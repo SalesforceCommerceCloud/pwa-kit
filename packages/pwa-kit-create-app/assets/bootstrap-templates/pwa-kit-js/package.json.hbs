@@ -7,32 +7,13 @@
     "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
   },
   "ccExtensibility": {
-    "extends": "{{general.templateSource.id}}",
+    "extends": "{{templateSource.id}}",
     "overridesDir": "overrides"
   },
   "devDependencies": {
-    "{{general.templateSource.id}}": "{{general.templateVersion}}"
+    "{{templateSource.id}}": "{{templatePackageJSON.version}}"
   },
-  "scripts": {
-    "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
-    "build-translations": "npm run extract-default-translations && npm run compile-translations",
-    "compile-translations": "formatjs compile-folder --ast app/translations app/translations/compiled",
-    "compile-translations:pseudo": "formatjs compile --ast app/translations/en-US.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
-    "extract-default-translations": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
-    "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
-    "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
-    "lint:fix": "npm run lint -- --fix",
-    "build": "npm run build-translations && pwa-kit-dev build",
-    "push": "npm run build && pwa-kit-dev push",
-    "save-credentials": "pwa-kit-dev save-credentials",
-    "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
-    "start:inspect": "npm run start -- --inspect",
-    "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
-    "tail-logs": "pwa-kit-dev tail-logs",
-    "test": "pwa-kit-dev test",
-    "test:lighthouse": "cross-env NODE_ENV=production lhci autorun --config=tests/lighthouserc.js",
-    "test:max-file-size": "npm run build && bundlesize"
-  },
+  "scripts": {{templatePackageJSON.scripts}},
   "bundlesize": [
     {
       "path": "build/main.js",

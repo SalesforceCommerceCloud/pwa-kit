@@ -55,6 +55,9 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
+// Utilities
+const noop = async (x) => x
+
 // Validations
 const validPreset = (preset) => {
     return Object.keys(PRESETS).includes(preset)
@@ -90,22 +93,18 @@ const validClientId = (s) =>
 const validOrganizationId = (s) =>
     /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
 
-// Project name constants.
-const RETAIL_REACT_APP_DEMO = 'retail-react-app-demo'
-const RETAIL_REACT_APP_TEST_PROJECT = 'retail-react-app-test-project' // TODO: update the ci scripts
-const RETAIL_REACT_APP = 'retail-react-app'
-const TYPESCRIPT_MINIMAL_TEST_PROJECT = 'typescript-minimal-test-project'
-const TYPESCRIPT_MINIMAL = 'typescript-minimal'
-const EXPRESS_MINIMAL_TEST_PROJECT = 'express-minimal-test-project'
-const EXPRESS_MINIMAL = 'express-minimal'
-const MRT_REFERENCE_APP = 'mrt-reference-app'
-
 // Project dictionary describing details and how the gerator should ask questions etc.
-const PRESETS = {
-    [RETAIL_REACT_APP]: {
-        id: RETAIL_REACT_APP,
+const PRESETS = [
+    {
+        id: 'retail-react-app',
         name: 'Retail React App',
-        description: 'The Retail app using your own Commerce Cloud instance',
+        description: `
+            Generate a project using custom settings by answering questions about a
+            B2C Commerce instance.
+    
+            Use this preset to connect to an existing instance, such as a sandbox.
+        `,
+        shortDescription: 'The Retail app using your own Commerce Cloud instance',
         templateSources: [
             {
                 type: 'npm',
@@ -116,9 +115,9 @@ const PRESETS = {
                 id: 'template-retail-react-app'
             }
         ],
-        preProcess: async (answers = {}) => {
+        preGenerate: async (context = {}) => {
             // "answers" are the answers up until asking the detailed project quesions.
-            const questions = [
+            const commerceQuestions = [
                 {
                     name: 'instanceUrl',
                     message: 'What is the URL for your Commerce Cloud instance?',
@@ -145,44 +144,61 @@ const PRESETS = {
                     validate: validShortCode
                 }
             ]
-            const projectAnswers = await inquirer.prompt(questions)
+            const commerceAnswers = await inquirer.prompt(commerceQuestions)
 
-            return {
-                ...answers,
-                project: projectAnswers
-            }
+            // Update the context.
+            context = merge(context, {
+                answers: {
+                    project: {
+                        commerce: commerceAnswers
+                    }
+                }
+            })
+
+            return context
         },
         private: false
     },
-    [RETAIL_REACT_APP_DEMO]: {
-        id: RETAIL_REACT_APP_DEMO,
+    {
+        id: 'retail-react-app-demo',
         name: 'Retail React App Demo',
-        description: 'The Retail app with demo Commerce Cloud instance',
+        description: `
+            Generate a project using the settings for a special B2C Commerce
+            instance that is used for demo purposes. No questions are asked.
+    
+            Use this preset to try out PWA Kit.
+        `,
+        shortDescription: 'The Retail app with demo Commerce Cloud instance',
         templateSources: [
             {
                 type: 'bundle',
                 id: 'template-retail-react-app'
             }
         ],
-        preProcess: (answers = {}) => {
-            return {
-                ...answers,
-                project: {
-                    projectName: 'demo-storefront',
-                    instanceUrl: 'https://zzte-053.dx.commercecloud.salesforce.com',
-                    clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
-                    siteId: 'RefArch',
-                    organizationId: 'f_ecom_zzte_053',
-                    shortCode: 'kv7kzm78',
-                    einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                    einsteinSiteId: 'aaij-MobileFirst'
+        preGenerate: (context = {}) => {
+            return merge(context, {
+                answers: {
+                    project: {
+                        name: 'demo-storefront',
+                        commerce: {
+                            instanceUrl: 'https://zzte-053.dx.commercecloud.salesforce.com',
+                            clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
+                            siteId: 'RefArch',
+                            organizationId: 'f_ecom_zzte_053',
+                            shortCode: 'kv7kzm78'
+                        },
+                        einstein: {
+                            einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                            einsteinSiteId: 'aaij-MobileFirst'
+                        }
+                    }
                 }
-            }
+            })
         },
         private: false
     },
-    [RETAIL_REACT_APP_TEST_PROJECT]: {
-        id: RETAIL_REACT_APP_TEST_PROJECT,
+    {
+        id: 'retail-react-app-test-project',
         name: 'Retail React App Test Project',
         description: '',
         templateSources: [
@@ -191,22 +207,30 @@ const PRESETS = {
                 id: 'template-retail-react-app'
             }
         ],
-        preProcess: () => {
-            return {
-                projectName: 'retail-react-app',
-                instanceUrl: 'https://zzrf-001.dx.commercecloud.salesforce.com',
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                siteId: 'RefArch',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: 'kv7kzm78',
-                einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                einsteinSiteId: 'aaij-MobileFirst'
-            }
+        preGenerate: (context = {}) => {
+            return merge(context, {
+                answers: {
+                    project: {
+                        name: 'retail-react-app',
+                        commerce: {
+                            instanceUrl: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+                            clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                            siteId: 'RefArch',
+                            organizationId: 'f_ecom_zzrf_001',
+                            shortCode: 'kv7kzm78'
+                        },
+                        einstein: {
+                            einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                            einsteinSiteId: 'aaij-MobileFirst'
+                        }
+                    }
+                }
+            })
         },
-        private: false
+        private: true
     },
-    [TYPESCRIPT_MINIMAL_TEST_PROJECT]: {
-        id: TYPESCRIPT_MINIMAL_TEST_PROJECT,
+    {
+        id: 'typescript-minimal-test-project',
         name: 'Template Minimal Test Project',
         description: '',
         templateSources: [
@@ -217,10 +241,15 @@ const PRESETS = {
         ],
         private: true
     },
-    [TYPESCRIPT_MINIMAL]: {
-        id: TYPESCRIPT_MINIMAL,
+    {
+        id: 'typescript-minimal',
         name: 'Template Minimal Project',
-        description: '',
+        description: `
+            Generate a project using a bare-bones TypeScript app template.
+        
+            Use this as a TypeScript starting point or as a base on top of 
+            which to build new TypeScript project templates for Managed Runtime.
+        `,
         templateSources: [
             {
                 type: 'bundle',
@@ -229,8 +258,8 @@ const PRESETS = {
         ],
         private: true
     },
-    [EXPRESS_MINIMAL_TEST_PROJECT]: {
-        id: EXPRESS_MINIMAL_TEST_PROJECT,
+    {
+        id: 'express-minimal-test-project',
         name: 'Express Minimal Test Project',
         description: '',
         templateSources: [
@@ -241,10 +270,15 @@ const PRESETS = {
         ],
         private: true
     },
-    [EXPRESS_MINIMAL]: {
-        id: EXPRESS_MINIMAL,
+    {
+        id: 'express-minimal',
         name: 'Express Minimal Project',
-        description: '',
+        description: `
+            Generate a project using a bare-bones express app template.
+
+            Use this as a starting point for APIs or as a base on top of
+            which to build new project templates for Managed Runtime.
+        `,
         templateSources: [
             {
                 type: 'bundle',
@@ -253,8 +287,8 @@ const PRESETS = {
         ],
         private: true
     },
-    [MRT_REFERENCE_APP]: {
-        id: MRT_REFERENCE_APP,
+    {
+        id: 'mrt-reference-app',
         name: 'Managed Runtime Reference App',
         description: '',
         templateSources: [
@@ -265,15 +299,11 @@ const PRESETS = {
         ],
         private: true
     }
-}
+]
 
-const PRIVATE_PRESET_NAMES = Object.values(PRESETS)
-    .filter(({private}) => !!private)
-    .map(({id}) => id)
+const PRIVATE_PRESET_NAMES = PRESETS.filter(({private}) => !!private).map(({id}) => id)
 
-const PUBLIC_PRESET_NAMES = Object.values(PRESETS)
-    .filter(({private}) => !private)
-    .map(({id}) => id)
+const PUBLIC_PRESET_NAMES = PRESETS.filter(({private}) => !private).map(({id}) => id)
 
 const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
 
@@ -393,11 +423,11 @@ const npmInstall = (outputDir, {verbose}) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (preset, answers, {outputDir, verbose}) => {
+const runGenerator = (context, {outputDir, verbose}) => {
     console.log('runGenerator: ')
-    console.log('preset: ', preset)
-    console.log('answers: ', answers)
-    const {templateSource, projectId} = answers.general
+    console.log('context: ', context)
+    const {answers, templateSource} = context
+    const {projectId} = answers.general
     const templateSourceType = templateSource.type
 
     // Check if the output directory doesn't already exist.
@@ -420,27 +450,28 @@ const runGenerator = (preset, answers, {outputDir, verbose}) => {
                 if (inputFile.endsWith('.hbs')) {
                     const templateString = sh.cat(inputFile)
                     const template = Handlebars.compile(templateString.stdout)
-                    fs.writeFileSync(outputFile.replace('.hbs', ''), template(answers))
+                    fs.writeFileSync(outputFile.replace('.hbs', ''), template(context))
                 } else {
                     fs.copyFileSync(inputFile, outputFile)
                 }
             })
             break
         }
-        case 'bundle':
+        case 'bundle': {
             prepareTemplate(templateSource.id, {outputDir, source: templateSourceType})
+
+            // Update the `package.json` manually. We don't have to do this step in `bootstrapped` projects
+            // because the package.json is templated in that scenario.
+            const pkgJsonPath = p.resolve(outputDir, 'package.json')
+            const pkgJSON = readJson(pkgJsonPath)
+            const finalPkgData = merge(pkgJSON, {name: projectId})
+
+            writeJson(pkgJsonPath, finalPkgData)
             break
+        }
         default:
-            console.error('Unknown template source type. How did I get here?')
             process.exit(1)
     }
-
-    // This is where we do post processing of the project. Like updating package json values,
-    // etc.
-    const pkgJsonPath = p.resolve(outputDir, 'package.json')
-    const pkgJSON = readJson(pkgJsonPath)
-    const finalPkgData = merge(pkgJSON, {name: projectId})
-    writeJson(pkgJsonPath, finalPkgData)
 
     // Finally we install the newly minted projects dependencies
     npmInstall(outputDir, {verbose})
@@ -460,9 +491,10 @@ const askGeneralQuestions = async () => {
             name: 'presetId',
             message: 'Choose a project preset to get started:',
             type: 'list',
-            choices: Object.values(PRESETS)
-                .filter(({private}) => !private)
-                .map(({description, id}) => ({name: description, value: id}))
+            choices: PRESETS.filter(({private}) => !private).map(({shortDescription, id}) => ({
+                name: shortDescription,
+                value: id
+            }))
         },
         {
             name: 'projectName',
@@ -474,7 +506,12 @@ const askGeneralQuestions = async () => {
     return await inquirer.prompt(questions)
 }
 
-const askExtensibilityQuestions = async (preset) => {
+/**
+ *
+ * @param {*} context
+ * @returns
+ */
+const askExtensibilityQuestions = async (context) => {
     // Returns the extends, and version, and output dir (leave that out for now.)
     const questions = [
         {
@@ -495,27 +532,31 @@ const askExtensibilityQuestions = async (preset) => {
     ]
 
     let answers = await inquirer.prompt(questions)
-    let version
+    let pkgJSON
 
     if (answers.extend) {
         // TODO: This needs to be a utility!
-        const templateSource = preset.templateSources.find(({type}) => type === 'npm')
+        const templateSource = context.preset.templateSources.find(({type}) => type === 'npm')
 
         // In the future we might want to ask what version of the selected project they
         // want to extend. But for now lets just get the latest version and synthetically
         // inject it as an "answer"
-        console.log(`npm view ${templateSource.id} version`)
-        version = sh.exec(`npm view ${templateSource.id} version`).stdout.slice(0, -1)
+        pkgJSON = JSON.parse(sh.exec(`npm view ${templateSource.id} --json`).stdout)
     }
 
     answers = {
         ...answers,
-        templateVersion: version
+        templatePackageJSON: pkgJSON
     }
 
     return answers
 }
 
+/**
+ *
+ * @param {*} templateName
+ * @param {*} param1
+ */
 const prepareTemplate = (templateName, {outputDir, source = 'bundle'}) => {
     console.log('prepareTemplate: ', templateName, outputDir, source)
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
@@ -566,22 +607,25 @@ const main = async (opts) => {
         console.log('')
     }
 
+    // The context object will have all the current information, like the selected preset, the answers
+    // to "general" and "project" questions. It'll also be populated with details of the selected project,
+    // like its `package.json` value.
+    let context = {
+        preset: undefined,
+        answers: {
+            general: undefined,
+            project: undefined
+        }
+    }
+
     const OUTPUT_DIR_FLAG_ACTIVE = !!opts.outputDir
 
     const presetId = opts.preset || process.env.GENERATOR_PRESET
-    // TODO: Think about creating a "Context" object to hold the selected preset and answers.
-    // It will make more sense to pass this around tot he pre and post generation steps.
-    let preset
-    let answers = {
-        general: {
-            projectId: preset
-        }
-    }
 
     // Exit is preset is provided by not valid.
     if (presetId && !validPreset(presetId)) {
         console.error(
-            `The preset "${preset}" is not valid. Valid presets are: ${
+            `The preset "${presetId}" is not valid. Valid presets are: ${
                 process.env.GENERATOR_PRESET
                     ? ALL_PRESET_NAMES.map((x) => `"${x}"`).join(' ')
                     : PUBLIC_PRESET_NAMES.map((x) => `"${x}"`).join(' ')
@@ -590,57 +634,60 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // Step 1: If we aren't using a preset ask what type of project the user wants to generate.
-    // TODO: We need a flag to show private projects.
+    // Step 1: If we aren't using a preset, ask what type of project the user wants to generate.
     if (!presetId) {
-        answers.general = await askGeneralQuestions()
+        context.answers.general = await askGeneralQuestions()
     }
 
-    // Assign project details for use in following steps.
-    preset = PRESETS[answers.general.presetId]
+    // Add the selected preset to the context object.
+    const selectedPreset = PRESETS.find(({id}) => id === context.answers.general.presetId)
+    context.preset = selectedPreset
 
     // For convenience access only
-    const noop = async (x) => x // TODO: Move me.
-    const {preProcess = noop, postProcess = noop} = preset
+    const {preGenerate = noop, postGenerate = noop} = selectedPreset
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
-        opts.outputDir = p.join(process.cwd(), preset.id)
+        opts.outputDir = p.join(process.cwd(), selectedPreset.id)
     }
 
     // If the preset is configured to allow its template source to be "NPM"
     // then that means it supports extensibility.
-    const extendable = preset.templateSources.find(({type}) => type === 'npm')
+    const extendable = selectedPreset.templateSources.find(({type}) => type === 'npm')
 
     // Step 2: If extensibility is supported ask if you want to use it.
     let templateSource
     let extendableAnswers = {}
 
     if (extendable) {
-        extendableAnswers = await askExtensibilityQuestions(preset)
+        extendableAnswers = await askExtensibilityQuestions(context)
     }
 
     // Get the templateSource object based on the `extendable` answer.
     const {extend = false} = extendableAnswers
-    templateSource = preset.templateSources.find(({type}) =>
+    templateSource = selectedPreset.templateSources.find(({type}) =>
         extend || false ? type === 'npm' : type === 'bundle'
     )
 
-    // TODO: Maybe error when template source is not defined.
-    console.log('templateSource: ', templateSource)
-    answers.general = {
-        ...answers.general,
-        ...extendableAnswers,
-        templateSource
+    context.templateSource = templateSource // TODO? Rename to selectedTemplateSrouce?
+
+    // Update the context answers.
+    context.answers.general = {
+        ...context.answers.general,
+        ...extendableAnswers
     }
 
-    // Step 3: Ask project specific questions if there are any.
-    answers = await preProcess(answers)
+    // Step 3: Run project specific logic there are any and update the context. We mainly
+    // use this for assing project specific questions.
+    context = await preGenerate(context)
+
+    // Meh! Think about changing me.
+    context.answers.project.name = context.answers.general.projectName
 
     // Step 4: Generate the project.
-    runGenerator(preset, answers, {outputDir: opts.outputDir, verbose: opts.verbose})
+    runGenerator(context, {outputDir: opts.outputDir, verbose: opts.verbose})
 
     // Step 5: Run the post process is one exists
-    await postProcess(opts.outputDir)
+    await postGenerate(context)
 
     return true
 }
@@ -651,29 +698,13 @@ if (require.main === module) {
 
  Examples:
 
-   ${program.name()} --preset "${RETAIL_REACT_APP}"
-     Generate a project using custom settings by answering questions about a
-     B2C Commerce instance.
-
-     Use this preset to connect to an existing instance, such as a sandbox.
-
-   ${program.name()} --preset "${RETAIL_REACT_APP_DEMO}"
-     Generate a project using the settings for a special B2C Commerce
-     instance that is used for demo purposes. No questions are asked.
-
-     Use this preset to try out PWA Kit.
-
-   ${program.name()} --preset "${EXPRESS_MINIMAL}"
-     Generate a project using a bare-bones express app template.
-
-     Use this as a starting point for APIs or as a base on top of
-     which to build new project templates for Managed Runtime.
-     
-   ${program.name()} --preset "${TYPESCRIPT_MINIMAL}"
-     Generate a project using a bare-bones TypeScript app template.
-     
-     Use this as a TypeScript starting point or as a base on top of 
-     which to build new TypeScript project templates for Managed Runtime.
+   ${PRESETS.filter(({private}) => !private).map(({id, description}) => {
+       return `
+         ${program.name()} --preset "${id}"
+            ${description}
+        `
+   })}
+   
    `)
     program
         .option('--outputDir <path>', `Path to the output directory for the new project`)
