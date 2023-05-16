@@ -665,6 +665,7 @@ const main = async (opts) => {
     context.preset = selectedPreset
 
     // For convenience access only
+    debugger
     const {preGenerate = noop, postGenerate = noop} = selectedPreset
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
