@@ -50,7 +50,7 @@ const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
 
 // Register Handlebars helper to allow use to display objects.
-Handlebars.registerHelper('json', (context) => JSON.stringify(context, null, 2))
+Handlebars.registerHelper('json', (context) => JSON.stringify(context, null, 4))
 
 const program = new Command()
 
@@ -506,8 +506,11 @@ const askGeneralQuestions = async () => {
             message: 'What is the name of your Project?'
         }
     ]
+    const answers = await inquirer.prompt(questions)
 
-    return await inquirer.prompt(questions)
+    answers.projectName = slugifyName(answers.projectName)
+
+    return answers
 }
 
 /**
