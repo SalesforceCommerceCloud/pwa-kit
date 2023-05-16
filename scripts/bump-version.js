@@ -30,9 +30,6 @@ const main = () => {
     const args = process.argv.slice(2).join(' ')
     sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${args}`)
 
-    // TODO: is this really necessary? Well, it does cause some bootstrapping to happen, plus other lifecycle scripts
-    // sh.exec(`npm install`)
-
     const lernaConfig = JSON.parse(sh.cat(lernaConfigPath))
     const newMonorepoVersion = lernaConfig.version
 

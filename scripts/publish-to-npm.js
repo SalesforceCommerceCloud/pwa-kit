@@ -16,19 +16,23 @@ sh.set('-e')
 const RELEASE_ONE_PACKAGE = /release-([-a-z]+)-\d+\./i
 
 const main = () => {
+    // First of all, verify that all the versions are correct by installing every package in the monorepo
+    console.log('--- Installing every package')
+    sh.exec('npm install')
+
     const {stdout} = sh.exec('git branch --show-current', {silent: true})
     // TODO
     // const branchName = stdout.trim()
     const branchName = 'release-3.1.x'
     // const branchName = 'release-retail-react-app-3.1.x'
 
-    console.log('--- branchName', branchName)
+    console.log('--- Given the current branch:', branchName)
 
     const matched = branchName.match(RELEASE_ONE_PACKAGE)
     const packageName = matched && matched[1]
 
     if (packageName) {
-        console.log(`--- Planning to release ${packageName}...`)
+        console.log(`--- Releasing ${packageName}...`)
 
         const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
         const allOtherPublicPackages = publicPackages.filter((pkg) => pkg.name !== packageName)
@@ -41,7 +45,7 @@ const main = () => {
             sh.exec('npm pkg delete private', {cwd: pkg.location})
         })
     } else {
-        console.log('--- Planning to release all packages...')
+        console.log('--- Releasing all packages...')
         lernaPublish()
     }
 }
@@ -54,7 +58,7 @@ const lernaPublish = () => {
     // DEBUG: disable for now
     // sh.exec('npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next')
 
-    console.log('--- Would publish these public packages:')
+    console.log('--- Would publish these public packages to npm:')
     sh.exec('lerna list --long')
 }
 
