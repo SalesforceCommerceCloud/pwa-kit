@@ -386,7 +386,8 @@ const getAllFiles = (dirPath, arrayOfFiles = []) => {
 const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => replacement})
 
 /**
- *
+ * Envoke the "npm install" command for the provided project directory.
+ * 
  * @param {*} outputDir
  * @param {*} param1
  */
@@ -422,8 +423,6 @@ const npmInstall = (outputDir, {verbose}) => {
  * @param {*} param2
  */
 const runGenerator = (context, {outputDir}) => {
-    console.log('runGenerator: ', context)
-    debugger
     const {answers, preset} = context
     const {templateSource} = preset
     const {extend} = answers.general
@@ -547,15 +546,17 @@ const bootstrapTemplate = (context, {lang = 'js', outputDir, filterRegex}) => {
 }
 
 /**
- *
+ * Extracts the template with the provided template name to the destination
+ * output directory. By default the template will be sourced locally from the generator
+ * package template assets, but can also download from NPM if required.
+ * 
  * @param {*} templateName
- * @param {*} param1
+ * @param {*} opts
  */
 const prepareTemplate = (templateName, {outputDir, source = TEMPLATE_SOURCE_BUNDLE}) => {
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     switch (source) {
         case TEMPLATE_SOURCE_NPM: {
-            console.log('Downloading Template from NPM')
             const {stdout} = sh.exec(
                 `npm pack ${templateName}@latest --pack-destination="${tmp}"`,
                 {
@@ -567,11 +568,10 @@ const prepareTemplate = (templateName, {outputDir, source = TEMPLATE_SOURCE_BUND
                 cwd: p.join(tmp),
                 sync: true
             })
-            sh.cp('-R', p.join(tmp, 'package', '*'), outputDir)
+            sh.mv(p.join(tmp, 'package'), outputDir)
             break
         }
         default:
-            console.log('Extracting Template from Bundle')
             tar.x({
                 file: p.join(__dirname, '..', 'templates', `${templateName}.tar.gz`),
                 cwd: p.join(tmp),
@@ -612,7 +612,6 @@ const main = async (opts) => {
     }
 
     const OUTPUT_DIR_FLAG_ACTIVE = !!opts.outputDir
-
     const presetId = opts.preset || process.env.GENERATOR_PRESET
 
     // Exit if the preset provided is not valid.
