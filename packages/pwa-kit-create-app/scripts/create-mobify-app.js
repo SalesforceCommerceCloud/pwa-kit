@@ -615,7 +615,7 @@ const main = async (opts) => {
 
     const presetId = opts.preset || process.env.GENERATOR_PRESET
 
-    // Exit is preset is provided by not valid.
+    // Exit if the preset provided is not valid.
     if (presetId && !validPreset(presetId)) {
         console.error(
             `The preset "${presetId}" is not valid. Valid presets are: ${
@@ -630,15 +630,10 @@ const main = async (opts) => {
     // Step 1: If we aren't using a preset, ask what type of project the user wants to generate.
     if (!presetId) {
         context.answers.general = await askGeneralQuestions()
-    } else {
-        // This is ugly.. I'll clean it up later
-        context.answers.general = {
-            presetId
-        }
     }
 
     // Add the selected preset to the context object.
-    const selectedPreset = PRESETS.find(({id}) => id === context.answers.general.presetId)
+    const selectedPreset = PRESETS.find(({id}) => id === (presetId || context.answers.general.presetId))
     const {preGenerate = noop, postGenerate = noop} = selectedPreset
 
     // Add the preset to the context. TODO: rename to 'selectedPreset'
@@ -669,7 +664,11 @@ const main = async (opts) => {
     context = await preGenerate(context)
 
     // Meh! Think about changing me.
-    context.answers.project.name = context.answers.general.projectName
+    context.answers.project = {
+        ...context.answers.project,
+        name: context.answers.general.projectName
+    }
+
 
     // Step 4: Generate the project.
     runGenerator(context, {outputDir: opts.outputDir, verbose: opts.verbose})
