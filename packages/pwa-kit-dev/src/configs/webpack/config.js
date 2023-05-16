@@ -21,7 +21,7 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 import {sdkReplacementPlugin, makeRegExp} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
-import ExtendsCircularImportsPlugin from './overrides-plugin'
+import OverridesResolverPlugin from './overrides-plugin'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -159,7 +159,7 @@ const baseConfig = (target) => {
                     ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
                         ? {
                               plugins: [
-                                  new ExtendsCircularImportsPlugin({
+                                  new OverridesResolverPlugin({
                                       extends: [EXT_EXTENDS],
                                       overridesDir: EXT_OVERRIDES_DIR,
                                       projectDir: process.cwd()
@@ -195,10 +195,10 @@ const baseConfig = (target) => {
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
                                   ...[EXT_EXTENDS].map((extendTarget) => ({
-                                      [extendTarget]: [
-                                          path.resolve(projectDir, EXT_OVERRIDES_DIR_NO_SLASH),
-                                          path.resolve(projectDir, `node_modules/${extendTarget}`)
-                                      ]
+                                      [extendTarget]: path.resolve(
+                                          projectDir,
+                                          `node_modules/${extendTarget}`
+                                      )
                                   }))
                               )
                             : {}),
@@ -453,7 +453,7 @@ const renderer =
                         patterns: [
                             {
                                 from: `${
-                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR + '/' : ''
+                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
                                 }app/static`,
                                 to: 'static/',
                                 noErrorOnMissing: true
@@ -489,7 +489,7 @@ const ssr = (() => {
                             patterns: [
                                 {
                                     from: `${
-                                        EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR + '/' : ''
+                                        EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
                                     }app/static`,
                                     to: 'static/'
                                 }
