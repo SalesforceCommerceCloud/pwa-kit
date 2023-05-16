@@ -174,6 +174,10 @@ const PRESETS = [
         shortDescription: 'The Retail app with demo Commerce Cloud instance',
         templateSources: [
             {
+                type: 'npm',
+                id: 'retail-react-app'
+            },
+            {
                 type: 'bundle',
                 id: 'template-retail-react-app'
             }
