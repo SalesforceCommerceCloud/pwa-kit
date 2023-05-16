@@ -47,16 +47,16 @@ export class CookieStorage extends BaseStorage {
         }
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
-        const prefixedKey = this.getSuffixedKey(key)
-        Cookies.set(prefixedKey, value, {...options, secure: true})
+        const suffixedKey = this.getSuffixedKey(key)
+        Cookies.set(suffixedKey, value, {...options, secure: true})
     }
     get(key: string) {
-        const prefixedKey = this.getSuffixedKey(key)
-        return Cookies.get(prefixedKey) || ''
+        const suffixedKey = this.getSuffixedKey(key)
+        return Cookies.get(suffixedKey) || ''
     }
     delete(key: string) {
-        const prefixedKey = this.getSuffixedKey(key)
-        Cookies.remove(prefixedKey)
+        const suffixedKey = this.getSuffixedKey(key)
+        Cookies.remove(suffixedKey)
     }
 }
 
