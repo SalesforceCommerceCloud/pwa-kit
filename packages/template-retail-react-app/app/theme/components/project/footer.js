@@ -62,6 +62,9 @@ export default {
                 background: 'whiteAlpha.500'
             }
         },
+        localeDropdownOption: {
+            color: 'black'
+        },
         bottomHalf: {
             maxWidth: {base: '34.5rem', lg: '100%'}
         },
