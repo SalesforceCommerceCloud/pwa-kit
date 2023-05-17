@@ -8,6 +8,7 @@
 
 const sh = require('shelljs')
 const path = require('path')
+const {saveJSONToFile, setPackageVersion} = require('./utils')
 
 // Exit upon error
 sh.set('-e')
@@ -18,8 +19,7 @@ const monorepoPackages = JSON.parse(stdout.toString())
 const main = () => {
     const version = process.argv[2]
 
-    // TODO: when bumping the version of retail-react-app, we also need to update other packages that depend on it
-    sh.exec(`npm version --no-git-tag ${version}`, {silent: true})
+    setPackageVersion(version)
 
     // TODO
     const pkgName = 'retail-react-app'
@@ -37,10 +37,6 @@ const main = () => {
 
         saveJSONToFile(pkgJson, pathToPkgJson)
     })
-}
-
-const saveJSONToFile = (json, filePath) => {
-    new sh.ShellString(JSON.stringify(json, null, 2)).to(filePath)
 }
 
 main()

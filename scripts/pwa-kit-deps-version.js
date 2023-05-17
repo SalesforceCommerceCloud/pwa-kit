@@ -7,6 +7,7 @@
 
 const sh = require('shelljs')
 const path = require('path')
+const {saveJSONToFile} = require('./utils')
 
 const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
 const independentPackages = JSON.parse(
@@ -32,10 +33,6 @@ const main = () => {
     })
 
     saveJSONToFile(pkgJson, pathToPackageJson)
-}
-
-const saveJSONToFile = (json, filePath) => {
-    new sh.ShellString(JSON.stringify(json, null, 2)).to(filePath)
 }
 
 main()

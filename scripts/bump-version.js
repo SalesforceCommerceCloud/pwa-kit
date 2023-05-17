@@ -8,6 +8,7 @@
 
 const sh = require('shelljs')
 const path = require('path')
+const {saveJSONToFile, setPackageVersion} = require('./utils')
 
 // Exit upon error
 sh.set('-e')
@@ -60,14 +61,6 @@ const main = () => {
 
     sh.echo('\nVersions of packages in the monorepo:\n')
     sh.exec('lerna list --all --long')
-}
-
-const saveJSONToFile = (json, filePath) => {
-    new sh.ShellString(JSON.stringify(json, null, 2)).to(filePath)
-}
-
-const setPackageVersion = (version, shellOptions = {}) => {
-    sh.exec(`npm version --no-git-tag ${version}`, {silent: true, ...shellOptions})
 }
 
 const updatePeerDeps = (pkgJson, newMonorepoVersion) => {
