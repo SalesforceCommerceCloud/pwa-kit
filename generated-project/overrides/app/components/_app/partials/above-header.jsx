@@ -14,6 +14,10 @@ const AboveHeader = () => {
                 defaultMessage: 'Above Header Section',
                 id: 'header.link.above_header_section'
             })}
+            {intl.formatMessage({
+                defaultMessage: 'Home descript features Testing',
+                id: 'home.description.features'
+            })}
         </div>
     )
 }
