@@ -16,8 +16,9 @@ sh.set('-e')
 const RELEASE_ONE_PACKAGE = /release-([-a-z]+)-\d+\./i
 
 const main = () => {
-    // First of all, verify that all the versions are correct by installing every package in the monorepo
-    console.log('--- Installing every package')
+    console.log(
+        '--- Verify that all the versions are correct by installing every package in the monorepo'
+    )
     sh.exec('npm install')
 
     const {stdout} = sh.exec('git branch --show-current', {silent: true})
@@ -51,7 +52,7 @@ const main = () => {
 }
 
 const lernaPublish = () => {
-    // Why do we still want `lerna publish`? It turns that we do need it. Sometimes we wanted some behaviour that's unique to Lerna.
+    // Why do we still want `lerna publish`? It turns out that we do need it. Sometimes we wanted some behaviour that's unique to Lerna.
     // For example: we have `publishConfig.directory` in some package.json files that only Lerna knows what to do with it.
     // https://github.com/lerna/lerna/tree/main/libs/commands/publish#publishconfigdirectory
 
