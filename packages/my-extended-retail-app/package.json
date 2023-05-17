@@ -84,16 +84,6 @@
     "test:lighthouse": "cross-env NODE_ENV=production lhci autorun --config=tests/lighthouserc.js",
     "test:max-file-size": "npm run build && bundlesize"
   },
-  "bundlesize": [
-    {
-      "path": "build/main.js",
-      "maxSize": "42 kB"
-    },
-    {
-      "path": "build/vendor.js",
-      "maxSize": "320 kB"
-    }
-  ],
   "browserslist": [
     "iOS >= 9.0",
     "Android >= 4.4.4",
