@@ -50,15 +50,13 @@ export const EXT_OVERRIDES_DIR =
 export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
-// in a Template Extensibility project, these can include BOTH the node_modules/*
-// AND the node_modules/<extends>/node_modules/* npm deps, so we route here to
-// prevent duplication in the final bundle. We want a better way of doing this,
-// but for now this is the best option we've found.
 
 // TODO: can these be handled in package.json as peerDependencies?
 // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
 
-export const OG_OVERRIDABLE_DEPS = [
+// due to to how the sdks work and the potential of these npm deps coming
+// from multiple places, we need to force them to one place where they're found
+export const DEPS_TO_DEDUPE = [
     'babel-runtime',
     '@tanstack/react-query',
     '@loadable/component',
@@ -70,68 +68,11 @@ export const OG_OVERRIDABLE_DEPS = [
     'react-dom',
     'react-helmet',
     'webpack-hot-middleware',
-
     'react-intl',
     '@chakra-ui/icons',
     '@chakra-ui/react',
     '@chakra-ui/skip-nav',
     '@emotion/react'
-]
-
-export const OVERRIDABLE_DEPS = [
-    '@chakra-ui/icons',
-    '@chakra-ui/react',
-    '@chakra-ui/skip-nav',
-    '@chakra-ui/system',
-    '@chakra-ui/theme',
-    '@emotion/react',
-    '@emotion/styled',
-    '@formatjs/cli',
-    '@lhci/cli',
-    '@loadable/component',
-    '@loadable/server',
-    '@peculiar/webcrypto',
-    '@loadable/webpack-plugin',
-    '@tanstack/react-query',
-    '@tanstack/react-query-devtools',
-    '@testing-library/dom',
-    '@testing-library/jest-dom',
-    '@testing-library/react',
-    '@testing-library/react-hooks',
-    '@testing-library/user-event',
-    'babel-runtime',
-    'base64-arraybuffer',
-    'bundlesize2',
-    'card-validator',
-    'commerce-sdk-react-preview',
-    'cross-env',
-    'focus-visible',
-    'framer-motion',
-    'full-icu',
-    'helmet',
-    'jest-fetch-mock',
-    'js-cookie',
-    'jsonwebtoken',
-    'jwt-decode',
-    'lodash',
-    'msw',
-    'nanoid',
-    'njwt',
-    'prop-types',
-    'pwa-kit-dev',
-    'pwa-kit-react-sdk',
-    'pwa-kit-runtime',
-    'query-string',
-    'raf',
-    'randomstring',
-    'react',
-    'react-dom',
-    'react-helmet',
-    'react-hook-form',
-    'react-intl',
-    'react-router-dom',
-    'svg-sprite-loader',
-    'webpack-hot-middleware'
 ]
 
 if (EXT_EXTENDABLE && EXT_EXTENDS) {
@@ -252,13 +193,8 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        // ...Object.assign(
-                        //     ...OVERRIDABLE_DEPS.map((dep) => ({
-                        //         [dep]: findDepInStack(dep)
-                        //     }))
-                        // ),
                         ...Object.assign(
-                            ...OG_OVERRIDABLE_DEPS.map((dep) => ({
+                            ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
                             }))
                         ),
@@ -356,7 +292,18 @@ const withChunking = (config) => {
                         // 2. The package is one of the monorepo packages.
                         //    This is for local development to ensure the bundle
                         //    composition is the same as a production build
-                        test: /(node_modules)|(packages\/.*\/dist)/,
+                        // 3. If extending another template, don't include the
+                        //    baseline route files in vendor.js
+                        test: (module) => {
+                            if (
+                                EXT_EXTENDS &&
+                                EXT_OVERRIDES_DIR &&
+                                module?.context?.includes(`/${EXT_EXTENDS}/`)
+                            ) {
+                                return false
+                            }
+                            return module?.context?.match?.(/(node_modules)|(packages\/.*\/dist)/)
+                        },
                         name: 'vendor',
                         chunks: 'all'
                     }
@@ -436,8 +383,6 @@ const client =
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
-            const sysPath = fse.realpathSync(path.resolve('node_modules', EXT_EXTENDS ?? ''))
-            const depsMap = new Map()
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
