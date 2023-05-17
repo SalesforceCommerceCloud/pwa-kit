@@ -58,6 +58,26 @@ export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 // TODO: can these be handled in package.json as peerDependencies?
 // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
 
+export const OG_OVERRIDABLE_DEPS = [
+    'babel-runtime',
+    '@tanstack/react-query',
+    '@loadable/component',
+    '@loadable/server',
+    '@loadable/webpack-plugin',
+    'svg-sprite-loader',
+    'react',
+    'react-router-dom',
+    'react-dom',
+    'react-helmet',
+    'webpack-hot-middleware',
+
+    'react-intl',
+    '@chakra-ui/icons',
+    '@chakra-ui/react',
+    '@chakra-ui/skip-nav',
+    '@emotion/react'
+]
+
 export const OVERRIDABLE_DEPS = [
     '@chakra-ui/icons',
     '@chakra-ui/react',
@@ -232,8 +252,13 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
+                        // ...Object.assign(
+                        //     ...OVERRIDABLE_DEPS.map((dep) => ({
+                        //         [dep]: findDepInStack(dep)
+                        //     }))
+                        // ),
                         ...Object.assign(
-                            ...OVERRIDABLE_DEPS.map((dep) => ({
+                            ...OG_OVERRIDABLE_DEPS.map((dep) => ({
                                 [dep]: findDepInStack(dep)
                             }))
                         ),
