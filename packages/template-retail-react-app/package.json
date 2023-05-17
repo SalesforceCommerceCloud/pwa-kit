@@ -18,7 +18,7 @@
     "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
     "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
     "lint:fix": "npm run lint -- --fix",
-    "pkg-version": "npm version --no-git-tag",
+    "pkg-version": "node ../../scripts/independent-pkg-version.js",
     "pwa-kit-deps-version": "node ../../scripts/pwa-kit-deps-version.js",
     "push": "npm run build && pwa-kit-dev push",
     "save-credentials": "pwa-kit-dev save-credentials",
