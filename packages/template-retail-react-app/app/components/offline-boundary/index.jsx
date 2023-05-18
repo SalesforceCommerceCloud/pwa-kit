@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {withRouter} from 'react-router-dom'
+import {withRouter} from 'pwa-kit-react-sdk/ssr/universal/components/with-router'
 import {Button} from '@chakra-ui/react'
 import {AlertIcon} from '../icons'
 

@@ -6,7 +6,7 @@
  */
 import PropTypes from 'prop-types'
 import React from 'react'
-import {withRouter} from 'react-router-dom'
+import {withRouter} from '../../components/with-router'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
 import Throw404 from '../../components/throw-404'
