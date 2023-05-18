@@ -119,6 +119,30 @@ const EXTENSIBILITY_QUESTIONS = [
     }
 ]
 
+const MRT_REFERENCE_QUESTIONS = [
+    {
+        name: 'project.name',
+        validate: validProjectName,
+        message: 'What is the name of your Project?'
+    }
+]
+
+const EXPRESS_MINIMAL_QUESTIONS = [
+    {
+        name: 'project.name',
+        validate: validProjectName,
+        message: 'What is the name of your Project?'
+    }
+]
+
+const TYPESCRIPT_MINIMAL_QUESTIONS = [
+    {
+        name: 'project.name',
+        validate: validProjectName,
+        message: 'What is the name of your Project?'
+    }
+]
+
 const RETAIL_REACT_APP_QUESTIONS = [
     {
         name: 'project.name',
@@ -244,6 +268,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
+        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
         private: true
     },
     {
@@ -253,6 +278,10 @@ const PRESETS = [
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'express-minimal'
+        },
+        questions: EXPRESS_MINIMAL_QUESTIONS,
+        answers: {
+            ['project.name']: 'express-minimal',
         },
         private: true
     },
@@ -269,6 +298,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'express-minimal'
         },
+        questions: EXPRESS_MINIMAL_QUESTIONS,
         private: true
     },
     {
@@ -278,6 +308,10 @@ const PRESETS = [
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'mrt-reference-app'
+        },
+        questions: MRT_REFERENCE_QUESTIONS,
+        answers: {
+            ['project.name']: 'mrt-reference-app',
         },
         private: true
     }
