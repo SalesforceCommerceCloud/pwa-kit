@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useCallback} from 'react'
+// TODO
 import {useHistory} from 'react-router'
 import useMultiSite from './use-multi-site'
 import {removeSiteLocaleFromPath} from '../utils/url'
@@ -15,6 +16,7 @@ import {removeSiteLocaleFromPath} from '../utils/url'
  * @returns {function} - Returns a navigate function that passes args to history methods.
  */
 const useNavigation = () => {
+    // TODO
     const history = useHistory()
 
     const {site, locale: localeShortCode, buildUrl} = useMultiSite()

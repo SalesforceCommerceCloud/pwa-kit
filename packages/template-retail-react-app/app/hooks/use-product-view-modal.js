@@ -7,7 +7,7 @@
 
 import {useEffect, useState} from 'react'
 import {rebuildPathWithParams, removeQueryParamsFromPath} from '../utils/url'
-import {useHistory, useLocation} from 'react-router-dom'
+import {useNavigate, useLocation} from 'react-router-dom'
 import {useVariant} from './use-variant'
 import {useToast} from './use-toast'
 import {useIntl} from 'react-intl'
@@ -22,7 +22,7 @@ import {useProduct} from 'commerce-sdk-react-preview'
  */
 export const useProductViewModal = (initialProduct) => {
     const location = useLocation()
-    const history = useHistory()
+    const navigate = useNavigate()
     const intl = useIntl()
     const toast = useToast()
     const [product, setProduct] = useState(initialProduct)
@@ -58,7 +58,7 @@ export const useProductViewModal = (initialProduct) => {
         const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
         const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
 
-        history.replace({search: updatedParams})
+        navigate({search: updatedParams}, {replace: true})
     }
 
     useEffect(() => {
@@ -78,7 +78,7 @@ export const useProductViewModal = (initialProduct) => {
                 ...variationValues,
                 pid: variant.productId
             })
-            history.replace(updatedUrl)
+            navigate(updatedUrl, {replace: true})
         }
     }, [variant])
 

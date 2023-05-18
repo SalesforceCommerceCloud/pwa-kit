@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Link as RouteLink, useHistory} from 'react-router-dom'
+import {Link as RouteLink, useNavigate} from 'react-router-dom'
 
 // Components
 import {
@@ -35,7 +35,7 @@ const SELECT_ID = 'pagination'
 const Pagination = (props) => {
     const intl = useIntl()
     const styles = useStyleConfig('Pagination')
-    const history = useHistory()
+    const navigate = useNavigate()
     const {urls, currentURL, ...rest} = props
 
     const currentIndex = urls.indexOf(currentURL) > 0 ? urls.indexOf(currentURL) : 0
@@ -71,7 +71,7 @@ const Pagination = (props) => {
                 <Select
                     id={SELECT_ID}
                     onChange={(e) => {
-                        history.push(e.target.value)
+                        navigate(e.target.value)
                     }}
                     value={currentURL}
                     height={11}

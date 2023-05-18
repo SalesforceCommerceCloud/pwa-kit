@@ -7,7 +7,7 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useLocation} from 'react-router-dom'
+import {useNavigate, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
@@ -66,7 +66,7 @@ import Seo from '../seo'
 
 const onClient = typeof window !== 'undefined'
 
-/* 
+/*
 The categories tree can be really large! For performance reasons,
 we only load the level 0 categories on server side, and load the rest
 on client side to reduce SSR page size.
@@ -105,7 +105,7 @@ const App = (props) => {
 
     const appOrigin = getAppOrigin()
 
-    const history = useHistory()
+    const navigate = useNavigate()
     const location = useLocation()
     const authModal = useAuthModal()
     const {isRegistered} = useCustomerType()
@@ -191,7 +191,7 @@ const App = (props) => {
         // Goto the home page.
         const path = buildUrl(HOME_HREF)
 
-        history.push(path)
+        navigate(path)
 
         // Close the drawer.
         onClose()
@@ -199,7 +199,7 @@ const App = (props) => {
 
     const onCartClick = () => {
         const path = buildUrl('/cart')
-        history.push(path)
+        navigate(path)
 
         // Close the drawer.
         onClose()
@@ -209,7 +209,7 @@ const App = (props) => {
         // Link to account page for registered customer, open auth modal otherwise
         if (isRegistered) {
             const path = buildUrl('/account')
-            history.push(path)
+            navigate(path)
         } else {
             // if they already are at the login page, do not show login modal
             if (new RegExp(`^/login$`).test(location.pathname)) return
@@ -219,7 +219,7 @@ const App = (props) => {
 
     const onWishlistClick = () => {
         const path = buildUrl('/account/wishlist')
-        history.push(path)
+        navigate(path)
     }
 
     return (

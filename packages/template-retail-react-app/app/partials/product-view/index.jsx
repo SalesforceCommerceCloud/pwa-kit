@@ -7,7 +7,7 @@
 
 import React, {forwardRef, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useLocation} from 'react-router-dom'
+import {useNavigate, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 
 import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
@@ -101,7 +101,7 @@ const ProductView = forwardRef(
     ) => {
         const showToast = useToast()
         const intl = useIntl()
-        const history = useHistory()
+        const navigate = useNavigate()
         const location = useLocation()
         const {
             isOpen: isAddToCartModalOpen,
@@ -363,7 +363,7 @@ const ProductView = forwardRef(
                                                 key={id}
                                                 onChange={(_, href) => {
                                                     if (!href) return
-                                                    history.replace(href)
+                                                    navigate(href, {replace: true})
                                                 }}
                                                 variant={id === 'color' ? 'circle' : 'square'}
                                                 value={selectedValue?.value}

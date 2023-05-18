@@ -11,12 +11,12 @@ import {Helmet} from 'react-helmet'
 import {useIntl} from 'react-intl'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {SearchIcon} from '../../components/icons'
-import {useHistory} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 import Link from '../../components/link'
 
 const PageNotFound = () => {
     const intl = useIntl()
-    const history = useHistory()
+    const navigate = useNavigate()
     const {res} = useServerContext()
 
     if (res) {
@@ -67,7 +67,7 @@ const PageNotFound = () => {
                     <Button
                         variant="outline"
                         bg="white"
-                        onClick={() => history.goBack()}
+                        onClick={() => navigate(-1)}
                         borderColor={'gray.200'}
                     >
                         {intl.formatMessage({

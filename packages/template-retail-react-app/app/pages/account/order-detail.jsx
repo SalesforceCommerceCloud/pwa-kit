@@ -7,6 +7,7 @@
 
 import React from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
+// TODO
 import {useHistory, useRouteMatch} from 'react-router'
 import {
     Box,
@@ -134,8 +135,10 @@ const AccountOrderDetail = () => {
                         leftIcon={<ChevronLeftIcon />}
                         size="sm"
                         onClick={(e) => {
+                            // TODO
                             if (history.action === 'PUSH') {
                                 e.preventDefault()
+                                // TODO
                                 history.goBack()
                             }
                         }}

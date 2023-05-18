@@ -40,16 +40,18 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST
 } from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
-import {useHistory, useLocation, useParams} from 'react-router-dom'
+import {useNavigate, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 import {useWishList} from '../../hooks/use-wish-list'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
-    const history = useHistory()
+    // TODO rename `navigateRouter` to `navigate` after resolving the our `useNavigation` custom hook name collision
+    const navigateRouter = useNavigation()
     const location = useLocation()
     const einstein = useEinstein()
     const toast = useToast()
+    // TODO: `navigate` name collision with react-router-v6
     const navigate = useNavigation()
     const [productSetSelection, setProductSetSelection] = useState({})
     const childProductRefs = React.useRef({})
@@ -110,7 +112,7 @@ const ProductDetail = () => {
         const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
             pid: variant?.productId
         })
-        history.replace(updatedUrl)
+        navigateRouter(updatedUrl, {replace: true})
     }, [variant])
 
     /**************** Wishlist ****************/

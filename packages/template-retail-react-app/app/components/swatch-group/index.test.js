@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {screen, render, fireEvent, waitFor} from '@testing-library/react'
-import {Router, useHistory, useLocation} from 'react-router-dom'
+import {Router, useNavigate, useLocation} from 'react-router-dom'
 import SwatchGroup from './index'
 import {Box} from '@chakra-ui/react'
 import Swatch from './swatch'
@@ -60,7 +60,7 @@ const data = {
 
 const Page = () => {
     const location = useLocation()
-    const history = useHistory()
+    const navigate = useNavigate()
     const params = new URLSearchParams(location.search)
     const selectedColor = data.values.find(({value}) => {
         return value === params.get('color')
@@ -76,7 +76,7 @@ const Page = () => {
             name={data.name}
             onChange={(_, href) => {
                 if (!href) return
-                history.replace(href)
+                navigate(href, {replace: true})
             }}
         >
             {data.values.map(({value, name, image, orderable, href}) => {

@@ -25,6 +25,7 @@ jest.mock('react-router', () => {
 
     return {
         ...original,
+        // TODO
         useHistory: jest.fn().mockImplementation(() => {
             return {
                 push: mockHistoryPush,
