@@ -55,7 +55,6 @@ try {
         process.exit(1)
     }
     const overridesDir = path.join(process.cwd(), '.', pkgJSON.ccExtensibility?.overridesDir)
-    const overridesAppDir = path.join(overridesDir, 'app')
     const fileNames = getAllFilesByExtensions(
         path.join(overridesDir, 'app'),
         [],
@@ -64,15 +63,17 @@ try {
     // files that will be ignored in translation extraction
     const filesToIgnore = fileNames
         .map((path) => {
-            return path.replace(
+            const replacedPath = path.replace(
                 overridesDir,
-                `--ignore ./node_modules/${pkgJSON.ccExtensibility?.extends}`
+                `./node_modules/${pkgJSON.ccExtensibility?.extends}`
             )
+            // check if this file does exist in base template
+            const isFileExist = fs.existsSync(replacedPath)
+            return isFileExist ? `--ignore ${replacedPath}` : ''
         })
+        .filter(Boolean)
         .join(' ')
-    // const ignoreString = filesToIgnore.map((path) => `--ignore ${path}`).join(' ')
-    const extractCommand = `formatjs extract ${overridesAppDir}/**/*.{js,jsx} ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/pages/**/*.{js,jsx} ${filesToIgnore} --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
-    console.log('extractCommand', extractCommand)
+    const extractCommand = `formatjs extract ${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx} ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/pages/**/*.{js,jsx} ${filesToIgnore} --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
     exec(extractCommand, (err, stdout) => {
         if (err) {
             console.error(err)
