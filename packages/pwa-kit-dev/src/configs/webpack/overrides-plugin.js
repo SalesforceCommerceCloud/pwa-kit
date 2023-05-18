@@ -5,15 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path from 'path'
-import {makeRegExp} from './plugins'
+import glob from 'glob'
 
 /**
- * @class ExtendsCircularImportsPlugin
+ * @class OverridesResolverPlugin
  *
- *  This plugin adds "guardrails" to the "Overrides" behavior of the Template Extensibility feature,
- *  preventing the dynamic aliases in webpack/config.js from allowing a file to attempt to import itself
+ *  This plugin provides the "Overrides" behavior of the Template Extensibility feature,
+ *  allowing third party implementations that depend on an npm module for the base implementation
+ *  and then overriding only specific files
  */
-class ExtendsCircularImportsPlugin {
+class OverridesResolverPlugin {
     /**
      *
      * @param options
@@ -26,51 +27,108 @@ class ExtendsCircularImportsPlugin {
         this.extends = options.extends || []
         this.projectDir = options.projectDir
         this._allSearchDirs = [this.projectDir + this.overridesDir, ...this.extends]
+        this.pkg = require(path.resolve(this.projectDir, 'package.json'))
+        this.extendsHashMap = new Map()
+
+        const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
+        const globPattern = `${this.pkg?.ccExtensibility?.overridesDir?.replace(
+            /^\//,
+            ''
+        )}/**/*${OVERRIDES_EXTENSIONS}`
+        const overridesFsRead = glob.sync(globPattern)
+
+        const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + '/'
+
+        overridesFsRead.forEach((item) => {
+            const end = item.substring(item.lastIndexOf('/index'))
+            const [l, ...rest] = item.split(/(index|\.)/)
+            this.extendsHashMap.set(
+                l.replace(/\/$/, '')?.replace(overrideReplace.replace(/\//, ''), ''),
+                [end, rest]
+            )
+        })
+    }
+
+    /**
+     *
+     * @param requestPath
+     * @param dirs
+     */
+    findFileFromMap(requestPath, dirs) {
+        const fileExt = path.extname(requestPath)
+        for (const dir of dirs) {
+            let base = path.join(dir, requestPath)
+            if (fileExt) {
+                const noExtPath = requestPath.replace(fileExt, '')
+                if (this.extendsHashMap.has(noExtPath)) {
+                    return base
+                }
+            } else {
+                if (this.extendsHashMap.has(requestPath)) {
+                    const end = this.extendsHashMap.get(requestPath)[1]
+                    const isRequestingIndex = end[0] === 'index'
+                    let result = base?.replace(/$\//, '') + end.join('')
+                    if (isRequestingIndex) {
+                        result = path.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
+                    }
+                    return result
+                }
+            }
+        }
     }
 
     toOverrideRelative(path) {
         const override = this.findOverride(path)
-        return path?.substring(override?.length + 1)
+        return path.substring(override.length + 1)
     }
 
     findOverride(path) {
         return this._allSearchDirs.find((override) => {
-            return path?.indexOf(override) === 0
+            return path.indexOf(override) === 0
         })
     }
 
+    isFromExtends(request, path) {
+        // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
+        const basePkgIndex = request?.startsWith('@') ? 1 : 0
+        return (
+            this.extends.includes(request?.split('/')?.[basePkgIndex]) &&
+            // this is very important, to avoid circular imports, check that the
+            // `issuer` (requesting context) isn't the overrides directory
+            !path.match(this.projectDir + this.overridesDir)
+        )
+    }
+
     apply(resolver) {
-        const extendsRegex = makeRegExp(`(${this.extends?.join('|')})`)
-        resolver
-            .getHook('before-resolve')
-            .tapAsync('BeforeAliasPlugin', (request, requestContext, callback) => {
-                const splitPath = request?.request?.split(extendsRegex)
-                if (
-                    splitPath?.length > 2 &&
-                    request.path?.includes(this.projectDir + this.overridesDir) &&
-                    request.context.issuer.includes(splitPath?.[2]) &&
-                    request.request.includes(splitPath?.[2])
-                ) {
-                    const target = resolver.ensureHook('resolved')
-                    var relativeOverride = this.toOverrideRelative(request.context.issuer)
-                    requestContext.path = path.resolve(
-                        this.projectDir,
-                        'node_modules',
-                        splitPath?.[1],
-                        relativeOverride
+        resolver.getHook('resolve').tapAsync(
+            'FeatureResolverPlugin',
+            function (requestContext, resolveContext, callback) {
+                let targetFile
+                let overrideRelative
+                if (this.isFromExtends(requestContext.request, requestContext.path)) {
+                    overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(
+                        /$\//,
+                        ''
                     )
-                    return resolver.doResolve(
+                    targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
+                }
+
+                if (targetFile) {
+                    const target = resolver.ensureHook('resolved')
+                    requestContext.path = targetFile
+                    resolver.doResolve(
                         target,
                         requestContext,
-                        `BeforeAliasPlugin found base override file`,
-                        requestContext,
+                        `${this.constructor.name} found base override file`,
+                        resolveContext,
                         callback
                     )
                 } else {
                     return callback()
                 }
-            })
+            }.bind(this)
+        )
     }
 }
 
-export default ExtendsCircularImportsPlugin
+export default OverridesResolverPlugin
