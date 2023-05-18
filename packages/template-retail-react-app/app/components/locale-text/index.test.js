@@ -9,29 +9,28 @@ import LocaleText from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
 test('Renders LocaleText', () => {
-    renderWithProviders(<LocaleText shortCode="en-GB" />)
-    const text = document.querySelector('.chakra-text')
-
-    expect(text).toBeInTheDocument()
-})
-
-test('Renders LocaleText with as type', () => {
-    renderWithProviders(<LocaleText className="test-class" shortCode="en-GB" as="option" />)
-
-    const text = document.querySelector('option.test-class')
-
-    expect(text).toBeInTheDocument()
+    renderWithProviders(
+        <div>
+            <LocaleText shortCode="en-GB" />
+        </div>
+    )
+    const el = document.querySelector('div')
+    expect(el.textContent).toBe('English (United Kingdom)')
 })
 
 test('Warns on missing shortCode message definition', () => {
     jest.spyOn(console, 'error')
 
-    renderWithProviders(<LocaleText shortCode="fa-KE" />)
+    renderWithProviders(
+        <div>
+            <LocaleText shortCode="fa-KE" />
+        </div>
+    )
 
-    const text = document.querySelector('.chakra-text')
+    const el = document.querySelector('div')
 
     expect(console.error.mock.calls[0][0]).toContain(
         `No locale message found for "fa-KE". Please update the list accordingly.`
     )
-    expect(text).toBeInTheDocument()
+    expect(el.textContent).toBe('Unknown fa-KE')
 })

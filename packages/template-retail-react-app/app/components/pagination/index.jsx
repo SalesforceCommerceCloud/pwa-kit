@@ -14,7 +14,6 @@ import {Link as RouteLink, useHistory} from 'react-router-dom'
 import {
     Button,
     Flex,
-    Link,
     Select,
     Text,
 
@@ -27,9 +26,6 @@ import {ChevronLeftIcon, ChevronRightIcon} from '../icons'
 
 // Constants
 const SELECT_ID = 'pagination'
-
-// Helpers
-const isServer = typeof window === 'undefined'
 
 /**
  * The pagination component is a simple component allowing you to navigate
@@ -52,7 +48,7 @@ const Pagination = (props) => {
             {/* Previous Button */}
             <Button
                 {...styles.button}
-                as={isServer ? Link : RouteLink}
+                as={RouteLink}
                 // Because we are using a button component as a link, the isDisabled flag isn't working
                 // as intended, the workaround is to use the current url when its disabled.
                 href={prev || currentURL}
@@ -101,7 +97,7 @@ const Pagination = (props) => {
             {/* Next Button */}
             <Button
                 {...styles.button}
-                as={isServer ? Link : RouteLink}
+                as={RouteLink}
                 // Because we are using a button component as a link, the isDisabled flag isn't working
                 // as intended, the workaround is to use the current url when its disabled.
                 href={next || currentURL}

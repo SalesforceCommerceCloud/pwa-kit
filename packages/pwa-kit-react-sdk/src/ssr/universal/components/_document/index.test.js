@@ -6,7 +6,8 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render, screen} from '@testing-library/react'
+
 import Document from './index'
 
 describe('Document', () => {
@@ -17,7 +18,7 @@ describe('Document', () => {
         const html = '<p>Hello world</p>'
         const bodyAttributes = {className: 'root'}
         const htmlAttributes = {lang: 'en'}
-        const wrapper = shallow(
+        render(
             <Document
                 head={[style]}
                 html={html}
@@ -27,11 +28,19 @@ describe('Document', () => {
                 bodyAttributes={bodyAttributes}
             />
         )
-        expect(wrapper.contains(sprite)).toBe(true)
-        expect(wrapper.contains(style)).toBe(true)
-        expect(wrapper.contains(script)).toBe(true)
-        expect(wrapper.html()).toContain(html)
-        expect(wrapper.html()).toContain('<body class="root">')
-        expect(wrapper.html()).toContain('<html lang="en">')
+        const scriptTag = document.querySelector('script')
+        const svgTag = document.querySelector('svg')
+        const styleTag = document.querySelector('link')
+        // by default, React Testing Library append the test component into a body tag, since our component is a full DOM
+        // there will be two body tags in the DOM, we only want to check the second one
+        const bodyTag = document.querySelectorAll('body')[1]
+        // it looks like it returns two html collection, the first one is the React Testing library, the second one is our component we are testing
+        const htmlTag = document.getElementsByTagName('html')[1]
+        expect(svgTag).toBeInTheDocument()
+        expect(scriptTag).toBeInTheDocument()
+        expect(styleTag).toBeInTheDocument()
+        expect(screen.getByText(/hello world/i)).toBeInTheDocument()
+        expect(bodyTag).toHaveAttribute('class', 'root')
+        expect(htmlTag).toHaveAttribute('lang', 'en')
     })
 })

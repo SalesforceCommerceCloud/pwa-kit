@@ -8,7 +8,7 @@ import React from 'react'
 import ConfirmationModal from './index'
 import {Box, useDisclosure} from '@chakra-ui/react'
 import {renderWithProviders} from '../../utils/test-utils'
-import user from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event'
 import {screen} from '@testing-library/react'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/partials/cart-secondary-button-group'
 
@@ -28,11 +28,13 @@ afterEach(() => {
 })
 
 test('Renders confirmation modal with default config', async () => {
+    const user = userEvent.setup()
+
     renderWithProviders(<MockedComponent />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
     expect(screen.getByText(/confirm action/i)).toBeInTheDocument()
     expect(screen.getByText(/are you sure you want to continue/i)).toBeInTheDocument()
@@ -41,11 +43,13 @@ test('Renders confirmation modal with default config', async () => {
 })
 
 test('Renders confirmation modal with the given config', async () => {
+    const user = userEvent.setup()
+
     renderWithProviders(<MockedComponent {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
     expect(screen.getByText(/confirm remove item/i)).toBeInTheDocument()
     expect(screen.getByText(/are you sure you want to remove this item/i)).toBeInTheDocument()
@@ -54,37 +58,41 @@ test('Renders confirmation modal with the given config', async () => {
 })
 
 test('Verify confirm action button click', async () => {
+    const user = userEvent.setup()
+
     const onPrimaryAction = jest.fn()
 
     renderWithProviders(<MockedComponent onPrimaryAction={onPrimaryAction} />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
     const onPrimaryActionTrigger = screen.getByText(/yes/i)
 
     expect(screen.getByText(/confirm action/i)).toBeInTheDocument()
     expect(onPrimaryActionTrigger).toBeInTheDocument()
 
-    user.click(onPrimaryActionTrigger)
+    await user.click(onPrimaryActionTrigger)
     expect(onPrimaryAction).toHaveBeenCalledTimes(1)
 })
 
 test('Verify cancel action button click', async () => {
+    const user = userEvent.setup()
+
     const onAlternateAction = jest.fn()
 
     renderWithProviders(<MockedComponent onAlternateAction={onAlternateAction} />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
     const onAlternateActionTrigger = screen.getByText(/no/i)
 
     expect(screen.getByText(/confirm action/i)).toBeInTheDocument()
     expect(onAlternateActionTrigger).toBeInTheDocument()
 
-    user.click(onAlternateActionTrigger)
+    await user.click(onAlternateActionTrigger)
     expect(onAlternateAction).toHaveBeenCalledTimes(1)
 })

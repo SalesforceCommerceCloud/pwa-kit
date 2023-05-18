@@ -190,10 +190,10 @@ const CheckoutConfirmation = () => {
 
                                 <form onSubmit={form.handleSubmit(submitForm)}>
                                     <Stack spacing={4}>
-                                        {form.errors?.global && (
+                                        {form.formState.errors?.global && (
                                             <Alert status="error">
                                                 <AlertIcon />
-                                                {form.errors.global.message}
+                                                {form.formState.errors.global.message}
                                             </Alert>
                                         )}
 

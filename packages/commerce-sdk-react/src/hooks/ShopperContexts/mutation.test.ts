@@ -68,19 +68,19 @@ describe('Shopper Contexts mutation hooks', () => {
         // raml updated.
         mockMutationEndpoints(contextEndpoint, {}, 201) // createShopperContext
 
-        const {result, /* rerender, */ waitForValueToChange} = renderHookWithProviders(() => ({
+        const {result /* rerender, */} = renderHookWithProviders(() => ({
             mutation: useShopperContextsMutation('createShopperContext'),
             query: queries.useShopperContext(queryOptions)
         }))
 
         // 1. Populate cache with initial data
         expect(result.current.query.error).toBeNull()
-        await waitAndExpectError(waitForValueToChange, () => result.current.query)
+        await waitAndExpectError(() => result.current.query)
         expect(result.current.query.error).toHaveProperty('response')
 
         // 2. Do creation mutation
         act(() => result.current.mutation.mutate(options))
-        await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
+        await waitAndExpectSuccess(() => result.current.mutation)
         expect(result.current.mutation.data).toEqual({})
 
         // FIXME: This probably isn't working because the createContext API has changes to not
@@ -100,19 +100,19 @@ describe('Shopper Contexts mutation hooks', () => {
         mockQueryEndpoint(contextEndpoint, newContext) // getShopperContext
         mockMutationEndpoints(contextEndpoint, updatedContext) // createShopperContext
 
-        const {result, waitForValueToChange} = renderHookWithProviders(() => ({
+        const {result} = renderHookWithProviders(() => ({
             mutation: useShopperContextsMutation('updateShopperContext'),
             query: queries.useShopperContext(queryOptions)
         }))
 
         // 1. Populate cache with initial data
         expect(result.current.query.error).toBeNull()
-        await waitAndExpectSuccess(waitForValueToChange, () => result.current.query)
+        await waitAndExpectSuccess(() => result.current.query)
         expect(result.current.query.data).toEqual(newContext)
 
         // 2. Do update mutation
         act(() => result.current.mutation.mutate(options))
-        await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
+        await waitAndExpectSuccess(() => result.current.mutation)
         expect(result.current.mutation.data).toEqual(updatedContext)
     })
 
@@ -121,19 +121,19 @@ describe('Shopper Contexts mutation hooks', () => {
         mockQueryEndpoint(contextEndpoint, newContext) // getShopperContext
         mockMutationEndpoints(contextEndpoint, updatedContext) // createShopperContext
 
-        const {result, waitForValueToChange} = renderHookWithProviders(() => ({
+        const {result} = renderHookWithProviders(() => ({
             mutation: useShopperContextsMutation('deleteShopperContext'),
             query: queries.useShopperContext(queryOptions)
         }))
 
         // 1. Populate cache with initial data
         expect(result.current.query.error).toBeNull()
-        await waitAndExpectSuccess(waitForValueToChange, () => result.current.query)
+        await waitAndExpectSuccess(() => result.current.query)
         expect(result.current.query.data).toEqual(newContext)
 
         // 2. Do delete mutation
         act(() => result.current.mutation.mutate(options))
-        await waitAndExpectSuccess(waitForValueToChange, () => result.current.mutation)
+        await waitAndExpectSuccess(() => result.current.mutation)
         expect(result.current.mutation.data).toBeUndefined()
     })
 })

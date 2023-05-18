@@ -7,7 +7,13 @@
 import {useIntl} from 'react-intl'
 import {validatePassword} from '../../utils/password-utils'
 
-export default function useUpdatePasswordFields({form: {control, errors}, prefix = ''}) {
+export default function useUpdatePasswordFields({
+    form: {
+        control,
+        formState: {errors}
+    },
+    prefix = ''
+}) {
     const {formatMessage} = useIntl()
 
     const fields = {

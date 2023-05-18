@@ -158,13 +158,11 @@ export const getConfigMatcher = (config) => {
     const locales = [...localesIds, ...localeAliases].filter(Boolean)
 
     // prettier-ignore
-    // eslint-disable-next-line
     const searchPatternForSite = `site=(?<site>${sites.join('|')})`
     // prettier-ignore
     // eslint-disable-next-line
     const pathPattern = `(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
     // prettier-ignore
-    // eslint-disable-next-line
     const searchPatternForLocale = `locale=(?<locale>${locales.join('|')})`
     const pathMatcher = new RegExp(pathPattern)
     const searchMatcherForSite = new RegExp(searchPatternForSite)

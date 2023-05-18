@@ -31,10 +31,17 @@ const messages = defineMessages({
  * A React hook that provides the field definitions for an address form.
  * @param {Object} form - The object returned from `useForm`
  * @param {Object} form.control - The form control object
- * @param {Object} form.errors - An object containing field errors
+ * @param {Object} form.formState.errors - An object containing field errors
  * @returns {Object} Field definitions for use in a form
  */
-export default function useAddressFields({form: {watch, control, errors}, prefix = ''}) {
+export default function useAddressFields({
+    form: {
+        watch,
+        control,
+        formState: {errors}
+    },
+    prefix = ''
+}) {
     const {formatMessage} = useIntl()
 
     const countryCode = watch('countryCode')
