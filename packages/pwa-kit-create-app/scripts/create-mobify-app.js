@@ -489,7 +489,8 @@ const runGenerator = (context, {outputDir, verbose}) => {
 
     if (extend) {
         getAllFiles(BOOTSTRAP_DIR).forEach((inputFile) =>
-            processTemplate(inputFile, outputDir, context)
+            // TODO: Clean up this sig
+            processTemplate(inputFile, outputDir, context, BOOTSTRAP_DIR)
         )
     } else {
         const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
