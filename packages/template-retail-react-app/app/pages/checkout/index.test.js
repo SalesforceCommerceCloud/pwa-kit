@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import Checkout from './index'
-import {Route, Switch} from 'react-router-dom'
+import {Route, Routes} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import {rest} from 'msw'
 import {
@@ -43,7 +43,7 @@ const defaultShippingMethod = mockShippingMethods.applicableShippingMethods.find
 // fake routes to simulate moving from checkout to confirmation page.
 const WrappedCheckout = () => {
     return (
-        <Switch>
+        <Routes>
             <Route exact path={createPathWithDefaults('/checkout')}>
                 <Checkout />
             </Route>
@@ -55,7 +55,7 @@ const WrappedCheckout = () => {
             >
                 <div>success</div>
             </Route>
-        </Switch>
+        </Routes>
     )
 }
 

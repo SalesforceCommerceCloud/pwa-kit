@@ -11,7 +11,7 @@ import {
     mockedCustomerProductLists,
     productsResponse
 } from '../../mocks/mock-data'
-import {Route, Switch} from 'react-router-dom'
+import {Route, Routes} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
 import {renderWithProviders} from '../../utils/test-utils'
@@ -24,12 +24,12 @@ jest.useFakeTimers()
 
 const MockedComponent = () => {
     return (
-        <Switch>
+        <Routes>
             <Route
                 path="/en-GB/product/:productId"
                 render={(props) => <ProductDetail {...props} />}
             />
-        </Switch>
+        </Routes>
     )
 }
 

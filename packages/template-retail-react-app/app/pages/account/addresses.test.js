@@ -13,18 +13,18 @@ import {
     mockedRegisteredCustomerWithNoAddress,
     mockedRegisteredCustomer
 } from '../../mocks/mock-data'
-import {Route, Switch} from 'react-router-dom'
+import {Route, Routes} from 'react-router-dom'
 import mockConfig from '../../../config/mocks/default'
 
 let mockCustomer = {}
 
 const MockedComponent = () => {
     return (
-        <Switch>
+        <Routes>
             <Route path={createPathWithDefaults('/account/addresses')}>
                 <AccountAddresses />
             </Route>
-        </Switch>
+        </Routes>
     )
 }
 

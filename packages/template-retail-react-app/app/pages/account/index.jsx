@@ -8,7 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
+import {Route, Routes, useRouteMatch, Redirect} from 'react-router'
 import {
     Accordion,
     AccordionButton,
@@ -205,7 +205,7 @@ const Account = () => {
                     </Flex>
                 </Stack>
 
-                <Switch>
+                <Routes>
                     <Route exact path={path}>
                         <AccountDetail />
                     </Route>
@@ -218,7 +218,7 @@ const Account = () => {
                     <Route path={`${path}/orders`}>
                         <AccountOrders />
                     </Route>
-                </Switch>
+                </Routes>
             </Grid>
         </Box>
     )

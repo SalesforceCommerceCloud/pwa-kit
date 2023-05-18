@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import {Route, Switch} from 'react-router-dom'
+import {Route, Routes} from 'react-router-dom'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Confirmation from './confirmation'
@@ -15,11 +15,11 @@ import {mockOrder, mockProducts} from './confirmation.mock'
 
 const MockedComponent = () => {
     return (
-        <Switch>
+        <Routes>
             <Route path={createPathWithDefaults('/checkout/confirmation/:orderNo')}>
                 <Confirmation />
             </Route>
-        </Switch>
+        </Routes>
     )
 }
 

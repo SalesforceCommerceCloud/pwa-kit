@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {Route, Switch, useRouteMatch} from 'react-router'
+import {Route, Routes, useRouteMatch} from 'react-router'
 import OrderHistory from './order-history'
 import OrderDetail from './order-detail'
 
@@ -14,14 +14,14 @@ const AccountOrders = () => {
     const {path} = useRouteMatch()
 
     return (
-        <Switch>
+        <Routes>
             <Route exact path={path}>
                 <OrderHistory />
             </Route>
             <Route exact path={`${path}/:orderNo`}>
                 <OrderDetail />
             </Route>
-        </Switch>
+        </Routes>
     )
 }
 

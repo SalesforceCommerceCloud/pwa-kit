@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Route, Switch} from 'react-router-dom'
+import {Route, Routes} from 'react-router-dom'
 import {screen} from '@testing-library/react'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
@@ -15,11 +15,11 @@ import mockConfig from '../../../config/mocks/default'
 
 const MockedComponent = () => {
     return (
-        <Switch>
+        <Routes>
             <Route path={createPathWithDefaults('/account/orders')}>
                 <Orders />
             </Route>
-        </Switch>
+        </Routes>
     )
 }
 
