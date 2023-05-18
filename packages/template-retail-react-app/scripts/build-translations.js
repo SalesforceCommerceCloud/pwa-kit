@@ -8,7 +8,7 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 
 /**
- * This script will extract messages from base template and extended app and have the output inside extended app
+ * This script will extract messages from base template and extended app and output all translations in the extended app
  * If a file is overridden, it won't extract messages from that file in the base template
  */
 const {exec} = require('child_process')
@@ -40,7 +40,7 @@ const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) =>
 
     return arrayOfFiles
 }
-// look for overridden files
+
 try {
     const isBaseTemplate = !!pkgJSON.ccExtensibility.extendable
     if (isBaseTemplate) {
