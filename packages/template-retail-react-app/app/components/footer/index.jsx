@@ -12,7 +12,7 @@ import {
     Divider,
     SimpleGrid,
     useMultiStyleConfig,
-    Select,
+    Select as ChakraSelect,
     Heading,
     Input,
     InputGroup,
@@ -29,6 +29,7 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
+import styled from '@emotion/styled'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
@@ -39,6 +40,15 @@ const Footer = ({...otherProps}) => {
     const {l10n} = site
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
+
+    // NOTE: this is a workaround to fix hydration error, by making sure that the `option.selected` property is set.
+    // For some reason, adding some styles prop (to the option element) prevented `selected` from being set.
+    // So now we add the styling to the parent element instead.
+    const Select = styled(ChakraSelect)({
+        // Targeting the child element
+        option: styles.localeDropdownOption
+    })
+
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
             <Box {...styles.content}>
@@ -130,7 +140,7 @@ const Footer = ({...otherProps}) => {
                                 {...otherProps}
                             >
                                 <Select
-                                    value={locale}
+                                    defaultValue={locale}
                                     onChange={({target}) => {
                                         setLocale(target.value)
 
@@ -145,13 +155,9 @@ const Footer = ({...otherProps}) => {
                                     {...styles.localeDropdown}
                                 >
                                     {supportedLocaleIds.map((locale) => (
-                                        <LocaleText
-                                            as="option"
-                                            value={locale}
-                                            shortCode={locale}
-                                            key={locale}
-                                            {...styles.localeDropdownOption}
-                                        />
+                                        <option key={locale} value={locale}>
+                                            <LocaleText shortCode={locale} />
+                                        </option>
                                     ))}
                                 </Select>
                             </FormControl>

@@ -8,21 +8,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {defineMessages, useIntl} from 'react-intl'
-import {chakra, Text} from '@chakra-ui/react'
 
-const LocaleText = ({shortCode, as, ...otherProps}) => {
+const LocaleText = ({shortCode}) => {
     const intl = useIntl()
-    const Wrapper = as ? chakra(as) : Text
     const message = LOCALE_MESSAGES[shortCode]
 
     if (!message) {
         console.error(
             `No locale message found for "${shortCode}". Please update the list accordingly.`
         )
-        return <Wrapper {...otherProps}>Unknown {shortCode}</Wrapper>
+        return <>Unknown {shortCode}</>
     }
 
-    return <Wrapper {...otherProps}>{intl.formatMessage(message)}</Wrapper>
+    return <>{intl.formatMessage(message)}</>
 }
 
 LocaleText.displayName = 'LocaleText'
@@ -31,11 +29,7 @@ LocaleText.propTypes = {
     /**
      * The locale shortcode that you would like the localized text for.
      */
-    shortCode: PropTypes.string.isRequired,
-    /**
-     * The element type to render this component as, defaults to a Text component.
-     */
-    as: PropTypes.string
+    shortCode: PropTypes.string.isRequired
 }
 
 export default LocaleText
