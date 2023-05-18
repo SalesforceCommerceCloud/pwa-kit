@@ -19,7 +19,7 @@
     "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
     "lint:fix": "npm run lint -- --fix",
     "pkg-version": "node ../../scripts/independent-pkg-version.js",
-    "pwa-kit-deps-version": "node ../../scripts/pwa-kit-deps-version.js",
+    "pwa-kit-deps-latest-version": "node ../../scripts/pwa-kit-deps-latest-version.js",
     "push": "npm run build && pwa-kit-dev push",
     "save-credentials": "pwa-kit-dev save-credentials",
     "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
