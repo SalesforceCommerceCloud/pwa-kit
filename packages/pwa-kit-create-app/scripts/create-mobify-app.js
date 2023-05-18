@@ -458,7 +458,6 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 
     if (inputFile.endsWith('.hbs')) {
         const template = sh.cat(inputFile).stdout
-        console.log('Writting new file: ', outputFile.replace('.hbs', ''))
         fs.writeFileSync(outputFile.replace('.hbs', ''), Handlebars.compile(template)(context))
     } else {
         fs.copyFileSync(inputFile, outputFile)
