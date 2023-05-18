@@ -13,7 +13,7 @@
     "build-translations": "npm run extract-default-translations && npm run compile-translations",
     "compile-translations": "formatjs compile-folder --ast app/translations app/translations/compiled",
     "compile-translations:pseudo": "formatjs compile --ast app/translations/en-US.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
-    "extract-default-translations": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
+    "extract-default-translations": "node ./scripts/build-translations.js",
     "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
     "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
     "lint:fix": "npm run lint -- --fix",
