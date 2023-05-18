@@ -1,4 +1,4 @@
-#!/usr/bin/env node --inspect
+#!/usr/bin/env node
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
