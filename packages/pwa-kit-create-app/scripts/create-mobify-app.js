@@ -281,7 +281,7 @@ const PRESETS = [
         },
         questions: EXPRESS_MINIMAL_QUESTIONS,
         answers: {
-            ['project.name']: 'express-minimal',
+            ['project.name']: 'express-minimal'
         },
         private: true
     },
@@ -311,7 +311,7 @@ const PRESETS = [
         },
         questions: MRT_REFERENCE_QUESTIONS,
         answers: {
-            ['project.name']: 'mrt-reference-app',
+            ['project.name']: 'mrt-reference-app'
         },
         private: true
     }
@@ -516,8 +516,10 @@ const runGenerator = (context, {outputDir, verbose}) => {
 
     if (extend) {
         getAllFiles(BOOTSTRAP_DIR)
-                .map((file) => file.replace(BOOTSTRAP_DIR, ''))
-                .forEach((relFilePath) => processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context))
+            .map((file) => file.replace(BOOTSTRAP_DIR, ''))
+            .forEach((relFilePath) =>
+                processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context)
+            )
     } else {
         const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
         const {id, type} = templateSource
@@ -555,7 +557,9 @@ const runGenerator = (context, {outputDir, verbose}) => {
         if (sh.test('-e', assetsDir)) {
             getAllFiles(assetsDir)
                 .map((file) => file.replace(assetsDir, ''))
-                .forEach((relFilePath) => processTemplate(relFilePath, assetsDir, outputDir, context))
+                .forEach((relFilePath) =>
+                    processTemplate(relFilePath, assetsDir, outputDir, context)
+                )
         }
 
         // Clean up
