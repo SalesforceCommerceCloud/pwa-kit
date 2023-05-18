@@ -16,8 +16,7 @@ sh.set('-e')
 const lernaConfigPath = path.join(__dirname, '..', 'lerna.json')
 const rootPath = path.join(__dirname, '..')
 
-const {stdout} = sh.exec('lerna list --all --json', {silent: true})
-const monorepoPackages = JSON.parse(stdout.toString())
+const monorepoPackages = JSON.parse(sh.exec('lerna list --all --json', {silent: true}))
 const monorepoPackageNames = monorepoPackages.map((pkg) => pkg.name)
 
 const INDEPENDENT_PACKAGES = JSON.parse(

@@ -13,8 +13,7 @@ const {saveJSONToFile, setPackageVersion} = require('./utils')
 // Exit upon error
 sh.set('-e')
 
-const {stdout} = sh.exec('lerna list --all --json', {silent: true})
-const monorepoPackages = JSON.parse(stdout.toString())
+const monorepoPackages = JSON.parse(sh.exec('lerna list --all --json', {silent: true}))
 
 const main = () => {
     const version = process.argv[2]

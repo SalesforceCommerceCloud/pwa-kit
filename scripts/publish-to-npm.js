@@ -21,9 +21,8 @@ const main = () => {
     )
     sh.exec('npm install')
 
-    const {stdout} = sh.exec('git branch --show-current', {silent: true})
-    // TODO
-    // const branchName = stdout.trim()
+    // TODO: un-comment this
+    // const branchName = sh.exec('git branch --show-current', {silent: true}).trim()
     const branchName = 'release-3.1.x'
     // const branchName = 'release-retail-react-app-3.1.x'
 
