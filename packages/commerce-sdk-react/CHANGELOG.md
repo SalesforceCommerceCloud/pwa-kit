@@ -1,4 +1,7 @@
 ## v3.0.0-dev (May 12, 2023)
+
+- Upgrade React 18, React DOM 18, @types/react@18, @types/react-dom@v18 Testing library 14 [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
+
 ## v2.7.1 (May 11, 2023)
 
 -   Re-generate lock files and fix hook lib tests [#1186](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1186)

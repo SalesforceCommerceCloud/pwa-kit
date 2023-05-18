@@ -6,11 +6,10 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const base = require('internal-lib-build/configs/jest/jest.config')
-const path = require('path')
 
 module.exports = {
     ...base,
-    setupFiles: base.setupFiles.concat(path.join(__dirname, 'setup-jest.js')),
+    setupFilesAfterEnv: ['./setup-jest.js'],
     collectCoverageFrom: [
         'src/**/*.{js,jsx}',
         'scripts/**/*.{js,jsx}',

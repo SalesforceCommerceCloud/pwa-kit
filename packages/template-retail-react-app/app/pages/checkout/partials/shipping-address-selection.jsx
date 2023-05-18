@@ -233,7 +233,7 @@ const ShippingAddressSelection = ({
                         defaultValue=""
                         control={form.control}
                         rules={{required: !isEditingAddress}}
-                        render={({value}) => (
+                        render={({field: {value}}) => (
                             <RadioCardGroup value={value} onChange={handleAddressIdSelection}>
                                 <SimpleGrid
                                     columns={[1, 1, 2]}

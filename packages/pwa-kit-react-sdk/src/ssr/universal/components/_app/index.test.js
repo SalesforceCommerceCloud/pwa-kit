@@ -6,13 +6,13 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 import App from './index'
 
 describe('App', () => {
     test('Renders correctly', () => {
         const body = <p>Hello world</p>
-        const wrapper = shallow(<App>{body}</App>)
-        expect(wrapper.contains(body)).toBe(true)
+        render(<App>{body}</App>)
+        expect(screen.getByText(/hello world/i)).toBeInTheDocument()
     })
 })

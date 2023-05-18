@@ -6,7 +6,7 @@ A library of components and utilities that supports the rendering pipeline for t
 
 ## Requirements
 
--   Node 16 or later
+-   Node 16.11 or later
 -   npm 8 or later
 
 ## Install Dependencies
