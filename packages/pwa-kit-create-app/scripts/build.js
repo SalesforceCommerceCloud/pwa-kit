@@ -14,6 +14,8 @@ const tar = require('tar')
 sh.set('-e')
 sh.config.silent = false
 
+const TEMPLATE_PREFIX = 'template-'
+
 const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
 const templatesDir = p.resolve(__dirname, '..', 'templates')
 
@@ -23,10 +25,10 @@ const tarPathForPkg = (pkg) => p.resolve(templatesDir, `${pkg}.tar.gz`)
 
 const main = () => {
     const pkgNames = [
-        'template-retail-react-app',
-        'template-express-minimal',
-        'template-typescript-minimal',
-        'template-mrt-reference-app'
+        'retail-react-app',
+        'express-minimal',
+        'typescript-minimal',
+        'mrt-reference-app'
     ]
 
     if (!sh.test('-d', templatesDir)) {
@@ -37,6 +39,7 @@ const main = () => {
 
     const tmpDir = mkdtempSync()
     const checkoutDir = p.join(tmpDir, 'mobify-platform-sdks')
+    const packageDir = p.join(checkoutDir, 'packages')
 
     sh.exec(
         `git clone --config core.longpaths=true --single-branch ` +
@@ -44,15 +47,17 @@ const main = () => {
     )
 
     return Promise.all(
-        pkgNames.map((pkgName) =>
-            tar.c(
+        pkgNames.map((pkgName) => {
+            sh.mv(p.join(packageDir, `${TEMPLATE_PREFIX}${pkgName}`), p.join(packageDir, pkgName))
+
+            return tar.c(
                 {
                     file: tarPathForPkg(pkgName),
-                    cwd: p.join(checkoutDir, 'packages')
+                    cwd: packageDir
                 },
                 [pkgName]
             )
-        )
+        })
     ).then(() => sh.rm('-rf', tmpDir))
 }
 

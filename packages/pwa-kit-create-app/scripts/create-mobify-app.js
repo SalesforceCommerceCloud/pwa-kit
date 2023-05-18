@@ -58,8 +58,13 @@ sh.set('-e')
 
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
-// Utilities
-const noop = async (x) => x
+const INITIAL_CONTEXT = {
+    preset: undefined,
+    answers: {
+        general: {},
+        project: {}
+    }
+}
 
 // Validations
 const validPreset = (preset) => {
@@ -99,6 +104,57 @@ const validOrganizationId = (s) =>
 const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 
+const EXTENSIBILITY_QUESTIONS = [
+    {
+        name: 'project.extend',
+        message: 'Do you wish to use template extensibility?',
+        type: 'list',
+        choices: [
+            {
+                name: 'No',
+                value: false
+            },
+            {
+                name: 'Yes',
+                value: true
+            }
+        ]
+    }
+]
+
+const RETAIL_REACT_APP_QUESTIONS = [
+    {
+        name: 'project.name',
+        validate: validProjectName,
+        message: 'What is the name of your Project?'
+    },
+    {
+        name: 'project.commerce.instanceUrl',
+        message: 'What is the URL for your Commerce Cloud instance?',
+        validate: validUrl
+    },
+    {
+        name: 'project.commerce.clientId',
+        message: 'What is your SLAS Client ID?',
+        validate: validClientId
+    },
+    {
+        name: 'project.commerce.siteId',
+        message: 'What is your Site ID in Business Manager?',
+        validate: validSiteId
+    },
+    {
+        name: 'project.commerce.organizationId',
+        message: 'What is your Commerce API organization ID in Business Manager?',
+        validate: validOrganizationId
+    },
+    {
+        name: 'project.commerce.shortCode',
+        message: 'What is your Commerce API short code in Business Manager?',
+        validate: validShortCode
+    }
+]
+
 // Project dictionary describing details and how the gerator should ask questions etc.
 const PRESETS = [
     {
@@ -115,47 +171,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: 'retail-react-app'
         },
-        preGenerate: async (context = {}) => {
-            const commerceQuestions = [
-                {
-                    name: 'instanceUrl',
-                    message: 'What is the URL for your Commerce Cloud instance?',
-                    validate: validUrl
-                },
-                {
-                    name: 'clientId',
-                    message: 'What is your SLAS Client ID?',
-                    validate: validClientId
-                },
-                {
-                    name: 'siteId',
-                    message: 'What is your Site ID in Business Manager?',
-                    validate: validSiteId
-                },
-                {
-                    name: 'organizationId',
-                    message: 'What is your Commerce API organization ID in Business Manager?',
-                    validate: validOrganizationId
-                },
-                {
-                    name: 'shortCode',
-                    message: 'What is your Commerce API short code in Business Manager?',
-                    validate: validShortCode
-                }
-            ]
-            const commerceAnswers = await inquirer.prompt(commerceQuestions)
-
-            // Update the context.
-            context = merge(context, {
-                answers: {
-                    project: {
-                        commerce: commerceAnswers
-                    }
-                }
-            })
-
-            return context
-        },
+        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         private: false
     },
     {
@@ -172,36 +188,17 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: 'retail-react-app'
         },
-        preGenerate: (context = {}) => {
-            return merge(context, {
-                answers: {
-                    project: {
-                        name: 'demo-storefront',
-                        commerce: {
-                            instanceUrl: 'https://zzte-053.dx.commercecloud.salesforce.com',
-                            clientId: '1d763261-6522-4913-9d52-5d947d3b94c4',
-                            siteId: 'RefArch',
-                            organizationId: 'f_ecom_zzte_053',
-                            shortCode: 'kv7kzm78'
-                        },
-                        einstein: {
-                            einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                            einsteinSiteId: 'aaij-MobileFirst'
-                        }
-                    }
-                }
-            })
-        },
-        postGenerate: (context, {outputDir}) => {
-            const {answers} = context
-
-            if (!answers.general.extend) {
-                console.log('copying templates')
-                bootstrapTemplate(context, {
-                    filterRegex: /(sites.js.hbs|default.js.hbs)$/,
-                    outputDir
-                })
-            }
+        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        answers: {
+            ['project.extend']: true,
+            ['project.name']: 'demo-storefront',
+            ['project.commerce.instanceUrl']: 'https://zzte-053.dx.commercecloud.salesforce.com',
+            ['project.commerce.clientId']: '1d763261-6522-4913-9d52-5d947d3b94c4',
+            ['project.commerce.siteId']: 'RefArch',
+            ['project.commerce.organizationId']: 'f_ecom_zzte_053',
+            ['project.commerce.shortCode']: 'kv7kzm78',
+            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            ['project.einstein.siteId']: 'aaij-MobileFirst'
         },
         private: false
     },
@@ -213,25 +210,17 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'template-retail-react-app'
         },
-        preGenerate: (context = {}) => {
-            return merge(context, {
-                answers: {
-                    project: {
-                        name: 'retail-react-app',
-                        commerce: {
-                            instanceUrl: 'https://zzrf-001.dx.commercecloud.salesforce.com',
-                            clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                            siteId: 'RefArch',
-                            organizationId: 'f_ecom_zzrf_001',
-                            shortCode: 'kv7kzm78'
-                        },
-                        einstein: {
-                            einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                            einsteinSiteId: 'aaij-MobileFirst'
-                        }
-                    }
-                }
-            })
+        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        answers: {
+            ['project.extend']: true,
+            ['project.name']: 'retail-react-app',
+            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+            ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+            ['project.commerce.siteId']: 'RefArch',
+            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
+            ['project.commerce.shortCode']: 'kv7kzm78',
+            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            ['project.einstein.siteId']: 'aaij-MobileFirst'
         },
         private: true
     },
@@ -297,7 +286,21 @@ const PRESETS = [
     }
 ]
 
-const BOOTSTRAP_DIR = p.join(__dirname, '..', 'assets', 'bootstrap')
+const PRESET_QUESTIONS = [
+    {
+        name: 'general.presetId',
+        message: 'Choose a project preset to get started:',
+        type: 'list',
+        choices: PRESETS.filter(({private}) => !private).map(({shortDescription, id}) => ({
+            name: shortDescription,
+            value: id
+        }))
+    }
+]
+
+const BOOTSTRAP_DIR = p.join(__dirname, '..', 'assets', 'bootstrap', 'js')
+
+const ASSETS_TEMPLATES_DIR = p.join(__dirname, '..', 'assets', 'templates')
 
 const PRIVATE_PRESET_NAMES = PRESETS.filter(({private}) => !!private).map(({id}) => id)
 
@@ -358,7 +361,7 @@ const checkOutputDir = (path) => {
 const getAllFiles = (dirPath, arrayOfFiles = []) => {
     const files = fs.readdirSync(dirPath)
 
-    files.forEach(function (file) {
+    files.forEach((file) => {
         if (fs.statSync(p.join(dirPath, file)).isDirectory()) {
             arrayOfFiles = getAllFiles(p.join(dirPath, file), arrayOfFiles)
         } else {
@@ -386,8 +389,39 @@ const getAllFiles = (dirPath, arrayOfFiles = []) => {
 const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => replacement})
 
 /**
+ *
+ * @param {*} key
+ * @param {*} value
+ * @returns
+ */
+const expand = (key, value) =>
+    key
+        .split('.')
+        .reverse()
+        .reduce(
+            (acc, curr) =>
+                acc
+                    ? {
+                          [curr]: acc
+                      }
+                    : {
+                          [curr]: value
+                      },
+            undefined
+        )
+
+/**
+ *
+ * @param {*} answers
+ * @returns
+ */
+// TODO: Think of better names.
+const expandDotNotationObject = (answers = {}) =>
+    Object.keys(answers).reduce((acc, curr) => merge(acc, expand(curr, answers[curr])), {})
+
+/**
  * Envoke the "npm install" command for the provided project directory.
- * 
+ *
  * @param {*} outputDir
  * @param {*} param1
  */
@@ -415,6 +449,29 @@ const npmInstall = (outputDir, {verbose}) => {
 }
 
 /**
+ *
+ * @param {*} inputFile
+ * @param {*} outputDir
+ * @param {*} context
+ */
+const processTemplate = (inputFile, outputDir, context, baseDir) => {
+    const outputFile = outputDir + inputFile.replace(baseDir, '')
+    const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
+
+    // Create folder if we are doing a deep copy
+    if (destDir) {
+        fs.mkdirSync(destDir, {recursive: true})
+    }
+
+    if (inputFile.endsWith('.hbs')) {
+        const template = sh.cat(inputFile).stdout
+        fs.writeFileSync(outputFile.replace('.hbs', ''), Handlebars.compile(template)(context))
+    } else {
+        fs.copyFileSync(inputFile, outputFile)
+    }
+}
+
+/**
  * This function does the bulk of the project generation given the project config
  * object and the answers returned from the survey process.
  *
@@ -422,167 +479,75 @@ const npmInstall = (outputDir, {verbose}) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir}) => {
+const runGenerator = (context, {outputDir, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    const {extend} = answers.general
+    const {extend = false} = answers.project
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
 
     if (extend) {
-        bootstrapTemplate(context, {outputDir})
-    } else {
-        prepareTemplate(templateSource.id, {outputDir, source: templateSource.type})
-    }
-}
-
-/**
- * Return all the generic questions that relate to all projects that can be
- * generated with this tool. In this case it's the type of project you want
- * to generate, but there might be more in the future.
- *
- * @returns
- */
-const askGeneralQuestions = async () => {
-    const questions = [
-        {
-            name: 'presetId',
-            message: 'Choose a project preset to get started:',
-            type: 'list',
-            choices: PRESETS.filter(({private}) => !private).map(({shortDescription, id}) => ({
-                name: shortDescription,
-                value: id
-            }))
-        },
-        {
-            name: 'projectName',
-            validate: validProjectName,
-            message: 'What is the name of your Project?'
-        }
-    ]
-    const answers = await inquirer.prompt(questions)
-
-    answers.projectName = slugifyName(answers.projectName)
-
-    return answers
-}
-
-/**
- *
- * @param {*} context
- * @returns
- */
-const askExtensibilityQuestions = async (context) => {
-    const {templateSource} = context.preset
-    const questions = [
-        {
-            name: 'extend',
-            message: 'Do you wish to use template extensibility?',
-            type: 'list',
-            choices: [
-                {
-                    name: 'No',
-                    value: false
-                },
-                {
-                    name: 'Yes',
-                    value: true
-                }
-            ]
-        }
-    ]
-
-    let answers = await inquirer.prompt(questions)
-    let pkgJSON
-
-    if (answers.extend) {
-        // In the future we might want to ask what version of the selected project they
-        // want to extend. But for now lets just get the latest version and synthetically
-        // inject it as an "answer"
-        pkgJSON = JSON.parse(
-            sh.exec(`npm view ${templateSource.id} --json`, {
-                silent: true
-            }).stdout
+        getAllFiles(BOOTSTRAP_DIR).forEach((inputFile) =>
+            processTemplate(inputFile, outputDir, context)
         )
-    }
+    } else {
+        const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
+        const {id, type} = templateSource
 
-    answers = {
-        ...answers,
-        templatePackageJSON: pkgJSON
-    }
-
-    return answers
-}
-
-/**
- *
- * @param {*} generatorContext
- * @param {*} param1
- */
-const bootstrapTemplate = (context, {lang = 'js', outputDir, filterRegex}) => {
-    const inputDir = p.join(BOOTSTRAP_DIR, lang)
-    const files = getAllFiles(inputDir)
-
-    files
-        .filter((file) => !filterRegex || !!file.match(filterRegex))
-        .forEach((inputFile) => {
-            const outputFile = outputDir + inputFile.replace(inputDir, '')
-            const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
-
-            // Create folder if we are doing a deep copy
-            if (destDir) {
-                fs.mkdirSync(destDir, {recursive: true})
-            }
-
-            if (inputFile.endsWith('.hbs')) {
-                const templateString = sh.cat(inputFile)
-                const template = Handlebars.compile(templateString.stdout)
-                fs.writeFileSync(outputFile.replace('.hbs', ''), template(context))
-            } else {
-                fs.copyFileSync(inputFile, outputFile)
-            }
-        })
-}
-
-/**
- * Extracts the template with the provided template name to the destination
- * output directory. By default the template will be sourced locally from the generator
- * package template assets, but can also download from NPM if required.
- * 
- * @param {*} templateName
- * @param {*} opts
- */
-const prepareTemplate = (templateName, {outputDir, source = TEMPLATE_SOURCE_BUNDLE}) => {
-    const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
-    switch (source) {
-        case TEMPLATE_SOURCE_NPM: {
-            const {stdout} = sh.exec(
-                `npm pack ${templateName}@latest --pack-destination="${tmp}"`,
-                {
+        switch (type) {
+            case TEMPLATE_SOURCE_NPM: {
+                const {stdout} = sh.exec(`npm pack ${id}@latest --pack-destination="${tmp}"`, {
                     silent: true
-                }
-            )
-            tar.x({
-                file: p.join(tmp, stdout.trim()),
-                cwd: p.join(tmp),
-                sync: true
-            })
-            sh.mv(p.join(tmp, 'package'), outputDir)
-            break
+                })
+                tar.x({
+                    file: p.join(tmp, stdout.trim()),
+                    cwd: p.join(tmp),
+                    sync: true
+                })
+                sh.mv(p.join(tmp, 'package'), outputDir)
+                break
+            }
+            case TEMPLATE_SOURCE_BUNDLE:
+                tar.x({
+                    file: p.join(__dirname, '..', 'templates', `${id}.tar.gz`),
+                    cwd: p.join(tmp),
+                    sync: true
+                })
+                sh.cp('-R', p.join(tmp, id), outputDir)
+                break
+            default: {
+                const msg = `Error: Cannot handle template source type ${type}.`
+                console.error(msg)
+                process.exit(1)
+            }
         }
-        default:
-            tar.x({
-                file: p.join(__dirname, '..', 'templates', `${templateName}.tar.gz`),
-                cwd: p.join(tmp),
-                sync: true
-            })
-            sh.cp('-R', p.join(tmp, templateName), outputDir)
-            sh.rm('-rf', tmp)
+
+        // Copy template specific assets over.
+        const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
+        if (sh.test('-e', assetsDir)) {
+            getAllFiles(assetsDir).forEach((inputFile) =>
+                processTemplate(inputFile, outputDir, context, assetsDir)
+            )
+        }
+
+        // Clean up
+        sh.rm('-rf', tmp)
     }
 
-    // Clean up
-    sh.rm('-rf', tmp)
+    // Update the generated projects version. NOTE: For bootstrapped projects this
+    // can be done in the template building. But since we have two types of project builds,
+    // (bootstrap/bundle) we'll do it here where it works in both scenarios.
+    const pkgJsonPath = p.resolve(outputDir, 'package.json')
+    const pkgJSON = readJson(pkgJsonPath)
+    const finalPkgData = merge(pkgJSON, {
+        name: context.preset.id,
+        version: GENERATED_PROJECT_VERSION
+    })
+    writeJson(pkgJsonPath, finalPkgData)
+
+    // Install dependencies for the newly minted project.
+    npmInstall(outputDir, {verbose})
 }
 
 const foundNode = process.versions.node
@@ -603,16 +568,11 @@ const main = async (opts) => {
     // The context object will have all the current information, like the selected preset, the answers
     // to "general" and "project" questions. It'll also be populated with details of the selected project,
     // like its `package.json` value.
-    let context = {
-        preset: undefined,
-        answers: {
-            general: undefined,
-            project: undefined
-        }
-    }
-
-    const OUTPUT_DIR_FLAG_ACTIVE = !!opts.outputDir
-    const presetId = opts.preset || process.env.GENERATOR_PRESET
+    let context = INITIAL_CONTEXT
+    let {outputDir, verbose, preset} = opts
+    const {prompt} = inquirer
+    const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
+    const presetId = preset || process.env.GENERATOR_PRESET
 
     // Exit if the preset provided is not valid.
     if (presetId && !validPreset(presetId)) {
@@ -626,71 +586,72 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // Step 1: If we aren't using a preset, ask what type of project the user wants to generate.
+    // If there is no preset arg, prompt the user with a selection of presets.
     if (!presetId) {
-        context.answers.general = await askGeneralQuestions()
+        context.answers = await prompt(PRESET_QUESTIONS)
     }
 
     // Add the selected preset to the context object.
-    const selectedPreset = PRESETS.find(({id}) => id === (presetId || context.answers.general.presetId))
-    const {preGenerate = noop, postGenerate = noop} = selectedPreset
+    const selectedPreset = PRESETS.find(
+        ({id}) => id === (presetId || context.answers.general.presetId)
+    )
 
-    // Add the preset to the context. TODO: rename to 'selectedPreset'
+    // Add the preset to the context.
     context.preset = selectedPreset
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
-        opts.outputDir = p.join(process.cwd(), selectedPreset.id)
+        outputDir = p.join(process.cwd(), selectedPreset.id)
     }
 
-    // If the template source is NPM then we know the template can be extended.
-    const extendable = selectedPreset.templateSource.type === TEMPLATE_SOURCE_NPM
+    // Ask preset specific questions.
+    const {questions = {}, answers = {}} = selectedPreset
+    if (questions) {
+        const projectAnswers = await prompt(questions, answers)
 
-    // Step 2: If extensibility is supported ask if you want to use it.
-    let extendableAnswers = {}
-
-    if (extendable) {
-        extendableAnswers = await askExtensibilityQuestions(context)
+        // Merge answers into context.
+        context.answers = {
+            ...context.answers,
+            ...expandDotNotationObject(projectAnswers)
+        }
     }
 
-    // Update the context answers.
-    context.answers.general = {
-        ...context.answers.general,
-        ...extendableAnswers
+    // If the project is using extensibility, add the package.json content
+    // to the context.
+    if (context.answers.project.extend) {
+        // In the future we might want to ask what version of the selected project they
+        // want to extend. But for now lets just get the latest version and synthetically
+        // inject it as an "answer"
+        const pkgJSON = JSON.parse(
+            sh.exec(`npm view ${selectedPreset.templateSource.id} --json`, {
+                silent: true
+            }).stdout
+        )
+
+        // TODO: Can we make a util for this to make it look nicer.
+        context = merge(
+            context,
+            expandDotNotationObject({
+                ['answers.general.packageJSON']: pkgJSON
+            })
+        )
     }
+    console.log('context: ', context)
+    // Generate the project.
+    runGenerator(context, {outputDir, verbose})
 
-    // Step 3: Run project specific logic there are any and update the context. We mainly
-    // use this for assing project specific questions.
-    context = await preGenerate(context)
-
-    // Meh! Think about changing me.
-    context.answers.project = {
-        ...context.answers.project,
-        name: context.answers.general.projectName
-    }
-
-
-    // Step 4: Generate the project.
-    runGenerator(context, {outputDir: opts.outputDir, verbose: opts.verbose})
-
-    // Step 5: Run the post process is one exists
-    await postGenerate(context, {outputDir: opts.outputDir})
-
-    // Finally we install the newly minted projects dependencies
-    npmInstall(opts.outputDir, {verbose: opts.verbose})
-
-    return true
+    // Return the folder in which the project was generated in.
+    return outputDir
 }
 
 if (require.main === module) {
     program.name(`pwa-kit-create-app`)
     program.description(`Generate a new PWA Kit project, optionally using a preset.
 
- Examples:
+Examples:
 
    ${PRESETS.filter(({private}) => !private).map(({id, description}) => {
        return `
-         ${program.name()} --preset "${id}"
-            ${description}
+  ${program.name()} --preset "${id}"\n${description}
         `
    })}
    
