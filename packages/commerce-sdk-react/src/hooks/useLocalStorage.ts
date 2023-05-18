@@ -24,6 +24,8 @@ function useLocalStorage(key: string): Value {
     const [storedValue, setStoredValue] = useState<Value>(readValue)
 
     const handleStorageChange = (event: StorageEvent) => {
+        console.log('event.key', event.key)
+        console.log('key', key)
         if (event.key !== key) {
             return
         }

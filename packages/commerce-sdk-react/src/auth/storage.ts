@@ -75,8 +75,8 @@ export class LocalStorage extends BaseStorage {
         }
     }
     set(key: string, value: string) {
+        const oldValue = this.get(key)
         const suffixedKey = this.getSuffixedKey(key)
-        const oldValue = this.get(suffixedKey)
         window.localStorage.setItem(suffixedKey, value)
         const event = new StorageEvent('storage', {
             key: suffixedKey,
