@@ -6,12 +6,12 @@
  */
 
 import React from 'react'
-import {Route, Routes, useRouteMatch} from 'react-router'
+import {Route, Routes, useMatch} from 'react-router'
 import OrderHistory from './order-history'
 import OrderDetail from './order-detail'
 
 const AccountOrders = () => {
-    const {path} = useRouteMatch()
+    const {path} = useMatch()
 
     return (
         <Routes>

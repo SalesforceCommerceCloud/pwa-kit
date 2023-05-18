@@ -8,7 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Route, Routes, useRouteMatch, Redirect} from 'react-router'
+import {Route, Routes, useMatch, Redirect} from 'react-router'
 import {
     Accordion,
     AccordionButton,
@@ -77,7 +77,7 @@ LogoutButton.propTypes = {
     onClick: PropTypes.func.isRequired
 }
 const Account = () => {
-    const {path} = useRouteMatch()
+    const {path} = useMatch()
     const {formatMessage} = useIntl()
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerType} = customer

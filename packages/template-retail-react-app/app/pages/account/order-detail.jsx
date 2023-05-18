@@ -8,7 +8,7 @@
 import React from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 // TODO
-import {useHistory, useRouteMatch} from 'react-router'
+import {useHistory, useMatch} from 'react-router'
 import {
     Box,
     Heading,
@@ -105,7 +105,7 @@ OrderProducts.propTypes = {
 }
 
 const AccountOrderDetail = () => {
-    const {params} = useRouteMatch()
+    const {params} = useMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
 
