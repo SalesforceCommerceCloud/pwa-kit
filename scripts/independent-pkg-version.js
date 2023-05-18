@@ -18,12 +18,12 @@ const monorepoPackages = JSON.parse(stdout.toString())
 
 const main = () => {
     const version = process.argv[2]
-
     setPackageVersion(version)
 
     const pkgName = JSON.parse(sh.exec('npm pkg get name', {silent: true}))
+    const otherPackages = monorepoPackages.filter((pkg) => pkg.name !== pkgName)
 
-    monorepoPackages.forEach(({location}) => {
+    otherPackages.forEach(({location}) => {
         const pathToPkgJson = path.join(location, 'package.json')
         const pkgJson = JSON.parse(sh.cat(pathToPkgJson))
 
