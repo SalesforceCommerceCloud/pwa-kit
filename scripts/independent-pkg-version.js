@@ -21,8 +21,7 @@ const main = () => {
 
     setPackageVersion(version)
 
-    // TODO
-    const pkgName = 'retail-react-app'
+    const pkgName = JSON.parse(sh.exec('npm pkg get name', {silent: true}))
 
     monorepoPackages.forEach(({location}) => {
         const pathToPkgJson = path.join(location, 'package.json')
