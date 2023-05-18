@@ -59,7 +59,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "5.2.1",
-    "react-router-dom": "^5.3.4",
+    "react-router-dom": "^6.11.2",
     "regenerator-runtime": "^0.13.11",
     "sinon": "^13.0.2",
     "supertest": "^4.0.2"
@@ -69,7 +69,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-helmet": "6",
-    "react-router-dom": "^5.1.2"
+    "react-router-dom": "^6.11.2"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",
