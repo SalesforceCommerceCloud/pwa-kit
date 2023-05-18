@@ -178,7 +178,7 @@ const emptyResponseTestCases = [
 const allTestCases = [...nonEmptyResponseTestCases, ...emptyResponseTestCases]
 
 describe('ShopperBaskets mutations', () => {
-    const storedCustomerIdKey = `${DEFAULT_TEST_CONFIG.siteId}_customer_id`
+    const storedCustomerIdKey = `customer_id_${DEFAULT_TEST_CONFIG.siteId}`
     beforeAll(() => {
         // Make sure we don't accidentally overwrite something before setting up our test state
         if (window.localStorage.length > 0) throw new Error('Unexpected data in local storage.')

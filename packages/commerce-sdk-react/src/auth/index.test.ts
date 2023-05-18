@@ -67,9 +67,9 @@ describe('Auth', () => {
         expect(auth.get('refresh_token_guest')).toBe(refreshToken)
         expect(auth.get('access_token')).toBe(accessToken)
         // @ts-expect-error private property
-        expect([...auth.stores['cookie'].map.keys()]).toEqual([`siteId_cc-nx-g`])
+        expect([...auth.stores['cookie'].map.keys()]).toEqual([`cc-nx-g_siteId`])
         // @ts-expect-error private property
-        expect([...auth.stores['local'].map.keys()]).toEqual([`siteId_access_token`])
+        expect([...auth.stores['local'].map.keys()]).toEqual([`access_token_siteId`])
     })
     test('set registered refresh token will clear guest refresh token, vise versa', () => {
         const auth = new Auth(config)
@@ -300,7 +300,7 @@ describe('Auth', () => {
         // @ts-expect-error private method
         authA.set('refresh_token_guest', refreshTokenGuest)
         // @ts-expect-error private property
-        expect([...authA.stores['memory'].map.keys()]).toEqual([`siteA_cc-nx-g`])
+        expect([...authA.stores['memory'].map.keys()]).toEqual([`cc-nx-g_siteA`])
 
         // Create a second auth instance and ensure that its memory store has previous
         // guest tokens set from the first store (this emulates a second lambda request.)
@@ -309,7 +309,7 @@ describe('Auth', () => {
         authB.set('refresh_token_guest', refreshTokenGuest)
 
         // @ts-expect-error private property
-        expect([...authB.stores['memory'].map.keys()]).toEqual([`siteA_cc-nx-g`, `siteB_cc-nx-g`])
+        expect([...authB.stores['memory'].map.keys()]).toEqual([`cc-nx-g_siteA`, `cc-nx-g_siteB`])
 
         // Set mock value back to expected.
         // @ts-expect-error read-only property
