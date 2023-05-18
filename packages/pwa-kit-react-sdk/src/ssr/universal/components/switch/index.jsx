@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Switch as RouterSwitch, Route} from 'react-router-dom'
+import {Routes as RouterSwitch, Route} from 'react-router-dom'
 import AppErrorBoundary from '../app-error-boundary'
 import {UIDReset, UIDFork} from 'react-uid'
 
