@@ -53,16 +53,6 @@ const program = new Command()
 
 sh.set('-e')
 
-const GENERATED_PROJECT_VERSION = '0.0.1'
-
-const INITIAL_CONTEXT = {
-    preset: undefined,
-    answers: {
-        general: {},
-        project: {}
-    }
-}
-
 // Validations
 const validPreset = (preset) => {
     return ALL_PRESET_NAMES.includes(preset)
@@ -98,6 +88,16 @@ const validClientId = (s) =>
 const validOrganizationId = (s) =>
     /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
 
+// Globals
+const GENERATED_PROJECT_VERSION = '0.0.1'
+
+const INITIAL_CONTEXT = {
+    preset: undefined,
+    answers: {
+        general: {},
+        project: {}
+    }
+}
 const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 
@@ -205,7 +205,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-retail-react-app'
+            id: 'retail-react-app'
         },
         questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         answers: {
@@ -227,7 +227,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-typescript-minimal'
+            id: 'typescript-minimal'
         },
         private: true
     },
@@ -242,7 +242,7 @@ const PRESETS = [
         `,
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-typescript-minimal'
+            id: 'typescript-minimal'
         },
         private: true
     },
@@ -252,7 +252,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-express-minimal'
+            id: 'express-minimal'
         },
         private: true
     },
@@ -267,7 +267,7 @@ const PRESETS = [
         `,
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-express-minimal'
+            id: 'express-minimal'
         },
         private: true
     },
@@ -277,7 +277,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-mrt-reference-app'
+            id: 'mrt-reference-app'
         },
         private: true
     }
@@ -307,16 +307,11 @@ const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
 
 const PROJECT_ID_MAX_LENGTH = 20
 
-const SDK_VERSION = generatorPkg.version
-
 // Utilities
 
 const readJson = (path) => JSON.parse(sh.cat(path))
 
 const writeJson = (path, data) => new sh.ShellString(JSON.stringify(data, null, 2)).to(path)
-
-const replaceJSON = (path, replacements) =>
-    writeJson(path, Object.assign(readJson(path), replacements))
 
 const slugifyName = (name) =>
     slugify(name, {
@@ -451,8 +446,9 @@ const npmInstall = (outputDir, {verbose}) => {
  * @param {*} outputDir
  * @param {*} context
  */
-const processTemplate = (inputFile, outputDir, context, baseDir) => {
-    const outputFile = outputDir + inputFile.replace(baseDir, '')
+const processTemplate = (relFile, inputDir, outputDir, context) => {
+    const inputFile = p.join(inputDir, relFile)
+    const outputFile = p.join(outputDir, relFile)
     const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
 
     // Create folder if we are doing a deep copy
@@ -462,6 +458,7 @@ const processTemplate = (inputFile, outputDir, context, baseDir) => {
 
     if (inputFile.endsWith('.hbs')) {
         const template = sh.cat(inputFile).stdout
+        console.log('Writting new file: ', outputFile.replace('.hbs', ''))
         fs.writeFileSync(outputFile.replace('.hbs', ''), Handlebars.compile(template)(context))
     } else {
         fs.copyFileSync(inputFile, outputFile)
@@ -485,10 +482,9 @@ const runGenerator = (context, {outputDir, verbose}) => {
     checkOutputDir(outputDir)
 
     if (extend) {
-        getAllFiles(BOOTSTRAP_DIR).forEach((inputFile) =>
-            // TODO: Clean up this sig
-            processTemplate(inputFile, outputDir, context, BOOTSTRAP_DIR)
-        )
+        getAllFiles(BOOTSTRAP_DIR)
+                .map((file) => file.replace(BOOTSTRAP_DIR, ''))
+                .forEach((relFilePath) => processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context))
     } else {
         const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
         const {id, type} = templateSource
@@ -524,9 +520,9 @@ const runGenerator = (context, {outputDir, verbose}) => {
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
         if (sh.test('-e', assetsDir)) {
-            getAllFiles(assetsDir).forEach((inputFile) =>
-                processTemplate(inputFile, outputDir, context, assetsDir)
-            )
+            getAllFiles(assetsDir)
+                .map((file) => file.replace(assetsDir, ''))
+                .forEach((relFilePath) => processTemplate(relFilePath, assetsDir, outputDir, context))
         }
 
         // Clean up
@@ -539,7 +535,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {
-        name: context.preset.id,
+        name: slugifyName(context.answers.project.name || context.preset.id),
         version: GENERATED_PROJECT_VERSION
     })
     writeJson(pkgJsonPath, finalPkgData)
@@ -633,7 +629,7 @@ const main = async (opts) => {
             })
         )
     }
-    console.log('context: ', context)
+
     // Generate the project.
     runGenerator(context, {outputDir, verbose})
 
