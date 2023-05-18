@@ -15,10 +15,10 @@ const AccountOrders = () => {
 
     return (
         <Routes>
-            <Route exact path={path}>
+            <Route path={path}>
                 <OrderHistory />
             </Route>
-            <Route exact path={`${path}/:orderNo`}>
+            <Route path={`${path}/:orderNo`}>
                 <OrderDetail />
             </Route>
         </Routes>

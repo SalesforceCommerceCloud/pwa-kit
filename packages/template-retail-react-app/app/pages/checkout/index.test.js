@@ -44,11 +44,10 @@ const defaultShippingMethod = mockShippingMethods.applicableShippingMethods.find
 const WrappedCheckout = () => {
     return (
         <Routes>
-            <Route exact path={createPathWithDefaults('/checkout')}>
+            <Route path={createPathWithDefaults('/checkout')}>
                 <Checkout />
             </Route>
             <Route
-                exact
                 path={createPathWithDefaults(
                     `/checkout/confirmation/${scapiOrderResponse.orderNo}`
                 )}

@@ -40,23 +40,19 @@ const PageNotFound = loadable(() => import('./pages/page-not-found'))
 const routes = [
     {
         path: '/',
-        component: Home,
-        exact: true
+        component: Home
     },
     {
         path: '/login',
-        component: Login,
-        exact: true
+        component: Login
     },
     {
         path: '/registration',
-        component: Registration,
-        exact: true
+        component: Registration
     },
     {
         path: '/reset-password',
-        component: ResetPassword,
-        exact: true
+        component: ResetPassword
     },
     {
         path: '/account',
@@ -64,8 +60,7 @@ const routes = [
     },
     {
         path: '/checkout',
-        component: Checkout,
-        exact: true
+        component: Checkout
     },
     {
         path: '/checkout/confirmation/:orderNo',
@@ -73,13 +68,11 @@ const routes = [
     },
     {
         path: '/callback',
-        component: LoginRedirect,
-        exact: true
+        component: LoginRedirect
     },
     {
         path: '/cart',
-        component: Cart,
-        exact: true
+        component: Cart
     },
     {
         path: '/product/:productId',

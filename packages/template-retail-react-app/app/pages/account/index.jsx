@@ -206,13 +206,13 @@ const Account = () => {
                 </Stack>
 
                 <Routes>
-                    <Route exact path={path}>
+                    <Route path={path}>
                         <AccountDetail />
                     </Route>
-                    <Route exact path={`${path}/wishlist`}>
+                    <Route path={`${path}/wishlist`}>
                         <AccountWishlist />
                     </Route>
-                    <Route exact path={`${path}/addresses`}>
+                    <Route path={`${path}/addresses`}>
                         <AccountAddresses />
                     </Route>
                     <Route path={`${path}/orders`}>
