@@ -16,7 +16,11 @@
     "{{@key}}": "{{this}}"
     {{/each}}
   },
-  "scripts": {{{json answers.general.packageJSON.scripts}}},
+  "scripts": {
+    {{#each answers.general.packageJSON.scripts}}
+    "{{@key}}": "{{this}}"
+    {{/each}}
+  },
   "bundlesize": [
     {
       "path": "build/main.js",
