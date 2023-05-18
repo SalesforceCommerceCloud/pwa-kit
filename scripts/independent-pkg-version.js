@@ -29,8 +29,7 @@ const main = () => {
 
         if (pkgJson.dependencies?.[pkgName]) {
             pkgJson.dependencies[pkgName] = version
-        }
-        if (pkgJson.devDependencies?.[pkgName]) {
+        } else if (pkgJson.devDependencies?.[pkgName]) {
             pkgJson.devDependencies[pkgName] = version
         }
 

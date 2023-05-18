@@ -81,8 +81,7 @@ const updateDeps = (pkgJson) => {
 
         if (pkgJson.dependencies?.[independentPkg.name]) {
             pkgJson.dependencies[independentPkg.name] = newVersion
-        }
-        if (pkgJson.devDependencies?.[independentPkg.name]) {
+        } else if (pkgJson.devDependencies?.[independentPkg.name]) {
             pkgJson.devDependencies[independentPkg.name] = newVersion
         }
     })
