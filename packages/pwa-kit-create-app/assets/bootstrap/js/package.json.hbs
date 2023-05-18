@@ -11,7 +11,8 @@
     "overridesDir": "overrides"
   },
   "devDependencies": {
-    "{{preset.templateSource.id}}": "{{answers.general.packageJSON.version}}"
+    "{{preset.templateSource.id}}": "{{answers.general.packageJSON.version}}",
+    {{{json answers.general.packageJSON.peerDependencies}}}
   },
   "scripts": {{{json answers.general.packageJSON.scripts}}},
   "bundlesize": [
