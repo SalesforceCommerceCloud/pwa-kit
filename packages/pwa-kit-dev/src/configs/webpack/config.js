@@ -51,6 +51,30 @@ export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
+// TODO: can these be handled in package.json as peerDependencies?
+// https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
+
+// due to to how the sdks work and the potential of these npm deps coming
+// from multiple places, we need to force them to one place where they're found
+export const DEPS_TO_DEDUPE = [
+    'babel-runtime',
+    '@tanstack/react-query',
+    '@loadable/component',
+    '@loadable/server',
+    '@loadable/webpack-plugin',
+    'svg-sprite-loader',
+    'react',
+    'react-router-dom',
+    'react-dom',
+    'react-helmet',
+    'webpack-hot-middleware',
+    'react-intl',
+    '@chakra-ui/icons',
+    '@chakra-ui/react',
+    '@chakra-ui/skip-nav',
+    '@emotion/react'
+]
+
 if (EXT_EXTENDABLE && EXT_EXTENDS) {
     const extendsAsArr = Array.isArray(EXT_EXTENDS) ? EXT_EXTENDS : [EXT_EXTENDS]
     const conflicts = extendsAsArr.filter((x) => EXT_EXTENDABLE?.includes(x))
@@ -93,7 +117,7 @@ const getAppEntryPoint = () => {
     return EXT_OVERRIDES_DIR + '/app/main'
 }
 
-const findInProjectThenSDK = (pkg) => {
+const findDepInStack = (pkg) => {
     // Look for the SDK node_modules in two places because in CI,
     // pwa-kit-dev is published under a 'dist' directory, which
     // changes this file's location relative to the package root.
@@ -169,28 +193,11 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        'babel-runtime': findInProjectThenSDK('babel-runtime'),
-                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
-                        '@loadable/component': findInProjectThenSDK('@loadable/component'),
-                        '@loadable/server': findInProjectThenSDK('@loadable/server'),
-                        '@loadable/webpack-plugin': findInProjectThenSDK(
-                            '@loadable/webpack-plugin'
+                        ...Object.assign(
+                            ...DEPS_TO_DEDUPE.map((dep) => ({
+                                [dep]: findDepInStack(dep)
+                            }))
                         ),
-                        'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
-                        react: findInProjectThenSDK('react'),
-                        'react-router-dom': findInProjectThenSDK('react-router-dom'),
-                        'react-dom': findInProjectThenSDK('react-dom'),
-                        'react-helmet': findInProjectThenSDK('react-helmet'),
-                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware'),
-
-                        // TODO: these need to be declared in package.json as peerDependencies ?
-                        // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
-                        'react-intl': findInProjectThenSDK('react-intl'),
-                        '@chakra-ui/icons': findInProjectThenSDK('@chakra-ui/icons'),
-                        '@chakra-ui/react': findInProjectThenSDK('@chakra-ui/react'),
-                        '@chakra-ui/skip-nav': findInProjectThenSDK('@chakra-ui/skip-nav'),
-                        '@emotion/react': findInProjectThenSDK('@emotion/react'),
-                        '@emotion/styled': findInProjectThenSDK('@emotion/styled'),
                         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
                             ? Object.assign(
                                   // NOTE: when an array of `extends` dirs are accepted, don't coerce here
@@ -234,17 +241,17 @@ const baseConfig = (target) => {
                         ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('svg-sprite-loader')
+                            loader: findDepInStack('svg-sprite-loader')
                         },
                         target === 'web' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('ignore-loader')
+                            loader: findDepInStack('ignore-loader')
                         },
                         {
                             test: /\.html$/,
                             exclude: /node_modules/,
                             use: {
-                                loader: findInProjectThenSDK('html-loader')
+                                loader: findDepInStack('html-loader')
                             }
                         }
                     ].filter(Boolean)
@@ -285,8 +292,14 @@ const withChunking = (config) => {
                         // 2. The package is one of the monorepo packages.
                         //    This is for local development to ensure the bundle
                         //    composition is the same as a production build
+                        // 3. If extending another template, don't include the
+                        //    baseline route files in vendor.js
                         test: (module) => {
-                            if (module?.context?.match(makeRegExp(`${sysPath}/node_modules`))) {
+                            if (
+                                EXT_EXTENDS &&
+                                EXT_OVERRIDES_DIR &&
+                                module?.context?.includes(`/${EXT_EXTENDS}/`)
+                            ) {
                                 return false
                             }
                             return module?.context?.match?.(/(node_modules)|(packages\/.*\/dist)/)
@@ -310,7 +323,7 @@ const ruleForBabelLoader = (babelPlugins) => {
             : {exclude: /node_modules/}),
         use: [
             {
-                loader: findInProjectThenSDK('babel-loader'),
+                loader: findDepInStack('babel-loader'),
                 options: {
                     rootMode: 'upward',
                     cacheDirectory: true,
