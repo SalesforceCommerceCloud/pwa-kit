@@ -47,7 +47,7 @@ import {useWishList} from '../../hooks/use-wish-list'
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
     // TODO rename `navigateRouter` to `navigate` after resolving the our `useNavigation` custom hook name collision
-    const navigateRouter = useNavigation()
+    const navigateRouter = useNavigate()
     const location = useLocation()
     const einstein = useEinstein()
     const toast = useToast()

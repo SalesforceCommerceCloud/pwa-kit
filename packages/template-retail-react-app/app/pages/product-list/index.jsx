@@ -97,7 +97,8 @@ const ProductList = (props) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const navigate = useNavigate()
+    // TODO: Fix name collision
+    const navigateRouter = useNavigate()
     const params = useParams()
     const location = useLocation()
     const toast = useToast()
@@ -566,7 +567,7 @@ const ProductList = (props) => {
                                     display="none"
                                     value={basePath}
                                     onChange={({target}) => {
-                                        navigate(target.value)
+                                        navigateRouter(target.value)
                                     }}
                                 >
                                     {limitUrls.map((href, index) => (
@@ -664,7 +665,7 @@ const ProductList = (props) => {
                                 width="full"
                                 onClick={() => {
                                     setSortOpen(false)
-                                    navigate(href)
+                                    navigateRouter(href)
                                 }}
                                 fontSize={'md'}
                                 key={idx}
