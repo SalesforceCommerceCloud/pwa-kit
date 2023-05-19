@@ -16,6 +16,10 @@ sh.set('-e')
 const RELEASE_ONE_PACKAGE = /release-([-a-z]+)-\d+\./i
 
 const main = () => {
+    // TODO: initially check whether the working tree has uncommitted changes.
+    // If there are, then let's not proceed. Lerna publish would also complain about this.
+    // `git status --porcelain`
+
     console.log(
         '--- Verify that all the versions are correct by installing every package in the monorepo'
     )
@@ -23,8 +27,8 @@ const main = () => {
 
     // TODO: un-comment this
     // const branchName = sh.exec('git branch --show-current', {silent: true}).trim()
-    const branchName = 'release-3.1.x'
-    // const branchName = 'release-retail-react-app-3.1.x'
+    // const branchName = 'release-3.1.x'
+    const branchName = 'release-retail-react-app-1.0.x'
 
     console.log('--- Given the current branch:', branchName)
 
@@ -40,6 +44,8 @@ const main = () => {
         allOtherPublicPackages.forEach((pkg) => {
             sh.exec('npm pkg set private=true', {cwd: pkg.location})
         })
+        // TODO: now there are uncommitted changes. let's commit them temporarily.
+        // TODO: if there's an error in this publish, then we'll need to clean up (by restoring "private")
         lernaPublish()
         allOtherPublicPackages.forEach((pkg) => {
             sh.exec('npm pkg delete private', {cwd: pkg.location})
@@ -55,7 +61,7 @@ const lernaPublish = () => {
     // For example: we have `publishConfig.directory` in some package.json files that only Lerna knows what to do with it.
     // https://github.com/lerna/lerna/tree/main/libs/commands/publish#publishconfigdirectory
 
-    // DEBUG: disable for now
+    // TODO: un-comment this
     // sh.exec('npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next')
 
     console.log('--- Would publish these public packages to npm:')
