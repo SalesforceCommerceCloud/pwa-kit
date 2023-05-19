@@ -417,15 +417,15 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
 /**
  * Provided a dot notation key, and a value, return an expanded object splitting
  * the key.
- * 
+ *
  * @example
  * const expandedObj = expand('parent.child.grandchild': { name: 'Preseley' })
  * console.log(expandedObj) // {parent: { child: {grandchild: {name: 'Presley}}}}
- * 
+ *
  * @param {string} key
  * @param {Object} value
  * @returns
- * 
+ *
  */
 const expandKey = (key, value) =>
     key
@@ -446,14 +446,14 @@ const expandKey = (key, value) =>
 /**
  * Provided an object there the keys use "dot notation", expand each individual key.
  * NOTE: This only expands keys at the root level, and not those nested.
- * 
+ *
  * @example
  * const expandedObj = expand({'coolthings.babynames': 'Preseley', 'coolthings.cars': 'bmws'})
  * console.log(expandedObj) // {coolthings: { babynames: 'Presley', cars: 'bmws'}}
- * 
+ *
  * @param {Object} answers
  * @returns {Object} The expanded object.
- * 
+ *
  */
 const expandObject = (obj = {}) =>
     Object.keys(obj).reduce((acc, curr) => merge(acc, expandKey(curr, obj[curr])), {})
@@ -491,7 +491,7 @@ const npmInstall = (outputDir, {verbose}) => {
  * Execute and copy the handlebars template to the output directory using
  * the provided context object. If the file isn't a template, simply copy
  * it to the destination.
- * 
+ *
  * @param {string} inputFile
  * @param {string} outputDir
  * @param {Object} context
@@ -657,12 +657,9 @@ const main = async (opts) => {
     if (questions) {
         const projectAnswers = await prompt(questions, answers)
 
-        context = merge(
-            context,
-            {
-                answers: expandObject(projectAnswers)
-            }
-        )
+        context = merge(context, {
+            answers: expandObject(projectAnswers)
+        })
     }
 
     // Inject the packageJSON into the context for extensibile projects.
