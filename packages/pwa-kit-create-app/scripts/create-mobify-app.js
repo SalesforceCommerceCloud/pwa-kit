@@ -603,7 +603,6 @@ const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
 const main = async (opts) => {
-    debugger
     if (!isUsingCompatibleNode) {
         console.log('')
         console.warn(
