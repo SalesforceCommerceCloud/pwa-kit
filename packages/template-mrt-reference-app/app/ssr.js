@@ -209,14 +209,10 @@ const runtime = getRuntime()
 const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
 
-    // Add middleware to explicitly suppress caching on all responses
-    // except the /cache endpoint (done before we invoke the handlers)
+    // Add middleware to explicitly suppress caching on all responses (done
+    // before we invoke the handlers)
     app.use((req, res, next) => {
-        if (req.path !== '/cache') {
-            res.set('Cache-Control', 'no-cache')
-        } else {
-            res.set('Cache-Control', 's-maxage=60')
-        }
+        res.set('Cache-Control', 'no-cache')
         return next()
     })
 
