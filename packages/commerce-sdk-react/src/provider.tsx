@@ -149,7 +149,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 siteId,
                 shortCode,
                 locale,
-                currency,
+                currency
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>
