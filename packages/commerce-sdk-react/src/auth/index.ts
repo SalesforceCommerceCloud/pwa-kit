@@ -276,7 +276,9 @@ class Auth {
             .then(async () => {
                 const token = await fn()
                 this.handleTokenResponse(token, isGuest)
-                onClient() && (await this.createOCAPISession())
+                if (onClient() && this.OCAPISessionsURL) {
+                    await this.createOCAPISession())
+                }
                 // Q: Why don't we just return token? Why re-construct the same object again?
                 // A: because a user could open multiple tabs and the data in memory could be out-dated
                 // We must always grab the data from the storage (cookie/localstorage) directly
