@@ -1,4 +1,4 @@
-#!/usr/bin/env node --inspect
+#!/usr/bin/env node
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
@@ -659,7 +659,9 @@ const main = async (opts) => {
 
         context = merge(
             context,
-            expandObject(projectAnswers)
+            {
+                answers: expandObject(projectAnswers)
+            }
         )
     }
 
