@@ -448,10 +448,6 @@ class Auth {
      * @returns {Promise}
      */
     createOCAPISession() {
-        if (!this.OCAPISessionsURL) {
-            return
-        }
-
         return fetch(this.OCAPISessionsURL, {
             method: 'POST',
             headers: {
