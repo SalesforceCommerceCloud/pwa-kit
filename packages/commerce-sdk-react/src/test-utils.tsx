@@ -31,7 +31,8 @@ export const DEFAULT_TEST_CONFIG = {
     siteId: 'RefArchGlobal',
     locale: 'en-US',
     currency: 'USD',
-    fetchedToken: 'test-token'
+    fetchedToken: 'test-token',
+    OCAPISessionsURL: `${DEFAULT_TEST_HOST}/mobify/proxy/ocapi/s/RefArch/dw/shop/v22_8/sessions`
 }
 
 export const createQueryClient = () => {

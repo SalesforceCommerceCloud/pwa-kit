@@ -30,6 +30,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     fetchOptions?: ShopperBasketsTypes.FetchOptions
     headers?: Record<string, string>
     fetchedToken?: string
+    OCAPISessionsURL?: string
 }
 
 /**
@@ -66,7 +67,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shortCode,
         locale,
         currency,
-        fetchedToken
+        fetchedToken,
+        OCAPISessionsURL
     } = props
 
     const config = {
@@ -117,7 +119,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             proxy,
             redirectURI,
             fetchOptions,
-            fetchedToken
+            fetchedToken,
+            OCAPISessionsURL
         })
     }, [
         clientId,
@@ -127,7 +130,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         proxy,
         redirectURI,
         fetchOptions,
-        fetchedToken
+        fetchedToken,
+        OCAPISessionsURL
     ])
 
     // Initialize the session
@@ -145,7 +149,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 siteId,
                 shortCode,
                 locale,
-                currency
+                currency,
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>
