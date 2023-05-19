@@ -16,9 +16,13 @@ sh.set('-e')
 const RELEASE_ONE_PACKAGE = /release-([-a-z]+)-\d+\./i
 
 const main = () => {
-    // TODO: initially check whether the working tree has uncommitted changes.
-    // If there are, then let's not proceed. Lerna publish would also complain about this.
-    // `git status --porcelain`
+    const isWorkingTreeClean = sh.exec('git status --porcelain', {silent: true}).trim() === ''
+    if (!isWorkingTreeClean) {
+        console.error(
+            'There are some uncommitted changes. `lerna publish` expects a clean working tree.'
+        )
+        process.exit(1)
+    }
 
     console.log(
         '--- Verify that all the versions are correct by installing every package in the monorepo'
