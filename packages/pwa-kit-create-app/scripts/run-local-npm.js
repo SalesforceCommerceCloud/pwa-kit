@@ -23,13 +23,16 @@ const main = () => {
     let verdaccioServerProcess
 
     const cleanup = () => {
-        console.log('Shutting down local NPM repository')
+        console.log('Shutting down local NPM registry')
         // delete process.env['npm_config_registry']
         sh.exec('npm config delete registry')
         verdaccioServerProcess.kill()
+
+        console.log('npm registry is now restored to:')
+        sh.exec('npm config get registry')
     }
 
-    console.log('Starting up local NPM repository')
+    console.log('Starting up local NPM registry')
 
     verdaccioServerProcess = cp.exec(`${verdaccioBinary} --config config.yaml`, {
         cwd: verdaccioConfigDir,
@@ -46,10 +49,12 @@ const main = () => {
         // we know verdaccio server is up when
         // 'http address' is in log output
         if (data.includes('http address')) {
-            console.log('local NPM repository is up')
+            console.log('Local NPM registry is up at:')
 
             sh.exec('npm config set registry=http://localhost:4873/')
             // process.env['npm_config_registry'] = 'http://localhost:4873/'
+
+            sh.exec('npm config get registry')
         }
     })
 
