@@ -133,7 +133,8 @@ const jsonFromRequest = (req) => {
         body: req.body,
         headers: redactAndSortObjectKeys(req.headers),
         ip: req.ip,
-        env: filterAndSortObjectKeys(process.env, ENVS_TO_EXPOSE)
+        env: filterAndSortObjectKeys(process.env, ENVS_TO_EXPOSE),
+        timestamp: new Date().toISOString()
     }
 }
 
