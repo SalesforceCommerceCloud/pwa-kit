@@ -83,19 +83,6 @@
     "msw": "^1.2.1",
     "pwa-kit-dev": "^3.0.0-dev"
   },
-  "peerDependencies": {
-    "@formatjs/cli": "^6.0.4",
-    "@lhci/cli": "^0.11.0",
-    "bundlesize2": "^0.0.31",
-    "cross-env": "^5.2.1",
-    "full-icu": "^1.5.0",
-    "pwa-kit-dev": "^3.0.0-dev"
-  },
-  "peerDependenciesMeta": {
-    "pwa-kit-dev": {
-      "optional": true
-    }
-  },
   "engines": {
     "node": "^16.0.0 || ^18.0.0",
     "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"

@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "{{preset.templateSource.id}}": "{{answers.general.packageJSON.version}}",
-    {{#each answers.general.packageJSON.peerDependencies}}
+    {{#each answers.general.packageJSON.devDependencies}}
     "{{@key}}": "{{{this}}}"{{#unless @last}},{{/unless}}
     {{/each}}
   },
