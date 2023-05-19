@@ -6,6 +6,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 const p = require('path')
 const sh = require('shelljs')
 const cp = require('child_process')
