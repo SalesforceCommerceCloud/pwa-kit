@@ -81,7 +81,7 @@ try {
             fsPromises.rename(path, `${path}.ignore`)
         })
 
-        const extractCommand = `formatjs extract ${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx} ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/pages/**/*.{js,jsx} --ignore ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/pages/**/*.{js,jsx}.ignore --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        const extractCommand = `formatjs extract ${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx} ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/pages/**/*.{js,jsx} --ignore ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/pages/**/*.{ignore} --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
         exec(extractCommand, (err) => {
             if (err) {
                 console.error(err)
