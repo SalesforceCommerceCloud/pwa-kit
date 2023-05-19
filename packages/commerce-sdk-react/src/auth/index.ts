@@ -277,7 +277,7 @@ class Auth {
                 const token = await fn()
                 this.handleTokenResponse(token, isGuest)
                 if (onClient() && this.OCAPISessionsURL) {
-                    await this.createOCAPISession())
+                    void this.createOCAPISession()
                 }
                 // Q: Why don't we just return token? Why re-construct the same object again?
                 // A: because a user could open multiple tabs and the data in memory could be out-dated
