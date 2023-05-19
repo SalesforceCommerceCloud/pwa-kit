@@ -15,6 +15,7 @@ sh.set('-e')
 
 const monorepoPackages = JSON.parse(sh.exec('lerna list --all --json', {silent: true}))
 
+// Meant for setting the version of a package that has its own independent version
 const main = () => {
     const version = process.argv[2]
     setPackageVersion(version)
@@ -22,6 +23,7 @@ const main = () => {
     const pkgName = JSON.parse(sh.exec('npm pkg get name', {silent: true}))
     const otherPackages = monorepoPackages.filter((pkg) => pkg.name !== pkgName)
 
+    // Update other packages who depend on the current package
     otherPackages.forEach(({location}) => {
         const pathToPkgJson = path.join(location, 'package.json')
         const pkgJson = JSON.parse(sh.cat(pathToPkgJson))

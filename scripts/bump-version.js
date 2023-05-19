@@ -29,6 +29,8 @@ const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) =>
 const main = () => {
     const args = process.argv.slice(2).join(' ')
     sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${args}`)
+    // `--exact` above is for pinning the version of the pwa-kit dependencies
+    // https://github.com/lerna/lerna/tree/main/libs/commands/version#--exact
 
     const lernaConfig = JSON.parse(sh.cat(lernaConfigPath))
     const newMonorepoVersion = lernaConfig.version
