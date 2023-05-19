@@ -42,7 +42,7 @@ const main = (opts) => {
         /^compile-translations.*$/,
         /^extract-default-translations.*$/,
         /^pkg-version$/,
-        /^pwa-kit-deps-version$/
+        /^pwa-kit-deps-version.*$/
     ]
 
     const scripts = Object.keys(pkg.scripts).filter(
