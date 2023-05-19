@@ -23,7 +23,7 @@ export const fetchTranslations = async (locale) => {
 
     let module
     try {
-        module = await import(`retail-react-app/app/translations/compiled/${targetLocale}.json`)
+        module = await import(`retail-react-app/translations/compiled/${targetLocale}.json`)
     } catch (err) {
         console.error(err)
         console.log(
