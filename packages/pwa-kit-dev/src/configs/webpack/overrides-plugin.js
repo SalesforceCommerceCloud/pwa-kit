@@ -30,22 +30,15 @@ class OverridesResolverPlugin {
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
         this.extendsHashMap = new Map()
 
-        const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx|svg|jpg|jpeg)'
-        const globPattern = `${this.pkg?.ccExtensibility?.overridesDir?.replace(
-            /^\//,
-            ''
-        )}/**/*${OVERRIDES_EXTENSIONS}`
+        // everything except directories
+        const globPattern = `${this.pkg?.ccExtensibility?.overridesDir?.replace(/^\//, '')}/**/*.*`
         const overridesFsRead = glob.sync(globPattern)
-
         const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + '/'
 
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
             const [l, ...rest] = item.split(/(index|\.)/)
-            this.extendsHashMap.set(
-                l.replace(/\/$/, '')?.replace(overrideReplace.replace(/\//, ''), ''),
-                [end, rest]
-            )
+            this.extendsHashMap.set(l?.replace(overrideReplace, '').replace(/\/$/, ''), [end, rest])
         })
     }
 
@@ -99,35 +92,34 @@ class OverridesResolverPlugin {
         )
     }
 
-    apply(resolver) {
-        resolver.getHook('resolve').tapAsync(
-            'FeatureResolverPlugin',
-            function (requestContext, resolveContext, callback) {
-                let targetFile
-                let overrideRelative
-                if (this.isFromExtends(requestContext.request, requestContext.path)) {
-                    overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(
-                        /$\//,
-                        ''
-                    )
-                    targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
-                }
+    handleHook(requestContext, resolveContext, callback, resolver) {
+        let targetFile
+        let overrideRelative
+        if (this.isFromExtends(requestContext.request, requestContext.path)) {
+            overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(/$\//, '')
+            targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
+        }
+        if (targetFile) {
+            const target = resolver.ensureHook('resolved')
+            requestContext.path = targetFile
+            resolver.doResolve(
+                target,
+                requestContext,
+                `${this.constructor.name} found base override file`,
+                resolveContext,
+                callback
+            )
+        } else {
+            return callback()
+        }
+    }
 
-                if (targetFile) {
-                    const target = resolver.ensureHook('resolved')
-                    requestContext.path = targetFile
-                    resolver.doResolve(
-                        target,
-                        requestContext,
-                        `${this.constructor.name} found base override file`,
-                        resolveContext,
-                        callback
-                    )
-                } else {
-                    return callback()
-                }
-            }.bind(this)
-        )
+    apply(resolver) {
+        resolver
+            .getHook('resolve')
+            .tapAsync('FeatureResolverPlugin', (requestContext, resolveContext, callback) => {
+                this.handleHook(requestContext, resolveContext, callback, resolver)
+            })
     }
 }
 

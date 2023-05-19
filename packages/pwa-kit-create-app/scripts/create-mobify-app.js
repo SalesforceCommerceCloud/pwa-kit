@@ -53,16 +53,6 @@ const program = new Command()
 
 sh.set('-e')
 
-const GENERATED_PROJECT_VERSION = '0.0.1'
-
-const INITIAL_CONTEXT = {
-    preset: undefined,
-    answers: {
-        general: {},
-        project: {}
-    }
-}
-
 // Validations
 const validPreset = (preset) => {
     return ALL_PRESET_NAMES.includes(preset)
@@ -98,6 +88,16 @@ const validClientId = (s) =>
 const validOrganizationId = (s) =>
     /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
 
+// Globals
+const GENERATED_PROJECT_VERSION = '0.0.1'
+
+const INITIAL_CONTEXT = {
+    preset: undefined,
+    answers: {
+        general: {},
+        project: {}
+    }
+}
 const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 
@@ -116,6 +116,30 @@ const EXTENSIBILITY_QUESTIONS = [
                 value: true
             }
         ]
+    }
+]
+
+const MRT_REFERENCE_QUESTIONS = [
+    {
+        name: 'project.name',
+        validate: validProjectName,
+        message: 'What is the name of your Project?'
+    }
+]
+
+const EXPRESS_MINIMAL_QUESTIONS = [
+    {
+        name: 'project.name',
+        validate: validProjectName,
+        message: 'What is the name of your Project?'
+    }
+]
+
+const TYPESCRIPT_MINIMAL_QUESTIONS = [
+    {
+        name: 'project.name',
+        validate: validProjectName,
+        message: 'What is the name of your Project?'
     }
 ]
 
@@ -205,7 +229,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-retail-react-app'
+            id: 'retail-react-app'
         },
         questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         answers: {
@@ -227,7 +251,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-typescript-minimal'
+            id: 'typescript-minimal'
         },
         private: true
     },
@@ -242,8 +266,9 @@ const PRESETS = [
         `,
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-typescript-minimal'
+            id: 'typescript-minimal'
         },
+        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
         private: true
     },
     {
@@ -252,7 +277,11 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-express-minimal'
+            id: 'express-minimal'
+        },
+        questions: EXPRESS_MINIMAL_QUESTIONS,
+        answers: {
+            ['project.name']: 'express-minimal'
         },
         private: true
     },
@@ -267,8 +296,9 @@ const PRESETS = [
         `,
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-express-minimal'
+            id: 'express-minimal'
         },
+        questions: EXPRESS_MINIMAL_QUESTIONS,
         private: true
     },
     {
@@ -277,7 +307,11 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'template-mrt-reference-app'
+            id: 'mrt-reference-app'
+        },
+        questions: MRT_REFERENCE_QUESTIONS,
+        answers: {
+            ['project.name']: 'mrt-reference-app'
         },
         private: true
     }
@@ -307,16 +341,11 @@ const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
 
 const PROJECT_ID_MAX_LENGTH = 20
 
-const SDK_VERSION = generatorPkg.version
-
 // Utilities
 
 const readJson = (path) => JSON.parse(sh.cat(path))
 
 const writeJson = (path, data) => new sh.ShellString(JSON.stringify(data, null, 2)).to(path)
-
-const replaceJSON = (path, replacements) =>
-    writeJson(path, Object.assign(readJson(path), replacements))
 
 const slugifyName = (name) =>
     slugify(name, {
@@ -355,12 +384,12 @@ const checkOutputDir = (path) => {
  * @param {*} arrayOfFiles
  * @returns
  */
-const getAllFiles = (dirPath, arrayOfFiles = []) => {
+const getFiles = (dirPath, arrayOfFiles = []) => {
     const files = fs.readdirSync(dirPath)
 
     files.forEach((file) => {
         if (fs.statSync(p.join(dirPath, file)).isDirectory()) {
-            arrayOfFiles = getAllFiles(p.join(dirPath, file), arrayOfFiles)
+            arrayOfFiles = getFiles(p.join(dirPath, file), arrayOfFiles)
         } else {
             arrayOfFiles.push(p.join(dirPath, file))
         }
@@ -386,12 +415,19 @@ const getAllFiles = (dirPath, arrayOfFiles = []) => {
 const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => replacement})
 
 /**
+ * Provided a dot notation key, and a value, return an expanded object splitting
+ * the key.
  *
- * @param {*} key
- * @param {*} value
+ * @example
+ * const expandedObj = expand('parent.child.grandchild': { name: 'Preseley' })
+ * console.log(expandedObj) // {parent: { child: {grandchild: {name: 'Presley}}}}
+ *
+ * @param {string} key
+ * @param {Object} value
  * @returns
+ *
  */
-const expand = (key, value) =>
+const expandKey = (key, value) =>
     key
         .split('.')
         .reverse()
@@ -408,13 +444,19 @@ const expand = (key, value) =>
         )
 
 /**
+ * Provided an object there the keys use "dot notation", expand each individual key.
+ * NOTE: This only expands keys at the root level, and not those nested.
  *
- * @param {*} answers
- * @returns
+ * @example
+ * const expandedObj = expand({'coolthings.babynames': 'Preseley', 'coolthings.cars': 'bmws'})
+ * console.log(expandedObj) // {coolthings: { babynames: 'Presley', cars: 'bmws'}}
+ *
+ * @param {Object} answers
+ * @returns {Object} The expanded object.
+ *
  */
-// TODO: Think of better names.
-const expandDotNotationObject = (answers = {}) =>
-    Object.keys(answers).reduce((acc, curr) => merge(acc, expand(curr, answers[curr])), {})
+const expandObject = (obj = {}) =>
+    Object.keys(obj).reduce((acc, curr) => merge(acc, expandKey(curr, obj[curr])), {})
 
 /**
  * Envoke the "npm install" command for the provided project directory.
@@ -446,13 +488,17 @@ const npmInstall = (outputDir, {verbose}) => {
 }
 
 /**
+ * Execute and copy the handlebars template to the output directory using
+ * the provided context object. If the file isn't a template, simply copy
+ * it to the destination.
  *
- * @param {*} inputFile
- * @param {*} outputDir
- * @param {*} context
+ * @param {string} inputFile
+ * @param {string} outputDir
+ * @param {Object} context
  */
-const processTemplate = (inputFile, outputDir, context, baseDir) => {
-    const outputFile = outputDir + inputFile.replace(baseDir, '')
+const processTemplate = (relFile, inputDir, outputDir, context) => {
+    const inputFile = p.join(inputDir, relFile)
+    const outputFile = p.join(outputDir, relFile)
     const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
 
     // Create folder if we are doing a deep copy
@@ -485,10 +531,12 @@ const runGenerator = (context, {outputDir, verbose}) => {
     checkOutputDir(outputDir)
 
     if (extend) {
-        getAllFiles(BOOTSTRAP_DIR).forEach((inputFile) =>
-            // TODO: Clean up this sig
-            processTemplate(inputFile, outputDir, context, BOOTSTRAP_DIR)
-        )
+        // Bootstrap the projects.
+        getFiles(BOOTSTRAP_DIR)
+            .map((file) => file.replace(BOOTSTRAP_DIR, ''))
+            .forEach((relFilePath) =>
+                processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context)
+            )
     } else {
         const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
         const {id, type} = templateSource
@@ -524,9 +572,11 @@ const runGenerator = (context, {outputDir, verbose}) => {
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
         if (sh.test('-e', assetsDir)) {
-            getAllFiles(assetsDir).forEach((inputFile) =>
-                processTemplate(inputFile, outputDir, context, assetsDir)
-            )
+            getFiles(assetsDir)
+                .map((file) => file.replace(assetsDir, ''))
+                .forEach((relFilePath) =>
+                    processTemplate(relFilePath, assetsDir, outputDir, context)
+                )
         }
 
         // Clean up
@@ -539,7 +589,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const finalPkgData = merge(pkgJSON, {
-        name: context.preset.id,
+        name: slugifyName(context.answers.project.name || context.preset.id),
         version: GENERATED_PROJECT_VERSION
     })
     writeJson(pkgJsonPath, finalPkgData)
@@ -601,39 +651,32 @@ const main = async (opts) => {
         outputDir = p.join(process.cwd(), selectedPreset.id)
     }
 
-    // Ask preset specific questions.
+    // Ask preset specific questions and merge into the current context.
     const {questions = {}, answers = {}} = selectedPreset
     if (questions) {
         const projectAnswers = await prompt(questions, answers)
 
-        // Merge answers into context.
-        context.answers = {
-            ...context.answers,
-            ...expandDotNotationObject(projectAnswers)
-        }
+        context = merge(context, {
+            answers: expandObject(projectAnswers)
+        })
     }
 
-    // If the project is using extensibility, add the package.json content
-    // to the context.
+    // Inject the packageJSON into the context for extensibile projects.
     if (context.answers.project.extend) {
-        // In the future we might want to ask what version of the selected project they
-        // want to extend. But for now lets just get the latest version and synthetically
-        // inject it as an "answer"
         const pkgJSON = JSON.parse(
             sh.exec(`npm view ${selectedPreset.templateSource.id} --json`, {
                 silent: true
             }).stdout
         )
 
-        // TODO: Can we make a util for this to make it look nicer.
         context = merge(
             context,
-            expandDotNotationObject({
+            expandObject({
                 ['answers.general.packageJSON']: pkgJSON
             })
         )
     }
-    console.log('context: ', context)
+
     // Generate the project.
     runGenerator(context, {outputDir, verbose})
 
