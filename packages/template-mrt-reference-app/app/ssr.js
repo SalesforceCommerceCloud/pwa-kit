@@ -168,6 +168,14 @@ const tlsVersionTest = async (_, res) => {
 }
 
 /**
+ * Express handler that enables the cache.
+ */
+const cacheTest = async (req, res) => {
+    res.set('Cache-Control', 's-maxage=60')
+    res.json(jsonFromRequest(req))
+}
+
+/**
  * Logging middleware; logs request and response headers (and response status).
  */
 const loggingMiddleware = (req, res, next) => {
@@ -222,6 +230,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     // Configure routes
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
+    app.get('/cache', cacheTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
