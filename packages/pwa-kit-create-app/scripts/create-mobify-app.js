@@ -384,12 +384,12 @@ const checkOutputDir = (path) => {
  * @param {*} arrayOfFiles
  * @returns
  */
-const getAllFiles = (dirPath, arrayOfFiles = []) => {
+const getFiles = (dirPath, arrayOfFiles = []) => {
     const files = fs.readdirSync(dirPath)
 
     files.forEach((file) => {
         if (fs.statSync(p.join(dirPath, file)).isDirectory()) {
-            arrayOfFiles = getAllFiles(p.join(dirPath, file), arrayOfFiles)
+            arrayOfFiles = getFiles(p.join(dirPath, file), arrayOfFiles)
         } else {
             arrayOfFiles.push(p.join(dirPath, file))
         }
@@ -415,12 +415,19 @@ const getAllFiles = (dirPath, arrayOfFiles = []) => {
 const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => replacement})
 
 /**
- *
- * @param {*} key
- * @param {*} value
+ * Provided a dot notation key, and a value, return an expanded object splitting
+ * the key.
+ * 
+ * @example
+ * const expandedObj = expand('parent.child.grandchild': { name: 'Preseley' })
+ * console.log(expandedObj) // {parent: { child: {grandchild: {name: 'Presley}}}}
+ * 
+ * @param {string} key
+ * @param {Object} value
  * @returns
+ * 
  */
-const expand = (key, value) =>
+const expandKey = (key, value) =>
     key
         .split('.')
         .reverse()
@@ -437,13 +444,19 @@ const expand = (key, value) =>
         )
 
 /**
- *
- * @param {*} answers
- * @returns
+ * Provided an object there the keys use "dot notation", expand each individual key.
+ * NOTE: This only expands keys at the root level, and not those nested.
+ * 
+ * @example
+ * const expandedObj = expand({'coolthings.babynames': 'Preseley', 'coolthings.cars': 'bmws'})
+ * console.log(expandedObj) // {coolthings: { babynames: 'Presley', cars: 'bmws'}}
+ * 
+ * @param {Object} answers
+ * @returns {Object} The expanded object.
+ * 
  */
-// TODO: Think of better names.
-const expandDotNotationObject = (answers = {}) =>
-    Object.keys(answers).reduce((acc, curr) => merge(acc, expand(curr, answers[curr])), {})
+const expandObject = (obj = {}) =>
+    Object.keys(obj).reduce((acc, curr) => merge(acc, expandKey(curr, obj[curr])), {})
 
 /**
  * Envoke the "npm install" command for the provided project directory.
@@ -475,10 +488,13 @@ const npmInstall = (outputDir, {verbose}) => {
 }
 
 /**
- *
- * @param {*} inputFile
- * @param {*} outputDir
- * @param {*} context
+ * Execute and copy the handlebars template to the output directory using
+ * the provided context object. If the file isn't a template, simply copy
+ * it to the destination.
+ * 
+ * @param {string} inputFile
+ * @param {string} outputDir
+ * @param {Object} context
  */
 const processTemplate = (relFile, inputDir, outputDir, context) => {
     const inputFile = p.join(inputDir, relFile)
@@ -515,7 +531,8 @@ const runGenerator = (context, {outputDir, verbose}) => {
     checkOutputDir(outputDir)
 
     if (extend) {
-        getAllFiles(BOOTSTRAP_DIR)
+        // Bootstrap the projects.
+        getFiles(BOOTSTRAP_DIR)
             .map((file) => file.replace(BOOTSTRAP_DIR, ''))
             .forEach((relFilePath) =>
                 processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context)
@@ -555,7 +572,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
         if (sh.test('-e', assetsDir)) {
-            getAllFiles(assetsDir)
+            getFiles(assetsDir)
                 .map((file) => file.replace(assetsDir, ''))
                 .forEach((relFilePath) =>
                     processTemplate(relFilePath, assetsDir, outputDir, context)
@@ -634,34 +651,28 @@ const main = async (opts) => {
         outputDir = p.join(process.cwd(), selectedPreset.id)
     }
 
-    // Ask preset specific questions.
+    // Ask preset specific questions and merge into the current context.
     const {questions = {}, answers = {}} = selectedPreset
     if (questions) {
         const projectAnswers = await prompt(questions, answers)
 
-        // Merge answers into context.
-        context.answers = {
-            ...context.answers,
-            ...expandDotNotationObject(projectAnswers)
-        }
+        context = merge(
+            context,
+            expandObject(projectAnswers)
+        )
     }
 
-    // If the project is using extensibility, add the package.json content
-    // to the context.
+    // Inject the packageJSON into the context for extensibile projects.
     if (context.answers.project.extend) {
-        // In the future we might want to ask what version of the selected project they
-        // want to extend. But for now lets just get the latest version and synthetically
-        // inject it as an "answer"
         const pkgJSON = JSON.parse(
             sh.exec(`npm view ${selectedPreset.templateSource.id} --json`, {
                 silent: true
             }).stdout
         )
 
-        // TODO: Can we make a util for this to make it look nicer.
         context = merge(
             context,
-            expandDotNotationObject({
+            expandObject({
                 ['answers.general.packageJSON']: pkgJSON
             })
         )
