@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --inspect
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
@@ -603,6 +603,7 @@ const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
 const main = async (opts) => {
+    debugger
     if (!isUsingCompatibleNode) {
         console.log('')
         console.warn(
@@ -633,7 +634,7 @@ const main = async (opts) => {
         )
         process.exit(1)
     }
-    debugger
+
     // If there is no preset arg, prompt the user with a selection of presets.
     if (!presetId) {
         context.answers = await prompt(PRESET_QUESTIONS)
