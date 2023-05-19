@@ -45,7 +45,6 @@ const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) =>
 
 try {
     const overridesDir = pkgJSON.ccExtensibility?.overridesDir
-    console.log('overridesDir', overridesDir)
     if (!overridesDir) {
         const command =
             "formatjs extract 'app/**/*.{js,jsx}' --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]"
@@ -62,7 +61,6 @@ try {
             [],
             ['js', 'jsx', 'ts', 'tsx']
         )
-        console.log('files', files)
         // get the file names that are overridden in base template
         const overriddenFiles = files
             .map((path) => {
@@ -75,13 +73,12 @@ try {
                 return isFileExist ? replacedPath : ''
             })
             .filter(Boolean)
-        console.log('overriddenFiles', overriddenFiles)
         // rename the files needs to ignore to have .ignore extensions
         overriddenFiles.forEach((path) => {
             fsPromises.rename(path, `${path}.ignore`)
         })
 
-        const extractCommand = `formatjs extract ${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx} ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/pages/**/*.{js,jsx} --ignore ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/pages/**/*.{ignore} --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        const extractCommand = `formatjs extract ${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx} ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{js,jsx} --ignore ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{ignore} --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
         exec(extractCommand, (err) => {
             if (err) {
                 console.error(err)
