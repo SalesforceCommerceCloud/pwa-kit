@@ -25,7 +25,7 @@ import {CurrencyProvider, MultiSiteProvider} from '../contexts'
 import {createUrlTemplate} from './url'
 import {getSiteByReference} from './site-utils'
 import jwt from 'jsonwebtoken'
-
+import userEvent from '@testing-library/user-event'
 // This JWT's payload is special
 // it includes 3 fields that commerce-sdk-react cares:
 // exp, isb and sub
@@ -182,9 +182,10 @@ export const renderWithProviders = (children, options) => {
             }
         }
     })
+    const user = userEvent.setup()
     const locals = {}
 
-    return render(children, {
+    const res = render(children, {
         wrapper: () => (
             <TestProvidersWithDataAPI {...options?.wrapperProps} locals={locals}>
                 {children}
@@ -192,6 +193,7 @@ export const renderWithProviders = (children, options) => {
         ),
         ...options
     })
+    return {user, ...res}
 }
 
 /**

@@ -39,18 +39,18 @@ describe('Shopper Gift Certificates query hooks', () => {
     test.each(testCases)('`%s` returns data on success', async (queryName, data) => {
         // getGiftCertificate uses POST, so we need the mutation mock helper to mock the right verb
         mockMutationEndpoints(giftCertificatesEndpoint, data)
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+        const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
-        await waitAndExpectSuccess(wait, () => result.current)
+        await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(data)
     })
     // eslint-disable-next-line jest/expect-expect
     test.each(testCases)('`%s` returns error on error', async (queryName) => {
         mockQueryEndpoint(giftCertificatesEndpoint, {}, 400)
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+        const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
-        await waitAndExpectError(wait, () => result.current)
+        await waitAndExpectError(() => result.current)
     })
 })

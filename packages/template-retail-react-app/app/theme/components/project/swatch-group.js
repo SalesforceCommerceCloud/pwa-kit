@@ -111,5 +111,5 @@ export default {
             swatchButton: {}
         })
     },
-    parts: ['swatch', 'swatchItem']
+    parts: ['swatch', 'swatchButton']
 }

@@ -40,18 +40,18 @@ describe('Shopper Experience query hooks', () => {
     })
     test.each(testCases)('`%s` returns data on success', async (queryName, data) => {
         mockQueryEndpoint(experienceEndpoint, data)
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+        const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
-        await waitAndExpectSuccess(wait, () => result.current)
+        await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(data)
     })
     // eslint-disable-next-line jest/expect-expect
     test.each(testCases)('`%s` returns error on error', async (queryName) => {
         mockQueryEndpoint(experienceEndpoint, {}, 400)
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+        const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
-        await waitAndExpectError(wait, () => result.current)
+        await waitAndExpectError(() => result.current)
     })
 })

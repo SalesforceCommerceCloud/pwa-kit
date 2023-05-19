@@ -6,8 +6,7 @@
  */
 
 import React from 'react'
-import {render, RenderOptions} from '@testing-library/react'
-import {renderHook, WaitForValueToChange} from '@testing-library/react-hooks/dom'
+import {render, RenderOptions, renderHook, waitFor} from '@testing-library/react'
 import {
     QueryClient,
     QueryClientProvider,
@@ -99,6 +98,7 @@ export function renderHookWithProviders<TProps, TResult>(
     })
 }
 
+const NOCK_DELAY = 50
 /** Mocks DELETE, PATCH, POST, and PUT so we don't have to look up which verb an endpoint uses. */
 export const mockMutationEndpoints = (
     matchingPath: string,
@@ -109,10 +109,18 @@ export const mockMutationEndpoints = (
     // For some reason, re-using scope (i.e. nock() and chained methods)
     // results in duplicate mocked requests, which breaks our validation
     // of # of requests used.
-    nock(DEFAULT_TEST_HOST).delete(matcher).reply(statusCode, response)
-    nock(DEFAULT_TEST_HOST).patch(matcher).reply(statusCode, response)
-    nock(DEFAULT_TEST_HOST).put(matcher).reply(statusCode, response)
-    nock(DEFAULT_TEST_HOST).post(matcher).reply(statusCode, response)
+
+    // For delay(NOCK_DELAY):
+    // It sucks that we have to do the delay
+    // but since @react-testing-library/react@14, the waitFor
+    // method only checks hook result by interval, there is no
+    // reliable way to trigger waitFor per re-render.
+    // So we need to give the mocks a small delay to ensure that
+    // the waitFor have time to catch every re-render.
+    nock(DEFAULT_TEST_HOST).delete(matcher).delay(NOCK_DELAY).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).patch(matcher).delay(NOCK_DELAY).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).put(matcher).delay(NOCK_DELAY).reply(statusCode, response)
+    nock(DEFAULT_TEST_HOST).post(matcher).delay(NOCK_DELAY).reply(statusCode, response)
 }
 
 /** Mocks a GET request to an endpoint. */
@@ -122,7 +130,7 @@ export const mockQueryEndpoint = (
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)
-    return nock(DEFAULT_TEST_HOST).get(matcher).reply(statusCode, response)
+    return nock(DEFAULT_TEST_HOST).get(matcher).delay(NOCK_DELAY).reply(statusCode, response)
 }
 
 export const assertUpdateQuery = (
@@ -179,32 +187,38 @@ export const getUnimplementedEndpoints = (
     })
     return [...unimplemented]
 }
+
+// Since @react-testing-library/react@14, the waitFor
+// method only checks hook result by interval. Re-renders no longer
+// trigger waitFor. The default interval value is 100ms and it is way
+// too slow for us to assert value changes per re-render.
+// See https://github.com/testing-library/react-hooks-testing-library/blob/chore/migration-guide/MIGRATION_GUIDE.md#waitfor
+const WAIT_FOR_INTERVAL = 5
 /** Helper type for WaitForValueToChange with hooks */
 type GetHookResult<Data, Err, Vars, Ctx> = () =>
     | UseQueryResult
     | UseMutationResult<Data, Err, Vars, Ctx>
-/** Helper that waits for a hook to finish loading. */
-const waitForHookToFinish = async <Data, Err, Vars, Ctx>(
-    wait: WaitForValueToChange,
-    getResult: GetHookResult<Data, Err, Vars, Ctx>
-) => {
-    await wait(() => getResult().isSuccess || getResult().isError)
-}
 /** Helper that asserts that a hook is a success. */
 export const waitAndExpectSuccess = async <Data, Err, Vars, Ctx>(
-    wait: WaitForValueToChange,
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
-    await waitForHookToFinish(wait, getResult)
-    // Checking the error first gives us the best context for failing tests
+    // Checking for success first because result is still in loading state when checking for error first
+    await waitFor(
+        () => {
+            expect(getResult().isSuccess).toBe(true)
+        },
+        {interval: WAIT_FOR_INTERVAL}
+    )
     expect(getResult().error).toBeNull()
-    expect(getResult().isSuccess).toBe(true)
 }
 /** Helper that asserts that a hook returned an error */
 export const waitAndExpectError = async <Data, Err, Vars, Ctx>(
-    wait: WaitForValueToChange,
     getResult: GetHookResult<Data, Err, Vars, Ctx>
 ) => {
-    await waitForHookToFinish(wait, getResult)
-    expect(getResult().isError).toBe(true)
+    await waitFor(
+        () => {
+            expect(getResult().isError).toBe(true)
+        },
+        {interval: WAIT_FOR_INTERVAL}
+    )
 }

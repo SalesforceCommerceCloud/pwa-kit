@@ -157,6 +157,7 @@ test('route to account page when an authenticated users click on account icon', 
 })
 
 test('route to wishlist page when an authenticated users click on wishlist icon', async () => {
+    const user = userEvent.setup()
     const history = createMemoryHistory()
     // mock push function
     history.push = jest.fn()
@@ -169,13 +170,14 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
         expect(accountTrigger).toBeInTheDocument()
     })
     const wishlistIcon = screen.getByRole('button', {name: /wishlist/i})
-    userEvent.click(wishlistIcon)
+    await user.click(wishlistIcon)
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account/wishlist'))
     })
 })
 
 test('shows dropdown menu when an authenticated users hover on the account icon', async () => {
+    const user = userEvent.setup()
     global.server.use(
         rest.post('*/customers/action/login', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
@@ -198,7 +200,7 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
     })
-    userEvent.hover(accountIcon)
+    await user.hover(accountIcon)
 
     await waitFor(() => {
         expect(screen.getByText(/account details/i)).toBeInTheDocument()

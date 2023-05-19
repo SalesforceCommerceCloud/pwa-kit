@@ -27,7 +27,7 @@ const useAccessToken = (): AccessToken => {
         ? // This conditional is a constant value based on the environment, so the same path will
           // always be followed., and the "rule of hooks" is not violated.
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          useLocalStorage(`${config.siteId}_access_token`)
+          useLocalStorage(`access_token_${config.siteId}`)
         : auth.get('access_token')
 
     // NOTE: auth.ready() is to be called later. If you call it immediately in this hook,

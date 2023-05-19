@@ -6,9 +6,14 @@
  */
 import {useIntl} from 'react-intl'
 
-export default function useLoginFields({form: {control, errors}, prefix = ''}) {
+export default function useLoginFields({
+    form: {
+        control,
+        formState: {errors}
+    },
+    prefix = ''
+}) {
     const {formatMessage} = useIntl()
-
     const fields = {
         email: {
             name: `${prefix}email`,
@@ -22,7 +27,7 @@ export default function useLoginFields({form: {control, errors}, prefix = ''}) {
                     id: 'use_login_fields.error.required_email'
                 })
             },
-            error: errors[`${prefix}email`],
+            error: errors?.[`${prefix}email`],
             control
         },
         password: {
@@ -39,10 +44,9 @@ export default function useLoginFields({form: {control, errors}, prefix = ''}) {
                     id: 'use_login_fields.error.required_password'
                 })
             },
-            error: errors[`${prefix}password`],
+            error: errors?.[`${prefix}password`],
             control
         }
     }
-
     return fields
 }

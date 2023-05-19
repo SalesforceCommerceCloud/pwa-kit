@@ -44,7 +44,7 @@ import {
     SignoutIcon
 } from '../icons'
 
-import {noop} from '../../utils/utils'
+import {isHydrated, noop} from '../../utils/utils'
 import {navLinks, messages} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../loading-spinner'
@@ -86,7 +86,6 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-
     const {isOpen, onClose, onOpen} = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
 
@@ -115,7 +114,6 @@ const Header = ({
             if (!hasEnterPopoverContent.current) onClose()
         }, 100)
     }
-
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
@@ -166,7 +164,7 @@ const Header = ({
                         })}
                     />
 
-                    {isRegistered && (
+                    {isRegistered && isHydrated() && (
                         <Popover
                             isLazy
                             arrowSize={15}
