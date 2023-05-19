@@ -633,7 +633,7 @@ const main = async (opts) => {
         )
         process.exit(1)
     }
-
+    debugger
     // If there is no preset arg, prompt the user with a selection of presets.
     if (!presetId) {
         context.answers = await prompt(PRESET_QUESTIONS)
