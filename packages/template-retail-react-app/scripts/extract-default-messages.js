@@ -53,7 +53,6 @@ try {
         })
     } else {
         const overridesPath = path.join(process.cwd(), pkgJSON.ccExtensibility?.overridesDir)
-        const base = path.join(process.cwd(), 'node_modules', pkgJSON.ccExtensibility?.extends)
         // get all the files in extended app
         const files = getAllFilesByExtensions(
             path.join(overridesPath, 'app'),
@@ -83,10 +82,10 @@ try {
             if (err) {
                 console.error(err)
             }
-        })
-        // restore file names
-        overriddenFiles.forEach((filePath) => {
-            fs.rename(`${filePath}.ignore`, filePath, (err) => err && console.error(err))
+            // restore file names
+            overriddenFiles.forEach((filePath) => {
+                fs.rename(`${filePath}.ignore`, filePath, (err) => err && console.error(err))
+            })
         })
     }
 } catch (error) {
