@@ -13,8 +13,6 @@
  */
 const {exec} = require('child_process')
 const fs = require('fs')
-const fsPromises = require('fs').promises
-
 const path = require('path')
 const packagePath = path.join(process.cwd(), 'package.json')
 const pkgJSON = JSON.parse(fs.readFileSync(packagePath))
@@ -54,7 +52,8 @@ try {
             }
         })
     } else {
-        const overridesPath = path.join(process.cwd(), '.', pkgJSON.ccExtensibility?.overridesDir)
+        const overridesPath = path.join(process.cwd(), pkgJSON.ccExtensibility?.overridesDir)
+        const base = path.join(process.cwd(), 'node_modules', pkgJSON.ccExtensibility?.extends)
         // get all the files in extended app
         const files = getAllFilesByExtensions(
             path.join(overridesPath, 'app'),
@@ -66,7 +65,7 @@ try {
             .map((path) => {
                 const replacedPath = path.replace(
                     overridesDir,
-                    `./node_modules/${pkgJSON.ccExtensibility?.extends}`
+                    `node_modules/${pkgJSON.ccExtensibility?.extends}`
                 )
                 // check if this file does exist in base template
                 const isFileExist = fs.existsSync(replacedPath)
@@ -74,11 +73,12 @@ try {
             })
             .filter(Boolean)
         // rename the files needs to ignore to have .ignore extensions
-        overriddenFiles.forEach((path) => {
-            fsPromises.rename(path, `${path}.ignore`)
+        overriddenFiles.forEach((filePath) => {
+            fs.rename(filePath, `${filePath}.ignore`, (err) => err && console.error(err))
         })
 
-        const extractCommand = `formatjs extract ${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx} ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{js,jsx} --ignore ./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{ignore} --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        const extractCommand = `formatjs extract "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{js,jsx}" "${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx}" --ignore "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.ignore" --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        console.log('extractCommand', extractCommand)
         exec(extractCommand, (err) => {
             if (err) {
                 console.error(err)
@@ -86,7 +86,7 @@ try {
         })
         // restore file names
         overriddenFiles.forEach((filePath) => {
-            fsPromises.rename(`${filePath}.ignore`, filePath)
+            fs.rename(`${filePath}.ignore`, filePath, (err) => err && console.error(err))
         })
     }
 } catch (error) {
