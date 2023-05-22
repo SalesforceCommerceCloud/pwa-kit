@@ -16,13 +16,8 @@ sh.set('-e')
 const RELEASE_ONE_PACKAGE = /release-([-a-z]+)-\d+\./i
 
 const main = () => {
-    const isWorkingTreeClean = sh.exec('git status --porcelain', {silent: true}).trim() === ''
-    if (!isWorkingTreeClean) {
-        console.error(
-            'There are some uncommitted changes. `lerna publish` expects a clean working tree.'
-        )
-        process.exit(1)
-    }
+    // Exiting early if working tree is not clean
+    verifyCleanWorkingTree()
 
     console.log(
         '--- Verify that all the versions are correct by installing every package in the monorepo'
@@ -41,35 +36,61 @@ const main = () => {
 
     if (packageName) {
         console.log(`--- Releasing ${packageName}...`)
-
-        const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
-        const allOtherPublicPackages = publicPackages.filter((pkg) => pkg.name !== packageName)
-
-        allOtherPublicPackages.forEach((pkg) => {
-            sh.exec('npm pkg set private=true', {cwd: pkg.location})
-        })
-        // TODO: now there are uncommitted changes. let's commit them temporarily.
-        // TODO: if there's an error in this publish, then we'll need to clean up (by restoring "private")
-        lernaPublish()
-        allOtherPublicPackages.forEach((pkg) => {
-            sh.exec('npm pkg delete private', {cwd: pkg.location})
-        })
+        publishPackages([packageName])
     } else {
         console.log('--- Releasing all packages...')
-        lernaPublish()
+        publishPackages()
     }
 }
 
-const lernaPublish = () => {
+const publishPackages = (packages = []) => {
+    verifyCleanWorkingTree()
+
+    const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
+    const packagesToIgnore = publicPackages.filter((pkg) => !packages.includes(pkg.name))
+
+    const cleanUp = () => {
+        sh.exec('git reset HEAD~1', {silent: true})
+
+        packagesToIgnore.forEach((pkg) => {
+            sh.exec('npm pkg delete private', {cwd: pkg.location})
+        })
+    }
+
+    const publishSomePackagesOnly = packages.length > 0
+    if (publishSomePackagesOnly) {
+        packagesToIgnore.forEach((pkg) => {
+            sh.exec('npm pkg set private=true', {cwd: pkg.location})
+        })
+
+        sh.exec('git add .', {silent: true})
+        sh.exec('git commit -m "temporary commit to have clean working tree"', {silent: true})
+    }
+
     // Why do we still want `lerna publish`? It turns out that we do need it. Sometimes we wanted some behaviour that's unique to Lerna.
     // For example: we have `publishConfig.directory` in some package.json files that only Lerna knows what to do with it.
     // https://github.com/lerna/lerna/tree/main/libs/commands/publish#publishconfigdirectory
 
     // TODO: un-comment this
-    // sh.exec('npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next')
+    sh.exec('npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next')
+    // TODO: if there's an error in this publish, then we'll need to clean up (by restoring "private")
 
-    console.log('--- Would publish these public packages to npm:')
-    sh.exec('lerna list --long')
+    // console.log('--- Would publish these public packages to npm:')
+    // sh.exec('lerna list --long')
+
+    if (publishSomePackagesOnly) {
+        cleanUp()
+    }
+}
+
+const verifyCleanWorkingTree = () => {
+    const isWorkingTreeClean = sh.exec('git status --porcelain', {silent: true}).trim() === ''
+    if (!isWorkingTreeClean) {
+        console.error(
+            'There are some uncommitted changes. `lerna publish` expects a clean working tree.'
+        )
+        process.exit(1)
+    }
 }
 
 main()
