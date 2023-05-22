@@ -19,14 +19,9 @@ const main = () => {
     // Exiting early if working tree is not clean
     verifyCleanWorkingTree()
 
-    console.log(
-        '--- Verify that all the versions are correct by installing every package in the monorepo'
-    )
-    sh.exec('npm install')
-
     // TODO: un-comment this
     // const branchName = sh.exec('git branch --show-current', {silent: true}).trim()
-    // const branchName = 'release-3.1.x'
+    // const branchName = 'release-3.0.x'
     const branchName = 'release-retail-react-app-1.0.x'
 
     console.log('--- Given the current branch:', branchName)
