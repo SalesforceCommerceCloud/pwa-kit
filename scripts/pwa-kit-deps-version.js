@@ -9,7 +9,11 @@ const sh = require('shelljs')
 const path = require('path')
 const {saveJSONToFile} = require('./utils')
 
+// Exit upon error
+sh.set('-e')
+
 const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
+const pathToRoot = path.join(__dirname, '..')
 
 // Assuming that this is run within a specific package,
 // the script would update its pwa-kit/sdk dependencies.
@@ -41,7 +45,7 @@ const main = () => {
     saveJSONToFile(pkgJson, pathToPackageJson)
 
     // After updating the dependencies, let's update the package lock files
-    sh.exec('npm install')
+    sh.exec('npm install', {cwd: pathToRoot})
 }
 
 const getLatestVersion = (pkgName) => {
