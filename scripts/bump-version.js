@@ -60,6 +60,9 @@ const main = () => {
         saveJSONToFile(pkgJson, pathToPkgJson)
     })
 
+    // After updating the dependencies, let's update the package lock files
+    sh.exec('npm install')
+
     sh.echo('\nVersions of packages in the monorepo:\n')
     sh.exec('lerna list --all --long')
 }
