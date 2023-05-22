@@ -50,6 +50,7 @@ const publishPackages = (packages = []) => {
     const packagesToIgnore = publicPackages.filter((pkg) => !packages.includes(pkg.name))
 
     const cleanUp = () => {
+        // Undo the temporary commit
         sh.exec('git reset HEAD~1', {silent: true})
 
         packagesToIgnore.forEach((pkg) => {
@@ -76,18 +77,15 @@ const publishPackages = (packages = []) => {
         'npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next',
         {fatal: false}
     )
-    if (stderr) {
-        cleanUp()
-        process.exit(code)
-    }
-
     // DEBUG
     // console.log('--- Would publish these public packages to npm:')
     // sh.exec('lerna list --long')
 
+    // Make sure to clean up, no matter if there's an error or not
     if (publishSomePackagesOnly) {
         cleanUp()
     }
+    process.exit(stderr ? code : 0)
 }
 
 const verifyCleanWorkingTree = () => {
