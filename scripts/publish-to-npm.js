@@ -68,13 +68,13 @@ const publishPackages = (packages = []) => {
     // https://github.com/lerna/lerna/tree/main/libs/commands/publish#publishconfigdirectory
 
     // TODO: un-comment this
-    const {stderr, code} = sh.exec(
-        'npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next',
-        {fatal: false}
-    )
+    // const {stderr, code} = sh.exec(
+    //     'npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next',
+    //     {fatal: false}
+    // )
     // DEBUG
-    // console.log('--- Would publish these public packages to npm:')
-    // sh.exec('lerna list --long')
+    console.log('--- Would publish these public packages to npm:')
+    sh.exec('lerna list --long')
 
     // Make sure to clean up, no matter if there's an error or not
     if (publishSomePackagesOnly) {
