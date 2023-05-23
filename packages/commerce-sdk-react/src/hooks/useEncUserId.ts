@@ -24,7 +24,7 @@ const useEncUserId = (): string | null => {
         ? // This conditional is a constant value based on the environment, so the same path will
           // always be followed., and the "rule of hooks" is not violated.
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          useLocalStorage(`${config.siteId}_enc_user_id`)
+          useLocalStorage(`$enc_user_id_${config.siteId}`)
         : auth.get('enc_user_id')
 }
 

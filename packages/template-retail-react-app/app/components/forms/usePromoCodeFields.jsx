@@ -6,7 +6,13 @@
  */
 import {useIntl} from 'react-intl'
 
-export default function usePromoCodeFields({form: {control, errors}, prefix = ''}) {
+export default function usePromoCodeFields({
+    form: {
+        control,
+        formState: {errors}
+    },
+    prefix = ''
+}) {
     const {formatMessage} = useIntl()
 
     const fields = {

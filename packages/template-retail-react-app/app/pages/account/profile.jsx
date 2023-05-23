@@ -142,11 +142,11 @@ const ProfileCard = () => {
                 <Container variant="form">
                     <form onSubmit={form.handleSubmit(submit)}>
                         <Stack spacing={6}>
-                            {form.errors?.global && (
+                            {form.formState.errors?.global && (
                                 <Alert status="error">
                                     <AlertIcon color="red.500" boxSize={4} />
                                     <Text fontSize="sm" ml={3}>
-                                        {form.errors.global.message}
+                                        {form.formState.errors.global.message}
                                     </Text>
                                 </Alert>
                             )}
@@ -292,11 +292,11 @@ const PasswordCard = () => {
                 <Container variant="form">
                     <form onSubmit={form.handleSubmit(submit)}>
                         <Stack spacing={6}>
-                            {form.errors?.global && (
+                            {form.formState.errors?.global && (
                                 <Alert status="error">
                                     <AlertIcon color="red.500" boxSize={4} />
                                     <Text fontSize="sm" ml={3}>
-                                        {form.errors.global.message}
+                                        {form.formState.errors.global.message}
                                     </Text>
                                 </Alert>
                             )}

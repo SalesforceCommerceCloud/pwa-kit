@@ -13,7 +13,6 @@ import {
     mockedEmptyCustomerProductList
 } from 'retail-react-app/app/mocks/mock-data'
 import {screen, waitFor} from '@testing-library/react'
-import user from '@testing-library/user-event'
 import {Route, Switch} from 'react-router-dom'
 import {createPathWithDefaults, renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import ProductList from '.'
@@ -72,6 +71,9 @@ test('should render product list page', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText(/Classic Glen Plaid Pant/i)).toBeInTheDocument()
+    })
 })
 
 test('should render sort option list page', async () => {
@@ -109,24 +111,24 @@ test('should display Selected refinements as there are some in the response', as
 // eslint-disable-next-line jest/no-disabled-tests
 test.skip('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
     expect(await screen.findAllByText('Black')).toBeInTheDocument()
     const wishlistButton = await screen.getAllByLabelText('Wishlist')
     expect(wishlistButton).toHaveLength(25)
-    user.click(wishlistButton[0])
+    await user.click(wishlistButton[0])
     expect(await screen.findByText(/Email/)).toBeInTheDocument()
     expect(await screen.findByText(/Password/)).toBeInTheDocument()
 })
 
 test('clicking a filter will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     // NOTE: Look for a better wait to wait an additional render.
     await waitFor(() => !!screen.getByText(/Beige/i))
 
-    user.click(screen.getByText(/Beige/i))
+    await user.click(screen.getByText(/Beige/i))
     await waitFor(() =>
         expect(window.location.search).toBe(
             '?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
@@ -140,11 +142,11 @@ test('click on Clear All should clear out all the filter in search params', asyn
         'ProductList',
         '/uk/en-GB/category/mens-clothing-jackets?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
     )
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     const clearAllButton = await screen.findAllByText(/Clear All/i)
-    user.click(clearAllButton[0])
+    await user.click(clearAllButton[0])
     await waitFor(() => expect(window.location.search).toBe('?limit=25&offset=0&sort=best-matches'))
 })
 
@@ -158,14 +160,14 @@ test('should display Search Results for when searching', async () => {
 
 test('clicking a filter on search result will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/search?q=dress')
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
 
     // NOTE: Look for a better wait to wait an additional render.
     await waitFor(() => !!screen.getByText(/Beige/i))
 
-    user.click(screen.getByText(/Beige/i))
+    await user.click(screen.getByText(/Beige/i))
 
     await waitFor(() =>
         expect(window.location.search).toBe(

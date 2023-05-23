@@ -27,7 +27,7 @@
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
     "prepare": "npm run build",
-    "test": "internal-lib-build test",
+    "test": "pwa-kit-dev test",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "test:watch": "npm test -- --watch",
     "version": "node ./scripts/version.js"
@@ -49,14 +49,15 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
-    "enzyme": "^3.11.0",
-    "internal-lib-build": "^3.0.0-dev",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
+    "internal-lib-build": "3.0.0-dev",
     "node-html-parser": "^3.3.6",
     "nodemon": "^2.0.22",
-    "pwa-kit-dev": "^3.0.0-dev",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "pwa-kit-dev": "3.0.0-dev",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-helmet": "5.2.1",
     "react-router-dom": "^5.3.4",
     "regenerator-runtime": "^0.13.11",
@@ -65,14 +66,14 @@
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.0",
-    "react": ">=16.14 || <18",
-    "react-dom": ">=16.14 || <18",
+    "react": "^18",
+    "react-dom": "^18",
     "react-helmet": "6",
     "react-router-dom": "^5.1.2"
   },
   "engines": {
-    "node": "^16.0.0 || ^18.0.0",
-    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+    "node": "^16.11.0 || ^18.0.0",
+    "npm": "^8.0.0 || ^9.0.0"
   },
   "publishConfig": {
     "directory": "dist"

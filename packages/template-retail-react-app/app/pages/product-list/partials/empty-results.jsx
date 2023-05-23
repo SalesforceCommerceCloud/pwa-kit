@@ -12,6 +12,7 @@ import {Link as RouteLink} from 'react-router-dom'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {SearchIcon} from 'retail-react-app/app/components/icons'
 import RecommendedProducts from 'retail-react-app/app/components/recommended-products'
+import {EINSTEIN_RECOMMENDERS} from 'retail-react-app/app/constants'
 
 const contactUsMessage = defineMessage({
     id: 'empty_search_results.link.contact_us',
@@ -88,7 +89,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                                     id="empty_search_results.recommended_products.title.top_sellers"
                                 />
                             }
-                            recommender={'home-top-revenue-for-category'}
+                            recommender={EINSTEIN_RECOMMENDERS.EMPTY_SEARCH_RESULTS_TOP_SELLERS}
                             mx={{base: -4, md: -8, lg: 0}}
                         />
 
@@ -99,18 +100,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                                     id="empty_search_results.recommended_products.title.most_viewed"
                                 />
                             }
-                            recommender={'products-in-all-categories'}
-                            mx={{base: -4, md: -8, lg: 0}}
-                        />
-
-                        <RecommendedProducts
-                            title={
-                                <FormattedMessage
-                                    defaultMessage="Most Viewed"
-                                    id="empty_search_results.recommended_products.title.most_viewed"
-                                />
-                            }
-                            recommender={'products-in-all-categories'}
+                            recommender={EINSTEIN_RECOMMENDERS.EMPTY_SEARCH_RESULTS_MOST_VIEWED}
                             mx={{base: -4, md: -8, lg: 0}}
                         />
                     </Stack>

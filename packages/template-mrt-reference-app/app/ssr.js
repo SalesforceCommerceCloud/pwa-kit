@@ -67,6 +67,9 @@ const ENVS_TO_EXPOSE = [
     'aws_lambda_log_stream_name',
     'aws_region',
     'bundle_id',
+    // These "customer" defined environment variables are set by the Manager
+    // and expected by the MRT smoke test suite
+    'customer_*',
     'deploy_id',
     'deploy_target',
     'external_domain_name',

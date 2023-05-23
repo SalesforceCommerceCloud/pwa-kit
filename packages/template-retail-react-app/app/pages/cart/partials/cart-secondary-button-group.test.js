@@ -11,7 +11,6 @@ import ItemVariantProvider from 'retail-react-app/app/components/item-variant'
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import CartSecondaryButtonGroup from 'retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
-import user from '@testing-library/user-event'
 import {noop} from 'retail-react-app/app/utils/utils'
 
 const MockedComponent = ({
@@ -42,12 +41,12 @@ beforeEach(() => {
 })
 
 test('renders secondary action component', async () => {
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
     const removeButton = screen.getByRole('button', {
         name: /remove/i
     })
     expect(removeButton).toBeInTheDocument()
-    user.click(removeButton)
+    await user.click(removeButton)
 
     const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
     await waitFor(() => {
@@ -62,7 +61,7 @@ test('renders secondary with event handlers', async () => {
     const onEditClick = jest.fn()
     const onAddToWishlistClick = jest.fn()
 
-    renderWithProviders(
+    const {user} = renderWithProviders(
         <MockedComponent
             onAddToWishlistClick={onAddToWishlistClick}
             onEditClick={onEditClick}
@@ -75,13 +74,13 @@ test('renders secondary with event handlers', async () => {
     })
 
     expect(editButton).toBeInTheDocument()
-    user.click(editButton)
+    await user.click(editButton)
     expect(onEditClick).toHaveBeenCalledTimes(1)
 
     const addToWishlistButton = screen.getByRole('button', {
         name: /Add to wishlist/i
     })
-    user.click(addToWishlistButton)
+    await user.click(addToWishlistButton)
     expect(onAddToWishlistClick).toHaveBeenCalledTimes(1)
 
     const removeButton = screen.getByRole('button', {
@@ -90,7 +89,7 @@ test('renders secondary with event handlers', async () => {
 
     expect(removeButton).toBeInTheDocument()
 
-    user.click(removeButton)
+    await user.click(removeButton)
 
     const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
     await waitFor(() => {
@@ -98,7 +97,7 @@ test('renders secondary with event handlers', async () => {
         // We need to assert the actual text within the alert
         expect(confirmButton).toBeInTheDocument()
     })
-    user.click(confirmButton)
+    await user.click(confirmButton)
 
     expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
 })

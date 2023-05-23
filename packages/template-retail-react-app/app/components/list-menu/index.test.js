@@ -5,21 +5,23 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import ListMenu from 'retail-react-app/app/components/list-menu/index'
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import {mockCategories} from 'retail-react-app/app/mocks/mock-data'
+import userEvent from '@testing-library/user-event'
 
 describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {
+        const user = userEvent.setup()
         renderWithProviders(<ListMenu root={mockCategories.root} />)
 
-        const drawer = document.getElementById('chakra-toast-portal')
-
-        const category = await waitFor(() => screen.getByText(/Mens/i))
-        expect(category).toBeInTheDocument()
-        expect(drawer).toBeInTheDocument()
+        const categoryTrigger = screen.getByText(/Mens/i)
+        await user.hover(categoryTrigger)
+        expect(categoryTrigger).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
+        const suit = screen.getByText(/suits/i)
+        expect(suit).toBeInTheDocument()
     })
     test('ListMenu renders Spinner without root categories', () => {
         renderWithProviders(<ListMenu />, {
