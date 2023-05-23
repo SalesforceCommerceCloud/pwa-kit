@@ -94,7 +94,7 @@ describe('ShopperOrders mutations', () => {
     beforeEach(() => nock.cleanAll())
     test.each(allTestCases)('`%s` returns data on success', async (mutationName, options) => {
         mockMutationEndpoints(ordersEndpoint, ORDER)
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+        const {result} = renderHookWithProviders(() => {
             return useShopperOrdersMutation(mutationName)
         })
         expect(result.current.data).toBeUndefined()
@@ -103,12 +103,12 @@ describe('ShopperOrders mutations', () => {
             type Opts = Parameters<typeof result.current.mutate>[0]
             result.current.mutate(options as Opts)
         })
-        await waitAndExpectSuccess(wait, () => result.current)
+        await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(ORDER)
     })
     test.each(allTestCases)('`%s` returns error on error', async (mutationName, options) => {
         mockMutationEndpoints(ordersEndpoint, {error: true}, 400)
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+        const {result} = renderHookWithProviders(() => {
             return useShopperOrdersMutation(mutationName)
         })
         expect(result.current.error).toBeNull()
@@ -116,7 +116,7 @@ describe('ShopperOrders mutations', () => {
             type Opts = Parameters<typeof result.current.mutate>[0]
             result.current.mutate(options as Opts)
         })
-        await waitAndExpectError(wait, () => result.current)
+        await waitAndExpectError(() => result.current)
         // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
         // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
         expect(result.current.error).toHaveProperty('response')
@@ -125,7 +125,7 @@ describe('ShopperOrders mutations', () => {
         const [mutationName, options] = createTestCase
         mockMutationEndpoints(ordersEndpoint, ORDER) // createOrder
         mockQueryEndpoint(ordersEndpoint, ORDER) // getOrder
-        const {result: mut, waitForValueToChange: wait} = renderHookWithProviders(() => ({
+        const {result: mut} = renderHookWithProviders(() => ({
             queryClient: useQueryClient(),
             mutation: useShopperOrdersMutation(mutationName)
         }))
@@ -133,19 +133,19 @@ describe('ShopperOrders mutations', () => {
         // The query cache should be empty before we do anything
         expect(cached).toEqual([])
         act(() => mut.current.mutation.mutate(options))
-        await waitAndExpectSuccess(wait, () => mut.current.mutation)
+        await waitAndExpectSuccess(() => mut.current.mutation)
         const {result: query} = renderHookWithProviders(() =>
             // We know `ORDER` has an `orderNo` because we set it, but the `Order` type forgets that
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             queries.useOrder({parameters: {orderNo: ORDER.orderNo!}})
         )
-        await waitAndExpectSuccess(wait, () => query.current)
+        await waitAndExpectSuccess(() => query.current)
         expect(query.current.data).toEqual(ORDER)
     })
     test('`createOrder` does not update the cache on error', async () => {
         const [mutationName, options] = createTestCase
         mockMutationEndpoints(ordersEndpoint, {error: true}, 400) // createOrder
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => ({
+        const {result} = renderHookWithProviders(() => ({
             queryClient: useQueryClient(),
             mutation: useShopperOrdersMutation(mutationName)
         }))
@@ -153,7 +153,7 @@ describe('ShopperOrders mutations', () => {
         // The query cache should be empty before we do anything
         expect(getQueries()).toEqual([])
         act(() => result.current.mutation.mutate(options))
-        await waitAndExpectError(wait, () => result.current.mutation)
+        await waitAndExpectError(() => result.current.mutation)
         // The query cache should not have changed
         expect(getQueries()).toEqual([])
     })

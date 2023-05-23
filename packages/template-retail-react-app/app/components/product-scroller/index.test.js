@@ -6,9 +6,9 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-import user from '@testing-library/user-event'
 import ProductScroller from './index'
 import {renderWithProviders} from '../../utils/test-utils'
+import userEvent from '@testing-library/user-event'
 
 // Our component uses `scrollBy` on an html element, which we need
 // to create ourselves as its not in jsdom by default. Here we make
@@ -47,15 +47,16 @@ describe('Product Scroller', () => {
         )
         expect(screen.getByTestId('custom-header')).toBeInTheDocument()
     })
-    test('Renders left/right scroll buttons', () => {
+    test('Renders left/right scroll buttons', async () => {
+        const user = userEvent.setup()
         renderWithProviders(<ProductScroller title="Scroller Title" products={testProducts} />)
-        user.click(screen.getByTestId('product-scroller-nav-right'))
+        await user.click(screen.getByTestId('product-scroller-nav-right'))
         expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
             top: 0,
             left: 1024,
             behavior: 'smooth'
         })
-        user.click(screen.getByTestId('product-scroller-nav-left'))
+        await user.click(screen.getByTestId('product-scroller-nav-left'))
         expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
             top: 0,
             left: -1024,
@@ -71,15 +72,19 @@ describe('Product Scroller', () => {
         expect(screen.queryByTestId('product-scroller-nav-left')).not.toBeInTheDocument()
         expect(screen.queryByTestId('product-scroller-nav-right')).not.toBeInTheDocument()
     })
-    test('productTileProps as object', () => {
+    test('productTileProps as object', async () => {
+        const user = userEvent.setup()
+
         const onClickMock = jest.fn()
         renderWithProviders(
             <ProductScroller products={testProducts} productTileProps={{onClick: onClickMock}} />
         )
-        user.click(screen.getByText(testProducts[0].productName))
+        await user.click(screen.getByText(testProducts[0].productName))
         expect(onClickMock).toHaveBeenCalled()
     })
-    test('productTileProps as function', () => {
+    test('productTileProps as function', async () => {
+        const user = userEvent.setup()
+
         const onClickMock = jest.fn()
         renderWithProviders(
             <ProductScroller
@@ -87,7 +92,7 @@ describe('Product Scroller', () => {
                 productTileProps={() => ({onClick: onClickMock})}
             />
         )
-        user.click(screen.getByText(testProducts[0].productName))
+        await user.click(screen.getByText(testProducts[0].productName))
         expect(onClickMock).toHaveBeenCalled()
     })
 })

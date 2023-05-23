@@ -21,7 +21,6 @@ import {
     Stack,
     Text
 } from '@chakra-ui/react'
-import {useHistory} from 'react-router-dom'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
@@ -29,14 +28,15 @@ import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
 import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
+import useNavigation from '../../../hooks/use-navigation'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
-    const history = useHistory()
     const authModal = useAuthModal('password')
+    const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
@@ -187,7 +187,7 @@ const ContactInfo = () => {
                     onClose={() => setSignOutConfirmDialogIsOpen(false)}
                     onConfirm={async () => {
                         await logout.mutateAsync()
-                        history.replace('/')
+                        navigate('/login')
                         setSignOutConfirmDialogIsOpen(false)
                     }}
                 />

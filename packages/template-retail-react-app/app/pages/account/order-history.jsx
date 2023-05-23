@@ -92,7 +92,7 @@ const AccountOrderHistory = () => {
         {
             parameters: {customerId, limit, offset}
         },
-        {enabled: onClient}
+        {enabled: onClient && !!customerId}
     )
 
     const hasOrders = orders?.length > 0
