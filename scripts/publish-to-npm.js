@@ -8,9 +8,6 @@
 
 const sh = require('shelljs')
 
-// Exit upon error
-sh.set('-e')
-
 // The branch naming convention for releasing a particular package is: release-<package-name>-1.1.x
 // For example: 'release-retail-react-app-1.1.x'
 const RELEASE_ONE_PACKAGE = /release-([-a-z]+)-\d+\./i
@@ -19,10 +16,10 @@ const main = () => {
     // Exiting early if working tree is not clean
     verifyCleanWorkingTree()
 
-    // TODO: un-comment this
-    // const branchName = sh.exec('git branch --show-current', {silent: true}).trim()
+    const branchName = sh.exec('git branch --show-current', {silent: true}).trim()
+    // DEBUG
     // const branchName = 'release-3.0.x'
-    const branchName = 'release-retail-react-app-1.0.x'
+    // const branchName = 'release-retail-react-app-1.0.x'
 
     console.log('--- Given the current branch:', branchName)
 
@@ -67,14 +64,14 @@ const publishPackages = (packages = []) => {
     // For example: we have `publishConfig.directory` in some package.json files that only Lerna knows what to do with it.
     // https://github.com/lerna/lerna/tree/main/libs/commands/publish#publishconfigdirectory
 
-    // TODO: un-comment this
-    // const {stderr, code} = sh.exec(
-    //     'npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next',
-    //     {fatal: false}
-    // )
+    const {stderr, code} = sh.exec(
+        `npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next ${
+            process.env.CI ? '' : '--registry http://localhost:4873/'
+        }`
+    )
     // DEBUG
-    console.log('--- Would publish these public packages to npm:')
-    sh.exec('lerna list --long')
+    // console.log('--- Would publish these public packages to npm:')
+    // sh.exec('lerna list --long')
 
     // Make sure to clean up, no matter if there's an error or not
     if (publishSomePackagesOnly) {
