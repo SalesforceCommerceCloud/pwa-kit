@@ -8,7 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Route, Routes, useMatch, Redirect} from 'react-router'
+import {Route, Routes, useMatch, Navigate} from 'react-router-dom'
 import {
     Accordion,
     AccordionButton,
@@ -109,7 +109,7 @@ const Account = () => {
     // we don't want redirect on server side
     if (customerType !== null && !isRegistered && onClient) {
         const path = buildUrl('/login')
-        return <Redirect to={{pathname: path, state: {directedFrom: '/account'}}} />
+        return <Navigate to={{pathname: path, state: {directedFrom: '/account'}}} />
     }
     return (
         <Box

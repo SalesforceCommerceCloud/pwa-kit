@@ -57,7 +57,7 @@ jest.mock('../universal/routes', () => {
     const React = require('react')
     const PropTypes = require('prop-types')
     const errors = require('../universal/errors')
-    const {Redirect} = require('react-router-dom')
+    const {Navigate} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
     const {useQuery} = require('@tanstack/react-query')
     const {useServerContext} = require('../universal/hooks')
@@ -178,7 +178,7 @@ jest.mock('../universal/routes', () => {
         }
 
         render() {
-            return <Redirect to="/elsewhere/" />
+            return <Navigate to="/elsewhere/" />
         }
     }
 

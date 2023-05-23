@@ -8,7 +8,7 @@
 import React from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 // TODO
-import {useHistory, useMatch} from 'react-router'
+import {useNavigate, useMatch} from 'react-router'
 import {
     Box,
     Heading,
@@ -106,7 +106,7 @@ OrderProducts.propTypes = {
 
 const AccountOrderDetail = () => {
     const {params} = useMatch()
-    const history = useHistory()
+    const navigate = useNavigate()
     const {formatMessage, formatDate} = useIntl()
 
     const {data: order, isLoading: isOrderLoading} = useOrder(
@@ -136,11 +136,11 @@ const AccountOrderDetail = () => {
                         size="sm"
                         onClick={(e) => {
                             // TODO
-                            if (history.action === 'PUSH') {
-                                e.preventDefault()
-                                // TODO
-                                history.goBack()
-                            }
+                            // if (history.action === 'PUSH') {
+                            //     e.preventDefault()
+                            //     // TODO
+                            //     history.goBack()
+                            // }
                         }}
                     >
                         <FormattedMessage
