@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
-import HomePage from './index'
+import HomePage from 'retail-react-app/app/pages/home'
 import {rest} from 'msw'
 import {mockProductSearch} from 'retail-react-app/app/mocks/mock-data'
 

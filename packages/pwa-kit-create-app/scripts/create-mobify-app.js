@@ -499,7 +499,7 @@ const npmInstall = (outputDir, {verbose}) => {
 const processTemplate = (relFile, inputDir, outputDir, context) => {
     const inputFile = p.join(inputDir, relFile)
     const outputFile = p.join(outputDir, relFile)
-    const destDir = outputFile.split(p.sep).slice(0, -1).join(p.sep)
+    const destDir = p.join(outputFile, '..')
 
     // Create folder if we are doing a deep copy
     if (destDir) {
