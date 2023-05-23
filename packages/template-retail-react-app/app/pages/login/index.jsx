@@ -91,7 +91,6 @@ const Login = () => {
     useEffect(() => {
         einstein.sendViewPage(location.pathname)
     }, [])
-
     return (
         <Box data-testid="login-page" bg="gray.50" py={[8, 16]}>
             <Seo title="Sign in" description="Customer sign in" />

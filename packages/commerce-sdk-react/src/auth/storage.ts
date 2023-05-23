@@ -9,25 +9,23 @@ import Cookies from 'js-cookie'
 export type StorageType = 'cookie' | 'local' | 'memory'
 
 export interface BaseStorageOptions {
-    keyPrefix?: string
-    keyPrefixSeparator?: string
+    keySuffix?: string
 }
 
 export interface MemoryStorageOptions extends BaseStorageOptions {
     sharedContext?: boolean
 }
 export abstract class BaseStorage {
-    protected options: Required<BaseStorageOptions>
+    protected options: BaseStorageOptions = {}
 
-    constructor(options: BaseStorageOptions = {keyPrefixSeparator: '_'}) {
+    constructor(options?: BaseStorageOptions) {
         this.options = {
-            keyPrefixSeparator: options.keyPrefix ? options.keyPrefixSeparator ?? '_' : '',
-            keyPrefix: options.keyPrefix ?? ''
+            keySuffix: options?.keySuffix ?? ''
         }
     }
 
-    protected getPrefixedKey(key: string): string {
-        return `${this.options.keyPrefix}${this.options.keyPrefixSeparator}${key}`
+    protected getSuffixedKey(key: string): string {
+        return this.options.keySuffix ? `${key}_${this.options.keySuffix}` : key
     }
     abstract set(key: string, value: string, options?: unknown): void
     abstract get(key: string): string
@@ -49,16 +47,16 @@ export class CookieStorage extends BaseStorage {
         }
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
-        const prefixedKey = this.getPrefixedKey(key)
-        Cookies.set(prefixedKey, value, {...options, secure: true})
+        const suffixedKey = this.getSuffixedKey(key)
+        Cookies.set(suffixedKey, value, {...options, secure: true})
     }
     get(key: string) {
-        const prefixedKey = this.getPrefixedKey(key)
-        return Cookies.get(prefixedKey) || ''
+        const suffixedKey = this.getSuffixedKey(key)
+        return Cookies.get(suffixedKey) || ''
     }
     delete(key: string) {
-        const prefixedKey = this.getPrefixedKey(key)
-        Cookies.remove(prefixedKey)
+        const suffixedKey = this.getSuffixedKey(key)
+        Cookies.remove(suffixedKey)
     }
 }
 
@@ -77,26 +75,26 @@ export class LocalStorage extends BaseStorage {
         }
     }
     set(key: string, value: string) {
-        const prefixedKey = this.getPrefixedKey(key)
-        const oldValue = this.get(prefixedKey)
-        window.localStorage.setItem(prefixedKey, value)
+        const oldValue = this.get(key)
+        const suffixedKey = this.getSuffixedKey(key)
+        window.localStorage.setItem(suffixedKey, value)
         const event = new StorageEvent('storage', {
-            key: prefixedKey,
+            key: suffixedKey,
             oldValue: oldValue,
             newValue: value
         })
         window.dispatchEvent(event)
     }
     get(key: string) {
-        const prefixedKey = this.getPrefixedKey(key)
-        return window.localStorage.getItem(prefixedKey) || ''
+        const suffixedKey = this.getSuffixedKey(key)
+        return window.localStorage.getItem(suffixedKey) || ''
     }
     delete(key: string) {
-        const prefixedKey = this.getPrefixedKey(key)
-        const oldValue = this.get(prefixedKey)
-        window.localStorage.removeItem(prefixedKey)
+        const suffixedKey = this.getSuffixedKey(key)
+        const oldValue = this.get(suffixedKey)
+        window.localStorage.removeItem(suffixedKey)
         const event = new StorageEvent('storage', {
-            key: prefixedKey,
+            key: suffixedKey,
             oldValue: oldValue,
             newValue: null
         })
@@ -114,15 +112,15 @@ export class MemoryStorage extends BaseStorage {
         this.map = options?.sharedContext ? globalMap : new Map()
     }
     set(key: string, value: string) {
-        const prefixedKey = this.getPrefixedKey(key)
-        this.map.set(prefixedKey, value)
+        const suffixedKey = this.getSuffixedKey(key)
+        this.map.set(suffixedKey, value)
     }
     get(key: string) {
-        const prefixedKey = this.getPrefixedKey(key)
-        return this.map.get(prefixedKey) || ''
+        const suffixedKey = this.getSuffixedKey(key)
+        return this.map.get(suffixedKey) || ''
     }
     delete(key: string) {
-        const prefixedKey = this.getPrefixedKey(key)
-        this.map.delete(prefixedKey)
+        const suffixedKey = this.getSuffixedKey(key)
+        this.map.delete(suffixedKey)
     }
 }

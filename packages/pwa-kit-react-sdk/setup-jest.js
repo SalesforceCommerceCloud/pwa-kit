@@ -6,16 +6,8 @@
  */
 /* eslint-env jest */
 
-import Enzyme from 'enzyme'
 import 'regenerator-runtime/runtime'
-
-// DANGEROUS: this enzyme React 17 adapter is unofficial
-// because the official adaptor is still in development
-// see https://github.com/enzymejs/enzyme/issues/2429
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
-
-Enzyme.configure({adapter: new Adapter()})
-
+import '@testing-library/jest-dom'
 // Mock the application configuration to be used in all tests.
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {

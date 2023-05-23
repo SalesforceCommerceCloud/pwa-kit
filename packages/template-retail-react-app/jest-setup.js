@@ -69,6 +69,9 @@ export const setupMockServer = () => {
         rest.post('*/v3/activities/EinsteinTestSite/*', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         }),
+        rest.post('*/activities/EinsteinTestSite/*', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+        }),
         rest.post('*/v3/personalization/recs/EinsteinTestSite/*', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         })
@@ -153,4 +156,36 @@ if (typeof window.matchMedia !== 'function') {
             dispatchEvent: jest.fn()
         }))
     })
+}
+
+const prepareHandlers = (handlerConfig = []) => {
+    return handlerConfig.map((config) => {
+        return rest[config.method?.toLowerCase() || 'get'](config.path, (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(config.status || 200),
+                config.res && ctx.json(config.res(req, res, ctx))
+            )
+        })
+    })
+}
+
+/**
+ * This util function allows developer to prepend handlers to the mock server by passing a config array of objects
+ *
+ * @param handlerConfig
+ * @example
+ * const handlers = [
+ *  {
+ *      path: "*\/products/"
+ *      method: 'post',
+ *      res: (req, res, ctx) => {
+ *          return mockData
+ *      }
+ *  }
+ * ]
+ */
+export const prependHandlersToServer = (handlerConfig) => {
+    const handlers = prepareHandlers(handlerConfig)
+    global.server.use(...handlers)
 }

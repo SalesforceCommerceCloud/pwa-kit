@@ -12,13 +12,12 @@ import {
     Divider,
     SimpleGrid,
     useMultiStyleConfig,
-    StylesProvider,
-    Select,
-    useStyles,
+    Select as ChakraSelect,
     Heading,
     Input,
     InputGroup,
     InputRightElement,
+    createStylesContext,
     Button,
     FormControl
 } from '@chakra-ui/react'
@@ -30,16 +29,25 @@ import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/respo
 import {getPathWithLocale} from 'retail-react-app/app/utils/url'
 import LocaleText from 'retail-react-app/app/components/locale-text'
 import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
+import styled from '@emotion/styled'
 
+const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
     const styles = useMultiStyleConfig('Footer')
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
-
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
+
+    // NOTE: this is a workaround to fix hydration error, by making sure that the `option.selected` property is set.
+    // For some reason, adding some styles prop (to the option element) prevented `selected` from being set.
+    // So now we add the styling to the parent element instead.
+    const Select = styled(ChakraSelect)({
+        // Targeting the child element
+        option: styles.localeDropdownOption
+    })
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -132,7 +140,7 @@ const Footer = ({...otherProps}) => {
                                 {...otherProps}
                             >
                                 <Select
-                                    value={locale}
+                                    defaultValue={locale}
                                     onChange={({target}) => {
                                         setLocale(target.value)
 
@@ -147,13 +155,9 @@ const Footer = ({...otherProps}) => {
                                     {...styles.localeDropdown}
                                 >
                                     {supportedLocaleIds.map((locale) => (
-                                        <LocaleText
-                                            as="option"
-                                            value={locale}
-                                            shortCode={locale}
-                                            key={locale}
-                                            {...styles.localeDropdownOption}
-                                        />
+                                        <option key={locale} value={locale}>
+                                            <LocaleText shortCode={locale} />
+                                        </option>
                                     ))}
                                 </Select>
                             </FormControl>
@@ -190,7 +194,6 @@ export default Footer
 const Subscribe = ({...otherProps}) => {
     const styles = useStyles()
     const intl = useIntl()
-
     return (
         <Box {...styles.subscribe} {...otherProps}>
             <Heading {...styles.subscribeHeading}>
@@ -208,7 +211,10 @@ const Subscribe = ({...otherProps}) => {
 
             <Box>
                 <InputGroup>
-                    <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
+                    {/* Had to swap the following InputRightElement and Input 
+                        to avoid the hydration error due to mismatched html between server and client side.
+                        This is a workaround for Lastpass plugin that automatically injects its icon for input fields.
+                    */}
                     <InputRightElement {...styles.subscribeButtonContainer}>
                         <Button variant="footer">
                             {intl.formatMessage({
@@ -217,6 +223,7 @@ const Subscribe = ({...otherProps}) => {
                             })}
                         </Button>
                     </InputRightElement>
+                    <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
                 </InputGroup>
             </Box>
 

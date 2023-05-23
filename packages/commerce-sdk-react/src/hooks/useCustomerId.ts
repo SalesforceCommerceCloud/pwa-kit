@@ -21,7 +21,7 @@ const useCustomerId = (): string | null => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const config = useConfig()
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useLocalStorage(`${config.siteId}_customer_id`)
+        return useLocalStorage(`customer_id_${config.siteId}`)
     }
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const auth = useAuthContext()

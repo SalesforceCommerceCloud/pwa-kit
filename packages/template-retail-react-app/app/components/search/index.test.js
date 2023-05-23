@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {renderWithProviders, createPathWithDefaults} from 'retail-react-app/app/utils/test-utils'
-import user from '@testing-library/user-event'
-import {screen, waitFor, within, act} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {screen, waitFor, within} from '@testing-library/react'
 import SearchInput from 'retail-react-app/app/components/search/index'
 import Suggestions from 'retail-react-app/app/components/search/partials/suggestions'
 import {
@@ -42,10 +42,10 @@ test('renders SearchInput', () => {
 })
 
 test('changes url when enter is pressed', async () => {
-    await act(async () => {
-        renderWithProviders(<SearchInput />, {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
-        })
+    const user = userEvent.setup()
+
+    renderWithProviders(<SearchInput />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dresses{enter}')
@@ -58,10 +58,12 @@ test('changes url when enter is pressed', async () => {
 })
 
 test('shows previously searched items when focused', async () => {
+    const user = userEvent.setup()
+
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
-    user.clear(searchInput)
+    await user.clear(searchInput)
     await searchInput.focus()
     const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
     const recentSearchesEl = await within(suggestionPopoverEl).getByTestId('sf-suggestion-recent')
@@ -72,6 +74,7 @@ test('shows previously searched items when focused', async () => {
 })
 
 test('saves recent searches on submit', async () => {
+    const user = userEvent.setup()
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
@@ -80,6 +83,8 @@ test('saves recent searches on submit', async () => {
 })
 
 test('limits number of saved recent searches', async () => {
+    const user = userEvent.setup()
+
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops', 'Gloves', 'Bracelets'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
@@ -88,9 +93,8 @@ test('limits number of saved recent searches', async () => {
 })
 
 test('suggestions render when there are some', async () => {
-    await act(() => {
-        renderWithProviders(<SearchInput />)
-    })
+    const user = userEvent.setup()
+    renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dress')
     expect(searchInput.value).toBe('Dress')
@@ -102,6 +106,7 @@ test('suggestions render when there are some', async () => {
 })
 
 test('clicking clear searches clears recent searches', async () => {
+    const user = userEvent.setup()
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')

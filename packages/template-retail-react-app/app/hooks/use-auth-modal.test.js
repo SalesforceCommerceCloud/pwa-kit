@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {screen, within, waitFor} from '@testing-library/react'
-import user from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event'
 import {
     renderWithProviders,
     createPathWithDefaults,
@@ -104,22 +104,28 @@ afterEach(() => {
 })
 
 test('Renders login modal by default', async () => {
+    const user = userEvent.setup()
+
     renderWithProviders(<MockedComponent />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
-    expect(screen.getByText(/welcome back/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Password/)).toBeInTheDocument()
-    expect(screen.getByText(/forgot password/i)).toBeInTheDocument()
-    expect(screen.getByText(/sign in/i)).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText(/welcome back/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/Password/)).toBeInTheDocument()
+        expect(screen.getByText(/forgot password/i)).toBeInTheDocument()
+        expect(screen.getByText(/sign in/i)).toBeInTheDocument()
+    })
 })
 
 // TODO: Fix flaky/broken test
 // eslint-disable-next-line jest/no-disabled-tests
 test.skip('Renders error when given incorrect log in credentials', async () => {
+    const user = userEvent.setup()
+
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {
@@ -129,11 +135,11 @@ test.skip('Renders error when given incorrect log in credentials', async () => {
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'bad@test.com')
-    user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
+    await user.type(screen.getByLabelText('Email'), 'bad@test.com')
+    await user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
 
     // mock failed auth request
     global.server.use(
@@ -145,7 +151,7 @@ test.skip('Renders error when given incorrect log in credentials', async () => {
         })
     )
 
-    user.click(screen.getByText(/sign in/i))
+    await user.click(screen.getByText(/sign in/i))
     // give it some time to show the error in the form
     await waitFor(
         () => {
@@ -160,9 +166,9 @@ test.skip('Renders error when given incorrect log in credentials', async () => {
     )
 })
 
-// TODO: investigate why this test is failing when running with other tests
-// eslint-disable-next-line jest/no-disabled-tests
-test.skip('Allows customer to create an account', async () => {
+test('Allows customer to create an account', async () => {
+    const user = userEvent.setup()
+
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {
@@ -173,14 +179,14 @@ test.skip('Allows customer to create an account', async () => {
     // open the modal
     const trigger = screen.getByText('Open Modal')
 
-    user.click(trigger)
+    await user.click(trigger)
     let form
     await waitFor(() => {
         form = screen.queryByTestId('sf-auth-modal-form')
         expect(form).toBeInTheDocument()
     })
     const createAccount = screen.getByText(/create account/i)
-    user.click(createAccount)
+    await user.click(createAccount)
     let registerForm
     await waitFor(() => {
         registerForm = screen.getByTestId('sf-auth-modal-form-register')
@@ -194,10 +200,10 @@ test.skip('Allows customer to create an account', async () => {
         expect(firstName).toBeInTheDocument()
     })
 
-    user.paste(withinForm.getByLabelText('First Name'), 'Tester')
-    user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
-    user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
-    user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+    await user.type(withinForm.getByLabelText('First Name'), 'Tester')
+    await user.type(withinForm.getByLabelText('Last Name'), 'Tester')
+    await user.type(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
+    await user.type(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
 
     // login with credentials
     global.server.use(
@@ -223,7 +229,7 @@ test.skip('Allows customer to create an account', async () => {
         })
     )
     const submitButton = withinForm.getByText(/create account/i)
-    user.click(submitButton)
+    await user.click(submitButton)
 
     await waitFor(() => {
         expect(form).not.toBeInTheDocument()
@@ -244,6 +250,8 @@ test.skip('Allows customer to create an account', async () => {
 // TODO: investingate why this test is failing when running with other tests
 // eslint-disable-next-line jest/no-disabled-tests
 test.skip('Allows customer to sign in to their account', async () => {
+    const user = userEvent.setup()
+
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {
@@ -253,11 +261,11 @@ test.skip('Allows customer to sign in to their account', async () => {
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'customer@test.com')
-    user.type(screen.getByLabelText('Password'), 'Password!1')
+    await user.type(screen.getByLabelText('Email'), 'customer@test.com')
+    await user.type(screen.getByLabelText('Password'), 'Password!1')
 
     // login with credentials
     global.server.use(
@@ -276,7 +284,7 @@ test.skip('Allows customer to sign in to their account', async () => {
             )
         )
     )
-    user.click(screen.getByText(/sign in/i))
+    await user.click(screen.getByText(/sign in/i))
 
     // allow time to transition to account page
     await waitFor(
@@ -300,6 +308,8 @@ describe('Reset password', function () {
     // TODO: Fix flaky/broken test
     // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Allows customer to generate password token', async () => {
+        const user = userEvent.setup()
+
         // render our test component
         renderWithProviders(<MockedComponent initialView="password" />, {
             wrapperProps: {
@@ -309,7 +319,7 @@ describe('Reset password', function () {
 
         // open the modal
         const trigger = screen.getByText(/open modal/i)
-        user.click(trigger)
+        await user.click(trigger)
         expect(authModal.isOpen).toBe(true)
 
         // enter credentials and submit
@@ -318,8 +328,8 @@ describe('Reset password', function () {
         let resetPwForm = await screen.findByTestId('sf-auth-modal-form-reset-pw')
         expect(resetPwForm).toBeInTheDocument()
         const withinForm = within(resetPwForm)
-        user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
-        user.click(withinForm.getByText(/reset password/i))
+        await user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
+        await user.click(withinForm.getByText(/reset password/i))
 
         // wait for success state
         await waitFor(() => {
@@ -330,13 +340,15 @@ describe('Reset password', function () {
 
     // TODO: Fix flaky/broken test
     // eslint-disable-next-line jest/no-disabled-tests
-    test.skip('Allows customer to open generate password token modal from everywhere', () => {
+    test.skip('Allows customer to open generate password token modal from everywhere', async () => {
+        const user = userEvent.setup()
+
         // render our test component
         renderWithProviders(<MockedComponent initialView="password" />)
 
         // open the modal
         const trigger = screen.getByText(/open modal/i)
-        user.click(trigger)
+        await user.click(trigger)
         expect(authModal.isOpen).toBe(true)
 
         const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
@@ -345,7 +357,7 @@ describe('Reset password', function () {
 
         // close the modal
         const switchToSignIn = screen.getByText(/Sign in/i)
-        user.click(switchToSignIn)
+        await user.click(switchToSignIn)
 
         // check that the modal is closed
         expect(authModal.isOpen).toBe(false)

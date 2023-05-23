@@ -18,13 +18,13 @@
     "@loadable/component": "^5.15.0",
     "cross-fetch": "^3.1.4",
     "express-basic-auth": "^1.2.0",
-    "pwa-kit-dev": "^3.0.0-dev",
-    "pwa-kit-runtime": "^3.0.0-dev",
+    "pwa-kit-dev": "3.0.0-dev",
+    "pwa-kit-runtime": "3.0.0-dev",
     "supertest": "^4.0.2"
   },
   "engines": {
-    "node": "^16.0.0 || ^18.0.0",
-    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+    "node": "^16.11.0 || ^18.0.0",
+    "npm": "^8.0.0 || ^9.0.0"
   },
   "mobify": {
     "ssrEnabled": true,

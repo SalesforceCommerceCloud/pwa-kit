@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "npm-packlist": "^4.0.0",
-    "pwa-kit-dev": "^3.0.0-dev",
+    "pwa-kit-dev": "3.0.0-dev",
     "typescript": "4.8.3"
   },
   "peerDependencies": {
@@ -73,7 +73,10 @@
     }
   },
   "engines": {
-    "node": "^16.0.0 || ^18.0.0",
-    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+    "node": "^16.11.0 || ^18.0.0",
+    "npm": "^8.0.0 || ^9.0.0"
+  },
+  "overrides": {
+    "nwsapi": "2.2.2"
   }
 }

@@ -31,11 +31,11 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                 data-testid="sf-auth-modal-form"
             >
                 <Stack spacing={8} paddingLeft={4} paddingRight={4}>
-                    {form.errors?.global && (
+                    {form.formState.errors?.global && (
                         <Alert status="error">
                             <AlertIcon color="red.500" boxSize={4} />
                             <Text fontSize="sm" ml={3}>
-                                {form.errors.global.message}
+                                {form.formState.errors.global.message}
                             </Text>
                         </Alert>
                     )}
@@ -54,7 +54,9 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                     <Stack spacing={6}>
                         <Button
                             type="submit"
-                            onClick={() => form.clearErrors('global')}
+                            onClick={() => {
+                                form.clearErrors('global')
+                            }}
                             isLoading={form.formState.isSubmitting}
                         >
                             <FormattedMessage
