@@ -462,9 +462,14 @@ const renderer =
 
                     // This must only appear on one config – this one is the only mandatory one.
                     new CopyPlugin({
-                        patterns: [{from: `${
-                            EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
-                        }app/static`, to: 'static/'}]
+                        patterns: [
+                            {
+                                from: `${
+                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
+                                }app/static`,
+                                to: 'static/'
+                            }
+                        ]
                     }),
 
                     // Keep this on the slowest-to-build item - the server-side bundle.
