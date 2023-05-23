@@ -11,10 +11,7 @@
     "overridesDir": "overrides"
   },
   "devDependencies": {
-    "{{preset.templateSource.id}}": "{{answers.general.packageJSON.version}}",
-    {{#each answers.general.packageJSON.peerDependencies}}
-    "{{@key}}": "{{{this}}}"{{#unless @last}},{{/unless}}
-    {{/each}}
+    "{{preset.templateSource.id}}": "{{answers.general.packageJSON.version}}"
   },
   "scripts": {
     {{#each answers.general.packageJSON.scripts}}
