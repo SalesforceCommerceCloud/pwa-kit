@@ -11,7 +11,7 @@
     "build-translations": "npm run extract-default-translations && npm run compile-translations",
     "compile-translations": "formatjs compile-folder --ast translations translations/compiled",
     "compile-translations:pseudo": "formatjs compile --ast translations/en-US.json --out-file translations/compiled/en-XA.json --pseudo-locale en-XA",
-    "extract-default-translations": "node ./scripts/extract-default-messages.js",
+    "extract-default-translations": "node ./scripts/extract-default-messages.js en-US",
     "format": "pwa-kit-dev format '**/*.{js,jsx}'",
     "lint": "pwa-kit-dev lint '**/*.{js,jsx}'",
     "lint:fix": "npm run lint -- --fix",
