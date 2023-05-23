@@ -48,6 +48,7 @@ import {noop} from 'retail-react-app/app/utils/utils'
 import {navLinks, messages} from 'retail-react-app/app/pages/account/constant'
 import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
+import {isHydrated, noop} from 'retail-react-app/app/utils/utils'
 
 const ENTER_KEY = 'Enter'
 
@@ -86,7 +87,6 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-
     const {isOpen, onClose, onOpen} = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
 
@@ -115,7 +115,6 @@ const Header = ({
             if (!hasEnterPopoverContent.current) onClose()
         }, 100)
     }
-
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
@@ -166,7 +165,7 @@ const Header = ({
                         })}
                     />
 
-                    {isRegistered && (
+                    {isRegistered && isHydrated() && (
                         <Popover
                             isLazy
                             arrowSize={15}

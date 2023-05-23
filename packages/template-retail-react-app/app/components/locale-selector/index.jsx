@@ -15,6 +15,7 @@ import {
     AccordionItem,
     AccordionPanel,
     Box,
+    Text,
 
     // Hooks
     useStyleConfig
@@ -66,7 +67,9 @@ const LocaleSelector = ({selectedLocale = '', locales = [], onSelect = () => {},
                                 )}
                                 {/* Display flag icon if one exists */}
                                 {flags[selectedLocale]}
-                                <LocaleText {...styles.selectedText} shortCode={selectedLocale} />
+                                <Text {...styles.selectedText}>
+                                    <LocaleText shortCode={selectedLocale} />
+                                </Text>
                             </AccordionButton>
                             <AccordionPanel>
                                 <Accordion allowToggle={true} {...styles.accordion}>
@@ -80,10 +83,9 @@ const LocaleSelector = ({selectedLocale = '', locales = [], onSelect = () => {},
                                                 {flags[locale]}
 
                                                 {/* Locale name */}
-                                                <LocaleText
-                                                    {...styles.optionText}
-                                                    shortCode={locale}
-                                                />
+                                                <Text {...styles.optionText}>
+                                                    <LocaleText shortCode={locale} />
+                                                </Text>
 
                                                 {/* Selection indicator */}
                                                 {selectedLocale === locale && (

@@ -2488,6 +2488,35 @@ export const mockCategories = {
             {
                 id: 'mens',
                 name: 'Mens',
+                categories: [
+                    {
+                        id: 'mens-clothing-suits',
+                        image: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dw14ce9267/images/slot/sub_banners/cat-banner-mens-suits.jpg',
+                        name: 'Suits',
+                        pageDescription:
+                            "Shop Men's suits for business or pleasure. Enjoy from a variety of different styles and cuts at Commerce Cloud.",
+                        pageTitle: 'Mens Suits for Business and Casual',
+                        parentCategoryId: 'mens-clothing',
+                        parentCategoryTree: [
+                            {
+                                id: 'mens',
+                                name: 'Mens'
+                            },
+                            {
+                                id: 'mens-clothing',
+                                name: 'Clothing'
+                            },
+                            {
+                                id: 'mens-clothing-suits',
+                                name: 'Suits'
+                            }
+                        ],
+                        c_enableCompare: false,
+                        c_showInMenu: true,
+                        c_slotBannerImage:
+                            'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dw6228a2ea/images/slot/landing/cat-landing-slotbottom-mens-suits.jpg'
+                    }
+                ],
                 pageDescription:
                     "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
                 pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',

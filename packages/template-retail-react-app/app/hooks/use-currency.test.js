@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {renderHook} from '@testing-library/react-hooks'
+import {renderHook} from '@testing-library/react'
 import {useCurrency} from 'retail-react-app/app/hooks/use-currency'
 import {CurrencyProvider} from 'retail-react-app/app/contexts'
 import {DEFAULT_CURRENCY} from 'retail-react-app/app/constants'

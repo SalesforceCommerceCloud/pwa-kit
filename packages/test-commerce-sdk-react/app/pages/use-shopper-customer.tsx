@@ -264,7 +264,11 @@ function UseCustomer() {
                     >
                         loginRegisteredUser
                     </button>
-                    {loginError && <p style={{color: 'red'}}>Error: {loginErrorMessage}</p>}
+                    {loginError && (
+                        <p style={{color: 'red'}}>
+                            <>Error: {loginErrorMessage}</>
+                        </p>
+                    )}
                 </>
             ) : (
                 <>

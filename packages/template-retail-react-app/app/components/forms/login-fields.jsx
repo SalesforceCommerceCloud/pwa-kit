@@ -12,7 +12,6 @@ import Field from 'retail-react-app/app/components/field'
 
 const LoginFields = ({form, prefix = ''}) => {
     const fields = useLoginFields({form, prefix})
-
     return (
         <Stack spacing={5}>
             <Field {...fields.email} />

@@ -581,6 +581,7 @@ test('Renders AddToCartModal with multiple products', () => {
             {
                 product: MOCK_PRODUCT,
                 variant: MOCK_PRODUCT.variants[0],
+                id: '701642811399M',
                 quantity: 22
             },
             {

@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
-import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import ResetPassword from '.'
@@ -63,11 +62,11 @@ afterEach(() => {
 
 test('Allows customer to go to sign in page', async () => {
     // render our test component
-    await renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
-    user.click(await screen.findByText('Sign in'))
+    await user.click(await screen.findByText('Sign in'))
 
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/login')
@@ -89,13 +88,15 @@ test('Allows customer to generate password token', async () => {
         )
     )
     // render our test component
-    await renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
     // enter credentials and submit
-    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+    await user.click(
+        within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
+    )
 
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
 
@@ -103,9 +104,7 @@ test('Allows customer to generate password token', async () => {
         expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
     })
 
-    await waitFor(() => {
-        user.click(screen.getByText('Back to Sign In'))
-    })
+    await user.click(screen.getByText('Back to Sign In'))
 
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/login')
@@ -126,10 +125,12 @@ test('Renders error message from server', async () => {
             )
         )
     )
-    await renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
 
-    user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+    await user.click(
+        within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
+    )
 
     await waitFor(() => {
         expect(screen.getByText('500 Internal Server Error')).toBeInTheDocument()

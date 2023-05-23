@@ -7,7 +7,13 @@
 import {useIntl} from 'react-intl'
 import {validatePassword} from 'retail-react-app/app/utils/password-utils'
 
-export default function useRegistrationFields({form: {control, errors}, prefix = ''}) {
+export default function useRegistrationFields({
+    form: {
+        control,
+        formState: {errors}
+    },
+    prefix = ''
+}) {
     const {formatMessage} = useIntl()
 
     const fields = {
