@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {renderWithProviders, createPathWithDefaults} from 'retail-react-app/app/utils/test-utils'
-import user from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event'
 import {screen, waitFor, within} from '@testing-library/react'
 import SearchInput from 'retail-react-app/app/components/search/index'
 import Suggestions from 'retail-react-app/app/components/search/partials/suggestions'
