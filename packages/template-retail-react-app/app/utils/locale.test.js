@@ -97,7 +97,7 @@ describe('getTargetLocale', () => {
         })
         expect(targetLocale).toBe(locale)
     })
-    test.only('with pseudo locale', async () => {
+    test('with pseudo locale', async () => {
         process.env.USE_PSEUDOLOCALE = 'true'
         // Simulate server side
         windowSpy.mockImplementation(() => undefined)
