@@ -17,7 +17,7 @@ import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {PageContext, Region} from 'commerce-sdk-react-preview/components'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import fallbackMessages from 'retail-react-app/app/translations/compiled/en-GB.json'
+import fallbackMessages from 'retail-react-app/translations/compiled/en-GB.json'
 import mockConfig from 'retail-react-app/config/mocks/default'
 // Contexts
 import {CurrencyProvider, MultiSiteProvider} from 'retail-react-app/app/contexts'
