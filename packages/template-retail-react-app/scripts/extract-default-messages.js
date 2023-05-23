@@ -45,7 +45,7 @@ const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) =>
 try {
     const overridesDir = pkgJSON.ccExtensibility?.overridesDir
     if (!overridesDir) {
-        const command = `formatjs extract "app/**/*.{js,jsx}" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        const command = `formatjs extract "app/**/*.{js,jsx,ts,tsx}" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
         exec(command, (err) => {
             if (err) {
                 console.error(err)
@@ -71,12 +71,12 @@ try {
                 return isFileExist ? replacedPath : ''
             })
             .filter(Boolean)
-        // rename the files needs to ignore to have .ignore extensions
+        // rename the files needs to ignore to have .ignore extensions so it won't be recognized by formatjs
         overriddenFiles.forEach((filePath) => {
             fs.rename(filePath, `${filePath}.ignore`, (err) => err && console.error(err))
         })
 
-        const extractCommand = `formatjs extract "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{js,jsx}" "${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx}" --ignore "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.ignore" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        const extractCommand = `formatjs extract "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{js,jsx}" "${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx}" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
         exec(extractCommand, (err) => {
             if (err) {
                 console.error(err)
