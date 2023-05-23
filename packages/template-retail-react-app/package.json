@@ -3,9 +3,7 @@
   "version": "3.0.0-dev",
   "license": "See license in LICENSE",
   "ccExtensibility": {
-    "extendable": [
-      "retail-react-app"
-    ]
+    "extendable": ["retail-react-app"]
   },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
