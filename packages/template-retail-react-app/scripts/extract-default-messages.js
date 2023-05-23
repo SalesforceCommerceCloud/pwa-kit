@@ -77,7 +77,6 @@ try {
         })
 
         const extractCommand = `formatjs extract "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{js,jsx}" "${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx}" --ignore "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.ignore" --out-file translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
-        console.log('extractCommand', extractCommand)
         exec(extractCommand, (err) => {
             if (err) {
                 console.error(err)
