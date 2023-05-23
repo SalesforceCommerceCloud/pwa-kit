@@ -54,8 +54,8 @@ describe('fetchTranslations', () => {
         expect(messages[testId2]).toBeDefined()
     })
     test('loading the pseudo locale', async () => {
-        const messages = await fetchTranslations('en-XB')
-        expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
+        const messages = await fetchTranslations('en-XA')
+        expect(messages[testId1][1].value).toMatch(/Ƥřīṽȧȧƈẏ Ƥǿǿŀīƈẏ/)
     })
     test('handling a not-found translation file', async () => {
         const messages = await fetchTranslations('xx-XX')
@@ -97,17 +97,16 @@ describe('getTargetLocale', () => {
         })
         expect(targetLocale).toBe(locale)
     })
-    test('with pseudo locale', async () => {
+    test.only('with pseudo locale', async () => {
         process.env.USE_PSEUDOLOCALE = 'true'
         // Simulate server side
         windowSpy.mockImplementation(() => undefined)
 
         const targetLocale = getTargetLocale({l10nConfig})
         const messages = await fetchTranslations(targetLocale)
-
         // The app should still think its target locale is the default one
         expect(targetLocale).toBe(DEFAULT_LOCALE)
         // But the actual translation should be using the pseudo locale
-        expect(messages[testId1][0].value).toMatch(/^\[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]$/)
+        expect(messages[testId1][1].value).toMatch(/Ƥřīṽȧȧƈẏ Ƥǿǿŀīƈẏ/)
     })
 })

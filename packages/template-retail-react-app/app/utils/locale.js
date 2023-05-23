@@ -17,7 +17,7 @@ export const fetchTranslations = async (locale) => {
     const targetLocale =
         typeof window === 'undefined'
             ? process.env.USE_PSEUDOLOCALE === 'true'
-                ? 'en-XB'
+                ? 'en-XA'
                 : locale
             : locale
 

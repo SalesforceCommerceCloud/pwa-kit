@@ -12,7 +12,7 @@
     "build": "npm run build-translations && pwa-kit-dev build",
     "build-translations": "npm run extract-default-translations && npm run compile-translations",
     "compile-translations": "formatjs compile-folder --ast translations translations/compiled",
-    "compile-translations:pseudo": "formatjs compile --ast translations/en-US.json --out-file translations/compiled/en-XB.json --pseudo-locale en-XB",
+    "compile-translations:pseudo": "formatjs compile --ast translations/en-US.json --out-file translations/compiled/en-XA.json --pseudo-locale en-XA",
     "extract-default-translations": "node ./scripts/extract-default-messages.js",
     "format": "pwa-kit-dev format '**/*.{js,jsx}'",
     "lint": "pwa-kit-dev lint '**/*.{js,jsx}'",
