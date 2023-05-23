@@ -77,7 +77,10 @@ const publishPackages = (packages = []) => {
     if (publishSomePackagesOnly) {
         cleanUp()
     }
-    process.exit(stderr ? code : 0)
+
+    if (stderr) {
+        process.exit(code)
+    }
 }
 
 const verifyCleanWorkingTree = () => {
