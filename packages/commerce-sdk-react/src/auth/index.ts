@@ -451,7 +451,7 @@ class Auth {
         return fetch(this.OCAPISessionsURL, {
             method: 'POST',
             headers: {
-                Authorization: this.get('access_token')
+                Authorization: 'Bearer ' + this.get('access_token')
             }
         })
     }
