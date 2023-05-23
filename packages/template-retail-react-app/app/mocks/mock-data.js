@@ -14,7 +14,7 @@ export const exampleTokenReponse = {
     token_type: 'BEARER',
     usid: 'f51fd491-eba1-4582-81f9-4a014a472a20',
     customer_id: 'customerid',
-    enc_user_id: 'ce5f0dd2fc1fdb7f06e8e97011200943',
+    enc_user_id: 'ce5f0dd2fc1fdb7f06e8e97011200943'
 }
 export const password = '64Labs2020!'
 
@@ -139,8 +139,8 @@ export const mockedRegisteredCustomer = {
             phone: '(727) 555-1234',
             postalCode: '33712',
             preferred: true,
-            stateCode: 'FL',
-        },
+            stateCode: 'FL'
+        }
     ],
     authType: 'registered',
     creationDate: '2021-03-31T13:32:42.000Z',
@@ -169,14 +169,14 @@ export const mockedRegisteredCustomer = {
                 maskedNumber: '************5454',
                 numberLastDigits: '5454',
                 validFromMonth: 1,
-                validFromYear: 2020,
+                validFromYear: 2020
             },
             paymentInstrumentId: 'testcard1',
-            paymentMethodId: 'CREDIT_CARD',
-        },
+            paymentMethodId: 'CREDIT_CARD'
+        }
     ],
     previousLoginTime: '2021-04-14T13:38:29.778Z',
-    previousVisitTime: '2021-04-14T13:38:29.778Z',
+    previousVisitTime: '2021-04-14T13:38:29.778Z'
 }
 
 export const mockedRegisteredCustomerWithNoAddress = {
@@ -221,7 +221,7 @@ export const mockedRegisteredCustomerWithNoAddress = {
 export const mockedGuestCustomer = {
     authType: 'guest',
     customerId: 'customerid',
-    email: '',
+    email: ''
 }
 
 export const productsResponse = {
@@ -253,12 +253,12 @@ export const productsResponse = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ825XX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ825XX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'large',
+                    viewType: 'large'
                 },
                 {
                     images: [
@@ -282,12 +282,12 @@ export const productsResponse = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ825XX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ825XX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'medium',
+                    viewType: 'medium'
                 },
                 {
                     images: [
@@ -311,12 +311,12 @@ export const productsResponse = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ825XX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ825XX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'small',
+                    viewType: 'small'
                 },
                 {
                     images: [
@@ -333,13 +333,13 @@ export const productsResponse = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ825XX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ825XX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'swatch',
-                },
+                    viewType: 'swatch'
+                }
             ],
             inventory: {
                 ats: 89,
@@ -347,14 +347,14 @@ export const productsResponse = {
                 id: 'inventory_m',
                 orderable: true,
                 preorderable: false,
-                stockLevel: 89,
+                stockLevel: 89
             },
             longDescription:
                 'Wear this long sleeve crew neck top alone, or pair it with a jacket for a classic look.',
             master: {
                 masterId: '25517823M',
                 orderable: true,
-                price: 14.99,
+                price: 14.99
             },
             minOrderQuantity: 1,
             name: 'Long Sleeve Crew Neck',
@@ -365,18 +365,18 @@ export const productsResponse = {
             productPromotions: [
                 {
                     calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
-                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased',
-                },
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                }
             ],
             shortDescription:
                 'Wear this long sleeve crew neck top alone, or pair it with a jacket for a classic look.',
             stepQuantity: 1,
             type: {
-                variant: true,
+                variant: true
             },
             upc: '701642811398',
             validFrom: {
-                default: '2010-11-18T05:00:00.000Z',
+                default: '2010-11-18T05:00:00.000Z'
             },
             variants: [
                 {
@@ -385,8 +385,8 @@ export const productsResponse = {
                     productId: '701642811398M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -394,8 +394,8 @@ export const productsResponse = {
                     productId: '701642841227M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -403,8 +403,8 @@ export const productsResponse = {
                     productId: '701642841265M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -412,8 +412,8 @@ export const productsResponse = {
                     productId: '701642811473M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -421,8 +421,8 @@ export const productsResponse = {
                     productId: '701642811435M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -430,8 +430,8 @@ export const productsResponse = {
                     productId: '701642811312M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -439,8 +439,8 @@ export const productsResponse = {
                     productId: '701642811237M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -448,8 +448,8 @@ export const productsResponse = {
                     productId: '701643342570M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -457,8 +457,8 @@ export const productsResponse = {
                     productId: '701642811343M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -466,8 +466,8 @@ export const productsResponse = {
                     productId: '701642811404M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -475,8 +475,8 @@ export const productsResponse = {
                     productId: '701642811336M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -484,8 +484,8 @@ export const productsResponse = {
                     productId: '701642811268M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -493,8 +493,8 @@ export const productsResponse = {
                     productId: '701643070756M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -502,8 +502,8 @@ export const productsResponse = {
                     productId: '701642811497M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -511,8 +511,8 @@ export const productsResponse = {
                     productId: '701642811480M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -520,8 +520,8 @@ export const productsResponse = {
                     productId: '701642811466M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -529,8 +529,8 @@ export const productsResponse = {
                     productId: '701642811428M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -538,8 +538,8 @@ export const productsResponse = {
                     productId: '701643070732M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -547,8 +547,8 @@ export const productsResponse = {
                     productId: '701642811244M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -556,8 +556,8 @@ export const productsResponse = {
                     productId: '701643070763M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -565,8 +565,8 @@ export const productsResponse = {
                     productId: '701643342587M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -574,8 +574,8 @@ export const productsResponse = {
                     productId: '701642811503M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -583,8 +583,8 @@ export const productsResponse = {
                     productId: '701642811459M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -592,8 +592,8 @@ export const productsResponse = {
                     productId: '701643070725M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -601,8 +601,8 @@ export const productsResponse = {
                     productId: '701642841289M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -610,8 +610,8 @@ export const productsResponse = {
                     productId: '701642841272M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -619,8 +619,8 @@ export const productsResponse = {
                     productId: '701642841241M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -628,8 +628,8 @@ export const productsResponse = {
                     productId: '701642811329M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -637,8 +637,8 @@ export const productsResponse = {
                     productId: '701642811251M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -646,8 +646,8 @@ export const productsResponse = {
                     productId: '701643070770M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -655,8 +655,8 @@ export const productsResponse = {
                     productId: '701642841296M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -664,8 +664,8 @@ export const productsResponse = {
                     productId: '701642841258M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -673,8 +673,8 @@ export const productsResponse = {
                     productId: '701642811442M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -682,8 +682,8 @@ export const productsResponse = {
                     productId: '701642811411M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -691,9 +691,9 @@ export const productsResponse = {
                     productId: '701642841234M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9MD',
-                    },
-                },
+                        size: '9MD'
+                    }
+                }
             ],
             variationAttributes: [
                 {
@@ -703,39 +703,39 @@ export const productsResponse = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ169XX',
+                            value: 'JJ169XX'
                         },
                         {
                             name: 'Grey Heather',
                             orderable: true,
-                            value: 'JJ2XNXX',
+                            value: 'JJ2XNXX'
                         },
                         {
                             name: 'Meadow Violet',
                             orderable: true,
-                            value: 'JJ3HDXX',
+                            value: 'JJ3HDXX'
                         },
                         {
                             name: 'Begonia Pink',
                             orderable: true,
-                            value: 'JJ5QZXX',
+                            value: 'JJ5QZXX'
                         },
                         {
                             name: 'Fire Red',
                             orderable: true,
-                            value: 'JJ825XX',
+                            value: 'JJ825XX'
                         },
                         {
                             name: 'Sugar',
                             orderable: true,
-                            value: 'JJG80XX',
+                            value: 'JJG80XX'
                         },
                         {
                             name: 'White',
                             orderable: true,
-                            value: 'JJI15XX',
-                        },
-                    ],
+                            value: 'JJI15XX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -744,42 +744,42 @@ export const productsResponse = {
                         {
                             name: 'XS',
                             orderable: true,
-                            value: '9XS',
+                            value: '9XS'
                         },
                         {
                             name: 'S',
                             orderable: true,
-                            value: '9SM',
+                            value: '9SM'
                         },
                         {
                             name: 'M',
                             orderable: true,
-                            value: '9MD',
+                            value: '9MD'
                         },
                         {
                             name: 'L',
                             orderable: true,
-                            value: '9LG',
+                            value: '9LG'
                         },
                         {
                             name: 'XL',
                             orderable: true,
-                            value: '9XL',
-                        },
-                    ],
-                },
+                            value: '9XL'
+                        }
+                    ]
+                }
             ],
             variationValues: {
                 color: 'JJ825XX',
-                size: '9LG',
+                size: '9LG'
             },
             c_color: 'JJ825XX',
             c_refinementColor: 'red',
             c_size: '9LG',
-            c_width: 'Z',
-        },
+            c_width: 'Z'
+        }
     ],
-    total: 1,
+    total: 1
 }
 
 export const mockOrderHistory = {
@@ -798,7 +798,7 @@ export const mockOrderHistory = {
                 lastName: 'testing',
                 phone: '7275551234',
                 postalCode: '33712',
-                stateCode: 'FL',
+                stateCode: 'FL'
             },
             channelType: 'storefront',
             confirmationStatus: 'not_confirmed',
@@ -809,7 +809,7 @@ export const mockOrderHistory = {
                 customerId: 'customerid',
                 customerName: ' testing',
                 customerNo: '00149004',
-                email: 'tester@test.com',
+                email: 'tester@test.com'
             },
             customerName: ' testing',
             exportStatus: 'not_exported',
@@ -831,11 +831,11 @@ export const mockOrderHistory = {
                         maskedNumber: '************1111',
                         numberLastDigits: '1111',
                         validFromMonth: 1,
-                        validFromYear: 2020,
+                        validFromYear: 2020
                     },
                     paymentInstrumentId: 'fd4ddecfc5c95b60c7898bbd2a',
-                    paymentMethodId: 'CREDIT_CARD',
-                },
+                    paymentMethodId: 'CREDIT_CARD'
+                }
             ],
             paymentStatus: 'not_paid',
             productItems: [
@@ -856,7 +856,7 @@ export const mockOrderHistory = {
                     tax: 2.4,
                     taxBasis: 47.99,
                     taxClassId: 'standard',
-                    taxRate: 0.05,
+                    taxRate: 0.05
                 },
                 {
                     adjustedTax: 0.75,
@@ -875,8 +875,8 @@ export const mockOrderHistory = {
                     tax: 0.75,
                     taxBasis: 14.99,
                     taxClassId: 'standard',
-                    taxRate: 0.05,
-                },
+                    taxRate: 0.05
+                }
             ],
             productSubTotal: 62.98,
             productTotal: 62.98,
@@ -900,19 +900,19 @@ export const mockOrderHistory = {
                         lastName: 'testing',
                         phone: '7275551234',
                         postalCode: '33712',
-                        stateCode: 'FL',
+                        stateCode: 'FL'
                     },
                     shippingMethod: {
                         description: 'Order received within 7-10 business days',
                         id: '001',
                         name: 'Ground',
-                        c_estimatedArrivalTime: '7-10 Business Days',
+                        c_estimatedArrivalTime: '7-10 Business Days'
                     },
                     shippingStatus: 'not_shipped',
                     shippingTotal: 5.99,
                     shippingTotalTax: 0.3,
-                    taxTotal: 3.45,
-                },
+                    taxTotal: 3.45
+                }
             ],
             shippingItems: [
                 {
@@ -926,8 +926,8 @@ export const mockOrderHistory = {
                     tax: 0.3,
                     taxBasis: 5.99,
                     taxClassId: 'standard',
-                    taxRate: 0.05,
-                },
+                    taxRate: 0.05
+                }
             ],
             shippingStatus: 'not_shipped',
             shippingTotal: 5.99,
@@ -935,7 +935,7 @@ export const mockOrderHistory = {
             siteId: 'RefArch',
             status: 'created',
             taxation: 'net',
-            taxTotal: 3.45,
+            taxTotal: 3.45
         },
         {
             adjustedMerchandizeTotalTax: 3.15,
@@ -950,7 +950,7 @@ export const mockOrderHistory = {
                 lastName: 'testing',
                 phone: '7275551234',
                 postalCode: '33712',
-                stateCode: 'FL',
+                stateCode: 'FL'
             },
             channelType: 'storefront',
             confirmationStatus: 'not_confirmed',
@@ -961,7 +961,7 @@ export const mockOrderHistory = {
                 customerId: 'customerid',
                 customerName: ' testing',
                 customerNo: '00149004',
-                email: 'tester@test.com',
+                email: 'tester@test.com'
             },
             customerName: ' testing',
             exportStatus: 'not_exported',
@@ -983,11 +983,11 @@ export const mockOrderHistory = {
                         maskedNumber: '************5454',
                         numberLastDigits: '5454',
                         validFromMonth: 1,
-                        validFromYear: 2020,
+                        validFromYear: 2020
                     },
                     paymentInstrumentId: '2aadecebb15f35913e8ce76a54',
-                    paymentMethodId: 'CREDIT_CARD',
-                },
+                    paymentMethodId: 'CREDIT_CARD'
+                }
             ],
             paymentStatus: 'not_paid',
             productItems: [
@@ -1008,7 +1008,7 @@ export const mockOrderHistory = {
                     tax: 2.4,
                     taxBasis: 47.99,
                     taxClassId: 'standard',
-                    taxRate: 0.05,
+                    taxRate: 0.05
                 },
                 {
                     adjustedTax: 0.75,
@@ -1027,8 +1027,8 @@ export const mockOrderHistory = {
                     tax: 0.75,
                     taxBasis: 14.99,
                     taxClassId: 'standard',
-                    taxRate: 0.05,
-                },
+                    taxRate: 0.05
+                }
             ],
             productSubTotal: 62.98,
             productTotal: 62.98,
@@ -1052,19 +1052,19 @@ export const mockOrderHistory = {
                         lastName: 'testing',
                         phone: '7275551234',
                         postalCode: '33712',
-                        stateCode: 'FL',
+                        stateCode: 'FL'
                     },
                     shippingMethod: {
                         description: 'Order received within 7-10 business days',
                         id: '001',
                         name: 'Ground',
-                        c_estimatedArrivalTime: '7-10 Business Days',
+                        c_estimatedArrivalTime: '7-10 Business Days'
                     },
                     shippingStatus: 'not_shipped',
                     shippingTotal: 5.99,
                     shippingTotalTax: 0.3,
-                    taxTotal: 3.45,
-                },
+                    taxTotal: 3.45
+                }
             ],
             shippingItems: [
                 {
@@ -1078,8 +1078,8 @@ export const mockOrderHistory = {
                     tax: 0.3,
                     taxBasis: 5.99,
                     taxClassId: 'standard',
-                    taxRate: 0.05,
-                },
+                    taxRate: 0.05
+                }
             ],
             shippingStatus: 'not_shipped',
             shippingTotal: 5.99,
@@ -1087,7 +1087,7 @@ export const mockOrderHistory = {
             siteId: 'RefArch',
             status: 'created',
             taxation: 'net',
-            taxTotal: 3.45,
+            taxTotal: 3.45
         },
         {
             adjustedMerchandizeTotalTax: 6.3,
@@ -1102,7 +1102,7 @@ export const mockOrderHistory = {
                 lastName: 'testing',
                 phone: '7275551234',
                 postalCode: '33712',
-                stateCode: 'FL',
+                stateCode: 'FL'
             },
             channelType: 'storefront',
             confirmationStatus: 'not_confirmed',
@@ -1113,7 +1113,7 @@ export const mockOrderHistory = {
                 customerId: 'customerid',
                 customerName: ' testing',
                 customerNo: '00149004',
-                email: 'tester@test.com',
+                email: 'tester@test.com'
             },
             customerName: ' testing',
             exportStatus: 'not_exported',
@@ -1135,11 +1135,11 @@ export const mockOrderHistory = {
                         maskedNumber: '************5454',
                         numberLastDigits: '5454',
                         validFromMonth: 1,
-                        validFromYear: 2020,
+                        validFromYear: 2020
                     },
                     paymentInstrumentId: '99e32045955705b49b343b852a',
-                    paymentMethodId: 'CREDIT_CARD',
-                },
+                    paymentMethodId: 'CREDIT_CARD'
+                }
             ],
             paymentStatus: 'not_paid',
             productItems: [
@@ -1160,7 +1160,7 @@ export const mockOrderHistory = {
                     tax: 4.8,
                     taxBasis: 95.98,
                     taxClassId: 'standard',
-                    taxRate: 0.05,
+                    taxRate: 0.05
                 },
                 {
                     adjustedTax: 1.5,
@@ -1179,8 +1179,8 @@ export const mockOrderHistory = {
                     tax: 1.5,
                     taxBasis: 29.98,
                     taxClassId: 'standard',
-                    taxRate: 0.05,
-                },
+                    taxRate: 0.05
+                }
             ],
             productSubTotal: 125.96,
             productTotal: 125.96,
@@ -1204,19 +1204,19 @@ export const mockOrderHistory = {
                         lastName: 'testing',
                         phone: '7275551234',
                         postalCode: '33712',
-                        stateCode: 'FL',
+                        stateCode: 'FL'
                     },
                     shippingMethod: {
                         description: 'Order received within 7-10 business days',
                         id: '001',
                         name: 'Ground',
-                        c_estimatedArrivalTime: '7-10 Business Days',
+                        c_estimatedArrivalTime: '7-10 Business Days'
                     },
                     shippingStatus: 'not_shipped',
                     shippingTotal: 7.99,
                     shippingTotalTax: 0.4,
-                    taxTotal: 6.7,
-                },
+                    taxTotal: 6.7
+                }
             ],
             shippingItems: [
                 {
@@ -1230,8 +1230,8 @@ export const mockOrderHistory = {
                     tax: 0.4,
                     taxBasis: 7.99,
                     taxClassId: 'standard',
-                    taxRate: 0.05,
-                },
+                    taxRate: 0.05
+                }
             ],
             shippingStatus: 'not_shipped',
             shippingTotal: 7.99,
@@ -1239,11 +1239,11 @@ export const mockOrderHistory = {
             siteId: 'RefArch',
             status: 'created',
             taxation: 'net',
-            taxTotal: 6.7,
-        },
+            taxTotal: 6.7
+        }
     ],
     offset: 0,
-    total: 20,
+    total: 20
 }
 
 export const mockOrderProducts = {
@@ -1275,12 +1275,12 @@ export const mockOrderProducts = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ1ANXX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ1ANXX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'large',
+                    viewType: 'large'
                 },
                 {
                     images: [
@@ -1304,12 +1304,12 @@ export const mockOrderProducts = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ1ANXX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ1ANXX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'medium',
+                    viewType: 'medium'
                 },
                 {
                     images: [
@@ -1333,12 +1333,12 @@ export const mockOrderProducts = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ1ANXX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ1ANXX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'small',
+                    viewType: 'small'
                 },
                 {
                     images: [
@@ -1355,13 +1355,13 @@ export const mockOrderProducts = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ1ANXX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ1ANXX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'swatch',
-                },
+                    viewType: 'swatch'
+                }
             ],
             inventory: {
                 ats: 99,
@@ -1369,14 +1369,14 @@ export const mockOrderProducts = {
                 id: 'inventory_m',
                 orderable: true,
                 preorderable: false,
-                stockLevel: 99,
+                stockLevel: 99
             },
             longDescription:
                 'This is a feminine take on a tuxedo classic.  Pair it with a pair of Commerce Cloud Store slacks.',
             master: {
                 masterId: '25518344M',
                 orderable: true,
-                price: 47.99,
+                price: 47.99
             },
             minOrderQuantity: 1,
             name: 'Pleated Bib Long Sleeve Shirt',
@@ -1387,18 +1387,18 @@ export const mockOrderProducts = {
             productPromotions: [
                 {
                     calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
-                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased',
-                },
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                }
             ],
             shortDescription:
                 'This is a feminine take on a tuxedo classic.  Pair it with a pair of Commerce Cloud Store slacks.',
             stepQuantity: 1,
             type: {
-                variant: true,
+                variant: true
             },
             upc: '701642852179',
             validFrom: {
-                default: '2010-10-21T04:00:00.000Z',
+                default: '2010-10-21T04:00:00.000Z'
             },
             variants: [
                 {
@@ -1407,8 +1407,8 @@ export const mockOrderProducts = {
                     productId: '701642852179M',
                     variationValues: {
                         color: 'JJ1ANXX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -1416,8 +1416,8 @@ export const mockOrderProducts = {
                     productId: '701642852209M',
                     variationValues: {
                         color: 'JJ1ANXX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -1425,8 +1425,8 @@ export const mockOrderProducts = {
                     productId: '701642852193M',
                     variationValues: {
                         color: 'JJ1ANXX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -1434,9 +1434,9 @@ export const mockOrderProducts = {
                     productId: '701642852186M',
                     variationValues: {
                         color: 'JJ1ANXX',
-                        size: '9MD',
-                    },
-                },
+                        size: '9MD'
+                    }
+                }
             ],
             variationAttributes: [
                 {
@@ -1446,9 +1446,9 @@ export const mockOrderProducts = {
                         {
                             name: 'Silver Grey',
                             orderable: true,
-                            value: 'JJ1ANXX',
-                        },
-                    ],
+                            value: 'JJ1ANXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -1457,36 +1457,36 @@ export const mockOrderProducts = {
                         {
                             name: 'S',
                             orderable: true,
-                            value: '9SM',
+                            value: '9SM'
                         },
                         {
                             name: 'M',
                             orderable: true,
-                            value: '9MD',
+                            value: '9MD'
                         },
                         {
                             name: 'L',
                             orderable: true,
-                            value: '9LG',
+                            value: '9LG'
                         },
                         {
                             name: 'XL',
                             orderable: true,
-                            value: '9XL',
-                        },
-                    ],
-                },
+                            value: '9XL'
+                        }
+                    ]
+                }
             ],
             variationValues: {
                 color: 'JJ1ANXX',
-                size: '9LG',
+                size: '9LG'
             },
             c_color: 'JJ1ANXX',
             c_isNewtest: true,
             c_isSale: true,
             c_refinementColor: 'grey',
             c_size: '9LG',
-            c_width: 'Z',
+            c_width: 'Z'
         },
         {
             currency: 'USD',
@@ -1514,12 +1514,12 @@ export const mockOrderProducts = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ825XX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ825XX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'large',
+                    viewType: 'large'
                 },
                 {
                     images: [
@@ -1543,12 +1543,12 @@ export const mockOrderProducts = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ825XX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ825XX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'medium',
+                    viewType: 'medium'
                 },
                 {
                     images: [
@@ -1572,12 +1572,12 @@ export const mockOrderProducts = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ825XX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ825XX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'small',
+                    viewType: 'small'
                 },
                 {
                     images: [
@@ -1594,13 +1594,13 @@ export const mockOrderProducts = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'JJ825XX',
-                                },
-                            ],
-                        },
+                                    value: 'JJ825XX'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'swatch',
-                },
+                    viewType: 'swatch'
+                }
             ],
             inventory: {
                 ats: 34,
@@ -1608,14 +1608,14 @@ export const mockOrderProducts = {
                 id: 'inventory_m',
                 orderable: true,
                 preorderable: false,
-                stockLevel: 34,
+                stockLevel: 34
             },
             longDescription:
                 'Wear this long sleeve crew neck top alone, or pair it with a jacket for a classic look.',
             master: {
                 masterId: '25517823M',
                 orderable: true,
-                price: 14.99,
+                price: 14.99
             },
             minOrderQuantity: 1,
             name: 'Long Sleeve Crew Neck',
@@ -1626,18 +1626,18 @@ export const mockOrderProducts = {
             productPromotions: [
                 {
                     calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
-                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased',
-                },
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                }
             ],
             shortDescription:
                 'Wear this long sleeve crew neck top alone, or pair it with a jacket for a classic look.',
             stepQuantity: 1,
             type: {
-                variant: true,
+                variant: true
             },
             upc: '701642811398',
             validFrom: {
-                default: '2010-11-18T05:00:00.000Z',
+                default: '2010-11-18T05:00:00.000Z'
             },
             variants: [
                 {
@@ -1646,8 +1646,8 @@ export const mockOrderProducts = {
                     productId: '701642811398M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -1655,8 +1655,8 @@ export const mockOrderProducts = {
                     productId: '701642841227M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -1664,8 +1664,8 @@ export const mockOrderProducts = {
                     productId: '701642841265M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -1673,8 +1673,8 @@ export const mockOrderProducts = {
                     productId: '701642811473M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -1682,8 +1682,8 @@ export const mockOrderProducts = {
                     productId: '701642811435M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -1691,8 +1691,8 @@ export const mockOrderProducts = {
                     productId: '701642811312M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -1700,8 +1700,8 @@ export const mockOrderProducts = {
                     productId: '701642811237M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9LG',
-                    },
+                        size: '9LG'
+                    }
                 },
                 {
                     orderable: true,
@@ -1709,8 +1709,8 @@ export const mockOrderProducts = {
                     productId: '701643342570M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -1718,8 +1718,8 @@ export const mockOrderProducts = {
                     productId: '701642811343M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -1727,8 +1727,8 @@ export const mockOrderProducts = {
                     productId: '701642811404M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -1736,8 +1736,8 @@ export const mockOrderProducts = {
                     productId: '701642811336M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -1745,8 +1745,8 @@ export const mockOrderProducts = {
                     productId: '701642811268M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -1754,8 +1754,8 @@ export const mockOrderProducts = {
                     productId: '701643070756M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -1763,8 +1763,8 @@ export const mockOrderProducts = {
                     productId: '701642811497M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -1772,8 +1772,8 @@ export const mockOrderProducts = {
                     productId: '701642811480M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -1781,8 +1781,8 @@ export const mockOrderProducts = {
                     productId: '701642811466M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -1790,8 +1790,8 @@ export const mockOrderProducts = {
                     productId: '701642811428M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -1799,8 +1799,8 @@ export const mockOrderProducts = {
                     productId: '701643070732M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -1808,8 +1808,8 @@ export const mockOrderProducts = {
                     productId: '701642811244M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -1817,8 +1817,8 @@ export const mockOrderProducts = {
                     productId: '701643070763M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -1826,8 +1826,8 @@ export const mockOrderProducts = {
                     productId: '701643342587M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -1835,8 +1835,8 @@ export const mockOrderProducts = {
                     productId: '701642811503M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -1844,8 +1844,8 @@ export const mockOrderProducts = {
                     productId: '701642811459M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -1853,8 +1853,8 @@ export const mockOrderProducts = {
                     productId: '701643070725M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -1862,8 +1862,8 @@ export const mockOrderProducts = {
                     productId: '701642841289M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -1871,8 +1871,8 @@ export const mockOrderProducts = {
                     productId: '701642841272M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -1880,8 +1880,8 @@ export const mockOrderProducts = {
                     productId: '701642841241M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -1889,8 +1889,8 @@ export const mockOrderProducts = {
                     productId: '701642811329M',
                     variationValues: {
                         color: 'JJ2XNXX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -1898,8 +1898,8 @@ export const mockOrderProducts = {
                     productId: '701642811251M',
                     variationValues: {
                         color: 'JJ169XX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -1907,8 +1907,8 @@ export const mockOrderProducts = {
                     productId: '701643070770M',
                     variationValues: {
                         color: 'JJI15XX',
-                        size: '9XS',
-                    },
+                        size: '9XS'
+                    }
                 },
                 {
                     orderable: true,
@@ -1916,8 +1916,8 @@ export const mockOrderProducts = {
                     productId: '701642841296M',
                     variationValues: {
                         color: 'JJ5QZXX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -1925,8 +1925,8 @@ export const mockOrderProducts = {
                     productId: '701642841258M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9XL',
-                    },
+                        size: '9XL'
+                    }
                 },
                 {
                     orderable: true,
@@ -1934,8 +1934,8 @@ export const mockOrderProducts = {
                     productId: '701642811442M',
                     variationValues: {
                         color: 'JJG80XX',
-                        size: '9MD',
-                    },
+                        size: '9MD'
+                    }
                 },
                 {
                     orderable: true,
@@ -1943,8 +1943,8 @@ export const mockOrderProducts = {
                     productId: '701642811411M',
                     variationValues: {
                         color: 'JJ825XX',
-                        size: '9SM',
-                    },
+                        size: '9SM'
+                    }
                 },
                 {
                     orderable: true,
@@ -1952,9 +1952,9 @@ export const mockOrderProducts = {
                     productId: '701642841234M',
                     variationValues: {
                         color: 'JJ3HDXX',
-                        size: '9MD',
-                    },
-                },
+                        size: '9MD'
+                    }
+                }
             ],
             variationAttributes: [
                 {
@@ -1964,39 +1964,39 @@ export const mockOrderProducts = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ169XX',
+                            value: 'JJ169XX'
                         },
                         {
                             name: 'Grey Heather',
                             orderable: true,
-                            value: 'JJ2XNXX',
+                            value: 'JJ2XNXX'
                         },
                         {
                             name: 'Meadow Violet',
                             orderable: true,
-                            value: 'JJ3HDXX',
+                            value: 'JJ3HDXX'
                         },
                         {
                             name: 'Begonia Pink',
                             orderable: true,
-                            value: 'JJ5QZXX',
+                            value: 'JJ5QZXX'
                         },
                         {
                             name: 'Fire Red',
                             orderable: true,
-                            value: 'JJ825XX',
+                            value: 'JJ825XX'
                         },
                         {
                             name: 'Sugar',
                             orderable: true,
-                            value: 'JJG80XX',
+                            value: 'JJG80XX'
                         },
                         {
                             name: 'White',
                             orderable: true,
-                            value: 'JJI15XX',
-                        },
-                    ],
+                            value: 'JJI15XX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -2005,42 +2005,42 @@ export const mockOrderProducts = {
                         {
                             name: 'XS',
                             orderable: true,
-                            value: '9XS',
+                            value: '9XS'
                         },
                         {
                             name: 'S',
                             orderable: true,
-                            value: '9SM',
+                            value: '9SM'
                         },
                         {
                             name: 'M',
                             orderable: true,
-                            value: '9MD',
+                            value: '9MD'
                         },
                         {
                             name: 'L',
                             orderable: true,
-                            value: '9LG',
+                            value: '9LG'
                         },
                         {
                             name: 'XL',
                             orderable: true,
-                            value: '9XL',
-                        },
-                    ],
-                },
+                            value: '9XL'
+                        }
+                    ]
+                }
             ],
             variationValues: {
                 color: 'JJ825XX',
-                size: '9LG',
+                size: '9LG'
             },
             c_color: 'JJ825XX',
             c_refinementColor: 'red',
             c_size: '9LG',
-            c_width: 'Z',
-        },
+            c_width: 'Z'
+        }
     ],
-    total: 2,
+    total: 2
 }
 
 export const mockedCustomerProductLists = {
@@ -2056,18 +2056,18 @@ export const mockedCustomerProductLists = {
                     public: false,
                     purchasedQuantity: 0,
                     quantity: 1,
-                    type: 'product',
-                },
+                    type: 'product'
+                }
             ],
             event: {},
             id: 'c1b0edb2ad6fcfb153044ef3b0',
             lastModified: '2021-06-30T04:11:12.602Z',
             public: false,
             name: 'PWA wishlist',
-            type: 'wish_list',
-        },
+            type: 'wish_list'
+        }
     ],
-    total: 1,
+    total: 1
 }
 
 export const mockedEmptyCustomerProductList = {
@@ -2080,10 +2080,10 @@ export const mockedEmptyCustomerProductList = {
             id: 'c1b0edb2ad6fcfb153044ef3b0',
             lastModified: '2021-06-30T04:11:12.602Z',
             public: false,
-            type: 'wish_list',
-        },
+            type: 'wish_list'
+        }
     ],
-    total: 1,
+    total: 1
 }
 
 export const mockedCustomerProductListsDetails = {
@@ -2109,12 +2109,12 @@ export const mockedCustomerProductListsDetails = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'Green',
-                                },
-                            ],
-                        },
+                                    value: 'Green'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'large',
+                    viewType: 'large'
                 },
                 {
                     images: [
@@ -2131,12 +2131,12 @@ export const mockedCustomerProductListsDetails = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'Green',
-                                },
-                            ],
-                        },
+                                    value: 'Green'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'medium',
+                    viewType: 'medium'
                 },
                 {
                     images: [
@@ -2153,12 +2153,12 @@ export const mockedCustomerProductListsDetails = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'Green',
-                                },
-                            ],
-                        },
+                                    value: 'Green'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'small',
+                    viewType: 'small'
                 },
                 {
                     images: [
@@ -2175,13 +2175,13 @@ export const mockedCustomerProductListsDetails = {
                             id: 'color',
                             values: [
                                 {
-                                    value: 'Green',
-                                },
-                            ],
-                        },
+                                    value: 'Green'
+                                }
+                            ]
+                        }
                     ],
-                    viewType: 'swatch',
-                },
+                    viewType: 'swatch'
+                }
             ],
             inventory: {
                 ats: 10,
@@ -2190,14 +2190,14 @@ export const mockedCustomerProductListsDetails = {
                 inStockDate: '2009-03-31T00:00:00.000Z',
                 orderable: true,
                 preorderable: false,
-                stockLevel: 0,
+                stockLevel: 0
             },
             longDescription:
                 'Supports MP3 (up to 320 Kbps), MP3 VBR, AAC (up to 320 Kbps), Protected AAC (iTunes Music Store), Audible (formats 2, 3, 4), AIFF, Apple Lossless and WAV audio formats, plus BMP, JPEG, GIF, TIFF, PNG and PSD (Mac only) image formats; podcasting support',
             master: {
                 masterId: 'apple-ipod-nanoM',
                 orderable: true,
-                price: 119.0,
+                price: 119.0
             },
             minOrderQuantity: 1,
             name: 'Apple iPod Nano',
@@ -2210,14 +2210,14 @@ export const mockedCustomerProductListsDetails = {
             productPromotions: [
                 {
                     calloutMsg: '$50offOrderCountAbove5',
-                    promotionId: '$50offOrderCountAbove5',
-                },
+                    promotionId: '$50offOrderCountAbove5'
+                }
             ],
             shortDescription:
                 'The all new iPod nano has a curved aluminum and glass design and stunning new features. The Genius music \r\nfeature helps you find music to fit your mood. With the built-in accelerometer, you can rotate the nano to flip through album art with \r\nCover Flow. Plus, view photos and videos in either portrait or landscape.',
             stepQuantity: 1,
             type: {
-                variant: true,
+                variant: true
             },
             unitMeasure: '',
             unitQuantity: 0,
@@ -2228,8 +2228,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-silver-8gM',
                     variationValues: {
                         color: 'Silver',
-                        memorySize: '8 GB',
-                    },
+                        memorySize: '8 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2237,8 +2237,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-black-8gM',
                     variationValues: {
                         color: 'Black',
-                        memorySize: '8 GB',
-                    },
+                        memorySize: '8 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2246,8 +2246,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-purple-8gM',
                     variationValues: {
                         color: 'Purple',
-                        memorySize: '8 GB',
-                    },
+                        memorySize: '8 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2255,8 +2255,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-blue-8gM',
                     variationValues: {
                         color: 'Blue',
-                        memorySize: '8 GB',
-                    },
+                        memorySize: '8 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2264,8 +2264,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-green-8gM',
                     variationValues: {
                         color: 'Green',
-                        memorySize: '8 GB',
-                    },
+                        memorySize: '8 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2273,8 +2273,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-yellow-8gM',
                     variationValues: {
                         color: 'Yellow',
-                        memorySize: '8 GB',
-                    },
+                        memorySize: '8 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2282,8 +2282,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-orange-8gM',
                     variationValues: {
                         color: 'Orange',
-                        memorySize: '8 GB',
-                    },
+                        memorySize: '8 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2291,8 +2291,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-red-8gM',
                     variationValues: {
                         color: 'Red',
-                        memorySize: '8 GB',
-                    },
+                        memorySize: '8 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2300,8 +2300,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-fuscia-8gM',
                     variationValues: {
                         color: 'Fuscia',
-                        memorySize: '8 GB',
-                    },
+                        memorySize: '8 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2309,8 +2309,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-silver-16gM',
                     variationValues: {
                         color: 'Silver',
-                        memorySize: '16 GB',
-                    },
+                        memorySize: '16 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2318,8 +2318,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-black-16gM',
                     variationValues: {
                         color: 'Black',
-                        memorySize: '16 GB',
-                    },
+                        memorySize: '16 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2327,8 +2327,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-purple-16gM',
                     variationValues: {
                         color: 'Purple',
-                        memorySize: '16 GB',
-                    },
+                        memorySize: '16 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2336,8 +2336,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-blue-16gM',
                     variationValues: {
                         color: 'Blue',
-                        memorySize: '16 GB',
-                    },
+                        memorySize: '16 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2345,8 +2345,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-green-16gM',
                     variationValues: {
                         color: 'Green',
-                        memorySize: '16 GB',
-                    },
+                        memorySize: '16 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2354,8 +2354,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-yellow-16gM',
                     variationValues: {
                         color: 'Yellow',
-                        memorySize: '16 GB',
-                    },
+                        memorySize: '16 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2363,8 +2363,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-orange-16gM',
                     variationValues: {
                         color: 'Orange',
-                        memorySize: '16 GB',
-                    },
+                        memorySize: '16 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2372,8 +2372,8 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-red-16gM',
                     variationValues: {
                         color: 'Red',
-                        memorySize: '16 GB',
-                    },
+                        memorySize: '16 GB'
+                    }
                 },
                 {
                     orderable: true,
@@ -2381,9 +2381,9 @@ export const mockedCustomerProductListsDetails = {
                     productId: 'apple-ipod-nano-fuscia-16gM',
                     variationValues: {
                         color: 'Fuscia',
-                        memorySize: '16 GB',
-                    },
-                },
+                        memorySize: '16 GB'
+                    }
+                }
             ],
             variationAttributes: [
                 {
@@ -2393,49 +2393,49 @@ export const mockedCustomerProductListsDetails = {
                         {
                             name: 'Silver',
                             orderable: true,
-                            value: 'Silver',
+                            value: 'Silver'
                         },
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'Black',
+                            value: 'Black'
                         },
                         {
                             name: 'Purple',
                             orderable: true,
-                            value: 'Purple',
+                            value: 'Purple'
                         },
                         {
                             name: 'Blue',
                             orderable: true,
-                            value: 'Blue',
+                            value: 'Blue'
                         },
                         {
                             name: 'Green',
                             orderable: true,
-                            value: 'Green',
+                            value: 'Green'
                         },
                         {
                             name: 'Yellow',
                             orderable: true,
-                            value: 'Yellow',
+                            value: 'Yellow'
                         },
                         {
                             name: 'Orange',
                             orderable: true,
-                            value: 'Orange',
+                            value: 'Orange'
                         },
                         {
                             name: 'Red',
                             orderable: true,
-                            value: 'Red',
+                            value: 'Red'
                         },
                         {
                             name: 'Fuscia',
                             orderable: true,
-                            value: 'Fuscia',
-                        },
-                    ],
+                            value: 'Fuscia'
+                        }
+                    ]
                 },
                 {
                     id: 'memorySize',
@@ -2444,19 +2444,19 @@ export const mockedCustomerProductListsDetails = {
                         {
                             name: '8 GB',
                             orderable: true,
-                            value: '8 GB',
+                            value: '8 GB'
                         },
                         {
                             name: '16 GB',
                             orderable: true,
-                            value: '16 GB',
-                        },
-                    ],
-                },
+                            value: '16 GB'
+                        }
+                    ]
+                }
             ],
             variationValues: {
                 color: 'Green',
-                memorySize: '16 GB',
+                memorySize: '16 GB'
             },
             c_batteryLife: '24 hours',
             c_batteryType: 'Lithium Ion',
@@ -2476,10 +2476,10 @@ export const mockedCustomerProductListsDetails = {
                 'The all new iPod nano has a curved aluminum and glass design and stunning new features. The Genius music feature helps you find music to fit your mood. With the built-in accelerometer, you can rotate the nano to flip through album art with Cover Flow. Plus, view photos and videos in either portrait or landscape.',
             c_tabDetails:
                 'Supports MP3 (up to 320 Kbps), MP3 VBR, AAC (up to 320 Kbps), Protected AAC (iTunes Music Store), Audible (formats 2, 3, 4), AIFF, Apple Lossless and WAV audio formats, plus BMP, JPEG, GIF, TIFF, PNG and PSD (Mac only) image formats; podcasting support',
-            c_videoStorage: '16 hours',
-        },
+            c_videoStorage: '16 hours'
+        }
     ],
-    total: 1,
+    total: 1
 }
 
 export const mockCategories = {
@@ -2549,33 +2549,33 @@ export const mockProductSearch = {
             productId: '25588993M',
             productName: 'Slim Skirt With Back Kick Pleats',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701644042639M',
+                id: '701644042639M'
             },
             representedProducts: [
                 {
-                    id: '701644042639M',
+                    id: '701644042639M'
                 },
                 {
-                    id: '701644042622M',
+                    id: '701644042622M'
                 },
                 {
-                    id: '701644042653M',
+                    id: '701644042653M'
                 },
                 {
-                    id: '701644042646M',
+                    id: '701644042646M'
                 },
                 {
-                    id: '701644042592M',
+                    id: '701644042592M'
                 },
                 {
-                    id: '701644042608M',
+                    id: '701644042608M'
                 },
                 {
-                    id: '701644042615M',
-                },
+                    id: '701644042615M'
+                }
             ],
             variationAttributes: [
                 {
@@ -2585,9 +2585,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ3WCXX',
-                        },
-                    ],
+                            value: 'JJ3WCXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -2596,41 +2596,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -2647,27 +2647,27 @@ export const mockProductSearch = {
             productId: '25565094M',
             productName: 'Pull On Neutral Pant',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643458462M',
+                id: '701643458462M'
             },
             representedProducts: [
                 {
-                    id: '701643458462M',
+                    id: '701643458462M'
                 },
                 {
-                    id: '701643458509M',
+                    id: '701643458509M'
                 },
                 {
-                    id: '701643458479M',
+                    id: '701643458479M'
                 },
                 {
-                    id: '701643458493M',
+                    id: '701643458493M'
                 },
                 {
-                    id: '701643458486M',
-                },
+                    id: '701643458486M'
+                }
             ],
             variationAttributes: [
                 {
@@ -2677,9 +2677,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black & Sugar',
                             orderable: true,
-                            value: 'JJ0CZXX',
-                        },
-                    ],
+                            value: 'JJ0CZXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -2688,31 +2688,31 @@ export const mockProductSearch = {
                         {
                             name: 'XS',
                             orderable: true,
-                            value: '9XS',
+                            value: '9XS'
                         },
                         {
                             name: 'S',
                             orderable: true,
-                            value: '9SM',
+                            value: '9SM'
                         },
                         {
                             name: 'M',
                             orderable: true,
-                            value: '9MD',
+                            value: '9MD'
                         },
                         {
                             name: 'L',
                             orderable: true,
-                            value: '9LG',
+                            value: '9LG'
                         },
                         {
                             name: 'XL',
                             orderable: true,
-                            value: '9XL',
-                        },
-                    ],
-                },
-            ],
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -2729,33 +2729,33 @@ export const mockProductSearch = {
             productId: '25593301M',
             productName: 'Washable Linen Slim Pant',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701644068349M',
+                id: '701644068349M'
             },
             representedProducts: [
                 {
-                    id: '701644068349M',
+                    id: '701644068349M'
                 },
                 {
-                    id: '701644068301M',
+                    id: '701644068301M'
                 },
                 {
-                    id: '701644068318M',
+                    id: '701644068318M'
                 },
                 {
-                    id: '701644068356M',
+                    id: '701644068356M'
                 },
                 {
-                    id: '701644068325M',
+                    id: '701644068325M'
                 },
                 {
-                    id: '701644068332M',
+                    id: '701644068332M'
                 },
                 {
-                    id: '701644068363M',
-                },
+                    id: '701644068363M'
+                }
             ],
             variationAttributes: [
                 {
@@ -2765,9 +2765,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ3WCXX',
-                        },
-                    ],
+                            value: 'JJ3WCXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -2776,41 +2776,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -2827,33 +2827,33 @@ export const mockProductSearch = {
             productId: '25564454M',
             productName: 'Classic Crop Pant',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643370818M',
+                id: '701643370818M'
             },
             representedProducts: [
                 {
-                    id: '701643370818M',
+                    id: '701643370818M'
                 },
                 {
-                    id: '701643370801M',
+                    id: '701643370801M'
                 },
                 {
-                    id: '701643370825M',
+                    id: '701643370825M'
                 },
                 {
-                    id: '701643370849M',
+                    id: '701643370849M'
                 },
                 {
-                    id: '701643370832M',
+                    id: '701643370832M'
                 },
                 {
-                    id: '701643370856M',
+                    id: '701643370856M'
                 },
                 {
-                    id: '701643370795M',
-                },
+                    id: '701643370795M'
+                }
             ],
             variationAttributes: [
                 {
@@ -2863,9 +2863,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ169XX',
-                        },
-                    ],
+                            value: 'JJ169XX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -2874,41 +2874,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -2925,33 +2925,33 @@ export const mockProductSearch = {
             productId: '25589419M',
             productName: 'Slim Floral Skirt',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643415397M',
+                id: '701643415397M'
             },
             representedProducts: [
                 {
-                    id: '701643415397M',
+                    id: '701643415397M'
                 },
                 {
-                    id: '701643415434M',
+                    id: '701643415434M'
                 },
                 {
-                    id: '701643415403M',
+                    id: '701643415403M'
                 },
                 {
-                    id: '701643415410M',
+                    id: '701643415410M'
                 },
                 {
-                    id: '701643415380M',
+                    id: '701643415380M'
                 },
                 {
-                    id: '701643415427M',
+                    id: '701643415427M'
                 },
                 {
-                    id: '701643415441M',
-                },
+                    id: '701643415441M'
+                }
             ],
             variationAttributes: [
                 {
@@ -2961,9 +2961,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black Multi',
                             orderable: true,
-                            value: 'JJ3WDXX',
-                        },
-                    ],
+                            value: 'JJ3WDXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -2972,41 +2972,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3015,37 +3015,37 @@ export const mockProductSearch = {
                 alt: 'Trouser Leg Pant, , large',
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg',
-                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg'
             },
             productName: 'Trouser Leg Pant',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701642867753M',
+                id: '701642867753M'
             },
             representedProducts: [
                 {
-                    id: '701642867753M',
+                    id: '701642867753M'
                 },
                 {
-                    id: '701642867777M',
+                    id: '701642867777M'
                 },
                 {
-                    id: '701642867715M',
+                    id: '701642867715M'
                 },
                 {
-                    id: '701642867722M',
+                    id: '701642867722M'
                 },
                 {
-                    id: '701642867746M',
+                    id: '701642867746M'
                 },
                 {
-                    id: '701642867760M',
+                    id: '701642867760M'
                 },
                 {
-                    id: '701642867739M',
-                },
+                    id: '701642867739M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3055,9 +3055,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ169XX',
-                        },
-                    ],
+                            value: 'JJ169XX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3066,41 +3066,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3117,27 +3117,27 @@ export const mockProductSearch = {
             productId: '25762759M',
             productName: 'Tribal Inspired Slim Skirt',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643636334M',
+                id: '701643636334M'
             },
             representedProducts: [
                 {
-                    id: '701643636334M',
+                    id: '701643636334M'
                 },
                 {
-                    id: '701643636365M',
+                    id: '701643636365M'
                 },
                 {
-                    id: '701643636372M',
+                    id: '701643636372M'
                 },
                 {
-                    id: '701643636310M',
+                    id: '701643636310M'
                 },
                 {
-                    id: '701643636341M',
-                },
+                    id: '701643636341M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3147,9 +3147,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black Multi',
                             orderable: true,
-                            value: 'JJ3WDXX',
-                        },
-                    ],
+                            value: 'JJ3WDXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3158,31 +3158,31 @@ export const mockProductSearch = {
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3199,27 +3199,27 @@ export const mockProductSearch = {
             productId: '25565572M',
             productName: 'Relaxed Fit Pant',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701644025151M',
+                id: '701644025151M'
             },
             representedProducts: [
                 {
-                    id: '701644025151M',
+                    id: '701644025151M'
                 },
                 {
-                    id: '701644025182M',
+                    id: '701644025182M'
                 },
                 {
-                    id: '701644025175M',
+                    id: '701644025175M'
                 },
                 {
-                    id: '701644025168M',
+                    id: '701644025168M'
                 },
                 {
-                    id: '701644025199M',
-                },
+                    id: '701644025199M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3229,9 +3229,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ169XX',
-                        },
-                    ],
+                            value: 'JJ169XX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3240,31 +3240,31 @@ export const mockProductSearch = {
                         {
                             name: 'XS',
                             orderable: true,
-                            value: '9XS',
+                            value: '9XS'
                         },
                         {
                             name: 'S',
                             orderable: true,
-                            value: '9SM',
+                            value: '9SM'
                         },
                         {
                             name: 'M',
                             orderable: true,
-                            value: '9MD',
+                            value: '9MD'
                         },
                         {
                             name: 'L',
                             orderable: true,
-                            value: '9LG',
+                            value: '9LG'
                         },
                         {
                             name: 'XL',
                             orderable: true,
-                            value: '9XL',
-                        },
-                    ],
-                },
-            ],
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3281,33 +3281,33 @@ export const mockProductSearch = {
             productId: '25688156M',
             productName: '5 Pocket Cuffed Capri',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '609717696089M',
+                id: '609717696089M'
             },
             representedProducts: [
                 {
-                    id: '609717696089M',
+                    id: '609717696089M'
                 },
                 {
-                    id: '609717696041M',
+                    id: '609717696041M'
                 },
                 {
-                    id: '609717696096M',
+                    id: '609717696096M'
                 },
                 {
-                    id: '609717696027M',
+                    id: '609717696027M'
                 },
                 {
-                    id: '609717696102M',
+                    id: '609717696102M'
                 },
                 {
-                    id: '609717696034M',
+                    id: '609717696034M'
                 },
                 {
-                    id: '609717696058M',
-                },
+                    id: '609717696058M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3317,9 +3317,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ169XX',
-                        },
-                    ],
+                            value: 'JJ169XX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3328,41 +3328,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3379,24 +3379,24 @@ export const mockProductSearch = {
             productId: '25697392M',
             productName: 'Pleated Skirt.',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701644443054M',
+                id: '701644443054M'
             },
             representedProducts: [
                 {
-                    id: '701644443054M',
+                    id: '701644443054M'
                 },
                 {
-                    id: '701644443061M',
+                    id: '701644443061M'
                 },
                 {
-                    id: '701644443085M',
+                    id: '701644443085M'
                 },
                 {
-                    id: '701644443078M',
-                },
+                    id: '701644443078M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3406,9 +3406,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ3WCXX',
-                        },
-                    ],
+                            value: 'JJ3WCXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3417,26 +3417,26 @@ export const mockProductSearch = {
                         {
                             name: 'S',
                             orderable: true,
-                            value: '9SM',
+                            value: '9SM'
                         },
                         {
                             name: 'M',
                             orderable: true,
-                            value: '9MD',
+                            value: '9MD'
                         },
                         {
                             name: 'L',
                             orderable: true,
-                            value: '9LG',
+                            value: '9LG'
                         },
                         {
                             name: 'XL',
                             orderable: true,
-                            value: '9XL',
-                        },
-                    ],
-                },
-            ],
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3453,27 +3453,27 @@ export const mockProductSearch = {
             productId: '25589157M',
             productName: 'Classic Glen Plaid Pant',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643409747M',
+                id: '701643409747M'
             },
             representedProducts: [
                 {
-                    id: '701643409747M',
+                    id: '701643409747M'
                 },
                 {
-                    id: '701643409716M',
+                    id: '701643409716M'
                 },
                 {
-                    id: '701643409761M',
+                    id: '701643409761M'
                 },
                 {
-                    id: '701643409723M',
+                    id: '701643409723M'
                 },
                 {
-                    id: '701643409730M',
-                },
+                    id: '701643409730M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3483,9 +3483,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black & Ivory',
                             orderable: true,
-                            value: 'JJ3WRXX',
-                        },
-                    ],
+                            value: 'JJ3WRXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3494,31 +3494,31 @@ export const mockProductSearch = {
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3535,21 +3535,21 @@ export const mockProductSearch = {
             productId: '25589795M',
             productName: 'Long Pleated Skirt',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701644066987M',
+                id: '701644066987M'
             },
             representedProducts: [
                 {
-                    id: '701644066987M',
+                    id: '701644066987M'
                 },
                 {
-                    id: '701644066994M',
+                    id: '701644066994M'
                 },
                 {
-                    id: '701644067007M',
-                },
+                    id: '701644067007M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3559,9 +3559,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ3WCXX',
-                        },
-                    ],
+                            value: 'JJ3WCXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3570,21 +3570,21 @@ export const mockProductSearch = {
                         {
                             name: 'S',
                             orderable: true,
-                            value: '9SM',
+                            value: '9SM'
                         },
                         {
                             name: 'M',
                             orderable: true,
-                            value: '9MD',
+                            value: '9MD'
                         },
                         {
                             name: 'XL',
                             orderable: true,
-                            value: '9XL',
-                        },
-                    ],
-                },
-            ],
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3593,37 +3593,37 @@ export const mockProductSearch = {
                 alt: 'Pleated Skirt With Embroidery., , large',
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg',
-                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg'
             },
             productName: 'Pleated Skirt With Embroidery.',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701644335342M',
+                id: '701644335342M'
             },
             representedProducts: [
                 {
-                    id: '701644335342M',
+                    id: '701644335342M'
                 },
                 {
-                    id: '701644335397M',
+                    id: '701644335397M'
                 },
                 {
-                    id: '701644335373M',
+                    id: '701644335373M'
                 },
                 {
-                    id: '701644335380M',
+                    id: '701644335380M'
                 },
                 {
-                    id: '701644335366M',
+                    id: '701644335366M'
                 },
                 {
-                    id: '701644335359M',
+                    id: '701644335359M'
                 },
                 {
-                    id: '701644335403M',
-                },
+                    id: '701644335403M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3633,9 +3633,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ3WCXX',
-                        },
-                    ],
+                            value: 'JJ3WCXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3644,41 +3644,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3695,33 +3695,33 @@ export const mockProductSearch = {
             productId: '25697630M',
             productName: 'Straight Ankle Pant.',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701644389383M',
+                id: '701644389383M'
             },
             representedProducts: [
                 {
-                    id: '701644389383M',
+                    id: '701644389383M'
                 },
                 {
-                    id: '701644389369M',
+                    id: '701644389369M'
                 },
                 {
-                    id: '701644389413M',
+                    id: '701644389413M'
                 },
                 {
-                    id: '701644389420M',
+                    id: '701644389420M'
                 },
                 {
-                    id: '701644389376M',
+                    id: '701644389376M'
                 },
                 {
-                    id: '701644389437M',
+                    id: '701644389437M'
                 },
                 {
-                    id: '701644389390M',
-                },
+                    id: '701644389390M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3731,9 +3731,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black & White',
                             orderable: true,
-                            value: 'JJ0DDXX',
-                        },
-                    ],
+                            value: 'JJ0DDXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3742,41 +3742,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3793,33 +3793,33 @@ export const mockProductSearch = {
             productId: '25502027M',
             productName: 'Classic Tweed Pant',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701642884323M',
+                id: '701642884323M'
             },
             representedProducts: [
                 {
-                    id: '701642884323M',
+                    id: '701642884323M'
                 },
                 {
-                    id: '701642884347M',
+                    id: '701642884347M'
                 },
                 {
-                    id: '701642884309M',
+                    id: '701642884309M'
                 },
                 {
-                    id: '701642884354M',
+                    id: '701642884354M'
                 },
                 {
-                    id: '701642884361M',
+                    id: '701642884361M'
                 },
                 {
-                    id: '701642884330M',
+                    id: '701642884330M'
                 },
                 {
-                    id: '701642884316M',
-                },
+                    id: '701642884316M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3829,9 +3829,9 @@ export const mockProductSearch = {
                         {
                             name: 'Laurel Multi',
                             orderable: true,
-                            value: 'JJ0QRXX',
-                        },
-                    ],
+                            value: 'JJ0QRXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3840,41 +3840,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3891,24 +3891,24 @@ export const mockProductSearch = {
             productId: '25503070M',
             productName: 'Ribbed Pleated Skirt',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643037582M',
+                id: '701643037582M'
             },
             representedProducts: [
                 {
-                    id: '701643037582M',
+                    id: '701643037582M'
                 },
                 {
-                    id: '701643037612M',
+                    id: '701643037612M'
                 },
                 {
-                    id: '701643037599M',
+                    id: '701643037599M'
                 },
                 {
-                    id: '701643037605M',
-                },
+                    id: '701643037605M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3918,9 +3918,9 @@ export const mockProductSearch = {
                         {
                             name: 'Laurel',
                             orderable: true,
-                            value: 'JJ0NLE5',
-                        },
-                    ],
+                            value: 'JJ0NLE5'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -3929,26 +3929,26 @@ export const mockProductSearch = {
                         {
                             name: 'S',
                             orderable: true,
-                            value: '9SM',
+                            value: '9SM'
                         },
                         {
                             name: 'M',
                             orderable: true,
-                            value: '9MD',
+                            value: '9MD'
                         },
                         {
                             name: 'L',
                             orderable: true,
-                            value: '9LG',
+                            value: '9LG'
                         },
                         {
                             name: 'XL',
                             orderable: true,
-                            value: '9XL',
-                        },
-                    ],
-                },
-            ],
+                            value: '9XL'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -3965,30 +3965,30 @@ export const mockProductSearch = {
             productId: '25518397M',
             productName: 'Bootleg Trouser',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701642853077M',
+                id: '701642853077M'
             },
             representedProducts: [
                 {
-                    id: '701642853077M',
+                    id: '701642853077M'
                 },
                 {
-                    id: '701642853084M',
+                    id: '701642853084M'
                 },
                 {
-                    id: '701642853107M',
+                    id: '701642853107M'
                 },
                 {
-                    id: '701642853145M',
+                    id: '701642853145M'
                 },
                 {
-                    id: '701642853121M',
+                    id: '701642853121M'
                 },
                 {
-                    id: '701642853091M',
-                },
+                    id: '701642853091M'
+                }
             ],
             variationAttributes: [
                 {
@@ -3998,9 +3998,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black & Sugar',
                             orderable: true,
-                            value: 'JJ0CZXX',
-                        },
-                    ],
+                            value: 'JJ0CZXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -4009,36 +4009,36 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -4055,33 +4055,33 @@ export const mockProductSearch = {
             productId: '25696685M',
             productName: 'Wide Leg Pant.',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701644334871M',
+                id: '701644334871M'
             },
             representedProducts: [
                 {
-                    id: '701644334871M',
+                    id: '701644334871M'
                 },
                 {
-                    id: '701644334895M',
+                    id: '701644334895M'
                 },
                 {
-                    id: '701644334864M',
+                    id: '701644334864M'
                 },
                 {
-                    id: '701644334901M',
+                    id: '701644334901M'
                 },
                 {
-                    id: '701644334840M',
+                    id: '701644334840M'
                 },
                 {
-                    id: '701644334857M',
+                    id: '701644334857M'
                 },
                 {
-                    id: '701644334888M',
-                },
+                    id: '701644334888M'
+                }
             ],
             variationAttributes: [
                 {
@@ -4091,9 +4091,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black Multi',
                             orderable: true,
-                            value: 'JJ3WDXX',
-                        },
-                    ],
+                            value: 'JJ3WDXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -4102,41 +4102,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -4153,33 +4153,33 @@ export const mockProductSearch = {
             productId: '25697659M',
             productName: 'Eyelet Skirt.',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701644390952M',
+                id: '701644390952M'
             },
             representedProducts: [
                 {
-                    id: '701644390952M',
+                    id: '701644390952M'
                 },
                 {
-                    id: '701644390891M',
+                    id: '701644390891M'
                 },
                 {
-                    id: '701644390907M',
+                    id: '701644390907M'
                 },
                 {
-                    id: '701644390921M',
+                    id: '701644390921M'
                 },
                 {
-                    id: '701644390945M',
+                    id: '701644390945M'
                 },
                 {
-                    id: '701644390914M',
+                    id: '701644390914M'
                 },
                 {
-                    id: '701644390969M',
-                },
+                    id: '701644390969M'
+                }
             ],
             variationAttributes: [
                 {
@@ -4189,9 +4189,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ169XX',
-                        },
-                    ],
+                            value: 'JJ169XX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -4200,41 +4200,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -4251,33 +4251,33 @@ export const mockProductSearch = {
             productId: '25328702M',
             productName: 'Washable Wool Classic Straight Skirt ',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701641312858M',
+                id: '701641312858M'
             },
             representedProducts: [
                 {
-                    id: '701641312858M',
+                    id: '701641312858M'
                 },
                 {
-                    id: '701641312865M',
+                    id: '701641312865M'
                 },
                 {
-                    id: '701641312834M',
+                    id: '701641312834M'
                 },
                 {
-                    id: '701641312841M',
+                    id: '701641312841M'
                 },
                 {
-                    id: '701641312810M',
+                    id: '701641312810M'
                 },
                 {
-                    id: '701641312827M',
+                    id: '701641312827M'
                 },
                 {
-                    id: '701641312872M',
-                },
+                    id: '701641312872M'
+                }
             ],
             variationAttributes: [
                 {
@@ -4287,9 +4287,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ3WCXX',
-                        },
-                    ],
+                            value: 'JJ3WCXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -4298,41 +4298,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -4349,33 +4349,33 @@ export const mockProductSearch = {
             productId: '25564782M',
             productName: 'Roll Up Cargo Pant',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643422074M',
+                id: '701643422074M'
             },
             representedProducts: [
                 {
-                    id: '701643422074M',
+                    id: '701643422074M'
                 },
                 {
-                    id: '701643422128M',
+                    id: '701643422128M'
                 },
                 {
-                    id: '701643422111M',
+                    id: '701643422111M'
                 },
                 {
-                    id: '701643422098M',
+                    id: '701643422098M'
                 },
                 {
-                    id: '701643422104M',
+                    id: '701643422104M'
                 },
                 {
-                    id: '701643422081M',
+                    id: '701643422081M'
                 },
                 {
-                    id: '701643422135M',
-                },
+                    id: '701643422135M'
+                }
             ],
             variationAttributes: [
                 {
@@ -4385,9 +4385,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ169XX',
-                        },
-                    ],
+                            value: 'JJ169XX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -4396,41 +4396,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -4447,18 +4447,18 @@ export const mockProductSearch = {
             productId: '25629003M',
             productName: 'Side Button Pleated Skirt',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643408139M',
+                id: '701643408139M'
             },
             representedProducts: [
                 {
-                    id: '701643408139M',
+                    id: '701643408139M'
                 },
                 {
-                    id: '701643408177M',
-                },
+                    id: '701643408177M'
+                }
             ],
             variationAttributes: [
                 {
@@ -4468,9 +4468,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ3WCXX',
-                        },
-                    ],
+                            value: 'JJ3WCXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -4479,16 +4479,16 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
-                        },
-                    ],
-                },
-            ],
+                            value: '010'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -4505,33 +4505,33 @@ export const mockProductSearch = {
             productId: '25589652M',
             productName: 'Flat Front Pant',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643632909M',
+                id: '701643632909M'
             },
             representedProducts: [
                 {
-                    id: '701643632909M',
+                    id: '701643632909M'
                 },
                 {
-                    id: '701643632930M',
+                    id: '701643632930M'
                 },
                 {
-                    id: '701643632916M',
+                    id: '701643632916M'
                 },
                 {
-                    id: '701643632893M',
+                    id: '701643632893M'
                 },
                 {
-                    id: '701643632886M',
+                    id: '701643632886M'
                 },
                 {
-                    id: '701643632879M',
+                    id: '701643632879M'
                 },
                 {
-                    id: '701643632923M',
-                },
+                    id: '701643632923M'
+                }
             ],
             variationAttributes: [
                 {
@@ -4541,9 +4541,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ3WCXX',
-                        },
-                    ],
+                            value: 'JJ3WCXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -4552,41 +4552,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -4603,33 +4603,33 @@ export const mockProductSearch = {
             productId: '25688325M',
             productName: 'Pencil Skirt',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '701643317820M',
+                id: '701643317820M'
             },
             representedProducts: [
                 {
-                    id: '701643317820M',
+                    id: '701643317820M'
                 },
                 {
-                    id: '701643317806M',
+                    id: '701643317806M'
                 },
                 {
-                    id: '701643317813M',
+                    id: '701643317813M'
                 },
                 {
-                    id: '701643317844M',
+                    id: '701643317844M'
                 },
                 {
-                    id: '701643317790M',
+                    id: '701643317790M'
                 },
                 {
-                    id: '701643317837M',
+                    id: '701643317837M'
                 },
                 {
-                    id: '701643317851M',
-                },
+                    id: '701643317851M'
+                }
             ],
             variationAttributes: [
                 {
@@ -4639,9 +4639,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ3WCXX',
-                        },
-                    ],
+                            value: 'JJ3WCXX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -4650,41 +4650,41 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
         },
         {
             currency: 'USD',
@@ -4702,33 +4702,33 @@ export const mockProductSearch = {
             productId: '25688228M',
             productName: 'Light Weight Cargo Capri (Master)',
             productType: {
-                master: true,
+                master: true
             },
             representedProduct: {
-                id: '609717701479M',
+                id: '609717701479M'
             },
             representedProducts: [
                 {
-                    id: '609717701479M',
+                    id: '609717701479M'
                 },
                 {
-                    id: '609717701547M',
+                    id: '609717701547M'
                 },
                 {
-                    id: '609717701493M',
+                    id: '609717701493M'
                 },
                 {
-                    id: '609717701554M',
+                    id: '609717701554M'
                 },
                 {
-                    id: '609717701530M',
+                    id: '609717701530M'
                 },
                 {
-                    id: '609717701509M',
+                    id: '609717701509M'
                 },
                 {
-                    id: '609717701486M',
-                },
+                    id: '609717701486M'
+                }
             ],
             variationAttributes: [
                 {
@@ -4738,9 +4738,9 @@ export const mockProductSearch = {
                         {
                             name: 'Black',
                             orderable: true,
-                            value: 'JJ169XX',
-                        },
-                    ],
+                            value: 'JJ169XX'
+                        }
+                    ]
                 },
                 {
                     id: 'size',
@@ -4749,42 +4749,42 @@ export const mockProductSearch = {
                         {
                             name: '4',
                             orderable: true,
-                            value: '004',
+                            value: '004'
                         },
                         {
                             name: '6',
                             orderable: true,
-                            value: '006',
+                            value: '006'
                         },
                         {
                             name: '8',
                             orderable: true,
-                            value: '008',
+                            value: '008'
                         },
                         {
                             name: '10',
                             orderable: true,
-                            value: '010',
+                            value: '010'
                         },
                         {
                             name: '12',
                             orderable: true,
-                            value: '012',
+                            value: '012'
                         },
                         {
                             name: '14',
                             orderable: true,
-                            value: '014',
+                            value: '014'
                         },
                         {
                             name: '16',
                             orderable: true,
-                            value: '016',
-                        },
-                    ],
-                },
-            ],
-        },
+                            value: '016'
+                        }
+                    ]
+                }
+            ]
+        }
     ],
     query: '',
     refinements: [
@@ -4795,7 +4795,7 @@ export const mockProductSearch = {
                 {
                     hitCount: 43,
                     label: 'New Arrivals',
-                    value: 'newarrivals',
+                    value: 'newarrivals'
                 },
                 {
                     hitCount: 43,
@@ -4810,13 +4810,13 @@ export const mockProductSearch = {
                                 {
                                     hitCount: 43,
                                     label: 'Bottoms',
-                                    value: 'womens-clothing-bottoms',
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ],
+                                    value: 'womens-clothing-bottoms'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         },
         {
             attributeId: 'c_refinementColor',
@@ -4826,87 +4826,87 @@ export const mockProductSearch = {
                     hitCount: 6,
                     label: 'Beige',
                     presentationId: 'beige',
-                    value: 'Beige',
+                    value: 'Beige'
                 },
                 {
                     hitCount: 43,
                     label: 'Black',
                     presentationId: 'black',
-                    value: 'Black',
+                    value: 'Black'
                 },
                 {
                     hitCount: 27,
                     label: 'Blue',
                     presentationId: 'blue',
-                    value: 'Blue',
+                    value: 'Blue'
                 },
                 {
                     hitCount: 0,
                     label: 'Navy',
                     presentationId: 'navy',
-                    value: 'Navy',
+                    value: 'Navy'
                 },
                 {
                     hitCount: 15,
                     label: 'Brown',
                     presentationId: 'brown',
-                    value: 'Brown',
+                    value: 'Brown'
                 },
                 {
                     hitCount: 4,
                     label: 'Green',
                     presentationId: 'green',
-                    value: 'Green',
+                    value: 'Green'
                 },
                 {
                     hitCount: 13,
                     label: 'Grey',
                     presentationId: 'grey',
-                    value: 'Grey',
+                    value: 'Grey'
                 },
                 {
                     hitCount: 0,
                     label: 'Orange',
                     presentationId: 'orange',
-                    value: 'Orange',
+                    value: 'Orange'
                 },
                 {
                     hitCount: 3,
                     label: 'Pink',
                     presentationId: 'pink',
-                    value: 'Pink',
+                    value: 'Pink'
                 },
                 {
                     hitCount: 0,
                     label: 'Purple',
                     presentationId: 'purple',
-                    value: 'Purple',
+                    value: 'Purple'
                 },
                 {
                     hitCount: 1,
                     label: 'Red',
                     presentationId: 'red',
-                    value: 'Red',
+                    value: 'Red'
                 },
                 {
                     hitCount: 30,
                     label: 'White',
                     presentationId: 'white',
-                    value: 'White',
+                    value: 'White'
                 },
                 {
                     hitCount: 0,
                     label: 'Yellow',
                     presentationId: 'yellow',
-                    value: 'Yellow',
+                    value: 'Yellow'
                 },
                 {
                     hitCount: 2,
                     label: 'Miscellaneous',
                     presentationId: 'miscellaneous',
-                    value: 'Miscellaneous',
-                },
-            ],
+                    value: 'Miscellaneous'
+                }
+            ]
         },
         {
             attributeId: 'c_isNew',
@@ -4915,13 +4915,13 @@ export const mockProductSearch = {
                 {
                     hitCount: 4,
                     label: 'true',
-                    value: 'true',
-                },
-            ],
+                    value: 'true'
+                }
+            ]
         },
         {
             attributeId: 'c_bottomType',
-            label: 'Type | Use',
+            label: 'Type | Use'
         },
         {
             attributeId: 'c_size',
@@ -4930,137 +4930,137 @@ export const mockProductSearch = {
                 {
                     hitCount: 31,
                     label: '4',
-                    value: '4',
+                    value: '4'
                 },
                 {
                     hitCount: 32,
                     label: '6',
-                    value: '6',
+                    value: '6'
                 },
                 {
                     hitCount: 32,
                     label: '8',
-                    value: '8',
+                    value: '8'
                 },
                 {
                     hitCount: 34,
                     label: '10',
-                    value: '10',
+                    value: '10'
                 },
                 {
                     hitCount: 31,
                     label: '12',
-                    value: '12',
+                    value: '12'
                 },
                 {
                     hitCount: 33,
                     label: '14',
-                    value: '14',
+                    value: '14'
                 },
                 {
                     hitCount: 32,
                     label: '16',
-                    value: '16',
+                    value: '16'
                 },
                 {
                     hitCount: 5,
                     label: 'XS',
-                    value: 'XS',
+                    value: 'XS'
                 },
                 {
                     hitCount: 8,
                     label: 'S',
-                    value: 'S',
+                    value: 'S'
                 },
                 {
                     hitCount: 8,
                     label: 'M',
-                    value: 'M',
+                    value: 'M'
                 },
                 {
                     hitCount: 6,
                     label: 'L',
-                    value: 'L',
+                    value: 'L'
                 },
                 {
                     hitCount: 7,
                     label: 'XL',
-                    value: 'XL',
+                    value: 'XL'
                 },
                 {
                     hitCount: 0,
                     label: '10P',
-                    value: '10P',
+                    value: '10P'
                 },
                 {
                     hitCount: 0,
                     label: '12P',
-                    value: '12P',
+                    value: '12P'
                 },
                 {
                     hitCount: 0,
                     label: '14P',
-                    value: '14P',
+                    value: '14P'
                 },
                 {
                     hitCount: 0,
                     label: '14W',
-                    value: '14W',
+                    value: '14W'
                 },
                 {
                     hitCount: 0,
                     label: '16W',
-                    value: '16W',
+                    value: '16W'
                 },
                 {
                     hitCount: 0,
                     label: '18W',
-                    value: '18W',
+                    value: '18W'
                 },
                 {
                     hitCount: 0,
                     label: '20W',
-                    value: '20W',
+                    value: '20W'
                 },
                 {
                     hitCount: 0,
                     label: '22W',
-                    value: '22W',
+                    value: '22W'
                 },
                 {
                     hitCount: 0,
                     label: '24W',
-                    value: '24W',
+                    value: '24W'
                 },
                 {
                     hitCount: 0,
                     label: '2P',
-                    value: '2P',
+                    value: '2P'
                 },
                 {
                     hitCount: 0,
                     label: '4P',
-                    value: '4P',
+                    value: '4P'
                 },
                 {
                     hitCount: 0,
                     label: '6P',
-                    value: '6P',
+                    value: '6P'
                 },
                 {
                     hitCount: 0,
                     label: '8P',
-                    value: '8P',
-                },
-            ],
+                    value: '8P'
+                }
+            ]
         },
         {
             attributeId: 'c_waist',
-            label: 'Waist',
+            label: 'Waist'
         },
         {
             attributeId: 'c_length',
-            label: 'Length',
+            label: 'Length'
         },
         {
             attributeId: 'price',
@@ -5069,64 +5069,64 @@ export const mockProductSearch = {
                 {
                     hitCount: 5,
                     label: '$20 - $49.99',
-                    value: '(20..50)',
+                    value: '(20..50)'
                 },
                 {
                     hitCount: 32,
                     label: '$50 - $99.99',
-                    value: '(50..100)',
+                    value: '(50..100)'
                 },
                 {
                     hitCount: 6,
                     label: '$100 - $499.99',
-                    value: '(100..500)',
-                },
-            ],
-        },
+                    value: '(100..500)'
+                }
+            ]
+        }
     ],
     searchPhraseSuggestions: {},
     selectedRefinements: {
         cgid: 'womens-clothing-bottoms',
         c_refinementColor: 'Black',
-        htype: 'master',
+        htype: 'master'
     },
     selectedSortingOption: 'best-matches',
     sortingOptions: [
         {
             id: 'best-matches',
-            label: 'Best Matches',
+            label: 'Best Matches'
         },
         {
             id: 'price-low-to-high',
-            label: 'Price Low To High',
+            label: 'Price Low To High'
         },
         {
             id: 'price-high-to-low',
-            label: 'Price High to Low',
+            label: 'Price High to Low'
         },
         {
             id: 'product-name-ascending',
-            label: 'Product Name A - Z',
+            label: 'Product Name A - Z'
         },
         {
             id: 'product-name-descending',
-            label: 'Product Name Z - A',
+            label: 'Product Name Z - A'
         },
         {
             id: 'brand',
-            label: 'Brand',
+            label: 'Brand'
         },
         {
             id: 'most-popular',
-            label: 'Most Popular',
+            label: 'Most Popular'
         },
         {
             id: 'top-sellers',
-            label: 'Top Sellers',
-        },
+            label: 'Top Sellers'
+        }
     ],
     offset: 0,
-    total: 43,
+    total: 43
 }
 
 export const mockCategory = {

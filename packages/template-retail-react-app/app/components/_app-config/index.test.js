@@ -6,15 +6,15 @@
  */
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import AppConfig from './index.jsx'
+import AppConfig from 'retail-react-app/app/components/_app-config/index.jsx'
 
 import {CorrelationIdProvider} from 'pwa-kit-react-sdk/ssr/universal/contexts'
 import {uuidv4} from 'pwa-kit-react-sdk/utils/uuidv4.client'
 import {StaticRouter} from 'react-router-dom'
 
-import mockConfig from '../../../config/mocks/default'
+import mockConfig from 'retail-react-app/config/mocks/default'
 import {rest} from 'msw'
-import {registerUserToken} from '../../utils/test-utils'
+import {registerUserToken} from 'retail-react-app/app/utils/test-utils'
 
 describe('AppConfig', () => {
     beforeAll(() => {

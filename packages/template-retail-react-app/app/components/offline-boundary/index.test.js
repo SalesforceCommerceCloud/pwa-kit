@@ -8,8 +8,8 @@ import React from 'react'
 import {screen} from '@testing-library/react'
 // import userEvent from '@testing-library/user-event'
 
-import OfflineBoundary from './index'
-import {renderWithRouter} from '../../utils/test-utils'
+import OfflineBoundary from 'retail-react-app/app/components/offline-boundary/index'
+import {renderWithRouter} from 'retail-react-app/app/utils/test-utils'
 
 // class ChunkLoadError extends Error {
 //     constructor(...params) {

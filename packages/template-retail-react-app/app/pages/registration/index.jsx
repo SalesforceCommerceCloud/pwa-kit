@@ -12,11 +12,11 @@ import {Box, Container} from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
-import Seo from '../../components/seo'
-import RegisterForm from '../../components/register'
-import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../hooks/use-einstein'
-import {API_ERROR_MESSAGE} from '../../constants'
+import Seo from 'retail-react-app/app/components/seo'
+import RegisterForm from 'retail-react-app/app/components/register'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import useEinstein from 'retail-react-app/app/hooks/use-einstein'
+import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
 
 const Registration = () => {
     const {formatMessage} = useIntl()

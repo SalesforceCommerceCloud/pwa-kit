@@ -21,15 +21,15 @@ import {
 } from 'commerce-sdk-react-preview'
 
 // Hooks
-import {useCurrentBasket} from '../../hooks/use-current-basket'
-import {useVariant} from '../../hooks'
-import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../hooks/use-einstein'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+import {useVariant} from 'retail-react-app/app/hooks'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import useEinstein from 'retail-react-app/app/hooks/use-einstein'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
-import RecommendedProducts from '../../components/recommended-products'
-import ProductView from '../../partials/product-view'
-import InformationAccordion from './partials/information-accordion'
+import RecommendedProducts from 'retail-react-app/app/components/recommended-products'
+import ProductView from 'retail-react-app/app/partials/product-view'
+import InformationAccordion from 'retail-react-app/app/pages/product-detail/partials/information-accordion'
 
 // constant
 import {
@@ -38,11 +38,11 @@ import {
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST
-} from '../../constants'
-import {rebuildPathWithParams} from '../../utils/url'
+} from 'retail-react-app/app/constants'
+import {rebuildPathWithParams} from 'retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
-import {useToast} from '../../hooks/use-toast'
-import {useWishList} from '../../hooks/use-wish-list'
+import {useToast} from 'retail-react-app/app/hooks/use-toast'
+import {useWishList} from 'retail-react-app/app/hooks/use-wish-list'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()

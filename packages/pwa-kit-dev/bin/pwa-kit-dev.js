@@ -13,7 +13,6 @@ const WebSocket = require('ws')
 const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
-const pkg = require('../package.json')
 const projectPkg = require(process.cwd() + '/package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
@@ -183,7 +182,10 @@ const main = async () => {
     const appSSRjs = fse.pathExistsSync(appSSRpath)
     const overrideSSRpath = p.join(
         process.cwd(),
-        projectPkg?.mobify?.overridesDir ?? '',
+        typeof projectPkg?.ccExtensibility?.overridesDir === 'string' &&
+            !projectPkg?.ccExtensibility?.overridesDir?.startsWith('/')
+            ? '/' + projectPkg?.ccExtensibility?.overridesDir
+            : projectPkg?.ccExtensibility?.overridesDir ?? '',
         'app',
         'ssr.js'
     )

@@ -7,9 +7,13 @@
 
 // CAUTION: This test file relies on config values that may get changed in generated projects
 
-import {determineTargetLocale, fetchTranslations, getTargetLocale} from './locale'
+import {
+    determineTargetLocale,
+    fetchTranslations,
+    getTargetLocale
+} from 'retail-react-app/app/utils/locale'
 
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from './test-utils'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from 'retail-react-app/app/utils/test-utils'
 
 const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
 const isMultiLocales = supportedLocales.length > 1

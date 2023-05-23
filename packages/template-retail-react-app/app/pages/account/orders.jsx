@@ -7,8 +7,8 @@
 
 import React from 'react'
 import {Route, Switch, useRouteMatch} from 'react-router'
-import OrderHistory from './order-history'
-import OrderDetail from './order-detail'
+import OrderHistory from 'retail-react-app/app/pages/account/order-history'
+import OrderDetail from 'retail-react-app/app/pages/account/order-detail'
 
 const AccountOrders = () => {
     const {path} = useRouteMatch()

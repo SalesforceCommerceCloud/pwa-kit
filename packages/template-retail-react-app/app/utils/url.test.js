@@ -16,9 +16,9 @@ import {
     absoluteUrl,
     createUrlTemplate,
     removeSiteLocaleFromPath
-} from './url'
-import {getUrlConfig} from './site-utils'
-import mockConfig from '../../config/mocks/default'
+} from 'retail-react-app/app/utils/url'
+import {getUrlConfig} from 'retail-react-app/app/utils/site-utils'
+import mockConfig from 'retail-react-app/config/mocks/default'
 
 afterEach(() => {
     jest.clearAllMocks()

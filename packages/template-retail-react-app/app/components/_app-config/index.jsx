@@ -11,11 +11,11 @@ import {ChakraProvider} from '@chakra-ui/react'
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from '../../theme'
-import {MultiSiteProvider} from '../../contexts'
-import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
+import theme from 'retail-react-app/app/theme'
+import {MultiSiteProvider} from 'retail-react-app/app/contexts'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from 'retail-react-app/app/utils/site-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {createUrlTemplate} from '../../utils/url'
+import {createUrlTemplate} from 'retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
@@ -73,7 +73,7 @@ AppConfig.restore = (locals = {}) => {
     const {app: appConfig} = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
-        einsteinConfig: appConfig.einsteinAPI,
+        einsteinConfig: appConfig.einsteinAPI
     }
 
     apiConfig.parameters.siteId = site.id
@@ -86,9 +86,17 @@ AppConfig.restore = (locals = {}) => {
 
 AppConfig.freeze = () => undefined
 
+AppConfig.extraGetPropsArgs = (locals = {}) => {
+    return {
+        buildUrl: locals.buildUrl,
+        site: locals.site,
+        locale: locals.locale
+    }
+}
+
 AppConfig.propTypes = {
     children: PropTypes.node,
-    locals: PropTypes.object,
+    locals: PropTypes.object
 }
 
 const isServerSide = typeof window === 'undefined'

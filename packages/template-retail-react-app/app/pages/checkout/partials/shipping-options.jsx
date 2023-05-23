@@ -8,12 +8,16 @@ import React, {useEffect} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {Box, Button, Container, Flex, Radio, RadioGroup, Stack, Text} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
-import {useCheckout} from '../util/checkout-context'
-import {ChevronDownIcon} from '../../../components/icons'
-import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
+import {useCheckout} from 'retail-react-app/app/pages/checkout/util/checkout-context'
+import {ChevronDownIcon} from 'retail-react-app/app/components/icons'
+import {
+    ToggleCard,
+    ToggleCardEdit,
+    ToggleCardSummary
+} from 'retail-react-app/app/components/toggle-card'
 import {useShippingMethodsForShipment, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import {useCurrency} from '../../../hooks'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+import {useCurrency} from 'retail-react-app/app/hooks'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()

@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithReactIntl} from '../../utils/test-utils'
-import LoginRedirect from './index'
+import {renderWithReactIntl} from 'retail-react-app/app/utils/test-utils'
+import LoginRedirect from 'retail-react-app/app/pages/login-redirect/index'
 
 test('Login Redirect renders without errors', () => {
     const {getByRole} = renderWithReactIntl(<LoginRedirect />)

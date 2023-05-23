@@ -8,8 +8,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Flex, Text, Stack} from '@chakra-ui/react'
-import {CheckCircleIcon} from '../icons'
-import {validatePassword} from '../../utils/password-utils'
+import {CheckCircleIcon} from 'retail-react-app/app/components/icons'
+import {validatePassword} from 'retail-react-app/app/utils/password-utils'
 
 /**
  * UI component for styling password requirement line

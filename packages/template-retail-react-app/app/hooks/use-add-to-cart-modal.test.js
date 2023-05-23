@@ -5,11 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
-import {renderWithProviders} from '../utils/test-utils'
+import {
+    AddToCartModal,
+    AddToCartModalContext
+} from 'retail-react-app/app/hooks/use-add-to-cart-modal'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import {screen} from '@testing-library/react'
 import {rest} from 'msw'
-import {mockCustomerBaskets} from '../mocks/mock-data'
+import {mockCustomerBaskets} from 'retail-react-app/app/mocks/mock-data'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
