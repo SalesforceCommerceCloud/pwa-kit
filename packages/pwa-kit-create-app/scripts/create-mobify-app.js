@@ -542,7 +542,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
             const tarFile = sh.exec(`npm pack ${id}@latest --pack-destination="${tmp}"`, {
                 silent: true
             }).stdout.trim()
-            tarPath = p.join(__dirname, tarFile)
+            tarPath = p.join(tmp, tarFile)
             break
         }
         case TEMPLATE_SOURCE_BUNDLE:
