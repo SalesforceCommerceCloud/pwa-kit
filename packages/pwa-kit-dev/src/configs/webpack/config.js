@@ -8,8 +8,8 @@
 /* eslint-env node */
 
 // For more information on these settings, see https://webpack.js.org/configuration
+import path, {resolve} from 'path'
 import fse from 'fs-extra'
-import {resolve} from 'path'
 
 import webpack from 'webpack'
 import WebpackNotifierPlugin from 'webpack-notifier'
@@ -19,11 +19,11 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {createModuleReplacementPlugin} from './plugins'
+import {sdkReplacementPlugin, makeRegExp} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
+import OverridesResolverPlugin from './overrides-plugin'
 
 const projectDir = process.cwd()
-
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
@@ -41,6 +41,55 @@ if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
 
+// for API convenience, add the leading slash if missing
+export const EXT_OVERRIDES_DIR =
+    typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
+    !pkg?.ccExtensibility?.overridesDir?.startsWith(path.sep)
+        ? path.sep + pkg?.ccExtensibility?.overridesDir
+        : pkg?.ccExtensibility?.overridesDir ?? ''
+export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(
+    makeRegExp(`^\${path.sep}`),
+    ''
+)
+export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
+export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
+
+// TODO: can these be handled in package.json as peerDependencies?
+// https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
+
+// due to to how the sdks work and the potential of these npm deps coming
+// from multiple places, we need to force them to one place where they're found
+export const DEPS_TO_DEDUPE = [
+    'babel-runtime',
+    '@tanstack/react-query',
+    '@loadable/component',
+    '@loadable/server',
+    '@loadable/webpack-plugin',
+    'svg-sprite-loader',
+    'react',
+    'react-router-dom',
+    'react-dom',
+    'react-helmet',
+    'webpack-hot-middleware',
+    'react-intl',
+    '@chakra-ui/icons',
+    '@chakra-ui/react',
+    '@chakra-ui/skip-nav',
+    '@emotion/react'
+]
+
+if (EXT_EXTENDABLE && EXT_EXTENDS) {
+    const extendsAsArr = Array.isArray(EXT_EXTENDS) ? EXT_EXTENDS : [EXT_EXTENDS]
+    const conflicts = extendsAsArr.filter((x) => EXT_EXTENDABLE?.includes(x))
+    if (conflicts?.length) {
+        throw new Error(
+            `Dependencies in 'extendable' and 'extends' cannot overlap, fix these: ${conflicts.join(
+                ', '
+            )}"`
+        )
+    }
+}
+
 const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
     new BundleAnalyzerPlugin({
         analyzerMode: 'static',
@@ -55,15 +104,23 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
 
 const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
-        const p = resolve(projectDir, ...segments) + ext
-        if (fse.existsSync(p)) {
+        const primary = resolve(projectDir, ...segments) + ext
+        const override = EXT_OVERRIDES_DIR
+            ? resolve(projectDir, EXT_OVERRIDES_DIR_NO_SLASH, ...segments) + ext
+            : null
+
+        if (fse.existsSync(primary) || (override && fse.existsSync(override))) {
             return true
         }
     }
     return false
 }
 
-const findInProjectThenSDK = (pkg) => {
+const getAppEntryPoint = () => {
+    return EXT_OVERRIDES_DIR + '/app/main'
+}
+
+const findDepInStack = (pkg) => {
     // Look for the SDK node_modules in two places because in CI,
     // pwa-kit-dev is published under a 'dist' directory, which
     // changes this file's location relative to the package root.
@@ -85,7 +142,6 @@ const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
     }
-
     class Builder {
         constructor() {
             this.config = {
@@ -127,21 +183,42 @@ const baseConfig = (target) => {
                     path: buildDir
                 },
                 resolve: {
+                    ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
+                        ? {
+                              plugins: [
+                                  new OverridesResolverPlugin({
+                                      extends: [EXT_EXTENDS],
+                                      overridesDir: EXT_OVERRIDES_DIR,
+                                      projectDir: process.cwd()
+                                  })
+                              ]
+                          }
+                        : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        'babel-runtime': findInProjectThenSDK('babel-runtime'),
-                        '@tanstack/react-query': findInProjectThenSDK('@tanstack/react-query'),
-                        '@loadable/component': findInProjectThenSDK('@loadable/component'),
-                        '@loadable/server': findInProjectThenSDK('@loadable/server'),
-                        '@loadable/webpack-plugin': findInProjectThenSDK(
-                            '@loadable/webpack-plugin'
+                        ...Object.assign(
+                            ...DEPS_TO_DEDUPE.map((dep) => ({
+                                [dep]: findDepInStack(dep)
+                            }))
                         ),
-                        'svg-sprite-loader': findInProjectThenSDK('svg-sprite-loader'),
-                        react: findInProjectThenSDK('react'),
-                        'react-router-dom': findInProjectThenSDK('react-router-dom'),
-                        'react-dom': findInProjectThenSDK('react-dom'),
-                        'react-helmet': findInProjectThenSDK('react-helmet'),
-                        'webpack-hot-middleware': findInProjectThenSDK('webpack-hot-middleware')
+                        ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
+                            ? Object.assign(
+                                  // NOTE: when an array of `extends` dirs are accepted, don't coerce here
+                                  ...[EXT_EXTENDS].map((extendTarget) => ({
+                                      [extendTarget]: path.resolve(
+                                          projectDir,
+                                          `node_modules${path.sep}${extendTarget}`
+                                      )
+                                  }))
+                              )
+                            : {}),
+                        ...(EXT_EXTENDABLE
+                            ? Object.assign(
+                                  ...[EXT_EXTENDABLE].map((item) => ({
+                                      [item]: path.resolve(projectDir)
+                                  }))
+                              )
+                            : {})
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -156,7 +233,7 @@ const baseConfig = (target) => {
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
-                    createModuleReplacementPlugin(projectDir),
+                    sdkReplacementPlugin(),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
@@ -167,17 +244,17 @@ const baseConfig = (target) => {
                         ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('svg-sprite-loader')
+                            loader: findDepInStack('svg-sprite-loader')
                         },
                         target === 'web' && {
                             test: /\.svg$/,
-                            loader: findInProjectThenSDK('ignore-loader')
+                            loader: findDepInStack('ignore-loader')
                         },
                         {
                             test: /\.html$/,
                             exclude: /node_modules/,
                             use: {
-                                loader: findInProjectThenSDK('html-loader')
+                                loader: findDepInStack('html-loader')
                             }
                         }
                     ].filter(Boolean)
@@ -193,7 +270,6 @@ const baseConfig = (target) => {
         build() {
             // Clean up temporary properties, to be compatible with the config schema
             this.config.module.rules.filter((rule) => rule.id).forEach((rule) => delete rule.id)
-
             return this.config
         }
     }
@@ -218,7 +294,18 @@ const withChunking = (config) => {
                         // 2. The package is one of the monorepo packages.
                         //    This is for local development to ensure the bundle
                         //    composition is the same as a production build
-                        test: /(node_modules)|(packages\/.*\/dist)/,
+                        // 3. If extending another template, don't include the
+                        //    baseline route files in vendor.js
+                        test: (module) => {
+                            if (
+                                EXT_EXTENDS &&
+                                EXT_OVERRIDES_DIR &&
+                                module?.context?.includes(`/${EXT_EXTENDS}/`)
+                            ) {
+                                return false
+                            }
+                            return module?.context?.match?.(/(node_modules)|(packages\/.*\/dist)/)
+                        },
                         name: 'vendor',
                         chunks: 'all'
                     }
@@ -232,10 +319,13 @@ const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        exclude: /node_modules/,
+        ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
+            ? // TODO: handle for array here when that's supported
+              {exclude: makeRegExp(`/node_modules(?!/${EXT_EXTENDS})`)}
+            : {exclude: /node_modules/}),
         use: [
             {
-                loader: findInProjectThenSDK('babel-loader'),
+                loader: findDepInStack('babel-loader'),
                 options: {
                     rootMode: 'upward',
                     cacheDirectory: true,
@@ -273,7 +363,7 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', './app/main']
+            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getAppEntryPoint()]
         },
         plugins: [
             ...config.plugins,
@@ -290,7 +380,6 @@ const enableReactRefresh = (config) => {
         }
     }
 }
-
 const client =
     entryPointExists(['app', 'main']) &&
     baseConfig('web')
@@ -303,7 +392,7 @@ const client =
                 // use source map to make debugging easier
                 devtool: mode === development ? 'source-map' : false,
                 entry: {
-                    main: './app/main'
+                    main: getAppEntryPoint()
                 },
                 plugins: [
                     ...config.plugins,
@@ -329,8 +418,8 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', './app/loader.js'),
-                ...optional('worker', './worker/main.js'),
+                ...optional('loader', `.${EXT_OVERRIDES_DIR}/app/loader.js`),
+                ...optional('worker', `./worker/main.js`),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
@@ -378,6 +467,20 @@ const renderer =
                         excludeWarnings: true,
                         skipFirstNotification: true
                     }),
+
+                    // Must only appear on one config – this one is the only mandatory one.
+                    new CopyPlugin({
+                        patterns: [
+                            {
+                                from: `${
+                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
+                                }app/static`,
+                                to: 'static/',
+                                noErrorOnMissing: true
+                            }
+                        ]
+                    }),
+
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
                 ].filter(Boolean)
             }
@@ -393,7 +496,7 @@ const ssr = (() => {
                     ...config,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    entry: './app/ssr.js',
+                    entry: `.${EXT_OVERRIDES_DIR}/app/ssr.js`,
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
@@ -403,7 +506,14 @@ const ssr = (() => {
                         ...config.plugins,
                         // This must only appear on one config – this one is the only mandatory one.
                         new CopyPlugin({
-                            patterns: [{from: 'app/static/', to: 'static/'}]
+                            patterns: [
+                                {
+                                    from: `${
+                                        EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
+                                    }app/static`,
+                                    to: 'static/'
+                                }
+                            ]
                         }),
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
                     ].filter(Boolean)
@@ -422,7 +532,8 @@ const requestProcessor =
             return {
                 ...config,
                 name: REQUEST_PROCESSOR,
-                entry: './app/request-processor.js',
+                // entry: './app/request-processor.js',
+                entry: `.${EXT_OVERRIDES_DIR}/app/request-processor.js`,
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',

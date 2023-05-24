@@ -14,6 +14,7 @@ module.exports = {
     },
     extends: ['plugin:react/recommended', 'plugin:jsx-a11y/recommended'],
     plugins: ['jsx-a11y', 'react', 'react-hooks', 'use-effect-no-deps'],
+
     settings: {
         react: {
             version: 'detect'

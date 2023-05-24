@@ -23,12 +23,12 @@ import {
 } from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
-import LinksList from '../links-list'
-import SocialIcons from '../social-icons'
-import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {getPathWithLocale} from '../../utils/url'
-import LocaleText from '../locale-text'
-import useMultiSite from '../../hooks/use-multi-site'
+import LinksList from 'retail-react-app/app/components/links-list'
+import SocialIcons from 'retail-react-app/app/components/social-icons'
+import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
+import {getPathWithLocale} from 'retail-react-app/app/utils/url'
+import LocaleText from 'retail-react-app/app/components/locale-text'
+import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')

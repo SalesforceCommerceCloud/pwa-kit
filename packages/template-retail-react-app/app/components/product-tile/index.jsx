@@ -7,7 +7,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {HeartIcon, HeartSolidIcon} from '../icons'
+import {HeartIcon, HeartSolidIcon} from 'retail-react-app/app/components/icons'
 
 // Components
 import {
@@ -19,16 +19,16 @@ import {
     useMultiStyleConfig,
     IconButton
 } from '@chakra-ui/react'
-import DynamicImage from '../dynamic-image'
+import DynamicImage from 'retail-react-app/app/components/dynamic-image'
 
 // Hooks
 import {useIntl} from 'react-intl'
 
 // Other
-import {productUrlBuilder} from '../../utils/url'
-import Link from '../link'
-import withRegistration from '../with-registration'
-import {useCurrency} from '../../hooks'
+import {productUrlBuilder} from 'retail-react-app/app/utils/url'
+import Link from 'retail-react-app/app/components/link'
+import withRegistration from 'retail-react-app/app/components/with-registration'
+import {useCurrency} from 'retail-react-app/app/hooks'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 

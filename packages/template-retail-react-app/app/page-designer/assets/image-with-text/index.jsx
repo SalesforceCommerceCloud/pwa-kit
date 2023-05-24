@@ -7,8 +7,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Image, Link as ChakraLink, Text} from '@chakra-ui/react'
-import Link from '../../../components/link'
-import {isAbsoluteURL} from '../../utils'
+import Link from 'retail-react-app/app/components/link'
+import {isAbsoluteURL} from 'retail-react-app/app/page-designer/utils'
 
 /**
  * Image with text component

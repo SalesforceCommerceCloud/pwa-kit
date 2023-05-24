@@ -26,33 +26,38 @@ import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CurrencyProvider} from '../../contexts'
+import {CurrencyProvider} from 'retail-react-app/app/contexts'
 
 // Local Project Components
-import Header from '../../components/header'
-import OfflineBanner from '../../components/offline-banner'
-import OfflineBoundary from '../../components/offline-boundary'
-import ScrollToTop from '../../components/scroll-to-top'
-import Footer from '../../components/footer'
-import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
-import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
-import DrawerMenu from '../drawer-menu'
-import ListMenu from '../list-menu'
-import {HideOnDesktop, HideOnMobile} from '../responsive'
-import AboveHeader from './partials/above-header'
+import Header from 'retail-react-app/app/components/header'
+import OfflineBanner from 'retail-react-app/app/components/offline-banner'
+import OfflineBoundary from 'retail-react-app/app/components/offline-boundary'
+import ScrollToTop from 'retail-react-app/app/components/scroll-to-top'
+import Footer from 'retail-react-app/app/components/footer'
+import CheckoutHeader from 'retail-react-app/app/pages/checkout/partials/checkout-header'
+import CheckoutFooter from 'retail-react-app/app/pages/checkout/partials/checkout-footer'
+import DrawerMenu from 'retail-react-app/app/components/drawer-menu'
+import ListMenu from 'retail-react-app/app/components/list-menu'
+import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
+import AboveHeader from 'retail-react-app/app/components/_app/partials/above-header'
 
 // Hooks
-import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
-import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
-import useMultiSite from '../../hooks/use-multi-site'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {AuthModal, useAuthModal} from 'retail-react-app/app/hooks/use-auth-modal'
+import {AddToCartModalProvider} from 'retail-react-app/app/hooks/use-add-to-cart-modal'
+import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 
 // Localization
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, mergeMatchedItems, isServer} from '../../utils/utils'
-import {getTargetLocale, fetchTranslations} from '../../utils/locale'
+import {
+    watchOnlineStatus,
+    flatten,
+    mergeMatchedItems,
+    isServer
+} from 'retail-react-app/app/utils/utils'
+import {getTargetLocale, fetchTranslations} from 'retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
     HOME_HREF,
@@ -60,9 +65,9 @@ import {
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE
-} from '../../constants'
+} from 'retail-react-app/app/constants'
 
-import Seo from '../seo'
+import Seo from 'retail-react-app/app/components/seo'
 
 const onClient = typeof window !== 'undefined'
 

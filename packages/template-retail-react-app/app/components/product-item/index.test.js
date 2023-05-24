@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ProductItem from './index'
-import {mockedCustomerProductListsDetails} from '../../mocks/mock-data'
-import {renderWithProviders} from '../../utils/test-utils'
+import ProductItem from 'retail-react-app/app/components/product-item/index'
+import {mockedCustomerProductListsDetails} from 'retail-react-app/app/mocks/mock-data'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import {screen} from '@testing-library/react'
 
 jest.mock('commerce-sdk-react-preview', () => {

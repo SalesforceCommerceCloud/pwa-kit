@@ -7,8 +7,8 @@
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {Stack} from '@chakra-ui/react'
-import RecentSearches from './recent-searches'
-import Suggestions from './suggestions'
+import RecentSearches from 'retail-react-app/app/components/search/partials/recent-searches'
+import Suggestions from 'retail-react-app/app/components/search/partials/suggestions'
 
 const SearchSuggestions = ({recentSearches, searchSuggestions, closeAndNavigate}) => {
     const useSuggestions = searchSuggestions && searchSuggestions?.categorySuggestions?.length
