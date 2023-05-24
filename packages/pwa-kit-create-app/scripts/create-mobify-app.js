@@ -674,10 +674,13 @@ const main = async (opts) => {
         // move transations outside of the template and into the sdk where the script for
         // building translations will ultimately live, meaning we won't have to do this. So
         // its OK for now.
+        console.log(`pkgJSON['extract-default-translations']`, pkgJSON['extract-default-translations'])
+
         if (pkgJSON['extract-default-translations']) {
             pkgJSON['extract-default-translations'] = pkgJSON[
                 'extract-default-translations'
             ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+            console.log(`pkgJSON['extract-default-translations']`, pkgJSON['extract-default-translations'])
         }
 
         context = merge(
