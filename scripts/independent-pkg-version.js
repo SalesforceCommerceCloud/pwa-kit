@@ -14,6 +14,7 @@ const {saveJSONToFile, setPackageVersion} = require('./utils')
 sh.set('-e')
 
 const monorepoPackages = JSON.parse(sh.exec('lerna list --all --json', {silent: true}))
+const pathToRoot = path.join(__dirname, '..')
 
 // Meant for setting the version of a package that has its own independent version
 const main = () => {
@@ -36,6 +37,9 @@ const main = () => {
 
         saveJSONToFile(pkgJson, pathToPkgJson)
     })
+
+    // After updating the dependencies, let's update the package lock files
+    sh.exec('npm install', {cwd: pathToRoot})
 }
 
 main()
