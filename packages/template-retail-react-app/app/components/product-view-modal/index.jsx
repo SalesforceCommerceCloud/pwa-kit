@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay} from '@chakra-ui/react'
-import ProductView from '../../partials/product-view'
+import ProductView from '../product-view'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
 
 /**
