@@ -193,6 +193,7 @@ const PRESETS = [
             id: 'retail-react-app'
         },
         questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        assets: ['translations'],
         private: false
     },
     {
@@ -221,6 +222,7 @@ const PRESETS = [
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             ['project.einstein.siteId']: 'aaij-MobileFirst'
         },
+        assets: ['translations'],
         private: false
     },
     {
@@ -243,6 +245,7 @@ const PRESETS = [
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             ['project.einstein.siteId']: 'aaij-MobileFirst'
         },
+        assets: ['translations'],
         private: true
     },
     {
@@ -530,18 +533,20 @@ const runGenerator = (context, {outputDir, verbose}) => {
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
 
-    // We need to get some assets from the base template so extract it after 
+    // We need to get some assets from the base template. So extract it after
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
+    const packagePath = p.join(tmp, 'package')
     const {id, type} = templateSource
-
-    debugger
     let tarPath
+
     switch (type) {
         case TEMPLATE_SOURCE_NPM: {
-            const tarFile = sh.exec(`npm pack ${id}@latest --pack-destination="${tmp}"`, {
-                silent: true
-            }).stdout.trim()
+            const tarFile = sh
+                .exec(`npm pack ${id}@latest --pack-destination="${tmp}"`, {
+                    silent: true
+                })
+                .stdout.trim()
             tarPath = p.join(tmp, tarFile)
             break
         }
@@ -554,8 +559,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
             process.exit(1)
         }
     }
-    console.log('tarPath: ', tarPath)
-    debugger
+
     // Extract the source
     tar.x({
         file: tarPath,
@@ -570,12 +574,15 @@ const runGenerator = (context, {outputDir, verbose}) => {
             .forEach((relFilePath) =>
                 processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context)
             )
-        
-        // Copy required assets (translations).
-        sh.mv(p.join(tmp, 'package', 'translations'), outputDir)
+
+        // Copy required assets defind on the preset level.
+        const {assets = []} = preset
+        assets.forEach((asset) => {
+            sh.mv(p.join(packagePath, asset), outputDir)
+        })
     } else {
         // Copy the base template either from the package or npm.
-        sh.mv(p.join(tmp, 'package'), outputDir)
+        sh.mv(packagePath, outputDir)
 
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
