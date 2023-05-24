@@ -130,7 +130,7 @@ const ProductList = (props) => {
     /**************** Query Actions ****************/
     const {
         isLoading,
-        isFetching,
+        isRefetching,
         data: productSearchResult
     } = useProductSearch(
         {
@@ -152,16 +152,6 @@ const ProductList = (props) => {
         },
         {
             enabled: !isSearch && !!params.categoryId
-            // TODO: Why isn't this working?
-            // onError: (error) => {
-            //     const errorStatus = error.response?.status
-            //     switch (errorStatus) {
-            //         case 404:
-            //             throw new HTTPNotFound('Category Not Found.')
-            //         default:
-            //             throw new HTTPError('Unknown Error Occured.')
-            //     }
-            // }
         }
     )
 
@@ -189,11 +179,11 @@ const ProductList = (props) => {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
-    // Reset scroll position when `isLoaded` becomes `true`.
+    // Reset scroll position when `isRefetching` becomes `true`.
     useEffect(() => {
-        isFetching && window.scrollTo(0, 0)
-        setFiltersLoading(isFetching)
-    }, [isFetching])
+        isRefetching && window.scrollTo(0, 0)
+        setFiltersLoading(isRefetching)
+    }, [isRefetching])
 
     /**************** Render Variables ****************/
     const basePath = `${location.pathname}${location.search}`
@@ -499,7 +489,7 @@ const ProductList = (props) => {
                                 spacingX={4}
                                 spacingY={{base: 12, lg: 16}}
                             >
-                                {isFetching || !productSearchResult
+                                {isRefetching || !productSearchResult
                                     ? new Array(searchParams.limit)
                                           .fill(0)
                                           .map((value, index) => (
