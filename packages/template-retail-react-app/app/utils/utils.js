@@ -193,3 +193,9 @@ export const mergeMatchedItems = (arr1 = [], arr2 = []) => {
     })
     return merged
 }
+
+/**
+ * This util func determines if the app is finished hydration
+ * @return {boolean}
+ */
+export const isHydrated = () => typeof window !== 'undefined' && !window.__HYDRATING__

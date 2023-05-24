@@ -39,6 +39,7 @@ import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
 import useEinstein from 'retail-react-app/app/hooks/use-einstein'
 import {useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import {isHydrated} from 'retail-react-app/app/utils/utils'
 
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
@@ -91,7 +92,6 @@ const Account = () => {
     const einstein = useEinstein()
 
     const {buildUrl} = useMultiSite()
-
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)
@@ -113,7 +113,7 @@ const Account = () => {
     }
     return (
         <Box
-            data-testid={isRegistered ? 'account-page' : 'account-page-skeleton'}
+            data-testid={isRegistered && isHydrated() ? 'account-page' : 'account-page-skeleton'}
             layerStyle="page"
             paddingTop={[4, 4, 12, 12, 16]}
         >

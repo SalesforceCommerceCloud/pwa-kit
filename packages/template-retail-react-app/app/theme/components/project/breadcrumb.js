@@ -17,7 +17,8 @@ export default {
         },
         link: {
             paddingTop: 3,
-            paddingBottom: 3
+            paddingBottom: 3,
+            textDecoration: 'none'
         }
     },
     parts: ['container', 'icon', 'link']

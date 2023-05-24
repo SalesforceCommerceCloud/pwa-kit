@@ -19,6 +19,7 @@ import {registerUserToken} from 'retail-react-app/app/utils/test-utils'
 describe('AppConfig', () => {
     beforeAll(() => {
         jest.spyOn(window.localStorage, 'setItem')
+        global.fetch = jest.fn().mockImplementation(() => mockConfig.mockFetchOCAPISessions)
     })
 
     beforeEach(() => {
@@ -43,6 +44,8 @@ describe('AppConfig', () => {
 
     afterAll(() => {
         window.localStorage.setItem.mockRestore()
+        global.fetch.mockClear()
+        delete global.fetch
     })
 
     test('renders', async () => {

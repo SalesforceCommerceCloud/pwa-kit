@@ -12,6 +12,7 @@ import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import {fireEvent, screen} from '@testing-library/react'
 import {useDisclosure} from '@chakra-ui/react'
 import mockProductDetail from 'retail-react-app/app/mocks/variant-750518699578M'
+import {prependHandlersToServer} from 'retail-react-app/jest-setup'
 
 const MockComponent = ({updateCart}) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -19,15 +20,13 @@ const MockComponent = ({updateCart}) => {
     return (
         <div>
             <button onClick={onOpen}>Open Modal</button>
-            {isOpen && (
-                <ProductViewModal
-                    updateCart={updateCart}
-                    onOpen={onOpen}
-                    onClose={onClose}
-                    isOpen={isOpen}
-                    product={mockProductDetail}
-                />
-            )}
+            <ProductViewModal
+                updateCart={updateCart}
+                onOpen={onOpen}
+                onClose={onClose}
+                isOpen={isOpen}
+                product={mockProductDetail}
+            />
         </div>
     )
 }
@@ -35,6 +34,17 @@ const MockComponent = ({updateCart}) => {
 MockComponent.propTypes = {
     updateCart: PropTypes.func
 }
+
+beforeEach(() => {
+    prependHandlersToServer([
+        {
+            path: '*/products/:productId',
+            res: () => {
+                return mockProductDetail
+            }
+        }
+    ])
+})
 
 test('renders product view modal by default', () => {
     renderWithProviders(<MockComponent />)

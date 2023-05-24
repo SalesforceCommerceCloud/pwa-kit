@@ -6,9 +6,16 @@
  */
 import React from 'react'
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
-import HomePage from 'retail-react-app/app/pages/home/index'
+import HomePage from 'retail-react-app/app/pages/home'
+import {rest} from 'msw'
+import {mockProductSearch} from 'retail-react-app/app/mocks/mock-data'
 
 test('Home Page renders without errors', async () => {
+    global.server.use(
+        rest.get('*/product-search', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductSearch))
+        })
+    )
     const {getByTestId} = renderWithProviders(<HomePage />)
 
     expect(getByTestId('home-page')).toBeInTheDocument()

@@ -4,7 +4,7 @@ A tool for generating PWA Kit projects based on project templates, such as the [
 
 ## Requirements
 
--   Node 16 or later
+-   Node 16.11 or later
 -   npm 8 or later
 
 ## Quick Start

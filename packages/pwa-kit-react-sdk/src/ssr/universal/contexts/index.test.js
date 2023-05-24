@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 import {Router} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
 
@@ -14,6 +14,7 @@ import {CorrelationIdProvider} from './index'
 import {useCorrelationId} from '../hooks'
 import crypto from 'crypto'
 import PropTypes from 'prop-types'
+import userEvent from '@testing-library/user-event'
 const SampleProvider = (props) => {
     const {correlationId, resetOnPageChange} = props
     return (
@@ -38,50 +39,51 @@ describe('CorrelationIdProvider', function () {
         const history = createMemoryHistory()
         const id = crypto.randomUUID()
 
-        const wrapper = shallow(
+        render(
             <Router history={history}>
                 <SampleProvider correlationId={() => id}>
                     <Component />
                 </SampleProvider>
             </Router>
         )
-        expect(wrapper.find(Component)).toHaveLength(1)
+        expect(screen.getByText(id)).toBeInTheDocument()
     })
 
     test('renders when correlationId is passed as a function', () => {
         const id = crypto.randomUUID()
         const history = createMemoryHistory()
-        const wrapper = mount(
+        render(
             <Router history={history}>
                 <SampleProvider correlationId={() => id}>
                     <Component />
                 </SampleProvider>
             </Router>
         )
-        expect(wrapper.text()).toContain(id)
+        expect(screen.getByText(id)).toBeInTheDocument()
     })
 
     test('renders when correlationId is passed as a string', () => {
         const id = crypto.randomUUID()
         const history = createMemoryHistory()
 
-        const wrapper = mount(
+        render(
             <Router history={history}>
                 <SampleProvider correlationId={id} resetOnPageChange={false}>
                     <Component />
                 </SampleProvider>
             </Router>
         )
-        expect(wrapper.text()).toContain(id)
+        expect(screen.getByText(id)).toBeInTheDocument()
     })
 
-    test('generates a new id when changing page', () => {
+    test('generates a new id when changing page', async () => {
+        const user = userEvent.setup()
         const history = createMemoryHistory()
         const Component = () => {
             const {correlationId} = useCorrelationId()
             return (
                 <div>
-                    <div className="correlation-id">{correlationId}</div>
+                    <div data-testid="correlation-id">{correlationId}</div>
                     <button className="button" onClick={() => history.push('/page-1')}>
                         Go to another page
                     </button>
@@ -89,17 +91,18 @@ describe('CorrelationIdProvider', function () {
             )
         }
 
-        const wrapper = mount(
+        render(
             <Router history={history}>
                 <SampleProvider correlationId={() => crypto.randomUUID()}>
                     <Component />
                 </SampleProvider>
             </Router>
         )
-        const firstRenderedId = wrapper.find('.correlation-id').text()
-        const button = wrapper.find('.button')
-        button.simulate('click')
-        const secondRenderedId = wrapper.find('.correlation-id').text()
+
+        const firstRenderedId = screen.getByTestId('correlation-id').innerHTML
+        const button = screen.getByText(/go to another page/i)
+        await user.click(button)
+        const secondRenderedId = screen.getByTestId('correlation-id').innerHTML
         // expecting the provider to have a different correlation id when a page navigation happens
         expect(firstRenderedId).not.toEqual(secondRenderedId)
     })

@@ -90,24 +90,24 @@ describe('ShopperLogin mutations', () => {
         mockMutationEndpoints(loginEndpoint, data ?? {}) // Fallback for `void` endpoints
         mockQueryEndpoint(loginEndpoint, data ?? {}) // `customerLogout` uses GET
 
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+        const {result} = renderHookWithProviders(() => {
             return useShopperLoginMutation(mutationName)
         })
         expect(result.current.data).toBeUndefined()
         act(() => result.current.mutate(options))
-        await waitAndExpectSuccess(wait, () => result.current)
+        await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(data)
     })
     test.each(testCases)('`%s` returns error on error', async (mutationName, [options]) => {
         mockMutationEndpoints(loginEndpoint, {error: true}, 400)
         mockQueryEndpoint(loginEndpoint, {error: true}, 400)
 
-        const {result, waitForValueToChange: wait} = renderHookWithProviders(() => {
+        const {result} = renderHookWithProviders(() => {
             return useShopperLoginMutation(mutationName)
         })
         expect(result.current.error).toBeNull()
         act(() => result.current.mutate(options))
-        await waitAndExpectError(wait, () => result.current)
+        await waitAndExpectError(() => result.current)
         // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
         // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
         expect(result.current.error).toHaveProperty('response')

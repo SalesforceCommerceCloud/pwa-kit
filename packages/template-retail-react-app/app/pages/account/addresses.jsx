@@ -92,11 +92,11 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
                     <Container variant="form">
                         <form onSubmit={form.handleSubmit(submitForm)}>
                             <Stack spacing={6}>
-                                {form.errors?.global && (
+                                {form.formState.errors?.global && (
                                     <Alert status="error">
                                         <AlertIcon color="red.500" boxSize={4} />
                                         <Text fontSize="sm" ml={3}>
-                                            {form.errors.global.message}
+                                            {form.formState.errors.global.message}
                                         </Text>
                                     </Alert>
                                 )}
@@ -277,7 +277,7 @@ const AccountAddresses = () => {
                             rounded="base"
                             fontWeight="medium"
                             leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
-                            onClick={toggleEdit}
+                            onClick={() => toggleEdit()}
                         >
                             <FormattedMessage
                                 defaultMessage="Add Address"
@@ -288,13 +288,15 @@ const AccountAddresses = () => {
                     }
 
                     {isEditing && !selectedAddressId && (
-                        <ShippingAddressForm
-                            form={form}
-                            hasAddresses={hasAddresses}
-                            submitForm={submitForm}
-                            selectedAddressId={selectedAddressId}
-                            toggleEdit={toggleEdit}
-                        />
+                        <>
+                            <ShippingAddressForm
+                                form={form}
+                                hasAddresses={hasAddresses}
+                                submitForm={submitForm}
+                                selectedAddressId={selectedAddressId}
+                                toggleEdit={toggleEdit}
+                            />
+                        </>
                     )}
 
                     {addresses.map((address) => (
@@ -357,7 +359,7 @@ const AccountAddresses = () => {
                                 defaultMessage: 'Add Address',
                                 id: 'account_addresses.page_action_placeholder.button.add_address'
                             })}
-                            onButtonClick={toggleEdit}
+                            onButtonClick={() => toggleEdit()}
                         />
                     )}
                     {isEditing && !selectedAddressId && (

@@ -39,11 +39,11 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                 data-testid="sf-auth-modal-form-register"
             >
                 <Stack paddingTop={8} spacing={8} paddingLeft={4} paddingRight={4}>
-                    {form.errors?.global && (
+                    {form.formState.errors?.global && (
                         <Alert status="error">
                             <AlertIcon color="red.500" boxSize={4} />
                             <Text fontSize="sm" ml={3}>
-                                {form.errors.global.message}
+                                {form.formState.errors.global.message}
                             </Text>
                         </Alert>
                     )}

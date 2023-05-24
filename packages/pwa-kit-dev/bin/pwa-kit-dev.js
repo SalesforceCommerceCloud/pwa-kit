@@ -183,8 +183,8 @@ const main = async () => {
     const overrideSSRpath = p.join(
         process.cwd(),
         typeof projectPkg?.ccExtensibility?.overridesDir === 'string' &&
-            !projectPkg?.ccExtensibility?.overridesDir?.startsWith('/')
-            ? '/' + projectPkg?.ccExtensibility?.overridesDir
+            !projectPkg?.ccExtensibility?.overridesDir?.startsWith(p.sep)
+            ? p.sep + projectPkg?.ccExtensibility?.overridesDir
             : projectPkg?.ccExtensibility?.overridesDir ?? '',
         'app',
         'ssr.js'
