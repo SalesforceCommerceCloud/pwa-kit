@@ -76,7 +76,7 @@ try {
             fs.rename(filePath, `${filePath}.ignore`, (err) => err && console.error(err))
         })
 
-        const extractCommand = `formatjs extract "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{js,jsx}" "${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx}" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        const extractCommand = `formatjs extract "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{js,jsx,ts,tsx}" "${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx,ts,tsx}" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
         exec(extractCommand, (err) => {
             if (err) {
                 console.error(err)
