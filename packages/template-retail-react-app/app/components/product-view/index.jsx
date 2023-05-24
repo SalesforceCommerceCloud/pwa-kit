@@ -26,6 +26,7 @@ import {useToast} from 'retail-react-app/app/hooks/use-toast'
 import {Skeleton as ImageGallerySkeleton} from 'retail-react-app/app/components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
 import QuantityPicker from 'retail-react-app/app/components/quantity-picker'
+import {useToast} from 'retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
 
 const ProductViewHeader = ({name, price, currency, category, productType}) => {
