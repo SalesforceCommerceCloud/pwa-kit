@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --inspect
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
@@ -553,10 +553,11 @@ const runGenerator = (context, {outputDir, verbose}) => {
         }
     }
     console.log('tarPath: ', tarPath)
+    debugger
     // Extract the source
     tar.x({
         file: tarPath,
-        cwd: p.join(tmp),
+        cwd: tmp,
         sync: true
     })
 
