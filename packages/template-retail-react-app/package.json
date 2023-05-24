@@ -1,6 +1,6 @@
 {
   "name": "retail-react-app",
-  "version": "2.8.0-dev",
+  "version": "3.0.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
@@ -54,7 +54,7 @@
     "base64-arraybuffer": "^0.2.0",
     "bundlesize2": "^0.0.31",
     "card-validator": "^8.1.1",
-    "commerce-sdk-react-preview": "2.8.0-dev",
+    "commerce-sdk-react-preview": "3.0.0-dev",
     "cross-env": "^5.2.1",
     "focus-visible": "^5.2.0",
     "framer-motion": "^10.12.9",
