@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {fireEvent} from '@testing-library/react'
-import {renderWithProviders} from '../../utils/test-utils'
-import Hero from './index'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import Hero from 'retail-react-app/app/components/hero/index'
 
 test('Hero renders without errors', () => {
     const data = {

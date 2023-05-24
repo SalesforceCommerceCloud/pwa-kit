@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {useItemVariant} from '.'
-import Link from '../link'
+import Link from 'retail-react-app/app/components/link'
 
 /**
  * In the context of a cart product item variant, this components simply renders

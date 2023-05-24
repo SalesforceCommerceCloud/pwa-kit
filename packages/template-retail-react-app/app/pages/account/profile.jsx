@@ -19,13 +19,17 @@ import {
     useToast
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {AlertIcon} from '../../components/icons'
-import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../components/toggle-card'
-import ProfileFields from '../../components/forms/profile-fields'
-import UpdatePasswordFields from '../../components/forms/update-password-fields'
-import FormActionButtons from '../../components/forms/form-action-buttons'
+import {AlertIcon} from 'retail-react-app/app/components/icons'
+import {
+    ToggleCard,
+    ToggleCardEdit,
+    ToggleCardSummary
+} from 'retail-react-app/app/components/toggle-card'
+import ProfileFields from 'retail-react-app/app/components/forms/profile-fields'
+import UpdatePasswordFields from 'retail-react-app/app/components/forms/update-password-fields'
+import FormActionButtons from 'retail-react-app/app/components/forms/form-action-buttons'
 import {useShopperCustomersMutation, useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the

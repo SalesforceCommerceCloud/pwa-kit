@@ -7,16 +7,19 @@
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
-import useNavigation from '../../hooks/use-navigation'
-import {CheckoutProvider, useCheckout} from './util/checkout-context'
-import ContactInfo from './partials/contact-info'
-import ShippingAddress from './partials/shipping-address'
-import ShippingOptions from './partials/shipping-options'
-import Payment from './partials/payment'
-import OrderSummary from '../../components/order-summary'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
-import CheckoutSkeleton from './partials/checkout-skeleton'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import {
+    CheckoutProvider,
+    useCheckout
+} from 'retail-react-app/app/pages/checkout/util/checkout-context'
+import ContactInfo from 'retail-react-app/app/pages/checkout/partials/contact-info'
+import ShippingAddress from 'retail-react-app/app/pages/checkout/partials/shipping-address'
+import ShippingOptions from 'retail-react-app/app/pages/checkout/partials/shipping-options'
+import Payment from 'retail-react-app/app/pages/checkout/partials/payment'
+import OrderSummary from 'retail-react-app/app/components/order-summary'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+import CheckoutSkeleton from 'retail-react-app/app/pages/checkout/partials/checkout-skeleton'
 import {useUsid, useShopperOrdersMutation} from 'commerce-sdk-react-preview'
 
 const Checkout = () => {

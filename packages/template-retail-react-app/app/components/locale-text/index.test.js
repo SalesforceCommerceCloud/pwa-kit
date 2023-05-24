@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import LocaleText from './index'
-import {renderWithProviders} from '../../utils/test-utils'
+import LocaleText from 'retail-react-app/app/components/locale-text/index'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 
 test('Renders LocaleText', () => {
     renderWithProviders(

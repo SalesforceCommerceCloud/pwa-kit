@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getDisplayVariationValues} from './product-utils'
+import {getDisplayVariationValues} from 'retail-react-app/app/utils/product-utils'
 
 const variationAttributes = [
     {

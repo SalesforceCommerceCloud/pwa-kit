@@ -11,8 +11,8 @@ import {
     getParamsFromPath,
     getDefaultSite,
     getSiteByReference
-} from './site-utils'
-import {HOME_HREF, urlPartPositions} from '../constants'
+} from 'retail-react-app/app/utils/site-utils'
+import {HOME_HREF, urlPartPositions} from 'retail-react-app/app/constants'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.

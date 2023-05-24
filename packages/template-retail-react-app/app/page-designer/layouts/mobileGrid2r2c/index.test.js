@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, withPageProvider} from '../../../utils/test-utils'
-import MobileGrid2r2c from './index'
+import {renderWithProviders, withPageProvider} from 'retail-react-app/app/utils/test-utils'
+import MobileGrid2r2c from 'retail-react-app/app/page-designer/layouts/mobileGrid2r2c/index'
 
 test('MobileGrid2r2c renders without errors', () => {
     const MobileGrid2r2cWithPageProvider = withPageProvider(MobileGrid2r2c)

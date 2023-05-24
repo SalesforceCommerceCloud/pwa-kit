@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getDefaultSite, getSites, resolveSiteFromUrl} from './site-utils'
+import {getDefaultSite, getSites, resolveSiteFromUrl} from 'retail-react-app/app/utils/site-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
-import mockConfig from '../../config/mocks/default'
-import {getParamsFromPath, resolveLocaleFromUrl} from './site-utils'
+import mockConfig from 'retail-react-app/config/mocks/default'
+import {getParamsFromPath, resolveLocaleFromUrl} from 'retail-react-app/app/utils/site-utils'
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     const origin = jest.requireActual('pwa-kit-react-sdk/ssr/universal/utils')
     return {

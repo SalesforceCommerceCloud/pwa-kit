@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders} from '../../utils/test-utils'
-import Link from './index'
-import mockConfig from '../../../config/mocks/default'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import Link from 'retail-react-app/app/components/link/index'
+import mockConfig from 'retail-react-app/config/mocks/default'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 const originalLocation = window.location
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {

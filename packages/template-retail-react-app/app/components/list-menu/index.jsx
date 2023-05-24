@@ -11,7 +11,7 @@ import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
 
 // Project Components
-import LinksList from '../links-list'
+import LinksList from 'retail-react-app/app/components/links-list'
 
 // Components
 import {
@@ -32,10 +32,10 @@ import {
     useTheme,
     useDisclosure
 } from '@chakra-ui/react'
-import Link from '../link'
+import Link from 'retail-react-app/app/components/link'
 // Others
-import {categoryUrlBuilder} from '../../utils/url'
-import {ChevronDownIcon} from '../icons'
+import {categoryUrlBuilder} from 'retail-react-app/app/utils/url'
+import {ChevronDownIcon} from 'retail-react-app/app/components/icons'
 
 const MAXIMUM_NUMBER_COLUMNS = 5
 

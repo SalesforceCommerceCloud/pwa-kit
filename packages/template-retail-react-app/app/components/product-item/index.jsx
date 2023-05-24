@@ -12,20 +12,20 @@ import {FormattedMessage} from 'react-intl'
 import {Box, Fade, Flex, Stack, Text} from '@chakra-ui/react'
 
 // Project Components
-import {HideOnDesktop, HideOnMobile} from '../responsive'
-import ItemVariantProvider from '../item-variant'
-import CartItemVariantImage from '../item-variant/item-image'
-import CartItemVariantName from '../item-variant/item-name'
-import CartItemVariantAttributes from '../item-variant/item-attributes'
-import CartItemVariantPrice from '../item-variant/item-price'
-import LoadingSpinner from '../loading-spinner'
-import QuantityPicker from '../quantity-picker'
+import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
+import ItemVariantProvider from 'retail-react-app/app/components/item-variant'
+import CartItemVariantImage from 'retail-react-app/app/components/item-variant/item-image'
+import CartItemVariantName from 'retail-react-app/app/components/item-variant/item-name'
+import CartItemVariantAttributes from 'retail-react-app/app/components/item-variant/item-attributes'
+import CartItemVariantPrice from 'retail-react-app/app/components/item-variant/item-price'
+import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
+import QuantityPicker from 'retail-react-app/app/components/quantity-picker'
 
 // Utilities
-import {noop} from '../../utils/utils'
+import {noop} from 'retail-react-app/app/utils/utils'
 
 // Hooks
-import {useDerivedProduct} from '../../hooks'
+import {useDerivedProduct} from 'retail-react-app/app/hooks'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
