@@ -530,6 +530,36 @@ const runGenerator = (context, {outputDir, verbose}) => {
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
 
+    // We need to get some assets from the base template so extract it after 
+    // downloading from NPM or copying from the template bundle folder.
+    const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
+    const {id, type} = templateSource
+
+    let tarPath
+    switch (type) {
+        case TEMPLATE_SOURCE_NPM: {
+            tarPath = sh.exec(`npm pack ${id}@latest --pack-destination="${tmp}"`, {
+                silent: true
+            }).stdout.trim()
+            break
+        }
+        case TEMPLATE_SOURCE_BUNDLE:
+            tarPath = p.join(__dirname, '..', 'templates', `${id}.tar.gz`)
+            break
+        default: {
+            const msg = `Error: Cannot handle template source type ${type}.`
+            console.error(msg)
+            process.exit(1)
+        }
+    }
+    console.log('tarPath: ', tarPath)
+    // Extract the source
+    tar.x({
+        file: tarPath,
+        cwd: p.join(tmp),
+        sync: true
+    })
+
     if (extend) {
         // Bootstrap the projects.
         getFiles(BOOTSTRAP_DIR)
@@ -537,37 +567,12 @@ const runGenerator = (context, {outputDir, verbose}) => {
             .forEach((relFilePath) =>
                 processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context)
             )
+        
+        // Copy required assets (translations).
+        sh.mv(p.join(tmp, 'package', 'translations'), outputDir)
     } else {
-        const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
-        const {id, type} = templateSource
-
-        switch (type) {
-            case TEMPLATE_SOURCE_NPM: {
-                const {stdout} = sh.exec(`npm pack ${id}@latest --pack-destination="${tmp}"`, {
-                    silent: true
-                })
-                tar.x({
-                    file: p.join(tmp, stdout.trim()),
-                    cwd: p.join(tmp),
-                    sync: true
-                })
-                sh.mv(p.join(tmp, 'package'), outputDir)
-                break
-            }
-            case TEMPLATE_SOURCE_BUNDLE:
-                tar.x({
-                    file: p.join(__dirname, '..', 'templates', `${id}.tar.gz`),
-                    cwd: p.join(tmp),
-                    sync: true
-                })
-                sh.cp('-R', p.join(tmp, id), outputDir)
-                break
-            default: {
-                const msg = `Error: Cannot handle template source type ${type}.`
-                console.error(msg)
-                process.exit(1)
-            }
-        }
+        // Copy the base template either from the package or npm.
+        sh.mv(p.join(tmp, 'package'), outputDir)
 
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)

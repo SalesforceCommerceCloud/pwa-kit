@@ -48,15 +48,17 @@ const main = () => {
 
     return Promise.all(
         pkgNames.map((pkgName) => {
-            sh.mv(p.join(packageDir, `${TEMPLATE_PREFIX}${pkgName}`), p.join(packageDir, pkgName))
+            // Emulate an NPM package by having the tar contain a "package" folder.
+            const tmpPackageDir = mkdtempSync() 
+            sh.mv(p.join(packageDir, `${TEMPLATE_PREFIX}${pkgName}`), p.join(tmpPackageDir, 'package'))
 
             return tar.c(
                 {
                     file: tarPathForPkg(pkgName),
-                    cwd: packageDir
+                    cwd: tmpPackageDir
                 },
-                [pkgName]
-            )
+                ['.']
+            ).then(() => sh.rm('-rf', tmpPackageDir))
         })
     ).then(() => sh.rm('-rf', tmpDir))
 }
