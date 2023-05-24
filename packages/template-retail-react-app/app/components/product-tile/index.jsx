@@ -27,7 +27,7 @@ import {useIntl} from 'react-intl'
 // Other
 import {productUrlBuilder} from '../../utils/url'
 import Link from '../link'
-import withRegistration from '../../hoc/with-registration'
+import withRegistration from '../with-registration'
 import {useCurrency} from '../../hooks'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
