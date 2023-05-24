@@ -669,6 +669,17 @@ const main = async (opts) => {
             }).stdout
         )
 
+        // NOTE: Here we are rewriting a specific script (extract-default-translations) in order
+        // to update the script location for extensibility. In the future we'll hopefully
+        // move transations outside of the template and into the sdk where the script for
+        // building translations will ultimately live, meaning we won't have to do this. So
+        // its OK for now.
+        if (pkgJSON['extract-default-translations']) {
+            pkgJSON['extract-default-translations'] = pkgJSON[
+                'extract-default-translations'
+            ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+        }
+
         context = merge(
             context,
             expandObject({
