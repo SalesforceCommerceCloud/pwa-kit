@@ -14,7 +14,10 @@ module.exports = {
         ...base.moduleNameMapper,
         '^react$': '<rootDir>/node_modules/react/index.js',
         '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js',
-        '^@tanstack/react-query$': '<rootDir>/node_modules/@tanstack/react-query/build/lib/index.js'
+        '^retail-react-app(.*)$': '<rootDir>$1',
+        '^@tanstack/react-query$': '<rootDir>/node_modules/@tanstack/react-query/build/lib/index.js',
+        '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',
+        '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs'
     },
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [

@@ -9,10 +9,10 @@ import {useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 
 // Constants
-import {DEFAULT_LIMIT_VALUES} from '../constants'
+import {DEFAULT_LIMIT_VALUES} from 'retail-react-app/app/constants'
 
 // Utils
-import {buildUrlSet} from '../utils/url'
+import {buildUrlSet} from 'retail-react-app/app/utils/url'
 
 /*
  * Generate a memoized list of page size urls. Chaning the page size will reset

@@ -10,7 +10,7 @@ import {Router} from 'react-router'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useVariant} from './use-variant'
+import {useVariant} from 'retail-react-app/app/hooks/use-variant'
 
 // Below is a partial product used for mocking purposes. Note: only the properties
 // that are used in the hook at defined.

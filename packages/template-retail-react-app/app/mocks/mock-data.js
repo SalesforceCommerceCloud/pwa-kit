@@ -3015,12 +3015,8 @@ export const mockProductSearch = {
                 alt: 'Trouser Leg Pant, , large',
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg',
-                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg',
-                title: 'Trouser Leg Pant, '
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw56926d5f/images/large/PG.10207088.JJ169XX.PZ.jpg'
             },
-            orderable: true,
-            price: 47.99,
-            productId: '25518746M',
             productName: 'Trouser Leg Pant',
             productType: {
                 master: true
@@ -3597,12 +3593,8 @@ export const mockProductSearch = {
                 alt: 'Pleated Skirt With Embroidery., , large',
                 disBaseLink:
                     'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg',
-                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg',
-                title: 'Pleated Skirt With Embroidery., '
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07b70fb1/images/large/PG.10245262.JJ3WCXX.PZ.jpg'
             },
-            orderable: true,
-            price: 149.0,
-            productId: '25696693M',
             productName: 'Pleated Skirt With Embroidery.',
             productType: {
                 master: true

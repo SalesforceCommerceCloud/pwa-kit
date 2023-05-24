@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useContext} from 'react'
-import {CurrencyContext} from '../contexts'
+import {CurrencyContext} from 'retail-react-app/app/contexts'
 
 /**
  * Custom React hook to get the currency for the active locale and to change it to a different currency

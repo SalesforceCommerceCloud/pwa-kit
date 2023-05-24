@@ -7,8 +7,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {SimpleGrid, Stack} from '@chakra-ui/react'
-import useProfileFields from './useProfileFields'
-import Field from '../field'
+import useProfileFields from 'retail-react-app/app/components/forms/useProfileFields'
+import Field from 'retail-react-app/app/components/field'
 
 const ProfileFields = ({form, prefix = ''}) => {
     const fields = useProfileFields({form, prefix})

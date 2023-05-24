@@ -9,9 +9,9 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {Stack, Text} from '@chakra-ui/react'
 import {useItemVariant} from '.'
-import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {useCurrency} from '../../hooks'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
+import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
+import {useCurrency} from 'retail-react-app/app/hooks'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 
 const PricePerItem = ({currency, basket, basePrice}) => {
     const {currency: activeCurrency} = useCurrency()

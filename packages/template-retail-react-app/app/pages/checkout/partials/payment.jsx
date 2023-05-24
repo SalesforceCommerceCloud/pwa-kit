@@ -9,17 +9,21 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {useToast} from '../../../hooks/use-toast'
+import {useToast} from 'retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import {useCheckout} from '../util/checkout-context'
-import {getPaymentInstrumentCardType, getCreditCardIcon} from '../../../utils/cc-utils'
-import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
-import PaymentForm from './payment-form'
-import ShippingAddressSelection from './shipping-address-selection'
-import AddressDisplay from '../../../components/address-display'
-import {PromoCode, usePromoCode} from '../../../components/promo-code'
-import {API_ERROR_MESSAGE} from '../../../constants'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+import {useCheckout} from 'retail-react-app/app/pages/checkout/util/checkout-context'
+import {getPaymentInstrumentCardType, getCreditCardIcon} from 'retail-react-app/app/utils/cc-utils'
+import {
+    ToggleCard,
+    ToggleCardEdit,
+    ToggleCardSummary
+} from 'retail-react-app/app/components/toggle-card'
+import PaymentForm from 'retail-react-app/app/pages/checkout/partials/payment-form'
+import ShippingAddressSelection from 'retail-react-app/app/pages/checkout/partials/shipping-address-selection'
+import AddressDisplay from 'retail-react-app/app/components/address-display'
+import {PromoCode, usePromoCode} from 'retail-react-app/app/components/promo-code'
+import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
 
 const Payment = () => {
     const {formatMessage} = useIntl()

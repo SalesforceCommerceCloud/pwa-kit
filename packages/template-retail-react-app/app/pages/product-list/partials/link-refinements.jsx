@@ -8,7 +8,7 @@
 import React from 'react'
 import {Stack, Text} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import Link from '../../../components/link'
+import Link from 'retail-react-app/app/components/link'
 
 const LinkRefinements = ({filter}) => {
     return (

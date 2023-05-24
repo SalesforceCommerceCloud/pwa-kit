@@ -17,11 +17,11 @@ import {
     useToast
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {ChevronDownIcon, ChevronUpIcon} from '../icons'
-import PromoCodeFields from '../../components/forms/promo-code-fields'
-import {API_ERROR_MESSAGE} from '../../constants'
+import {ChevronDownIcon, ChevronUpIcon} from 'retail-react-app/app/components/icons'
+import PromoCodeFields from 'retail-react-app/app/components/forms/promo-code-fields'
+import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
 import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 
 export const usePromoCode = () => {
     const {formatMessage} = useIntl()

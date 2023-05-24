@@ -10,7 +10,7 @@ import {Router} from 'react-router'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useSearchParams, stringify, parse} from './use-search-params'
+import {useSearchParams, stringify, parse} from 'retail-react-app/app/hooks/use-search-params'
 
 const MockComponent = () => {
     const [params] = useSearchParams()
