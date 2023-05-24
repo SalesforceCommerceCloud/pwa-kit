@@ -33,7 +33,7 @@ import {useCurrentBasket} from '../../hooks/use-current-basket'
 
 import Link from '../link'
 import Search from '../search'
-import withRegistration from '../../hoc/with-registration'
+import withRegistration from '../with-registration'
 import {
     AccountIcon,
     BrandLogo,
