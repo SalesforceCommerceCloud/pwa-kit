@@ -79,6 +79,7 @@ import {
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import {useWishList} from '../../hooks/use-wish-list'
+import {isHydrated} from '../../utils/utils'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -489,7 +490,7 @@ const ProductList = (props) => {
                                 spacingX={4}
                                 spacingY={{base: 12, lg: 16}}
                             >
-                                {isRefetching || !productSearchResult
+                                {isHydrated() && isRefetching || !productSearchResult
                                     ? new Array(searchParams.limit)
                                           .fill(0)
                                           .map((value, index) => (
