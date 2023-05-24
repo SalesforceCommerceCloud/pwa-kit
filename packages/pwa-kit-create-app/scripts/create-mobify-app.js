@@ -535,13 +535,14 @@ const runGenerator = (context, {outputDir, verbose}) => {
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const {id, type} = templateSource
 
+    debugger
     let tarPath
     switch (type) {
         case TEMPLATE_SOURCE_NPM: {
             const tarFile = sh.exec(`npm pack ${id}@latest --pack-destination="${tmp}"`, {
                 silent: true
             }).stdout.trim()
-            tarPath = p.join(tarPath, tarFile)
+            tarPath = p.join(__dirname, tarFile)
             break
         }
         case TEMPLATE_SOURCE_BUNDLE:
