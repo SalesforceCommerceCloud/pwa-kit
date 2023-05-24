@@ -22,20 +22,20 @@ import {
     Stack,
     Text
 } from '@chakra-ui/react'
-import FormActionButtons from '../../components/forms/form-action-buttons'
+import FormActionButtons from 'retail-react-app/app/components/forms/form-action-buttons'
 import {useForm} from 'react-hook-form'
-import {useToast} from '../../hooks/use-toast'
+import {useToast} from 'retail-react-app/app/hooks/use-toast'
 
-import LoadingSpinner from '../../components/loading-spinner'
-import {LocationIcon, PlusIcon} from '../../components/icons'
-import ActionCard from '../../components/action-card'
-import AddressFields from '../../components/forms/address-fields'
-import AddressDisplay from '../../components/address-display'
-import PageActionPlaceHolder from '../../components/page-action-placeholder'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
+import {LocationIcon, PlusIcon} from 'retail-react-app/app/components/icons'
+import ActionCard from 'retail-react-app/app/components/action-card'
+import AddressFields from 'retail-react-app/app/components/forms/address-fields'
+import AddressDisplay from 'retail-react-app/app/components/address-display'
+import PageActionPlaceHolder from 'retail-react-app/app/components/page-action-placeholder'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 import {nanoid} from 'nanoid'
-import {API_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
 
 const DEFAULT_SKELETON_COUNT = 3
 

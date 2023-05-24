@@ -8,7 +8,7 @@
 import React from 'react'
 import {Box, Button, Wrap, WrapItem} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import {CloseIcon} from '../../../components/icons'
+import {CloseIcon} from 'retail-react-app/app/components/icons'
 
 import {FormattedMessage} from 'react-intl'
 

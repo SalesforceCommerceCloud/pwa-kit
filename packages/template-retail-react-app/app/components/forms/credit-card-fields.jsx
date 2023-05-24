@@ -9,10 +9,16 @@ import PropTypes from 'prop-types'
 import ccValidator from 'card-validator'
 import {useIntl} from 'react-intl'
 import {Box, Flex, FormLabel, InputRightElement, SimpleGrid, Stack, Tooltip} from '@chakra-ui/react'
-import {formatCreditCardNumber, getCreditCardIcon} from '../../utils/cc-utils'
-import useCreditCardFields from './useCreditCardFields'
-import Field from '../field'
-import {AmexIcon, DiscoverIcon, MastercardIcon, VisaIcon, InfoIcon} from '../icons'
+import {formatCreditCardNumber, getCreditCardIcon} from 'retail-react-app/app/utils/cc-utils'
+import useCreditCardFields from 'retail-react-app/app/components/forms/useCreditCardFields'
+import Field from 'retail-react-app/app/components/field'
+import {
+    AmexIcon,
+    DiscoverIcon,
+    MastercardIcon,
+    VisaIcon,
+    InfoIcon
+} from 'retail-react-app/app/components/icons'
 
 const CreditCardFields = ({form, prefix = ''}) => {
     const {formatMessage} = useIntl()

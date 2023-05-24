@@ -17,13 +17,13 @@ import {
     AccordionIcon
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import ColorRefinements from './color-refinements'
-import SizeRefinements from './size-refinements'
-import RadioRefinements from './radio-refinements'
-import CheckboxRefinements from './checkbox-refinements'
-import LinkRefinements from './link-refinements'
-import {isServer} from '../../../utils/utils'
-import {FILTER_ACCORDION_SATE} from '../../../constants'
+import ColorRefinements from 'retail-react-app/app/pages/product-list/partials/color-refinements'
+import SizeRefinements from 'retail-react-app/app/pages/product-list/partials/size-refinements'
+import RadioRefinements from 'retail-react-app/app/pages/product-list/partials/radio-refinements'
+import CheckboxRefinements from 'retail-react-app/app/pages/product-list/partials/checkbox-refinements'
+import LinkRefinements from 'retail-react-app/app/pages/product-list/partials/link-refinements'
+import {isServer} from 'retail-react-app/app/utils/utils'
+import {FILTER_ACCORDION_SATE} from 'retail-react-app/app/constants'
 
 const componentMap = {
     cgid: LinkRefinements,

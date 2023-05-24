@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Flex, Box, HStack, useStyleConfig} from '@chakra-ui/react'
-import {noop} from '../../utils/utils'
+import {noop} from 'retail-react-app/app/utils/utils'
 
 /**
  * SwatchGroup allows you to create a list of swatches
