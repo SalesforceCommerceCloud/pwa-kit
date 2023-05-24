@@ -48,7 +48,7 @@ export const EXT_OVERRIDES_DIR =
         ? path.sep + pkg?.ccExtensibility?.overridesDir
         : pkg?.ccExtensibility?.overridesDir ?? ''
 export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(
-    makeRegExp(`^\${path.sep}`),
+    makeRegExp(`^\\${path.sep}`),
     ''
 )
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
