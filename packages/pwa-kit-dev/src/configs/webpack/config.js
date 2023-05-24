@@ -44,10 +44,13 @@ if ([production, development].indexOf(mode) < 0) {
 // for API convenience, add the leading slash if missing
 export const EXT_OVERRIDES_DIR =
     typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
-    !pkg?.ccExtensibility?.overridesDir?.startsWith('/')
-        ? '/' + pkg?.ccExtensibility?.overridesDir
+    !pkg?.ccExtensibility?.overridesDir?.startsWith(path.sep)
+        ? path.sep + pkg?.ccExtensibility?.overridesDir
         : pkg?.ccExtensibility?.overridesDir ?? ''
-export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
+export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(
+    makeRegExp(`^\${path.sep}`),
+    ''
+)
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
@@ -204,7 +207,7 @@ const baseConfig = (target) => {
                                   ...[EXT_EXTENDS].map((extendTarget) => ({
                                       [extendTarget]: path.resolve(
                                           projectDir,
-                                          `node_modules/${extendTarget}`
+                                          `node_modules${path.sep}${extendTarget}`
                                       )
                                   }))
                               )
@@ -274,7 +277,6 @@ const baseConfig = (target) => {
 }
 
 const withChunking = (config) => {
-    const sysPath = fse.realpathSync(path.resolve('node_modules', EXT_EXTENDS ?? ''))
     return {
         ...config,
         output: {
