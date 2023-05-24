@@ -130,12 +130,7 @@ const merge = (a, b) => deepmerge(a, b, {arrayMerge: (orignal, replacement) => r
 const runGenerator = (answers, {outputDir, verbose}) => {
     checkOutputDir(outputDir)
     // Excluding pwa-kit-create-app, these are the public pwa-kit-* packages that can be installed through NPM.
-    const npmInstallables = [
-        'pwa-kit-react-sdk',
-        'pwa-kit-dev',
-        'pwa-kit-runtime',
-        'commerce-sdk-react-preview'
-    ]
+    const npmInstallables = ['pwa-kit-react-sdk', 'pwa-kit-dev', 'pwa-kit-runtime']
 
     // Check specified SDK versions actually exist on NPM.
     npmInstallables.forEach((pkgName) => {
@@ -150,12 +145,21 @@ const runGenerator = (answers, {outputDir, verbose}) => {
         }
     })
 
-    // TODO: Ben (and it should grarefully handle package-not-found error)
-    downloadPackage('retail-react-app@latest', outputDir)
+    extractTemplate('template-retail-react-app', outputDir)
 
     const pkgJsonPath = p.resolve(outputDir, 'package.json')
     const pkgJSON = readJson(pkgJsonPath)
     const pkgDataWithAnswers = merge(pkgJSON, answers['retail-react-app'])
+
+    npmInstallables.forEach((pkgName) => {
+        const keys = ['dependencies', 'devDependencies']
+        keys.forEach((key) => {
+            const deps = pkgDataWithAnswers[key]
+            if (deps && deps[pkgName]) {
+                deps[pkgName] = SDK_VERSION
+            }
+        })
+    })
 
     writeJson(pkgJsonPath, pkgDataWithAnswers)
 
@@ -397,20 +401,6 @@ const extractTemplate = (templateName, outputDir) => {
         sync: true
     })
     sh.cp('-R', p.join(tmp, templateName), outputDir)
-    sh.rm('-rf', tmp)
-}
-
-const downloadPackage = (packageSpec, outputDir) => {
-    const {stdout: packageVersion} = sh.exec(`npm info ${packageSpec} version`, {silent: true})
-    const {stdout: packageName} = sh.exec(`npm info ${packageSpec} name`, {silent: true})
-    const {stdout: distTags} = sh.exec(`npm info ${packageSpec} dist-tags`, {silent: true})
-    const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'download-package'))
-
-    console.log(`--- downloading ${packageSpec} ${packageVersion}`)
-    console.log('--- dist tags', distTags)
-    sh.exec(`npm install ${packageSpec} --prefix ${tmp}`, {silent: true})
-    sh.cp('-R', p.join(tmp, `node_modules/${packageName}`), outputDir)
-
     sh.rm('-rf', tmp)
 }
 

@@ -22,9 +22,8 @@ const mkdtempSync = () => fs.mkdtempSync(p.resolve(os.tmpdir(), 'pwa-template-tm
 const tarPathForPkg = (pkg) => p.resolve(templatesDir, `${pkg}.tar.gz`)
 
 const main = () => {
-    // TODO: ignore template-retail-react-app here
     const pkgNames = [
-        // 'template-retail-react-app',
+        'template-retail-react-app',
         'template-express-minimal',
         'template-typescript-minimal',
         'template-mrt-reference-app'
