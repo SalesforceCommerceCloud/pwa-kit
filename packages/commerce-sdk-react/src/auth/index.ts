@@ -419,6 +419,9 @@ class Auth {
             ...(usid && {usid})
         })
         this.handleTokenResponse(token, isGuest)
+        if (onClient() && this.OCAPISessionsURL) {
+            void this.createOCAPISession()
+        }
         return token
     }
 
