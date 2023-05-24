@@ -32,11 +32,18 @@ describe('server', () => {
     test.each([
         ['/', 200, 'application/json; charset=utf-8'],
         ['/tls', 200, 'application/json; charset=utf-8'],
-        ['/exception', 500, 'text/html; charset=utf-8']
+        ['/exception', 500, 'text/html; charset=utf-8'],
+        ['/cache', 200, 'application/json; charset=utf-8'],
     ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
         return request(app)
             .get(path)
             .expect(expectedStatus)
             .expect('Content-Type', expectedContentType)
+    })
+
+    test('Path "/cache" has Cache-Control set', () => {
+        return request(app)
+            .get('/cache')
+            .expect('Cache-Control', 's-maxage=60')
     })
 })
