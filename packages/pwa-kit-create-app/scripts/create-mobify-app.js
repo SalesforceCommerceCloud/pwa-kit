@@ -600,9 +600,6 @@ const runGenerator = (context, {outputDir, verbose}) => {
                 )
         }
 
-        // Clean up
-        sh.rm('-rf', tmp)
-
         // Update the generated projects version. NOTE: For bootstrapped projects this
         // can be done in the template building. But since we have two types of project builds,
         // (bootstrap/bundle) we'll do it here where it works in both scenarios.
@@ -612,8 +609,10 @@ const runGenerator = (context, {outputDir, verbose}) => {
             name: slugifyName(context.answers.project.name || context.preset.id),
             version: GENERATED_PROJECT_VERSION
         })
-        delete finalPkgData['ccExtensibility']
         writeJson(pkgJsonPath, finalPkgData)
+
+        // Clean up
+        sh.rm('-rf', tmp)
     }
 
     // Install dependencies for the newly minted project.
