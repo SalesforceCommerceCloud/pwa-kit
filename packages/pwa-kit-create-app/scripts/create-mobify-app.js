@@ -607,6 +607,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
         name: slugifyName(context.answers.project.name || context.preset.id),
         version: GENERATED_PROJECT_VERSION
     })
+    delete finalPkgData['ccExtensibility']
     writeJson(pkgJsonPath, finalPkgData)
 
     // Install dependencies for the newly minted project.
