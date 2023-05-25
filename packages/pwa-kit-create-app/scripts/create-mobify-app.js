@@ -588,7 +588,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
         })
     } else {
         // Copy the base template either from the package or npm.
-        sh.mv(packagePath, outputDir)
+        sh.cp('-rf', packagePath, outputDir)
 
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
