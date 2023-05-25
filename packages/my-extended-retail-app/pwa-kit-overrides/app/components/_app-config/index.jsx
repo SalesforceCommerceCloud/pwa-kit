@@ -21,7 +21,6 @@ import {CommerceApiProvider} from 'commerce-sdk-react-preview'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -52,12 +51,10 @@ const AppConfig = ({children, locals = {}}) => {
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
-            OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
             </MultiSiteProvider>
-            <ReactQueryDevtools />
         </CommerceApiProvider>
     )
 }
@@ -86,14 +83,6 @@ AppConfig.restore = (locals = {}) => {
 
 AppConfig.freeze = () => undefined
 
-AppConfig.extraGetPropsArgs = (locals = {}) => {
-    return {
-        buildUrl: locals.buildUrl,
-        site: locals.site,
-        locale: locals.locale
-    }
-}
-
 AppConfig.propTypes = {
     children: PropTypes.node,
     locals: PropTypes.object
@@ -109,7 +98,7 @@ const options = {
             queries: {
                 retry: false,
                 refetchOnWindowFocus: false,
-                staleTime: 10 * 1000,
+                staleTime: 2 * 1000,
                 ...(isServerSide ? {retryOnMount: false} : {})
             },
             mutations: {
