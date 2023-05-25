@@ -8,6 +8,7 @@
 
 const sh = require('shelljs')
 const path = require('path')
+const program = require('commander')
 const {saveJSONToFile, setPackageVersion} = require('./utils')
 
 // Exit upon error
@@ -26,9 +27,9 @@ const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) =>
     monorepoPackages.find((pkg) => pkg.name === pkgName)
 )
 
-const main = () => {
-    const args = process.argv.slice(2).join(' ')
-    sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${args}`)
+const main = (program) => {
+    const version = program.args[0]
+    sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${version}`)
     // `--exact` above is for pinning the version of the pwa-kit dependencies
     // https://github.com/lerna/lerna/tree/main/libs/commands/version#--exact
 
@@ -75,6 +76,7 @@ const updatePeerDeps = (pkgJson, newMonorepoVersion) => {
         if (monorepoPackageNames.includes(dep)) {
             console.log(`Found lerna local package ${dep} as a peer dependency of ${pkgJson.name}.`)
             peerDependencies[dep] = `^${newMonorepoVersion}`
+            // TODO: peer dependency in package _lock_ does not get updated, even after `npm install`. Seems like a caching issue.
         }
     })
 }
@@ -91,4 +93,14 @@ const updateDeps = (pkgJson) => {
     })
 }
 
-main()
+program.description('Bump the version of a package in our monorepo')
+program.arguments('<target-version>')
+
+program.option(
+    '--package <package-name>',
+    'the package name or an alias to a group of packages',
+    'sdk'
+)
+
+program.parse(process.argv)
+main(program)
