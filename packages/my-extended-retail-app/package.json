@@ -3,8 +3,8 @@
   "version": "3.0.0-dev",
   "license": "See license in LICENSE",
   "engines": {
-    "node": "^16.0.0 || ^18.0.0",
-    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+    "node": "^16.11.0 || ^18.0.0",
+    "npm": "^8.0.0 || ^9.0.0"
   },
   "ccExtensibility": {
     "extends": "retail-react-app",
@@ -62,7 +62,9 @@
     "retail-react-app": "3.0.0-dev"
   },
   "peerDependencies": {
-    "@chakra-ui/system": "^1.12.1"
+    "@chakra-ui/system": "^1.12.1",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
