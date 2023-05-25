@@ -33,7 +33,7 @@ import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 
 import Link from 'retail-react-app/app/components/link'
 import Search from 'retail-react-app/app/components/search'
-import withRegistration from 'retail-react-app/app/hoc/with-registration'
+import withRegistration from 'retail-react-app/app/components/with-registration'
 import {
     AccountIcon,
     BrandLogo,

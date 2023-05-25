@@ -28,7 +28,7 @@ import useEinstein from 'retail-react-app/app/hooks/use-einstein'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from 'retail-react-app/app/components/recommended-products'
-import ProductView from 'retail-react-app/app/partials/product-view'
+import ProductView from 'retail-react-app/app/components/product-view'
 import InformationAccordion from 'retail-react-app/app/pages/product-detail/partials/information-accordion'
 
 // constant
