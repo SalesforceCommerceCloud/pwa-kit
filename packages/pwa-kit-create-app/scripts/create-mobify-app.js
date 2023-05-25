@@ -584,7 +584,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
         // Copy required assets defind on the preset level.
         const {assets = []} = preset
         assets.forEach((asset) => {
-            sh.mv(p.join(packagePath, asset), outputDir)
+            sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
     } else {
         // Copy the base template either from the package or npm.
