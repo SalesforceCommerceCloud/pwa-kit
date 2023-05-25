@@ -15,7 +15,7 @@
   },
   "scripts": {
     {{#each answers.general.packageJSON.scripts}}
-    "{{@key}}": "{{{this}}}"{{#unless @last}},{{/unless}}
+    "{{@key}}": "{{{script this}}}"{{#unless @last}},{{/unless}}
     {{/each}}
   },
   "bundlesize": [
