@@ -6,12 +6,12 @@
  */
 
 import {useEffect, useState} from 'react'
-import {rebuildPathWithParams, removeQueryParamsFromPath} from '../utils/url'
+import {rebuildPathWithParams, removeQueryParamsFromPath} from 'retail-react-app/app/utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
-import {useVariant} from './use-variant'
-import {useToast} from './use-toast'
+import {useVariant} from 'retail-react-app/app/hooks/use-variant'
+import {useToast} from 'retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
-import {API_ERROR_MESSAGE} from '../constants'
+import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
 import {useProduct} from 'commerce-sdk-react-preview'
 
 /**

@@ -8,9 +8,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Stack, StackDivider} from '@chakra-ui/react'
-import useUpdatePasswordFields from './useUpdatePasswordFields'
-import Field from '../field'
-import PasswordRequirements from './password-requirements'
+import useUpdatePasswordFields from 'retail-react-app/app/components/forms/useUpdatePasswordFields'
+import Field from 'retail-react-app/app/components/field'
+import PasswordRequirements from 'retail-react-app/app/components/forms/password-requirements'
 
 const UpdatePasswordFields = ({form, prefix = ''}) => {
     const fields = useUpdatePasswordFields({form, prefix})

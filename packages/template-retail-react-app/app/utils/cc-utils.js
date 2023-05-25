@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {AmexIcon, DiscoverIcon, MastercardIcon, VisaIcon} from '../components/icons'
+import {
+    AmexIcon,
+    DiscoverIcon,
+    MastercardIcon,
+    VisaIcon
+} from 'retail-react-app/app/components/icons'
 
 /**
  * Formats a credit card number against given criteria

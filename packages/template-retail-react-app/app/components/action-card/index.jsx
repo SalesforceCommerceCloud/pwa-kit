@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Stack, Box, Button} from '@chakra-ui/react'
 import {FormattedMessage} from 'react-intl'
-import LoadingSpinner from '../loading-spinner'
+import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
 
 /**
  * Renders a card-style box with optional edit and remove buttons. Used for

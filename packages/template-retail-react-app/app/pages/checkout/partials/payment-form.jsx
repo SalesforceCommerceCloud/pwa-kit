@@ -8,10 +8,10 @@ import React from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Flex, Radio, RadioGroup, Stack, Text, Tooltip} from '@chakra-ui/react'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import {LockIcon, PaypalIcon} from '../../../components/icons'
-import CreditCardFields from '../../../components/forms/credit-card-fields'
-import {useCurrency} from '../../../hooks'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+import {LockIcon, PaypalIcon} from 'retail-react-app/app/components/icons'
+import CreditCardFields from 'retail-react-app/app/components/forms/credit-card-fields'
+import {useCurrency} from 'retail-react-app/app/hooks'
 
 const PaymentForm = ({form, onSubmit}) => {
     const {formatMessage} = useIntl()

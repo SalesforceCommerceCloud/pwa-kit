@@ -24,24 +24,24 @@ import {
 } from '@chakra-ui/react'
 
 // Project Components
-import Hero from '../../components/hero'
-import Seo from '../../components/seo'
-import Section from '../../components/section'
-import ProductScroller from '../../components/product-scroller'
+import Hero from 'retail-react-app/app/components/hero'
+import Seo from 'retail-react-app/app/components/seo'
+import Section from 'retail-react-app/app/components/section'
+import ProductScroller from 'retail-react-app/app/components/product-scroller'
 
 // Others
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
-import {heroFeatures, features} from './data'
+import {heroFeatures, features} from 'retail-react-app/app/pages/home/data'
 
 //Hooks
-import useEinstein from '../../hooks/use-einstein'
+import useEinstein from 'retail-react-app/app/hooks/use-einstein'
 
 // Constants
 import {
     MAX_CACHE_AGE,
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT
-} from '../../constants'
+} from 'retail-react-app/app/constants'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from 'commerce-sdk-react-preview'
 

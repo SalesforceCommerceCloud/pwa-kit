@@ -8,12 +8,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
-import mockProductDetail from '../../mocks/variant-750518699578M'
-import mockProductSet from '../../mocks/product-set-winter-lookM'
-import ProductView from './index'
-import {renderWithProviders} from '../../utils/test-utils'
+import mockProductDetail from 'retail-react-app/app/mocks/variant-750518699578M'
+import mockProductSet from 'retail-react-app/app/mocks/product-set-winter-lookM'
+import ProductView from 'retail-react-app/app/components/product-view'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 
 const MockComponent = (props) => {
     const {data: customer} = useCurrentCustomer()

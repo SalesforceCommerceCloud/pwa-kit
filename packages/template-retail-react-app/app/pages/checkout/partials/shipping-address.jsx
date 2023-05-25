@@ -7,13 +7,17 @@
 import React, {useState} from 'react'
 import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
-import {useCheckout} from '../util/checkout-context'
-import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
-import ShippingAddressSelection from './shipping-address-selection'
-import AddressDisplay from '../../../components/address-display'
+import {useCheckout} from 'retail-react-app/app/pages/checkout/util/checkout-context'
+import {
+    ToggleCard,
+    ToggleCardEdit,
+    ToggleCardSummary
+} from 'retail-react-app/app/components/toggle-card'
+import ShippingAddressSelection from 'retail-react-app/app/pages/checkout/partials/shipping-address-selection'
+import AddressDisplay from 'retail-react-app/app/components/address-display'
 import {useShopperCustomersMutation, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
