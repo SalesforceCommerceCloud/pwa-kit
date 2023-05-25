@@ -56,8 +56,8 @@ sh.set('-e')
 // Handlebars helpers
 
 // Our eslint script uses exscaped double quotes to have windows compatibility. This helper
-// will ensure those escaped double quotes are still escaped after processing the template. 
-Handlebars.registerHelper('script', (object )=> (object.replaceAll('"', '\\"')))
+// will ensure those escaped double quotes are still escaped after processing the template.
+Handlebars.registerHelper('script', (object) => object.replaceAll('"', '\\"'))
 
 // Validations
 const validPreset = (preset) => {
