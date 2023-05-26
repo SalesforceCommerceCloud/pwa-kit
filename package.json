@@ -5,7 +5,7 @@
     "bump-version": "node ./scripts/bump-version.js",
     "bump-version:sdk": "node ./scripts/bump-version.js --package=sdk",
     "bump-version:retail-react-app": "node ./scripts/bump-version.js --package=retail-react-app",
-    "bump-version:commerce-sdk-react": "node ./scripts/bump-version.js --package=commerce-sdk-react",
+    "bump-version:commerce-sdk-react": "node ./scripts/bump-version.js --package=commerce-sdk-react-preview",
     "publish-to-npm": "node ./scripts/publish-to-npm.js",
     "format": "lerna run --stream format",
     "preinstall": "node ./scripts/check-version.js",
