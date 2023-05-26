@@ -130,7 +130,7 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.set('refresh_token_registered_copy', '456')
         // @ts-expect-error private method
-        expect(auth.hasSFRAAuthStateChanged()).toBe(true)
+        expect(auth.hasSFRAAuthStateChanged(true)).toBe(true)
 
         // Should return true if refresh_token keys are same but values are different
         // @ts-expect-error private method
@@ -138,7 +138,7 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.set('refresh_token_guest_copy', '456')
         // @ts-expect-error private method
-        expect(auth.hasSFRAAuthStateChanged()).toBe(true)
+        expect(auth.hasSFRAAuthStateChanged(true)).toBe(true)
 
         // Should return false if refresh_token keys are same
         // @ts-expect-error private method
@@ -146,9 +146,9 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.set('refresh_token_guest_copy', '123')
         // @ts-expect-error private method
-        expect(auth.hasSFRAAuthStateChanged()).toBe(false)
+        expect(auth.hasSFRAAuthStateChanged(true)).toBe(false)
     })
-    test('isTokenValid', () => {
+    test('isTokenValidForHybrid', () => {
         const auth = new Auth(config)
 
         // Return false if JWT Expired
@@ -158,7 +158,7 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.set('refresh_token_guest_copy', '123')
         // @ts-expect-error private method
-        expect(auth.isTokenValid(JWTExpired)).toBe(false)
+        expect(auth.isTokenValidForHybrid(JWTExpired, true)).toBe(false)
 
         // Return false if SFRA Auth state changed
         const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
@@ -167,7 +167,7 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.set('refresh_token_registered_copy', '456')
         // @ts-expect-error private method
-        expect(auth.isTokenValid(JWTNotExpired)).toBe(false)
+        expect(auth.isTokenValidForHybrid(JWTNotExpired, true)).toBe(false)
 
         // Return true if JWT NOT expired and SFRA Auth state NOT changed
         // @ts-expect-error private method
@@ -175,7 +175,7 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.set('refresh_token_guest_copy', '123')
         // @ts-expect-error private method
-        expect(auth.isTokenValid(JWTNotExpired)).toBe(true)
+        expect(auth.isTokenValidForHybrid(JWTNotExpired, true)).toBe(true)
     })
     test('site switch clears auth storage', () => {
         const auth = new Auth(config)
