@@ -50,9 +50,6 @@ const main = () => {
     }
 
     saveJSONToFile(pkgJson, pathToPackageJson)
-
-    // After updating the dependencies, let's update the package lock files
-    sh.exec('npm install', {cwd: pathToRoot})
 }
 
 const getLatestVersion = (pkgName) => {

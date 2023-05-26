@@ -45,10 +45,12 @@ const main = (program) => {
         const script1 = path.join(__dirname, 'independent-pkg-version.js')
         sh.exec(`node ${script1} ${targetVersion} ${opts.package}`)
 
-        // TODO: can we avoid `npm install` twice? Both script1 and script2 do it.
         const script2 = path.join(__dirname, 'pwa-kit-deps-version.js')
         const updateDepsBehaviour = /-dev\b/.test(targetVersion) ? 'sync' : 'latest'
         sh.exec(`node ${script2} ${updateDepsBehaviour} ${opts.package}`)
+
+        // After updating the dependencies, let's update the package lock files
+        sh.exec('npm install')
 
         process.exit(0)
     }
@@ -101,7 +103,6 @@ const updatePeerDeps = (pkgJson, newMonorepoVersion) => {
         if (monorepoPackageNames.includes(dep)) {
             console.log(`Found lerna local package ${dep} as a peer dependency of ${pkgJson.name}.`)
             peerDependencies[dep] = `^${newMonorepoVersion}`
-            // TODO: peer dependency in package _lock_ does not get updated, even after `npm install`. Seems like a caching issue.
         }
     })
 }
