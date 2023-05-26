@@ -23,7 +23,7 @@ Now that the development server is running, you can open a browser and preview y
 
 ## Localization
 
-See the [Localization README.md](./app/translations/README.md) for important setup instructions for localization.
+See the [Localization README.md](./translations/README.md) for important setup instructions for localization.
 
 ## Configuration Files
 

@@ -10,9 +10,9 @@
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "npm run build-translations && pwa-kit-dev build",
     "build-translations": "npm run extract-default-translations && npm run compile-translations",
-    "compile-translations": "formatjs compile-folder --ast app/translations app/translations/compiled",
-    "compile-translations:pseudo": "formatjs compile --ast app/translations/en-US.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
-    "extract-default-translations": "formatjs extract 'app/**/*.{js,jsx}' --out-file app/translations/en-US.json --id-interpolation-pattern [sha512:contenthash:base64:6]",
+    "compile-translations": "formatjs compile-folder --ast translations translations/compiled",
+    "compile-translations:pseudo": "formatjs compile --ast translations/en-US.json --out-file translations/compiled/en-XA.json --pseudo-locale en-XA",
+    "extract-default-translations": "node ./scripts/extract-default-messages.js en-US",
     "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
     "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
     "lint:fix": "npm run lint -- --fix",
@@ -31,7 +31,7 @@
     "Android >= 4.4.4",
     "last 4 ChromeAndroid versions"
   ],
-  "devDependencies": {
+  "dependencies": {
     "@chakra-ui/icons": "^2.0.19",
     "@chakra-ui/react": "^2.6.0",
     "@chakra-ui/skip-nav": "^2.0.15",
@@ -78,6 +78,9 @@
     "react-hook-form": "^7.43.9",
     "react-intl": "^5.25.1",
     "react-router-dom": "^5.3.4"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.1"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",
