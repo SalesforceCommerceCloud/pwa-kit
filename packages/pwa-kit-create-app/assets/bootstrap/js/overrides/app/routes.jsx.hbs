@@ -1,0 +1,19 @@
+/*
+ * Copyright (c) 2023, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+import {routes} from '{{preset.templateSource.id}}/app/routes'
+{{!-- TODO: The configure routes should be an optional opt-in provided from the SDK. --}}
+import {configureRoutes} from '{{preset.templateSource.id}}/app/utils/routes-utils'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+
+{{!-- export default routes --}}
+export default () => {
+    const config = getConfig()
+    return configureRoutes(routes, config, {
+        ignoredRoutes: ['/callback', '*']
+    })
+}

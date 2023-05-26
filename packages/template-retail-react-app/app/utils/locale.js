@@ -17,13 +17,13 @@ export const fetchTranslations = async (locale) => {
     const targetLocale =
         typeof window === 'undefined'
             ? process.env.USE_PSEUDOLOCALE === 'true'
-                ? 'en-XB'
+                ? 'en-XA'
                 : locale
             : locale
 
     let module
     try {
-        module = await import(`retail-react-app/app/translations/compiled/${targetLocale}.json`)
+        module = await import(`retail-react-app/translations/compiled/${targetLocale}.json`)
     } catch (err) {
         console.error(err)
         console.log(

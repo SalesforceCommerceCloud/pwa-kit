@@ -1,5 +1,7 @@
 ## v3.0.0-dev (May 12, 2023)
 
+- Add missing cache invalidation for contexts/customers/login/order [#1073](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1073)
+
 - Upgrade React 18, React DOM 18, @types/react@18, @types/react-dom@v18 Testing library 14 [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
 
 ## v2.7.1 (May 11, 2023)
