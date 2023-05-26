@@ -55,6 +55,8 @@ type AuthDataKeys =
     | Exclude<keyof AuthData, 'refresh_token'>
     | 'refresh_token_guest'
     | 'refresh_token_registered'
+    | 'refresh_token_guest_copy'
+    | 'refresh_token_registered_copy'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -112,6 +114,20 @@ const DATA_MAP: AuthDataMap = {
     },
     refresh_token_registered: {
         storageType: 'cookie',
+        key: 'cc-nx',
+        callback: (store) => {
+            store.delete('cc-nx-g')
+        }
+    },
+    refresh_token_guest_copy: {
+        storageType: 'local',
+        key: 'cc-nx-g',
+        callback: (store) => {
+            store.delete('cc-nx')
+        }
+    },
+    refresh_token_registered_copy: {
+        storageType: 'local',
         key: 'cc-nx',
         callback: (store) => {
             store.delete('cc-nx-g')
@@ -243,6 +259,39 @@ class Auth {
     }
 
     /**
+     * WARNING: This function is relevant to be used in Hybrid deployments only.
+     * Compares the refresh_token keys for guest('cc-nx-g') and registered('cc-nx') login from the cookie received from SFRA with the copy stored in localstorage on PWA Kit
+     * to determine if the login state of the shopper on SFRA site has changed. If the keys are different we return true considering the login state did change. If the keys are same,
+     * we compare the values of the refresh_token to cover an edge case where the login state might have changed multiple times on SFRA and the eventual refresh_token key might be same
+     * as that on PWA Kit which would incorrectly show both keys to be the same even though the sessions are different.
+     * @returns {boolean} true if the keys do not match (login state changed), false otherwise.
+     */
+    private hasSFRAAuthStateChanged() {
+        const refreshTokenKey: AuthDataKeys =
+            (this.get('refresh_token_registered') && 'refresh_token_registered') ||
+            'refresh_token_guest'
+
+        const refreshTokenCopyKey =
+            (this.get('refresh_token_registered_copy') && 'refresh_token_registered_copy') ||
+            'refresh_token_guest_copy'
+
+        if (DATA_MAP[refreshTokenKey].key !== DATA_MAP[refreshTokenCopyKey].key) {
+            return true
+        }
+
+        return this.get(refreshTokenKey) !== this.get(refreshTokenCopyKey)
+    }
+
+    /**
+     * Used to validate JWT expiry and ensure auth state consistency with SFRA in a hybrid setup
+     * @param token access_token received on SLAS authentication
+     * @returns {boolean} true if JWT is valid; false otherwise
+     */
+    private isTokenValid(token: string) {
+        return !this.isTokenExpired(token) && !this.hasSFRAAuthStateChanged()
+    }
+
+    /**
      * This method stores the TokenResponse object retrived from SLAS, and
      * store the data in storage.
      */
@@ -258,7 +307,14 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+        const refreshTokenCopyKey = isGuest
+            ? 'refresh_token_guest_copy'
+            : 'refresh_token_registered_copy'
+
         this.set(refreshTokenKey, res.refresh_token, {
+            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
+        })
+        this.set(refreshTokenCopyKey, res.refresh_token, {
             expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
         })
     }
@@ -315,7 +371,7 @@ class Auth {
         }
         const accessToken = this.get('access_token')
 
-        if (accessToken && !this.isTokenExpired(accessToken)) {
+        if (accessToken && this.isTokenValid(accessToken)) {
             return this.data
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')
