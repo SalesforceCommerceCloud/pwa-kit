@@ -21,10 +21,7 @@ const rootPath = path.join(__dirname, '..')
 const monorepoPackages = JSON.parse(sh.exec('lerna list --all --json', {silent: true}))
 const monorepoPackageNames = monorepoPackages.map((pkg) => pkg.name)
 
-// TODO: convert to simply a constant.. no need for a separate file
-const INDEPENDENT_PACKAGES = JSON.parse(
-    sh.cat(path.join(__dirname, 'packages-with-independent-version.json'))
-)
+const INDEPENDENT_PACKAGES = ['retail-react-app', 'commerce-sdk-react-preview']
 const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) =>
     monorepoPackages.find((pkg) => pkg.name === pkgName)
 )
@@ -123,7 +120,7 @@ program.description('Bump the version of a package in our monorepo')
 program.arguments('<target-version>')
 
 program.option(
-    '--package <package-name>',
+    '-p, --package <package-name>',
     'the package name or an alias to a group of packages',
     'sdk'
 )
