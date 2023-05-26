@@ -10,18 +10,18 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Flex, Skeleton} from '@chakra-ui/react'
 import {useProducts, useShopperCustomersMutation} from 'commerce-sdk-react-preview'
 
-import useNavigation from '../../../hooks/use-navigation'
-import {useToast} from '../../../hooks/use-toast'
-import {useWishList} from '../../../hooks/use-wish-list'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import {useToast} from 'retail-react-app/app/hooks/use-toast'
+import {useWishList} from 'retail-react-app/app/hooks/use-wish-list'
 
-import PageActionPlaceHolder from '../../../components/page-action-placeholder'
-import {HeartIcon} from '../../../components/icons'
-import ProductItem from '../../../components/product-item/index'
-import WishlistPrimaryAction from './partials/wishlist-primary-action'
-import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
+import PageActionPlaceHolder from 'retail-react-app/app/components/page-action-placeholder'
+import {HeartIcon} from 'retail-react-app/app/components/icons'
+import ProductItem from 'retail-react-app/app/components/product-item/index'
+import WishlistPrimaryAction from 'retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action'
+import WishlistSecondaryButtonGroup from 'retail-react-app/app/pages/account/wishlist/partials/wishlist-secondary-button-group'
 
-import {API_ERROR_MESSAGE} from '../../../constants'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
+import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 
 const numberOfSkeletonItems = 3
 

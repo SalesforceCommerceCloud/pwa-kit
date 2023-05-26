@@ -20,10 +20,10 @@ import {
 } from '@chakra-ui/react'
 
 // Icons
-import {ChevronRightIcon} from '../icons'
+import {ChevronRightIcon} from 'retail-react-app/app/components/icons'
 
 // Others
-import {categoryUrlBuilder} from '../../utils/url'
+import {categoryUrlBuilder} from 'retail-react-app/app/utils/url'
 
 /**
  * A simplification of the Chakra `Breadcrumb` component for our project needs. Given

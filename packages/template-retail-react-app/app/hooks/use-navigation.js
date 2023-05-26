@@ -6,8 +6,8 @@
  */
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
-import useMultiSite from './use-multi-site'
-import {removeSiteLocaleFromPath} from '../utils/url'
+import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
+import {removeSiteLocaleFromPath} from 'retail-react-app/app/utils/url'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale

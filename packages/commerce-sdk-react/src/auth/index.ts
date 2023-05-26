@@ -475,6 +475,9 @@ class Auth {
             ...(usid && {usid})
         })
         this.handleTokenResponse(token, isGuest)
+        if (onClient() && this.OCAPISessionsURL) {
+            void this.createOCAPISession()
+        }
         return token
     }
 
@@ -507,7 +510,7 @@ class Auth {
         return fetch(this.OCAPISessionsURL, {
             method: 'POST',
             headers: {
-                Authorization: this.get('access_token')
+                Authorization: 'Bearer ' + this.get('access_token')
             }
         })
     }

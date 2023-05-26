@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, useRadio, useRadioGroup} from '@chakra-ui/react'
-import {CheckIcon} from '../icons'
+import {CheckIcon} from 'retail-react-app/app/components/icons'
 
 const RadioCardGroupContext = React.createContext()
 

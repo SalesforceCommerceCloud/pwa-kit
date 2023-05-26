@@ -13,6 +13,7 @@ const WebSocket = require('ws')
 const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
+const projectPkg = require(process.cwd() + '/package.json')
 const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
 
 // Scripts in ./bin have never gone through babel, so we
@@ -177,6 +178,20 @@ const main = async () => {
             }
         })
 
+    const appSSRpath = p.join(process.cwd(), 'app', 'ssr.js')
+    const appSSRjs = fse.pathExistsSync(appSSRpath)
+    const overrideSSRpath = p.join(
+        process.cwd(),
+        typeof projectPkg?.ccExtensibility?.overridesDir === 'string' &&
+            !projectPkg?.ccExtensibility?.overridesDir?.startsWith(p.sep)
+            ? p.sep + projectPkg?.ccExtensibility?.overridesDir
+            : projectPkg?.ccExtensibility?.overridesDir ?? '',
+        'app',
+        'ssr.js'
+    )
+    const overrideSSRjs = fse.pathExistsSync(overrideSSRpath)
+    const resolvedSSRPath = appSSRjs ? appSSRpath : overrideSSRjs ? overrideSSRpath : null
+
     program
         .command('start')
         .description(`develop your app locally`)
@@ -185,15 +200,12 @@ const main = async () => {
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
         .action(async ({inspect, noHMR}) => {
-            execSync(
-                `node${inspect ? ' --inspect' : ''} ${p.join(process.cwd(), 'app', 'ssr.js')}`,
-                {
-                    env: {
-                        ...process.env,
-                        ...(noHMR ? {HMR: 'false'} : {})
-                    }
+            execSync(`node${inspect ? ' --inspect' : ''} ${resolvedSSRPath}`, {
+                env: {
+                    ...process.env,
+                    ...(noHMR ? {HMR: 'false'} : {})
                 }
-            )
+            })
         })
 
     program

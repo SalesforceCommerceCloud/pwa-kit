@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders} from '../../utils/test-utils'
-import OfflineBanner from './index'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import OfflineBanner from 'retail-react-app/app/components/offline-banner/index'
 import {screen} from '@testing-library/react'
 
 test('OfflineBanner component is rendered appropriately', () => {

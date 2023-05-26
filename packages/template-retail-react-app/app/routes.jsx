@@ -18,7 +18,7 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
-import {configureRoutes} from './utils/routes-utils'
+import {configureRoutes} from 'retail-react-app/app/utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -37,7 +37,7 @@ const ProductList = loadable(() => import('./pages/product-list'), {fallback})
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
-const routes = [
+export const routes = [
     {
         path: '/',
         component: Home,

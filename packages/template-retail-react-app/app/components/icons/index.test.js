@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {within} from '@testing-library/dom'
-import {renderWithProviders} from '../../utils/test-utils'
-import * as Icons from './index'
+import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import * as Icons from 'retail-react-app/app/components/icons/index'
 
 test('renders svg icons with Chakra Icon component', () => {
     renderWithProviders(<Icons.CheckIcon />)

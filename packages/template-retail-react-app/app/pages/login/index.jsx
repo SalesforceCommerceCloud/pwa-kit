@@ -17,15 +17,15 @@ import {
     useCustomerType,
     useShopperBasketsMutation
 } from 'commerce-sdk-react-preview'
-import useNavigation from '../../hooks/use-navigation'
-import Seo from '../../components/seo'
+import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import Seo from 'retail-react-app/app/components/seo'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
-import useEinstein from '../../hooks/use-einstein'
-import LoginForm from '../../components/login'
-import {API_ERROR_MESSAGE} from '../../constants'
-import {usePrevious} from '../../hooks/use-previous'
-import {isServer} from '../../utils/utils'
+import useEinstein from 'retail-react-app/app/hooks/use-einstein'
+import LoginForm from 'retail-react-app/app/components/login'
+import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
+import {usePrevious} from 'retail-react-app/app/hooks/use-previous'
+import {isServer} from 'retail-react-app/app/utils/utils'
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
     id: 'login_page.error.incorrect_username_or_password'
