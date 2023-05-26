@@ -77,8 +77,7 @@
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.43.9",
     "react-intl": "^5.25.1",
-    "react-router-dom": "^5.3.4",
-    "shelljs": "^0.8.5"
+    "react-router-dom": "^5.3.4"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",
