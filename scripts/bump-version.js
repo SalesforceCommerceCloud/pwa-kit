@@ -9,6 +9,7 @@
 const sh = require('shelljs')
 const path = require('path')
 const program = require('commander')
+const childProc = require('child_process')
 const {saveJSONToFile, setPackageVersion} = require('./utils')
 
 // Exit upon error
@@ -20,6 +21,7 @@ const rootPath = path.join(__dirname, '..')
 const monorepoPackages = JSON.parse(sh.exec('lerna list --all --json', {silent: true}))
 const monorepoPackageNames = monorepoPackages.map((pkg) => pkg.name)
 
+// TODO: convert to simply a constant.. no need for a separate file
 const INDEPENDENT_PACKAGES = JSON.parse(
     sh.cat(path.join(__dirname, 'packages-with-independent-version.json'))
 )
@@ -27,9 +29,30 @@ const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) =>
     monorepoPackages.find((pkg) => pkg.name === pkgName)
 )
 
+/**
+ * @param {import('commander').CommanderStatic} program
+ */
 const main = (program) => {
-    const version = program.args[0]
-    sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${version}`)
+    const targetVersion = program.args[0]
+    if (!targetVersion) {
+        program.help()
+    }
+
+    const opts = program.opts()
+    if (opts.package !== 'sdk') {
+        // Assume that we're bumping the version of package that has its own independent version
+
+        const script1 = path.join(__dirname, 'independent-pkg-version.js')
+        sh.exec(`node ${script1} ${targetVersion} ${opts.package}`)
+
+        const script2 = path.join(__dirname, 'pwa-kit-deps-version.js')
+        const updateDepsBehaviour = /-dev\b/.test(targetVersion) ? 'sync' : 'latest'
+        sh.exec(`node ${script2} ${updateDepsBehaviour} ${opts.package}`)
+
+        process.exit(0)
+    }
+
+    sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${targetVersion}`)
     // `--exact` above is for pinning the version of the pwa-kit dependencies
     // https://github.com/lerna/lerna/tree/main/libs/commands/version#--exact
 

@@ -13,14 +13,20 @@ const {saveJSONToFile} = require('./utils')
 sh.set('-e')
 
 const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
+
+const pathToPackage = (packageName) => {
+    const pkg = publicPackages.find((pkg) => pkg.name === packageName)
+    return pkg?.location
+}
 const pathToRoot = path.join(__dirname, '..')
 
 // Assuming that this is run within a specific package,
 // the script would update its pwa-kit/sdk dependencies.
 const main = () => {
     const updateBehaviour = process.argv[2]
+    const packageName = process.argv[3]
 
-    const pathToPackageJson = path.join(process.cwd(), 'package.json')
+    const pathToPackageJson = path.join(pathToPackage(packageName), 'package.json')
     const pkgJson = JSON.parse(sh.cat(pathToPackageJson))
 
     if (updateBehaviour === 'latest') {
@@ -33,6 +39,7 @@ const main = () => {
         })
     } else if (updateBehaviour === 'sync') {
         // Sync version with what's in the monorepo
+        // TODO: publicPackages or monorepoPackages ?
         publicPackages.forEach(({version, name}) => {
             if (pkgJson.dependencies?.[name]) {
                 pkgJson.dependencies[name] = version

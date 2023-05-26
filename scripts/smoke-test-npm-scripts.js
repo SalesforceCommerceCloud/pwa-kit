@@ -41,8 +41,6 @@ const main = (opts) => {
         /^start.*$/,
         /^compile-translations.*$/,
         /^extract-default-translations.*$/,
-        /^pkg-version$/,
-        /^pwa-kit-deps-version.*$/,
         /^bump-version.*$/
     ]
 

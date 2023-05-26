@@ -14,15 +14,20 @@ const {saveJSONToFile, setPackageVersion} = require('./utils')
 sh.set('-e')
 
 const monorepoPackages = JSON.parse(sh.exec('lerna list --all --json', {silent: true}))
+
+const pathToPackage = (packageName) => {
+    const pkg = monorepoPackages.find((pkg) => pkg.name === packageName)
+    return pkg?.location
+}
 const pathToRoot = path.join(__dirname, '..')
 
 // Meant for setting the version of a package that has its own independent version
 const main = () => {
     const version = process.argv[2]
-    setPackageVersion(version)
-
-    const pkgName = JSON.parse(sh.exec('npm pkg get name', {silent: true}))
+    const pkgName = process.argv[3]
     const otherPackages = monorepoPackages.filter((pkg) => pkg.name !== pkgName)
+
+    setPackageVersion(version, {cwd: pathToPackage(pkgName)})
 
     // Update other packages who depend on the current package
     otherPackages.forEach(({location}) => {
