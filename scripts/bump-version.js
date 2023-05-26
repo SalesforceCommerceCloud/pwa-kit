@@ -45,6 +45,7 @@ const main = (program) => {
         const script1 = path.join(__dirname, 'independent-pkg-version.js')
         sh.exec(`node ${script1} ${targetVersion} ${opts.package}`)
 
+        // TODO: can we avoid `npm install` twice? Both script1 and script2 do it.
         const script2 = path.join(__dirname, 'pwa-kit-deps-version.js')
         const updateDepsBehaviour = /-dev\b/.test(targetVersion) ? 'sync' : 'latest'
         sh.exec(`node ${script2} ${updateDepsBehaviour} ${opts.package}`)
@@ -65,6 +66,7 @@ const main = (program) => {
     independentPackages.forEach((pkg) => {
         const {location, version: oldVersion} = pkg
         // Restore and then increment to the next pre-release version
+        // TODO: is it possible to _not_ trigger the lifecycle scripts? See CHANGELOG.md
         setPackageVersion(oldVersion, {cwd: location})
         setPackageVersion('prerelease', {cwd: location})
 
