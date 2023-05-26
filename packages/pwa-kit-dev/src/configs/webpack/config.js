@@ -19,9 +19,10 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {sdkReplacementPlugin, makeRegExp} from './plugins'
-import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 import OverridesResolverPlugin from './overrides-plugin'
+import {sdkReplacementPlugin} from './plugins'
+import {makeRegExp} from './utils'
+import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))

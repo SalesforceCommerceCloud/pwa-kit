@@ -8,6 +8,8 @@ import webpack from 'webpack'
 import path, {resolve} from 'path'
 import glob from 'glob'
 import {EXT_OVERRIDES_DIR, EXT_EXTENDS} from './config'
+import {makeRegExp} from './utils'
+
 const projectDir = process.cwd()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require(resolve(projectDir, 'package.json'))
@@ -51,14 +53,6 @@ const getOverridePath = (relativePath) => {
               'universal',
               ...relativePath.filter((item) => item !== 'app')
           )
-}
-
-export const makeRegExp = (str, sep = path.sep) => {
-    // Replace unix paths with windows if needed and build a RegExp
-    if (sep === '\\') {
-        str = str.replace(/\//g, '\\\\')
-    }
-    return new RegExp(str)
 }
 
 /**
