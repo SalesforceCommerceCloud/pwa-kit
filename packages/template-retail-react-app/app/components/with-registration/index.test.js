@@ -7,7 +7,7 @@
 import React from 'react'
 import {Button} from '@chakra-ui/react'
 import {screen, waitFor} from '@testing-library/react'
-import withRegistration from 'retail-react-app/app/hoc/with-registration/index'
+import withRegistration from 'retail-react-app/app/components/with-registration/index'
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'

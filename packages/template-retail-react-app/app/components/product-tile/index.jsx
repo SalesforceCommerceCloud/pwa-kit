@@ -27,7 +27,7 @@ import {useIntl} from 'react-intl'
 // Other
 import {productUrlBuilder} from 'retail-react-app/app/utils/url'
 import Link from 'retail-react-app/app/components/link'
-import withRegistration from 'retail-react-app/app/hoc/with-registration'
+import withRegistration from 'retail-react-app/app/components/with-registration'
 import {useCurrency} from 'retail-react-app/app/hooks'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
