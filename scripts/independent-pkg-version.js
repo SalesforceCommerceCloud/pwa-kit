@@ -6,6 +6,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 const sh = require('shelljs')
 const path = require('path')
 const {saveJSONToFile, setPackageVersion} = require('./utils')
@@ -19,7 +20,6 @@ const pathToPackage = (packageName) => {
     const pkg = monorepoPackages.find((pkg) => pkg.name === packageName)
     return pkg?.location
 }
-const pathToRoot = path.join(__dirname, '..')
 
 // Meant for setting the version of a package that has its own independent version
 const main = () => {
