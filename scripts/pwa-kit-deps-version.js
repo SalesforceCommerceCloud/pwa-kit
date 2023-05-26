@@ -39,7 +39,6 @@ const main = () => {
         })
     } else if (updateBehaviour === 'sync') {
         // Sync version with what's in the monorepo
-        // TODO: publicPackages or monorepoPackages ?
         publicPackages.forEach(({version, name}) => {
             if (pkgJson.dependencies?.[name]) {
                 pkgJson.dependencies[name] = version
