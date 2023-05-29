@@ -10,8 +10,8 @@ import {mockedCustomerProductListsDetails} from 'retail-react-app/app/mocks/mock
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import {screen} from '@testing-library/react'
 
-jest.mock('commerce-sdk-react-preview', () => {
-    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
         useCustomerBaskets: jest.fn().mockReturnValue({data: {baskets: [{currency: 'GBP'}]}})

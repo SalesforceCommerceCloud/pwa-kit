@@ -15,7 +15,10 @@ import {
 } from 'retail-react-app/app/components/toggle-card'
 import ShippingAddressSelection from 'retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from 'retail-react-app/app/components/address-display'
-import {useShopperCustomersMutation, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {
+    useShopperCustomersMutation,
+    useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 

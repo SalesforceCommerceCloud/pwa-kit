@@ -23,7 +23,7 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST
 } from 'retail-react-app/app/constants'
-import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
+import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 /**
  * A component for fetching and rendering product recommendations from the Einstein API

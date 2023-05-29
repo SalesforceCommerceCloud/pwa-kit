@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {usePage, usePages} from 'commerce-sdk-react-preview'
-import {Page, Region} from 'commerce-sdk-react-preview/components'
+import {usePage, usePages} from '@salesforce/commerce-sdk-react'
+import {Page, Region} from '@salesforce/commerce-sdk-react/components'
 import Json from '../components/Json'
 
 const PAGE_ID = 'homepage-example'

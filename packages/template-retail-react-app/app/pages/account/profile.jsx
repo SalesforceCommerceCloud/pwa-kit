@@ -28,7 +28,11 @@ import {
 import ProfileFields from 'retail-react-app/app/components/forms/profile-fields'
 import UpdatePasswordFields from 'retail-react-app/app/components/forms/update-password-fields'
 import FormActionButtons from 'retail-react-app/app/components/forms/form-action-buttons'
-import {useShopperCustomersMutation, useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
+import {
+    useShopperCustomersMutation,
+    useAuthHelper,
+    AuthHelpers
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 
 /**

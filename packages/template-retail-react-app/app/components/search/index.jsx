@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useMemo, useRef, useState} from 'react'
-import {useSearchSuggestions} from 'commerce-sdk-react-preview'
+import {useSearchSuggestions} from '@salesforce/commerce-sdk-react'
 import {
     Input,
     InputGroup,

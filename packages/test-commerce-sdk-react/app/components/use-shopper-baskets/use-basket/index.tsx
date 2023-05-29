@@ -6,7 +6,7 @@
  */
 import React, {ReactElement} from 'react'
 import Json from '../../Json'
-import {useBasket} from 'commerce-sdk-react-preview'
+import {useBasket} from '@salesforce/commerce-sdk-react'
 
 export const UseBasket = ({basketId}: {basketId: string}): ReactElement | null => {
     const {isLoading, error, data} = useBasket({parameters: {basketId}})

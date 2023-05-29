@@ -15,7 +15,7 @@ import {
     useCustomerId,
     useProductSearch,
     useShopperCustomersMutation
-} from 'commerce-sdk-react-preview'
+} from '@salesforce/commerce-sdk-react'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 
 // Components

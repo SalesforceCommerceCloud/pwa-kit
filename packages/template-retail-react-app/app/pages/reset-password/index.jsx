@@ -10,7 +10,10 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Container, Stack, Text} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {useShopperCustomersMutation, ShopperCustomersMutations} from 'commerce-sdk-react-preview'
+import {
+    useShopperCustomersMutation,
+    ShopperCustomersMutations
+} from '@salesforce/commerce-sdk-react'
 import Seo from 'retail-react-app/app/components/seo'
 import ResetPasswordForm from 'retail-react-app/app/components/reset-password'
 import {BrandLogo} from 'retail-react-app/app/components/icons'

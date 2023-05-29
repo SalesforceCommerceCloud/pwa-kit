@@ -18,7 +18,7 @@ import {
     useShopperBasketsMutation,
     useShopperCustomersMutation,
     useCustomerId
-} from 'commerce-sdk-react-preview'
+} from '@salesforce/commerce-sdk-react'
 
 // Hooks
 import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'

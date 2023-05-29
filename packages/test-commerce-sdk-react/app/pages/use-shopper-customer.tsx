@@ -16,7 +16,7 @@ import {
     useShopperCustomersMutation,
     useAuthHelper,
     ShopperCustomersMutation
-} from 'commerce-sdk-react-preview'
+} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
 import {useQueryClient} from '@tanstack/react-query'
 

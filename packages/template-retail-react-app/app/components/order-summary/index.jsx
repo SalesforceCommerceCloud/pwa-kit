@@ -17,7 +17,7 @@ import CartItemVariantName from 'retail-react-app/app/components/item-variant/it
 import CartItemVariantAttributes from 'retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from 'retail-react-app/app/components/item-variant/item-price'
 import PromoPopover from 'retail-react-app/app/components/promo-popover'
-import {useProducts} from 'commerce-sdk-react-preview'
+import {useProducts} from '@salesforce/commerce-sdk-react'
 
 const CartItems = ({basket}) => {
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0

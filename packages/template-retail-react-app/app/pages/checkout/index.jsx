@@ -20,7 +20,7 @@ import OrderSummary from 'retail-react-app/app/components/order-summary'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 import CheckoutSkeleton from 'retail-react-app/app/pages/checkout/partials/checkout-skeleton'
-import {useUsid, useShopperOrdersMutation} from 'commerce-sdk-react-preview'
+import {useUsid, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()

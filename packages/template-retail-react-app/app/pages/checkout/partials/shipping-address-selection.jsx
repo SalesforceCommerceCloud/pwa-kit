@@ -18,7 +18,7 @@ import AddressFields from 'retail-react-app/app/components/forms/address-fields'
 import FormActionButtons from 'retail-react-app/app/components/forms/form-action-buttons'
 import {MESSAGE_PROPTYPE} from 'retail-react-app/app/utils/locale'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
-import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
+import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 const saveButtonMessage = defineMessage({
     defaultMessage: 'Save & Continue to Shipping Method',

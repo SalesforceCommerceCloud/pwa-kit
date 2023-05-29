@@ -22,7 +22,7 @@ import {
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
-import {useOrder, useProducts, useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
+import {useOrder, useProducts, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from 'retail-react-app/app/utils/cc-utils'
 import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import Link from 'retail-react-app/app/components/link'

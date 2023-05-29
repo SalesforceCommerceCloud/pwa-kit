@@ -20,7 +20,7 @@ import {useForm} from 'react-hook-form'
 import {ChevronDownIcon, ChevronUpIcon} from 'retail-react-app/app/components/icons'
 import PromoCodeFields from 'retail-react-app/app/components/forms/promo-code-fields'
 import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
-import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 
 export const usePromoCode = () => {

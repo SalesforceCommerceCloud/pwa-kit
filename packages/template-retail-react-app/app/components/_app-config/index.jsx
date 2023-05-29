@@ -17,7 +17,7 @@ import {resolveSiteFromUrl, resolveLocaleFromUrl} from 'retail-react-app/app/uti
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from 'retail-react-app/app/utils/url'
 
-import {CommerceApiProvider} from 'commerce-sdk-react-preview'
+import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'

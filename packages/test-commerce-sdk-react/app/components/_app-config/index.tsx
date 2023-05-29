@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState, ReactElement} from 'react'
-import {CommerceApiProvider} from 'commerce-sdk-react-preview'
+import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
 

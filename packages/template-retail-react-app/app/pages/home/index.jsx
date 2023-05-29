@@ -43,7 +43,7 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT
 } from 'retail-react-app/app/constants'
 import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
-import {useProductSearch} from 'commerce-sdk-react-preview'
+import {useProductSearch} from '@salesforce/commerce-sdk-react'
 
 /**
  * This is the home page for Retail React App.

@@ -37,7 +37,7 @@ import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
 import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
 import useEinstein from 'retail-react-app/app/hooks/use-einstein'
-import {useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
+import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 import {isHydrated} from 'retail-react-app/app/utils/utils'
 

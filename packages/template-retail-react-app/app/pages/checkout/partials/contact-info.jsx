@@ -35,7 +35,7 @@ import {AuthModal, useAuthModal} from 'retail-react-app/app/hooks/use-auth-modal
 import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
-import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()

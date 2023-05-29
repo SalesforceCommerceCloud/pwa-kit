@@ -22,7 +22,7 @@ import {
     Skeleton
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from 'retail-react-app/app/utils/cc-utils'
-import {useOrder, useProducts} from 'commerce-sdk-react-preview'
+import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
 import Link from 'retail-react-app/app/components/link'
 import {ChevronLeftIcon} from 'retail-react-app/app/components/icons'
 import OrderSummary from 'retail-react-app/app/components/order-summary'

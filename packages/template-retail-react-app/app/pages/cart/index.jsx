@@ -45,7 +45,7 @@ import {
     useShippingMethodsForShipment,
     useProducts,
     useShopperCustomersMutation
-} from 'commerce-sdk-react-preview'
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
 
 const Cart = () => {

@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
 import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
-import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
+import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 import {useToast} from 'retail-react-app/app/hooks/use-toast'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'

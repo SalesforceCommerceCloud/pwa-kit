@@ -6,7 +6,7 @@
  */
 import {useMemo, useState} from 'react'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {useCommerceApi, useAccessToken, useUsid, useEncUserId} from 'commerce-sdk-react-preview'
+import {useCommerceApi, useAccessToken, useUsid, useEncUserId} from '@salesforce/commerce-sdk-react'
 import {keysToCamel} from 'retail-react-app/app/utils/utils'
 
 export class EinsteinAPI {

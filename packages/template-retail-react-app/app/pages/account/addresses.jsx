@@ -33,7 +33,7 @@ import AddressFields from 'retail-react-app/app/components/forms/address-fields'
 import AddressDisplay from 'retail-react-app/app/components/address-display'
 import PageActionPlaceHolder from 'retail-react-app/app/components/page-action-placeholder'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
-import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
+import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {nanoid} from 'nanoid'
 import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
 

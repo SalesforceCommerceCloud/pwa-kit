@@ -23,7 +23,7 @@ import {
     Skeleton
 } from '@chakra-ui/react'
 import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
-import {useCustomerOrders, useProducts} from 'commerce-sdk-react-preview'
+import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
 import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import {usePageUrls, useSearchParams} from 'retail-react-app/app/hooks'
 import PageActionPlaceHolder from 'retail-react-app/app/components/page-action-placeholder'

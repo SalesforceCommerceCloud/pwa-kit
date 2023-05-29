@@ -23,7 +23,7 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.1",
     "@types/react-router-dom": "^5.3.3",
-    "commerce-sdk-react-preview": "^3.0.0-dev",
+    "@salesforce/commerce-sdk-react": "^3.0.0-dev",
     "internal-lib-build": "^3.0.0-dev",
     "pwa-kit-dev": "^3.0.0-dev",
     "pwa-kit-react-sdk": "^3.0.0-dev",

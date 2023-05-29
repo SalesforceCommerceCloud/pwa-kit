@@ -30,7 +30,7 @@ import {
     useShopperCustomersMutation,
     useShopperBasketsMutation,
     ShopperCustomersMutations
-} from 'commerce-sdk-react-preview'
+} from '@salesforce/commerce-sdk-react'
 import {BrandLogo} from 'retail-react-app/app/components/icons'
 import LoginForm from 'retail-react-app/app/components/login'
 import ResetPasswordForm from 'retail-react-app/app/components/reset-password'

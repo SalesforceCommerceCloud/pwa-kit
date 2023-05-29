@@ -13,7 +13,7 @@ import {useItemVariant} from 'retail-react-app/app/components/item-variant'
 import PromoPopover from 'retail-react-app/app/components/promo-popover'
 import {useCurrency} from 'retail-react-app/app/hooks'
 import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
-import {usePromotions} from 'commerce-sdk-react-preview'
+import {usePromotions} from '@salesforce/commerce-sdk-react'
 
 /**
  * In the context of a cart product item variant, this component renders a styled

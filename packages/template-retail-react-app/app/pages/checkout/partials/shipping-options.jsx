@@ -15,7 +15,10 @@ import {
     ToggleCardEdit,
     ToggleCardSummary
 } from 'retail-react-app/app/components/toggle-card'
-import {useShippingMethodsForShipment, useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {
+    useShippingMethodsForShipment,
+    useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from 'retail-react-app/app/hooks'
 

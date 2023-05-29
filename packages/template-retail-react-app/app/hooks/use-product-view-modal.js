@@ -12,7 +12,7 @@ import {useVariant} from 'retail-react-app/app/hooks/use-variant'
 import {useToast} from 'retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
 import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
-import {useProduct} from 'commerce-sdk-react-preview'
+import {useProduct} from '@salesforce/commerce-sdk-react'
 
 /**
  * This hook is responsible for fetching a product detail based on the variation selection

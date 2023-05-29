@@ -19,8 +19,8 @@ import {
     useCustomerType,
     useCustomerBaskets,
     useShopperBasketsMutation
-} from 'commerce-sdk-react-preview'
-import * as queryKeyHelpers from 'commerce-sdk-react-preview/hooks/ShopperProducts/queryKeyHelpers'
+} from '@salesforce/commerce-sdk-react'
+import * as queryKeyHelpers from '@salesforce/commerce-sdk-react/hooks/ShopperProducts/queryKeyHelpers'
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'

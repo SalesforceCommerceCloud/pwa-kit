@@ -16,7 +16,7 @@ import {
     useCustomerId,
     useCustomerType,
     useShopperBasketsMutation
-} from 'commerce-sdk-react-preview'
+} from '@salesforce/commerce-sdk-react'
 import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import Seo from 'retail-react-app/app/components/seo'
 import {useForm} from 'react-hook-form'

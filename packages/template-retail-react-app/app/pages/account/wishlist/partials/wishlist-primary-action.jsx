@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
-import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useItemVariant} from 'retail-react-app/app/components/item-variant'
 import ProductViewModal from 'retail-react-app/app/components/product-view-modal'

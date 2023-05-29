@@ -18,8 +18,8 @@ import {DEFAULT_LOCALE, renderWithProviders} from 'retail-react-app/app/utils/te
 import messages from 'retail-react-app/translations/compiled/en-GB.json'
 import {rest} from 'msw'
 
-jest.mock('commerce-sdk-react-preview', () => {
-    const originalModule = jest.requireActual('commerce-sdk-react-preview')
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
         useProduct: jest.fn().mockReturnValue({isFetching: false})

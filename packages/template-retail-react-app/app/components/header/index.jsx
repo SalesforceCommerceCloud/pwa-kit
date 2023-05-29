@@ -27,7 +27,7 @@ import {
     useDisclosure,
     useMediaQuery
 } from '@chakra-ui/react'
-import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 
 import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 

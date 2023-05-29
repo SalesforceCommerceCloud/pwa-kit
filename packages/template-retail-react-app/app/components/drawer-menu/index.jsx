@@ -40,7 +40,7 @@ import {
     useBreakpointValue,
     useMultiStyleConfig
 } from '@chakra-ui/react'
-import {AuthHelpers, useAuthHelper, useCustomerType} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 import Link from 'retail-react-app/app/components/link'
 // Icons
 import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from 'retail-react-app/app/components/icons'
