@@ -738,7 +738,7 @@ Examples:
             ).join(', ')})`
         )
         .option(
-            '--templateVersion',
+            '--templateVersion <version>',
             `The version of the template to be generated. This defaults to 'latest'. NOTE: This option only applies to templates being downloaded from NPM.`
         )
         .option('--verbose', `Print additional logging information to the console.`, false)
