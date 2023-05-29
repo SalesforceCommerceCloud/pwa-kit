@@ -1,3 +1,4 @@
+## v2.7.2-preview.0 (May 29, 2023)
 ## v2.7.1 (May 11, 2023)
 
 -   Fix `multi-value` params being lost [#1150](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1150)
