@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "internal-lib-build": "3.0.0-dev",
-    "pwa-kit-dev": "3.0.0-dev",
+    "@salesforce/pwa-kit-dev": "3.0.0-dev",
     "verdaccio": "^5.22.1"
   },
   "engines": {

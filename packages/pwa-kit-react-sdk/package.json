@@ -55,7 +55,7 @@
     "internal-lib-build": "3.0.0-dev",
     "node-html-parser": "^3.3.6",
     "nodemon": "^2.0.22",
-    "pwa-kit-dev": "3.0.0-dev",
+    "@salesforce/pwa-kit-dev": "3.0.0-dev",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "5.2.1",

@@ -10,7 +10,7 @@ A command-line tool to develop, build, and deploy PWA Kit projects.
 To see all the available commands, run:
 
 ```bash
-npx pwa-kit-dev --help
+npx @salesforce/pwa-kit-dev --help
 ```
 
 ## Documentation

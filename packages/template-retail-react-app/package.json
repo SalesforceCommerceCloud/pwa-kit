@@ -66,7 +66,7 @@
     "nanoid": "^3.3.4",
     "njwt": "^1.2.0",
     "prop-types": "^15.8.1",
-    "pwa-kit-dev": "3.0.0-dev",
+    "@salesforce/pwa-kit-dev": "3.0.0-dev",
     "pwa-kit-react-sdk": "3.0.0-dev",
     "pwa-kit-runtime": "3.0.0-dev",
     "query-string": "^7.1.3",

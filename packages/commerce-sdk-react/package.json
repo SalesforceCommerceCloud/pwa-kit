@@ -60,7 +60,7 @@
     "jsonwebtoken": "^8.5.1",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
-    "pwa-kit-dev": "3.0.0-dev",
+    "@salesforce/pwa-kit-dev": "3.0.0-dev",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",

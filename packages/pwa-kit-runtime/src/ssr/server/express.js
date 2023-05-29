@@ -444,7 +444,7 @@ export const getRuntime = () => {
           // To avoid deploying the dev server (and all of its dependencies) to production, it exists
           // as an optional peer dependency to this package. The unusual `require` statement is needed
           // to bypass webpack and ensure that the dev server does not get bundled.
-          eval('require').main.require('pwa-kit-dev/ssr/server/build-dev-server').DevServerFactory
+          eval('require').main.require('@salesforce/pwa-kit-dev/ssr/server/build-dev-server').DevServerFactory
 
     // The runtime is a JavaScript object.
     // Sometimes the runtime APIs are invoked directly as express middlewares.

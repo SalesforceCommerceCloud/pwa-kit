@@ -6,7 +6,7 @@
  */
 
 const path = require('path')
-const base = require('pwa-kit-dev/configs/jest/jest.config.js')
+const base = require('@salesforce/pwa-kit-dev/configs/jest/jest.config.js')
 
 module.exports = {
     ...base,
@@ -15,7 +15,8 @@ module.exports = {
         '^react$': '<rootDir>/node_modules/react/index.js',
         '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js',
         '^retail-react-app(.*)$': '<rootDir>$1',
-        '^@tanstack/react-query$': '<rootDir>/node_modules/@tanstack/react-query/build/lib/index.js',
+        '^@tanstack/react-query$':
+            '<rootDir>/node_modules/@tanstack/react-query/build/lib/index.js',
         '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',
         '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs'
     },
