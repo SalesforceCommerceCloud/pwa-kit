@@ -532,7 +532,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, templateVersion = DEFAULT_TEMPLATE_VERSION, verbose}) => {
+const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
     const {extend = false} = answers.project
@@ -639,7 +639,7 @@ const main = async (opts) => {
     // to "general" and "project" questions. It'll also be populated with details of the selected project,
     // like its `package.json` value.
     let context = INITIAL_CONTEXT
-    let {outputDir, verbose, preset, templateVersion = DEFAULT_TEMPLATE_VERSION} = opts
+    let {outputDir, verbose, preset, templateVersion} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
@@ -740,7 +740,8 @@ Examples:
         )
         .option(
             '--templateVersion <version>',
-            `The version of the template to be generated. This defaults to 'latest'. NOTE: This option only applies to templates being downloaded from NPM.`
+            `The version of the template to be generated when it's source is NPM.`,
+            DEFAULT_TEMPLATE_VERSION
         )
         .option('--verbose', `Print additional logging information to the console.`, false)
 
