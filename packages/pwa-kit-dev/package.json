@@ -1,5 +1,5 @@
 {
-  "name": "pwa-kit-dev",
+  "name": "@salesforce/pwa-kit-dev",
   "version": "3.0.0-dev",
   "description": "Build tools for pwa-kit",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-dev#readme",

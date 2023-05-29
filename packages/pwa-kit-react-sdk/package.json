@@ -1,5 +1,5 @@
 {
-  "name": "pwa-kit-react-sdk",
+  "name": "@salesforce/pwa-kit-react-sdk",
   "version": "3.0.0-dev",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-react-sdk#readme",
