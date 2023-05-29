@@ -1,3 +1,8 @@
+## v3.0.0-dev (May 11, 2023)
+
+-   Add `--templateVersion` argument to allow template version selection when generating a project using a template that is hosted on NPM. [#1229](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1229)
+-   Add extensible project generation support. [#1205](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1205)
+
 ## v2.7.1 (May 11, 2023)
 
 -   Moved the MRT reference app to the SDKs, so that we can verify eg. Node support [#966](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/966)
