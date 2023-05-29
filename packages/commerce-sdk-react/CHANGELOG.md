@@ -1,3 +1,4 @@
+## v2.7.2-preview.0 (May 29, 2023)
 ## v2.7.1 (May 11, 2023)
 
 -   Re-generate lock files and fix hook lib tests [#1186](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1186)
