@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const sh = require('shelljs')
 const path = require('path')
-const {saveJSONToFile} = require('./utils')
+const {saveJSONToFile} = require('../utils')
 
 // Exit upon error
 sh.set('-e')

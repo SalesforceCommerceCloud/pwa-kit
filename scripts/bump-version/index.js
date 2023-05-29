@@ -10,13 +10,13 @@
 const sh = require('shelljs')
 const path = require('path')
 const program = require('commander')
-const {saveJSONToFile, setPackageVersion} = require('./utils')
+const {saveJSONToFile, setPackageVersion} = require('../utils')
 
 // Exit upon error
 sh.set('-e')
 
-const lernaConfigPath = path.join(__dirname, '..', 'lerna.json')
-const rootPath = path.join(__dirname, '..')
+const rootPath = path.join(__dirname, '..', '..')
+const lernaConfigPath = path.join(rootPath, 'lerna.json')
 
 const monorepoPackages = JSON.parse(sh.exec('lerna list --all --json', {silent: true}))
 const monorepoPackageNames = monorepoPackages.map((pkg) => pkg.name)
