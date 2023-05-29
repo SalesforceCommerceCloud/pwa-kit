@@ -106,6 +106,7 @@ const INITIAL_CONTEXT = {
 }
 const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
+const DEFAULT_TEMPLATE_VERSION = 'latest'
 
 const EXTENSIBILITY_QUESTIONS = [
     {
@@ -531,7 +532,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
+const runGenerator = (context, {outputDir, templateVersion = DEFAULT_TEMPLATE_VERSION, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
     const {extend = false} = answers.project
@@ -638,7 +639,7 @@ const main = async (opts) => {
     // to "general" and "project" questions. It'll also be populated with details of the selected project,
     // like its `package.json` value.
     let context = INITIAL_CONTEXT
-    let {outputDir, verbose, preset, templateVersion = 'latest'} = opts
+    let {outputDir, verbose, preset, templateVersion = DEFAULT_TEMPLATE_VERSION} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
