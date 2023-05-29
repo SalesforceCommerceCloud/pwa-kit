@@ -531,7 +531,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, verbose}) => {
+const runGenerator = (context, {outputDir, templateVesion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
     const {extend = false} = answers.project
@@ -549,7 +549,7 @@ const runGenerator = (context, {outputDir, verbose}) => {
     switch (type) {
         case TEMPLATE_SOURCE_NPM: {
             const tarFile = sh
-                .exec(`npm pack ${id}@latest --pack-destination="${tmp}"`, {
+                .exec(`npm pack ${id}@${templateVesion} --pack-destination="${tmp}"`, {
                     silent: true
                 })
                 .stdout.trim()
@@ -638,7 +638,7 @@ const main = async (opts) => {
     // to "general" and "project" questions. It'll also be populated with details of the selected project,
     // like its `package.json` value.
     let context = INITIAL_CONTEXT
-    let {outputDir, verbose, preset} = opts
+    let {outputDir, verbose, preset, templateVesion = 'latest'} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
@@ -685,7 +685,7 @@ const main = async (opts) => {
     // Inject the packageJSON into the context for extensibile projects.
     if (context.answers.project.extend) {
         const pkgJSON = JSON.parse(
-            sh.exec(`npm view ${selectedPreset.templateSource.id} --json`, {
+            sh.exec(`npm view ${selectedPreset.templateSource.id}@${templateVesion} --json`, {
                 silent: true
             }).stdout
         )
@@ -710,7 +710,7 @@ const main = async (opts) => {
     }
 
     // Generate the project.
-    runGenerator(context, {outputDir, verbose})
+    runGenerator(context, {outputDir, templateVesion, verbose})
 
     // Return the folder in which the project was generated in.
     return outputDir
@@ -736,6 +736,11 @@ Examples:
             `The name of a project preset to use (choices: ${PUBLIC_PRESET_NAMES.map(
                 (x) => `"${x}"`
             ).join(', ')})`
+        )
+        .option(
+            '--template-version',
+            `The version of the template to be generated. This defaults to 'latest'. NOTE: This option only applies to templates being downloaded from NPM.`,
+            false
         )
         .option('--verbose', `Print additional logging information to the console.`, false)
 
