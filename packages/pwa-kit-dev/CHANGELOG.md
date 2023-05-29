@@ -1,6 +1,6 @@
-## v2.7.2-preview.0 (May 29, 2023)
+## v2.7.2 (May 29, 2023)
 
--   Add missing babel dependency [#1231](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1231)
+-   Add missing babel plugin dependency [#1231](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1231)
 ## v2.7.1 (May 11, 2023)
 
 -   Fix static file serving [#1196](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1196)
