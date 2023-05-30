@@ -19,7 +19,7 @@
  *
  * ## Basic usage
  *
- * We expect end-users to generate projects by running `npx pwa-kit-create-app` on
+ * We expect end-users to generate projects by running `npx @salesforce/pwa-kit-create-app` on
  * the CLI and following the prompts. Users must be able to run that command without
  * installing any dependencies first.
  *

@@ -13,7 +13,7 @@
  * script but does setup/teardown of a local NPM repository that lets us test some
  * important edge-cases. Those are:
  *
- * 1. Testing `npx pwa-kit-create-app` without publishing to the public NPM repo.
+ * 1. Testing `npx @salesforce/pwa-kit-create-app` without publishing to the public NPM repo.
  * 2. Realistically testing generated projects as though they were installed from
  *    the public NPM repo.
  *
@@ -22,7 +22,7 @@
  *
  * ## Detailed Explanations
  *
- * ### Testing `npx pwa-kit-create-app`
+ * ### Testing `npx @salesforce/pwa-kit-create-app`
  *
  * It is simply not possible to test the behaviour of the `npx` command without
  * first publishing the package under test. We don't want to publish to the public
@@ -128,7 +128,7 @@ const runGenerator = () => {
     const foundNpm = cp.spawnSync(npm, ['-v']).stdout.toString().trim()
     const flags = semver.satisfies(foundNpm, '>=7') ? '-y' : ''
 
-    cp.execSync(`npx ${flags} pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`, {
+    cp.execSync(`npx ${flags} @salesforce/pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`, {
         stdio: 'inherit'
     })
 }

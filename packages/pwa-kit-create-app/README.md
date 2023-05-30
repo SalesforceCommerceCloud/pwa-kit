@@ -12,13 +12,13 @@ A tool for generating PWA Kit projects based on project templates, such as the [
 To get started, open a terminal and run the following:
 
 ```bash
-npx pwa-kit-create-app
+npx @salesforce/pwa-kit-create-app
 ```
 
 For help, run:
 
 ```bash
-npx pwa-kit-create-app --help
+npx @salesforce/pwa-kit-create-app --help
 ```
 
 ## Documentation

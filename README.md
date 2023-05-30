@@ -34,7 +34,7 @@ The PWA Kit is a storefront technology for headless commerce using Salesforce Co
 ### Create Your First Project
 
 ```bash
-npx pwa-kit-create-app
+npx @salesforce/pwa-kit-create-app
 ```
 
 Enter your [sandbox configuration](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html#new-project).
