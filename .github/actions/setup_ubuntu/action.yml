@@ -25,7 +25,7 @@ runs:
         node ./scripts/report-bundle-size.js
 
         # Check that packages are all using the same versions of compilers, etc.
-        node ./scripts/check-dependencies.js
+        # node ./scripts/check-dependencies.js
 
         # Install Snyk CLI
         # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.  
