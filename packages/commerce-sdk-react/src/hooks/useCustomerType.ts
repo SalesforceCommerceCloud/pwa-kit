@@ -23,7 +23,7 @@ type useCustomerType = {
  *
  * During initialization, type is null. And it is possible that
  * isGuest and isRegistered to both be false.
- * 
+ *
  * @group Helpers
  * @category Shopper Authentication
  *

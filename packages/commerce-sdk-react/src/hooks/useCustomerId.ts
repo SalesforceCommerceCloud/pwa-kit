@@ -12,7 +12,7 @@ const onClient = typeof window !== 'undefined'
 
 /**
  * Hook that returns the customer ID.
- * 
+ *
  * @group Helpers
  * @category Shopper Authentication
  */

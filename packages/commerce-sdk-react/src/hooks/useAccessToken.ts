@@ -20,7 +20,7 @@ interface AccessToken {
 
 /**
  * Hook that returns the access token.
- * 
+ *
  * @group Helpers
  * @category Shopper Authentication
  *

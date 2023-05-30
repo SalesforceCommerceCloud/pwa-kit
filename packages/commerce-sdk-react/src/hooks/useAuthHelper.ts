@@ -47,7 +47,7 @@ type CacheUpdateMatrix = {
 
 /**
  * A hook for Public Client OAuth helpers.
- * 
+ *
  * @remarks
  * The hook calls the SLAS helpers imported from commerce-sdk-isomorphic.
  * For more, see https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/#public-client-shopper-login-helpers
@@ -57,7 +57,7 @@ type CacheUpdateMatrix = {
  * - loginGuestUser
  * - logout
  * - register
- * 
+ *
  * @group Helpers
  * @category Shopper Authentication
  */

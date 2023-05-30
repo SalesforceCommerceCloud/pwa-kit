@@ -18,7 +18,7 @@ type Client = ApiClients['shopperCustomers']
  * @group ShopperCustomers
  * @category Mutation
  * @enum
-*/
+ */
 export const ShopperCustomersMutations = {
     /**
      * Registers a new customer. The mandatory data are the credentials, profile last name, and email. This requires a JSON Web Token (JWT) which needs to be obtained using the POST /customers/auth API with type \"guest\".
@@ -133,7 +133,7 @@ The value of this property must be valid for the type of custom attribute define
 } as const
 
 /**
- * Mutation for Shopper Customers. 
+ * Mutation for Shopper Customers.
  * @group ShopperCustomers
  * @category Mutation
  */

@@ -13,7 +13,7 @@ import {ApiClients} from './types'
  * Access a set of initialized Commerce API clients, which are initialized using the configurations passed to the CommerceApiProvider.
  *
  * @group Helpers
- * 
+ *
  * @returns Commerce API clients
  */
 const useCommerceApi = (): ApiClients => {

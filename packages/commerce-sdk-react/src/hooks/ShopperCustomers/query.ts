@@ -56,7 +56,7 @@ type Client = ApiClients['shopperCustomers']
 
 /**
  * Gets a customer's information.
- * 
+ *
  * @group ShopperCustomers
  * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.

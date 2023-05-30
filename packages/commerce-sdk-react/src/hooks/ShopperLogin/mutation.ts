@@ -103,7 +103,7 @@ The value of the `_sfdc_client_auth` header must be a Base64-encoded string. The
 /**
  * Mutation for Shopper Login.
  * @group ShopperLogin
- * @category Mutation 
+ * @category Mutation
  */
 export type ShopperLoginMutation =
     (typeof ShopperLoginMutations)[keyof typeof ShopperLoginMutations]
