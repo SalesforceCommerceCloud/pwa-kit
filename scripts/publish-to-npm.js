@@ -35,11 +35,16 @@ const main = () => {
     }
 }
 
+/**
+ * @param {string[]} packages - a list of package names without the "@salesforce" namespace
+ */
 const publishPackages = (packages = []) => {
     verifyCleanWorkingTree()
 
     const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
-    const packagesToIgnore = publicPackages.filter((pkg) => !packages.includes(pkg.name))
+    const packagesToIgnore = publicPackages.filter(
+        (pkg) => !packages.includes(pkg.name.replace('@salesforce/', ''))
+    )
 
     const cleanUp = () => {
         // Undo the temporary commit

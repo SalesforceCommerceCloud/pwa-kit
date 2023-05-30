@@ -8,10 +8,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Stack, Text, SimpleGrid, FormControl, FormErrorMessage} from '@chakra-ui/react'
-import {PlusIcon} from 'retail-react-app/app/components/icons'
-import {RadioCard, RadioCardGroup} from 'retail-react-app/app/components/radio-card'
-import {getCreditCardIcon} from 'retail-react-app/app/utils/cc-utils'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import {PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {RadioCard, RadioCardGroup} from '@salesforce/retail-react-app/app/components/radio-card'
+import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const CCRadioGroup = ({
     form,

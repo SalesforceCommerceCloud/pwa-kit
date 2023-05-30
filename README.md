@@ -2,10 +2,10 @@
 
 <h1>The Progressive Web App (PWA) Kit</h1>
 
-[![npm](https://img.shields.io/npm/v/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/pwa-kit-react-sdk)
+[![npm](https://img.shields.io/npm/v/@salesforce/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/@salesforce/pwa-kit-react-sdk)
 [![License](https://img.shields.io/github/license/SalesforceCommerceCloud/pwa-kit.svg)](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/master/LICENSE)
 [![Checks](https://img.shields.io/github/checks-status/SalesforceCommerceCloud/pwa-kit/develop.svg)](https://github.com/SalesforceCommerceCloud/pwa-kit)
-[![npm](https://img.shields.io/npm/dm/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/pwa-kit-react-sdk)
+[![npm](https://img.shields.io/npm/dm/@salesforce/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/@salesforce/pwa-kit-react-sdk)
 
 </div>
 
@@ -34,7 +34,7 @@ The PWA Kit is a storefront technology for headless commerce using Salesforce Co
 ### Create Your First Project
 
 ```bash
-npx pwa-kit-create-app
+npx @salesforce/pwa-kit-create-app
 ```
 
 Enter your [sandbox configuration](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html#new-project).

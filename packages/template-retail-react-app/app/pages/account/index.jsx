@@ -23,23 +23,27 @@ import {
     Text,
     Divider
 } from '@chakra-ui/react'
-import Seo from 'retail-react-app/app/components/seo'
-import Link from 'retail-react-app/app/components/link'
-import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from 'retail-react-app/app/components/icons'
-import AccountDetail from 'retail-react-app/app/pages/account/profile'
-import AccountAddresses from 'retail-react-app/app/pages/account/addresses'
-import AccountOrders from 'retail-react-app/app/pages/account/orders'
-import AccountWishlist from 'retail-react-app/app/pages/account/wishlist/index'
+import Seo from '@salesforce/retail-react-app/app/components/seo'
+import Link from '@salesforce/retail-react-app/app/components/link'
+import {
+    ChevronDownIcon,
+    ChevronUpIcon,
+    SignoutIcon
+} from '@salesforce/retail-react-app/app/components/icons'
+import AccountDetail from '@salesforce/retail-react-app/app/pages/account/profile'
+import AccountAddresses from '@salesforce/retail-react-app/app/pages/account/addresses'
+import AccountOrders from '@salesforce/retail-react-app/app/pages/account/orders'
+import AccountWishlist from '@salesforce/retail-react-app/app/pages/account/wishlist/index'
 import {useLocation} from 'react-router-dom'
 
-import {messages, navLinks} from 'retail-react-app/app/pages/account/constant'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
-import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
-import useEinstein from 'retail-react-app/app/hooks/use-einstein'
-import {useAuthHelper, AuthHelpers} from 'commerce-sdk-react-preview'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
-import {isHydrated} from 'retail-react-app/app/utils/utils'
+import {messages, navLinks} from '@salesforce/retail-react-app/app/pages/account/constant'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {

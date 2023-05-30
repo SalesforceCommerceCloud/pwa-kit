@@ -3,8 +3,8 @@
   "version": "3.0.0-dev",
   "scripts": {
     "bump-version": "node ./scripts/bump-version/index.js",
-    "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=retail-react-app",
-    "bump-version:commerce-sdk-react": "node ./scripts/bump-version/index.js --package=commerce-sdk-react-preview",
+    "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
+    "bump-version:commerce-sdk-react": "node ./scripts/bump-version/index.js --package=@salesforce/commerce-sdk-react",
     "publish-to-npm": "node ./scripts/publish-to-npm.js",
     "format": "lerna run --stream format",
     "preinstall": "node ./scripts/check-version.js",

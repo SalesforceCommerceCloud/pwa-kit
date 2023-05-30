@@ -13,8 +13,8 @@ import {
     LockIcon,
     MastercardIcon,
     VisaIcon
-} from 'retail-react-app/app/components/icons'
-import Link from 'retail-react-app/app/components/link'
+} from '@salesforce/retail-react-app/app/components/icons'
+import Link from '@salesforce/retail-react-app/app/components/link'
 
 const CartCta = () => {
     return (

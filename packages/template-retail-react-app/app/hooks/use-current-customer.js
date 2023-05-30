@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useCustomer, useCustomerId, useCustomerType} from 'commerce-sdk-react-preview'
+import {useCustomer, useCustomerId, useCustomerType} from '@salesforce/commerce-sdk-react'
 
 /**
  * A hook that returns the current customer.

@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {AspectRatio, Box, Badge, Image} from '@chakra-ui/react'
 import {useItemVariant} from '.'
 import {FormattedMessage} from 'react-intl'
-import {findImageGroupBy} from 'retail-react-app/app/utils/image-groups-utils'
+import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 
 /**
  * In the context of a cart product item variant, this component renders the item's

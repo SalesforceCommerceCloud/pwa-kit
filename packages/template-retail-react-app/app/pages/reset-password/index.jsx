@@ -10,12 +10,15 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Container, Stack, Text} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {useShopperCustomersMutation, ShopperCustomersMutations} from 'commerce-sdk-react-preview'
-import Seo from 'retail-react-app/app/components/seo'
-import ResetPasswordForm from 'retail-react-app/app/components/reset-password'
-import {BrandLogo} from 'retail-react-app/app/components/icons'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import useEinstein from 'retail-react-app/app/hooks/use-einstein'
+import {
+    useShopperCustomersMutation,
+    ShopperCustomersMutations
+} from '@salesforce/commerce-sdk-react'
+import Seo from '@salesforce/retail-react-app/app/components/seo'
+import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
+import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useLocation} from 'react-router-dom'
 
 const ResetPassword = () => {
