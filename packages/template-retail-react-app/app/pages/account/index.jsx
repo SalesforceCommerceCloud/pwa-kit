@@ -25,7 +25,11 @@ import {
 } from '@chakra-ui/react'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {
+    ChevronDownIcon,
+    ChevronUpIcon,
+    SignoutIcon
+} from '@salesforce/retail-react-app/app/components/icons'
 import AccountDetail from '@salesforce/retail-react-app/app/pages/account/profile'
 import AccountAddresses from '@salesforce/retail-react-app/app/pages/account/addresses'
 import AccountOrders from '@salesforce/retail-react-app/app/pages/account/orders'

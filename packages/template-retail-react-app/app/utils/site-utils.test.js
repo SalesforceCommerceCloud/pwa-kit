@@ -5,11 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getDefaultSite, getSites, resolveSiteFromUrl} from '@salesforce/retail-react-app/app/utils/site-utils'
+import {
+    getDefaultSite,
+    getSites,
+    resolveSiteFromUrl
+} from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {getParamsFromPath, resolveLocaleFromUrl} from '@salesforce/retail-react-app/app/utils/site-utils'
+import {
+    getParamsFromPath,
+    resolveLocaleFromUrl
+} from '@salesforce/retail-react-app/app/utils/site-utils'
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     const origin = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
     return {

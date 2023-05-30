@@ -9,9 +9,15 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {
+    renderWithProviders,
+    createPathWithDefaults
+} from '@salesforce/retail-react-app/app/utils/test-utils'
 import Confirmation from '@salesforce/retail-react-app/app/pages/checkout/confirmation'
-import {mockOrder, mockProducts} from '@salesforce/retail-react-app/app/pages/checkout/confirmation.mock'
+import {
+    mockOrder,
+    mockProducts
+} from '@salesforce/retail-react-app/app/pages/checkout/confirmation.mock'
 
 const MockedComponent = () => {
     return (

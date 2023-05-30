@@ -61,7 +61,12 @@ import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list
 import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 // Hooks
-import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '@salesforce/retail-react-app/app/hooks'
+import {
+    useLimitUrls,
+    usePageUrls,
+    useSortUrls,
+    useSearchParams
+} from '@salesforce/retail-react-app/app/hooks'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 // import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'

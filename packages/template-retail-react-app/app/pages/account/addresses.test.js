@@ -6,7 +6,10 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import {createPathWithDefaults, renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {
+    createPathWithDefaults,
+    renderWithProviders
+} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
 import AccountAddresses from '@salesforce/retail-react-app/app/pages/account/addresses'
 import {

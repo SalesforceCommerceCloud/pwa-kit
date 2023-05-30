@@ -8,7 +8,10 @@ import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {
+    renderWithProviders,
+    createPathWithDefaults
+} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     mockCustomerBaskets,
     mockOrderHistory,

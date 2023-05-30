@@ -13,7 +13,10 @@ import 'focus-visible/dist/focus-visible'
 
 import theme from '@salesforce/retail-react-app/app/theme'
 import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
-import {resolveSiteFromUrl, resolveLocaleFromUrl} from '@salesforce/retail-react-app/app/utils/site-utils'
+import {
+    resolveSiteFromUrl,
+    resolveLocaleFromUrl
+} from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 

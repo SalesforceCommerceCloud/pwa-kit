@@ -5,7 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, createPathWithDefaults} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {
+    renderWithProviders,
+    createPathWithDefaults
+} from '@salesforce/retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {screen, waitFor, within} from '@testing-library/react'
 import SearchInput from '@salesforce/retail-react-app/app/components/search/index'

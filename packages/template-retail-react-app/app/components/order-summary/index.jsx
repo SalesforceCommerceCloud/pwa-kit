@@ -8,7 +8,11 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Box, Flex, Button, Stack, Text, Heading, Divider} from '@chakra-ui/react'
-import {BasketIcon, ChevronDownIcon, ChevronUpIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {
+    BasketIcon,
+    ChevronDownIcon,
+    ChevronUpIcon
+} from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'

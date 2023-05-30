@@ -13,7 +13,10 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import {getPaymentInstrumentCardType, getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
+import {
+    getPaymentInstrumentCardType,
+    getCreditCardIcon
+} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {
     ToggleCard,
     ToggleCardEdit,

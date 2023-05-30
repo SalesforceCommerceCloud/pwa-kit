@@ -14,7 +14,10 @@ import {IntlProvider} from 'react-intl'
 
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
-import {DEFAULT_LOCALE, renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {
+    DEFAULT_LOCALE,
+    renderWithProviders
+} from '@salesforce/retail-react-app/app/utils/test-utils'
 import messages from '@salesforce/retail-react-app/translations/compiled/en-GB.json'
 import {rest} from 'msw'
 

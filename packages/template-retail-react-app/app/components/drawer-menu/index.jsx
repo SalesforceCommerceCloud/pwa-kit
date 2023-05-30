@@ -43,7 +43,12 @@ import {
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 // Icons
-import {BrandLogo, LocationIcon, SignoutIcon, UserIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {
+    BrandLogo,
+    LocationIcon,
+    SignoutIcon,
+    UserIcon
+} from '@salesforce/retail-react-app/app/components/icons'
 
 // Others
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
