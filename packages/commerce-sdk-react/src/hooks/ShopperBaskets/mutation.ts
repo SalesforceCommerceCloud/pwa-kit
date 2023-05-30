@@ -64,10 +64,6 @@ using a POST to resource /orders, or it is deleted using a DELETE to resource
 Custom properties in the form c_\<CUSTOM_NAME\> are supported. A custom property must correspond to a custom
 attribute (\<CUSTOM_NAME\>) defined for the basket system object, and its value must be valid for that custom
 attribute.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `createBasket` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=createBasket| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#createbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     CreateBasket: 'createBasket',
     /**
@@ -79,10 +75,6 @@ If the current shopper has an active basket, and the `overrideExisting` request 
 - Keep the current shopper's active basket.
 - Merge the previous and current shoppers' baskets by calling the `baskets/merge` endpoint.
 - Force the transfer by calling the `baskets/transfer` endpoint again, with the parameter `overrideExisting=true`. Forcing the transfer deletes the current shopper's active basket.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `transferBasket` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=transferBasket| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#transferbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     TransferBasket: 'transferBasket',
     /**
@@ -113,95 +105,55 @@ If the current shopper doesn't have an active basket, and the createDestinationB
 - Transfer the previous shopper's active basket to the current logged-in shopper by calling the `baskets/transfer` endpoint.
 - Force the merge by calling the `baskets/merge` endpoint again, with the parameter `createDestinationBasket=true`. Forcing the merge creates a new basket for the current shopper and copies information from the previous shopper's basket into it. Because the merge doesn't copy all basket data, a forced merge is not the same as a transfer. For example, the new basket doesn't contain any Personally Identifiable Information (PII) from the previous basket.
 
-### before merge
+Before merge
 | Previous Shopper's Basket, SKU: Quantity, Custom Attributes | Current Shopper's Basket, SKU: Quantity, Custom Attributes  |
 |-------------------------------------------------------------|-------------------------------------------------------------|
 | SKU_A: 5\<br\> SKU_B: 3\<br\> SKU_C: 4\<br\> c_customAttr_1: 'ABC' \<br\> c_customAttr_2: 'DEF'   | SKU_A: 2\<br\> SKU_D: 6\<br\> SKU_E: 7\<br\> c_customAttr_1: 'UVW' \<br\> c_customAttr_3: 'XYZ'   |
 
-### after merge - (previous shopper's basket is deleted)
+After merge - (previous shopper's basket is deleted)
 | productItemMergeMode | Current Shopper's Basket - SKU: Quantity, Custom Attributes  |
 |----------------------|--------------------------------------------------------------|
 | sum_quantities         | SKU_A: 7\<br\> SKU_B: 3\<br\> SKU_C: 4\<br\> SKU_D: 6\<br\> SKU_E: 7\<br\> c_customAttr_1: 'UVW' \<br\> c_customAttr_2: 'DEF' \<br\> c_customAttr_3: 'XYZ'              |
 | higher_quantity      | SKU_A: 5\<br\> SKU_B: 3\<br\> SKU_C: 4\<br\> SKU_D: 6\<br\> SKU_E: 7\<br\> c_customAttr_1: 'UVW' \<br\> c_customAttr_2: 'DEF' \<br\> c_customAttr_3: 'XYZ'              |
 | saved_quantity       | SKU_A: 2\<br\> SKU_B: 3\<br\> SKU_C: 4\<br\> SKU_D: 6\<br\> SKU_E: 7\<br\> c_customAttr_1: 'UVW' \<br\> c_customAttr_2: 'DEF' \<br\> c_customAttr_3: 'XYZ'              |
 | separate_item        | SKU_A: 5\<br\> SKU_B: 3\<br\> SKU_C: 4\<br\> SKU_A: 2\<br\> SKU_D: 6\<br\> SKU_E: 7\<br\> c_customAttr_1: 'UVW' \<br\> c_customAttr_2: 'DEF' \<br\> c_customAttr_3: 'XYZ' |
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `mergeBasket` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=mergeBasket| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#mergebasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     MergeBasket: 'mergeBasket',
     /**
      * Removes a basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `deleteBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=deleteBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#deletebasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     DeleteBasket: 'deleteBasket',
     /**
    * Updates a basket. Only the currency of the basket, source code, the custom
 properties of the basket, and the shipping items will be considered.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `updateBasket` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateBasket| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatebasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     UpdateBasket: 'updateBasket',
     /**
      * Sets the billing address of a basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `updateBillingAddressForBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateBillingAddressForBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatebillingaddressforbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     UpdateBillingAddressForBasket: 'updateBillingAddressForBasket',
     /**
      * Adds a coupon to an existing basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `addCouponToBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addCouponToBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addcoupontobasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     AddCouponToBasket: 'addCouponToBasket',
     /**
      * Removes a coupon from the basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `removeCouponFromBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeCouponFromBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removecouponfrombasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     RemoveCouponFromBasket: 'removeCouponFromBasket',
     /**
      * Sets customer information for an existing basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `updateCustomerForBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateCustomerForBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatecustomerforbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     UpdateCustomerForBasket: 'updateCustomerForBasket',
     /**
      * Adds a gift certificate item to an existing basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `addGiftCertificateItemToBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addGiftCertificateItemToBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addgiftcertificateitemtobasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     AddGiftCertificateItemToBasket: 'addGiftCertificateItemToBasket',
     /**
      * Deletes a gift certificate item from an existing basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `removeGiftCertificateItemFromBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeGiftCertificateItemFromBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removegiftcertificateitemfrombasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     RemoveGiftCertificateItemFromBasket: 'removeGiftCertificateItemFromBasket',
     /**
      * Updates a gift certificate item of an existing basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `updateGiftCertificateItemInBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateGiftCertificateItemInBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updategiftcertificateiteminbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     UpdateGiftCertificateItemInBasket: 'updateGiftCertificateItemInBasket',
     /**
@@ -231,18 +183,10 @@ InvalidProductOptionValueItemException.
 - custom properties in the form c_\<CUSTOM_NAME\>: the custom property must correspond to a custom
 attribute (\<CUSTOM_NAME\>) defined for ProductLineItem. The value of this property must be valid for the
 type of custom attribute defined for ProductLineItem.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `addItemToBasket` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addItemToBasket| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#additemtobasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     AddItemToBasket: 'addItemToBasket',
     /**
      * Removes a product item from the basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `removeItemFromBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeItemFromBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removeitemfrombasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     RemoveItemFromBasket: 'removeItemFromBasket',
     /**
@@ -272,50 +216,26 @@ value corresponding to the type defined for custom attribute
 \<CUSTOM_NAME\> of ProductLineItem. The purpose of this value is to
 add or change the value of a custom attribute defined for
 ProductLineItem.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `updateItemInBasket` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateItemInBasket| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateiteminbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     UpdateItemInBasket: 'updateItemInBasket',
     /**
      * This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for a specific taxable line item. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `addTaxesForBasketItem` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasketItem| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasketitem | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     AddTaxesForBasketItem: 'addTaxesForBasketItem',
     /**
      * Adds a payment instrument to a basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `addPaymentInstrumentToBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addPaymentInstrumentToBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addpaymentinstrumenttobasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     AddPaymentInstrumentToBasket: 'addPaymentInstrumentToBasket',
     /**
      * Removes a payment instrument of a basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `removePaymentInstrumentFromBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removePaymentInstrumentFromBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removepaymentinstrumentfrombasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     RemovePaymentInstrumentFromBasket: 'removePaymentInstrumentFromBasket',
     /**
      * Updates payment instrument of an existing basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `updatePaymentInstrumentInBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updatePaymentInstrumentInBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updatepaymentinstrumentinbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     UpdatePaymentInstrumentInBasket: 'updatePaymentInstrumentInBasket',
     /**
      * This method allows you to put an array of priceBookIds to an existing basket, which will be used for basket calculation.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `addPriceBooksToBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addPriceBooksToBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addpricebookstobasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     AddPriceBooksToBasket: 'addPriceBooksToBasket',
     /**
@@ -331,20 +251,12 @@ the body are the following properties if specified:
 - gift boolean flag
 - gift message
 - custom properties
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `createShipmentForBasket` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=createShipmentForBasket| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#createshipmentforbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     CreateShipmentForBasket: 'createShipmentForBasket',
     /**
    * Removes a specified shipment and all associated product, gift certificate,
 shipping, and price adjustment line items from a basket.
 It is not allowed to remove the default shipment.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `removeShipmentFromBasket` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=removeShipmentFromBasket| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#removeshipmentfrombasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     RemoveShipmentFromBasket: 'removeShipmentFromBasket',
     /**
@@ -359,34 +271,18 @@ the body are the following properties if specified:
 - gift boolean flag
 - gift message
 - custom properties
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `updateShipmentForBasket` endpoint.
-   * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateShipmentForBasket| Salesforce Developer Center} for more information about the API endpoint.
-   * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateshipmentforbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-   * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
    */
     UpdateShipmentForBasket: 'updateShipmentForBasket',
     /**
      * Sets a shipping address of a specific shipment of a basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `updateShippingAddressForShipment` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateShippingAddressForShipment| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateshippingaddressforshipment | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     UpdateShippingAddressForShipment: 'updateShippingAddressForShipment',
     /**
      * Sets a shipping method to a specific shipment of a basket.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `updateShippingMethodForShipment` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=updateShippingMethodForShipment| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#updateshippingmethodforshipment | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     UpdateShippingMethodForShipment: 'updateShippingMethodForShipment',
     /**
      * This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for all taxable line items. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Baskets `addTaxesForBasket` endpoint.
-     * @see {@link https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=addTaxesForBasket| Salesforce Developer Center} for more information about the API endpoint.
-     * @see {@link https://salesforcecommercecloud.github.io/commerce-sdk-isomorphic/classes/shopperbaskets.shopperbaskets-1.html#addtaxesforbasket | `commerce-sdk-isomorphic` documentation} for more information on the parameters and returned data type.
-     * @see {@link https://tanstack.com/query/latest/docs/react/reference/useMutation | TanStack Query `useMutation` reference} for more information about the return value.
      */
     AddTaxesForBasket: 'addTaxesForBasket'
 } as const

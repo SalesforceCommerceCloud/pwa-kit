@@ -15,6 +15,11 @@ import Auth from '../auth'
 import {Argument, CacheUpdate} from './types'
 import {updateCache} from './utils'
 
+/**
+ * @group Helpers
+ * @category Shopper Authentication
+ * @enum
+ */
 export const AuthHelpers = {
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
