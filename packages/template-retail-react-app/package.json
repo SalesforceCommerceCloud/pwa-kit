@@ -4,7 +4,9 @@
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
-    "extendable": ["retail-react-app"]
+    "extendable": [
+      "retail-react-app"
+    ]
   },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",

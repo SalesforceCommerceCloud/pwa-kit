@@ -14,7 +14,8 @@
     "lint:fix": "lerna run lint:fix",
     "pretest": "npm run lint",
     "test": "lerna run --stream --concurrency=1 test",
-    "test:max-file-size": "lerna run --stream test:max-file-size"
+    "test:max-file-size": "lerna run --stream test:max-file-size",
+    "check-dep-version": "syncpack list-mismatches"
   },
   "devDependencies": {
     "commander": "^2.20.3",
