@@ -15,6 +15,8 @@ type Client = ApiClients['shopperOrders']
 
 /**
  * Gets information for an order.
+ * @group ShopperOrders
+ * @category Query Hooks
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Orders `getOrder` endpoint.
@@ -49,6 +51,8 @@ export const useOrder = (
 }
 /**
  * Gets the applicable payment methods for an existing order considering the open payment amount only.
+ * @group ShopperOrders
+ * @category Query Hooks
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Orders `getPaymentMethodsForOrder` endpoint.
@@ -84,7 +88,9 @@ export const usePaymentMethodsForOrder = (
 /**
  * This method gives you the external taxation data of the order transferred from the basket during 
 order creation. This endpoint can be called only if external taxation was used. See POST /baskets 
-for more information.         
+for more information.     
+ * @group ShopperOrders
+ * @category Query Hooks    
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Orders `getTaxesFromOrder` endpoint.

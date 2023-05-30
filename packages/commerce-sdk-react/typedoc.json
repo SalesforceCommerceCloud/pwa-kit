@@ -2,5 +2,10 @@
   "out": "docs",
   "entryPoints": [
     "src/index.ts"
-  ]
+  ],
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+},
+  "categorizeByGroup": true
 }

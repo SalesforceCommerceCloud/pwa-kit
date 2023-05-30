@@ -13,7 +13,11 @@ import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['shopperCustomers']
 
-/** Mutations available for Shopper Customers. */
+/* 
+ * Mutations available for Shopper Customers.
+ * 
+ * @enum
+*/
 export const ShopperCustomersMutations = {
     /**
      * Registers a new customer. The mandatory data are the credentials, profile last name, and email. This requires a JSON Web Token (JWT) which needs to be obtained using the POST /customers/auth API with type \"guest\".
