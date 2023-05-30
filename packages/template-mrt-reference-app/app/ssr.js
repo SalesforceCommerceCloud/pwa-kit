@@ -133,7 +133,8 @@ const jsonFromRequest = (req) => {
         body: req.body,
         headers: redactAndSortObjectKeys(req.headers),
         ip: req.ip,
-        env: filterAndSortObjectKeys(process.env, ENVS_TO_EXPOSE)
+        env: filterAndSortObjectKeys(process.env, ENVS_TO_EXPOSE),
+        timestamp: new Date().toISOString()
     }
 }
 
@@ -165,6 +166,14 @@ const tlsVersionTest = async (_, res) => {
         .catch(() => false)
     res.header('Content-Type', 'application/json')
     res.send(JSON.stringify({'tls1.1': response11, 'tls1.2': response12}, null, 4))
+}
+
+/**
+ * Express handler that enables the cache and returns a JSON response with diagnostic values.
+ */
+const cacheTest = async (req, res) => {
+    res.set('Cache-Control', 's-maxage=60')
+    res.json(jsonFromRequest(req))
 }
 
 /**
@@ -222,6 +231,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     // Configure routes
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
+    app.get('/cache', cacheTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
