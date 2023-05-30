@@ -306,7 +306,7 @@ const withChunking = (config) => {
                                 return false
                             }
                             return module?.context?.match?.(
-                                makeRegExp(`(node_modules)|(packages/.*/dist))`)
+                                makeRegExp(`(node_modules)|(packages/.*/dist)`)
                             )
                         },
                         name: 'vendor',
