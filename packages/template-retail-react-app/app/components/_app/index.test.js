@@ -12,7 +12,7 @@ import App from 'retail-react-app/app/components/_app/index.jsx'
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import {DEFAULT_LOCALE} from 'retail-react-app/app/utils/test-utils'
 import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
-import messages from 'retail-react-app/app/translations/compiled/en-GB.json'
+import messages from 'retail-react-app/translations/compiled/en-GB.json'
 import mockConfig from 'retail-react-app/config/mocks/default'
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 let windowSpy
