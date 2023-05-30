@@ -29,11 +29,11 @@ import {
 } from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 
-import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
-import Link from 'retail-react-app/app/components/link'
-import Search from 'retail-react-app/app/components/search'
-import withRegistration from 'retail-react-app/app/components/with-registration'
+import Link from '@salesforce/retail-react-app/app/components/link'
+import Search from '@salesforce/retail-react-app/app/components/search'
+import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {
     AccountIcon,
     BrandLogo,
@@ -42,12 +42,12 @@ import {
     ChevronDownIcon,
     HeartIcon,
     SignoutIcon
-} from 'retail-react-app/app/components/icons'
+} from '@salesforce/retail-react-app/app/components/icons'
 
-import {navLinks, messages} from 'retail-react-app/app/pages/account/constant'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
-import {isHydrated, noop} from 'retail-react-app/app/utils/utils'
+import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account/constant'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 const ENTER_KEY = 'Enter'
 

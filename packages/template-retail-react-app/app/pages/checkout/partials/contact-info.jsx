@@ -23,18 +23,18 @@ import {
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from 'retail-react-app/app/pages/checkout/util/checkout-context'
-import useLoginFields from 'retail-react-app/app/components/forms/useLoginFields'
+import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
-} from 'retail-react-app/app/components/toggle-card'
-import Field from 'retail-react-app/app/components/field'
-import {AuthModal, useAuthModal} from 'retail-react-app/app/hooks/use-auth-modal'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
-import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+} from '@salesforce/retail-react-app/app/components/toggle-card'
+import Field from '@salesforce/retail-react-app/app/components/field'
+import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 const ContactInfo = () => {

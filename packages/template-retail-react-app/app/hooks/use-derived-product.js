@@ -6,10 +6,10 @@
  */
 
 import {useEffect, useState} from 'react'
-import {useVariant} from 'retail-react-app/app/hooks/use-variant'
+import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useIntl} from 'react-intl'
-import {useVariationParams} from 'retail-react-app/app/hooks/use-variation-params'
-import {useVariationAttributes} from 'retail-react-app/app/hooks/use-variation-attributes'
+import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
+import {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
 
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'

@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
-import Error from 'retail-react-app/app/components/_error/index'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import Error from '@salesforce/retail-react-app/app/components/_error/index'
 
 test('Error renders without errors', () => {
     expect(renderWithProviders(<Error />)).toBeDefined()

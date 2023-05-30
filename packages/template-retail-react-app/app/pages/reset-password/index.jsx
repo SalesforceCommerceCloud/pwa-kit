@@ -14,11 +14,11 @@ import {
     useShopperCustomersMutation,
     ShopperCustomersMutations
 } from '@salesforce/commerce-sdk-react'
-import Seo from 'retail-react-app/app/components/seo'
-import ResetPasswordForm from 'retail-react-app/app/components/reset-password'
-import {BrandLogo} from 'retail-react-app/app/components/icons'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import useEinstein from 'retail-react-app/app/hooks/use-einstein'
+import Seo from '@salesforce/retail-react-app/app/components/seo'
+import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
+import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useLocation} from 'react-router-dom'
 
 const ResetPassword = () => {

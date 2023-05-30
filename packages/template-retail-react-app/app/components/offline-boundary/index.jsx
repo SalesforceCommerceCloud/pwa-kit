@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
 import {Button} from '@chakra-ui/react'
-import {AlertIcon} from 'retail-react-app/app/components/icons'
+import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 // import Button from '@salesforce/pwa-kit-react-sdk/components/button'
 // import Icon from '@salesforce/pwa-kit-react-sdk/components/icon'

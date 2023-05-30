@@ -7,12 +7,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import ProductViewModal from 'retail-react-app/app/components/product-view-modal/index'
-import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/index'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {fireEvent, screen} from '@testing-library/react'
 import {useDisclosure} from '@chakra-ui/react'
-import mockProductDetail from 'retail-react-app/app/mocks/variant-750518699578M'
-import {prependHandlersToServer} from 'retail-react-app/jest-setup'
+import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
+import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
 
 const MockComponent = ({updateCart}) => {
     const {isOpen, onOpen, onClose} = useDisclosure()

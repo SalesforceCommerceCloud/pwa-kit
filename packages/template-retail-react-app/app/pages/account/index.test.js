@@ -8,16 +8,16 @@ import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults} from 'retail-react-app/app/utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     mockOrderHistory,
     mockedGuestCustomer,
     mockedRegisteredCustomer,
     mockOrderProducts
-} from 'retail-react-app/app/mocks/mock-data'
-import Account from 'retail-react-app/app/pages/account/index'
-import Login from 'retail-react-app/app/pages/login'
-import mockConfig from 'retail-react-app/config/mocks/default'
+} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import Account from '@salesforce/retail-react-app/app/pages/account/index'
+import Login from '@salesforce/retail-react-app/app/pages/login'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 const MockedComponent = () => {
     return (

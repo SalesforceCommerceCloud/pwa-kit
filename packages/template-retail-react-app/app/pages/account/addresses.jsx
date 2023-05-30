@@ -22,20 +22,20 @@ import {
     Stack,
     Text
 } from '@chakra-ui/react'
-import FormActionButtons from 'retail-react-app/app/components/forms/form-action-buttons'
+import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
 import {useForm} from 'react-hook-form'
-import {useToast} from 'retail-react-app/app/hooks/use-toast'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
-import LoadingSpinner from 'retail-react-app/app/components/loading-spinner'
-import {LocationIcon, PlusIcon} from 'retail-react-app/app/components/icons'
-import ActionCard from 'retail-react-app/app/components/action-card'
-import AddressFields from 'retail-react-app/app/components/forms/address-fields'
-import AddressDisplay from 'retail-react-app/app/components/address-display'
-import PageActionPlaceHolder from 'retail-react-app/app/components/page-action-placeholder'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {LocationIcon, PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
+import ActionCard from '@salesforce/retail-react-app/app/components/action-card'
+import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
+import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
+import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {nanoid} from 'nanoid'
-import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 const DEFAULT_SKELETON_COUNT = 3
 

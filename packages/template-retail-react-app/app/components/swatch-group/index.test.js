@@ -7,9 +7,9 @@
 import React from 'react'
 import {screen, render, fireEvent, waitFor} from '@testing-library/react'
 import {Router, useHistory, useLocation} from 'react-router-dom'
-import SwatchGroup from 'retail-react-app/app/components/swatch-group/index'
+import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group/index'
 import {Box} from '@chakra-ui/react'
-import Swatch from 'retail-react-app/app/components/swatch-group/swatch'
+import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import {createMemoryHistory} from 'history'
 
 const data = {

@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useCustomerBaskets} from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
-import {isServer} from 'retail-react-app/app/utils/utils'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
  * This hook combine some commerce-react-sdk hooks to provide more derived data for Retail App baskets

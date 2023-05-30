@@ -11,9 +11,9 @@ import {
     determineTargetLocale,
     fetchTranslations,
     getTargetLocale
-} from 'retail-react-app/app/utils/locale'
+} from '@salesforce/retail-react-app/app/utils/locale'
 
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from 'retail-react-app/app/utils/test-utils'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
 const isMultiLocales = supportedLocales.length > 1

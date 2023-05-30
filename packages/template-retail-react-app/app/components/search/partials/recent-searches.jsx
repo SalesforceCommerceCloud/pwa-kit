@@ -8,11 +8,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Text, Button, Box} from '@chakra-ui/react'
 
-import {clearSessionJSONItem} from 'retail-react-app/app/utils/utils'
-import {RECENT_SEARCH_KEY} from 'retail-react-app/app/constants'
+import {clearSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
+import {RECENT_SEARCH_KEY} from '@salesforce/retail-react-app/app/constants'
 
 import {FormattedMessage} from 'react-intl'
-import {searchUrlBuilder} from 'retail-react-app/app/utils/url'
+import {searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 
 const RecentSearches = ({recentSearches, closeAndNavigate}) => {
     const clearSearches = () => {

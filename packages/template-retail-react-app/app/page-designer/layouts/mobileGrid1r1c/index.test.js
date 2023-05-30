@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, withPageProvider} from 'retail-react-app/app/utils/test-utils'
-import MobileGrid1r1c from 'retail-react-app/app/page-designer/layouts/mobileGrid1r1c/index'
+import {renderWithProviders, withPageProvider} from '@salesforce/retail-react-app/app/utils/test-utils'
+import MobileGrid1r1c from '@salesforce/retail-react-app/app/page-designer/layouts/mobileGrid1r1c/index'
 
 test('MobileGrid1r1c renders without errors', () => {
     const MobileGrid1r1cWithPageProvider = withPageProvider(MobileGrid1r1c)

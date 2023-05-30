@@ -8,7 +8,7 @@
 import React from 'react'
 import {Box, SimpleGrid, HStack, Text, Button, Center, useMultiStyleConfig} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import {cssColorGroups} from 'retail-react-app/app/constants'
+import {cssColorGroups} from '@salesforce/retail-react-app/app/constants'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const styles = useMultiStyleConfig('SwatchGroup', {

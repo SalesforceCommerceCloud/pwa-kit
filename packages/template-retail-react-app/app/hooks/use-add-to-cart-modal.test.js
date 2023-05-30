@@ -8,11 +8,11 @@ import React from 'react'
 import {
     AddToCartModal,
     AddToCartModalContext
-} from 'retail-react-app/app/hooks/use-add-to-cart-modal'
-import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {screen} from '@testing-library/react'
 import {rest} from 'msw'
-import {mockCustomerBaskets} from 'retail-react-app/app/mocks/mock-data'
+import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
