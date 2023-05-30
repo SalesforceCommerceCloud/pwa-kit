@@ -4,7 +4,9 @@
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
-    "extendable": ["retail-react-app"]
+    "extendable": [
+      "retail-react-app"
+    ]
   },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
@@ -51,7 +53,7 @@
     "base64-arraybuffer": "^0.2.0",
     "bundlesize2": "^0.0.31",
     "card-validator": "^8.1.1",
-    "@salesforce/commerce-sdk-react": "3.0.0-dev",
+    "@salesforce/commerce-sdk-react": "1.0.0-dev",
     "cross-env": "^5.2.1",
     "focus-visible": "^5.2.0",
     "framer-motion": "^10.12.9",
