@@ -18,7 +18,7 @@ module.exports = {
                     ? {}
                     : // Otherwise, assumes that the current working directory is the monorepo
                       {rootDir: 'packages/template-retail-react-app/'}),
-                prefix: 'retail-react-app'
+                prefix: '@salesforce/retail-react-app'
             }
         ]
     }
