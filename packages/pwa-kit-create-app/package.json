@@ -28,7 +28,8 @@
   "dependencies": {
     "commander": "^9.5.0",
     "deepmerge": "2.2.1",
-    "inquirer": "7.3.3",
+    "handlebars": "^4.7.7",
+    "inquirer": "8.2.5",
     "semver": "^7.3.8",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
