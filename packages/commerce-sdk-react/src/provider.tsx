@@ -53,6 +53,31 @@ export const AuthContext = React.createContext({} as Auth)
  *
  * @group Components
  * 
+ * @example
+ * ```js
+    import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
+
+
+    const App = ({children}) => {
+        return (
+                <CommerceApiProvider
+                    clientId="12345678-1234-1234-1234-123412341234"
+                    organizationId="f_ecom_aaaa_001"
+                    proxy="localhost:3000/mobify/proxy/api"
+                    redirectURI="localhost:3000/callback"
+                    siteId="RefArch"
+                    shortCode="12345678"
+                    locale="en-US"
+                    currency="USD"
+                >
+                    {children}
+                </CommerceApiProvider>
+        )
+    } 
+
+    export default App
+ * ```
+ * 
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
