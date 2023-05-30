@@ -309,6 +309,12 @@ const withChunking = (config) => {
                         },
                         name: 'vendor',
                         chunks: 'all'
+                    },
+                    translations: {
+                        priority: 10,
+                        test: (module) => module?.context?.match?.(/app\/translations\/compiled/),
+                        name: 'translations',
+                        chunks: 'all'
                     }
                 }
             }
