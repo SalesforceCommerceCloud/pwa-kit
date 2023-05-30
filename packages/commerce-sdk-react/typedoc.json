@@ -7,5 +7,6 @@
     "includeCategories": true,
     "includeGroups": true
 },
-  "categorizeByGroup": true
+  "categorizeByGroup": true,
+  "groupOrder": ["Components", "Helpers", "ShopperBaskets", "ShopperContexts", "ShopperCustomers", "ShopperExperience", "ShopperGiftCertificates", "ShopperLogin", "ShopperOrders", "ShopperProducts", "ShopperPromotions", "ShopperSearch"]
 }
