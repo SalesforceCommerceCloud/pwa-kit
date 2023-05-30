@@ -9,9 +9,9 @@ import userEvent from '@testing-library/user-event'
 import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import mockConfig from 'retail-react-app/config/mocks/default'
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     return {
         getConfig: jest.fn()
     }

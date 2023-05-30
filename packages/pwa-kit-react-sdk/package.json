@@ -41,7 +41,7 @@
     "event-emitter": "^0.3.5",
     "hoist-non-react-statics": "^3.3.2",
     "prop-types": "^15.8.1",
-    "pwa-kit-runtime": "^3.0.0-dev",
+    "@salesforce/pwa-kit-runtime": "^3.0.0-dev",
     "react-ssr-prepass": "^1.5.0",
     "react-uid": "^2.3.2",
     "serialize-javascript": "^6.0.1",

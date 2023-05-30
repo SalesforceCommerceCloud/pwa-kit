@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@salesforce/pwa-kit-dev": "3.0.0-dev",
-    "pwa-kit-runtime": "3.0.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.0.0-dev",
     "supertest": "^4.0.2"
   },
   "mobify": {

@@ -8,9 +8,9 @@ import React from 'react'
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import Link from 'retail-react-app/app/components/link/index'
 import mockConfig from 'retail-react-app/config/mocks/default'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const originalLocation = window.location
-jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     return {
         getConfig: jest.fn()
     }

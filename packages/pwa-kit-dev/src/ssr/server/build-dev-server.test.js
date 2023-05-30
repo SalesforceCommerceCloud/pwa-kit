@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {NO_CACHE} from 'pwa-kit-runtime/ssr/server/constants'
-import {X_MOBIFY_REQUEST_CLASS, X_PROXY_REQUEST_URL} from 'pwa-kit-runtime/utils/ssr-proxying'
+import {NO_CACHE} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
+import {X_MOBIFY_REQUEST_CLASS, X_PROXY_REQUEST_URL} from '@salesforce/pwa-kit-runtime/utils/ssr-proxying'
 import {
     getResponseFromCache,
     sendCachedResponse,
     cacheResponseWhenDone
-} from 'pwa-kit-runtime/ssr/server/express'
+} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import fetch from 'node-fetch'
 import request from 'supertest'
 import {makeErrorHandler, DevServerFactory, setLocalAssetHeaders} from './build-dev-server'
