@@ -118,7 +118,7 @@ const entryPointExists = (segments) => {
 }
 
 const getAppEntryPoint = () => {
-    return EXT_OVERRIDES_DIR + '/app/main'
+    return EXT_OVERRIDES_DIR + `${path.sep}app${path.sep}main`
 }
 
 const findDepInStack = (pkg) => {
@@ -290,7 +290,7 @@ const withChunking = (config) => {
             splitChunks: {
                 cacheGroups: {
                     vendor: {
-                        // Two scenarios that we'd like to chunk vendor.js:
+                        // Three scenarios that we'd like to chunk vendor.js:
                         // 1. The package is in node_modules
                         // 2. The package is one of the monorepo packages.
                         //    This is for local development to ensure the bundle
@@ -305,14 +305,17 @@ const withChunking = (config) => {
                             ) {
                                 return false
                             }
-                            return module?.context?.match?.(/(node_modules)|(packages\/.*\/dist)/)
+                            return module?.context?.match?.(
+                                makeRegExp(`(node_modules)|(packages/.*/dist))`)
+                            )
                         },
                         name: 'vendor',
                         chunks: 'all'
                     },
                     translations: {
                         priority: 10,
-                        test: (module) => module?.context?.match?.(/app\/translations\/compiled/),
+                        test: (module) =>
+                            module?.context?.match?.(makeRegExp(`/app/translations/compiled`)),
                         name: 'translations',
                         chunks: 'all'
                     }
@@ -425,8 +428,8 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', `.${EXT_OVERRIDES_DIR}/app/loader.js`),
-                ...optional('worker', `./worker/main.js`),
+                ...optional('loader', resolve(projectDir, EXT_OVERRIDES_DIR, 'app', 'loader.js')),
+                ...optional('worker', resolve(projectDir, 'worker', 'main.js')),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
@@ -468,9 +471,9 @@ const renderer =
                         patterns: [
                             {
                                 from: `${
-                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
-                                }app/static`,
-                                to: 'static/'
+                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + path.sep : ''
+                                }app${path.sep}static`,
+                                to: `static${path.sep}`
                             }
                         ]
                     }),
@@ -487,9 +490,9 @@ const renderer =
                         patterns: [
                             {
                                 from: `${
-                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
-                                }app/static`,
-                                to: 'static/',
+                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + path.sep : ''
+                                }app${path.sep}static`,
+                                to: `static${path.sep}`,
                                 noErrorOnMissing: true
                             }
                         ]
@@ -510,7 +513,7 @@ const ssr = (() => {
                     ...config,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    entry: `.${EXT_OVERRIDES_DIR}/app/ssr.js`,
+                    entry: `.${EXT_OVERRIDES_DIR}${path.sep}app${path.sep}ssr.js`,
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
@@ -523,9 +526,11 @@ const ssr = (() => {
                             patterns: [
                                 {
                                     from: `${
-                                        EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
-                                    }app/static`,
-                                    to: 'static/'
+                                        EXT_OVERRIDES_DIR
+                                            ? EXT_OVERRIDES_DIR_NO_SLASH + path.sep
+                                            : ''
+                                    }app${path.sep}static`,
+                                    to: `static${path.sep}`
                                 }
                             ]
                         }),
@@ -547,7 +552,7 @@ const requestProcessor =
                 ...config,
                 name: REQUEST_PROCESSOR,
                 // entry: './app/request-processor.js',
-                entry: `.${EXT_OVERRIDES_DIR}/app/request-processor.js`,
+                entry: `.${EXT_OVERRIDES_DIR}${path.sep}app${path.sep}request-processor.js`,
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',
