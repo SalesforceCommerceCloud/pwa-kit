@@ -51,7 +51,8 @@ export const AuthContext = React.createContext({} as Auth)
 /**
  * Initialize a set of Commerce API clients and make it available to all of descendant components
  *
- * @param props
+ * @group Components
+ * 
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {

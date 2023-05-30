@@ -14,6 +14,9 @@ const onClient = typeof window !== 'undefined'
  * Hook that returns the ecom user ID.
  *
  * This is sometimes used as the user ID for Einstein.
+ * 
+ * @group Helpers
+ * @category Shopper Authentication
  *
  */
 const useEncUserId = (): string | null => {

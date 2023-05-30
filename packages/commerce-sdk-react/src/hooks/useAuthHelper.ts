@@ -21,11 +21,18 @@ export const AuthHelpers = {
     Logout: 'logout',
     Register: 'register'
 } as const
-
+/**
+ * @group Helpers
+ * @category Shopper Authentication
+ *
+ */
 export type AuthHelper = (typeof AuthHelpers)[keyof typeof AuthHelpers]
 
 const noop = () => ({})
 
+/**
+ * @internal
+ */
 type CacheUpdateMatrix = {
     [Method in AuthHelper]?: (
         options: Argument<Auth[Method]> | void,
@@ -35,6 +42,8 @@ type CacheUpdateMatrix = {
 
 /**
  * A hook for Public Client OAuth helpers.
+ * 
+ * @remarks
  * The hook calls the SLAS helpers imported from commerce-sdk-isomorphic.
  * For more, see https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/#public-client-shopper-login-helpers
  *
@@ -43,6 +52,9 @@ type CacheUpdateMatrix = {
  * - loginGuestUser
  * - logout
  * - register
+ * 
+ * @group Helpers
+ * @category Shopper Authentication
  */
 export function useAuthHelper<Mutation extends AuthHelper>(
     mutation: Mutation

@@ -13,9 +13,10 @@ import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['shopperCustomers']
 
-/* 
+/**
  * Mutations available for Shopper Customers.
- * 
+ * @group ShopperCustomers
+ * @category Mutation Hooks
  * @enum
 */
 export const ShopperCustomersMutations = {
@@ -182,10 +183,19 @@ The value of this property must be valid for the type of custom attribute define
     UpdateCustomerProductListItem: 'updateCustomerProductListItem'
 } as const
 
-/** Mutation for Shopper Customers. */
+/**
+ * Mutation for Shopper Customers. 
+ * @group ShopperCustomers
+ * @category Mutation Hooks
+ */
 export type ShopperCustomersMutation =
     (typeof ShopperCustomersMutations)[keyof typeof ShopperCustomersMutations]
 
+/**
+ * Mutation hook for Shopper Customers.
+ * @group ShopperCustomers
+ * @category Mutation Hooks
+ */
 export function useShopperCustomersMutation<Mutation extends ShopperCustomersMutation>(
     mutation: Mutation
 ): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {

@@ -13,7 +13,12 @@ import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['shopperOrders']
 
-/** Mutations available for Shopper Orders. */
+/**
+ * Mutations available for Shopper Orders
+ * @group ShopperOrders
+ * @category Mutation Hooks
+ * @enum
+ */
 export const ShopperOrdersMutations = {
     /**
      * Submits an order based on a prepared basket. The only considered value from the request body is basketId.
@@ -60,10 +65,19 @@ paymentCard must be specified in the request.
     UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
 } as const
 
-/** Mutation for Shopper Orders. */
+/**
+ * Mutation for Shopper Orders.
+ * @group ShopperOrders
+ * @category Mutation Hooks
+ */
 export type ShopperOrdersMutation =
     (typeof ShopperOrdersMutations)[keyof typeof ShopperOrdersMutations]
 
+/**
+ * Mutation hook for Shopper Orders.
+ * @group ShopperOrders
+ * @category Mutation Hooks
+ */
 export function useShopperOrdersMutation<Mutation extends ShopperOrdersMutation>(
     mutation: Mutation
 ): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {

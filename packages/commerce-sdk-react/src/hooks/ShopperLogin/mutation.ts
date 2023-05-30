@@ -13,7 +13,12 @@ import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['shopperLogin']
 
-/** Mutations available for Shopper Login. */
+/**
+ * Mutations available for Shopper Login
+ * @group ShopperLogin
+ * @category Mutation Hooks
+ * @enum
+ */
 export const ShopperLoginMutations = {
     /**
      * Allows the customer to authenticate when their identity provider is down.
@@ -125,10 +130,19 @@ The value of the `_sfdc_client_auth` header must be a Base64-encoded string. The
     IntrospectToken: 'introspectToken'
 } as const
 
-/** Mutation for Shopper Login. */
+/**
+ * Mutation for Shopper Login.
+ * @group ShopperLogin
+ * @category Mutation Hooks 
+ */
 export type ShopperLoginMutation =
     (typeof ShopperLoginMutations)[keyof typeof ShopperLoginMutations]
 
+/**
+ * Mutation hook for Shopper Login.
+ * @group ShopperLogin
+ * @category Mutation Hooks
+ */
 export function useShopperLoginMutation<Mutation extends ShopperLoginMutation>(
     mutation: Mutation
 ): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {

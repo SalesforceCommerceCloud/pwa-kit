@@ -12,7 +12,12 @@ import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['shopperBaskets']
 
-/** Mutations available for Shopper Baskets. */
+/**
+ * Mutations available for Shopper Baskets.
+ * @group ShopperBaskets
+ * @category Mutation Hooks
+ * @enum
+ */
 export const ShopperBasketsMutations = {
     /**
    * Creates a new basket.
@@ -386,10 +391,19 @@ the body are the following properties if specified:
     AddTaxesForBasket: 'addTaxesForBasket'
 } as const
 
-/** Mutation for Shopper Baskets. */
+/**
+ * Type for Shopper Baskets Mutation.
+ * @group ShopperBaskets
+ * @category Mutation Hooks
+ */
 export type ShopperBasketsMutation =
     (typeof ShopperBasketsMutations)[keyof typeof ShopperBasketsMutations]
 
+/**
+ * Mutation hook for Shopper Baskets.
+ * @group ShopperBaskets
+ * @category Mutation Hooks
+ */
 export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutation>(
     mutation: Mutation
 ): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {

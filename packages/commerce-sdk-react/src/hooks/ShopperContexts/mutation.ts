@@ -13,7 +13,12 @@ import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['shopperContexts']
 
-/** Mutations available for Shopper Contexts. */
+/**
+ * Mutation for Shopper Contexts.
+ * @group ShopperContexts
+ * @category Mutation Hooks
+ * @enum
+ */
 export const ShopperContextsMutations = {
     /**
      * Creates the shopper's context based on shopperJWT.
@@ -41,10 +46,19 @@ export const ShopperContextsMutations = {
     UpdateShopperContext: 'updateShopperContext'
 } as const
 
-/** Mutation for Shopper Contexts. */
+/**
+ * Mutation for Shopper Contexts.
+ * @group ShopperContexts
+ * @category Mutation Hooks
+ */
 export type ShopperContextsMutation =
     (typeof ShopperContextsMutations)[keyof typeof ShopperContextsMutations]
 
+/**
+ * Mutation hook for Shopper Contexts.
+ * @group ShopperContexts
+ * @category Mutation Hooks
+ */
 export function useShopperContextsMutation<Mutation extends ShopperContextsMutation>(
     mutation: Mutation
 ): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {
