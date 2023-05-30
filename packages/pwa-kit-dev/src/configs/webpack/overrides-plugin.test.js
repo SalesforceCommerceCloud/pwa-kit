@@ -23,6 +23,21 @@ const options = {
     projectDir: PROJECT_DIR
 }
 
+const setupResolverAndCallback = (target, requestContext, msg, resolveContext) => {
+    const callback = jest.fn(() => null)
+    const resolver = {
+        ensureHook: jest.fn(() => null),
+        // we only care about calling the callback and the value of `requestContext`
+        doResolve: jest.fn((target, requestContext, msg, resolveContext, callback) => {
+            if (typeof callback === 'function') {
+                callback()
+            }
+            return null
+        })
+    }
+    return {callback, resolver}
+}
+
 describe('overrides plugin', () => {
     test('class constructor setup works', () => {
         const overridesResolver = new OverridesResolverPlugin(options)
@@ -31,25 +46,24 @@ describe('overrides plugin', () => {
         expect(overridesResolver.projectDir).toBe(PROJECT_DIR)
     })
     test('resolver doResolve() hook is called for files in overrides dir', () => {
+        const REQUEST_PATH = 'exists'
+        const REQUEST_EXTENSION = '.jsx'
         const testRequestContext = {
             _ResolverCachePluginCacheMiss: true,
             context: {
                 issuer: path.join(process.cwd(), 'fake-file.js')
             },
             path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
-            request: `${EXTENDS_TARGET}/exists`
+            request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}`
         }
-        const callback = jest.fn(() => null)
-        const resolver = {
-            ensureHook: jest.fn(() => null),
-            // we only care about calling the callback and the value of `requestContext`
-            doResolve: jest.fn((target, requestContext, msg, resolveContext, callback) => {
-                if (typeof callback === 'function') {
-                    callback()
-                }
-                return null
-            })
-        }
+
+        const {resolver, callback} = setupResolverAndCallback(
+            null,
+            testRequestContext,
+            null,
+            {},
+            callback
+        )
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
@@ -62,8 +76,8 @@ describe('overrides plugin', () => {
                 context: {
                     issuer: path.join(process.cwd(), 'fake-file.js')
                 },
-                path: `${REWRITE_DIR}/exists.jsx`,
-                request: 'retail-react-app/exists'
+                path: `${REWRITE_DIR}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`,
+                request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}`
             },
             expect.anything(),
             expect.anything(),
@@ -71,13 +85,182 @@ describe('overrides plugin', () => {
         )
     })
 
-    test('nested and non-ts/tsx/js/jsx files rewrite if in overrides', () => {})
+    test('nested and non-ts/tsx/js/jsx files rewrite if in overrides', () => {
+        const REQUEST_PATH = `path${path.sep}nested${path.sep}icon`
+        const REQUEST_EXTENSION = '.svg'
+        const testRequestContext = {
+            _ResolverCachePluginCacheMiss: true,
+            context: {
+                issuer: path.join(process.cwd(), 'fake-file.js')
+            },
+            path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
+            request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`
+        }
+
+        const {resolver, callback} = setupResolverAndCallback(
+            null,
+            testRequestContext,
+            null,
+            {},
+            callback
+        )
+        const overridesResolver = new OverridesResolverPlugin(options)
+        overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
+
+        expect(callback).toHaveBeenCalled()
+        expect(resolver.ensureHook).toHaveBeenCalled()
+        expect(resolver.doResolve).toHaveBeenCalledWith(
+            null,
+            {
+                _ResolverCachePluginCacheMiss: true,
+                context: {
+                    issuer: path.join(process.cwd(), 'fake-file.js')
+                },
+                path: `${REWRITE_DIR}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`,
+                request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`
+            },
+            expect.anything(),
+            expect.anything(),
+            expect.anything()
+        )
+    })
 
     test('jsx base template files can be replaced by tsx files', () => {})
 
-    test('resolver doResolve() hook is NOT called for files NOT in overrides dir', () => {})
+    test('resolver doResolve() hook is NOT called for files NOT in overrides dir', () => {
+        const REQUEST_PATH = `path${path.sep}nested${path.sep}does_not_exist.svg`
+        const REQUEST_EXTENSION = '.svg'
+        const testRequestContext = {
+            _ResolverCachePluginCacheMiss: true,
+            context: {
+                issuer: path.join(process.cwd(), 'fake-file.js')
+            },
+            path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
+            request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`
+        }
 
-    test('a file that requests from relative AND base template is able to get both', () => {})
+        const {resolver, callback} = setupResolverAndCallback(
+            null,
+            testRequestContext,
+            null,
+            {},
+            callback
+        )
+        const overridesResolver = new OverridesResolverPlugin(options)
+        overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
-    test('windows filepaths work', () => {})
+        expect(callback).toHaveBeenCalled()
+        expect(resolver.ensureHook).not.toHaveBeenCalled()
+        expect(resolver.doResolve).not.toHaveBeenCalled()
+    })
+
+    test('a file that requests from relative AND base template is able to get both', () => {
+        const REQUEST_ONE_PATH = 'exists'
+        const REQUEST_ONE_EXTENSION = '.jsx'
+        const testOneRequestContext = {
+            _ResolverCachePluginCacheMiss: true,
+            context: {
+                issuer: path.join(process.cwd(), 'fake-file.js')
+            },
+            path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
+            request: `${EXTENDS_TARGET}${path.sep}${REQUEST_ONE_PATH}`
+        }
+
+        let {resolver, callback} = setupResolverAndCallback(
+            null,
+            testOneRequestContext,
+            null,
+            {},
+            callback
+        )
+        const overridesResolver = new OverridesResolverPlugin(options)
+        overridesResolver.handleHook(testOneRequestContext, {}, callback, resolver)
+
+        expect(callback).toHaveBeenCalled()
+        expect(resolver.ensureHook).toHaveBeenCalled()
+        expect(resolver.doResolve).toHaveBeenCalledWith(
+            null,
+            {
+                _ResolverCachePluginCacheMiss: true,
+                context: {
+                    issuer: path.join(process.cwd(), 'fake-file.js')
+                },
+                path: `${REWRITE_DIR}${path.sep}${REQUEST_ONE_PATH}${REQUEST_ONE_EXTENSION}`,
+                request: `retail-react-app${path.sep}exists`
+            },
+            expect.anything(),
+            expect.anything(),
+            expect.anything()
+        )
+
+        // TODO: this might be `..\` on Windows?
+        const REQUEST_TWO_PATH = `./exists`
+        const testTwoRequestContext = {
+            _ResolverCachePluginCacheMiss: true,
+            context: {
+                issuer: path.join(process.cwd(), 'fake-file.js')
+            },
+            path: path.resolve(process.cwd()),
+            request: REQUEST_TWO_PATH
+        }
+        ;({resolver, callback} = setupResolverAndCallback(
+            null,
+            testTwoRequestContext,
+            null,
+            {},
+            callback
+        ))
+        const _overridesResolver = new OverridesResolverPlugin(options)
+        _overridesResolver.handleHook(testTwoRequestContext, {}, callback, resolver)
+
+        expect(callback).toHaveBeenCalled()
+        expect(resolver.ensureHook).not.toHaveBeenCalled()
+        expect(resolver.doResolve).not.toHaveBeenCalledWith()
+    })
+
+    // test('windows filepaths work', () => {
+    //     const _original_sep = path.sep
+    //     path.sep = '\\'
+    //     const REQUEST_PATH = 'exists'
+    //     const REQUEST_EXTENSION = '.jsx'
+    //     const testRequestContext = {
+    //         _ResolverCachePluginCacheMiss: true,
+    //         context: {
+    //             issuer: path.join(process.cwd(), 'fake-file.js')
+    //         },
+    //         path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
+    //         request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}`
+    //     }
+
+    //     const {resolver, callback} = setupResolverAndCallback(
+    //         null,
+    //         testRequestContext,
+    //         null,
+    //         {},
+    //         callback
+    //     )
+    //     const overridesResolver = new OverridesResolverPlugin(options)
+    //     overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
+
+    //     expect(callback).toHaveBeenCalled()
+    //     expect(resolver.ensureHook).toHaveBeenCalled()
+    //     expect(resolver.doResolve).toHaveBeenCalledWith(
+    //         null,
+    //         {
+    //             _ResolverCachePluginCacheMiss: true,
+    //             context: {
+    //                 issuer: path.join(process.cwd(), 'fake-file.js')
+    //             },
+    //             path: `${REWRITE_DIR}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`,
+    //             request: `retail-react-app${path.sep}exists`
+    //         },
+    //         expect.anything(),
+    //         expect.anything(),
+    //         expect.anything()
+    //     )
+    //     path.sep = _original_sep
+    //     expect(path.sept).toBe(_original_sep)
+    // })
+
+    test('npm @namespaces resolve correctly', () => {})
 })

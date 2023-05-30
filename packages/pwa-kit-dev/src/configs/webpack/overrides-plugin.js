@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import p from 'path'
+import path from 'path'
 import glob from 'glob'
 import {makeRegExp} from './utils'
 
@@ -28,15 +28,15 @@ class OverridesResolverPlugin {
         this.extends = options.extends || []
         this.projectDir = options.projectDir
         this._allSearchDirs = [this.projectDir + this.overridesDir, ...this.extends]
-        this.pkg = require(p.resolve(this.projectDir, 'package.json'))
+        this.pkg = require(path.resolve(this.projectDir, 'package.json'))
         this.extendsHashMap = new Map()
 
         // everything except directories
         const globPattern = `${this.pkg?.ccExtensibility?.overridesDir?.replace(/^\//, '')}/**/*.*`
         const overridesFsRead = glob.sync(globPattern)
-        const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + p.sep
+        const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + path.sep
         overridesFsRead.forEach((item) => {
-            const end = item.substring(item.lastIndexOf(p.sep + 'index'))
+            const end = item.substring(item.lastIndexOf(path.sep + 'index'))
             const [l, ...rest] = item.split(/(index|\.)/)
             this.extendsHashMap.set(l?.replace(overrideReplace, '').replace(/\/$/, ''), [end, rest])
         })
@@ -48,9 +48,9 @@ class OverridesResolverPlugin {
      * @param dirs
      */
     findFileFromMap(requestPath, dirs) {
-        const fileExt = p.extname(requestPath)
+        const fileExt = path.extname(requestPath)
         for (const dir of dirs) {
-            let base = p.join(dir, requestPath)
+            let base = path.join(dir, requestPath)
             if (fileExt) {
                 const noExtPath = requestPath.replace(fileExt, '')
                 if (this.extendsHashMap.has(noExtPath)) {
@@ -62,7 +62,7 @@ class OverridesResolverPlugin {
                     const isRequestingIndex = end[0] === 'index'
                     let result = base?.replace(/$\//, '') + end.join('')
                     if (isRequestingIndex) {
-                        result = p.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
+                        result = path.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
                     }
                     return result
                 }
@@ -70,25 +70,25 @@ class OverridesResolverPlugin {
         }
     }
 
-    toOverrideRelative(path) {
-        const override = this.findOverride(path)
-        return path.substring(override.length + 1)
+    toOverrideRelative(_path) {
+        const override = this.findOverride(_path)
+        return _path.substring(override.length + 1)
     }
 
-    findOverride(path) {
+    findOverride(_path) {
         return this._allSearchDirs.find((override) => {
-            return path.indexOf(override) === 0
+            return _path.indexOf(override) === 0
         })
     }
 
-    isFromExtends(request, path) {
+    isFromExtends(request, _path) {
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
         const basePkgIndex = request?.startsWith('@') ? 1 : 0
         return (
-            this.extends.includes(request?.split(p.sep)?.[basePkgIndex]) &&
+            this.extends.includes(request?.split(path.sep)?.[basePkgIndex]) &&
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
-            !path.match(this.projectDir + this.overridesDir)
+            !_path.match(this.projectDir + this.overridesDir)
         )
     }
 
@@ -97,7 +97,7 @@ class OverridesResolverPlugin {
         let overrideRelative
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
             overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(
-                makeRegExp(`$\\${p.sep}`),
+                makeRegExp(`$\\${path.sep}`),
                 ''
             )
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
