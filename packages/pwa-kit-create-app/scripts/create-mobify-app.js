@@ -237,8 +237,8 @@ const PRESETS = [
         name: 'Retail React App Test Project',
         description: '',
         templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'retail-react-app'
+            type: TEMPLATE_SOURCE_NPM,
+            id: '@salesforce/retail-react-app'
         },
         questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         answers: {
