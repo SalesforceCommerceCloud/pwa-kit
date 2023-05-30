@@ -16,7 +16,7 @@ type Client = ApiClients['shopperCustomers']
 /**
  * Mutations available for Shopper Customers.
  * @group ShopperCustomers
- * @category Mutation Hooks
+ * @category Mutation
  * @enum
 */
 export const ShopperCustomersMutations = {
@@ -186,7 +186,7 @@ The value of this property must be valid for the type of custom attribute define
 /**
  * Mutation for Shopper Customers. 
  * @group ShopperCustomers
- * @category Mutation Hooks
+ * @category Mutation
  */
 export type ShopperCustomersMutation =
     (typeof ShopperCustomersMutations)[keyof typeof ShopperCustomersMutations]
@@ -194,7 +194,7 @@ export type ShopperCustomersMutation =
 /**
  * Mutation hook for Shopper Customers.
  * @group ShopperCustomers
- * @category Mutation Hooks
+ * @category Mutation
  */
 export function useShopperCustomersMutation<Mutation extends ShopperCustomersMutation>(
     mutation: Mutation

@@ -16,7 +16,7 @@ type Client = ApiClients['shopperBaskets']
 /**
  * Gets a basket.
  * @group ShopperBaskets
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Baskets `getBasket` endpoint.
@@ -52,7 +52,7 @@ export const useBasket = (
 /**
  * Gets applicable payment methods for an existing basket considering the open payment amount only.
  * @group ShopperBaskets
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Baskets `getPaymentMethodsForBasket` endpoint.
@@ -88,7 +88,7 @@ export const usePaymentMethodsForBasket = (
 /**
  * Gets applicable price books for an existing basket.
  * @group ShopperBaskets
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Baskets `getPriceBooksForBasket` endpoint.
@@ -124,7 +124,7 @@ export const usePriceBooksForBasket = (
 /**
  * Gets the applicable shipping methods for a certain shipment of a basket.
  * @group ShopperBaskets
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Baskets `getShippingMethodsForShipment` endpoint.
@@ -160,7 +160,7 @@ export const useShippingMethodsForShipment = (
 /**
  * This method gives you the external taxation data set by the PUT taxes API. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
  * @group ShopperBaskets
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Baskets `getTaxesFromBasket` endpoint.

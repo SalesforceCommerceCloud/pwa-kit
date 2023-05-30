@@ -19,7 +19,7 @@ type Client = ApiClients['shopperSearch']
  * Only returns the product ID, link, and name in the product search hit.
  * The search result contains only products that are online and assigned to site catalog.
  * @group ShopperSearch
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Search `productSearch` endpoint.
@@ -57,7 +57,7 @@ export const useProductSearch = (
  * @remarks
  * Returns suggested products, suggested categories, and suggested brands for the given search phrase.
  * @group ShopperSearch
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Search `getSearchSuggestions` endpoint.

@@ -16,7 +16,7 @@ type Client = ApiClients['shopperProducts']
 /**
  * Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, product options, images, price, promotions, and variations for the valid products will be included, as appropriate.
  * @group ShopperProducts
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Products `getProducts` endpoint.
@@ -52,7 +52,7 @@ export const useProducts = (
 /**
  * Allows access to product details for a single product ID. Only products that are online and assigned to a site catalog are returned. Along with product details, the availability, images, price, bundled_products, set_products, recommedations, product options, variations, and promotions for the products will be included, as appropriate.
  * @group ShopperProducts
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Products `getProduct` endpoint.
@@ -88,7 +88,7 @@ export const useProduct = (
 /**
  * When you use the URL template, the server returns multiple categories (a result object of category documents). You can use this template as a convenient way of obtaining multiple categories in a single request, instead of issuing separate requests for each category. You can specify up to 50 multiple IDs. You must enclose the list of IDs in parentheses. If a category identifier contains parenthesis or the separator sign, you must URL encode the character. The server only returns online categories.
  * @group ShopperProducts
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Products `getCategories` endpoint.
@@ -126,7 +126,7 @@ export const useCategories = (
 also returns the first level of subcategories, but you can specify another level by setting the levels
 parameter. The server only returns online categories.
  * @group ShopperProducts
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Products `getCategory` endpoint.

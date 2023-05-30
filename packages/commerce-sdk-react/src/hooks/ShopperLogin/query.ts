@@ -16,7 +16,7 @@ type Client = ApiClients['shopperLogin']
 /**
  * Get credential quality statistics for a user.
  * @group ShopperLogin
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Login `retrieveCredQualityUserInfo` endpoint.
@@ -52,7 +52,7 @@ export const useCredQualityUserInfo = (
 /**
  * Returns a JSON listing of claims about the currently authenticated user.
  * @group ShopperLogin
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Login `getUserInfo` endpoint.
@@ -88,7 +88,7 @@ export const useUserInfo = (
 /**
  * Returns a JSON listing of the OpenID/OAuth endpoints, supported scopes and claims, public keys used to sign the tokens, and other details.
  * @group ShopperLogin
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Login `getWellknownOpenidConfiguration` endpoint.
@@ -124,7 +124,7 @@ export const useWellknownOpenidConfiguration = (
 /**
  * Returns a JSON Web Key Set (JWKS) containing the current, past, and future public keys. The key set enables clients to validate the Shopper JSON Web Token (JWT) issued by SLAS.
  * @group ShopperLogin
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Login `getJwksUri` endpoint.

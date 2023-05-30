@@ -16,7 +16,7 @@ type Client = ApiClients['shopperOrders']
 /**
  * Mutations available for Shopper Orders
  * @group ShopperOrders
- * @category Mutation Hooks
+ * @category Mutation
  * @enum
  */
 export const ShopperOrdersMutations = {
@@ -68,7 +68,7 @@ paymentCard must be specified in the request.
 /**
  * Mutation for Shopper Orders.
  * @group ShopperOrders
- * @category Mutation Hooks
+ * @category Mutation
  */
 export type ShopperOrdersMutation =
     (typeof ShopperOrdersMutations)[keyof typeof ShopperOrdersMutations]
@@ -76,7 +76,7 @@ export type ShopperOrdersMutation =
 /**
  * Mutation hook for Shopper Orders.
  * @group ShopperOrders
- * @category Mutation Hooks
+ * @category Mutation
  */
 export function useShopperOrdersMutation<Mutation extends ShopperOrdersMutation>(
     mutation: Mutation

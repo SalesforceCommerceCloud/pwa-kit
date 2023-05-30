@@ -16,7 +16,7 @@ type Client = ApiClients['shopperLogin']
 /**
  * Mutations available for Shopper Login
  * @group ShopperLogin
- * @category Mutation Hooks
+ * @category Mutation
  * @enum
  */
 export const ShopperLoginMutations = {
@@ -133,7 +133,7 @@ The value of the `_sfdc_client_auth` header must be a Base64-encoded string. The
 /**
  * Mutation for Shopper Login.
  * @group ShopperLogin
- * @category Mutation Hooks 
+ * @category Mutation 
  */
 export type ShopperLoginMutation =
     (typeof ShopperLoginMutations)[keyof typeof ShopperLoginMutations]
@@ -141,7 +141,7 @@ export type ShopperLoginMutation =
 /**
  * Mutation hook for Shopper Login.
  * @group ShopperLogin
- * @category Mutation Hooks
+ * @category Mutation
  */
 export function useShopperLoginMutation<Mutation extends ShopperLoginMutation>(
     mutation: Mutation

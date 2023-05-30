@@ -15,7 +15,7 @@ type Client = ApiClients['shopperBaskets']
 /**
  * Mutations available for Shopper Baskets.
  * @group ShopperBaskets
- * @category Mutation Hooks
+ * @category Mutation
  * @enum
  */
 export const ShopperBasketsMutations = {
@@ -290,7 +290,7 @@ the body are the following properties if specified:
 /**
  * Type for Shopper Baskets Mutation.
  * @group ShopperBaskets
- * @category Mutation Hooks
+ * @category Mutation
  */
 export type ShopperBasketsMutation =
     (typeof ShopperBasketsMutations)[keyof typeof ShopperBasketsMutations]
@@ -298,7 +298,7 @@ export type ShopperBasketsMutation =
 /**
  * Mutation hook for Shopper Baskets.
  * @group ShopperBaskets
- * @category Mutation Hooks
+ * @category Mutation
  */
 export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutation>(
     mutation: Mutation

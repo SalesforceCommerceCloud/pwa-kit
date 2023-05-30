@@ -20,7 +20,7 @@ type Client = ApiClients['shopperExperience']
  * The results will apply the visibility rules for each page's components, such as personalization or scheduled visibility. Either `categoryId` or `productId` must be given in addition to `aspectTypeId`. Because only a single page-to-product and page-to-category assignment per aspect type can be authored today, the returned results contains one element at most.
  * *Important**: Because this resource uses the GET method, you must not pass sensitive data (payment card information, for example) and must not perform any transactional processes within the server-side scripts that are run for the page and components.
  * @group ShopperExperience
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Experience `getPages` endpoint.
@@ -60,7 +60,7 @@ export const usePages = (
  * The results will apply the visibility rules for the page's components, such as personalization or scheduled visibility.
  * *Important**: Because this resource uses the GET method, you must not pass sensitive data (payment card information, for example) and must not perform any transactional processes within the server-side scripts that are run for the page and components.
  * @group ShopperExperience
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Experience `getPage` endpoint.

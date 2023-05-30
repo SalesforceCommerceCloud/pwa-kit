@@ -16,7 +16,7 @@ type Client = ApiClients['shopperContexts']
 /**
  * Gets the shopper's context based on the shopperJWT.
  * @group ShopperContexts
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Contexts `getShopperContext` endpoint.

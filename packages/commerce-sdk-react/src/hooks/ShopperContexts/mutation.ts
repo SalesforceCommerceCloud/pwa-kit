@@ -16,7 +16,7 @@ type Client = ApiClients['shopperContexts']
 /**
  * Mutation for Shopper Contexts.
  * @group ShopperContexts
- * @category Mutation Hooks
+ * @category Mutation
  * @enum
  */
 export const ShopperContextsMutations = {
@@ -49,7 +49,7 @@ export const ShopperContextsMutations = {
 /**
  * Mutation for Shopper Contexts.
  * @group ShopperContexts
- * @category Mutation Hooks
+ * @category Mutation
  */
 export type ShopperContextsMutation =
     (typeof ShopperContextsMutations)[keyof typeof ShopperContextsMutations]
@@ -57,7 +57,7 @@ export type ShopperContextsMutation =
 /**
  * Mutation hook for Shopper Contexts.
  * @group ShopperContexts
- * @category Mutation Hooks
+ * @category Mutation
  */
 export function useShopperContextsMutation<Mutation extends ShopperContextsMutation>(
     mutation: Mutation

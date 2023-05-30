@@ -58,7 +58,7 @@ type Client = ApiClients['shopperCustomers']
  * Gets a customer's information.
  * 
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomer` endpoint.
@@ -94,7 +94,7 @@ export const useCustomer = (
 /**
  * Retrieves a customer's address by address name.
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerAddress` endpoint.
@@ -130,7 +130,7 @@ export const useCustomerAddress = (
 /**
  * Gets the baskets of a customer.
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerBaskets` endpoint.
@@ -168,7 +168,7 @@ export const useCustomerBaskets = (
  * @remarks
  * The default page size is 10.
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerOrders` endpoint.
@@ -204,7 +204,7 @@ export const useCustomerOrders = (
 /**
  * Retrieves a customer's payment instrument by its ID.
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerPaymentInstrument` endpoint.
@@ -245,7 +245,7 @@ export const useCustomerPaymentInstrument = (
 /**
  * Returns all customer product lists.
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerProductLists` endpoint.
@@ -281,7 +281,7 @@ export const useCustomerProductLists = (
 /**
  * Returns a customer product list of the given customer and the items in the list.
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerProductList` endpoint.
@@ -317,7 +317,7 @@ export const useCustomerProductList = (
 /**
  * Returns an item of a customer product list and the actual product details like image, availability and price.
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getCustomerProductListItem` endpoint.
@@ -359,7 +359,7 @@ export const useCustomerProductListItem = (
 /**
  * Retrieves all public product lists as defined by the given search term (for example, email OR first name and last name).
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getPublicProductListsBySearchTerm` endpoint.
@@ -395,7 +395,7 @@ export const usePublicProductListsBySearchTerm = (
 /**
  * Retrieves a public product list by ID and the items under that product list.
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getPublicProductList` endpoint.
@@ -431,7 +431,7 @@ export const usePublicProductList = (
 /**
  * Retrieves an item from a public product list and the actual product details like product, image, availability and price.
  * @group ShopperCustomers
- * @category Query Hooks
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Customers `getProductListItem` endpoint.
