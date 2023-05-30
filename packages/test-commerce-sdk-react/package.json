@@ -26,7 +26,7 @@
     "@salesforce/commerce-sdk-react": "^3.0.0-dev",
     "internal-lib-build": "^3.0.0-dev",
     "@salesforce/pwa-kit-dev": "^3.0.0-dev",
-    "pwa-kit-react-sdk": "^3.0.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "^3.0.0-dev",
     "pwa-kit-runtime": "^3.0.0-dev",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

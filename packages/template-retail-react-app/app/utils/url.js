@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {
     getLocaleByReference,
     getParamsFromPath,

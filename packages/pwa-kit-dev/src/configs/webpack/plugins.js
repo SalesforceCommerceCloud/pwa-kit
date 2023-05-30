@@ -46,6 +46,7 @@ const getOverridePath = (relativePath) => {
         ? generatedProjectOverride?.[0]
         : resolve(
               'node_modules',
+              '@salesforce',
               'pwa-kit-react-sdk',
               'ssr',
               'universal',
@@ -100,7 +101,7 @@ export const sdkReplacementPlugin = () => {
 
         const sdkPaths = [
             path.join('packages', 'pwa-kit-react-sdk'),
-            path.join('node_modules', 'pwa-kit-react-sdk')
+            path.join('node_modules', '@salesforce', 'pwa-kit-react-sdk')
         ]
 
         const requestedFromSDK = sdkPaths.some((p) => resource.context.includes(p))

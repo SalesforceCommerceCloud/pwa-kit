@@ -30,7 +30,7 @@ import Section from 'retail-react-app/app/components/section'
 import ProductScroller from 'retail-react-app/app/components/product-scroller'
 
 // Others
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from 'retail-react-app/app/pages/home/data'
 
 //Hooks
@@ -42,7 +42,7 @@ import {
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT
 } from 'retail-react-app/app/constants'
-import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
 
 /**

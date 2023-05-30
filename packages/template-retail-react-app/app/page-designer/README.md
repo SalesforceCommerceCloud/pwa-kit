@@ -48,7 +48,7 @@ import {
     MobileGrid3r2c
 } from '../../page-designer/layouts'
 
-import {HTTPError, HTTPNotFound} from 'pwa-kit-react-sdk/ssr/universal/errors'
+import {HTTPError, HTTPNotFound} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 
 const PAGEDESIGNER_TO_COMPONENT = {
     'commerce_assets.photoTile': ImageTile,

@@ -12,11 +12,11 @@ import PropTypes from 'prop-types'
 
 import theme from 'retail-react-app/app/theme'
 import {AddToCartModalProvider} from 'retail-react-app/app/hooks/use-add-to-cart-modal'
-import {ServerContext} from 'pwa-kit-react-sdk/ssr/universal/contexts'
+import {ServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {PageContext, Region} from '@salesforce/commerce-sdk-react/components'
-import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import fallbackMessages from 'retail-react-app/translations/compiled/en-GB.json'
 import mockConfig from 'retail-react-app/config/mocks/default'
 // Contexts

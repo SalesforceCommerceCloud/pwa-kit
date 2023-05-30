@@ -16,7 +16,7 @@ import {
     useProductSearch,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
-import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 // Components
 import {
@@ -67,7 +67,7 @@ import {useToast} from 'retail-react-app/app/hooks/use-toast'
 import useEinstein from 'retail-react-app/app/hooks/use-einstein'
 
 // Others
-import {HTTPNotFound, HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
+import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
 import {

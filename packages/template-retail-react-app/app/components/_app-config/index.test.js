@@ -8,8 +8,8 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import AppConfig from 'retail-react-app/app/components/_app-config/index.jsx'
 
-import {CorrelationIdProvider} from 'pwa-kit-react-sdk/ssr/universal/contexts'
-import {uuidv4} from 'pwa-kit-react-sdk/utils/uuidv4.client'
+import {CorrelationIdProvider} from '@salesforce/pwa-kit-react-sdk/ssr/universal/contexts'
+import {uuidv4} from '@salesforce/pwa-kit-react-sdk/utils/uuidv4.client'
 import {StaticRouter} from 'react-router-dom'
 
 import mockConfig from 'retail-react-app/config/mocks/default'

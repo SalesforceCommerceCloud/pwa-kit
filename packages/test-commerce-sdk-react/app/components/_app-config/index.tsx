@@ -6,8 +6,8 @@
  */
 import React, {useState, ReactElement} from 'react'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
-import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {useCorrelationId} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 interface AppConfigProps {
     children: React.ReactNode

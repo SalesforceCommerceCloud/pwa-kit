@@ -7,7 +7,7 @@
 import React from 'react'
 import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
 import ImageTile from 'retail-react-app/app/page-designer/assets/image-tile/index'
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 test('ImageTile renders without errors', () => {
     const {getByTestId} = renderWithProviders(

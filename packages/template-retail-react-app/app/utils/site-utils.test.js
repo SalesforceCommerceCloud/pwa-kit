@@ -11,7 +11,7 @@ import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import mockConfig from 'retail-react-app/config/mocks/default'
 import {getParamsFromPath, resolveLocaleFromUrl} from 'retail-react-app/app/utils/site-utils'
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
-    const origin = jest.requireActual('pwa-kit-react-sdk/ssr/universal/utils')
+    const origin = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
     return {
         ...origin,
         getConfig: jest.fn()

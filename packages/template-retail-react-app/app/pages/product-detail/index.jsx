@@ -25,7 +25,7 @@ import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
 import {useVariant} from 'retail-react-app/app/hooks'
 import useNavigation from 'retail-react-app/app/hooks/use-navigation'
 import useEinstein from 'retail-react-app/app/hooks/use-einstein'
-import {useServerContext} from 'pwa-kit-react-sdk/ssr/universal/hooks'
+import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from 'retail-react-app/app/components/recommended-products'
 import ProductView from 'retail-react-app/app/components/product-view'
