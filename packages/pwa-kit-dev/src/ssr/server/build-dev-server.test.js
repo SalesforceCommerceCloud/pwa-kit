@@ -5,7 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {NO_CACHE} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
-import {X_MOBIFY_REQUEST_CLASS, X_PROXY_REQUEST_URL} from '@salesforce/pwa-kit-runtime/utils/ssr-proxying'
+import {
+    X_MOBIFY_REQUEST_CLASS,
+    X_PROXY_REQUEST_URL
+} from '@salesforce/pwa-kit-runtime/utils/ssr-proxying'
 import {
     getResponseFromCache,
     sendCachedResponse,

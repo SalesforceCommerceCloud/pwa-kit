@@ -128,9 +128,12 @@ const runGenerator = () => {
     const foundNpm = cp.spawnSync(npm, ['-v']).stdout.toString().trim()
     const flags = semver.satisfies(foundNpm, '>=7') ? '-y' : ''
 
-    cp.execSync(`npx ${flags} @salesforce/pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`, {
-        stdio: 'inherit'
-    })
+    cp.execSync(
+        `npx ${flags} @salesforce/pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`,
+        {
+            stdio: 'inherit'
+        }
+    )
 }
 
 const main = () => {
