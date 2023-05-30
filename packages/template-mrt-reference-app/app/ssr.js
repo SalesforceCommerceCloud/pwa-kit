@@ -169,7 +169,7 @@ const tlsVersionTest = async (_, res) => {
 }
 
 /**
- * Express handler that enables the cache.
+ * Express handler that enables the cache and returns a JSON response with diagnostic values.
  */
 const cacheTest = async (req, res) => {
     res.set('Cache-Control', 's-maxage=60')
