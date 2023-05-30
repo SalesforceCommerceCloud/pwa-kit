@@ -41,7 +41,7 @@
     "event-emitter": "^0.3.5",
     "hoist-non-react-statics": "^3.3.2",
     "prop-types": "^15.8.1",
-    "pwa-kit-runtime": "^3.0.0-dev",
+    "pwa-kit-runtime": "3.0.0-dev",
     "react-ssr-prepass": "^1.5.0",
     "react-uid": "^2.3.2",
     "serialize-javascript": "^6.0.1",
@@ -58,7 +58,7 @@
     "pwa-kit-dev": "3.0.0-dev",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-helmet": "5.2.1",
+    "react-helmet": "^6.1.0",
     "react-router-dom": "^5.3.4",
     "regenerator-runtime": "^0.13.11",
     "sinon": "^13.0.2",
@@ -66,10 +66,10 @@
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.3",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-helmet": "6",
-    "react-router-dom": "^5.1.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
+    "react-router-dom": "^5.3.4"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",

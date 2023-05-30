@@ -21,7 +21,7 @@
     "@tanstack/react-query": "^4.28.0",
     "@types/loadable__component": "^5.13.4",
     "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/react-dom": "^18.2.1",
     "pwa-kit-dev": "3.0.0-dev",
     "pwa-kit-react-sdk": "3.0.0-dev",
     "pwa-kit-runtime": "3.0.0-dev",
@@ -29,7 +29,7 @@
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.3.4",
-    "typescript": "4.8.3"
+    "typescript": ">=4.8.3"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",
