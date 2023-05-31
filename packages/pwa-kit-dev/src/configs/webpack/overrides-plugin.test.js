@@ -76,8 +76,7 @@ describe('overrides plugin', () => {
                 context: {
                     issuer: path.join('./', 'fake-file.js')
                 },
-                // path: path.join(REWRITE_DIR, REQUEST_PATH + REQUEST_EXTENSION),
-                path: REWRITE_DIR + REQUEST_PATH + REQUEST_EXTENSION,
+                path: path.join(REWRITE_DIR, REQUEST_PATH + REQUEST_EXTENSION),
                 request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
             },
             expect.anything(),
