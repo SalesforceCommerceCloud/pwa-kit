@@ -125,8 +125,6 @@ describe('overrides plugin', () => {
         )
     })
 
-    test('jsx base template files can be replaced by tsx files', () => {})
-
     test('resolver doResolve() hook is NOT called for files NOT in overrides dir', () => {
         const REQUEST_PATH = `path/nested/does_not_exist.svg`
         const REQUEST_EXTENSION = '.svg'
@@ -218,49 +216,7 @@ describe('overrides plugin', () => {
         expect(resolver.doResolve).not.toHaveBeenCalledWith()
     })
 
-    // test('windows filepaths work', () => {
-    //     const _original_sep = path.sep
-    //     path.sep = '\\'
-    //     const REQUEST_PATH = 'exists'
-    //     const REQUEST_EXTENSION = '.jsx'
-    //     const testRequestContext = {
-    //         _ResolverCachePluginCacheMiss: true,
-    //         context: {
-    //             issuer: path.join('./', 'fake-file.js')
-    //         },
-    //         path: path.join('./', 'node_modules', EXTENDS_TARGET),
-    //         request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
-    //     }
-
-    //     const {resolver, callback} = setupResolverAndCallback(
-    //         null,
-    //         testRequestContext,
-    //         null,
-    //         {},
-    //         callback
-    //     )
-    //     const overridesResolver = new OverridesResolverPlugin(options)
-    //     overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
-
-    //     expect(callback).toHaveBeenCalled()
-    //     expect(resolver.ensureHook).toHaveBeenCalled()
-    //     expect(resolver.doResolve).toHaveBeenCalledWith(
-    //         null,
-    //         {
-    //             _ResolverCachePluginCacheMiss: true,
-    //             context: {
-    //                 issuer: path.join('./', 'fake-file.js')
-    //             },
-    //             path: `${REWRITE_DIR}/${REQUEST_PATH}${REQUEST_EXTENSION}`,
-    //             request: `retail-react-app/exists`
-    //         },
-    //         expect.anything(),
-    //         expect.anything(),
-    //         expect.anything()
-    //     )
-    //     path.sep = _original_sep
-    //     expect(path.sep).toBe(_original_sep)
-    // })
+    test('jsx base template files can be replaced by tsx files', () => {})
 
     test('npm @namespaces resolve correctly', () => {})
 
