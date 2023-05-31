@@ -1,3 +1,4 @@
+## v3.0.0-preview.0 (May 31, 2023)
 ## v3.0.0-dev (May 12, 2023)
 
 -   Update engines to drop npm 7, and requires Node to start from version 16.11 [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
