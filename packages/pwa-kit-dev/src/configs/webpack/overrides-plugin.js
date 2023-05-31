@@ -24,7 +24,8 @@ class OverridesResolverPlugin {
      * @param {string} options.projectDir path to project directory
      */
     constructor(options) {
-        this.overridesDir = options.overridesDir || ''
+        // always coerce to posix fs paths, as glob sync and imports
+        this.overridesDir = options.overridesDir?.replace(/\\/g, '/') || ''
         this.extends = options.extends || []
         this.projectDir = options.projectDir
         this._allSearchDirs = [this.projectDir + this.overridesDir, ...this.extends]
@@ -37,11 +38,9 @@ class OverridesResolverPlugin {
             ?.replace(/\\/g, '/')
             ?.replace(/^\//, '')}/**/*.*`
         const overridesFsRead = glob.sync(globPattern)
-        const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + path.sep
+        const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + '/'
         overridesFsRead.forEach((item) => {
-            // NOTE that the glob library expects posix so we replace windows file paths here
-            item = path.sep === '/' ? item : item.replace(makeRegExp('/'), path.sep)
-            const end = item.substring(item.lastIndexOf(path.sep + 'index'))
+            const end = item.substring(item.lastIndexOf('/index'))
             const [l, ...rest] = item.split(/(index|\.)/)
             this.extendsHashMap.set(l?.replace(overrideReplace, '').replace(/\/$/, ''), [end, rest])
         })
@@ -90,7 +89,7 @@ class OverridesResolverPlugin {
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
         const basePkgIndex = request?.startsWith('@') ? 1 : 0
         return (
-            this.extends.includes(request?.split(path.sep)?.[basePkgIndex]) &&
+            this.extends.includes(request?.split('/')?.[basePkgIndex]) &&
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
             !_path.match(this.projectDir + this.overridesDir)
@@ -101,10 +100,7 @@ class OverridesResolverPlugin {
         let targetFile
         let overrideRelative
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
-            overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(
-                makeRegExp(`$${path.sep}`),
-                ''
-            )
+            overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(/$\//, '')
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
         }
         if (targetFile) {
