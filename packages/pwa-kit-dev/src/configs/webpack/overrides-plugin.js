@@ -97,7 +97,7 @@ class OverridesResolverPlugin {
         let overrideRelative
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
             overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(
-                makeRegExp(`$\\${path.sep}`),
+                makeRegExp(`$${path.sep}`),
                 ''
             )
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)

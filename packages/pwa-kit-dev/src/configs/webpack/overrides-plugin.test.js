@@ -9,7 +9,7 @@ import path from 'path'
 import OverridesResolverPlugin from './overrides-plugin'
 
 const convertToOsPath = (str) =>
-    path.sep === '/' ? str.replace(/\\/, '/') : str.replace(/\//, '\\').replace(/^\./, '..')
+    path.sep === '/' ? str.replace(/\\/g, '/') : str.replace(/\//g, `\\`).replace(/^\./, '..')
 
 const PROJECT_DIR = convertToOsPath(`src/configs/webpack/test`)
 const FS_READ_HASHMAP = new Map([
