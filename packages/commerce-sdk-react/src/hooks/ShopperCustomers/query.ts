@@ -165,7 +165,7 @@ export const useCustomerBaskets = (
 }
 /**
  * Returns a pageable list of all customer's orders.
- * @remarks
+ *
  * The default page size is 10.
  * @group ShopperCustomers
  * @category Query

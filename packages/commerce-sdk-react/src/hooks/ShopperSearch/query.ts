@@ -15,7 +15,7 @@ type Client = ApiClients['shopperSearch']
 
 /**
  * Provides keyword and refinement search functionality for products.
- * @remarks
+ *
  * Only returns the product ID, link, and name in the product search hit.
  * The search result contains only products that are online and assigned to site catalog.
  * @group ShopperSearch
@@ -54,7 +54,7 @@ export const useProductSearch = (
 }
 /**
  * Provides keyword search functionality for products, categories, and brands suggestions.
- * @remarks
+ *
  * Returns suggested products, suggested categories, and suggested brands for the given search phrase.
  * @group ShopperSearch
  * @category Query
