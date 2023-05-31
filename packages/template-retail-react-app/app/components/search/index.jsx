@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useMemo, useRef, useState} from 'react'
-import {useSearchSuggestions} from 'commerce-sdk-react-preview'
+import {useSearchSuggestions} from '@salesforce/commerce-sdk-react'
 import {
     Input,
     InputGroup,
@@ -19,28 +19,28 @@ import {
     HStack,
     Spinner
 } from '@chakra-ui/react'
-import SearchSuggestions from 'retail-react-app/app/components/search/partials/search-suggestions'
-import {SearchIcon} from 'retail-react-app/app/components/icons'
+import SearchSuggestions from '@salesforce/retail-react-app/app/components/search/partials/search-suggestions'
+import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     capitalize,
     boldString,
     getSessionJSONItem,
     setSessionJSONItem
-} from 'retail-react-app/app/utils/utils'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
+} from '@salesforce/retail-react-app/app/utils/utils'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {FormattedMessage} from 'react-intl'
 import debounce from 'lodash/debounce'
 import {
     RECENT_SEARCH_KEY,
     RECENT_SEARCH_LIMIT,
     RECENT_SEARCH_MIN_LENGTH
-} from 'retail-react-app/app/constants'
+} from '@salesforce/retail-react-app/app/constants'
 import {
     productUrlBuilder,
     searchUrlBuilder,
     categoryUrlBuilder
-} from 'retail-react-app/app/utils/url'
+} from '@salesforce/retail-react-app/app/utils/url'
 
 const formatSuggestions = (searchSuggestions, input) => {
     return {

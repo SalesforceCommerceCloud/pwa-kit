@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
-import ImageTile from 'retail-react-app/app/page-designer/assets/image-tile/index'
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import ImageTile from '@salesforce/retail-react-app/app/page-designer/assets/image-tile/index'
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 test('ImageTile renders without errors', () => {
     const {getByTestId} = renderWithProviders(

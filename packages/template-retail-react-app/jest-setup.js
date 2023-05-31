@@ -94,7 +94,7 @@ afterAll(() => {
 })
 
 // Mock the application configuration to be used in all tests.
-jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     return {
         getConfig: () => mockConfig
     }

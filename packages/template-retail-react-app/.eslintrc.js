@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-    extends: [require.resolve('pwa-kit-dev/configs/eslint')],
+    extends: [require.resolve('@salesforce/pwa-kit-dev/configs/eslint')],
     plugins: ['no-relative-import-paths'],
     rules: {
         // https://github.com/MelvinVermeer/eslint-plugin-no-relative-import-paths
@@ -18,7 +18,7 @@ module.exports = {
                     ? {}
                     : // Otherwise, assumes that the current working directory is the monorepo
                       {rootDir: 'packages/template-retail-react-app/'}),
-                prefix: 'retail-react-app'
+                prefix: '@salesforce/retail-react-app'
             }
         ]
     }

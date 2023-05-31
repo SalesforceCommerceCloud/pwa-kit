@@ -9,9 +9,9 @@ import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
-import {AlertIcon, BrandLogo} from 'retail-react-app/app/components/icons'
-import {noop} from 'retail-react-app/app/utils/utils'
-import ResetPasswordFields from 'retail-react-app/app/components/forms/reset-password-fields'
+import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
+import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import ResetPasswordFields from '@salesforce/retail-react-app/app/components/forms/reset-password-fields'
 
 const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
     return (

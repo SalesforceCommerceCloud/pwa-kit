@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {useOrder} from 'commerce-sdk-react-preview'
+import {useOrder} from '@salesforce/commerce-sdk-react'
 import {Link, useParams} from 'react-router-dom'
 import Json from '../components/Json'
 

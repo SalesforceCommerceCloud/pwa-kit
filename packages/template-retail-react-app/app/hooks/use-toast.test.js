@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useToast} from 'retail-react-app/app/hooks/use-toast'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {Button} from '@chakra-ui/react'
-import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 

@@ -1,5 +1,5 @@
 {
-  "name": "pwa-kit-runtime",
+  "name": "@salesforce/pwa-kit-runtime",
   "version": "3.0.0-dev",
   "description": "The PWAKit Runtime",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-runtime#readme",
@@ -52,16 +52,16 @@
     "internal-lib-build": "3.0.0-dev",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
-    "pwa-kit-dev": "3.0.0-dev",
+    "@salesforce/pwa-kit-dev": "3.0.0-dev",
     "sinon": "^13.0.2",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
   },
   "peerDependencies": {
-    "pwa-kit-dev": "3.0.0-dev"
+    "@salesforce/pwa-kit-dev": "3.0.0-dev"
   },
   "peerDependenciesMeta": {
-    "pwa-kit-dev": {
+    "@salesforce/pwa-kit-dev": {
       "optional": true
     }
   },
