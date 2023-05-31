@@ -24,10 +24,11 @@ class OverridesResolverPlugin {
      * @param {string} options.projectDir path to project directory
      */
     constructor(options) {
-        // always coerce to posix fs paths, as glob sync and imports
+        // always coerce to posix fs paths, as glob sync and es6 imports don't use windows paths
         this.overridesDir = options.overridesDir?.replace(/\\/g, '/') || ''
         this.extends = options.extends || []
-        this.projectDir = options.projectDir
+        // always coerce to posix fs paths, as glob sync and es6 imports don't use windows paths
+        this.projectDir = options.projectDir?.replace(/\\/g, '/')
         this._allSearchDirs = [this.projectDir + this.overridesDir, ...this.extends]
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
         this.extendsHashMap = new Map()
