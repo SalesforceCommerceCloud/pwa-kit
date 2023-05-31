@@ -11,14 +11,14 @@ import {
     renderWithProviders,
     createPathWithDefaults,
     guestToken
-} from 'retail-react-app/app/utils/test-utils'
+} from '@salesforce/retail-react-app/app/utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import Account from 'retail-react-app/app/pages/account'
-import Registration from 'retail-react-app/app/pages/registration'
-import ResetPassword from 'retail-react-app/app/pages/reset-password'
-import mockConfig from 'retail-react-app/config/mocks/default'
-import {mockedRegisteredCustomer} from 'retail-react-app/app/mocks/mock-data'
+import Account from '@salesforce/retail-react-app/app/pages/account'
+import Registration from '@salesforce/retail-react-app/app/pages/registration'
+import ResetPassword from '@salesforce/retail-react-app/app/pages/reset-password'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
     currency: 'USD',

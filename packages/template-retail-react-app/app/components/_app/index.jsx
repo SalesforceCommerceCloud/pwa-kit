@@ -8,9 +8,9 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
-import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useQuery, useQueries} from '@tanstack/react-query'
 import {
     useAccessToken,
@@ -19,33 +19,33 @@ import {
     useCustomerType,
     useCustomerBaskets,
     useShopperBasketsMutation
-} from 'commerce-sdk-react-preview'
-import * as queryKeyHelpers from 'commerce-sdk-react-preview/hooks/ShopperProducts/queryKeyHelpers'
+} from '@salesforce/commerce-sdk-react'
+import * as queryKeyHelpers from '@salesforce/commerce-sdk-react/hooks/ShopperProducts/queryKeyHelpers'
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CurrencyProvider} from 'retail-react-app/app/contexts'
+import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
 
 // Local Project Components
-import Header from 'retail-react-app/app/components/header'
-import OfflineBanner from 'retail-react-app/app/components/offline-banner'
-import OfflineBoundary from 'retail-react-app/app/components/offline-boundary'
-import ScrollToTop from 'retail-react-app/app/components/scroll-to-top'
-import Footer from 'retail-react-app/app/components/footer'
-import CheckoutHeader from 'retail-react-app/app/pages/checkout/partials/checkout-header'
-import CheckoutFooter from 'retail-react-app/app/pages/checkout/partials/checkout-footer'
-import DrawerMenu from 'retail-react-app/app/components/drawer-menu'
-import ListMenu from 'retail-react-app/app/components/list-menu'
-import {HideOnDesktop, HideOnMobile} from 'retail-react-app/app/components/responsive'
-import AboveHeader from 'retail-react-app/app/components/_app/partials/above-header'
+import Header from '@salesforce/retail-react-app/app/components/header'
+import OfflineBanner from '@salesforce/retail-react-app/app/components/offline-banner'
+import OfflineBoundary from '@salesforce/retail-react-app/app/components/offline-boundary'
+import ScrollToTop from '@salesforce/retail-react-app/app/components/scroll-to-top'
+import Footer from '@salesforce/retail-react-app/app/components/footer'
+import CheckoutHeader from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-header'
+import CheckoutFooter from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-footer'
+import DrawerMenu from '@salesforce/retail-react-app/app/components/drawer-menu'
+import ListMenu from '@salesforce/retail-react-app/app/components/list-menu'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
+import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
 
 // Hooks
-import {AuthModal, useAuthModal} from 'retail-react-app/app/hooks/use-auth-modal'
-import {AddToCartModalProvider} from 'retail-react-app/app/hooks/use-add-to-cart-modal'
-import useMultiSite from 'retail-react-app/app/hooks/use-multi-site'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -56,8 +56,8 @@ import {
     flatten,
     mergeMatchedItems,
     isServer
-} from 'retail-react-app/app/utils/utils'
-import {getTargetLocale, fetchTranslations} from 'retail-react-app/app/utils/locale'
+} from '@salesforce/retail-react-app/app/utils/utils'
+import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
     HOME_HREF,
@@ -65,9 +65,9 @@ import {
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE
-} from 'retail-react-app/app/constants'
+} from '@salesforce/retail-react-app/app/constants'
 
-import Seo from 'retail-react-app/app/components/seo'
+import Seo from '@salesforce/retail-react-app/app/components/seo'
 
 const onClient = typeof window !== 'undefined'
 

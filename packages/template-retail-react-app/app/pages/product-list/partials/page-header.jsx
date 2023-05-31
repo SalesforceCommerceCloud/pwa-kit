@@ -11,7 +11,7 @@ import PropTypes from 'prop-types'
 import {Box, Heading, Flex, Text, Fade} from '@chakra-ui/react'
 
 // Project Components
-import Breadcrumb from 'retail-react-app/app/components/breadcrumb'
+import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'
 
 const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...otherProps}) => {
     return (

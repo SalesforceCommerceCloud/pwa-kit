@@ -10,7 +10,7 @@ import {
     useShopperContext,
     useShopperContextsMutation,
     ShopperContextsMutation
-} from 'commerce-sdk-react-preview'
+} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
 
 const renderQueryHook = (name: string, {data, isLoading, error}: any) => {

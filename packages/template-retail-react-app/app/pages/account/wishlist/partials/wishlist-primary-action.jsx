@@ -6,14 +6,14 @@
  */
 import React, {useState} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
-import {useShopperBasketsMutation} from 'commerce-sdk-react-preview'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useItemVariant} from 'retail-react-app/app/components/item-variant'
-import ProductViewModal from 'retail-react-app/app/components/product-view-modal'
-import {useToast} from 'retail-react-app/app/hooks/use-toast'
-import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
-import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
-import Link from 'retail-react-app/app/components/link'
+import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
+import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import Link from '@salesforce/retail-react-app/app/components/link'
 
 /**
  * Renders primary action on a product-item card in the form of a button.

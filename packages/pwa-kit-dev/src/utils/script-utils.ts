@@ -66,7 +66,7 @@ export const getPkgJSON = async (): Promise<Pkg> => {
             // Keep looking
         }
     }
-    return {name: 'pwa-kit-dev', version: 'unknown'}
+    return {name: '@salesforce/pwa-kit-dev', version: 'unknown'}
 }
 
 /**

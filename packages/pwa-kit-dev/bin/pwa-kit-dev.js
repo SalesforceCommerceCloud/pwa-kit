@@ -14,7 +14,7 @@ const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
 const projectPkg = require(process.cwd() + '/package.json')
-const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
+const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled

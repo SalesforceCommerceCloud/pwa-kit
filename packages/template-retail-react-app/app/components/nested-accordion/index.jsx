@@ -19,9 +19,9 @@ import {
     // Hooks
     useStyleConfig
 } from '@chakra-ui/react'
-import Link from 'retail-react-app/app/components/link'
+import Link from '@salesforce/retail-react-app/app/components/link'
 // Icons
-import {ChevronDownIcon, ChevronRightIcon} from 'retail-react-app/app/components/icons'
+import {ChevronDownIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 /**
  * The nested accordion allows you to create, as the name suggest, a nests

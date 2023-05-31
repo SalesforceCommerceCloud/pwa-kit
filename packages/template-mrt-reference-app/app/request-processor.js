@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {QueryParameters} from 'pwa-kit-runtime/utils/ssr-request-processing'
+import {QueryParameters} from '@salesforce/pwa-kit-runtime/utils/ssr-request-processing'
 
 const exclusions = ['removeme']
 

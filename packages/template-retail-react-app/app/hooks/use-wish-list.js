@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useCustomerProductLists, useShopperCustomersMutation} from 'commerce-sdk-react-preview'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import {useCustomerProductLists, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 const onClient = typeof window !== 'undefined'
 // TODO: remove `listId` input -> use the first list of type wish_list instead
 // (mimic the logic in the other older hook 'use-wishlist.js')

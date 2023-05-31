@@ -6,7 +6,7 @@
  */
 import React, {ReactElement} from 'react'
 import Json from '../../Json'
-import {usePaymentMethodsForBasket} from 'commerce-sdk-react-preview'
+import {usePaymentMethodsForBasket} from '@salesforce/commerce-sdk-react'
 
 export const UsePaymentMethodsForBasket = ({basketId}: {basketId: string}): ReactElement | null => {
     const {isLoading, error, data} = usePaymentMethodsForBasket({parameters: {basketId}})

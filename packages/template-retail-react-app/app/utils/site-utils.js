@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
-import {absoluteUrl} from 'retail-react-app/app/utils/url'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 
 /**
  * This functions takes an url and returns a site object,

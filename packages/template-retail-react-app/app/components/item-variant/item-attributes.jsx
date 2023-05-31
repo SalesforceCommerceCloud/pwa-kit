@@ -9,11 +9,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {Flex, Stack, Text} from '@chakra-ui/react'
-import {useItemVariant} from 'retail-react-app/app/components/item-variant'
-import PromoPopover from 'retail-react-app/app/components/promo-popover'
-import {useCurrency} from 'retail-react-app/app/hooks'
-import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
-import {usePromotions} from 'commerce-sdk-react-preview'
+import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
+import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {usePromotions} from '@salesforce/commerce-sdk-react'
 
 /**
  * In the context of a cart product item variant, this component renders a styled

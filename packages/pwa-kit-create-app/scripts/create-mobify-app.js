@@ -19,7 +19,7 @@
  *
  * ## Basic usage
  *
- * We expect end-users to generate projects by running `npx pwa-kit-create-app` on
+ * We expect end-users to generate projects by running `npx @salesforce/pwa-kit-create-app` on
  * the CLI and following the prompts. Users must be able to run that command without
  * installing any dependencies first.
  *
@@ -197,7 +197,7 @@ const PRESETS = [
         shortDescription: 'The Retail app using your own Commerce Cloud instance',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: 'retail-react-app'
+            id: '@salesforce/retail-react-app'
         },
         questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         assets: ['translations'],
@@ -215,7 +215,7 @@ const PRESETS = [
         shortDescription: 'The Retail app with demo Commerce Cloud instance',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: 'retail-react-app'
+            id: '@salesforce/retail-react-app'
         },
         questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         answers: {
@@ -237,8 +237,8 @@ const PRESETS = [
         name: 'Retail React App Test Project',
         description: '',
         templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'retail-react-app'
+            type: TEMPLATE_SOURCE_NPM,
+            id: '@salesforce/retail-react-app'
         },
         questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         answers: {

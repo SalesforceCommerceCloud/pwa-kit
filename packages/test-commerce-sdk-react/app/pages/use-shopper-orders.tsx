@@ -14,7 +14,7 @@ import {
     useShopperOrdersMutation,
     useAuthHelper,
     ShopperOrdersMutation
-} from 'commerce-sdk-react-preview'
+} from '@salesforce/commerce-sdk-react'
 const orderNos = ['00014202', '00014103']
 
 const renderQueryHook = (name: string, {data, isLoading, error}: any) => {

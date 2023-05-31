@@ -21,7 +21,7 @@ const lernaConfigPath = path.join(rootPath, 'lerna.json')
 const monorepoPackages = JSON.parse(sh.exec('lerna list --all --json', {silent: true}))
 const monorepoPackageNames = monorepoPackages.map((pkg) => pkg.name)
 
-const INDEPENDENT_PACKAGES = ['retail-react-app', 'commerce-sdk-react-preview']
+const INDEPENDENT_PACKAGES = ['@salesforce/retail-react-app', '@salesforce/commerce-sdk-react']
 const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) =>
     monorepoPackages.find((pkg) => pkg.name === pkgName)
 )

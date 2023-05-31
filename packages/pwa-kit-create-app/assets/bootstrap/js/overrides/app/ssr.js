@@ -8,9 +8,9 @@
 'use strict'
 
 const path = require('path')
-const {getRuntime} = require('pwa-kit-runtime/ssr/server/express')
-const {isRemote} = require('pwa-kit-runtime/utils/ssr-server')
-const {getConfig} = require('pwa-kit-runtime/utils/ssr-config')
+const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
+const {isRemote} = require('@salesforce/pwa-kit-runtime/utils/ssr-server')
+const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
 const helmet = require('helmet')
 
 const options = {

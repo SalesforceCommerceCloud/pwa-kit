@@ -14,11 +14,11 @@
 
 import React from 'react'
 import loadable from '@loadable/component'
-import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
-import {configureRoutes} from 'retail-react-app/app/utils/routes-utils'
+import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 

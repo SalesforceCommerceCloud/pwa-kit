@@ -7,8 +7,8 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 
-import CheckoutFooter from 'retail-react-app/app/pages/checkout/partials/checkout-footer'
-import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
+import CheckoutFooter from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-footer'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 test('renders component', () => {
     renderWithProviders(<CheckoutFooter />)

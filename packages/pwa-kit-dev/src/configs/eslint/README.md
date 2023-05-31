@@ -14,8 +14,8 @@ Extending a `pwa-kit-dev` ESLint configuration is a little bit from the standard
 
 ```js
 module.exports = {
-  extends: [require.resolve('pwa-kit-dev/configs/eslint/recommended')]
+  extends: [require.resolve('@salesforce/pwa-kit-dev/configs/eslint/recommended')]
 }
 ```
 
-> **Note:** For convenience, `pwa-kit-dev/configs/eslint` is provided as an alias for the `recommended` configuration.
+> **Note:** For convenience, `@salesforce/pwa-kit-dev/configs/eslint` is provided as an alias for the `recommended` configuration.

@@ -5,8 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders, withPageProvider} from 'retail-react-app/app/utils/test-utils'
-import Carousel from 'retail-react-app/app/page-designer/layouts/carousel/index'
+import {
+    renderWithProviders,
+    withPageProvider
+} from '@salesforce/retail-react-app/app/utils/test-utils'
+import Carousel from '@salesforce/retail-react-app/app/page-designer/layouts/carousel/index'
 
 const SAMPLE_REGION = {
     id: 'TEST_REGION',

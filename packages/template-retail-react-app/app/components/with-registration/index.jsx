@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {AuthModal, useAuthModal} from 'retail-react-app/app/hooks/use-auth-modal'
+import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import PropTypes from 'prop-types'
-import {noop} from 'retail-react-app/app/utils/utils'
+import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
-import {useToast} from 'retail-react-app/app/hooks/use-toast'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const withRegistration = (Component) => {
     const WrappedComponent = ({onClick = noop, ...passThroughProps}) => {

@@ -9,21 +9,21 @@ import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
-import ProductScroller from 'retail-react-app/app/components/product-scroller'
-import useEinstein from 'retail-react-app/app/hooks/use-einstein'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
-import useIntersectionObserver from 'retail-react-app/app/hooks/use-intersection-observer'
-import {useWishList} from 'retail-react-app/app/hooks/use-wish-list'
+import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
+import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import useIntersectionObserver from '@salesforce/retail-react-app/app/hooks/use-intersection-observer'
+import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
-import {useToast} from 'retail-react-app/app/hooks/use-toast'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     API_ERROR_MESSAGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST
-} from 'retail-react-app/app/constants'
-import {useShopperCustomersMutation} from 'commerce-sdk-react-preview'
+} from '@salesforce/retail-react-app/app/constants'
+import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 /**
  * A component for fetching and rendering product recommendations from the Einstein API

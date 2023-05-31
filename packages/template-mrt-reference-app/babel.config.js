@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const base = require('pwa-kit-dev/configs/babel/babel-config').default
+const base = require('@salesforce/pwa-kit-dev/configs/babel/babel-config').default
 
 module.exports = {
     ...base,

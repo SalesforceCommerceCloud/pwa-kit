@@ -24,7 +24,7 @@ import {
     SocialPinterestIcon,
     SocialTwitterIcon,
     SocialYoutubeIcon
-} from 'retail-react-app/app/components/icons'
+} from '@salesforce/retail-react-app/app/components/icons'
 
 /**
  *

@@ -12,12 +12,12 @@
 /* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
 import {randomUUID} from 'crypto'
-import {RemoteServerFactory} from 'pwa-kit-runtime/ssr/server/build-remote-server'
+import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
 
 import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
-import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
+import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 
 import {getAppConfig} from '../universal/compatibility'
 
@@ -344,8 +344,8 @@ jest.mock('../universal/routes', () => {
     }
 })
 
-jest.mock('pwa-kit-runtime/utils/ssr-server', () => {
-    const actual = jest.requireActual('pwa-kit-runtime/utils/ssr-server')
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-server', () => {
+    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-server')
     return {
         ...actual,
         isRemote: jest.fn()
@@ -369,8 +369,8 @@ jest.mock('@loadable/server', () => {
     }
 })
 
-jest.mock('pwa-kit-runtime/ssr/server/build-remote-server', () => {
-    const actual = jest.requireActual('pwa-kit-runtime/ssr/server/build-remote-server')
+jest.mock('@salesforce/pwa-kit-runtime/ssr/server/build-remote-server', () => {
+    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/ssr/server/build-remote-server')
     return {
         ...actual,
         RemoteServerFactory: {
