@@ -118,7 +118,7 @@ const entryPointExists = (segments) => {
 }
 
 const getAppEntryPoint = () => {
-    return EXT_OVERRIDES_DIR_NO_SLASH + `/app/main`
+    return resolve('./', EXT_OVERRIDES_DIR_NO_SLASH, 'app', 'main')
 }
 
 const findDepInStack = (pkg) => {
