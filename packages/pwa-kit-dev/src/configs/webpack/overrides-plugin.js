@@ -32,10 +32,15 @@ class OverridesResolverPlugin {
         this.extendsHashMap = new Map()
 
         // everything except directories
-        const globPattern = `${this.pkg?.ccExtensibility?.overridesDir?.replace(/^\//, '')}/**/*.*`
+        // NOTE that the glob library expects posix so we replace windows file paths here
+        const globPattern = `${this.pkg?.ccExtensibility?.overridesDir
+            ?.replace(/\\/g, '/')
+            ?.replace(/^\//, '')}/**/*.*`
         const overridesFsRead = glob.sync(globPattern)
         const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + path.sep
         overridesFsRead.forEach((item) => {
+            // NOTE that the glob library expects posix so we replace windows file paths here
+            item = path.sep === '/' ? item : item.replace(makeRegExp('/'), path.sep)
             const end = item.substring(item.lastIndexOf(path.sep + 'index'))
             const [l, ...rest] = item.split(/(index|\.)/)
             this.extendsHashMap.set(l?.replace(overrideReplace, '').replace(/\/$/, ''), [end, rest])
