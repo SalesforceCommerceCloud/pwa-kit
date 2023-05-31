@@ -51,9 +51,9 @@ describe('overrides plugin', () => {
         const testRequestContext = {
             _ResolverCachePluginCacheMiss: true,
             context: {
-                issuer: path.resolve('./', 'fake-file.js')
+                issuer: path.join('./', 'fake-file.js')
             },
-            path: path.resolve('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('./', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         }
 
@@ -74,9 +74,10 @@ describe('overrides plugin', () => {
             {
                 _ResolverCachePluginCacheMiss: true,
                 context: {
-                    issuer: path.resolve('./', 'fake-file.js')
+                    issuer: path.join('./', 'fake-file.js')
                 },
-                path: `${REWRITE_DIR}/${REQUEST_PATH}${REQUEST_EXTENSION}`,
+                // path: path.join(REWRITE_DIR, REQUEST_PATH + REQUEST_EXTENSION),
+                path: REWRITE_DIR + REQUEST_PATH + REQUEST_EXTENSION,
                 request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
             },
             expect.anything(),
@@ -91,9 +92,9 @@ describe('overrides plugin', () => {
         const testRequestContext = {
             _ResolverCachePluginCacheMiss: true,
             context: {
-                issuer: path.resolve('./', 'fake-file.js')
+                issuer: path.join('./', 'fake-file.js')
             },
-            path: path.resolve('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('./', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`
         }
 
@@ -114,9 +115,9 @@ describe('overrides plugin', () => {
             {
                 _ResolverCachePluginCacheMiss: true,
                 context: {
-                    issuer: path.resolve('./', 'fake-file.js')
+                    issuer: path.join('./', 'fake-file.js')
                 },
-                path: `${REWRITE_DIR}/${REQUEST_PATH}${REQUEST_EXTENSION}`,
+                path: path.join(REWRITE_DIR, REQUEST_PATH + REQUEST_EXTENSION),
                 request: `${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`
             },
             expect.anything(),
@@ -133,9 +134,9 @@ describe('overrides plugin', () => {
         const testRequestContext = {
             _ResolverCachePluginCacheMiss: true,
             context: {
-                issuer: path.resolve('./', 'fake-file.js')
+                issuer: path.join('./', 'fake-file.js')
             },
-            path: path.resolve('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('./', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`
         }
 
@@ -160,9 +161,9 @@ describe('overrides plugin', () => {
         const testOneRequestContext = {
             _ResolverCachePluginCacheMiss: true,
             context: {
-                issuer: path.resolve('./', 'fake-file.js')
+                issuer: path.join('./', 'fake-file.js')
             },
-            path: path.resolve('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('./', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_ONE_PATH}`
         }
 
@@ -183,9 +184,9 @@ describe('overrides plugin', () => {
             {
                 _ResolverCachePluginCacheMiss: true,
                 context: {
-                    issuer: path.resolve('./', 'fake-file.js')
+                    issuer: path.join('./', 'fake-file.js')
                 },
-                path: `${REWRITE_DIR}/${REQUEST_ONE_PATH}${REQUEST_ONE_EXTENSION}`,
+                path: path.join(REWRITE_DIR, REQUEST_ONE_PATH + REQUEST_ONE_EXTENSION),
                 request: `retail-react-app/exists`
             },
             expect.anything(),
@@ -198,9 +199,9 @@ describe('overrides plugin', () => {
         const testTwoRequestContext = {
             _ResolverCachePluginCacheMiss: true,
             context: {
-                issuer: path.resolve('./', 'fake-file.js')
+                issuer: path.join('./', 'fake-file.js')
             },
-            path: path.resolve('./'),
+            path: path.join('./'),
             request: REQUEST_TWO_PATH
         }
         ;({resolver, callback} = setupResolverAndCallback(
@@ -226,9 +227,9 @@ describe('overrides plugin', () => {
     //     const testRequestContext = {
     //         _ResolverCachePluginCacheMiss: true,
     //         context: {
-    //             issuer: path.resolve('./', 'fake-file.js')
+    //             issuer: path.join('./', 'fake-file.js')
     //         },
-    //         path: path.resolve('./', 'node_modules', EXTENDS_TARGET),
+    //         path: path.join('./', 'node_modules', EXTENDS_TARGET),
     //         request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
     //     }
 
@@ -249,7 +250,7 @@ describe('overrides plugin', () => {
     //         {
     //             _ResolverCachePluginCacheMiss: true,
     //             context: {
-    //                 issuer: path.resolve('./', 'fake-file.js')
+    //                 issuer: path.join('./', 'fake-file.js')
     //             },
     //             path: `${REWRITE_DIR}/${REQUEST_PATH}${REQUEST_EXTENSION}`,
     //             request: `retail-react-app/exists`
