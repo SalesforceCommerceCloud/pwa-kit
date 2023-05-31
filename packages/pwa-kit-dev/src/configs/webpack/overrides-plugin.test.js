@@ -8,17 +8,26 @@
 import path from 'path'
 import OverridesResolverPlugin from './overrides-plugin'
 
-const PROJECT_DIR = 'src/configs/webpack/test'
+const convertToOsPath = (str) =>
+    path.sep === '/' ? str.replace(/\\/, '/') : str.replace(/\//, '\\').replace(/^\./, '..')
+
+const PROJECT_DIR = convertToOsPath(`src/configs/webpack/test`)
 const FS_READ_HASHMAP = new Map([
-    ['exists', ['src/configs/webpack/test/overrides/exists.jsx', ['.', 'jsx']]],
-    ['path/data', ['src/configs/webpack/test/overrides/path/data.js', ['.', 'js']]],
+    ['exists', [convertToOsPath('src/configs/webpack/test/overrides/exists.jsx'), ['.', 'jsx']]],
+    [
+        'path/data',
+        [convertToOsPath('src/configs/webpack/test/overrides/path/data.js'), ['.', 'js']]
+    ],
     ['path', ['/index.jsx', ['index', '', '.', 'jsx']]],
-    ['path/nested/icon', ['src/configs/webpack/test/overrides/path/nested/icon.svg', ['.', 'svg']]]
+    [
+        convertToOsPath('path/nested/icon'),
+        [convertToOsPath('src/configs/webpack/test/overrides/path/nested/icon.svg'), ['.', 'svg']]
+    ]
 ])
 const EXTENDS_TARGET = 'retail-react-app'
-const REWRITE_DIR = 'src/configs/webpack/test/overrides'
+const REWRITE_DIR = convertToOsPath('src/configs/webpack/test/overrides')
 const options = {
-    overridesDir: '/overrides',
+    overridesDir: convertToOsPath('/overrides'),
     extends: ['retail-react-app'],
     projectDir: PROJECT_DIR
 }
@@ -54,7 +63,7 @@ describe('overrides plugin', () => {
                 issuer: path.join(process.cwd(), 'fake-file.js')
             },
             path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
-            request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}`
+            request: convertToOsPath(`${EXTENDS_TARGET}/${REQUEST_PATH}`)
         }
 
         const {resolver, callback} = setupResolverAndCallback(
@@ -76,8 +85,8 @@ describe('overrides plugin', () => {
                 context: {
                     issuer: path.join(process.cwd(), 'fake-file.js')
                 },
-                path: `${REWRITE_DIR}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`,
-                request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}`
+                path: convertToOsPath(`${REWRITE_DIR}/${REQUEST_PATH}${REQUEST_EXTENSION}`),
+                request: convertToOsPath(`${EXTENDS_TARGET}/${REQUEST_PATH}`)
             },
             expect.anything(),
             expect.anything(),
@@ -86,7 +95,7 @@ describe('overrides plugin', () => {
     })
 
     test('nested and non-ts/tsx/js/jsx files rewrite if in overrides', () => {
-        const REQUEST_PATH = `path${path.sep}nested${path.sep}icon`
+        const REQUEST_PATH = convertToOsPath(`path/nested/icon`)
         const REQUEST_EXTENSION = '.svg'
         const testRequestContext = {
             _ResolverCachePluginCacheMiss: true,
@@ -94,7 +103,7 @@ describe('overrides plugin', () => {
                 issuer: path.join(process.cwd(), 'fake-file.js')
             },
             path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
-            request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`
+            request: convertToOsPath(`${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`)
         }
 
         const {resolver, callback} = setupResolverAndCallback(
@@ -116,8 +125,8 @@ describe('overrides plugin', () => {
                 context: {
                     issuer: path.join(process.cwd(), 'fake-file.js')
                 },
-                path: `${REWRITE_DIR}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`,
-                request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`
+                path: convertToOsPath(`${REWRITE_DIR}/${REQUEST_PATH}${REQUEST_EXTENSION}`),
+                request: convertToOsPath(`${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`)
             },
             expect.anything(),
             expect.anything(),
@@ -128,7 +137,7 @@ describe('overrides plugin', () => {
     test('jsx base template files can be replaced by tsx files', () => {})
 
     test('resolver doResolve() hook is NOT called for files NOT in overrides dir', () => {
-        const REQUEST_PATH = `path${path.sep}nested${path.sep}does_not_exist.svg`
+        const REQUEST_PATH = convertToOsPath(`path/nested/does_not_exist.svg`)
         const REQUEST_EXTENSION = '.svg'
         const testRequestContext = {
             _ResolverCachePluginCacheMiss: true,
@@ -136,7 +145,7 @@ describe('overrides plugin', () => {
                 issuer: path.join(process.cwd(), 'fake-file.js')
             },
             path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
-            request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`
+            request: convertToOsPath(`${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`)
         }
 
         const {resolver, callback} = setupResolverAndCallback(
@@ -163,7 +172,7 @@ describe('overrides plugin', () => {
                 issuer: path.join(process.cwd(), 'fake-file.js')
             },
             path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
-            request: `${EXTENDS_TARGET}${path.sep}${REQUEST_ONE_PATH}`
+            request: convertToOsPath(`${EXTENDS_TARGET}/${REQUEST_ONE_PATH}`)
         }
 
         let {resolver, callback} = setupResolverAndCallback(
@@ -185,8 +194,8 @@ describe('overrides plugin', () => {
                 context: {
                     issuer: path.join(process.cwd(), 'fake-file.js')
                 },
-                path: `${REWRITE_DIR}${path.sep}${REQUEST_ONE_PATH}${REQUEST_ONE_EXTENSION}`,
-                request: `retail-react-app${path.sep}exists`
+                path: convertToOsPath(`${REWRITE_DIR}/${REQUEST_ONE_PATH}${REQUEST_ONE_EXTENSION}`),
+                request: convertToOsPath(`retail-react-app/exists`)
             },
             expect.anything(),
             expect.anything(),
@@ -194,7 +203,7 @@ describe('overrides plugin', () => {
         )
 
         // TODO: this might be `..\` on Windows?
-        const REQUEST_TWO_PATH = `./exists`
+        const REQUEST_TWO_PATH = convertToOsPath(`./exists`)
         const testTwoRequestContext = {
             _ResolverCachePluginCacheMiss: true,
             context: {
@@ -229,7 +238,7 @@ describe('overrides plugin', () => {
     //             issuer: path.join(process.cwd(), 'fake-file.js')
     //         },
     //         path: path.resolve(process.cwd(), 'node_modules', EXTENDS_TARGET),
-    //         request: `${EXTENDS_TARGET}${path.sep}${REQUEST_PATH}`
+    //         request: convertToOsPath(`${EXTENDS_TARGET}/${REQUEST_PATH}`)
     //     }
 
     //     const {resolver, callback} = setupResolverAndCallback(
@@ -251,16 +260,18 @@ describe('overrides plugin', () => {
     //             context: {
     //                 issuer: path.join(process.cwd(), 'fake-file.js')
     //             },
-    //             path: `${REWRITE_DIR}${path.sep}${REQUEST_PATH}${REQUEST_EXTENSION}`,
-    //             request: `retail-react-app${path.sep}exists`
+    //             path: convertToOsPath(`${REWRITE_DIR}/${REQUEST_PATH}${REQUEST_EXTENSION}`),
+    //             request: convertToOsPath(`retail-react-app/exists`)
     //         },
     //         expect.anything(),
     //         expect.anything(),
     //         expect.anything()
     //     )
     //     path.sep = _original_sep
-    //     expect(path.sept).toBe(_original_sep)
+    //     expect(path.sep).toBe(_original_sep)
     // })
 
     test('npm @namespaces resolve correctly', () => {})
+
+    test('a nested overrides folder path/to/overrides resolves correctly', () => {})
 })
