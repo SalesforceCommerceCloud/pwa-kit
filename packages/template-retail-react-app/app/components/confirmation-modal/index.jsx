@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {noop} from 'retail-react-app/app/utils/utils'
+import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     Button,
     AlertDialog,
@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 import PropTypes from 'prop-types'
-import {CONFIRMATION_DIALOG_DEFAULT_CONFIG} from 'retail-react-app/app/pages/account/constant'
+import {CONFIRMATION_DIALOG_DEFAULT_CONFIG} from '@salesforce/retail-react-app/app/pages/account/constant'
 import {useIntl} from 'react-intl'
 
 const ConfirmationModal = ({

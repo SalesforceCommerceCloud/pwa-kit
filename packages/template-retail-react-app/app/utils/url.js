@@ -5,14 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {
     getLocaleByReference,
     getParamsFromPath,
     getDefaultSite,
     getSiteByReference
-} from 'retail-react-app/app/utils/site-utils'
-import {HOME_HREF, urlPartPositions} from 'retail-react-app/app/constants'
+} from '@salesforce/retail-react-app/app/utils/site-utils'
+import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.

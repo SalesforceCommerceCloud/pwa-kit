@@ -11,21 +11,21 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
 
 // Project Components
-import CartCta from 'retail-react-app/app/pages/cart/partials/cart-cta'
-import CartSecondaryButtonGroup from 'retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
-import CartSkeleton from 'retail-react-app/app/pages/cart/partials/cart-skeleton'
-import CartTitle from 'retail-react-app/app/pages/cart/partials/cart-title'
-import ConfirmationModal from 'retail-react-app/app/components/confirmation-modal'
-import EmptyCart from 'retail-react-app/app/pages/cart/partials/empty-cart'
-import OrderSummary from 'retail-react-app/app/components/order-summary'
-import ProductItem from 'retail-react-app/app/components/product-item/index'
-import ProductViewModal from 'retail-react-app/app/components/product-view-modal'
-import RecommendedProducts from 'retail-react-app/app/components/recommended-products'
+import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'
+import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
+import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
+import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
+import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
+import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
+import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
+import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
+import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
+import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 
 // Hooks
-import {useToast} from 'retail-react-app/app/hooks/use-toast'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import {useWishList} from 'retail-react-app/app/hooks/use-wish-list'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
 // Constants
 import {
@@ -34,19 +34,19 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
-} from 'retail-react-app/app/constants'
-import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from 'retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
+} from '@salesforce/retail-react-app/app/constants'
+import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
 // Utilities
 import debounce from 'lodash/debounce'
-import {useCurrentBasket} from 'retail-react-app/app/hooks/use-current-basket'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
     useShopperCustomersMutation
-} from 'commerce-sdk-react-preview'
-import {useCurrentCustomer} from 'retail-react-app/app/hooks/use-current-customer'
+} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {AuthHelpers, useAuthHelper} from 'commerce-sdk-react-preview'
+import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
 
 const UseAuthHelper = () => {

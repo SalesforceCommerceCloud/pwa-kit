@@ -1,5 +1,5 @@
 {
-  "name": "pwa-kit-dev",
+  "name": "@salesforce/pwa-kit-dev",
   "version": "3.0.0-dev",
   "description": "Build tools for pwa-kit",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-dev#readme",
@@ -41,6 +41,7 @@
     "@babel/eslint-parser": "^7.21.3",
     "@babel/parser": "^7.21.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/plugin-transform-async-to-generator": "^7.20.7",
     "@babel/plugin-transform-object-assign": "^7.18.6",
     "@babel/plugin-transform-runtime": "^7.21.0",
@@ -91,7 +92,7 @@
     "node-fetch": "^2.6.9",
     "open": "^8.4.2",
     "prettier": "^2.8.6",
-    "pwa-kit-runtime": "^3.0.0-dev",
+    "@salesforce/pwa-kit-runtime": "^3.0.0-dev",
     "react-refresh": "^0.14.0",
     "replace-in-file": "^6.3.5",
     "require-from-string": "^2.0.2",

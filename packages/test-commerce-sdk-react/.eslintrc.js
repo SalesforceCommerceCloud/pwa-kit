@@ -6,5 +6,5 @@
  */
 
 module.exports = {
-    extends: [require.resolve('pwa-kit-dev/configs/eslint')]
+    extends: [require.resolve('@salesforce/pwa-kit-dev/configs/eslint')]
 }

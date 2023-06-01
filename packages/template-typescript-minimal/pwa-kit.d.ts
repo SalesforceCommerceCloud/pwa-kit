@@ -6,4 +6,4 @@
  */
 // Most PWA Kit packages currently do not export types; this file is used to create basic types
 // until the packages provide their own.
-declare module 'pwa-kit-react-sdk/ssr/browser/main'
+declare module '@salesforce/pwa-kit-react-sdk/ssr/browser/main'

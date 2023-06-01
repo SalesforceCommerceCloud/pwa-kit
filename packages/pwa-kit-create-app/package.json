@@ -1,5 +1,5 @@
 {
-  "name": "pwa-kit-create-app",
+  "name": "@salesforce/pwa-kit-create-app",
   "version": "3.0.0-dev",
   "description": "Salesforce's project generator tool",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-create-app#readme",
@@ -12,7 +12,7 @@
   },
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
-  "bin": "scripts/create-mobify-app.js",
+  "bin": {"pwa-kit-create-app": "scripts/create-mobify-app.js"},
   "files": [
     "assets",
     "templates"
@@ -28,7 +28,8 @@
   "dependencies": {
     "commander": "^9.5.0",
     "deepmerge": "2.2.1",
-    "inquirer": "7.3.3",
+    "handlebars": "^4.7.7",
+    "inquirer": "8.2.5",
     "semver": "^7.3.8",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
@@ -36,7 +37,7 @@
   },
   "devDependencies": {
     "internal-lib-build": "3.0.0-dev",
-    "pwa-kit-dev": "3.0.0-dev",
+    "@salesforce/pwa-kit-dev": "3.0.0-dev",
     "verdaccio": "^5.22.1"
   },
   "engines": {

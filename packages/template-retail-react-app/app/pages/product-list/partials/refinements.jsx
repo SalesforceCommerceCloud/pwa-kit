@@ -17,13 +17,13 @@ import {
     AccordionIcon
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import ColorRefinements from 'retail-react-app/app/pages/product-list/partials/color-refinements'
-import SizeRefinements from 'retail-react-app/app/pages/product-list/partials/size-refinements'
-import RadioRefinements from 'retail-react-app/app/pages/product-list/partials/radio-refinements'
-import CheckboxRefinements from 'retail-react-app/app/pages/product-list/partials/checkbox-refinements'
-import LinkRefinements from 'retail-react-app/app/pages/product-list/partials/link-refinements'
-import {isServer} from 'retail-react-app/app/utils/utils'
-import {FILTER_ACCORDION_SATE} from 'retail-react-app/app/constants'
+import ColorRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/color-refinements'
+import SizeRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/size-refinements'
+import RadioRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/radio-refinements'
+import CheckboxRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/checkbox-refinements'
+import LinkRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/link-refinements'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import {FILTER_ACCORDION_SATE} from '@salesforce/retail-react-app/app/constants'
 
 const componentMap = {
     cgid: LinkRefinements,

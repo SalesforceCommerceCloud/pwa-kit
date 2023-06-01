@@ -26,7 +26,7 @@ To integrate this library with your PWA Kit application you can use the `Commerc
 // app/components/_app-config/index.jsx
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
-import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 
 const AppConfig = ({children}) => {
     return (

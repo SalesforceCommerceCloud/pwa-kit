@@ -7,9 +7,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Stack} from '@chakra-ui/react'
-import useRegistrationFields from 'retail-react-app/app/components/forms/useRegistrationFields'
-import Field from 'retail-react-app/app/components/field'
-import PasswordRequirements from 'retail-react-app/app/components/forms/password-requirements'
+import useRegistrationFields from '@salesforce/retail-react-app/app/components/forms/useRegistrationFields'
+import Field from '@salesforce/retail-react-app/app/components/field'
+import PasswordRequirements from '@salesforce/retail-react-app/app/components/forms/password-requirements'
 
 const RegistrationFields = ({form, prefix = ''}) => {
     const fields = useRegistrationFields({form, prefix})

@@ -16,16 +16,16 @@ import {
     useCustomerId,
     useCustomerType,
     useShopperBasketsMutation
-} from 'commerce-sdk-react-preview'
-import useNavigation from 'retail-react-app/app/hooks/use-navigation'
-import Seo from 'retail-react-app/app/components/seo'
+} from '@salesforce/commerce-sdk-react'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
-import useEinstein from 'retail-react-app/app/hooks/use-einstein'
-import LoginForm from 'retail-react-app/app/components/login'
-import {API_ERROR_MESSAGE} from 'retail-react-app/app/constants'
-import {usePrevious} from 'retail-react-app/app/hooks/use-previous'
-import {isServer} from 'retail-react-app/app/utils/utils'
+import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import LoginForm from '@salesforce/retail-react-app/app/components/login'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
     id: 'login_page.error.incorrect_username_or_password'
