@@ -404,7 +404,6 @@ test('Can proceed through checkout as registered customer', async () => {
         }
     })
 
-    // await delay(1000)
     // Email should be displayed in previous step summary
     await waitFor(() => {
         expect(screen.getByText('customer@test.com')).toBeInTheDocument()
