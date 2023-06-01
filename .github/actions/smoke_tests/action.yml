@@ -7,12 +7,6 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Setup tmate session
-    if: ${{ failure() }}
-    uses: mxschmitt/action-tmate@v3
-    with:
-      detached: true
-      limit-access-to-actor: true
   - name: Smoke test scripts
     run: |-
       # Basic smoke-tests for uncommonly run scripts in a project
