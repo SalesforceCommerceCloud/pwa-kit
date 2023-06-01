@@ -21,7 +21,6 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
-import {makeRegExp} from './utils'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
@@ -46,12 +45,9 @@ if ([production, development].indexOf(mode) < 0) {
 export const EXT_OVERRIDES_DIR =
     typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
     !pkg?.ccExtensibility?.overridesDir?.startsWith(path.sep)
-        ? path.sep + pkg?.ccExtensibility?.overridesDir
-        : pkg?.ccExtensibility?.overridesDir ?? ''
-export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(
-    makeRegExp(`^\\${path.sep}`),
-    ''
-)
+        ? '/' + pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/')
+        : pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/') ?? ''
+export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
@@ -306,17 +302,14 @@ const withChunking = (config) => {
                             ) {
                                 return false
                             }
-                            return module?.context?.match?.(
-                                makeRegExp(`(node_modules)|(packages/.*/dist)`)
-                            )
+                            return module?.context?.match?.(/(node_modules)|(packages\/(.*)dist)/)
                         },
                         name: 'vendor',
                         chunks: 'all'
                     },
                     translations: {
                         priority: 10,
-                        test: (module) =>
-                            module?.context?.match?.(makeRegExp(`/app/translations/compiled`)),
+                        test: (module) => module?.context?.match?.(/\/app\/translations\/compiled/),
                         name: 'translations',
                         chunks: 'all'
                     }
@@ -332,7 +325,7 @@ const ruleForBabelLoader = (babelPlugins) => {
         test: /(\.js(x?)|\.ts(x?))$/,
         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
             ? // TODO: handle for array here when that's supported
-              {exclude: makeRegExp(`/node_modules(?!/${EXT_EXTENDS})`)}
+              {exclude: new RegExp(`/node_modules(?!/${EXT_EXTENDS})`)}
             : {exclude: /node_modules/}),
         use: [
             {
