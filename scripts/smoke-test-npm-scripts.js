@@ -44,11 +44,16 @@ const main = (opts) => {
         /^bump-version.*$/
     ]
 
+    console.log('~pkg.name', pkg.name)
+
     const scripts = Object.keys(pkg.scripts).filter(
         (script) => !exclude.some((re) => script.match(re))
     )
 
+    console.log('~scripts', scripts)
+
     scripts.forEach((script) => {
+        console.log('~script', script)
         const cmd = `npm run ${script}`
         console.log(`Testing "${cmd}"`)
         try {
