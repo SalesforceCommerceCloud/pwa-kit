@@ -93,7 +93,7 @@ export const ShopperCustomersMutations = {
     UpdateCustomerProductList: 'updateCustomerProductList',
     /**
      * @returns A TanStack Query mutation hook for interacting with the Shopper Customers `createCustomerProductListItem` endpoint.
-    */
+     */
     CreateCustomerProductListItem: 'createCustomerProductListItem',
     /**
      * Removes an item from a customer product list.

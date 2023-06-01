@@ -37,8 +37,8 @@ export const ShopperBasketsMutations = {
    */
     TransferBasket: 'transferBasket',
     /**
-      * Merge data from the previous shopper's basket into the current shopper's active basket and delete the previous shopper's basket. This endpoint doesn't merge Personally Identifiable Information (PII). You must obtain the shopper authorization token via SLAS and you must provide the ‘guest usid‘ in both the ‘/oauth2/login‘ and ‘/oauth2/token‘ calls while fetching the registered user JWT token. After the merge, all basket amounts are recalculated and totaled, including lookups for prices, taxes, shipping, and promotions.
-      */
+     * Merge data from the previous shopper's basket into the current shopper's active basket and delete the previous shopper's basket. This endpoint doesn't merge Personally Identifiable Information (PII). You must obtain the shopper authorization token via SLAS and you must provide the ‘guest usid‘ in both the ‘/oauth2/login‘ and ‘/oauth2/token‘ calls while fetching the registered user JWT token. After the merge, all basket amounts are recalculated and totaled, including lookups for prices, taxes, shipping, and promotions.
+     */
     MergeBasket: 'mergeBasket',
     /**
      * Removes a basket.
@@ -78,16 +78,16 @@ export const ShopperBasketsMutations = {
      */
     UpdateGiftCertificateItemInBasket: 'updateGiftCertificateItemInBasket',
     /**
-      * Adds new items to a basket. 
-      */
+     * Adds new items to a basket.
+     */
     AddItemToBasket: 'addItemToBasket',
     /**
      * Removes a product item from the basket.
      */
     RemoveItemFromBasket: 'removeItemFromBasket',
     /**
-      * Updates an item in a basket. 
-      */
+     * Updates an item in a basket.
+     */
     UpdateItemInBasket: 'updateItemInBasket',
     /**
      * This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for a specific taxable line item. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
