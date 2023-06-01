@@ -44,10 +44,10 @@ if ([production, development].indexOf(mode) < 0) {
 // for API convenience, add the leading slash if missing
 export const EXT_OVERRIDES_DIR =
     typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
-    !pkg?.ccExtensibility?.overridesDir?.startsWith(path.sep)
+    !pkg?.ccExtensibility?.overridesDir?.match(/(^\/|^\\)/)
         ? '/' + pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/')
         : pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/') ?? ''
-export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/(^\/|^\\)/, '')
+export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
