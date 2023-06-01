@@ -20,10 +20,6 @@ import mockConfig from 'retail-react-app/config/mocks/default'
 
 jest.setTimeout(30000)
 
-function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 // Minimal subset of `ocapiOrderResponse` in app/mocks/mock-data.js
 const scapiOrderResponse = {
     orderNo: '00000101',
@@ -176,11 +172,6 @@ beforeEach(() => {
             return res(ctx.json(baskets))
         })
     )
-
-    Object.defineProperty(document, 'cookie', {
-        value: '',
-        writable: true
-    })
 })
 afterEach(() => {
     jest.resetModules()
@@ -413,9 +404,11 @@ test('Can proceed through checkout as registered customer', async () => {
         }
     })
 
-    await delay(1000)
+    // await delay(1000)
     // Email should be displayed in previous step summary
-    expect(screen.getByText('customer@test.com')).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByText('customer@test.com')).toBeInTheDocument()
+    })
 
     // Select a saved address and continue
     await user.click(screen.getByDisplayValue('savedaddress1'))
@@ -499,7 +492,9 @@ test('Can edit address during checkout as a registered customer', async () => {
         }
     })
 
-    await delay(1000)
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-checkout-shipping-address-0')).toBeInTheDocument()
+    })
 
     const firstAddress = screen.getByTestId('sf-checkout-shipping-address-0')
     await user.click(within(firstAddress).getByText(/edit/i))
@@ -538,7 +533,7 @@ test('Can add address during checkout as a registered customer', async () => {
         }
     })
 
-    await delay(1000)
+    // await delay(1000)
 
     global.server.use(
         rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
@@ -546,6 +541,9 @@ test('Can add address during checkout as a registered customer', async () => {
         })
     )
 
+    await waitFor(() => {
+        expect(screen.getByText(/add new address/i)).toBeInTheDocument()
+    })
     // Add address
     await user.click(screen.getByText(/add new address/i))
 
