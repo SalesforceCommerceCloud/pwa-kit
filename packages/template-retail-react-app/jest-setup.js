@@ -21,6 +21,9 @@ const {
     mockCustomerBaskets
 } = require('./app/mocks/mock-data')
 
+// set jsdom in https context to allow read/write secure cookies
+global.jsdom.reconfigure({url: 'https://www.domain.com'})
+
 configureTestingLibrary({
     // Increase to: 6 x default timeout of 1 second
     ...(process.env.CI ? {asyncUtilTimeout: 6000} : {})

@@ -16,23 +16,12 @@ const testCases = [
         storageOptions: undefined,
         StorageClass: CookieStorage,
         validate: (storage: BaseStorage) => {
-            storage.set(key, value)
-            expect(storage.get(key)).toBe(value)
-            storage.delete(key)
-            expect(storage.get(key)).toBe('')
-        }
-    },
-    {
-        // Important: There is a bug with our testing setup at the moment!!
-        // Setting secure cookie in jsdom env doesn't work and this is likely due
-        // to the jsdom being configured to run in a HTTP context (not HTTPS)
-        // We can't find a way to reconfigure jsdom to run in HTTPS. :(
-        description: 'CookieStorage secure flag does NOT work in current jsdom environment',
-        storageOptions: undefined,
-        StorageClass: CookieStorage,
-        validate: (storage: BaseStorage) => {
+            // intentionally testing the secure flag
+            // If this test failed, a potential reason 
+            // is that the JSDOM testing environment
+            // isn't configured to run in a secure context (https)
             storage.set(key, value, {secure: true})
-            expect(storage.get(key)).toBe('')
+            expect(storage.get(key)).toBe(value)
             storage.delete(key)
             expect(storage.get(key)).toBe('')
         }

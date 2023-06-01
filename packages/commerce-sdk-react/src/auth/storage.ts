@@ -48,7 +48,7 @@ export class CookieStorage extends BaseStorage {
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
-        Cookies.set(suffixedKey, value, options)
+        Cookies.set(suffixedKey, value, {...options, secure: true})
     }
     get(key: string) {
         const suffixedKey = this.getSuffixedKey(key)
