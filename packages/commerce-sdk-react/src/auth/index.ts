@@ -119,6 +119,10 @@ const DATA_MAP: AuthDataMap = {
             store.delete('cc-nx-g')
         }
     },
+    // For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
+    // So we maintain a copy of the refersh_tokens in the local storage which is compared to the actual refresh_token stored in cookie storage.
+    // If the key or value of the refresh_token in local storage is different from the one in cookie storage, this indicates a change in customer auth state and we invalidate the access_token in PWA Kit.
+    // This triggers a new fetch for access_token using the current refresh_token from cookie storage and makes sure customer auth state is always in sync between SFRA and PWA sites in a hybrid setup.
     refresh_token_guest_copy: {
         storageType: 'local',
         key: 'cc-nx-g',
