@@ -47,7 +47,7 @@ export const EXT_OVERRIDES_DIR =
     !pkg?.ccExtensibility?.overridesDir?.startsWith(path.sep)
         ? '/' + pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/')
         : pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/') ?? ''
-export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
+export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/(^\/|^\\)/, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
@@ -523,7 +523,7 @@ const ssr = (() => {
                     ...config,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    entry: `.${EXT_OVERRIDES_DIR}${path.sep}app${path.sep}ssr.js`,
+                    entry: `.${EXT_OVERRIDES_DIR}/app/ssr.js`,
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
@@ -568,7 +568,7 @@ const requestProcessor =
                 ...config,
                 name: REQUEST_PROCESSOR,
                 // entry: './app/request-processor.js',
-                entry: `.${EXT_OVERRIDES_DIR}${path.sep}app${path.sep}request-processor.js`,
+                entry: `.${EXT_OVERRIDES_DIR}/app/request-processor.js`,
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',
