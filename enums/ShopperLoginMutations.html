@@ -53,17 +53,11 @@
 <h3 class="tsd-anchor-link"><span>Get<wbr/>Access<wbr/>Token</span><a href="#GetAccessToken" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Get<wbr/>Access<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;getAccessToken&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Get the shopper or guest JWT access token and a refresh token. This is the second step of the OAuth 2.1 authorization code flow.</p>
-<p>For a private client, an application is able to get an access token for the shopper through the back channel (a trusted server) by passing in the client credentials and the authorization code retrieved from the <code>authorize</code> endpoint.</p>
-<p>For a guest user, get the shopper JWT access token and a refresh token. This is where a client appplication is able to get an access token for the guest user through the back channel (a trusted server) by passing in the client credentials.</p>
-<p>For a public client using PKCE, an application will pass a PKCE <code>code_verifier`` that matches the </code>code_challenge`` that was used to <code>authorize</code> the customer along with the authorization code.</p>
-<p>When refreshing the access token with a private client ID and client secret, the refresh token is <em>not</em> regenerated. However, when refreshing the access token with a public client ID, the refresh token is <em>always</em> regenerated. The old refresh token is voided with every refresh call, so the refresh token on the client needs to be replaced to always store the new refresh token.</p>
-<p>See the Body section for required parameters, including <code>grant_type</code> and others, depending on the value of <code>grant_type</code>.</p>
-<p><em>Important</em>*: We strongly recommended using the <code>channel_id</code> query parameter because <strong>it will be required in the future</strong>.</p>
 
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Login <code>getAccessToken</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L53">src/hooks/ShopperLogin/mutation.ts:53</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L41">src/hooks/ShopperLogin/mutation.ts:41</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="GetPasswordLessAccessToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Get<wbr/>Password<wbr/>Less<wbr/>Access<wbr/>Token</span><a href="#GetPasswordLessAccessToken" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Get<wbr/>Password<wbr/>Less<wbr/>Access<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;getPasswordLessAccessToken&quot;</span></div>
@@ -72,7 +66,7 @@
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Login <code>getPasswordLessAccessToken</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L90">src/hooks/ShopperLogin/mutation.ts:90</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L78">src/hooks/ShopperLogin/mutation.ts:78</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="GetSessionBridgeAccessToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Get<wbr/>Session<wbr/>Bridge<wbr/>Access<wbr/>Token</span><a href="#GetSessionBridgeAccessToken" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Get<wbr/>Session<wbr/>Bridge<wbr/>Access<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;getSessionBridgeAccessToken&quot;</span></div>
@@ -83,7 +77,7 @@
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Login <code>getSessionBridgeAccessToken</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L62">src/hooks/ShopperLogin/mutation.ts:62</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L50">src/hooks/ShopperLogin/mutation.ts:50</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="GetTrustedAgentAccessToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Get<wbr/>Trusted<wbr/>Agent<wbr/>Access<wbr/>Token</span><a href="#GetTrustedAgentAccessToken" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Get<wbr/>Trusted<wbr/>Agent<wbr/>Access<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;getTrustedAgentAccessToken&quot;</span></div>
@@ -94,7 +88,7 @@
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Login <code>getTrustedAgentAccessToken</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L80">src/hooks/ShopperLogin/mutation.ts:80</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L68">src/hooks/ShopperLogin/mutation.ts:68</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="GetTrustedSystemAccessToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Get<wbr/>Trusted<wbr/>System<wbr/>Access<wbr/>Token</span><a href="#GetTrustedSystemAccessToken" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Get<wbr/>Trusted<wbr/>System<wbr/>Access<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;getTrustedSystemAccessToken&quot;</span></div>
@@ -105,7 +99,7 @@
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Login <code>getTrustedSystemAccessToken</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L71">src/hooks/ShopperLogin/mutation.ts:71</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L59">src/hooks/ShopperLogin/mutation.ts:59</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="IntrospectToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Introspect<wbr/>Token</span><a href="#IntrospectToken" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Introspect<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;introspectToken&quot;</span></div>
@@ -114,7 +108,7 @@
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Login <code>introspectToken</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L100">src/hooks/ShopperLogin/mutation.ts:100</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L88">src/hooks/ShopperLogin/mutation.ts:88</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="LogoutCustomer" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Logout<wbr/>Customer</span><a href="#LogoutCustomer" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Logout<wbr/>Customer</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;logoutCustomer&quot;</span></div>
@@ -134,7 +128,7 @@
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Login <code>resetPassword</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L85">src/hooks/ShopperLogin/mutation.ts:85</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L73">src/hooks/ShopperLogin/mutation.ts:73</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="RevokeToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Revoke<wbr/>Token</span><a href="#RevokeToken" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Revoke<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;revokeToken&quot;</span></div>
@@ -143,7 +137,7 @@
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Login <code>revokeToken</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L95">src/hooks/ShopperLogin/mutation.ts:95</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperLogin/mutation.ts#L83">src/hooks/ShopperLogin/mutation.ts:83</a></li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

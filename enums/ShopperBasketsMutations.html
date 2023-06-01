@@ -62,120 +62,57 @@
 <div class="tsd-comment tsd-typography"><p>Adds a coupon to an existing basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L138">src/hooks/ShopperBaskets/mutation.ts:138</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L59">src/hooks/ShopperBaskets/mutation.ts:59</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="AddGiftCertificateItemToBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Add<wbr/>Gift<wbr/>Certificate<wbr/>Item<wbr/>To<wbr/>Basket</span><a href="#AddGiftCertificateItemToBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Add<wbr/>Gift<wbr/>Certificate<wbr/>Item<wbr/>To<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;addGiftCertificateItemToBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Adds a gift certificate item to an existing basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L150">src/hooks/ShopperBaskets/mutation.ts:150</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L71">src/hooks/ShopperBaskets/mutation.ts:71</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="AddItemToBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Add<wbr/>Item<wbr/>To<wbr/>Basket</span><a href="#AddItemToBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Add<wbr/>Item<wbr/>To<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;addItemToBasket&quot;</span></div>
-<div class="tsd-comment tsd-typography"><p>Adds new items to a basket. The added items are associated with the
-specified shipment. If no shipment id is specified, the added items are associated with the default shipment.
-Considered values from the request body, for each item are:</p>
-<ul>
-<li>productId: a valid product ID. This is the ID of the product to be added to the basket. If the
-product is already in the basket, the API either increments the quantity of the existing product line item or
-creates a new product line item, based on the site preference &#39;Add Product Behavior&#39;. For option products and
-product bundles containing variation masters, the API creates a new product line item regardless of the site
-preference.</li>
-<li>shipmentId: a valid shipment ID (optional). This is the ID of the shipment in which the product item
-is created.</li>
-<li>quantity: a number between 0.01 and 999. This is the quantity of the product to order.</li>
-<li>inventoryId: a valid inventory ID (optional). This is the ID of the inventory from which the item is
-allocated.</li>
-<li>bonusDiscountLineItemId: a valid bonus discount line item ID (optional). This is the ID of the
-bonus discount line item for which the added product is a selected bonus product.</li>
-<li>optionItems/optionValueId: a valid option value ID. This is an option value for an option item of
-an option product.  This is only possible if the product item is an option
-product. To set option values, you must specify a collection of option items in the optionItems
-property. These option items must contain optionId and optionValueId. Also,
-the values you specify must be valid for the option product that this product item represents. Otherwise, the
-server throws an InvalidProductOptionItemException or an
-InvalidProductOptionValueItemException.</li>
-<li>custom properties in the form c_&lt;CUSTOM_NAME&gt;: the custom property must correspond to a custom
-attribute (&lt;CUSTOM_NAME&gt;) defined for ProductLineItem. The value of this property must be valid for the
-type of custom attribute defined for ProductLineItem.</li>
-</ul>
+<div class="tsd-comment tsd-typography"><p>Adds new items to a basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L187">src/hooks/ShopperBaskets/mutation.ts:187</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L83">src/hooks/ShopperBaskets/mutation.ts:83</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="AddPaymentInstrumentToBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Add<wbr/>Payment<wbr/>Instrument<wbr/>To<wbr/>Basket</span><a href="#AddPaymentInstrumentToBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Add<wbr/>Payment<wbr/>Instrument<wbr/>To<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;addPaymentInstrumentToBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Adds a payment instrument to a basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L228">src/hooks/ShopperBaskets/mutation.ts:228</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L99">src/hooks/ShopperBaskets/mutation.ts:99</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="AddPriceBooksToBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Add<wbr/>Price<wbr/>Books<wbr/>To<wbr/>Basket</span><a href="#AddPriceBooksToBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Add<wbr/>Price<wbr/>Books<wbr/>To<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;addPriceBooksToBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>This method allows you to put an array of priceBookIds to an existing basket, which will be used for basket calculation.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L240">src/hooks/ShopperBaskets/mutation.ts:240</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L111">src/hooks/ShopperBaskets/mutation.ts:111</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="AddTaxesForBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Add<wbr/>Taxes<wbr/>For<wbr/>Basket</span><a href="#AddTaxesForBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Add<wbr/>Taxes<wbr/>For<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;addTaxesForBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for all taxable line items. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L287">src/hooks/ShopperBaskets/mutation.ts:287</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L158">src/hooks/ShopperBaskets/mutation.ts:158</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="AddTaxesForBasketItem" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Add<wbr/>Taxes<wbr/>For<wbr/>Basket<wbr/>Item</span><a href="#AddTaxesForBasketItem" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Add<wbr/>Taxes<wbr/>For<wbr/>Basket<wbr/>Item</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;addTaxesForBasketItem&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for a specific taxable line item. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L224">src/hooks/ShopperBaskets/mutation.ts:224</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L95">src/hooks/ShopperBaskets/mutation.ts:95</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="CreateBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Create<wbr/>Basket</span><a href="#CreateBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Create<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;createBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Creates a new basket.</p>
-<p>The created basket is initialized with default values. Data provided in the body document is populated into the created basket. It can be updated with API endpoints listed below.</p>
-<p>The taxMode query parameter can be used to choose the basket tax mode. The default is internal, in which case the tax calculation is done automatically based on internal tax tables. Alternatively, external taxation mode can be set which allows manual modification of the tax rates and values. External tax data is mandatory for product line items, option line items, shipping line items, coupon line items, and bonus discount line item. Gift certificate line items are optional and use zero tax rate per default, which can be overwritten. Price adjustments cannot be set because they are either calculated or inherited (depending on the type, the tax rate is either obtained from the related line item or computed as prorate of the basket).</p>
-<p>API endpoints allowing further basket modification:</p>
-<ul>
-<li><p>customer information: PUT /baskets/{basketId}/customer</p>
-</li>
-<li><p>billing address: PUT /baskets/{basketId}/billing-address</p>
-</li>
-<li><p>shipments including shipping address and shipping method: POST /baskets/{basketId}/shipments</p>
-</li>
-<li><p>product items: POST /baskets/{basketId}/items</p>
-</li>
-<li><p>coupon items: POST /baskets/{basketId}/coupons</p>
-</li>
-<li><p>gift certificate items: POST /baskets/{basketId}/gift-certificates</p>
-</li>
-<li><p>basket taxation: PUT /baskets/{basketId}/taxes</p>
-</li>
-<li><p>basket item taxation: PUT /baskets/{basketId}/items/{itemId}/taxes</p>
-</li>
-<li><p>payment method and card type: POST /baskets/{basketId}/payment-instruments</p>
-</li>
-<li><p>custom properties: PATCH /baskets/{basketId}</p>
-</li>
-</ul>
-<p>Related resource means with which resource you can specify the same data after the basket creation.
-Identify the basket using the basketId property, which
-should be integrated into the path of an update request (for example a POST to
-/baskets/{basketId}/items).</p>
-<p>A customer must provide a JSON Web Token (JWT), which specifies exactly one customer (it can be a guest or a registered
-customer). In this case, the resource creates a basket for this customer.</p>
-<p>The number of baskets which can be created per customer is limited. When a
-basket is created, it is said to be open. It remains open until either an order is created from it
-using a POST to resource /orders, or it is deleted using a DELETE to resource
-/baskets/{basketId}. Each customer can have just one open basket.</p>
-<p>Custom properties in the form c_&lt;CUSTOM_NAME&gt; are supported. A custom property must correspond to a custom
-attribute (&lt;CUSTOM_NAME&gt;) defined for the basket system object, and its value must be valid for that custom
-attribute.</p>
+<p>The created basket is initialized with default values.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L68">src/hooks/ShopperBaskets/mutation.ts:68</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L27">src/hooks/ShopperBaskets/mutation.ts:27</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="CreateShipmentForBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Create<wbr/>Shipment<wbr/>For<wbr/>Basket</span><a href="#CreateShipmentForBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Create<wbr/>Shipment<wbr/>For<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;createShipmentForBasket&quot;</span></div>
@@ -193,113 +130,49 @@ the body are the following properties if specified:</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L255">src/hooks/ShopperBaskets/mutation.ts:255</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L126">src/hooks/ShopperBaskets/mutation.ts:126</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="DeleteBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Delete<wbr/>Basket</span><a href="#DeleteBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Delete<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;deleteBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Removes a basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L125">src/hooks/ShopperBaskets/mutation.ts:125</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L46">src/hooks/ShopperBaskets/mutation.ts:46</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="MergeBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Merge<wbr/>Basket</span><a href="#MergeBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Merge<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;mergeBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Merge data from the previous shopper&#39;s basket into the current shopper&#39;s active basket and delete the previous shopper&#39;s basket. This endpoint doesn&#39;t merge Personally Identifiable Information (PII). You must obtain the shopper authorization token via SLAS and you must provide the ‘guest usid‘ in both the ‘/oauth2/login‘ and ‘/oauth2/token‘ calls while fetching the registered user JWT token. After the merge, all basket amounts are recalculated and totaled, including lookups for prices, taxes, shipping, and promotions.</p>
-<p>The following information is merged:</p>
-<ul>
-<li>custom attributes on the basket and on all copied records</li>
-<li>product items</li>
-<li>gift certificate items</li>
-<li>coupon items</li>
-<li>shipments</li>
-<li>ad-hoc price adjustments</li>
-</ul>
-<p>To control the merging of products that exist in both baskets, use the <code>productItemMergeMode</code> parameter. By default, the higher of the two basket quantities is used for each product. Products in both baskets are considered to be the same when all of the following values match (if one product doesn&#39;t have a value, the other product is a match only if it also doesn&#39;t have that value):</p>
-<ul>
-<li>shipment</li>
-<li>productId</li>
-<li>option values</li>
-<li>wishlist reference</li>
-<li>inventory list id</li>
-<li>gift flag &amp; message</li>
-<li>ad-hoc price adjustments</li>
-</ul>
-<p>If any of the listed values don&#39;t match, then the item in the previous shopper&#39;s basket is copied to a new line item in the current shopper&#39;s basket. If the listed values all match, but the matching products have different values for any custom attribute, the merged line item keeps the custom attribute value from the current shopper&#39;s basket.</p>
-<p>A success response contains the current shopper&#39;s active basket. The previous guest shopper&#39;s active basket is deleted.</p>
-<p>If the current shopper doesn&#39;t have an active basket, and the createDestinationBasket request parameter is false, then the merge request returns a BasketMergeException (HTTP status 409). You can proceed with one of these options:</p>
-<ul>
-<li>Transfer the previous shopper&#39;s active basket to the current logged-in shopper by calling the <code>baskets/transfer</code> endpoint.</li>
-<li>Force the merge by calling the <code>baskets/merge</code> endpoint again, with the parameter <code>createDestinationBasket=true</code>. Forcing the merge creates a new basket for the current shopper and copies information from the previous shopper&#39;s basket into it. Because the merge doesn&#39;t copy all basket data, a forced merge is not the same as a transfer. For example, the new basket doesn&#39;t contain any Personally Identifiable Information (PII) from the previous basket.</li>
-</ul>
-<p>Before merge</p>
-<table>
-<thead>
-<tr>
-<th>Previous Shopper&#39;s Basket, SKU: Quantity, Custom Attributes</th>
-<th>Current Shopper&#39;s Basket, SKU: Quantity, Custom Attributes</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>SKU_A: 5&lt;br&gt; SKU_B: 3&lt;br&gt; SKU_C: 4&lt;br&gt; c_customAttr_1: &#39;ABC&#39; &lt;br&gt; c_customAttr_2: &#39;DEF&#39;</td>
-<td>SKU_A: 2&lt;br&gt; SKU_D: 6&lt;br&gt; SKU_E: 7&lt;br&gt; c_customAttr_1: &#39;UVW&#39; &lt;br&gt; c_customAttr_3: &#39;XYZ&#39;</td>
-</tr>
-</tbody></table>
-<p>After merge - (previous shopper&#39;s basket is deleted)</p>
-<table>
-<thead>
-<tr>
-<th>productItemMergeMode</th>
-<th>Current Shopper&#39;s Basket - SKU: Quantity, Custom Attributes</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>sum_quantities</td>
-<td>SKU_A: 7&lt;br&gt; SKU_B: 3&lt;br&gt; SKU_C: 4&lt;br&gt; SKU_D: 6&lt;br&gt; SKU_E: 7&lt;br&gt; c_customAttr_1: &#39;UVW&#39; &lt;br&gt; c_customAttr_2: &#39;DEF&#39; &lt;br&gt; c_customAttr_3: &#39;XYZ&#39;</td>
-</tr>
-<tr>
-<td>higher_quantity</td>
-<td>SKU_A: 5&lt;br&gt; SKU_B: 3&lt;br&gt; SKU_C: 4&lt;br&gt; SKU_D: 6&lt;br&gt; SKU_E: 7&lt;br&gt; c_customAttr_1: &#39;UVW&#39; &lt;br&gt; c_customAttr_2: &#39;DEF&#39; &lt;br&gt; c_customAttr_3: &#39;XYZ&#39;</td>
-</tr>
-<tr>
-<td>saved_quantity</td>
-<td>SKU_A: 2&lt;br&gt; SKU_B: 3&lt;br&gt; SKU_C: 4&lt;br&gt; SKU_D: 6&lt;br&gt; SKU_E: 7&lt;br&gt; c_customAttr_1: &#39;UVW&#39; &lt;br&gt; c_customAttr_2: &#39;DEF&#39; &lt;br&gt; c_customAttr_3: &#39;XYZ&#39;</td>
-</tr>
-<tr>
-<td>separate_item</td>
-<td>SKU_A: 5&lt;br&gt; SKU_B: 3&lt;br&gt; SKU_C: 4&lt;br&gt; SKU_A: 2&lt;br&gt; SKU_D: 6&lt;br&gt; SKU_E: 7&lt;br&gt; c_customAttr_1: &#39;UVW&#39; &lt;br&gt; c_customAttr_2: &#39;DEF&#39; &lt;br&gt; c_customAttr_3: &#39;XYZ&#39;</td>
-</tr>
-</tbody></table>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L121">src/hooks/ShopperBaskets/mutation.ts:121</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L42">src/hooks/ShopperBaskets/mutation.ts:42</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="RemoveCouponFromBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Remove<wbr/>Coupon<wbr/>From<wbr/>Basket</span><a href="#RemoveCouponFromBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Remove<wbr/>Coupon<wbr/>From<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;removeCouponFromBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Removes a coupon from the basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L142">src/hooks/ShopperBaskets/mutation.ts:142</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L63">src/hooks/ShopperBaskets/mutation.ts:63</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="RemoveGiftCertificateItemFromBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Remove<wbr/>Gift<wbr/>Certificate<wbr/>Item<wbr/>From<wbr/>Basket</span><a href="#RemoveGiftCertificateItemFromBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Remove<wbr/>Gift<wbr/>Certificate<wbr/>Item<wbr/>From<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;removeGiftCertificateItemFromBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Deletes a gift certificate item from an existing basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L154">src/hooks/ShopperBaskets/mutation.ts:154</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L75">src/hooks/ShopperBaskets/mutation.ts:75</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="RemoveItemFromBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Remove<wbr/>Item<wbr/>From<wbr/>Basket</span><a href="#RemoveItemFromBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Remove<wbr/>Item<wbr/>From<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;removeItemFromBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Removes a product item from the basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L191">src/hooks/ShopperBaskets/mutation.ts:191</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L87">src/hooks/ShopperBaskets/mutation.ts:87</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="RemovePaymentInstrumentFromBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Remove<wbr/>Payment<wbr/>Instrument<wbr/>From<wbr/>Basket</span><a href="#RemovePaymentInstrumentFromBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Remove<wbr/>Payment<wbr/>Instrument<wbr/>From<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;removePaymentInstrumentFromBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Removes a payment instrument of a basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L232">src/hooks/ShopperBaskets/mutation.ts:232</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L103">src/hooks/ShopperBaskets/mutation.ts:103</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="RemoveShipmentFromBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Remove<wbr/>Shipment<wbr/>From<wbr/>Basket</span><a href="#RemoveShipmentFromBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Remove<wbr/>Shipment<wbr/>From<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;removeShipmentFromBasket&quot;</span></div>
@@ -308,7 +181,7 @@ shipping, and price adjustment line items from a basket.
 It is not allowed to remove the default shipment.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L261">src/hooks/ShopperBaskets/mutation.ts:261</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L132">src/hooks/ShopperBaskets/mutation.ts:132</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="TransferBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Transfer<wbr/>Basket</span><a href="#TransferBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Transfer<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;transferBasket&quot;</span></div>
@@ -322,7 +195,7 @@ It is not allowed to remove the default shipment.</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L79">src/hooks/ShopperBaskets/mutation.ts:79</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L38">src/hooks/ShopperBaskets/mutation.ts:38</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="UpdateBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Basket</span><a href="#UpdateBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updateBasket&quot;</span></div>
@@ -330,68 +203,42 @@ It is not allowed to remove the default shipment.</p>
 properties of the basket, and the shipping items will be considered.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L130">src/hooks/ShopperBaskets/mutation.ts:130</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L51">src/hooks/ShopperBaskets/mutation.ts:51</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="UpdateBillingAddressForBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Billing<wbr/>Address<wbr/>For<wbr/>Basket</span><a href="#UpdateBillingAddressForBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Billing<wbr/>Address<wbr/>For<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updateBillingAddressForBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Sets the billing address of a basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L134">src/hooks/ShopperBaskets/mutation.ts:134</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L55">src/hooks/ShopperBaskets/mutation.ts:55</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="UpdateCustomerForBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Customer<wbr/>For<wbr/>Basket</span><a href="#UpdateCustomerForBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Customer<wbr/>For<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updateCustomerForBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Sets customer information for an existing basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L146">src/hooks/ShopperBaskets/mutation.ts:146</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L67">src/hooks/ShopperBaskets/mutation.ts:67</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="UpdateGiftCertificateItemInBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Gift<wbr/>Certificate<wbr/>Item<wbr/>In<wbr/>Basket</span><a href="#UpdateGiftCertificateItemInBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Gift<wbr/>Certificate<wbr/>Item<wbr/>In<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updateGiftCertificateItemInBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Updates a gift certificate item of an existing basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L158">src/hooks/ShopperBaskets/mutation.ts:158</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L79">src/hooks/ShopperBaskets/mutation.ts:79</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="UpdateItemInBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Item<wbr/>In<wbr/>Basket</span><a href="#UpdateItemInBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Item<wbr/>In<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updateItemInBasket&quot;</span></div>
-<div class="tsd-comment tsd-typography"><p>Updates an item in a basket. The
-following values in the request body are considered by the server:</p>
-<ul>
-<li>productId: a valid product ID. The purpose of this
-value is to exchange a variation of a variation product.</li>
-<li>shipmentId: a valid shipment ID. The purpose of
-this value is to move a product item to another shipment.</li>
-<li>quantity: a number between 0 and 999. The purpose of
-this value is to change quantity of the product item. If quantity is 0,
-the product item is removed.</li>
-<li>optionItems/optionValueId: a valid option value
-ID. The purpose of this value is to exchange an option value for an
-option item of an option product.
-This is only possible if the product item is an option product. To change
-option values a collection of option items to be changed need to be
-provided in property optionItems. Those
-optionItems need to contain optionId
-and optionValueId. The provided values must be valid
-for the option product that this product item represents. Otherwise
-InvalidProductOptionItemException or
-InvalidProductOptionValueItemException will be thrown.
-custom properties c_&lt;CUSTOM_NAME&gt;: a
-value corresponding to the type defined for custom attribute
-&lt;CUSTOM_NAME&gt; of ProductLineItem. The purpose of this value is to
-add or change the value of a custom attribute defined for
-ProductLineItem.</li>
-</ul>
+<div class="tsd-comment tsd-typography"><p>Updates an item in a basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L220">src/hooks/ShopperBaskets/mutation.ts:220</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L91">src/hooks/ShopperBaskets/mutation.ts:91</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="UpdatePaymentInstrumentInBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Payment<wbr/>Instrument<wbr/>In<wbr/>Basket</span><a href="#UpdatePaymentInstrumentInBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Payment<wbr/>Instrument<wbr/>In<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updatePaymentInstrumentInBasket&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Updates payment instrument of an existing basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L236">src/hooks/ShopperBaskets/mutation.ts:236</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L107">src/hooks/ShopperBaskets/mutation.ts:107</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="UpdateShipmentForBasket" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Shipment<wbr/>For<wbr/>Basket</span><a href="#UpdateShipmentForBasket" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Shipment<wbr/>For<wbr/>Basket</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updateShipmentForBasket&quot;</span></div>
@@ -409,21 +256,21 @@ the body are the following properties if specified:</p>
 </ul>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L275">src/hooks/ShopperBaskets/mutation.ts:275</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L146">src/hooks/ShopperBaskets/mutation.ts:146</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="UpdateShippingAddressForShipment" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Shipping<wbr/>Address<wbr/>For<wbr/>Shipment</span><a href="#UpdateShippingAddressForShipment" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Shipping<wbr/>Address<wbr/>For<wbr/>Shipment</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updateShippingAddressForShipment&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Sets a shipping address of a specific shipment of a basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L279">src/hooks/ShopperBaskets/mutation.ts:279</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L150">src/hooks/ShopperBaskets/mutation.ts:150</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="UpdateShippingMethodForShipment" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Shipping<wbr/>Method<wbr/>For<wbr/>Shipment</span><a href="#UpdateShippingMethodForShipment" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Shipping<wbr/>Method<wbr/>For<wbr/>Shipment</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updateShippingMethodForShipment&quot;</span></div>
 <div class="tsd-comment tsd-typography"><p>Sets a shipping method to a specific shipment of a basket.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L283">src/hooks/ShopperBaskets/mutation.ts:283</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperBaskets/mutation.ts#L154">src/hooks/ShopperBaskets/mutation.ts:154</a></li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

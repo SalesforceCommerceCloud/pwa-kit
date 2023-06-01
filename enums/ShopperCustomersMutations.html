@@ -76,26 +76,11 @@
 <section class="tsd-panel tsd-member"><a id="CreateCustomerProductListItem" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Create<wbr/>Customer<wbr/>Product<wbr/>List<wbr/>Item</span><a href="#CreateCustomerProductListItem" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Create<wbr/>Customer<wbr/>Product<wbr/>List<wbr/>Item</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;createCustomerProductListItem&quot;</span></div>
-<div class="tsd-comment tsd-typography"><p>Adds an item to the customer&#39;s product list. Considered values from the request body are:</p>
-<p>type: A valid type, mandatory. This is the type of the item to be added to the customer&#39;s product.
-list.
-priority: This is the priority of the item to be added to the customer&#39;s product list.
-public: This is the flag whether the item to be added to the customer&#39;s product list is public.
-product_id: A valid product ID, used for product item type only. This is the ID (SKU)
-of the product related to the item to be added to the customer&#39;s product list. It is mandatory for
-product item type, and it must be a valid product id, otherwise
-ProductListProductIdMissingException or ProductListProductNotFoundException
-will be thrown.
-quantity: Used for product item type only. This is the quantity of the item to be
-added to the customer&#39;s product list.
-custom properties in the form c_&lt;CUSTOM_NAME&gt;: The custom property must correspond to a custom
-attribute (&lt;CUSTOM_NAME&gt;) defined for ProductListItem. The value of this property must be valid for the
-type of custom attribute defined for ProductListItem.</p>
-
+<div class="tsd-comment tsd-typography">
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Customers <code>createCustomerProductListItem</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperCustomers/mutation.ts#L113">src/hooks/ShopperCustomers/mutation.ts:113</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperCustomers/mutation.ts#L97">src/hooks/ShopperCustomers/mutation.ts:97</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="DeleteCustomerPaymentInstrument" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Delete<wbr/>Customer<wbr/>Payment<wbr/>Instrument</span><a href="#DeleteCustomerPaymentInstrument" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Delete<wbr/>Customer<wbr/>Payment<wbr/>Instrument</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;deleteCustomerPaymentInstrument&quot;</span></div>
@@ -122,7 +107,7 @@ type of custom attribute defined for ProductListItem.</p>
 <h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Customers <code>deleteCustomerProductListItem</code> endpoint.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperCustomers/mutation.ts#L118">src/hooks/ShopperCustomers/mutation.ts:118</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperCustomers/mutation.ts#L102">src/hooks/ShopperCustomers/mutation.ts:102</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="GetResetPasswordToken" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Get<wbr/>Reset<wbr/>Password<wbr/>Token</span><a href="#GetResetPasswordToken" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Get<wbr/>Reset<wbr/>Password<wbr/>Token</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;getResetPasswordToken&quot;</span></div>
@@ -198,20 +183,10 @@ type of custom attribute defined for ProductListItem.</p>
 <section class="tsd-panel tsd-member"><a id="UpdateCustomerProductListItem" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Update<wbr/>Customer<wbr/>Product<wbr/>List<wbr/>Item</span><a href="#UpdateCustomerProductListItem" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-enum-member">Update<wbr/>Customer<wbr/>Product<wbr/>List<wbr/>Item</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;updateCustomerProductListItem&quot;</span></div>
-<div class="tsd-comment tsd-typography"><p>Updates an item of a customer&#39;s product list.
-Considered values from the request body are:</p>
-<p>priority: This is the priority of the customer&#39;s product list item.
-public: This is the flag whether the customer&#39;s product list item is public.
-quantity: This is the quantity of
-the customer&#39;s product list item. Used for product item type only. 
-custom properties in the form c_&lt;CUSTOM_NAME&gt;: The custom property
-must correspond to a custom attribute (&lt;CUSTOM_NAME&gt;) defined for ProductListItem.
-The value of this property must be valid for the type of custom attribute defined for ProductListItem.</p>
-
-<h3>Returns</h3><p>A TanStack Query mutation hook for interacting with the Shopper Customers <code>updateCustomerProductListItem</code> endpoint.</p>
+<div class="tsd-comment tsd-typography"><p>Updates an item of a customer&#39;s product list.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperCustomers/mutation.ts#L132">src/hooks/ShopperCustomers/mutation.ts:132</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/SalesforceCommerceCloud/pwa-kit/blob/109bac3c/packages/commerce-sdk-react/src/hooks/ShopperCustomers/mutation.ts#L106">src/hooks/ShopperCustomers/mutation.ts:106</a></li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
