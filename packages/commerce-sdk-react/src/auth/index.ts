@@ -267,9 +267,9 @@ class Auth {
      * @returns {boolean} true if the keys do not match (login state changed), false otherwise.
      */
     private hasSFRAAuthStateChanged(isGuest: boolean) {
-        const refreshTokenKey: AuthDataKeys = isGuest
-            ? 'refresh_token_guest'
-            : 'refresh_token_registered'
+        const refreshTokenKey =
+            (this.get('refresh_token_registered') && 'refresh_token_registered') ||
+            'refresh_token_guest'
 
         const refreshTokenCopyKey =
             (this.get('refresh_token_registered_copy') && 'refresh_token_registered_copy') ||
