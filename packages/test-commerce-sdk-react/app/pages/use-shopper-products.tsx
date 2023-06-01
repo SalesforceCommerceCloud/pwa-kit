@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useProducts} from 'commerce-sdk-react-preview'
+import {useProducts} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
 import {Link} from 'react-router-dom'
 const ids = '701642889823M,25503045M'

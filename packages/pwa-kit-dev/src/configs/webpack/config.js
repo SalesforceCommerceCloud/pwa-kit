@@ -438,14 +438,14 @@ const clientOptional = baseConfig('web')
     .build()
 
 const renderer =
-    fse.existsSync(resolve(projectDir, 'node_modules', 'pwa-kit-react-sdk')) &&
+    fse.existsSync(resolve(projectDir, 'node_modules', '@salesforce', 'pwa-kit-react-sdk')) &&
     baseConfig('node')
         .extend((config) => {
             return {
                 ...config,
                 // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                 name: SERVER,
-                entry: 'pwa-kit-react-sdk/ssr/server/react-rendering.js',
+                entry: '@salesforce/pwa-kit-react-sdk/ssr/server/react-rendering.js',
                 // use eval-source-map for server-side debugging
                 devtool: mode === development ? 'eval-source-map' : false,
                 output: {

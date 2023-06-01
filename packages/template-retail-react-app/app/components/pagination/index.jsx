@@ -22,7 +22,7 @@ import {
 } from '@chakra-ui/react'
 
 // Icons
-import {ChevronLeftIcon, ChevronRightIcon} from 'retail-react-app/app/components/icons'
+import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 // Constants
 const SELECT_ID = 'pagination'

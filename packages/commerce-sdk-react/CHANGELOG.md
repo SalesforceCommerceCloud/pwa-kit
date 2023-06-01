@@ -1,3 +1,4 @@
+## v1.0.0-dev (May 29, 2023)
 ## v3.0.0-dev (May 12, 2023)
 
 - Add missing cache invalidation for contexts/customers/login/order [#1073](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1073)

@@ -16,16 +16,16 @@ import {
     absoluteUrl,
     createUrlTemplate,
     removeSiteLocaleFromPath
-} from 'retail-react-app/app/utils/url'
-import {getUrlConfig} from 'retail-react-app/app/utils/site-utils'
-import mockConfig from 'retail-react-app/config/mocks/default'
+} from '@salesforce/retail-react-app/app/utils/url'
+import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 afterEach(() => {
     jest.clearAllMocks()
 })
 
-jest.mock('pwa-kit-react-sdk/utils/url', () => {
-    const original = jest.requireActual('pwa-kit-react-sdk/utils/url')
+jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/utils/url')
     return {
         ...original,
         getAppOrigin: jest.fn(() => 'https://www.example.com')

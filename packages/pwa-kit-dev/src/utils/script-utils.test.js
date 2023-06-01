@@ -98,7 +98,7 @@ describe('scriptUtils', () => {
 
     test('getPkgJSON', async () => {
         const pkg = await scriptUtils.getPkgJSON()
-        expect(pkg.name).toBe('pwa-kit-dev')
+        expect(pkg.name).toBe('@salesforce/pwa-kit-dev')
     })
 
     describe('defaultMessage', () => {

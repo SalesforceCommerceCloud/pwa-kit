@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {useProducts, useProduct} from 'commerce-sdk-react-preview'
+import {useProducts, useProduct} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
 
 const QueryErrors = () => {

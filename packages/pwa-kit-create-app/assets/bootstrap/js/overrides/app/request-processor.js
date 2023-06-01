@@ -10,7 +10,7 @@
 // it processes requests in whatever way your project requires.
 
 // Uncomment the following line for the example code to work.
-import {QueryParameters} from 'pwa-kit-runtime/utils/ssr-request-processing'
+import {QueryParameters} from '@salesforce/pwa-kit-runtime/utils/ssr-request-processing'
 
 /**
  * The processRequest function is called for *every* non-proxy, non-bundle

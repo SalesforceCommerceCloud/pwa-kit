@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import ScrollToTop from 'retail-react-app/app/components/scroll-to-top/index'
+import ScrollToTop from '@salesforce/retail-react-app/app/components/scroll-to-top/index'
 import {Router} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
 

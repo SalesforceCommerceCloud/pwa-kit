@@ -9,8 +9,8 @@ import PropTypes from 'prop-types'
 import {StylesProvider, useMultiStyleConfig} from '@chakra-ui/react'
 import {screen} from '@testing-library/react'
 
-import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
-import LinksList from 'retail-react-app/app/components/links-list/index'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import LinksList from '@salesforce/retail-react-app/app/components/links-list/index'
 
 const links = [
     {

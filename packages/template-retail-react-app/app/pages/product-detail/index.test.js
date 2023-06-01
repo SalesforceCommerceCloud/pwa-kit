@@ -10,13 +10,13 @@ import {
     mockCustomerBaskets,
     mockedCustomerProductLists,
     productsResponse
-} from 'retail-react-app/app/mocks/mock-data'
+} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
-import {renderWithProviders} from 'retail-react-app/app/utils/test-utils'
-import {basketWithProductSet} from 'retail-react-app/app/pages/product-detail/index.mock'
-import mockedProductSet from 'retail-react-app/app/mocks/product-set-winter-lookM'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {basketWithProductSet} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
+import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 
 jest.setTimeout(60000)
 

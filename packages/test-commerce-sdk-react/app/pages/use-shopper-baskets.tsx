@@ -9,7 +9,7 @@ import {
     useCustomerBaskets,
     useShopperBasketsMutation,
     useCustomerId
-} from 'commerce-sdk-react-preview'
+} from '@salesforce/commerce-sdk-react'
 import {UseBasket} from '../components/use-shopper-baskets/use-basket'
 import {UsePaymentMethodsForBasket} from '../components/use-shopper-baskets/use-payment-method-for-basket'
 

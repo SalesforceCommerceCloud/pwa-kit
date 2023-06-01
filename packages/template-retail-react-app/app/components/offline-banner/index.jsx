@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react'
 
 // Icons
-import {AlertIcon} from 'retail-react-app/app/components/icons'
+import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 const OfflineBanner = () => {
     const intl = useIntl()

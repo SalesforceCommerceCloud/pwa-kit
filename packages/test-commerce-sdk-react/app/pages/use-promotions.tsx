@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {usePromotions} from 'commerce-sdk-react-preview'
+import {usePromotions} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
 
 function UsePromotions() {
