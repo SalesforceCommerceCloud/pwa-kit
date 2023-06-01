@@ -234,6 +234,10 @@ You could also import the mutation options as a constant like:
 import {useShopperBasketsMutation, ShopperBasketsMutations} from '@salesforce/commerce-sdk-react'
 
 const Example = ({basketId}) => {
+    // this works
+    const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
+
+    // this also works
     const addItemToBasket = useShopperBasketsMutation(ShopperBasketsMutations.AddItemToBasket)
     return ...
 }

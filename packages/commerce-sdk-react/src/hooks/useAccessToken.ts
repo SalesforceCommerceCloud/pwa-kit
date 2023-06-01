@@ -10,6 +10,9 @@ import useConfig from './useConfig'
 
 const onClient = typeof window !== 'undefined'
 
+/**
+ * @group Shopper Authentication helpers
+ */
 interface AccessToken {
     token: string | null
     getTokenWhenReady: () => Promise<string>
@@ -17,6 +20,9 @@ interface AccessToken {
 
 /**
  * Hook that returns the access token.
+ *
+ * @group Helpers
+ * @category Shopper Authentication
  *
  */
 const useAccessToken = (): AccessToken => {

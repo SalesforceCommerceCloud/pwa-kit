@@ -13,6 +13,8 @@ const onClient = typeof window !== 'undefined'
 /**
  * Hook that returns the usid associated with the current access token.
  *
+ * @group Helpers
+ * @category Shopper Authentication
  */
 const useUsid = (): string | null => {
     const config = useConfig()
