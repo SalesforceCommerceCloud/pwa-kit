@@ -5,15 +5,42 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* eslint jest/expect-expect: ['error', {assertFunctionNames: ['validate']}] */
-import {BaseStorage, MemoryStorage} from './storage'
+import {BaseStorage, MemoryStorage, CookieStorage} from './storage'
 
 const key = 'key'
 const value = 'value'
 
 const testCases = [
     {
+        description: 'CookieStorage works',
+        storageOptions: undefined,
+        StorageClass: CookieStorage,
+        validate: (storage: BaseStorage) => {
+            storage.set(key, value)
+            expect(storage.get(key)).toBe(value)
+            storage.delete(key)
+            expect(storage.get(key)).toBe('')
+        }
+    },
+    {
+        // Important: There is a bug with our testing setup at the moment!!
+        // Setting secure cookie in jsdom env doesn't work and this is likely due
+        // to the jsdom being configured to run in a HTTP context (not HTTPS)
+        // We can't find a way to reconfigure jsdom to run in HTTPS. :(
+        description: 'CookieStorage secure flag does NOT work in current jsdom environment',
+        storageOptions: undefined,
+        StorageClass: CookieStorage,
+        validate: (storage: BaseStorage) => {
+            storage.set(key, value, {secure: true})
+            expect(storage.get(key)).toBe('')
+            storage.delete(key)
+            expect(storage.get(key)).toBe('')
+        }
+    },
+    {
         description: 'MemoryStorage works without options',
         storageOptions: undefined,
+        StorageClass: MemoryStorage,
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
@@ -26,6 +53,7 @@ const testCases = [
         storageOptions: {
             keySuffix: 'suffix'
         },
+        StorageClass: MemoryStorage,
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
@@ -40,6 +68,7 @@ const testCases = [
         storageOptions: {
             sharedContext: true
         },
+        StorageClass: MemoryStorage,
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
@@ -52,9 +81,9 @@ const testCases = [
 ]
 
 describe('Storage Classes', () => {
-    testCases.forEach(({description, storageOptions, validate}) => {
+    testCases.forEach(({description, storageOptions, validate, StorageClass}) => {
         test(`${description}`, () => {
-            const storage = new MemoryStorage(storageOptions)
+            const storage = new StorageClass(storageOptions)
             validate(storage)
         })
     })
