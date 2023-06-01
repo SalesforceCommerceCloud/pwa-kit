@@ -270,7 +270,7 @@ class Auth {
      * as that on PWA Kit which would incorrectly show both keys to be the same even though the sessions are different.
      * @returns {boolean} true if the keys do not match (login state changed), false otherwise.
      */
-    private hasSFRAAuthStateChanged(isGuest: boolean) {
+    private hasSFRAAuthStateChanged() {
         const refreshTokenKey =
             (this.get('refresh_token_registered') && 'refresh_token_registered') ||
             'refresh_token_guest'
@@ -291,8 +291,8 @@ class Auth {
      * @param token access_token received on SLAS authentication
      * @returns {boolean} true if JWT is valid; false otherwise
      */
-    private isTokenValidForHybrid(token: string, isGuest: boolean) {
-        return !this.isTokenExpired(token) && !this.hasSFRAAuthStateChanged(isGuest)
+    private isTokenValidForHybrid(token: string) {
+        return !this.isTokenExpired(token) && !this.hasSFRAAuthStateChanged()
     }
 
     /**
@@ -374,9 +374,8 @@ class Auth {
             return this.pendingToken
         }
         const accessToken = this.get('access_token')
-        const isGuest = this.get('customer_type') === 'guest'
 
-        if (accessToken && this.isTokenValidForHybrid(accessToken, isGuest)) {
+        if (accessToken && this.isTokenValidForHybrid(accessToken)) {
             return this.data
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')
