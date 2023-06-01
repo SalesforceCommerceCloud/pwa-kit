@@ -37,8 +37,7 @@ const config = {
                 idInterpolationPattern: '[sha512:contenthash:base64:6]',
                 ast: true
             }
-        ],
-        require('@babel/plugin-proposal-nullish-coalescing-operator')
+        ]
     ],
     env: {
         test: {
