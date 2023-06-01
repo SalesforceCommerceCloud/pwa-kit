@@ -34,7 +34,10 @@ const useCustomerType = (): useCustomerType => {
     const auth = useAuthContext()
 
     let customerType: string | null = onClient
-        ? useLocalStorage(`customer_type_${config.siteId}`)
+        ? // This conditional is a constant value based on the environment, so the same path will
+          // always be followed., and the "rule of hooks" is not violated.
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          useLocalStorage(`customer_type_${config.siteId}`)
         : auth.get('customer_type')
 
     const isGuest = customerType === 'guest'

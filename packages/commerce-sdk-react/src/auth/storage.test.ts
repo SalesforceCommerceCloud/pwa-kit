@@ -17,7 +17,7 @@ const testCases = [
         StorageClass: CookieStorage,
         validate: (storage: BaseStorage) => {
             // intentionally testing the secure flag
-            // If this test failed, a potential reason 
+            // If this test failed, a potential reason
             // is that the JSDOM testing environment
             // isn't configured to run in a secure context (https)
             storage.set(key, value, {secure: true})
