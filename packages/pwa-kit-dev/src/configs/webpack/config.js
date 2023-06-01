@@ -46,7 +46,9 @@ export const EXT_OVERRIDES_DIR =
     typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
     !pkg?.ccExtensibility?.overridesDir?.match(/(^\/|^\\)/)
         ? '/' + pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/')
-        : pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/') ?? ''
+        : pkg?.ccExtensibility?.overridesDir
+        ? pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/')
+        : ''
 export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
