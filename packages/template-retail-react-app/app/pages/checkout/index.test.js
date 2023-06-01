@@ -532,7 +532,6 @@ test('Can add address during checkout as a registered customer', async () => {
         }
     })
 
-    // await delay(1000)
 
     global.server.use(
         rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
