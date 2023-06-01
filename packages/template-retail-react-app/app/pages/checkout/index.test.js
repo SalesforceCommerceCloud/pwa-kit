@@ -9,14 +9,17 @@ import Checkout from '@salesforce/retail-react-app/app/pages/checkout/index'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import {rest} from 'msw'
-import {renderWithProviders, createPathWithDefaults} from 'retail-react-app/app/utils/test-utils'
+import {
+    renderWithProviders,
+    createPathWithDefaults
+} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     scapiBasketWithItem,
     mockShippingMethods,
     mockedRegisteredCustomer,
     mockedCustomerProductLists
-} from 'retail-react-app/app/mocks/mock-data'
-import mockConfig from 'retail-react-app/config/mocks/default'
+} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 jest.setTimeout(30000)
 
