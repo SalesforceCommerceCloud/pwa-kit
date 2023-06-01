@@ -92,24 +92,8 @@ export const ShopperCustomersMutations = {
      */
     UpdateCustomerProductList: 'updateCustomerProductList',
     /**
-   * Adds an item to the customer's product list. Considered values from the request body are:
-
-type: A valid type, mandatory. This is the type of the item to be added to the customer's product.
-list.
-priority: This is the priority of the item to be added to the customer's product list.
-public: This is the flag whether the item to be added to the customer's product list is public.
-product_id: A valid product ID, used for product item type only. This is the ID (SKU)
-of the product related to the item to be added to the customer's product list. It is mandatory for
-product item type, and it must be a valid product id, otherwise
-ProductListProductIdMissingException or ProductListProductNotFoundException
-will be thrown.
-quantity: Used for product item type only. This is the quantity of the item to be
-added to the customer's product list.
-custom properties in the form c_\<CUSTOM_NAME\>: The custom property must correspond to a custom
-attribute (\<CUSTOM_NAME\>) defined for ProductListItem. The value of this property must be valid for the
-type of custom attribute defined for ProductListItem.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Customers `createCustomerProductListItem` endpoint.
-   */
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Customers `createCustomerProductListItem` endpoint.
+    */
     CreateCustomerProductListItem: 'createCustomerProductListItem',
     /**
      * Removes an item from a customer product list.
@@ -117,18 +101,8 @@ type of custom attribute defined for ProductListItem.
      */
     DeleteCustomerProductListItem: 'deleteCustomerProductListItem',
     /**
-   * Updates an item of a customer's product list.
-Considered values from the request body are:
-
-priority: This is the priority of the customer's product list item.
-public: This is the flag whether the customer's product list item is public.
-quantity: This is the quantity of
-the customer's product list item. Used for product item type only. 
-custom properties in the form c_\<CUSTOM_NAME\>: The custom property
-must correspond to a custom attribute (\<CUSTOM_NAME\>) defined for ProductListItem.
-The value of this property must be valid for the type of custom attribute defined for ProductListItem.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Customers `updateCustomerProductListItem` endpoint.
-   */
+     * Updates an item of a customer's product list.
+     */
     UpdateCustomerProductListItem: 'updateCustomerProductListItem'
 } as const
 

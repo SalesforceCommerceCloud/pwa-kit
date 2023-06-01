@@ -41,15 +41,9 @@ The payment instrument is added with the provided details. The payment method mu
      */
     RemovePaymentInstrumentFromOrder: 'removePaymentInstrumentFromOrder',
     /**
-   * Updates a payment instrument of an order.
-
-Details:
-
-The payment instrument is updated with the provided details. The payment method must be applicable for the
-order see GET /baskets/\{basketId\}/payment-methods, if the payment method is 'CREDIT_CARD' a
-paymentCard must be specified in the request.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `updatePaymentInstrumentForOrder` endpoint.
-   */
+     * Updates a payment instrument of an order.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Orders `updatePaymentInstrumentForOrder` endpoint.
+     */
     UpdatePaymentInstrumentForOrder: 'updatePaymentInstrumentForOrder'
 } as const
 

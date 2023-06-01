@@ -35,21 +35,9 @@ Required parameters: `refresh token`, `channel_id`, and `client`.
    */
     LogoutCustomer: 'logoutCustomer',
     /**
-   * Get the shopper or guest JWT access token and a refresh token. This is the second step of the OAuth 2.1 authorization code flow.
-
-For a private client, an application is able to get an access token for the shopper through the back channel (a trusted server) by passing in the client credentials and the authorization code retrieved from the `authorize` endpoint.
-
-For a guest user, get the shopper JWT access token and a refresh token. This is where a client appplication is able to get an access token for the guest user through the back channel (a trusted server) by passing in the client credentials.
-
-For a public client using PKCE, an application will pass a PKCE `code_verifier`` that matches the `code_challenge`` that was used to `authorize` the customer along with the authorization code.
-
-When refreshing the access token with a private client ID and client secret, the refresh token is _not_ regenerated. However, when refreshing the access token with a public client ID, the refresh token is _always_ regenerated. The old refresh token is voided with every refresh call, so the refresh token on the client needs to be replaced to always store the new refresh token.
-
-See the Body section for required parameters, including `grant_type` and others, depending on the value of `grant_type`.
-
-**Important**: We strongly recommended using the `channel_id` query parameter because **it will be required in the future**.
-   * @returns A TanStack Query mutation hook for interacting with the Shopper Login `getAccessToken` endpoint.
-   */
+     * Get the shopper or guest JWT access token and a refresh token. This is the second step of the OAuth 2.1 authorization code flow.
+     * @returns A TanStack Query mutation hook for interacting with the Shopper Login `getAccessToken` endpoint.
+     */
     GetAccessToken: 'getAccessToken',
     /**
    * Get a shopper JWT access token for a registered customer using session bridge.
