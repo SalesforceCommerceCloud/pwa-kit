@@ -466,17 +466,15 @@ const renderer =
                     new CopyPlugin({
                         patterns: [
                             {
-                                from: path.posix.join(
-                                    path
-                                        .resolve(
-                                            `${
-                                                EXT_OVERRIDES_DIR
-                                                    ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
-                                                    : ''
-                                            }app/static`
-                                        )
-                                        .replace(/\\/g, '/')
-                                ),
+                                from: path
+                                    .resolve(
+                                        `${
+                                            EXT_OVERRIDES_DIR
+                                                ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
+                                                : ''
+                                        }app/static`
+                                    )
+                                    .replace(/\\/g, '/'),
                                 to: `static/`
                             }
                         ]
@@ -493,17 +491,15 @@ const renderer =
                     new CopyPlugin({
                         patterns: [
                             {
-                                from: path.posix.join(
-                                    path
-                                        .resolve(
-                                            `${
-                                                EXT_OVERRIDES_DIR
-                                                    ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
-                                                    : ''
-                                            }app/static`
-                                        )
-                                        .replace(/\\/g, '/')
-                                ),
+                                from: path
+                                    .resolve(
+                                        `${
+                                            EXT_OVERRIDES_DIR
+                                                ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
+                                                : ''
+                                        }app/static`
+                                    )
+                                    .replace(/\\/g, '/'),
                                 to: `static/`,
                                 noErrorOnMissing: true
                             }
@@ -537,17 +533,15 @@ const ssr = (() => {
                         new CopyPlugin({
                             patterns: [
                                 {
-                                    from: path.posix.join(
-                                        path
-                                            .resolve(
-                                                `${
-                                                    EXT_OVERRIDES_DIR
-                                                        ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
-                                                        : ''
-                                                }app/static`
-                                            )
-                                            .replace(/\\/g, '/')
-                                    ),
+                                    from: path
+                                        .resolve(
+                                            `${
+                                                EXT_OVERRIDES_DIR
+                                                    ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
+                                                    : ''
+                                            }app/static`
+                                        )
+                                        .replace(/\\/g, '/'),
                                     to: `static/`
                                 }
                             ]
