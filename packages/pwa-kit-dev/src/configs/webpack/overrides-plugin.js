@@ -91,9 +91,14 @@ class OverridesResolverPlugin {
 
     isFromExtends(request, _path) {
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
-        const basePkgIndex = request?.startsWith('@') ? 1 : 0
+        var [z, o] = request?.split('/')
+        var packageName = z
+        if (request?.startsWith('@')) {
+            packageName = z + '/' + o
+        }
+
         return (
-            this.extends.includes(request?.split('/')?.[basePkgIndex]) &&
+            this.extends.includes(packageName) &&
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
             !_path.match(this.projectDir + this.overridesDir)
