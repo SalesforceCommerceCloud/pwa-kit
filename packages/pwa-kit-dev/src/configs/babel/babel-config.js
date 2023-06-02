@@ -37,7 +37,8 @@ const config = {
                 idInterpolationPattern: '[sha512:contenthash:base64:6]',
                 ast: true
             }
-        ]
+        ],
+        require('@babel/plugin-transform-async-generator-functions')
     ],
     env: {
         test: {

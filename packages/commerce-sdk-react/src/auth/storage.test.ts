@@ -5,15 +5,31 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* eslint jest/expect-expect: ['error', {assertFunctionNames: ['validate']}] */
-import {BaseStorage, MemoryStorage} from './storage'
+import {BaseStorage, MemoryStorage, CookieStorage} from './storage'
 
 const key = 'key'
 const value = 'value'
 
 const testCases = [
     {
+        description: 'CookieStorage works',
+        storageOptions: undefined,
+        StorageClass: CookieStorage,
+        validate: (storage: BaseStorage) => {
+            // intentionally testing the secure flag
+            // If this test failed, a potential reason
+            // is that the JSDOM testing environment
+            // isn't configured to run in a secure context (https)
+            storage.set(key, value, {secure: true})
+            expect(storage.get(key)).toBe(value)
+            storage.delete(key)
+            expect(storage.get(key)).toBe('')
+        }
+    },
+    {
         description: 'MemoryStorage works without options',
         storageOptions: undefined,
+        StorageClass: MemoryStorage,
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
@@ -26,6 +42,7 @@ const testCases = [
         storageOptions: {
             keySuffix: 'suffix'
         },
+        StorageClass: MemoryStorage,
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
@@ -40,6 +57,7 @@ const testCases = [
         storageOptions: {
             sharedContext: true
         },
+        StorageClass: MemoryStorage,
         validate: (storage: BaseStorage) => {
             storage.set(key, value)
             expect(storage.get(key)).toBe(value)
@@ -52,9 +70,9 @@ const testCases = [
 ]
 
 describe('Storage Classes', () => {
-    testCases.forEach(({description, storageOptions, validate}) => {
+    testCases.forEach(({description, storageOptions, validate, StorageClass}) => {
         test(`${description}`, () => {
-            const storage = new MemoryStorage(storageOptions)
+            const storage = new StorageClass(storageOptions)
             validate(storage)
         })
     })

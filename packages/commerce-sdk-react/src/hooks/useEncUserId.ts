@@ -15,6 +15,9 @@ const onClient = typeof window !== 'undefined'
  *
  * This is sometimes used as the user ID for Einstein.
  *
+ * @group Helpers
+ * @category Shopper Authentication
+ *
  */
 const useEncUserId = (): string | null => {
     const config = useConfig()
