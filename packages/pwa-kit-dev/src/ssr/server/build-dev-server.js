@@ -242,7 +242,9 @@ export const DevServerMixin = {
         return (req, res) => {
             const baseDir = path.resolve(
                 req.app.options.projectDir,
-                pkg?.ccExtensibility?.overridesDir?.replace(/^\//, '') ?? '',
+                pkg?.ccExtensibility?.overridesDir
+                    ? pkg?.ccExtensibility?.overridesDir?.replace(/^\//, '')
+                    : '',
                 'app'
             )
             return this._serveStaticFile(req, res, baseDir, filePath, opts)

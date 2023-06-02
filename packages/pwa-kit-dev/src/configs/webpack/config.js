@@ -19,9 +19,9 @@ import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
-import {sdkReplacementPlugin, makeRegExp} from './plugins'
-import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 import OverridesResolverPlugin from './overrides-plugin'
+import {sdkReplacementPlugin} from './plugins'
+import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -44,13 +44,12 @@ if ([production, development].indexOf(mode) < 0) {
 // for API convenience, add the leading slash if missing
 export const EXT_OVERRIDES_DIR =
     typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
-    !pkg?.ccExtensibility?.overridesDir?.startsWith(path.sep)
-        ? path.sep + pkg?.ccExtensibility?.overridesDir
-        : pkg?.ccExtensibility?.overridesDir ?? ''
-export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(
-    makeRegExp(`^\\${path.sep}`),
-    ''
-)
+    !pkg?.ccExtensibility?.overridesDir?.match(/(^\/|^\\)/)
+        ? '/' + pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/')
+        : pkg?.ccExtensibility?.overridesDir
+        ? pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/')
+        : ''
+export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
@@ -117,7 +116,7 @@ const entryPointExists = (segments) => {
 }
 
 const getAppEntryPoint = () => {
-    return EXT_OVERRIDES_DIR + '/app/main'
+    return resolve('./', EXT_OVERRIDES_DIR_NO_SLASH, 'app', 'main')
 }
 
 const findDepInStack = (pkg) => {
@@ -207,7 +206,8 @@ const baseConfig = (target) => {
                                   ...[EXT_EXTENDS].map((extendTarget) => ({
                                       [extendTarget]: path.resolve(
                                           projectDir,
-                                          `node_modules${path.sep}${extendTarget}`
+                                          'node_modules',
+                                          extendTarget
                                       )
                                   }))
                               )
@@ -289,7 +289,7 @@ const withChunking = (config) => {
             splitChunks: {
                 cacheGroups: {
                     vendor: {
-                        // Two scenarios that we'd like to chunk vendor.js:
+                        // Three scenarios that we'd like to chunk vendor.js:
                         // 1. The package is in node_modules
                         // 2. The package is one of the monorepo packages.
                         //    This is for local development to ensure the bundle
@@ -304,14 +304,14 @@ const withChunking = (config) => {
                             ) {
                                 return false
                             }
-                            return module?.context?.match?.(/(node_modules)|(packages\/.*\/dist)/)
+                            return module?.context?.match?.(/(node_modules)|(packages\/(.*)dist)/)
                         },
                         name: 'vendor',
                         chunks: 'all'
                     },
                     translations: {
                         priority: 10,
-                        test: (module) => module?.context?.match?.(/app\/translations\/compiled/),
+                        test: (module) => module?.context?.match?.(/\/app\/translations\/compiled/),
                         name: 'translations',
                         chunks: 'all'
                     }
@@ -327,7 +327,7 @@ const ruleForBabelLoader = (babelPlugins) => {
         test: /(\.js(x?)|\.ts(x?))$/,
         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
             ? // TODO: handle for array here when that's supported
-              {exclude: makeRegExp(`/node_modules(?!/${EXT_EXTENDS})`)}
+              {exclude: new RegExp(`/node_modules(?!/${EXT_EXTENDS})`)}
             : {exclude: /node_modules/}),
         use: [
             {
@@ -424,8 +424,8 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', `.${EXT_OVERRIDES_DIR}/app/loader.js`),
-                ...optional('worker', `./worker/main.js`),
+                ...optional('loader', resolve(projectDir, EXT_OVERRIDES_DIR, 'app', 'loader.js')),
+                ...optional('worker', resolve(projectDir, 'worker', 'main.js')),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
@@ -466,10 +466,16 @@ const renderer =
                     new CopyPlugin({
                         patterns: [
                             {
-                                from: `${
-                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
-                                }app/static`,
-                                to: 'static/'
+                                from: path
+                                    .resolve(
+                                        `${
+                                            EXT_OVERRIDES_DIR
+                                                ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
+                                                : ''
+                                        }app/static`
+                                    )
+                                    .replace(/\\/g, '/'),
+                                to: `static/`
                             }
                         ]
                     }),
@@ -485,10 +491,16 @@ const renderer =
                     new CopyPlugin({
                         patterns: [
                             {
-                                from: `${
-                                    EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
-                                }app/static`,
-                                to: 'static/',
+                                from: path
+                                    .resolve(
+                                        `${
+                                            EXT_OVERRIDES_DIR
+                                                ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
+                                                : ''
+                                        }app/static`
+                                    )
+                                    .replace(/\\/g, '/'),
+                                to: `static/`,
                                 noErrorOnMissing: true
                             }
                         ]
@@ -521,10 +533,16 @@ const ssr = (() => {
                         new CopyPlugin({
                             patterns: [
                                 {
-                                    from: `${
-                                        EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''
-                                    }app/static`,
-                                    to: 'static/'
+                                    from: path
+                                        .resolve(
+                                            `${
+                                                EXT_OVERRIDES_DIR
+                                                    ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
+                                                    : ''
+                                            }app/static`
+                                        )
+                                        .replace(/\\/g, '/'),
+                                    to: `static/`
                                 }
                             ]
                         }),
