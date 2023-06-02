@@ -7,6 +7,9 @@
 import '@testing-library/jest-dom'
 import nock from 'nock'
 
+// set jsdom in https context to allow read/write secure cookies
+global.jsdom.reconfigure({url: 'https://www.domain.com'})
+
 class LocalStorageMock {
     constructor() {
         this.store = {}
