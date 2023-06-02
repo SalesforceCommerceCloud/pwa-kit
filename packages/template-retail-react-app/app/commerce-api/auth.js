@@ -345,7 +345,7 @@ class Auth {
 
         sessionStorage.setItem('codeVerifier', codeVerifier)
 
-        const authorization = `Basic ${btoa(`${credentials.email}:${credentials.password}`)}`
+        const authorization = `Basic ${btoa(unescape(encodeURIComponent(`${credentials.email}:${credentials.password}`)))}`
         const options = {
             headers: {
                 Authorization: authorization,
