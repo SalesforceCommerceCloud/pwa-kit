@@ -36,8 +36,12 @@ class OverridesResolverPlugin {
         const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + '/'
 
         overridesFsRead.forEach((item) => {
+            const end = item.substring(item.lastIndexOf('/index'))
             const [l, ...rest] = item.split(/(index(?!(.test|.mock))|\.(?!(test|mock)))/)
-            this.extendsHashMap.set(l?.replace(overrideReplace, '').replace(/\/$/, ''), rest)
+            this.extendsHashMap.set(l?.replace(overrideReplace, '').replace(/\/$/, ''), [
+                end,
+                rest.filter(Boolean)
+            ])
         })
     }
 
@@ -57,11 +61,11 @@ class OverridesResolverPlugin {
                 }
             } else {
                 if (this.extendsHashMap.has(requestPath)) {
-                    const end = this.extendsHashMap.get(requestPath)
+                    const end = this.extendsHashMap.get(requestPath)[1]
                     const isRequestingIndex = end[0] === 'index'
                     let result = base?.replace(/$\//, '') + end.join('')
                     if (isRequestingIndex) {
-                        result = path.join(base, this.extendsHashMap.get(requestPath).join(''))
+                        result = path.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
                     }
                     return result
                 }
