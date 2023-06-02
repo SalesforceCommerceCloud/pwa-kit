@@ -6,6 +6,7 @@
  */
 import path from 'path'
 import glob from 'glob'
+import {makeRegExp} from './utils'
 
 /**
  * @class OverridesResolverPlugin
@@ -23,18 +24,22 @@ class OverridesResolverPlugin {
      * @param {string} options.projectDir path to project directory
      */
     constructor(options) {
-        this.overridesDir = options.overridesDir || ''
+        // always coerce to posix fs paths, as glob sync and es6 imports don't use windows paths
+        this.overridesDir = options.overridesDir?.replace(/\\/g, '/') || ''
         this.extends = options.extends || []
-        this.projectDir = options.projectDir
+        // always coerce to posix fs paths, as glob sync and es6 imports don't use windows paths
+        this.projectDir = options.projectDir?.replace(/\\/g, '/')
         this._allSearchDirs = [this.projectDir + this.overridesDir, ...this.extends]
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
         this.extendsHashMap = new Map()
 
         // everything except directories
-        const globPattern = `${this.pkg?.ccExtensibility?.overridesDir?.replace(/^\//, '')}/**/*.*`
+        // NOTE that the glob library expects posix so we replace windows file paths here
+        const globPattern = `${this.pkg?.ccExtensibility?.overridesDir
+            ?.replace(/\\/g, '/')
+            ?.replace(/^\//, '')}/**/*.*`
         const overridesFsRead = glob.sync(globPattern)
         const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + '/'
-
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
             const [l, ...rest] = item.split(/(index(?!(\.[^\.]*\.))|\.(?!([^\.]*\.)))/)
@@ -73,25 +78,25 @@ class OverridesResolverPlugin {
         }
     }
 
-    toOverrideRelative(path) {
-        const override = this.findOverride(path)
-        return path.substring(override.length + 1)
+    toOverrideRelative(_path) {
+        const override = this.findOverride(_path)
+        return _path.substring(override.length + 1)
     }
 
-    findOverride(path) {
+    findOverride(_path) {
         return this._allSearchDirs.find((override) => {
-            return path.indexOf(override) === 0
+            return _path.indexOf(override) === 0
         })
     }
 
-    isFromExtends(request, path) {
+    isFromExtends(request, _path) {
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
         const basePkgIndex = request?.startsWith('@') ? 1 : 0
         return (
             this.extends.includes(request?.split('/')?.[basePkgIndex]) &&
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
-            !path.match(this.projectDir + this.overridesDir)
+            !_path.match(this.projectDir + this.overridesDir)
         )
     }
 
