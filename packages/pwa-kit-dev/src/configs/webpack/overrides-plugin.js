@@ -37,7 +37,7 @@ class OverridesResolverPlugin {
 
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
-            const [l, ...rest] = item.split(/(index(?!(.test|.mock))|\.(?!(test|mock)))/)
+            const [l, ...rest] = item.split(/(index(?!(\.[^\.]*\.))|\.(?!([^\.]*\.)))/)
             this.extendsHashMap.set(l?.replace(overrideReplace, '').replace(/\/$/, ''), [
                 end,
                 rest.filter(Boolean)
