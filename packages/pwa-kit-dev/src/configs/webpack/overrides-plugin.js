@@ -117,7 +117,12 @@ class OverridesResolverPlugin {
             this.extends.includes(pkgName) &&
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
-            !filepath.match(this.projectDir + this.overridesDir)
+            (path.sep === '/'
+                ? !filepath.match(this.projectDir + this.overridesDir)
+                : !filepath.match(
+                      this.projectDir.replace('/', '\\'),
+                      this.overridesDir.replace('/', '\\')
+                  ))
         )
     }
 
@@ -143,7 +148,7 @@ class OverridesResolverPlugin {
         }
         if (targetFile) {
             const target = resolver.ensureHook('resolved')
-            requestContext.path = targetFile
+            requestContext.path = path.sep === '/' ? targetFile : targetFile.replace('/', '\\')
             console.log('~NEW requestContext.path', requestContext.path)
             resolver.doResolve(
                 target,
