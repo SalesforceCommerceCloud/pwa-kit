@@ -43,16 +43,16 @@ class OverridesResolverPlugin {
         // For each filepath in the overrides directory:
         // Split it in one of two ways:
         // If the filepath is like /pages/home/index.js,
-        //    split on index and key is /pages/home/
+        //    split on index and 'left' is /pages/home/
         // If the filepath is like /pages/home/data.js,
-        //    split on the . and key is /pages/home/data
+        //    split on the . and 'left' is /pages/home/data
         // The negative lookaheads ensure the split occurs on the last occurence of .
-        //    This helps to avoid collisions when both index.js and index.test.js are
+        //    This avoids collisions when both index.js and index.test.js are
         //    present in the same directory
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
-            const [key, ...rest] = item.split(/(index(?!(\.[^.]*\.))|\.(?!([^.]*\.)))/)
-            this.extendsHashMap.set(key.replace(overrideReplace, '').replace(/\/$/, ''), [
+            const [left, ...rest] = item.split(/(index(?!(\.[^.]*\.))|\.(?!([^.]*\.)))/)
+            this.extendsHashMap.set(left.replace(overrideReplace, '').replace(/\/$/, ''), [
                 end,
                 rest.filter(Boolean)
             ])
