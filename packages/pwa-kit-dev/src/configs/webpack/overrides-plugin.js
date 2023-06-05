@@ -41,8 +41,8 @@ class OverridesResolverPlugin {
         const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + '/'
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
-            const [l, ...rest] = item.split(/(index(?!(\.[^.]*\.))|\.(?!([^.]*\.)))/)
-            this.extendsHashMap.set(l?.replace(overrideReplace, '').replace(/\/$/, ''), [
+            const [key, ...rest] = item.split(/(index(?!(\.[^.]*\.))|\.(?!([^.]*\.)))/)
+            this.extendsHashMap.set(key.replace(overrideReplace, '').replace(/\/$/, ''), [
                 end,
                 rest.filter(Boolean)
             ])
@@ -87,10 +87,7 @@ class OverridesResolverPlugin {
     isFromExtends(request, filepath) {
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
         const [_pkgName, _path] = request.split('/')
-        var pkgName = _pkgName
-        if (request?.startsWith('@')) {
-            pkgName = _pkgName + '/' + _path
-        }
+        const pkgName = request?.startsWith('@') ? `${_pkgName}/${_path}` : _pkgName
 
         return (
             this.extends.includes(pkgName) &&
