@@ -1,0 +1,13 @@
+{
+  "name": "my-extended-retail-app",
+  "version": "2.8.0-dev",
+  "license": "See license in LICENSE",
+  "engines": {
+    "node": "^16.0.0 || ^18.0.0",
+    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0"
+  },
+  "ccExtensibility": {
+    "extends": "retail-react-app",
+    "overridesDir": "src/configs/webpack/test/overrides"
+  }
+}
