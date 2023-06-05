@@ -30,6 +30,7 @@ class OverridesResolverPlugin {
         this.projectDir = options.projectDir?.replace(/\\/g, '/')
         this._allSearchDirs = [this.projectDir + this.overridesDir, ...this.extends]
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
+        this.slashIndex = this.extends[0].startsWith('@') ? 1 : 0
         this.extendsHashMap = new Map()
 
         // everything except directories
@@ -90,10 +91,10 @@ class OverridesResolverPlugin {
 
     isFromExtends(request, filepath) {
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
-        var [z, o] = request.split('/')
-        var packageName = z
+        var [_pkgName, _path] = request.split('/')
+        var packageName = _pkgName
         if (request?.startsWith('@')) {
-            packageName = z + '/' + o
+            packageName = _pkgName + '/' + _path
         }
 
         return (
@@ -108,7 +109,14 @@ class OverridesResolverPlugin {
         let targetFile
         let overrideRelative
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
-            overrideRelative = this.toOverrideRelative(requestContext.request)?.replace(/$\//, '')
+            // @salesforce/retail-react-app/app/etc
+            const regex =
+                this.slashIndex === 0
+                    ? new RegExp(/^(?:[^\/]*\/){1}\s*/)
+                    : new RegExp(/^(?:[^\/]*\/){2}\s*/)
+            var splitRequest = requestContext.request.replace(regex, '')
+            console.log('Split Request: ', splitRequest)
+            overrideRelative = this.toOverrideRelative(splitRequest)?.replace(/$\//, '')
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
         }
         if (targetFile) {
