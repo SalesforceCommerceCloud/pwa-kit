@@ -30,7 +30,6 @@ class OverridesResolverPlugin {
         this.projectDir = options.projectDir?.replace(/\\/g, '/')
         this._allSearchDirs = [this.projectDir + this.overridesDir, ...this.extends]
         this.pkg = require(path.resolve(this.projectDir, 'package.json'))
-        this.slashIndex = this.extends[0].startsWith('@') ? 1 : 0
         this.extendsHashMap = new Map()
 
         // everything except directories
@@ -79,26 +78,22 @@ class OverridesResolverPlugin {
     }
 
     toOverrideRelative(filepath) {
-        const override = this.findOverride(filepath)
-        return filepath.substring(override.length + 1)
-    }
-
-    findOverride(filepath) {
-        return this._allSearchDirs.find((override) => {
-            return filepath.indexOf(override) === 0
+        const override = this._allSearchDirs.find((dir) => {
+            return filepath.indexOf(dir) === 0
         })
+        return filepath.substring(override?.length + 1)
     }
 
     isFromExtends(request, filepath) {
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
-        var [_pkgName, _path] = request.split('/')
-        var packageName = _pkgName
+        const [_pkgName, _path] = request.split('/')
+        var pkgName = _pkgName
         if (request?.startsWith('@')) {
-            packageName = _pkgName + '/' + _path
+            pkgName = _pkgName + '/' + _path
         }
 
         return (
-            this.extends.includes(packageName) &&
+            this.extends.includes(pkgName) &&
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
             !filepath.match(this.projectDir + this.overridesDir)
@@ -109,14 +104,7 @@ class OverridesResolverPlugin {
         let targetFile
         let overrideRelative
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
-            // @salesforce/retail-react-app/app/etc
-            const regex =
-                this.slashIndex === 0
-                    ? new RegExp(/^(?:[^\/]*\/){1}\s*/)
-                    : new RegExp(/^(?:[^\/]*\/){2}\s*/)
-            var splitRequest = requestContext.request.replace(regex, '')
-            console.log('Split Request: ', splitRequest)
-            overrideRelative = this.toOverrideRelative(splitRequest)?.replace(/$\//, '')
+            overrideRelative = this.toOverrideRelative(requestContext.request)
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
         }
         if (targetFile) {

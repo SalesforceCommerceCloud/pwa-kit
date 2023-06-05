@@ -23,19 +23,39 @@ import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-uti
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Pages
-const Home = loadable(() => import('./pages/home'), {fallback})
-const Login = loadable(() => import('./pages/login'), {fallback})
-const Registration = loadable(() => import('./pages/registration'), {fallback})
-const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
-const Account = loadable(() => import('./pages/account'), {fallback})
-const Cart = loadable(() => import('./pages/cart'), {fallback})
-const Checkout = loadable(() => import('./pages/checkout'), {fallback})
-const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
-const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
-const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
-const ProductList = loadable(() => import('./pages/product-list'), {fallback})
-const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
-const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const Home = loadable(() => import('@salesforce/retail-react-app/app/pages/home'), {fallback})
+const Login = loadable(() => import('@salesforce/retail-react-app/app/pages/login'), {fallback})
+const Registration = loadable(() => import('@salesforce/retail-react-app/app/pages/registration'), {
+    fallback
+})
+const ResetPassword = loadable(
+    () => import('@salesforce/retail-react-app/app/pages/reset-password'),
+    {fallback}
+)
+const Account = loadable(() => import('@salesforce/retail-react-app/app/pages/account'), {fallback})
+const Cart = loadable(() => import('@salesforce/retail-react-app/app/pages/cart'), {fallback})
+const Checkout = loadable(() => import('@salesforce/retail-react-app/app/pages/checkout'), {
+    fallback
+})
+const CheckoutConfirmation = loadable(
+    () => import('@salesforce/retail-react-app/app/pages/checkout/confirmation'),
+    {fallback}
+)
+const LoginRedirect = loadable(
+    () => import('@salesforce/retail-react-app/app/pages/login-redirect'),
+    {fallback}
+)
+const ProductDetail = loadable(
+    () => import('@salesforce/retail-react-app/app/pages/product-detail'),
+    {fallback}
+)
+const ProductList = loadable(() => import('@salesforce/retail-react-app/app/pages/product-list'), {
+    fallback
+})
+const Wishlist = loadable(() => import('@salesforce/retail-react-app/app/pages/account/wishlist'), {
+    fallback
+})
+const PageNotFound = loadable(() => import('@salesforce/retail-react-app/app/pages/page-not-found'))
 
 export const routes = [
     {
