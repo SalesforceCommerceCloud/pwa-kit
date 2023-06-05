@@ -39,6 +39,16 @@ class OverridesResolverPlugin {
             ?.replace(/^\//, '')}/**/*.*`
         const overridesFsRead = glob.sync(globPattern)
         const overrideReplace = this.pkg?.ccExtensibility?.overridesDir + '/'
+
+        // For each filepath in the overrides directory:
+        // Split it in one of two ways:
+        // If the filepath is like /pages/home/index.js,
+        //    split on index and key is /pages/home/
+        // If the filepath is like /pages/home/data.js,
+        //    split on the . and key is /pages/home/data
+        // The negative lookaheads ensure the split occurs on the last occurence of .
+        //    This helps to avoid collisions when both index.js and index.test.js are
+        //    present in the same directory
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
             const [key, ...rest] = item.split(/(index(?!(\.[^.]*\.))|\.(?!([^.]*\.)))/)
