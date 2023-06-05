@@ -66,11 +66,19 @@ class OverridesResolverPlugin {
      */
     findFileFromMap(requestPath, dirs) {
         const fileExt = path.extname(requestPath)
+        if (requestPath.includes('routes')) {
+            console.log('~requestPath', requestPath)
+            console.log('~dirs', dirs)
+        }
         for (const dir of dirs) {
             let base = path.join(dir, requestPath)
+            if (requestPath.includes('routes')) {
+                console.log('~base', base)
+            }
             if (fileExt) {
                 const noExtPath = requestPath.replace(fileExt, '')
                 if (this.extendsHashMap.has(noExtPath)) {
+                    console.log('~ 81 returning base', base)
                     return base
                 }
             } else {
@@ -81,7 +89,13 @@ class OverridesResolverPlugin {
                     if (isRequestingIndex) {
                         result = path.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
                     }
+                    if (requestPath.includes('routes')) {
+                        console.log('~exists in hashmap returning result:', result)
+                    }
                     return result
+                }
+                if (requestPath.includes('routes')) {
+                    console.log('~not in map returning nothing')
                 }
             }
         }
@@ -110,13 +124,27 @@ class OverridesResolverPlugin {
     handleHook(requestContext, resolveContext, callback, resolver) {
         let targetFile
         let overrideRelative
+        if (requestContext.request.includes('routes')) {
+            console.log('~===================')
+            console.log('~requestContext.request', requestContext.request)
+            console.log('~requestContext.path', requestContext.path)
+            console.log(
+                '~this.isFromExtends(requestContext.request, requestContext.path)',
+                this.isFromExtends(requestContext.request, requestContext.path)
+            )
+        }
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
             overrideRelative = this.toOverrideRelative(requestContext.request).replace(/$\//, '')
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
+            if (requestContext.request.includes('routes')) {
+                console.log('~overrideRelative', overrideRelative)
+                console.log('~targetFile', targetFile)
+            }
         }
         if (targetFile) {
             const target = resolver.ensureHook('resolved')
             requestContext.path = targetFile
+            console.log('~NEW requestContext.path', requestContext.path)
             resolver.doResolve(
                 target,
                 requestContext,
