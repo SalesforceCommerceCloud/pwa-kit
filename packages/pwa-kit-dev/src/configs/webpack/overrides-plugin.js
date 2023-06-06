@@ -110,7 +110,7 @@ class OverridesResolverPlugin {
 
     isFromExtends(request, filepath) {
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
-        const [_pkgName, _path] = request.split('/')
+        const [_pkgName, _path] = request.split(path.sep)
         const pkgName = request?.startsWith('@') ? `${_pkgName}/${_path}` : _pkgName
 
         return (

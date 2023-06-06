@@ -51,7 +51,7 @@ export const EXT_OVERRIDES_DIR =
         : ''
 export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
-export const EXT_EXTENDS_POSIX = pkg?.ccExtensibility?.extends?.replace('/', '\\')
+export const EXT_EXTENDS_WIN = pkg?.ccExtensibility?.extends?.replace('/', '\\')
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
 // TODO: can these be handled in package.json as peerDependencies?
@@ -298,13 +298,12 @@ const withChunking = (config) => {
                         // 3. If extending another template, don't include the
                         //    baseline route files in vendor.js
                         test: (module) => {
-                            console.log('~module.context', module.context)
                             if (
                                 EXT_EXTENDS &&
                                 EXT_OVERRIDES_DIR &&
                                 module?.context?.includes(
                                     `${path.sep}${
-                                        path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_POSIX
+                                        path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
                                     }${path.sep}`
                                 )
                             ) {
@@ -336,7 +335,7 @@ const ruleForBabelLoader = (babelPlugins) => {
               {
                   exclude: new RegExp(
                       `${path.sep}node_modules(?!${path.sep}${
-                          path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_POSIX
+                          path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
                       })`
                   )
               }
