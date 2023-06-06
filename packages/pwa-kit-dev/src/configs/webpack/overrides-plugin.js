@@ -143,7 +143,7 @@ class OverridesResolverPlugin {
         )
 
         const reqIncludesExtends = this.extends.includes(pkgName)
-        const isNotFromOverrides = !filepath.match(issuerPath)
+        const isNotFromOverrides = !filepath.includes(issuerPath)
 
         if (request.includes('brand-logo') || request.includes('routes')) {
             console.log('~filepath', filepath)
