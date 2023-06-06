@@ -66,19 +66,18 @@ class OverridesResolverPlugin {
      */
     findFileFromMap(requestPath, dirs) {
         const fileExt = path.extname(requestPath)
-        if (requestPath.includes('routes')) {
+        if (requestPath.includes('brand-logo') || requestPath.includes('routes')) {
             console.log('~requestPath', requestPath)
             console.log('~dirs', dirs)
         }
         for (const dir of dirs) {
             let base = path.join(dir, requestPath)
-            if (requestPath.includes('routes')) {
+            if (requestPath.includes('brand-logo') || requestPath.includes('routes')) {
                 console.log('~base', base)
             }
             if (fileExt) {
                 const noExtPath = requestPath.replace(fileExt, '')
                 if (this.extendsHashMap.has(noExtPath)) {
-                    console.log('~ 81 returning base', base)
                     return base
                 }
             } else {
@@ -89,12 +88,12 @@ class OverridesResolverPlugin {
                     if (isRequestingIndex) {
                         result = path.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
                     }
-                    if (requestPath.includes('routes')) {
+                    if (requestPath.includes('brand-logo') || requestPath.includes('routes')) {
                         console.log('~exists in hashmap returning result:', result)
                     }
                     return result
                 }
-                if (requestPath.includes('routes')) {
+                if (requestPath.includes('brand-logo') || requestPath.includes('routes')) {
                     console.log('~not in map returning nothing')
                 }
             }
@@ -110,8 +109,10 @@ class OverridesResolverPlugin {
 
     isFromExtends(request, filepath) {
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
-        const [_pkgName, _path] = request.split(path.sep)
-        const pkgName = request?.startsWith('@') ? `${_pkgName}/${_path}` : _pkgName
+        const [nameOrNamespace, namespacedPath] = request.split(path.sep)
+        const pkgName = request?.startsWith('@')
+            ? `${nameOrNamespace}/${namespacedPath}`
+            : nameOrNamespace
 
         return (
             this.extends.includes(pkgName) &&
@@ -120,8 +121,7 @@ class OverridesResolverPlugin {
             (path.sep === '/'
                 ? !filepath.match(this.projectDir + this.overridesDir)
                 : !filepath.match(
-                      this.projectDir.replace('/', '\\'),
-                      this.overridesDir.replace('/', '\\')
+                      this.projectDir.replace('/', '\\') + this.overridesDir.replace('/', '\\')
                   ))
         )
     }
@@ -129,7 +129,10 @@ class OverridesResolverPlugin {
     handleHook(requestContext, resolveContext, callback, resolver) {
         let targetFile
         let overrideRelative
-        if (requestContext.request.includes('routes')) {
+        if (
+            requestContext.request.includes('brand-logo') ||
+            requestContext.request.includes('routes')
+        ) {
             console.log('~===================')
             console.log('~requestContext.request', requestContext.request)
             console.log('~requestContext.path', requestContext.path)
@@ -141,7 +144,10 @@ class OverridesResolverPlugin {
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
             overrideRelative = this.toOverrideRelative(requestContext.request).replace(/$\//, '')
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
-            if (requestContext.request.includes('routes')) {
+            if (
+                requestContext.request.includes('brand-logo') ||
+                requestContext.request.includes('routes')
+            ) {
                 console.log('~overrideRelative', overrideRelative)
                 console.log('~targetFile', targetFile)
             }
