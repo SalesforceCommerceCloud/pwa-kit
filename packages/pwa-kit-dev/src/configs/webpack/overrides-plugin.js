@@ -43,11 +43,11 @@ class OverridesResolverPlugin {
         // For each filepath in the overrides directory:
         // Split it in one of two ways:
         // If the filepath is like /pages/home/index.js,
-        //    split on index and key is /pages/home/
+        //    split on index and 'key' is /pages/home/
         // If the filepath is like /pages/home/data.js,
-        //    split on the . and key is /pages/home/data
+        //    split on the . and 'key' is /pages/home/data
         // The negative lookaheads ensure the split occurs on the last occurence of .
-        //    This helps to avoid collisions when both index.js and index.test.js are
+        //    This avoids collisions when both index.js and index.test.js are
         //    present in the same directory
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
@@ -95,28 +95,46 @@ class OverridesResolverPlugin {
     }
 
     isFromExtends(request, filepath) {
-        // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
-        const [_pkgName, _path] = request.split('/')
-        const pkgName = request?.startsWith('@') ? `${_pkgName}/${_path}` : _pkgName
+        const pkgName = request
+            .split(/(\/|\\)/)
+            .filter((item) => !item.match(/(\/|\\)/))
+            .slice(0, this.extends?.[0]?.startsWith?.('@') ? 2 : 1)
+            .join('/')
+
+        // we split by path delimeters (OS agnostic), filter out
+        // separators, then spread both to form a normalized
+        // '/base', 'path', 'to', 'dir' when both halves are joined
+        const issuerPath = path.join(
+            ...this.projectDir.split(path.sep).filter((item) => !item.match(/(\/|\\)/)),
+            ...this.overridesDir
+                .replace(/^(\/|\\)/, '')
+                .split('/')
+                .filter((item) => !item.match(/(\/|\\)/))
+        )
 
         return (
+            // request includes extends
             this.extends.includes(pkgName) &&
+            //
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
-            !filepath.match(this.projectDir + this.overridesDir)
+
+            // request is not issued from overrides
+            !filepath.includes(issuerPath)
         )
     }
 
     handleHook(requestContext, resolveContext, callback, resolver) {
         let targetFile
         let overrideRelative
+
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
             overrideRelative = this.toOverrideRelative(requestContext.request).replace(/$\//, '')
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
         }
         if (targetFile) {
             const target = resolver.ensureHook('resolved')
-            requestContext.path = targetFile
+            requestContext.path = path.sep === '/' ? targetFile : targetFile.replace('/', path.sep)
             resolver.doResolve(
                 target,
                 requestContext,

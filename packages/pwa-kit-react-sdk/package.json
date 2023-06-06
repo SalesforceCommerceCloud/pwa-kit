@@ -58,18 +58,18 @@
     "nodemon": "^2.0.22",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-helmet": "5.2.1",
+    "react-helmet": "^6.1.0",
     "react-router-dom": "^5.3.4",
     "regenerator-runtime": "^0.13.11",
     "sinon": "^13.0.2",
     "supertest": "^4.0.2"
   },
   "peerDependencies": {
-    "@loadable/component": "^5.15.0",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-helmet": "6",
-    "react-router-dom": "^5.1.2"
+    "@loadable/component": "^5.15.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
+    "react-router-dom": "^5.3.4"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",

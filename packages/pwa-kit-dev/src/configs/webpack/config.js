@@ -51,6 +51,7 @@ export const EXT_OVERRIDES_DIR =
         : ''
 export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
+export const EXT_EXTENDS_WIN = pkg?.ccExtensibility?.extends?.replace('/', '\\')
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
 // TODO: can these be handled in package.json as peerDependencies?
@@ -207,7 +208,7 @@ const baseConfig = (target) => {
                                       [extendTarget]: path.resolve(
                                           projectDir,
                                           'node_modules',
-                                          extendTarget
+                                          ...extendTarget.split('/')
                                       )
                                   }))
                               )
@@ -300,7 +301,11 @@ const withChunking = (config) => {
                             if (
                                 EXT_EXTENDS &&
                                 EXT_OVERRIDES_DIR &&
-                                module?.context?.includes(`/${EXT_EXTENDS}/`)
+                                module?.context?.includes(
+                                    `${path.sep}${
+                                        path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
+                                    }${path.sep}`
+                                )
                             ) {
                                 return false
                             }
@@ -327,7 +332,13 @@ const ruleForBabelLoader = (babelPlugins) => {
         test: /(\.js(x?)|\.ts(x?))$/,
         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
             ? // TODO: handle for array here when that's supported
-              {exclude: new RegExp(`/node_modules(?!/${EXT_EXTENDS})`)}
+              {
+                  exclude: new RegExp(
+                      `${path.sep}node_modules(?!${path.sep}${
+                          path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
+                      })`
+                  )
+              }
             : {exclude: /node_modules/}),
         use: [
             {
