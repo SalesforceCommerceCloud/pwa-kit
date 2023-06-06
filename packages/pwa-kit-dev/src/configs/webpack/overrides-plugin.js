@@ -108,11 +108,24 @@ class OverridesResolverPlugin {
     }
 
     isFromExtends(request, filepath) {
+        // EXAMPLE 1 BRAND-LOGO.svg ==> this should return TRUE as the requestContext.path IS from extends
+        //
+        // ~requestContext.request @salesforce/retail-react-app/app/assets/svg/brand-logo.svg
+        // ~requestContext.path C:\Users\bfeister\_retail-app-generated-jun5-2221\node_modules\@salesforce\retail-react-app\app\components\icons
+        // ~this.isFromExtends(requestContext.request, requestContext.path) false
+
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
         const [nameOrNamespace, namespacedPath] = request.split(path.sep)
         const pkgName = request?.startsWith('@')
             ? `${nameOrNamespace}/${namespacedPath}`
             : nameOrNamespace
+
+        const winPath = this.projectDir.replace('/', '\\') + this.overridesDir.replace('/', '\\')
+        if (request.includes('brand-logo') || request.includes('routes')) {
+            console.log('~filepath', filepath)
+            console.log('~winPath', winPath)
+            console.log('~posixPath', this.projectDir + this.overridesDir)
+        }
 
         return (
             this.extends.includes(pkgName) &&
@@ -120,9 +133,7 @@ class OverridesResolverPlugin {
             // `issuer` (requesting context) isn't the overrides directory
             (path.sep === '/'
                 ? !filepath.match(this.projectDir + this.overridesDir)
-                : !filepath.match(
-                      this.projectDir.replace('/', '\\') + this.overridesDir.replace('/', '\\')
-                  ))
+                : !filepath.match(winPath))
         )
     }
 
@@ -136,6 +147,7 @@ class OverridesResolverPlugin {
             console.log('~===================')
             console.log('~requestContext.request', requestContext.request)
             console.log('~requestContext.path', requestContext.path)
+            console.log('~requestContext?.issuer', requestContext?.issuer)
             console.log(
                 '~this.isFromExtends(requestContext.request, requestContext.path)',
                 this.isFromExtends(requestContext.request, requestContext.path)
@@ -154,7 +166,7 @@ class OverridesResolverPlugin {
         }
         if (targetFile) {
             const target = resolver.ensureHook('resolved')
-            requestContext.path = path.sep === '/' ? targetFile : targetFile.replace('/', '\\')
+            requestContext.path = path.sep === '/' ? targetFile : targetFile.replace('/', path.sep)
             console.log('~NEW requestContext.path', requestContext.path)
             resolver.doResolve(
                 target,
