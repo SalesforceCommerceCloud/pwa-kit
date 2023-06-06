@@ -116,6 +116,21 @@ class OverridesResolverPlugin {
 
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
         // ['my-local-pkg', 'retail-react-app']
+
+        // ~===================
+        // ~requestContext.request @salesforce/retail-react-app/app/assets/svg/brand-logo.svg
+        // ~requestContext.path C:\Users\bfeister\pwa-kit\packages\template-retail-react-app\app\components\icons
+        // ~requestContext?.issuer undefined
+        // ~filepath C:\Users\bfeister\pwa-kit\packages\template-retail-react-app\app\components\icons
+        // ~issuerPath C:\Users\bfeister\pwa-kit\packages\my-extended-retail-app\pwa-kit-overrides
+        // ~includesExtendsPkg false
+        // ~isNotFromOverrides true
+        // ~this.isFromExtends(requestContext.request, requestContext.path) false
+        // ~filepath C:\Users\bfeister\pwa-kit\packages\template-retail-react-app\app\components\icons
+        // ~issuerPath C:\Users\bfeister\pwa-kit\packages\my-extended-retail-app\pwa-kit-overrides
+        // ~includesExtendsPkg false
+        // ~isNotFromOverrides true
+
         const [nameOrNamespace, namespacedPath] = request.split(/(\/|\\)/)
         const pkgName = request?.startsWith('@')
             ? `${nameOrNamespace}/${namespacedPath}`
@@ -126,18 +141,20 @@ class OverridesResolverPlugin {
             ...this.overridesDir.split('/')
         )
 
-        const includesExtendsPkg = this.extends.includes(pkgName)
+        const reqIncludesExtends = this.extends.includes(pkgName)
         const isNotFromOverrides = !filepath.match(issuerPath)
 
         if (request.includes('brand-logo') || request.includes('routes')) {
             console.log('~filepath', filepath)
             console.log('~issuerPath', issuerPath)
-            console.log('~includesExtendsPkg', includesExtendsPkg)
+            console.log('~pkgName', pkgName)
+            console.log('~this.extends', this.extends)
+            console.log('~reqIncludesExtends', reqIncludesExtends)
             console.log('~isNotFromOverrides', isNotFromOverrides)
         }
 
         return (
-            includesExtendsPkg &&
+            reqIncludesExtends &&
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
             isNotFromOverrides
