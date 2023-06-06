@@ -51,8 +51,8 @@ class OverridesResolverPlugin {
         //    present in the same directory
         overridesFsRead.forEach((item) => {
             const end = item.substring(item.lastIndexOf('/index'))
-            const [left, ...rest] = item.split(/(index(?!(\.[^.]*\.))|\.(?!([^.]*\.)))/)
-            this.extendsHashMap.set(left.replace(overrideReplace, '').replace(/\/$/, ''), [
+            const [key, ...rest] = item.split(/(index(?!(\.[^.]*\.))|\.(?!([^.]*\.)))/)
+            this.extendsHashMap.set(key.replace(overrideReplace, '').replace(/\/$/, ''), [
                 end,
                 rest.filter(Boolean)
             ])
@@ -66,15 +66,8 @@ class OverridesResolverPlugin {
      */
     findFileFromMap(requestPath, dirs) {
         const fileExt = path.extname(requestPath)
-        if (requestPath.includes('brand-logo') || requestPath.includes('routes')) {
-            console.log('~requestPath', requestPath)
-            console.log('~dirs', dirs)
-        }
         for (const dir of dirs) {
             let base = path.join(dir, requestPath)
-            if (requestPath.includes('brand-logo') || requestPath.includes('routes')) {
-                console.log('~base', base)
-            }
             if (fileExt) {
                 const noExtPath = requestPath.replace(fileExt, '')
                 if (this.extendsHashMap.has(noExtPath)) {
@@ -88,13 +81,7 @@ class OverridesResolverPlugin {
                     if (isRequestingIndex) {
                         result = path.join(base, this.extendsHashMap.get(requestPath)[1].join(''))
                     }
-                    if (requestPath.includes('brand-logo') || requestPath.includes('routes')) {
-                        console.log('~exists in hashmap returning result:', result)
-                    }
                     return result
-                }
-                if (requestPath.includes('brand-logo') || requestPath.includes('routes')) {
-                    console.log('~not in map returning nothing')
                 }
             }
         }
@@ -108,29 +95,6 @@ class OverridesResolverPlugin {
     }
 
     isFromExtends(request, filepath) {
-        // EXAMPLE 1 BRAND-LOGO.svg ==> this should return TRUE as the requestContext.path IS from extends
-        //
-        // ~requestContext.request @salesforce/retail-react-app/app/assets/svg/brand-logo.svg
-        // ~requestContext.path C:\Users\bfeister\_retail-app-generated-jun5-2221\node_modules\@salesforce\retail-react-app\app\components\icons
-        // ~this.isFromExtends(requestContext.request, requestContext.path) false
-
-        // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
-        // ['my-local-pkg', 'retail-react-app']
-
-        // ~===================
-        // ~requestContext.request @salesforce/retail-react-app/app/assets/svg/brand-logo.svg
-        // ~requestContext.path C:\Users\bfeister\pwa-kit\packages\template-retail-react-app\app\components\icons
-        // ~requestContext?.issuer undefined
-        // ~filepath C:\Users\bfeister\pwa-kit\packages\template-retail-react-app\app\components\icons
-        // ~issuerPath C:\Users\bfeister\pwa-kit\packages\my-extended-retail-app\pwa-kit-overrides
-        // ~includesExtendsPkg false
-        // ~isNotFromOverrides true
-        // ~this.isFromExtends(requestContext.request, requestContext.path) false
-        // ~filepath C:\Users\bfeister\pwa-kit\packages\template-retail-react-app\app\components\icons
-        // ~issuerPath C:\Users\bfeister\pwa-kit\packages\my-extended-retail-app\pwa-kit-overrides
-        // ~includesExtendsPkg false
-        // ~isNotFromOverrides true
-
         const pkgName = request
             .split(/(\/|\\)/)
             .filter((item) => !item.match(/(\/|\\)/))
@@ -142,57 +106,29 @@ class OverridesResolverPlugin {
             ...this.overridesDir.split('/')
         )
 
-        const reqIncludesExtends = this.extends.includes(pkgName)
-        const isNotFromOverrides = !filepath.includes(issuerPath)
-
-        if (request.includes('brand-logo') || request.includes('routes')) {
-            console.log('~filepath', filepath)
-            console.log('~issuerPath', issuerPath)
-            console.log('~pkgName', pkgName)
-            console.log('~this.extends', this.extends)
-            console.log('~reqIncludesExtends', reqIncludesExtends)
-            console.log('~isNotFromOverrides', isNotFromOverrides)
-        }
-
         return (
-            reqIncludesExtends &&
+            // request includes extends
+            this.extends.includes(pkgName) &&
+            //
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
-            isNotFromOverrides
+
+            // request is not issued from overrides
+            !filepath.includes(issuerPath)
         )
     }
 
     handleHook(requestContext, resolveContext, callback, resolver) {
         let targetFile
         let overrideRelative
-        if (
-            requestContext.request.includes('brand-logo') ||
-            requestContext.request.includes('routes')
-        ) {
-            console.log('~===================')
-            console.log('~requestContext.request', requestContext.request)
-            console.log('~requestContext.path', requestContext.path)
-            console.log('~requestContext?.issuer', requestContext?.issuer)
-            console.log(
-                '~this.isFromExtends(requestContext.request, requestContext.path)',
-                this.isFromExtends(requestContext.request, requestContext.path)
-            )
-        }
+
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
             overrideRelative = this.toOverrideRelative(requestContext.request).replace(/$\//, '')
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
-            if (
-                requestContext.request.includes('brand-logo') ||
-                requestContext.request.includes('routes')
-            ) {
-                console.log('~overrideRelative', overrideRelative)
-                console.log('~targetFile', targetFile)
-            }
         }
         if (targetFile) {
             const target = resolver.ensureHook('resolved')
             requestContext.path = path.sep === '/' ? targetFile : targetFile.replace('/', path.sep)
-            console.log('~NEW requestContext.path', requestContext.path)
             resolver.doResolve(
                 target,
                 requestContext,
