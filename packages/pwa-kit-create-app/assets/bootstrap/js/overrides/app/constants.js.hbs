@@ -1,0 +1,5 @@
+// it's necessary that the interface remain consistent, as other
+// files in the base template rely on constants.js, thus we
+// import the underlying constants.js and re-export it
+export * from '{{preset.templateSource.id}}/app/constants'
+export const CUSTOM_HOME_TITLE = '🎉 Hello Extensible React Template!'
