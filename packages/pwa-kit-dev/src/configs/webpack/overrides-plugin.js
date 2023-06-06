@@ -101,43 +101,26 @@ class OverridesResolverPlugin {
             .slice(0, this.extends?.[0]?.startsWith?.('@') ? 2 : 1)
             .join('/')
 
-        const issuerPathVal1 = this.projectDir
-            .split(path.sep)
-            .filter((item) => !item.match(/(\/|\\)/))
-        const issuerPathVal2 = this.overridesDir
-            .replace(/^(\/|\\)/, '')
-            .split('/')
-            .filter((item) => !item.match(/(\/|\\)/))
+        // we split by path delimeters (OS agnostic), filter out
+        // separators, then spread both to form a normalized
+        // '/base', 'path', 'to', 'dir' when both halves are joined
+        const issuerPath = path.join(
+            ...this.projectDir.split(path.sep).filter((item) => !item.match(/(\/|\\)/)),
+            ...this.overridesDir
+                .replace(/^(\/|\\)/, '')
+                .split('/')
+                .filter((item) => !item.match(/(\/|\\)/))
+        )
 
-        const issuerPath = path.join(...issuerPathVal1, ...issuerPathVal2)
-        const reqIncludesExtends = this.extends.includes(pkgName)
-        const notIssuedFromOverrides = !filepath.includes(issuerPath)
-
-        if (request.includes('routes')) {
-            console.log('~==================')
-            console.log('~request', request)
-            console.log('~filepath', filepath)
-
-            console.log('~this.overridesDir', this.overridesDir)
-            console.log('~this.projectDir', this.projectDir)
-            console.log(`~issuerPathVal1`, issuerPathVal1)
-            console.log(`~issuerPathVal2`, issuerPathVal2)
-            console.log('~issuerPath', issuerPath)
-            console.log('~pkgName', pkgName)
-            console.log('~reqIncludesExtends', reqIncludesExtends)
-            console.log('~notIssuedFromOverrides', notIssuedFromOverrides)
-        }
         return (
             // request includes extends
-            reqIncludesExtends &&
-            // this.extends.includes(pkgName) &&
+            this.extends.includes(pkgName) &&
             //
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
 
             // request is not issued from overrides
-            // !filepath.includes(issuerPath)
-            notIssuedFromOverrides
+            !filepath.includes(issuerPath)
         )
     }
 
