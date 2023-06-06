@@ -51,6 +51,7 @@ export const EXT_OVERRIDES_DIR =
         : ''
 export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
+export const EXT_EXTENDS_POSIX = pkg?.ccExtensibility?.extends?.replace('/', '\\')
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
 // TODO: can these be handled in package.json as peerDependencies?
@@ -303,9 +304,7 @@ const withChunking = (config) => {
                                 EXT_OVERRIDES_DIR &&
                                 module?.context?.includes(
                                     `${path.sep}${
-                                        path.sep === '/'
-                                            ? EXT_EXTENDS
-                                            : EXT_EXTENDS.replace('/', '\\')
+                                        path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_POSIX
                                     }${path.sep}`
                                 )
                             ) {
@@ -334,7 +333,13 @@ const ruleForBabelLoader = (babelPlugins) => {
         test: /(\.js(x?)|\.ts(x?))$/,
         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
             ? // TODO: handle for array here when that's supported
-              {exclude: new RegExp(`/node_modules(?!/${EXT_EXTENDS})`)}
+              {
+                  exclude: new RegExp(
+                      `${path.sep}node_modules(?!${path.sep}${
+                          path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_POSIX
+                      })`
+                  )
+              }
             : {exclude: /node_modules/}),
         use: [
             {
