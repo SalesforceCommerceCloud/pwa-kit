@@ -58,7 +58,7 @@
     "supertest": "^4.0.2"
   },
   "peerDependencies": {
-    "@salesforce/pwa-kit-dev": "^3.0.0-preview.2"
+    "@salesforce/pwa-kit-dev": "3.0.0-preview.2"
   },
   "peerDependenciesMeta": {
     "@salesforce/pwa-kit-dev": {
