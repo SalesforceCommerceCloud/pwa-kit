@@ -6,25 +6,21 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {ChakraProvider} from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
 import theme from '@salesforce/retail-react-app/app/theme'
-import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
-import {
-    resolveSiteFromUrl,
-    resolveLocaleFromUrl
-} from '@salesforce/retail-react-app/app/utils/site-utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
+import { MultiSiteProvider } from '@salesforce/retail-react-app/app/contexts'
+import { resolveSiteFromUrl, resolveLocaleFromUrl } from '@salesforce/retail-react-app/app/utils/site-utils'
+import { getConfig } from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import { createUrlTemplate } from '@salesforce/retail-react-app/app/utils/url'
 
-import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
-import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+import { CommerceApiProvider } from '@salesforce/commerce-sdk-react'
+import { withReactQuery } from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import { useCorrelationId } from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import { getAppOrigin } from '@salesforce/pwa-kit-react-sdk/utils/url'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -34,8 +30,8 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
  * You can also use the AppConfig to configure a state-management library such
  * as Redux, or Mobx, if you like.
  */
-const AppConfig = ({children, locals = {}}) => {
-    const {correlationId} = useCorrelationId()
+const AppConfig = ({ children, locals = {} }) => {
+    const { correlationId } = useCorrelationId()
     const headers = {
         'correlation-id': correlationId
     }
@@ -55,12 +51,10 @@ const AppConfig = ({children, locals = {}}) => {
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
-            OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
             </MultiSiteProvider>
-            <ReactQueryDevtools />
         </CommerceApiProvider>
     )
 }
@@ -73,7 +67,7 @@ AppConfig.restore = (locals = {}) => {
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
 
-    const {app: appConfig} = getConfig()
+    const { app: appConfig } = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI
@@ -88,14 +82,6 @@ AppConfig.restore = (locals = {}) => {
 }
 
 AppConfig.freeze = () => undefined
-
-AppConfig.extraGetPropsArgs = (locals = {}) => {
-    return {
-        buildUrl: locals.buildUrl,
-        site: locals.site,
-        locale: locals.locale
-    }
-}
 
 AppConfig.propTypes = {
     children: PropTypes.node,
@@ -112,8 +98,8 @@ const options = {
             queries: {
                 retry: false,
                 refetchOnWindowFocus: false,
-                staleTime: 10 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {})
+                staleTime: 2 * 1000,
+                ...(isServerSide ? { retryOnMount: false } : {})
             },
             mutations: {
                 retry: false

@@ -14,34 +14,93 @@
 
 import React from 'react'
 import loadable from '@loadable/component'
-import { getConfig } from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Components
-import { Skeleton } from '@chakra-ui/react'
-import { configureRoutes } from '@salesforce/retail-react-app/app/utils/routes-utils'
-
-import { routes as _routes } from '@salesforce/retail-react-app/app/routes'
+import {Skeleton} from '@chakra-ui/react'
+import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Pages
-const Home = loadable(() => import('./pages/home'), { fallback })
-const MyNewRoute = loadable(() => import('./pages/my-new-route'))
+const Home = loadable(() => import('./pages/home'), {fallback})
+const Login = loadable(() => import('./pages/login'), {fallback})
+const Registration = loadable(() => import('./pages/registration'), {fallback})
+const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
+const Account = loadable(() => import('./pages/account'), {fallback})
+const Cart = loadable(() => import('./pages/cart'), {fallback})
+const Checkout = loadable(() => import('./pages/checkout'), {fallback})
+const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
+const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
+const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
+const ProductList = loadable(() => import('./pages/product-list'), {fallback})
+const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
+const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
-const routes = [
+export const routes = [
     {
         path: '/',
         component: Home,
         exact: true
     },
     {
-        path: '/my-new-route',
-        component: MyNewRoute
+        path: '/login',
+        component: Login,
+        exact: true
     },
-    // NOTE: the final item in the array must be the { path: '*', component: PageNotFound } so
-    // routes added after re-inserting the base templates routes here might fail to
-    // show up unless the '*' route is filtered out and re-inserted
-    ..._routes
+    {
+        path: '/registration',
+        component: Registration,
+        exact: true
+    },
+    {
+        path: '/reset-password',
+        component: ResetPassword,
+        exact: true
+    },
+    {
+        path: '/account',
+        component: Account
+    },
+    {
+        path: '/checkout',
+        component: Checkout,
+        exact: true
+    },
+    {
+        path: '/checkout/confirmation/:orderNo',
+        component: CheckoutConfirmation
+    },
+    {
+        path: '/callback',
+        component: LoginRedirect,
+        exact: true
+    },
+    {
+        path: '/cart',
+        component: Cart,
+        exact: true
+    },
+    {
+        path: '/product/:productId',
+        component: ProductDetail
+    },
+    {
+        path: '/search',
+        component: ProductList
+    },
+    {
+        path: '/category/:categoryId',
+        component: ProductList
+    },
+    {
+        path: '/account/wishlist',
+        component: Wishlist
+    },
+    {
+        path: '*',
+        component: PageNotFound
+    }
 ]
 
 export default () => {
