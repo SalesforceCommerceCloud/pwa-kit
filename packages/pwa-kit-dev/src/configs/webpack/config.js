@@ -301,7 +301,13 @@ const withChunking = (config) => {
                             if (
                                 EXT_EXTENDS &&
                                 EXT_OVERRIDES_DIR &&
-                                module?.context?.includes(`/${EXT_EXTENDS}/`)
+                                module?.context?.includes(
+                                    `${path.sep}${
+                                        path.sep === '/'
+                                            ? EXT_EXTENDS
+                                            : EXT_EXTENDS.replace('/', '\\')
+                                    }${path.sep}`
+                                )
                             ) {
                                 return false
                             }
