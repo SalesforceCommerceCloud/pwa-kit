@@ -24,7 +24,9 @@ program.option('--dir <dir>', `Path to a PWA Kit project`, defaultDir)
 
 program.parse(process.argv)
 
-const main = (opts) => {
+const main = () => {
+    const opts = program.opts();
+
     const cwd = path.resolve(opts.dir)
 
     const pkg = JSON.parse(sh.cat(path.join(cwd, 'package.json')))
@@ -60,4 +62,4 @@ const main = (opts) => {
     })
 }
 
-main(program)
+main()
