@@ -131,10 +131,11 @@ class OverridesResolverPlugin {
         // ~includesExtendsPkg false
         // ~isNotFromOverrides true
 
-        const [nameOrNamespace, namespacedPath] = request.split(/(\/|\\)/)
-        const pkgName = request?.startsWith('@')
-            ? `${nameOrNamespace}/${namespacedPath}`
-            : nameOrNamespace
+        const pkgName = request
+            .split(/(\/|\\)/)
+            .filter((item) => !item.match(/(\/|\\)/))
+            .slice(0, request?.startsWith('@') ? 2 : 1)
+            .join('/')
 
         const issuerPath = path.resolve(
             ...this.projectDir.split(path.sep),
