@@ -43,9 +43,9 @@ class OverridesResolverPlugin {
         // For each filepath in the overrides directory:
         // Split it in one of two ways:
         // If the filepath is like /pages/home/index.js,
-        //    split on index and 'left' is /pages/home/
+        //    split on index and 'key' is /pages/home/
         // If the filepath is like /pages/home/data.js,
-        //    split on the . and 'left' is /pages/home/data
+        //    split on the . and 'key' is /pages/home/data
         // The negative lookaheads ensure the split occurs on the last occurence of .
         //    This avoids collisions when both index.js and index.test.js are
         //    present in the same directory
@@ -98,23 +98,46 @@ class OverridesResolverPlugin {
         const pkgName = request
             .split(/(\/|\\)/)
             .filter((item) => !item.match(/(\/|\\)/))
-            .slice(0, request?.startsWith('@') ? 2 : 1)
+            .slice(0, this.extends?.[0]?.startsWith?.('@') ? 2 : 1)
             .join('/')
 
-        const issuerPath = path.resolve(
-            ...this.projectDir.split(path.sep),
-            ...this.overridesDir.split('/')
-        )
+        const issuerPathVal1 = this.projectDir
+            .split(path.sep)
+            .filter((item) => !item.match(/(\/|\\)/))
+        const issuerPathVal2 = this.overridesDir
+            .replace(/^(\/|\\)/, '')
+            .split('/')
+            .filter((item) => !item.match(/(\/|\\)/))
 
+        const issuerPath = path.join(...issuerPathVal1, ...issuerPathVal2)
+        const reqIncludesExtends = this.extends.includes(pkgName)
+        const notIssuedFromOverrides = !filepath.includes(issuerPath)
+
+        if (request.includes('routes')) {
+            console.log('~==================')
+            console.log('~request', request)
+            console.log('~filepath', filepath)
+
+            console.log('~this.overridesDir', this.overridesDir)
+            console.log('~this.projectDir', this.projectDir)
+            console.log(`~issuerPathVal1`, issuerPathVal1)
+            console.log(`~issuerPathVal2`, issuerPathVal2)
+            console.log('~issuerPath', issuerPath)
+            console.log('~pkgName', pkgName)
+            console.log('~reqIncludesExtends', reqIncludesExtends)
+            console.log('~notIssuedFromOverrides', notIssuedFromOverrides)
+        }
         return (
             // request includes extends
-            this.extends.includes(pkgName) &&
+            reqIncludesExtends &&
+            // this.extends.includes(pkgName) &&
             //
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
 
             // request is not issued from overrides
-            !filepath.includes(issuerPath)
+            // !filepath.includes(issuerPath)
+            notIssuedFromOverrides
         )
     }
 
