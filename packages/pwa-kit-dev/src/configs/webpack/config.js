@@ -207,7 +207,7 @@ const baseConfig = (target) => {
                                       [extendTarget]: path.resolve(
                                           projectDir,
                                           'node_modules',
-                                          extendTarget
+                                          ...extendTarget.split('/')
                                       )
                                   }))
                               )
@@ -297,6 +297,7 @@ const withChunking = (config) => {
                         // 3. If extending another template, don't include the
                         //    baseline route files in vendor.js
                         test: (module) => {
+                            console.log('~module.context', module.context)
                             if (
                                 EXT_EXTENDS &&
                                 EXT_OVERRIDES_DIR &&
