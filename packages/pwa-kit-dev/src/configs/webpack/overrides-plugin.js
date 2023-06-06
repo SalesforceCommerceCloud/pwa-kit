@@ -115,15 +115,19 @@ class OverridesResolverPlugin {
         // ~this.isFromExtends(requestContext.request, requestContext.path) false
 
         // in npm namespaces like `@salesforce/<pkg>` we need to ignore the first slash
-        const [nameOrNamespace, namespacedPath] = request.split(path.sep)
+        const [nameOrNamespace, namespacedPath] = request.split(/(\/|\\)/)
         const pkgName = request?.startsWith('@')
             ? `${nameOrNamespace}/${namespacedPath}`
             : nameOrNamespace
 
-        const winPath = this.projectDir.replace('/', '\\') + this.overridesDir.replace('/', '\\')
+        const issuerPath = path.resolve(
+            ...this.projectDir.split(path.sep),
+            ...this.overridesDir.split('/')
+        )
+
         if (request.includes('brand-logo') || request.includes('routes')) {
             console.log('~filepath', filepath)
-            console.log('~winPath', winPath)
+            console.log('~issuerPath', issuerPath)
             console.log('~posixPath', this.projectDir + this.overridesDir)
         }
 
@@ -131,9 +135,7 @@ class OverridesResolverPlugin {
             this.extends.includes(pkgName) &&
             // this is very important, to avoid circular imports, check that the
             // `issuer` (requesting context) isn't the overrides directory
-            (path.sep === '/'
-                ? !filepath.match(this.projectDir + this.overridesDir)
-                : !filepath.match(winPath))
+            issuerPath
         )
     }
 
