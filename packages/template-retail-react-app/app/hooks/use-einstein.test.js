@@ -35,7 +35,7 @@ afterAll(() => {
 
 describe('EinsteinAPI', () => {
     test('viewProduct sends expected api request', async () => {
-        await einsteinApi.sendViewProduct(mockProduct)
+        await einsteinApi.sendViewProduct(mockProduct, {cookieId: 'test-usid'})
 
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/viewProduct',
@@ -52,7 +52,7 @@ describe('EinsteinAPI', () => {
 
     test('viewSearch sends expected api request', async () => {
         const searchTerm = 'tie'
-        await einsteinApi.sendViewSearch(searchTerm, mockSearchResults)
+        await einsteinApi.sendViewSearch(searchTerm, mockSearchResults, {cookieId: 'test-usid'})
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/viewSearch',
             {
@@ -67,7 +67,7 @@ describe('EinsteinAPI', () => {
     })
 
     test('viewCategory sends expected api request', async () => {
-        await einsteinApi.sendViewCategory(mockCategory, mockSearchResults)
+        await einsteinApi.sendViewCategory(mockCategory, mockSearchResults, {cookieId: 'test-usid'})
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/viewCategory',
             {
@@ -84,7 +84,7 @@ describe('EinsteinAPI', () => {
     test('clickSearch sends expected api request', async () => {
         const searchTerm = 'tie'
         const clickedProduct = mockSearchResults.hits[0]
-        await einsteinApi.sendClickSearch(searchTerm, clickedProduct)
+        await einsteinApi.sendClickSearch(searchTerm, clickedProduct, {cookieId: 'test-usid'})
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/clickSearch',
             {
@@ -100,7 +100,7 @@ describe('EinsteinAPI', () => {
 
     test('clickCategory sends expected api request', async () => {
         const clickedProduct = mockSearchResults.hits[0]
-        await einsteinApi.sendClickCategory(mockCategory, clickedProduct)
+        await einsteinApi.sendClickCategory(mockCategory, clickedProduct, {cookieId: 'test-usid'})
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/clickCategory',
             {
@@ -116,7 +116,7 @@ describe('EinsteinAPI', () => {
 
     test('viewPage sends expected api request', async () => {
         const path = '/'
-        await einsteinApi.sendViewPage(path)
+        await einsteinApi.sendViewPage(path, {cookieId: 'test-usid'})
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/viewPage',
             {
@@ -131,7 +131,7 @@ describe('EinsteinAPI', () => {
     })
 
     test('beginCheckout sends expected api request', async () => {
-        await einsteinApi.sendBeginCheckout(mockBasket)
+        await einsteinApi.sendBeginCheckout(mockBasket, {cookieId: 'test-usid'})
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/beginCheckout',
             {
@@ -148,7 +148,9 @@ describe('EinsteinAPI', () => {
     test('checkouStep sends expected api request', async () => {
         const checkoutStepName = 'CheckoutStep'
         const checkoutStep = 0
-        await einsteinApi.sendCheckoutStep(checkoutStepName, checkoutStep, mockBasket)
+        await einsteinApi.sendCheckoutStep(checkoutStepName, checkoutStep, mockBasket, {
+            cookieId: 'test-usid'
+        })
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/checkoutStep',
             {
@@ -163,7 +165,7 @@ describe('EinsteinAPI', () => {
     })
 
     test('addToCart sends expected api request', async () => {
-        await einsteinApi.sendAddToCart([mockAddToCartProduct])
+        await einsteinApi.sendAddToCart([mockAddToCartProduct], {cookieId: 'test-usid'})
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/addToCart',
             {
@@ -178,7 +180,9 @@ describe('EinsteinAPI', () => {
     })
 
     test('clickRecommendation sends expected api request', async () => {
-        await einsteinApi.sendClickReco(mockRecommenderDetails, mockProduct)
+        await einsteinApi.sendClickReco(mockRecommenderDetails, mockProduct, {
+            cookieId: 'test-usid'
+        })
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/clickReco',
             {
@@ -193,7 +197,13 @@ describe('EinsteinAPI', () => {
     })
 
     test('viewRecommendation sends expected api request', async () => {
-        await einsteinApi.sendViewReco(mockRecommenderDetails, {id: 'test-reco'})
+        await einsteinApi.sendViewReco(
+            mockRecommenderDetails,
+            {
+                id: 'test-reco'
+            },
+            {cookieId: 'test-usid'}
+        )
         expect(fetch).toHaveBeenCalledWith(
             'http://localhost/test-path/v3/activities/test-site-id/viewReco',
             {
