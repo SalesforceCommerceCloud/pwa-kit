@@ -12,7 +12,9 @@
   },
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
-  "bin": {"pwa-kit-create-app": "scripts/create-mobify-app.js"},
+  "bin": {
+    "pwa-kit-create-app": "scripts/create-mobify-app.js"
+  },
   "files": [
     "assets",
     "templates"
