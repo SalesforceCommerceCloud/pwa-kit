@@ -12,7 +12,7 @@ const PROJECT_DIR = `src/configs/webpack/test`
 const FS_READ_HASHMAP = new Map([
     ['exists', ['src/configs/webpack/test/overrides/exists.jsx', ['.', 'jsx']]],
     ['path/data', ['src/configs/webpack/test/overrides/path/data.js', ['.', 'js']]],
-    ['path', ['/index.jsx', ['index', '.', 'jsx']]],
+    ['path', ['/index.jsx', ['index', '', '.', 'jsx']]],
     ['path/nested/icon', ['src/configs/webpack/test/overrides/path/nested/icon.svg', ['.', 'svg']]]
 ])
 const EXTENDS_TARGET = 'retail-react-app'

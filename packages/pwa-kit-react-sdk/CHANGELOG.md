@@ -1,4 +1,3 @@
-## v3.0.0-preview.2 (Jun 05, 2023)
 ## v3.0.0-preview.1 (Jun 02, 2023)
 ## v3.0.0-preview.0 (May 31, 2023)
 ## v3.0.0-dev (May 12, 2023)
