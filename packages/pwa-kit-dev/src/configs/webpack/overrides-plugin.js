@@ -111,7 +111,7 @@ class OverridesResolverPlugin {
         let targetFile
         let overrideRelative
         if (this.isFromExtends(requestContext.request, requestContext.path)) {
-            overrideRelative = this.toOverrideRelative(requestContext.request)
+            overrideRelative = this.toOverrideRelative(requestContext.request).replace(/$\//, '')
             targetFile = this.findFileFromMap(overrideRelative, this._allSearchDirs)
         }
         if (targetFile) {
