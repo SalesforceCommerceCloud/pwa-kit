@@ -99,7 +99,7 @@ const updatePeerDeps = (pkgJson, newMonorepoVersion) => {
     Object.keys(peerDependencies).forEach((dep) => {
         if (monorepoPackageNames.includes(dep)) {
             console.log(`Found lerna local package ${dep} as a peer dependency of ${pkgJson.name}.`)
-            peerDependencies[dep] = `^${newMonorepoVersion}`
+            peerDependencies[dep] = newMonorepoVersion
         }
     })
 }
