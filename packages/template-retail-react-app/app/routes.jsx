@@ -25,16 +25,24 @@ const fallback = <Skeleton height="75vh" width="100%" />
 // Pages
 const Home = loadable(() => import('./pages/home'), {fallback})
 const Login = loadable(() => import('./pages/login'), {fallback})
-const Registration = loadable(() => import('./pages/registration'), {fallback})
+const Registration = loadable(() => import('./pages/registration'), {
+    fallback
+})
 const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
 const Account = loadable(() => import('./pages/account'), {fallback})
 const Cart = loadable(() => import('./pages/cart'), {fallback})
-const Checkout = loadable(() => import('./pages/checkout'), {fallback})
+const Checkout = loadable(() => import('./pages/checkout'), {
+    fallback
+})
 const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
-const ProductList = loadable(() => import('./pages/product-list'), {fallback})
-const Wishlist = loadable(() => import('./pages/account/wishlist'), {fallback})
+const ProductList = loadable(() => import('./pages/product-list'), {
+    fallback
+})
+const Wishlist = loadable(() => import('./pages/account/wishlist'), {
+    fallback
+})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 export const routes = [
