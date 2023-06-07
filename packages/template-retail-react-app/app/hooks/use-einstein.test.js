@@ -18,8 +18,7 @@ import fetchMock from 'jest-fetch-mock'
 const einsteinApi = new EinsteinAPI({
     host: `http://localhost/test-path`,
     einsteinId: 'test-id',
-    siteId: 'test-site-id',
-    cookieId: 'test-usid'
+    siteId: 'test-site-id'
 })
 
 const fetchOriginal = global.fetch
