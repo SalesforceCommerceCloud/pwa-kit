@@ -9,9 +9,11 @@
 
 import {
     determineTargetLocale,
-    fetchTranslations,
     getTargetLocale
 } from '@salesforce/retail-react-app/app/utils/locale'
+import {
+    fetchTranslations
+} from '@salesforce/retail-react-app/app/utils/translations'
 
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '@salesforce/retail-react-app/app/utils/test-utils'
 
@@ -25,7 +27,6 @@ const supportedLocale = isMultiLocales
     : supportedLocales[0]
 
 const testId1 = 'footer.link.privacy_policy'
-const testId2 = 'account.accordion.button.my_account'
 
 test('our assumptions before further testing', () => {
     expect(supportedLocales).not.toContain(nonSupportedLocale)
@@ -48,21 +49,6 @@ describe('determineTargetLocale', () => {
     })
 })
 
-describe('fetchTranslations', () => {
-    test('loading the target locale', async () => {
-        const messages = await fetchTranslations(supportedLocale)
-        expect(messages[testId2]).toBeDefined()
-    })
-    test('loading the pseudo locale', async () => {
-        const messages = await fetchTranslations('en-XA')
-        expect(messages[testId1][1].value).toMatch(/Ƥřīṽȧȧƈẏ Ƥǿǿŀīƈẏ/)
-    })
-    test('handling a not-found translation file', async () => {
-        const messages = await fetchTranslations('xx-XX')
-        const emptyMessages = {}
-        expect(messages).toEqual(emptyMessages)
-    })
-})
 
 describe('getTargetLocale', () => {
     const originalEnv = {...process.env}

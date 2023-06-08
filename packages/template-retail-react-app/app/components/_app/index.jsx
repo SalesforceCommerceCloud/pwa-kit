@@ -57,7 +57,8 @@ import {
     mergeMatchedItems,
     isServer
 } from '@salesforce/retail-react-app/app/utils/utils'
-import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
+import {getTargetLocale} from '@salesforce/retail-react-app/app/utils/locale'
+import {fetchTranslations} from '@salesforce/retail-react-app/app/utils/translations'
 import {
     DEFAULT_SITE_TITLE,
     HOME_HREF,
