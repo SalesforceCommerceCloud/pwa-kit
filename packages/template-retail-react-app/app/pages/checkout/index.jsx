@@ -25,7 +25,7 @@ import {useUsid, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const usid = useUsid()
+    const {usid} = useUsid()
     const {step} = useCheckout()
     const [error, setError] = useState()
     const {data: basket} = useCurrentBasket()
