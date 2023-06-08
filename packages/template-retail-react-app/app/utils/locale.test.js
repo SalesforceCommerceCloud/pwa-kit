@@ -7,13 +7,8 @@
 
 // CAUTION: This test file relies on config values that may get changed in generated projects
 
-import {
-    determineTargetLocale,
-    getTargetLocale
-} from '@salesforce/retail-react-app/app/utils/locale'
-import {
-    fetchTranslations
-} from '@salesforce/retail-react-app/app/utils/translations'
+import {determineTargetLocale, getTargetLocale} from '@salesforce/retail-react-app/app/utils/locale'
+import {fetchTranslations} from '@salesforce/retail-react-app/app/utils/translations'
 
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '@salesforce/retail-react-app/app/utils/test-utils'
 
@@ -48,7 +43,6 @@ describe('determineTargetLocale', () => {
         expect(locale).toBe(supportedLocale)
     })
 })
-
 
 describe('getTargetLocale', () => {
     const originalEnv = {...process.env}

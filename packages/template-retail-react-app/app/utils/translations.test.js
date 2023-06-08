@@ -6,9 +6,7 @@
  */
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '@salesforce/retail-react-app/app/utils/test-utils'
 
-import {
-    fetchTranslations
-} from '@salesforce/retail-react-app/app/utils/translations'
+import {fetchTranslations} from '@salesforce/retail-react-app/app/utils/translations'
 
 const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
 const isMultiLocales = supportedLocales.length > 1
@@ -18,6 +16,7 @@ const supportedLocale = isMultiLocales
     ? supportedLocales.find((locale) => locale !== DEFAULT_LOCALE)
     : supportedLocales[0]
 
+const testId1 = 'footer.link.privacy_policy'
 const testId2 = 'account.accordion.button.my_account'
 
 describe('fetchTranslations', () => {
