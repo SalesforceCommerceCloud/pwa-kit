@@ -429,9 +429,9 @@ const useEinstein = () => {
         return reco
     }
 
-    const setEventUserParameters = async () => {
+    const getEventUserParameters = async () => {
         const usid = await getUsidWhenReady()
-        var userParameters = {}
+        const userParameters = {}
 
         // If the shopper is authenticated, send the encrypted user ID so recommendations
         // persist across logins
@@ -456,47 +456,47 @@ const useEinstein = () => {
         recommendations,
 
         async sendViewProduct(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendViewProduct(...args.concat(userParameters))
         },
         async sendViewSearch(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendViewSearch(...args.concat(userParameters))
         },
         async sendClickSearch(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendClickSearch(...args.concat(userParameters))
         },
         async sendViewCategory(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendViewCategory(...args.concat(userParameters))
         },
         async sendClickCategory(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendClickCategory(...args.concat(userParameters))
         },
         async sendViewPage(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendViewPage(...args.concat(userParameters))
         },
         async sendBeginCheckout(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendBeginCheckout(...args.concat(userParameters))
         },
         async sendCheckoutStep(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendCheckoutStep(...args.concat(userParameters))
         },
         async sendViewReco(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendViewReco(...args.concat(userParameters))
         },
         async sendClickReco(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendClickReco(...args.concat(userParameters))
         },
         async sendAddToCart(...args) {
-            const userParameters = await setEventUserParameters()
+            const userParameters = await getEventUserParameters()
             return einstein.sendAddToCart(...args.concat(userParameters))
         },
         async getRecommenders(...args) {
@@ -505,7 +505,7 @@ const useEinstein = () => {
         async getRecommendations(recommenderName, products, ...args) {
             setIsLoading(true)
             try {
-                const userParameters = await setEventUserParameters()
+                const userParameters = await getEventUserParameters()
                 const reco = await einstein.getRecommendations(
                     recommenderName,
                     products,
@@ -523,7 +523,7 @@ const useEinstein = () => {
         async getZoneRecommendations(zoneName, products, ...args) {
             setIsLoading(true)
             try {
-                const userParameters = await setEventUserParameters()
+                const userParameters = await getEventUserParameters()
                 const reco = await einstein.getZoneRecommendations(
                     zoneName,
                     products,
