@@ -28,7 +28,7 @@ import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
-const ProductViewHeader = ({name, price, currency, category, productType}) => {
+const ProductViewHeader = ({name, price, currency, category, productType, isProductPartOfBundle}) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
     const isProductASet = productType?.set
@@ -47,19 +47,21 @@ const ProductViewHeader = ({name, price, currency, category, productType}) => {
             </Skeleton>
 
             {/* Price */}
-            <Skeleton isLoaded={price} minWidth={32}>
-                <Text fontWeight="bold" fontSize="md" aria-label="price">
-                    {isProductASet &&
-                        `${intl.formatMessage({
-                            id: 'product_view.label.starting_at_price',
-                            defaultMessage: 'Starting at'
-                        })} `}
-                    {intl.formatNumber(price, {
-                        style: 'currency',
-                        currency: currency || activeCurrency
-                    })}
-                </Text>
-            </Skeleton>
+            {!isProductPartOfBundle && 
+                (<Skeleton isLoaded={price} minWidth={32}>
+                    <Text fontWeight="bold" fontSize="md" aria-label="price">
+                        {isProductASet &&
+                            `${intl.formatMessage({
+                                id: 'product_view.label.starting_at_price',
+                                defaultMessage: 'Starting at'
+                            })} `}
+                        {intl.formatNumber(price, {
+                            style: 'currency',
+                            currency: currency || activeCurrency
+                        })}
+                    </Text>
+                </Skeleton>
+            )}
         </VStack>
     )
 }
@@ -69,7 +71,8 @@ ProductViewHeader.propTypes = {
     price: PropTypes.number,
     currency: PropTypes.string,
     category: PropTypes.array,
-    productType: PropTypes.object
+    productType: PropTypes.object,
+    isProductPartOfBundle: PropTypes.bool,
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -93,6 +96,8 @@ const ProductView = forwardRef(
             updateWishlist,
             isProductLoading,
             isProductPartOfSet = false,
+            isProductPartOfBundle = false,
+            bundleQuantity = 0,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
@@ -122,7 +127,7 @@ const ProductView = forwardRef(
             variationAttributes,
             stockLevel,
             stepQuantity
-        } = useDerivedProduct(product, isProductPartOfSet)
+        } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)
@@ -198,7 +203,8 @@ const ProductView = forwardRef(
                     if (itemsAdded) {
                         onAddToCartModalOpen({
                             product,
-                            itemsAdded
+                            itemsAdded,
+                            isProductBundle: product?.type.bundle
                         })
                     }
                 } catch (e) {
@@ -291,6 +297,7 @@ const ProductView = forwardRef(
                         productType={product?.type}
                         currency={product?.currency}
                         category={category}
+                        isProductPartOfBundle={isProductPartOfBundle}
                     />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
@@ -302,6 +309,7 @@ const ProductView = forwardRef(
                                     imageGroups={product.imageGroups}
                                     selectedVariationAttributes={variationParams}
                                     lazy={isProductPartOfSet}
+                                    // TODO: potentially replicate with bundles
                                 />
                                 <HideOnMobile>
                                     {showFullLink && product && (
@@ -330,9 +338,23 @@ const ProductView = forwardRef(
                                 productType={product?.type}
                                 currency={product?.currency}
                                 category={category}
+                                isProductPartOfBundle={isProductPartOfBundle}
                             />
                         </Box>
                         <VStack align="stretch" spacing={4}>
+                            {isProductPartOfBundle && (
+                                <Box>
+                                    <Text fontWeight="medium" fontSize="md" aria-label="price">
+                                        <label htmlFor="quantity">
+                                            {intl.formatMessage({
+                                                defaultMessage: 'Quantity',
+                                                id: 'product_view.label.quantity'
+                                            })}
+                                            : {bundleQuantity}
+                                        </label>
+                                    </Text>
+                                </Box>
+                            )}
                             {/*
                                 Customize the skeletons shown for attributes to suit your needs. At the point
                                 that we show the skeleton we do not know how many variations are selectable. So choose
@@ -408,8 +430,8 @@ const ProductView = forwardRef(
                                 </>
                             )}
 
-                            {/* Quantity Selector */}
-                            {!isProductASet && (
+                            {/* Quantity Selector TODO: double check logic for isProductPartOfBundle*/}
+                            {!isProductASet && !isProductPartOfBundle && (
                                 <VStack align="stretch" maxWidth={'200px'}>
                                     <Box fontWeight="bold">
                                         <label htmlFor="quantity">
@@ -489,7 +511,7 @@ const ProductView = forwardRef(
                             )}
                             <Box
                                 display={
-                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
+                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block'] // TODO: potentially do for bundles
                                 }
                             >
                                 {renderActionButtons()}
@@ -522,6 +544,8 @@ ProductView.displayName = 'ProductView'
 ProductView.propTypes = {
     product: PropTypes.object,
     isProductPartOfSet: PropTypes.bool,
+    isProductPartOfBundle: PropTypes.bool,
+    bundleQuantity: PropTypes.number,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,
