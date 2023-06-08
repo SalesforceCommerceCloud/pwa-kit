@@ -430,18 +430,10 @@ const useEinstein = () => {
     }
 
     const getEventUserParameters = async () => {
-        const usid = await getUsidWhenReady()
-        const userParameters = {}
-
-        // If the shopper is authenticated, send the encrypted user ID so recommendations
-        // persist across logins
-        if (isRegistered) {
-            userParameters.userId = await getEncUserIdWhenReady()
+        return {
+            cookieId: await getUsidWhenReady(),
+            userId: isRegistered ? await getEncUserIdWhenReady() : undefined
         }
-
-        userParameters.cookieId = usid
-
-        return userParameters
     }
 
     return {
