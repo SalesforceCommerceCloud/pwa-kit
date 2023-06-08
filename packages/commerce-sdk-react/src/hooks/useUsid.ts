@@ -22,10 +22,14 @@ interface Usid {
  */
 const useUsid = (): Usid => {
     const auth = useAuthContext()
+
+    // TODO: auth.get does not trigger a re-render.
+    // This is fine for now since the only time the usid changes is on logout
+    // and currently when we log out we redirect to the login page which
+    // causes components to unmount.
+    // This will need to change if we stay on the PDP after logout
     const usid = auth.get('usid')
 
-    // NOTE: auth.ready() is to be called later. If you call it immediately in this hook,
-    // it'll cause infinite re-renders during testing.
     const getUsidWhenReady = () => auth.ready().then(({usid}) => usid)
 
     return {usid, getUsidWhenReady}

@@ -439,13 +439,7 @@ const useEinstein = () => {
             userParameters.userId = await getEncUserIdWhenReady()
         }
 
-        // Append the `usid` as the `cookieId` value if present. (It should always be present as long
-        // as the user is initilized)
-        if (usid) {
-            userParameters.cookieId = usid
-        } else {
-            console.warn('Missing `cookieId`. For optimal results this value must be defined.')
-        }
+        userParameters.cookieId = usid
 
         return userParameters
     }

@@ -38,8 +38,6 @@ const useEncUserId = (): EncUserId => {
           useLocalStorage(`enc_user_id_${config.siteId}`)
         : auth.get('enc_user_id')
 
-    // NOTE: auth.ready() is to be called later. If you call it immediately in this hook,
-    // it'll cause infinite re-renders during testing.
     const getEncUserIdWhenReady = () => auth.ready().then(({enc_user_id}) => enc_user_id)
 
     return {encUserId, getEncUserIdWhenReady}
