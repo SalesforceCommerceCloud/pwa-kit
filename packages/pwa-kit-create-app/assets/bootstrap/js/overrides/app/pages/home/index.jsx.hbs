@@ -45,6 +45,10 @@ const Home = () => {
     const einstein = useEinstein()
     const { pathname } = useLocation()
 
+    // useServerContext is a special hook introduced in v3 PWA Kit SDK.
+    // It replaces the legacy `getProps` and provide a react hook interface for SSR.
+    // it returns the request and response objects on the server side,
+    // and these objects are undefined on the client side.
     const { res } = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
