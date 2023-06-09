@@ -289,23 +289,13 @@ const ProductDetail = () => {
         return true
     }, [product, productBundleSelection])
 
-
-    const handleProductBundleAddToCart = async () => {
-        // Get all the selected products, and pass them to the addToCart handler which
-        // accepts an array.
-        console.log('In handleProductBundleAddToCart', productBundleSelection)
-        const productSelectionValues = Object.values(productBundleSelection)
+    // TODO: potentially refactor to not take variant
+    const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
-            // const productItems = productSelectionValues.map(({variant, quantity}) => ({
-            //     productId: variant.productId,
-            //     price: variant.price,
-            //     quantity
-            // }))
-
             const productItems = [{
                 productId: product.id,
                 price: product.price,
-                quantity: 1 // TODO: get correct quantity
+                quantity: selectedQuantity
             }]
 
             await addItemToBasketMutation.mutateAsync({
@@ -315,16 +305,7 @@ const ProductDetail = () => {
 
             einstein.sendAddToCart(productItems)
 
-            // If the items were successfully added, set the return value to be used
-            // by the add to cart modal.
-            console.log('@@@ productSelectionValues', productSelectionValues)
-            // productSelectionValues.unshift(product)
-            // return {[product.id]: {
-            //     product,
-            //     variant,
-            //     quantity: 1
-            // }}
-            return productSelectionValues // TODO: modify return value and modal to represent 
+            return Object.values(productBundleSelection)
         } catch (error) {
             showError(error)
         }

@@ -203,7 +203,8 @@ const ProductView = forwardRef(
                     if (itemsAdded) {
                         onAddToCartModalOpen({
                             product,
-                            itemsAdded
+                            itemsAdded,
+                            selectedQuantity: quantity
                         })
                     }
                 } catch (e) {

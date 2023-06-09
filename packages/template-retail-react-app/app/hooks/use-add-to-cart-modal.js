@@ -57,8 +57,9 @@ AddToCartModalProvider.propTypes = {
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     console.log('AddToCartModal DATA: ', data);
-    const {product, itemsAdded = []} = data || {}
+    const {product, itemsAdded = [], selectedQuantity} = data || {}
     const isProductABundle = product?.type.bundle
+    const isProductASet = product?.type.set
     const intl = useIntl()
     const {
         data: basket = {},
@@ -66,10 +67,9 @@ export const AddToCartModal = () => {
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const {currency, productItems, productSubTotal} = basket
-    let numerOfItemsAdded = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
-    if(isProductABundle) {
-        numerOfItemsAdded = 1 // TODO: implement quantity correctly
-    }
+    let numberOfItemsAdded = isProductASet ? 
+        itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0) :
+        selectedQuantity
 
     if (!isOpen) {
         return null
@@ -109,7 +109,7 @@ export const AddToCartModal = () => {
                                 defaultMessage: 'Qty',
                                 id: 'add_to_cart_modal.label.quantity'
                             })}
-                            : {numerOfItemsAdded}
+                            : {numberOfItemsAdded}
                         </Text>
                     </Box>
                     <Flex
@@ -159,7 +159,7 @@ export const AddToCartModal = () => {
 
             <Box flex="none" alignSelf="flex-end" fontWeight="600">
                 <Text>
-                    {intl.formatNumber(product.price * numerOfItemsAdded, {
+                    {intl.formatNumber(product.price * numberOfItemsAdded, {
                         style: 'currency',
                         currency: currency
                     })}
@@ -184,7 +184,7 @@ export const AddToCartModal = () => {
                                 '{quantity} {quantity, plural, one {item} other {items}} added to cart',
                             id: 'add_to_cart_modal.info.added_to_cart'
                         },
-                        {quantity: numerOfItemsAdded}
+                        {quantity: numberOfItemsAdded}
                     )}
                 </ModalHeader>
                 <ModalCloseButton />
@@ -429,7 +429,6 @@ export const useAddToCartModal = () => {
         isOpen: state.isOpen,
         data: state.data,
         onOpen: (data) => {
-            console.log("hello world this is the function I should edit")
             setState({
                 isOpen: true,
                 data
