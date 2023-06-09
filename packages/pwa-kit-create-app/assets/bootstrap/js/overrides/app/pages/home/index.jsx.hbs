@@ -72,19 +72,19 @@ const Home = () => {
 
             <Hero
                 title={CUSTOM_HOME_TITLE}
-                img=\{\{
+                img=\{{
                     src: getAssetUrl('static/img/hero.png'),
                     alt: 'npx pwa-kit-create-app'
-                \}\}
+                }}
                 actions={
-                    <Stack spacing=\{\{ base: 4, sm: 6 \}\} direction=\{\{ base: 'column', sm: 'row' \}\}>
+                    <Stack spacing=\{{ base: 4, sm: 6 }} direction=\{{ base: 'column', sm: 'row' }}>
                         <Button
                             as={Link}
                             href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
                             target="_blank"
-                            width=\{\{ base: 'full', md: 'inherit' \}\}
+                            width=\{{ base: 'full', md: 'inherit' }}
                             paddingX={7}
-                            _hover=\{\{ textDecoration: 'none' \}\}
+                            _hover=\{{ textDecoration: 'none' }}
                         >
                             <FormattedMessage
                                 defaultMessage="Get started"
@@ -118,7 +118,7 @@ const Home = () => {
                                     href={'https://sfdc.co/business-manager-manage-catalogs'}
                                     textDecoration={'none'}
                                     position={'relative'}
-                                    _after=\{\{
+                                    _after=\{{
                                         position: 'absolute',
                                         content: `""`,
                                         height: '2px',
@@ -127,8 +127,8 @@ const Home = () => {
                                         left: 0,
                                         right: 0,
                                         background: 'gray.700'
-                                    \}\}
-                                    _hover=\{\{ textDecoration: 'none' \}\}
+                                    }}
+                                    _hover=\{{ textDecoration: 'none' }}
                                 >
                                     {intl.formatMessage({
                                         defaultMessage: 'Read docs',

@@ -8,7 +8,7 @@
 import React from 'react'
 
 const MyNewRoute = () => {
-    return <h1 style=\{\{textAlign: 'center', fontSize: '4rem'\}\}>hello new route!</h1>
+    return <h1 style=\{{textAlign: 'center', fontSize: '4rem'}}>hello new route!</h1>
 }
 
 export default MyNewRoute
