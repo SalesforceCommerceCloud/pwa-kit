@@ -58,7 +58,6 @@ class OverridesResolverPlugin {
             ])
         })
     }
-
     /**
      *
      * @param requestPath
