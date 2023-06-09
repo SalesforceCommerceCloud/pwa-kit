@@ -191,7 +191,7 @@ const PRESETS = [
         description: `
             Generate a project using custom settings by answering questions about a
             B2C Commerce instance.
-    
+
             Use this preset to connect to an existing instance, such as a sandbox.
         `,
         shortDescription: 'The Retail app using your own Commerce Cloud instance',
@@ -209,7 +209,7 @@ const PRESETS = [
         description: `
             Generate a project using the settings for a special B2C Commerce
             instance that is used for demo purposes. No questions are asked.
-    
+
             Use this preset to try out PWA Kit.
         `,
         shortDescription: 'The Retail app with demo Commerce Cloud instance',
@@ -270,8 +270,8 @@ const PRESETS = [
         name: 'Template Minimal Project',
         description: `
             Generate a project using a bare-bones TypeScript app template.
-        
-            Use this as a TypeScript starting point or as a base on top of 
+
+            Use this as a TypeScript starting point or as a base on top of
             which to build new TypeScript project templates for Managed Runtime.
         `,
         templateSource: {
@@ -683,6 +683,12 @@ const main = async (opts) => {
         })
     }
 
+    if (context.answers.project.commerce.instanceUrl) {
+        // Remove protocol since we only use this to setup the OCAPI proxy
+        const url = new URL(context.answers.project.commerce.instanceUrl)
+        context.answers.project.commerce.instanceUrl = url.hostname
+    }
+
     // Inject the packageJSON into the context for extensibile projects.
     if (context.answers.project.extend) {
         const pkgJSON = JSON.parse(
@@ -728,7 +734,7 @@ Examples:
   ${program.name()} --preset "${id}"\n${description}
         `
    })}
-   
+
    `)
     program
         .option('--outputDir <path>', `Path to the output directory for the new project`)
