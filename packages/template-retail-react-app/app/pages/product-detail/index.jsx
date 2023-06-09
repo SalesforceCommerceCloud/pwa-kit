@@ -17,7 +17,10 @@ TODO:
     - update default.js to point to testing sandbox
 - potentially refactor bundles and set into individual components/files
 - potentially reformat data to include info about isProductPartOfSet and isProductPartOfBundle
-- branch off 2.7 and not 3.0
+- potentially branch off 2.7 and not 3.0
+- ensure quantity selector updates quantity correctly
+- ensure that page is responsive
+- refactor use-add-to-cart-modal.js
 
 */ 
 

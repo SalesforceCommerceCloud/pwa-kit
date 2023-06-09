@@ -203,8 +203,7 @@ const ProductView = forwardRef(
                     if (itemsAdded) {
                         onAddToCartModalOpen({
                             product,
-                            itemsAdded,
-                            isProductBundle: product?.type.bundle
+                            itemsAdded
                         })
                     }
                 } catch (e) {
