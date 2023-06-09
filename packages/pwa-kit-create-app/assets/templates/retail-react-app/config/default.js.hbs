@@ -73,7 +73,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: '${new URL(commerceApi.instanceUrl).hostname}',
+                host: '{{answers.project.commerce.instanceUrl}}',
                 path: 'ocapi'
             }
         ]
