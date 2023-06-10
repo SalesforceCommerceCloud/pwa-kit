@@ -484,7 +484,7 @@ const renderer =
                             },
                             {
                                 from: path.resolve('translations/compiled'),
-                                to: 'static/translations/'
+                                to: 'static/translations/compiled/'
                             }
                         ]
                     }),
