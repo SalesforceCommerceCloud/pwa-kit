@@ -313,12 +313,6 @@ const withChunking = (config) => {
                         },
                         name: 'vendor',
                         chunks: 'all'
-                    },
-                    translations: {
-                        priority: 10,
-                        test: (module) => module?.context?.match?.(/\/app\/translations\/compiled/),
-                        name: 'translations',
-                        chunks: 'all'
                     }
                 }
             }
@@ -487,6 +481,10 @@ const renderer =
                                     )
                                     .replace(/\\/g, '/'),
                                 to: `static/`
+                            },
+                            {
+                                from: path.resolve('translations/compiled'),
+                                to: 'static/translations/'
                             }
                         ]
                     }),
@@ -498,6 +496,7 @@ const renderer =
                         skipFirstNotification: true
                     }),
 
+                    // TODO: investigate why there are 3 similar instances of this CopyPlugin in this file
                     // Must only appear on one config – this one is the only mandatory one.
                     new CopyPlugin({
                         patterns: [
