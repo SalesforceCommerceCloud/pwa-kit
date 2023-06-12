@@ -480,7 +480,8 @@ const renderer =
                                         }app/static`
                                     )
                                     .replace(/\\/g, '/'),
-                                to: `static/`
+                                to: `static/`,
+                                noErrorOnMissing: true
                             },
                             {
                                 from: path.resolve('translations/compiled'),
@@ -494,26 +495,6 @@ const renderer =
                         title: `PWA Kit Project: ${pkg.name}`,
                         excludeWarnings: true,
                         skipFirstNotification: true
-                    }),
-
-                    // TODO: investigate why there are 3 similar instances of this CopyPlugin in this file
-                    // Must only appear on one config – this one is the only mandatory one.
-                    new CopyPlugin({
-                        patterns: [
-                            {
-                                from: path
-                                    .resolve(
-                                        `${
-                                            EXT_OVERRIDES_DIR
-                                                ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
-                                                : ''
-                                        }app/static`
-                                    )
-                                    .replace(/\\/g, '/'),
-                                to: `static/`,
-                                noErrorOnMissing: true
-                            }
-                        ]
                     }),
 
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
@@ -539,23 +520,6 @@ const ssr = (() => {
                     },
                     plugins: [
                         ...config.plugins,
-                        // This must only appear on one config – this one is the only mandatory one.
-                        new CopyPlugin({
-                            patterns: [
-                                {
-                                    from: path
-                                        .resolve(
-                                            `${
-                                                EXT_OVERRIDES_DIR
-                                                    ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
-                                                    : ''
-                                            }app/static`
-                                        )
-                                        .replace(/\\/g, '/'),
-                                    to: `static/`
-                                }
-                            ]
-                        }),
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
                     ].filter(Boolean)
                 }
