@@ -482,10 +482,6 @@ const renderer =
                                     .replace(/\\/g, '/'),
                                 to: `static/`,
                                 noErrorOnMissing: true
-                            },
-                            {
-                                from: path.resolve('translations/compiled'),
-                                to: 'static/translations/compiled/'
                             }
                         ]
                     }),
