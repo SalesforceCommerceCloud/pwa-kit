@@ -6,13 +6,17 @@
  */
 import {useMemo, useState} from 'react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useCommerceApi, useAccessToken, useUsid, useEncUserId} from '@salesforce/commerce-sdk-react'
+import {
+    useCommerceApi,
+    useAccessToken,
+    useUsid,
+    useEncUserId,
+    useCustomerType
+} from '@salesforce/commerce-sdk-react'
 import {keysToCamel} from '@salesforce/retail-react-app/app/utils/utils'
 
 export class EinsteinAPI {
-    constructor({host, einsteinId, userId, cookieId, siteId, isProduction}) {
-        this.userId = userId
-        this.cookieId = cookieId
+    constructor({host, einsteinId, siteId, isProduction}) {
         this.siteId = siteId
         this.isProduction = isProduction
         this.host = host
@@ -20,7 +24,7 @@ export class EinsteinAPI {
     }
 
     /**
-     * Given a POJO append the correct user and cookie identifier values using the current auth state.
+     * Given a POJO append the correct site and environment values
      *
      * @param {object} params
      * @returns {object} The decorated body object.
@@ -30,20 +34,6 @@ export class EinsteinAPI {
         const instanceType_sbx = 'sbx'
 
         const body = {...params}
-
-        // If we have an encrypted user id (authenticaed users only) use it as the `userId` otherwise
-        // we won't send a `userId` param for guest users.
-        if (this.userId) {
-            body.userId = this.userId
-        }
-
-        // Append the `usid` as the `cookieId` value if present. (It should always be present as long
-        // as the user is initilized)
-        if (this.cookieId) {
-            body.cookieId = this.cookieId
-        } else {
-            console.warn('Missing `cookieId`. For optimal results this value must be defined.')
-        }
 
         // The first part of the siteId is the realm
         if (this.siteId) {
@@ -123,7 +113,6 @@ export class EinsteinAPI {
             'x-cq-client-id': this.einsteinId
         }
 
-        // Include `userId` and `cookieId` parameters.
         if (body) {
             body = this._buildBody(body)
         }
@@ -393,20 +382,20 @@ const useEinstein = () => {
         app: {einsteinAPI: config}
     } = getConfig()
     const {host, einsteinId, siteId, isProduction} = config
-    const usid = useUsid()
-    const encUserId = useEncUserId()
+
+    const {getUsidWhenReady} = useUsid()
+    const {getEncUserIdWhenReady} = useEncUserId()
+    const {isRegistered} = useCustomerType()
 
     const einstein = useMemo(
         () =>
             new EinsteinAPI({
                 host,
                 einsteinId,
-                userId: encUserId,
-                cookieId: usid,
                 siteId,
                 isProduction
             }),
-        [host, einsteinId, encUserId, usid, siteId, isProduction]
+        [host, einsteinId, siteId, isProduction]
     )
     const [isLoading, setIsLoading] = useState(false)
     const [recommendations, setRecommendations] = useState([])
@@ -440,51 +429,74 @@ const useEinstein = () => {
         return reco
     }
 
+    const getEventUserParameters = async () => {
+        return {
+            cookieId: await getUsidWhenReady(),
+            userId: isRegistered ? await getEncUserIdWhenReady() : undefined
+        }
+    }
+
     return {
         isLoading,
 
         recommendations,
 
         async sendViewProduct(...args) {
-            return einstein.sendViewProduct(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendViewProduct(...args.concat(userParameters))
         },
         async sendViewSearch(...args) {
-            return einstein.sendViewSearch(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendViewSearch(...args.concat(userParameters))
         },
         async sendClickSearch(...args) {
-            return einstein.sendClickSearch(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendClickSearch(...args.concat(userParameters))
         },
         async sendViewCategory(...args) {
-            return einstein.sendViewCategory(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendViewCategory(...args.concat(userParameters))
         },
         async sendClickCategory(...args) {
-            return einstein.sendClickCategory(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendClickCategory(...args.concat(userParameters))
         },
         async sendViewPage(...args) {
-            return einstein.sendViewPage(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendViewPage(...args.concat(userParameters))
         },
         async sendBeginCheckout(...args) {
-            return einstein.sendBeginCheckout(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendBeginCheckout(...args.concat(userParameters))
         },
         async sendCheckoutStep(...args) {
-            return einstein.sendCheckoutStep(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendCheckoutStep(...args.concat(userParameters))
         },
         async sendViewReco(...args) {
-            return einstein.sendViewReco(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendViewReco(...args.concat(userParameters))
         },
         async sendClickReco(...args) {
-            return einstein.sendClickReco(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendClickReco(...args.concat(userParameters))
         },
         async sendAddToCart(...args) {
-            return einstein.sendAddToCart(...args)
+            const userParameters = await getEventUserParameters()
+            return einstein.sendAddToCart(...args.concat(userParameters))
         },
         async getRecommenders(...args) {
             return einstein.getRecommenders(...args)
         },
-        async getRecommendations(recommenderName, products, args) {
+        async getRecommendations(recommenderName, products, ...args) {
             setIsLoading(true)
             try {
-                const reco = await einstein.getRecommendations(recommenderName, products, args)
+                const userParameters = await getEventUserParameters()
+                const reco = await einstein.getRecommendations(
+                    recommenderName,
+                    products,
+                    ...args.concat(userParameters)
+                )
                 reco.recommenderName = recommenderName
                 const recommendations = await fetchRecProductDetails(reco)
                 setRecommendations(recommendations)
@@ -494,10 +506,15 @@ const useEinstein = () => {
                 setIsLoading(false)
             }
         },
-        async getZoneRecommendations(zoneName, products, args) {
+        async getZoneRecommendations(zoneName, products, ...args) {
             setIsLoading(true)
             try {
-                const reco = await einstein.getZoneRecommendations(zoneName, products, args)
+                const userParameters = await getEventUserParameters()
+                const reco = await einstein.getZoneRecommendations(
+                    zoneName,
+                    products,
+                    ...args.concat(userParameters)
+                )
                 const recommendations = await fetchRecProductDetails(reco)
                 setRecommendations(recommendations)
             } catch (err) {

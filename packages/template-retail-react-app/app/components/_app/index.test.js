@@ -12,7 +12,7 @@ import App from '@salesforce/retail-react-app/app/components/_app/index.jsx'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {DEFAULT_LOCALE} from '@salesforce/retail-react-app/app/utils/test-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import messages from '@salesforce/retail-react-app/translations/compiled/en-GB.json'
+import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 let windowSpy

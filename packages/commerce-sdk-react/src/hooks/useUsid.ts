@@ -5,25 +5,34 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import useAuthContext from './useAuthContext'
-import useLocalStorage from './useLocalStorage'
-import useConfig from './useConfig'
 
-const onClient = typeof window !== 'undefined'
+/**
+ * @group Shopper Authentication helpers
+ */
+interface Usid {
+    usid: string | null
+    getUsidWhenReady: () => Promise<string>
+}
 
 /**
  * Hook that returns the usid associated with the current access token.
  *
+ * @group Helpers
+ * @category Shopper Authentication
  */
-const useUsid = (): string | null => {
-    const config = useConfig()
+const useUsid = (): Usid => {
     const auth = useAuthContext()
 
-    return onClient
-        ? // This conditional is a constant value based on the environment, so the same path will
-          // always be followed., and the "rule of hooks" is not violated.
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          useLocalStorage(`usid_${config.siteId}`)
-        : auth.get('usid')
+    // TODO: auth.get does not trigger a re-render.
+    // This is fine for now since the only time the usid changes is on logout
+    // and currently when we log out we redirect to the login page which
+    // causes components to unmount.
+    // This will need to change if we stay on the PDP after logout
+    const usid = auth.get('usid')
+
+    const getUsidWhenReady = () => auth.ready().then(({usid}) => usid)
+
+    return {usid, getUsidWhenReady}
 }
 
 export default useUsid

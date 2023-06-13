@@ -76,6 +76,9 @@ export type ApiClientConfigParams = {
     currency?: string
 }
 
+/**
+ * A map of commerce-sdk-isomorphic API client instances.
+ */
 export interface ApiClients {
     shopperBaskets: ShopperBaskets<ApiClientConfigParams>
     shopperContexts: ShopperContexts<ApiClientConfigParams>

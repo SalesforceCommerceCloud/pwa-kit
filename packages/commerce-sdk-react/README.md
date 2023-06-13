@@ -5,12 +5,12 @@ A collection of <a href="https://tanstack.com/query/latest/docs/react/overview">
 
 ## 🎯 Features
 
-- Shopper authentication & token management via [SLAS](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login)
-- Server side data fetching (in conjuction with PWA Kit)
-- Phased Launch support ([plugin_slas](https://github.com/SalesforceCommerceCloud/plugin_slas) compatible)
-- Built-in caching for easy state management
-  - automatic cache invalidations/updates via the library's built-in mutations
-  - automatic cache key generation
+-   Shopper authentication & token management via [SLAS](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-login)
+-   Server side data fetching (in conjuction with PWA Kit)
+-   Phased Launch support ([plugin_slas](https://github.com/SalesforceCommerceCloud/plugin_slas) compatible)
+-   Built-in caching for easy state management
+    -   automatic cache invalidations/updates via the library's built-in mutations
+    -   automatic cache key generation
 
 ## ⚙️ Installation
 
@@ -43,7 +43,7 @@ const AppConfig = ({children}) => {
             {children}
         </CommerceApiProvider>
     )
-} 
+}
 
 // Set configuration options for react query.
 // NOTE: This configuration will be used both on the server-side and client-side.
@@ -65,12 +65,11 @@ export default withReactQuery(AppConfig, options)
 
 ## ⚡️ Quickstart (Generic React App)
 
-You can use this library in any React application by creating a new QueryClient and wrap your application with `QueryClientProvider`. For example: 
+You can use this library in any React application by creating a new QueryClient and wrap your application with `QueryClientProvider`. For example:
 
 ```jsx
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-
 
 const App = ({children}) => {
     const queryClient = new QueryClient()
@@ -91,7 +90,7 @@ const App = ({children}) => {
             </CommerceApiProvider>
         </QueryClientProvider>
     )
-} 
+}
 
 export default App
 ```
@@ -104,7 +103,7 @@ To help reduce boilerplate code for managing shopper authentication, by default,
 
 ### Shopper Session Initialization
 
-On `CommerceApiProvider` mount, the provider initializes shopper session by initiating the SLAS __Public Client__ login flow. The tokens are stored/managed/refreshed by the library.
+On `CommerceApiProvider` mount, the provider initializes shopper session by initiating the SLAS **Public Client** login flow. The tokens are stored/managed/refreshed by the library.
 
 ### Authenticate request queue
 
@@ -136,19 +135,15 @@ You have the option of handling shopper authentication externally, by providing 
 
 ```jsx
 const MyComponent = ({children}) => {
-    return (
-        <CommerceApiProvider fetchedToken="xxxxxxxxxxxx">
-            {children}
-        </CommerceApiProvider>
-    )
-} 
+    return <CommerceApiProvider fetchedToken="xxxxxxxxxxxx">{children}</CommerceApiProvider>
+}
 ```
 
 ## Hooks
 
 The majority of hooks provided in this library are built on top of the [useQuery](https://tanstack.com/query/latest/docs/react/reference/useQuery) and the [useMutation](https://tanstack.com/query/latest/docs/react/reference/useMutation) hook from [react-query](https://tanstack.com/query/latest). React-query provides a declarative way for fetching and updating data. This library takes advantage of the features provided by react-query and combine with the [commerce-sdk-isomorphic](https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic) API client to create a collection of hooks to simplify data fetching for SCAPI.
 
-The hooks can be categorized into __Query hooks__ and __Mutation hooks__.
+The hooks can be categorized into **Query hooks** and **Mutation hooks**.
 
 ### Query hooks
 
@@ -158,7 +153,7 @@ The query hooks correspond to the http GET endpoints from the SCAPI. The query h
 use<EntityName>(CommerceClientOptions, ReactQueryOptions)
 ```
 
-Both the __required__ and __optional__ parameters for the underlying `commerce-sdk-isomorphic` call is passed as the first parameter:
+Both the **required** and **optional** parameters for the underlying `commerce-sdk-isomorphic` call is passed as the first parameter:
 
 ```jsx
 import {useProduct} from '@salesforce/commerce-sdk-react'
@@ -171,10 +166,12 @@ const Example = () => {
         }
     })
 
-    return <>
-        <p>isLoading: {query.isLoading}</p>
-        <p>name: {query.data?.name}</p>
-    </>
+    return (
+        <>
+            <p>isLoading: {query.isLoading}</p>
+            <p>name: {query.data?.name}</p>
+        </>
+    )
 }
 ```
 
@@ -186,15 +183,18 @@ import {useBasket} from '@salesforce/commerce-sdk-react'
 const onServer = typeof window === undefined
 
 const Example = ({basketId}) => {
-    const query = useBasket({
-        parameters: {
-            basketId: basketId
+    const query = useBasket(
+        {
+            parameters: {
+                basketId: basketId
+            }
         },
-    }, {
-        // A common use case for `enabled` is
-        // to conditionally fetch based on environment
-        enabled: !onServer && basketId
-    })
+        {
+            // A common use case for `enabled` is
+            // to conditionally fetch based on environment
+            enabled: !onServer && basketId
+        }
+    )
 }
 ```
 
@@ -215,16 +215,22 @@ const Example = ({basketId}) => {
     // Typescript IDE intellisense for available options
     const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
 
-    return <button onClick={() => addItemToBasket.mutate({
-        parameters: {
-            basketId
-        },
-        body: {
-            productId: '25592770M',
-            price: 55,
-            quantity: 1
-        }
-    })} />
+    return (
+        <button
+            onClick={() =>
+                addItemToBasket.mutate({
+                    parameters: {
+                        basketId
+                    },
+                    body: {
+                        productId: '25592770M',
+                        price: 55,
+                        quantity: 1
+                    }
+                })
+            }
+        />
+    )
 }
 ```
 
@@ -234,6 +240,10 @@ You could also import the mutation options as a constant like:
 import {useShopperBasketsMutation, ShopperBasketsMutations} from '@salesforce/commerce-sdk-react'
 
 const Example = ({basketId}) => {
+    // this works
+    const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
+
+    // this also works
     const addItemToBasket = useShopperBasketsMutation(ShopperBasketsMutations.AddItemToBasket)
     return ...
 }
@@ -243,7 +253,7 @@ const Example = ({basketId}) => {
 
 Since mutations changes data on the server, the cache entries that are potentially affected by the mutation is automatically invalidated.
 
-For example, an `addItemToBasket` mutation automatically update `useBasket`  and `useCustomerBaskets` query cache, because the mutation result contains the information for the updated basket. In other cases, when the mutation response do not have the updated data, the library will invalidate the cache and trigger a re-fetch. For the DELETE endpoints, the library removes the cache entries on successful mutations.
+For example, an `addItemToBasket` mutation automatically update `useBasket` and `useCustomerBaskets` query cache, because the mutation result contains the information for the updated basket. In other cases, when the mutation response do not have the updated data, the library will invalidate the cache and trigger a re-fetch. For the DELETE endpoints, the library removes the cache entries on successful mutations.
 
 _💡 Debugging hint: install and include `@tanstack/react-query-devtools` in your React app to see the queries (inspect the query states and cache keys)._
 
@@ -265,14 +275,13 @@ const Example = () => {
     const fetchProducts = async () => {
         const token = await getTokenWhenReady()
         const products = await api.shopperProducts.getProducts({
-                parameters: {ids: ids.join(',')},
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
+            parameters: {ids: ids.join(',')},
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
         return products
     }
-
 }
 ```
 
@@ -299,18 +308,19 @@ useCustomerId() => null | 'guest' | 'registered'
 ### `useEncUserId()`
 
 ```ts
-useEncUserId() => null | string
+useEncUserId() => {encUserId: String, getEncUserIdWhenReady: Promise}
 ```
 
 ### `useUsid()`
 
 ```ts
-useUsid() => null | string
+useUsid() => {usid: String, getUsidWhenReady: Promise}
 ```
 
 ## Roadmap
-- Optimistic update support
-- SLAS private client support
+
+-   Optimistic update support
+-   SLAS private client support
 
 ## Useful Links:
 

@@ -185,7 +185,9 @@ const main = async () => {
         typeof projectPkg?.ccExtensibility?.overridesDir === 'string' &&
             !projectPkg?.ccExtensibility?.overridesDir?.startsWith(p.sep)
             ? p.sep + projectPkg?.ccExtensibility?.overridesDir
-            : projectPkg?.ccExtensibility?.overridesDir ?? '',
+            : projectPkg?.ccExtensibility?.overridesDir
+            ? projectPkg?.ccExtensibility?.overridesDir
+            : '',
         'app',
         'ssr.js'
     )

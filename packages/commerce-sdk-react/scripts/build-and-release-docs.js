@@ -16,6 +16,7 @@ const main = () => {
     const isPrerelease = semver.prerelease(currentVersion.trim())
     // if it is a pre-release version, do nothing
     if (isPrerelease) {
+        console.log('This is a preview release, exiting.')
         return
     }
 

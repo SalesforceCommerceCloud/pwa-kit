@@ -2,5 +2,11 @@
   "out": "docs",
   "entryPoints": [
     "src/index.ts"
-  ]
+  ],
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+},
+  "categorizeByGroup": true,
+  "groupOrder": ["Components", "Helpers", "ShopperBaskets", "ShopperContexts", "ShopperCustomers", "ShopperExperience", "ShopperGiftCertificates", "ShopperLogin", "ShopperOrders", "ShopperProducts", "ShopperPromotions", "ShopperSearch"]
 }
