@@ -8,24 +8,15 @@
 /* 
 
 TODO: 
-- write function for bundles to disable add to cart button if any child products are unavailable
-- write function for add to cart
-- figure out how to get variant selections for child products and send them to cart
-- ensure that link can be bookmarked
-- implement product modal
-- implement example bundle in BM with more variation options to test
-    - update default.js to point to testing sandbox
 - potentially refactor bundles and set into individual components/files
 - potentially reformat data to include info about isProductPartOfSet and isProductPartOfBundle
 - potentially branch off 2.7 and not 3.0
-- ensure quantity selector updates quantity correctly
 - ensure that page is responsive
 - refactor use-add-to-cart-modal.js
-- account for what the URL should look like if all child product only have 1 variant and the user adds to cart immediately
-- clicking quantity on child product for bundle causes page to jump to the top --> FIX
 - use enum for valid states (sets/bundles/regular product)
 - consider disabling add to cart button when child product is out of stock or unavailable
-- fix web-client-content-script.js:1 --> Uncaught TypeError: Cannot read properties of undefined (reading 'id')
+- fix case where child quantity has greater quantity than 1 and is not passed through to cart modal
+- refactor code once functionality has been completed
 
 */ 
 
@@ -75,10 +66,8 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
-    // const [childProductSelection, setChildProductSelection] = useState({})
-    const [productSetSelection, setProductSetSelection] = useState({})
-    const [productBundleSelection, setProductBundleSelection] = useState({})
-    const childProductRefs = React.useRef({}) // TODO: consider using useState
+    const [childProductSelection, setChildProductSelection] = useState({}) // for sets and bundles
+    const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
     const {data: basket} = useCurrentBasket()
@@ -224,7 +213,7 @@ const ProductDetail = () => {
     }
 
     /**************** Product Set Handlers ****************/
-    const handleProductSetValidation = useCallback(() => {
+    const handleChildProductValidation = useCallback(() => {
         // Run validation for all child products. This will ensure the error
         // messages are shown.
         Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
@@ -233,20 +222,11 @@ const ProductDetail = () => {
 
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected.
-        const selectedProductIds = Object.keys(productSetSelection)
-        // console.log('%%%% selectedProductIds: ', selectedProductIds);
-
-        // const firstUnselectedProduct = product.setProducts.find(
-        //     ({id}) => !selectedProductIds.includes(id)
-        // )
+        const selectedProductIds = Object.keys(childProductSelection)
         const normalizedProduct = normalizeSetBundleProduct(product)
         const firstUnselectedProduct = normalizedProduct.childProducts.find(
-            ({product: childProduct}) => !selectedProductIds.includes(childProduct.id.toString())
+            ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
         )?.product
-
-        // console.log('%%%% childProductRefs: ', childProductRefs);
-        // console.log('%%%% firstUnselectedProduct: ', firstUnselectedProduct);
-
 
         if (firstUnselectedProduct) {
             // Get the reference to the product view and scroll to it.
@@ -263,12 +243,12 @@ const ProductDetail = () => {
         }
 
         return true
-    }, [product, productSetSelection])
+    }, [product, childProductSelection])
 
     const handleProductSetAddToCart = () => {
         // Get all the selected products, and pass them to the addToCart handler which
         // accepts an array.
-        const productSelectionValues = Object.values(productSetSelection)
+        const productSelectionValues = Object.values(childProductSelection)
         return handleAddToCart(productSelectionValues)
     }
 
@@ -303,8 +283,7 @@ const ProductDetail = () => {
 
             einstein.sendAddToCart(productItems)
 
-            // return Object.values(productBundleSelection)
-            return Object.values(productSetSelection)
+            return Object.values(childProductSelection)
         } catch (error) {
             showError(error)
         }
@@ -339,7 +318,7 @@ const ProductDetail = () => {
                     addToWishlist={handleAddToWishlist}
                     isProductLoading={isProductLoading}
                     isWishlistLoading={isWishlistLoading}
-                    validateOrderability={handleProductSetValidation}
+                    validateOrderability={handleChildProductValidation}
                 />
 
                 <hr />
@@ -371,7 +350,7 @@ const ProductDetail = () => {
                                 addToWishlist={isProductASet ? handleAddToWishlist : null}
                                 onVariantSelected={(product, variant, quantity) => {
                                     if (quantity) {
-                                        setProductSetSelection((previousState) => ({
+                                        setChildProductSelection((previousState) => ({
                                             ...previousState,
                                             [product.id]: {
                                                 product,
@@ -380,73 +359,13 @@ const ProductDetail = () => {
                                             }
                                         }))
                                     } else {
-                                        const selections = {...productSetSelection}
+                                        const selections = {...childProductSelection}
                                         delete selections[product.id]
-                                        setProductSetSelection(selections)
+                                        setChildProductSelection(selections)
                                     }
                                 }}
                                 isProductLoading={isProductLoading}
                                 isWishlistLoading={isWishlistLoading}
-                            />
-                            <InformationAccordion product={childProduct} />
-
-                            <Box display={['none', 'none', 'none', 'block']}>
-                                <hr />
-                            </Box>
-                        </Box>
-                    ))
-                }
-            </Fragment>
-        )
-    } else if (isProductABundle) {
-        console.log('PRODUCT BUNDLE')
-        renderPDP = (
-            <Fragment>
-                <ProductView
-                    product={product}
-                    category={primaryCategory?.parentCategoryTree || []}
-                    addToCart={handleProductBundleAddToCart}
-                    addToWishlist={handleAddToWishlist}
-                    isProductLoading={isProductLoading}
-                    isWishlistLoading={isWishlistLoading}
-                    validateOrderability={handleProductBundleValidation} // TODO
-                />
-
-                <hr />
-
-                {
-                    product.bundledProducts.map(({ product: childProduct, quantity }) => (
-                        <Box key={childProduct.id} data-testid="child-product">
-                            <ProductView
-                                // Do no use an arrow function as we are manipulating the functions scope.
-                                // ref={function (ref) {
-                                //     // Assign the "set" scope of the ref, this is how we access the internal
-                                //     // validation.
-                                //     childProductRefs.current[childProduct.id] = {
-                                //         ref,
-                                //         validateOrderability: this.validateOrderability
-                                //     }
-                                // }} // TODO
-                                product={childProduct}
-                                isProductPartOfBundle={true}
-                                bundleQuantity={quantity}
-                                onVariantSelected={(product, variant, quantity) => {
-                                    if (quantity) {
-                                        setProductBundleSelection((previousState) => ({
-                                            ...previousState,
-                                            [product.id]: {
-                                                product,
-                                                variant,
-                                                quantity
-                                            }
-                                        }))
-                                    } else {
-                                        const selections = {...productBundleSelection}
-                                        delete selections[product.id]
-                                        setProductBundleSelection(selections)
-                                    }
-                                }} // TODO
-                                isProductLoading={isProductLoading}
                             />
                             <InformationAccordion product={childProduct} />
 

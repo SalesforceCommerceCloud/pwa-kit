@@ -346,7 +346,7 @@ const ProductView = forwardRef(
                             {isProductPartOfBundle && (
                                 <Box>
                                     <Text fontWeight="medium" fontSize="md" aria-label="price">
-                                        <label htmlFor="quantity">
+                                        <label>
                                             {intl.formatMessage({
                                                 defaultMessage: 'Quantity',
                                                 id: 'product_view.label.quantity'
