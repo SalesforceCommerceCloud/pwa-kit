@@ -683,7 +683,7 @@ const main = async (opts) => {
         })
     }
 
-    if (context.answers.project.commerce.instanceUrl) {
+    if (context.answers.project.commerce?.instanceUrl) {
         // Remove protocol since we only use this to setup the OCAPI proxy
         const url = new URL(context.answers.project.commerce.instanceUrl)
         context.answers.project.commerce.instanceUrl = url.hostname
