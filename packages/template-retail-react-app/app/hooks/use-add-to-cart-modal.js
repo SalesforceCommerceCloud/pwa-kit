@@ -118,8 +118,6 @@ export const AddToCartModal = () => {
                         marginTop={4}
                         gridGap={4}
                     >
-                        {/* TODO: pull string out for localization */}
-                        {/* <Text>Selected options:</Text> */}
                         {itemsAdded.map(({product, variant, quantity}) => {
                             const variationAttributeValues = getDisplayVariationValues(
                                 product.variationAttributes,
@@ -127,7 +125,9 @@ export const AddToCartModal = () => {
                             )
                             return (
                                 <Box key={variant.productId}>
-                                    <Text color="gray.600" fontWeight="700" fontSize="sm">{product.name}</Text>
+                                    <Text color="gray.600" fontWeight="700" fontSize="sm">
+                                        {product.name} {quantity > 1 ? `(${quantity})` : ''}
+                                    </Text>
                                     <Box
                                         color="gray.600"
                                         fontSize="sm"
@@ -142,13 +142,6 @@ export const AddToCartModal = () => {
                                                 )
                                             }
                                         )}
-                                        <Text>
-                                            {intl.formatMessage({
-                                                defaultMessage: 'Qty',
-                                                id: 'add_to_cart_modal.label.quantity'
-                                            })}
-                                            : {quantity}
-                                        </Text>
                                     </Box>
                                 </Box>
                             )
@@ -205,7 +198,7 @@ export const AddToCartModal = () => {
                         >
                             {/* TODO potentially refactor to use ternary operator */}
                             {isProductABundle && renderBundle}
-                            {!isProductABundle && itemsAdded.map(({product, variant, quantity}, index) => { // TODO: edit this part to work with bundles
+                            {!isProductABundle && itemsAdded.map(({product, variant, quantity}, index) => {
                                 const image = findImageGroupBy(product.imageGroups, {
                                     viewType: 'small',
                                     selectedVariationAttributes: variant.variationValues

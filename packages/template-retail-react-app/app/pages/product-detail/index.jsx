@@ -15,8 +15,10 @@ TODO:
 - refactor use-add-to-cart-modal.js
 - use enum for valid states (sets/bundles/regular product)
 - consider disabling add to cart button when child product is out of stock or unavailable
-- fix case where child quantity has greater quantity than 1 and is not passed through to cart modal
-- refactor code once functionality has been completed
+- once functionality is completed:
+    - refactor code
+    - go through all TODOs
+    - lint code
 
 */ 
 
@@ -355,7 +357,7 @@ const ProductDetail = () => {
                                             [product.id]: {
                                                 product,
                                                 variant,
-                                                quantity
+                                                quantity: isProductABundle ? childQuantity : quantity
                                             }
                                         }))
                                     } else {
