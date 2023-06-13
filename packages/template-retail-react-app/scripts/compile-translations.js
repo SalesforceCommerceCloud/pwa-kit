@@ -20,14 +20,15 @@ const outputFolder = overridesDir
 
 const inputFolder = process.argv[2]
 
-try {
+const main = () => {
     const command = `formatjs compile-folder --ast ${inputFolder} ${outputFolder}`
     console.log('Compiling translations into the folder:', outputFolder)
     exec(command, (err) => {
         if (err) {
             console.error(err)
+            return
         }
     })
-} catch (err) {
-    console.error(err)
 }
+
+main()

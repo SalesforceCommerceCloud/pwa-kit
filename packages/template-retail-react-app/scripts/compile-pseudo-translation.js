@@ -20,7 +20,7 @@ const outputFolder = overridesDir
 
 const inputFile = process.argv[2]
 
-try {
+const main = () => {
     const locale = 'en-XA'
     const outputFile = `${outputFolder}/${locale}.json`
     const command = `formatjs compile --ast ${inputFile} --out-file ${outputFile} --pseudo-locale ${locale}`
@@ -29,8 +29,9 @@ try {
     exec(command, (err) => {
         if (err) {
             console.error(err)
+            return
         }
     })
-} catch (err) {
-    console.error(err)
 }
+
+main()
