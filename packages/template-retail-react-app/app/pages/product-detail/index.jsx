@@ -21,6 +21,11 @@ TODO:
 - ensure quantity selector updates quantity correctly
 - ensure that page is responsive
 - refactor use-add-to-cart-modal.js
+- account for what the URL should look like if all child product only have 1 variant and the user adds to cart immediately
+- clicking quantity on child product for bundle causes page to jump to the top --> FIX
+- use enum for valid states (sets/bundles/regular product)
+- consider disabling add to cart button when child product is out of stock or unavailable
+- fix web-client-content-script.js:1 --> Uncaught TypeError: Cannot read properties of undefined (reading 'id')
 
 */ 
 
@@ -70,9 +75,10 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
+    // const [childProductSelection, setChildProductSelection] = useState({})
     const [productSetSelection, setProductSetSelection] = useState({})
     const [productBundleSelection, setProductBundleSelection] = useState({})
-    const childProductRefs = React.useRef({})
+    const childProductRefs = React.useRef({}) // TODO: consider using useState
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
     const {data: basket} = useCurrentBasket()
@@ -102,7 +108,8 @@ const ProductDetail = () => {
     const isProductABundle = product?.type.bundle
     console.log('product: ', product)
     if(isProductABundle) {
-        product.bundledProducts[2].product.inventory.stockLevel = 10; // TODO: configure stock level in BM
+        // TODO: implement new bundle in BM and remove this
+        // product.bundledProducts[2].product.inventory.stockLevel = 0
     }
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
@@ -227,9 +234,19 @@ const ProductDetail = () => {
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected.
         const selectedProductIds = Object.keys(productSetSelection)
-        const firstUnselectedProduct = product.setProducts.find(
-            ({id}) => !selectedProductIds.includes(id)
-        )
+        // console.log('%%%% selectedProductIds: ', selectedProductIds);
+
+        // const firstUnselectedProduct = product.setProducts.find(
+        //     ({id}) => !selectedProductIds.includes(id)
+        // )
+        const normalizedProduct = normalizeSetBundleProduct(product)
+        const firstUnselectedProduct = normalizedProduct.childProducts.find(
+            ({product: childProduct}) => !selectedProductIds.includes(childProduct.id.toString())
+        )?.product
+
+        // console.log('%%%% childProductRefs: ', childProductRefs);
+        // console.log('%%%% firstUnselectedProduct: ', firstUnselectedProduct);
+
 
         if (firstUnselectedProduct) {
             // Get the reference to the product view and scroll to it.
@@ -258,36 +275,17 @@ const ProductDetail = () => {
     /**************** Product Bundle Handlers ****************/
 
     // TODO: implement
-    const handleProductBundleValidation = useCallback(() => {
-        // Run validation for all child products. This will ensure the error
-        // messages are shown.
-        // Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
-        //     validateOrderability({scrollErrorIntoView: false})
-        // })
+    const normalizeSetBundleProduct = (product) => {
+        // ensure shape of data of this function and and ref to childProducts is the same
 
-        // Using ot state for which child products are selected, scroll to the first
-        // one that isn't selected.
-        // const selectedProductIds = Object.keys(productSetSelection)
-        // const firstUnselectedProduct = product.setProducts.find(
-        //     ({id}) => !selectedProductIds.includes(id)
-        // )
-
-        // if (firstUnselectedProduct) {
-        //     // Get the reference to the product view and scroll to it.
-        //     const {ref} = childProductRefs.current[firstUnselectedProduct.id]
-
-        //     if (ref.scrollIntoView) {
-        //         ref.scrollIntoView({
-        //             behavior: 'smooth',
-        //             block: 'end'
-        //         })
-        //     }
-
-        //     return false
-        // }
-
-        return true
-    }, [product, productBundleSelection])
+        // TODO: potentially optimize case for setProducts and bundledProducts being replaced by childProducts
+        return {
+            ...product, 
+            childProducts: isProductASet ? product.setProducts.map(child => {
+                return {product: child, quantity: null}
+            }) : product.bundledProducts
+        }
+    }
 
     // TODO: potentially refactor to not take variant
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
@@ -305,7 +303,8 @@ const ProductDetail = () => {
 
             einstein.sendAddToCart(productItems)
 
-            return Object.values(productBundleSelection)
+            // return Object.values(productBundleSelection)
+            return Object.values(productSetSelection)
         } catch (error) {
             showError(error)
         }
@@ -328,13 +327,15 @@ const ProductDetail = () => {
 
     // TODO: refactor
     let renderPDP = ''
-    if(isProductASet) {
+    if(isProductASet || isProductABundle) {
+        const normalizedProduct = normalizeSetBundleProduct(product)
+        console.log('!!! normalizedProduct:', normalizedProduct.childProducts)
         renderPDP = (
             <Fragment>
                 <ProductView
                     product={product}
                     category={primaryCategory?.parentCategoryTree || []}
-                    addToCart={handleProductSetAddToCart}
+                    addToCart={isProductASet ? handleProductSetAddToCart : handleProductBundleAddToCart}
                     addToWishlist={handleAddToWishlist}
                     isProductLoading={isProductLoading}
                     isWishlistLoading={isWishlistLoading}
@@ -346,10 +347,10 @@ const ProductDetail = () => {
                 {/* TODO: consider `childProduct.belongsToSet` */}
                 {
                     // Product Set: render the child products
-                    product.setProducts.map((childProduct) => (
+                    normalizedProduct.childProducts.map(({product: childProduct, quantity: childQuantity}) => (
                         <Box key={childProduct.id} data-testid="child-product">
                             <ProductView
-                                // Do no use an arrow function as we are manipulating the functions scope.
+                                // Do not use an arrow function as we are manipulating the functions scope.
                                 ref={function (ref) {
                                     // Assign the "set" scope of the ref, this is how we access the internal
                                     // validation.
@@ -359,13 +360,15 @@ const ProductDetail = () => {
                                     }
                                 }}
                                 product={childProduct}
-                                isProductPartOfSet={true}
-                                addToCart={(variant, quantity) =>
+                                isProductPartOfSet={isProductASet}
+                                isProductPartOfBundle={isProductABundle}
+                                bundleQuantity={childQuantity}
+                                addToCart={isProductASet ? (variant, quantity) =>
                                     handleAddToCart([
                                         {product: childProduct, variant, quantity}
-                                    ])
-                                }
-                                addToWishlist={handleAddToWishlist}
+                                    ]) : null
+                                } // TODO: potentially modify for bundles with turnery
+                                addToWishlist={isProductASet ? handleAddToWishlist : null}
                                 onVariantSelected={(product, variant, quantity) => {
                                     if (quantity) {
                                         setProductSetSelection((previousState) => ({

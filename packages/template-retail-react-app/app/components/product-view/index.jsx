@@ -130,13 +130,14 @@ const ProductView = forwardRef(
         } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
+        const isProductABundle = product?.type.bundle
         const errorContainerRef = useRef(null)
 
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
             const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
-            const showError = !isProductASet && !hasValidSelection
+            const showError = !isProductASet && !isProductABundle && !hasValidSelection
             const scrollToError = showError && scrollErrorIntoView
 
             toggleShowOptionsMessage(showError)
@@ -276,7 +277,7 @@ const ProductView = forwardRef(
         }, [location.pathname])
 
         useEffect(() => {
-            if (!isProductASet && validateOrderability(variant, quantity, stockLevel)) {
+            if (!isProductASet && !isProductABundle && validateOrderability(variant, quantity, stockLevel)) {
                 toggleShowOptionsMessage(false)
             }
         }, [variationParams])
