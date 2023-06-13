@@ -15,7 +15,7 @@ const getOutputFolder = () => {
     const pkgJSON = JSON.parse(fs.readFileSync(packagePath))
 
     const overridesDir = pkgJSON.ccExtensibility?.overridesDir
-    const outputFolder = overridesDir
+    const outputFolder = pkgJSON?.ccExtensibility?.overridesDir && pkgJSON?.ccExtensibility?.extends
         ? path.join(overridesDir, 'app/static/translations/compiled')
         : 'app/static/translations/compiled'
 
