@@ -18,7 +18,7 @@ import {
     DEFAULT_LOCALE,
     renderWithProviders
 } from '@salesforce/retail-react-app/app/utils/test-utils'
-import messages from '@salesforce/retail-react-app/translations/compiled/en-GB.json'
+import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import {rest} from 'msw'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {

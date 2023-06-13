@@ -15,6 +15,29 @@ import {
 
 import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '@salesforce/retail-react-app/app/utils/test-utils'
 
+jest.mock('cross-fetch', () => {
+    return async (url) => {
+        const matched = url.match(/translations\/compiled\/(.+)\.json/)
+        if (!matched) {
+            throw new Error('Not seeing the expected url for the translation file')
+        }
+
+        const locale = matched[1]
+        const json = await import(`../static/translations/compiled/${locale}.json`)
+
+        return {
+            ok: true,
+            json: () => Promise.resolve(json)
+        }
+    }
+})
+jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
+    return {getAppOrigin: () => ''}
+})
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
+    return {getAssetUrl: (url) => url}
+})
+
 const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
 const isMultiLocales = supportedLocales.length > 1
 const nonSupportedLocale = 'nl-NL'

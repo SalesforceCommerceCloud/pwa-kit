@@ -707,6 +707,16 @@ const main = async (opts) => {
                 'extract-default-translations'
             ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
         }
+        if (pkgJSON?.scripts['compile-translations']) {
+            pkgJSON.scripts['compile-translations'] = pkgJSON.scripts[
+                'compile-translations'
+            ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+        }
+        if (pkgJSON?.scripts['compile-translations:pseudo']) {
+            pkgJSON.scripts['compile-translations:pseudo'] = pkgJSON.scripts[
+                'compile-translations:pseudo'
+            ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+        }
 
         context = merge(
             context,
