@@ -64,12 +64,9 @@ describe('global useQuery checks', () => {
         // returns false, which means attempting to set retry / retryOnMount to true
         // should be impossible in a jest execution context, we verify that's true here
         mockQueryEndpoint(productsEndpoint, {}, 400)
-        const {result, rerender, ...rest} = renderHookWithProviders(
-            () => {
-                return queries['useProducts'](OPTIONS)
-            },
-            {retry: true, retryOnMount: true}
-        )
+        const {result, rerender} = renderHookWithProviders(() => {
+            return queries['useProducts'](OPTIONS, {retry: true, retryOnMount: true})
+        })
         await waitAndExpectError(() => result.current)
         expect(result?.current?.failureCount).toBe(1)
         // we are about to re-render a number of times to be sure retries are disabled
