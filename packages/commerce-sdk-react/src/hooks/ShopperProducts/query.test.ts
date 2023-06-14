@@ -12,11 +12,17 @@ import {
     waitAndExpectSuccess
 } from '../../test-utils'
 import * as queries from './query'
+import * as utilModuleApi from '../../utils'
 
 jest.mock('../../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
     mockAuth.prototype.ready = jest.fn().mockResolvedValue({access_token: 'access_token'})
     return mockAuth
+})
+
+jest.mock('../../utils', () => {
+    const onClient = jest.requireActual('../../utils.ts')
+    return onClient
 })
 
 type Queries = typeof queries
@@ -63,6 +69,7 @@ describe('global useQuery checks', () => {
         // NOTE: the jest mock execution context is a `node` runtime, so `onClient()`
         // returns false, which means attempting to set retry / retryOnMount to true
         // should be impossible in a jest execution context, we verify that's true here
+        utilModuleApi.onClient = jest.fn().mockReturnValue(false)
         mockQueryEndpoint(productsEndpoint, {}, 400)
         const {result, rerender} = renderHookWithProviders(() => {
             return queries['useProducts'](OPTIONS, {retry: true, retryOnMount: true})
@@ -75,6 +82,7 @@ describe('global useQuery checks', () => {
         await rerender()
         expect(result?.current?.failureCount).toBe(1)
         await rerender()
+        utilModuleApi.onClient = jest.fn().mockRestore()
         expect(result?.current?.failureCount).toBe(1)
     })
 })
