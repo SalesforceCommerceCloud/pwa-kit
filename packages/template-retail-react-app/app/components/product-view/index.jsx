@@ -329,8 +329,7 @@ const ProductView = forwardRef(
                                     size={imageSize}
                                     imageGroups={product.imageGroups}
                                     selectedVariationAttributes={variationParams}
-                                    lazy={isProductPartOfSet}
-                                    // TODO: potentially replicate with bundles
+                                    lazy={isProductPartOfSet || isProductABundle}
                                 />
                                 <HideOnMobile>
                                     {showFullLink && product && (
