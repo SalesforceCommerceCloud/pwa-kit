@@ -17,8 +17,7 @@ const STATE_KEY = '__reactQuery'
  *
  * @param {React.ReactElement} Wrapped The component to be wrapped
  * @param {Object} options
- * @param {Object} options.queryClientConfig The react query client configuration object to be used. By
- * default the `retry` option will be set to false to ensure performant server rendering.
+ * @param {Object} options.queryClientConfig The react query client configuration object to be used.
  *
  * @returns {React.ReactElement}
  */

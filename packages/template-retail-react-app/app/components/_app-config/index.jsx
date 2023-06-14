@@ -106,6 +106,7 @@ const isServerSide = typeof window === 'undefined'
 
 // Recommended settings for PWA-Kit usages.
 // NOTE: they will be applied on both server and client side.
+// retry is always disabled on server side regardless of the value from the options
 const options = {
     queryClientConfig: {
         defaultOptions: {
