@@ -26,6 +26,7 @@ import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
+import {normalizeSetBundleProduct} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
 import {Box, Button, Stack} from '@chakra-ui/react'
@@ -68,9 +69,11 @@ const ProductDetail = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const navigate = useNavigation()
-    const [childProductSelection, setChildProductSelection] = useState({}) // for sets and bundles
-    const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
+    /****************************** Sets and Bundles *********************************/
+    const [childProductSelection, setChildProductSelection] = useState({})
+    const [childProductOrderability, setChildProductOrderability] = useState({})
+    const childProductRefs = React.useRef({})
     /****************************** Basket *********************************/
     const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
@@ -256,19 +259,6 @@ const ProductDetail = () => {
 
     /**************** Product Bundle Handlers ****************/
 
-    // TODO: implement
-    const normalizeSetBundleProduct = (product) => {
-        // ensure shape of data of this function and and ref to childProducts is the same
-
-        // TODO: potentially optimize case for setProducts and bundledProducts being replaced by childProducts
-        return {
-            ...product, 
-            childProducts: isProductASet ? product.setProducts.map(child => {
-                return {product: child, quantity: null}
-            }) : product.bundledProducts
-        }
-    }
-
     // TODO: potentially refactor to not take variant
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
@@ -310,7 +300,7 @@ const ProductDetail = () => {
     let renderPDP = ''
     if(isProductASet || isProductABundle) {
         const normalizedProduct = normalizeSetBundleProduct(product)
-        console.log('!!! normalizedProduct:', normalizedProduct.childProducts)
+        console.log('!!! normalizedProduct:', normalizedProduct)
         renderPDP = (
             <Fragment>
                 <ProductView
@@ -321,6 +311,7 @@ const ProductDetail = () => {
                     isProductLoading={isProductLoading}
                     isWishlistLoading={isWishlistLoading}
                     validateOrderability={handleChildProductValidation}
+                    childProductOrderability={childProductOrderability}
                 />
 
                 <hr />
@@ -368,6 +359,7 @@ const ProductDetail = () => {
                                 }}
                                 isProductLoading={isProductLoading}
                                 isWishlistLoading={isWishlistLoading}
+                                setChildProductOrderability={setChildProductOrderability}
                             />
                             <InformationAccordion product={childProduct} />
 

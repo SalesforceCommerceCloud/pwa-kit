@@ -49,6 +49,8 @@ export const useDerivedProduct = (product, isProductPartOfSet = false, isProduct
             {stockLevel}
         )
     }
+
+    // showInventoryMessage controls if add to cart button is disabled
     const showInventoryMessage = variant && (isOutOfStock || unfulfillable)
     const inventoryMessage =
         (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||

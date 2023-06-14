@@ -98,6 +98,8 @@ const ProductView = forwardRef(
             isProductPartOfSet = false,
             isProductPartOfBundle = false,
             bundleQuantity = 0,
+            childProductOrderability,
+            setChildProductOrderability,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
@@ -222,12 +224,20 @@ const ProductView = forwardRef(
                 addToWishlist(product, variant, quantity)
             }
 
+            let disableButton = showInventoryMessage;
+            if(isProductASet || isProductABundle) {
+                // if any of the children are not orderable, it will disable the add to cart button
+                Object.keys(childProductOrderability).forEach(productId => {
+                    disableButton = !childProductOrderability[productId] || disableButton
+                })
+            }
+            
             if (addToCart || updateCart) {
                 buttons.push(
                     <Button
                         key="cart-button"
                         onClick={handleCartItem}
-                        disabled={showInventoryMessage}
+                        isDisabled={disableButton}
                         width="100%"
                         variant="solid"
                         marginBottom={4}
@@ -287,6 +297,16 @@ const ProductView = forwardRef(
                 onVariantSelected(product, variant, quantity)
             }
         }, [variant?.productId, quantity])
+
+        useEffect(() => {
+            if(isProductPartOfBundle || isProductPartOfSet) {
+                // when showInventoryMessage is true, it means child product is not orderable
+                setChildProductOrderability((previousState) => ({
+                    ...previousState,
+                    [product.id]: !showInventoryMessage
+                }))
+            }
+        }, [showInventoryMessage])
 
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
@@ -556,6 +576,8 @@ ProductView.propTypes = {
     updateWishlist: PropTypes.func,
     showFullLink: PropTypes.bool,
     imageSize: PropTypes.oneOf(['sm', 'md']),
+    childProductOrderability: PropTypes.object,
+    setChildProductOrderability: PropTypes.func,
     onVariantSelected: PropTypes.func,
     validateOrderability: PropTypes.func
 }
