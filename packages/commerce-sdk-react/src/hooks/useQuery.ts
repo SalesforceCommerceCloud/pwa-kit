@@ -58,9 +58,11 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
             hasAllKeys(apiOptions.parameters, hookConfig.requiredParameters),
         // End users can always completely OVERRIDE the default `enabled` check
 
+        ...queryOptions,
         // never retry on server side because it hurts server side rendering performance
-        retry: onClient() ? queryOptions.retry : false,
-        retryOnMount: onClient() ? queryOptions.retryOnMount : false,
-        ...queryOptions
+        ...(queryOptions?.retry ? {retry: onClient() ? queryOptions?.retry : false} : {}),
+        ...(queryOptions?.retryOnMount
+            ? {retryOnMount: onClient() ? queryOptions?.retryOnMount : false}
+            : {})
     })
 }
