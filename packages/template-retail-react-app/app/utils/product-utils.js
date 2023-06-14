@@ -41,13 +41,14 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
  * @param {Object} product - A product set or product bundle
  * @returns {Object} - returns normalized product if product is a set/bundle, otherwise returns original product
  */
-export const normalizeSetBundleProduct = (product) => { // TODO: write unit tests
-    if(!product?.type.set && !product?.type.bundle) return product
-    // TODO: consider case of removing setProducts property or bundledProducts property since assigned to childProducts
+export const normalizeSetBundleProduct = (product) => {
+    if (!product?.type.set && !product?.type.bundle) return product
     return {
-        ...product, 
-        childProducts: product?.type.set ? product.setProducts.map(child => {
-            return {product: child, quantity: null}
-        }) : product.bundledProducts
+        ...product,
+        childProducts: product?.type.set
+            ? product.setProducts.map((child) => {
+                  return {product: child, quantity: null}
+              })
+            : product.bundledProducts
     }
 }

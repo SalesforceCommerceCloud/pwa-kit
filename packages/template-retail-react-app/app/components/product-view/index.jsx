@@ -28,7 +28,14 @@ import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
-const ProductViewHeader = ({name, price, currency, category, productType, isProductPartOfBundle}) => {
+const ProductViewHeader = ({
+    name,
+    price,
+    currency,
+    category,
+    productType,
+    isProductPartOfBundle
+}) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
     const isProductASet = productType?.set
@@ -47,8 +54,8 @@ const ProductViewHeader = ({name, price, currency, category, productType, isProd
             </Skeleton>
 
             {/* Price */}
-            {!isProductPartOfBundle && 
-                (<Skeleton isLoaded={price} minWidth={32}>
+            {!isProductPartOfBundle && (
+                <Skeleton isLoaded={price} minWidth={32}>
                     <Text fontWeight="bold" fontSize="md" aria-label="price">
                         {isProductASet &&
                             `${intl.formatMessage({
@@ -72,7 +79,7 @@ ProductViewHeader.propTypes = {
     currency: PropTypes.string,
     category: PropTypes.array,
     productType: PropTypes.object,
-    isProductPartOfBundle: PropTypes.bool,
+    isProductPartOfBundle: PropTypes.bool
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -224,14 +231,14 @@ const ProductView = forwardRef(
                 addToWishlist(product, variant, quantity)
             }
 
-            let disableButton = showInventoryMessage;
-            if(isProductASet || isProductABundle) {
+            let disableButton = showInventoryMessage
+            if (isProductASet || isProductABundle) {
                 // if any of the children are not orderable, it will disable the add to cart button
-                Object.keys(childProductOrderability).forEach(productId => {
+                Object.keys(childProductOrderability).forEach((productId) => {
                     disableButton = !childProductOrderability[productId] || disableButton
                 })
             }
-            
+
             if (addToCart || updateCart) {
                 buttons.push(
                     <Button
@@ -287,7 +294,11 @@ const ProductView = forwardRef(
         }, [location.pathname])
 
         useEffect(() => {
-            if (!isProductASet && !isProductABundle && validateOrderability(variant, quantity, stockLevel)) {
+            if (
+                !isProductASet &&
+                !isProductABundle &&
+                validateOrderability(variant, quantity, stockLevel)
+            ) {
                 toggleShowOptionsMessage(false)
             }
         }, [variationParams])
@@ -299,7 +310,7 @@ const ProductView = forwardRef(
         }, [variant?.productId, quantity])
 
         useEffect(() => {
-            if(isProductPartOfBundle || isProductPartOfSet) {
+            if (isProductPartOfBundle || isProductPartOfSet) {
                 // when showInventoryMessage is true, it means child product is not orderable
                 setChildProductOrderability((previousState) => ({
                     ...previousState,
@@ -450,7 +461,6 @@ const ProductView = forwardRef(
                                 </>
                             )}
 
-                            {/* Quantity Selector TODO: double check logic for isProductPartOfBundle*/}
                             {!isProductASet && !isProductPartOfBundle && (
                                 <VStack align="stretch" maxWidth={'200px'}>
                                     <Box fontWeight="bold">
@@ -531,7 +541,7 @@ const ProductView = forwardRef(
                             )}
                             <Box
                                 display={
-                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block'] // TODO: potentially do for bundles
+                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
                                 }
                             >
                                 {renderActionButtons()}

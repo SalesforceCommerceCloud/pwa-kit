@@ -11,7 +11,11 @@ import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp
  * This hook will return only the params that are also product attributes for the
  * passed in product object.
  */
-export const useVariationParams = (product = {}, isProductPartOfSet = false, isProductPartOfBundle = false) => {
+export const useVariationParams = (
+    product = {},
+    isProductPartOfSet = false,
+    isProductPartOfBundle = false
+) => {
     const {variationAttributes = [], variationValues = {}} = product
 
     const [allParams, productParams] = usePDPSearchParams(product.id)

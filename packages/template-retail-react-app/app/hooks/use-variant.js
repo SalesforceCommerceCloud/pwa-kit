@@ -16,7 +16,11 @@ import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-var
  * @param {Object} product
  * @returns {Object} the currently selected `Variant` object.
  */
-export const useVariant = (product = {}, isProductPartOfSet = false, isProductPartOfBundle = false) => {
+export const useVariant = (
+    product = {},
+    isProductPartOfSet = false,
+    isProductPartOfBundle = false
+) => {
     const {variants = []} = product
     const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
 

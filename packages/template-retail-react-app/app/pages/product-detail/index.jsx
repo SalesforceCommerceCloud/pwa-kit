@@ -5,20 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* 
-
-TODO: 
-- potentially branch off 2.7 and not 3.0
-- change add to cart text --> add bundle to cart
-- increase font weight/color of child products in add to cart modal
-- refactor use-add-to-cart-modal.js
-- once functionality is completed:
-    - refactor code
-    - go through all TODOs
-    - lint code
-
-*/ 
-
 import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
@@ -254,14 +240,16 @@ const ProductDetail = () => {
 
     /**************** Product Bundle Handlers ****************/
 
-    // TODO: potentially refactor to not take variant
+    // Top level bundle does not have variants
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
-            const productItems = [{
-                productId: product.id,
-                price: product.price,
-                quantity: selectedQuantity
-            }]
+            const productItems = [
+                {
+                    productId: product.id,
+                    price: product.price,
+                    quantity: selectedQuantity
+                }
+            ]
 
             await addItemToBasketMutation.mutateAsync({
                 parameters: {basketId: basket.basketId},
@@ -308,7 +296,11 @@ const ProductDetail = () => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={isProductASet ? handleProductSetAddToCart : handleProductBundleAddToCart}
+                            addToCart={
+                                isProductASet
+                                    ? handleProductSetAddToCart
+                                    : handleProductBundleAddToCart
+                            }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
                             isWishlistLoading={isWishlistLoading}
@@ -321,55 +313,70 @@ const ProductDetail = () => {
                         {/* TODO: consider `childProduct.belongsToSet` */}
                         {
                             // Render the child products
-                            normalizedProduct.childProducts.map(({product: childProduct, quantity: childQuantity}) => (
-                                <Box key={childProduct.id} data-testid="child-product">
-                                    <ProductView
-                                        // Do not use an arrow function as we are manipulating the functions scope.
-                                        ref={function (ref) {
-                                            // Assign the "set" scope of the ref, this is how we access the internal
-                                            // validation.
-                                            childProductRefs.current[childProduct.id] = {
-                                                ref,
-                                                validateOrderability: this.validateOrderability
+                            normalizedProduct.childProducts.map(
+                                ({product: childProduct, quantity: childQuantity}) => (
+                                    <Box key={childProduct.id} data-testid="child-product">
+                                        <ProductView
+                                            // Do not use an arrow function as we are manipulating the functions scope.
+                                            ref={function (ref) {
+                                                // Assign the "set" scope of the ref, this is how we access the internal
+                                                // validation.
+                                                childProductRefs.current[childProduct.id] = {
+                                                    ref,
+                                                    validateOrderability: this.validateOrderability
+                                                }
+                                            }}
+                                            product={childProduct}
+                                            isProductPartOfSet={isProductASet}
+                                            isProductPartOfBundle={isProductABundle}
+                                            bundleQuantity={childQuantity}
+                                            addToCart={
+                                                isProductASet
+                                                    ? (variant, quantity) =>
+                                                          handleAddToCart([
+                                                              {
+                                                                  product: childProduct,
+                                                                  variant,
+                                                                  quantity
+                                                              }
+                                                          ])
+                                                    : null
                                             }
-                                        }}
-                                        product={childProduct}
-                                        isProductPartOfSet={isProductASet}
-                                        isProductPartOfBundle={isProductABundle}
-                                        bundleQuantity={childQuantity}
-                                        addToCart={isProductASet ? (variant, quantity) =>
-                                            handleAddToCart([
-                                                {product: childProduct, variant, quantity}
-                                            ]) : null
-                                        }
-                                        addToWishlist={isProductASet ? handleAddToWishlist : null}
-                                        onVariantSelected={(product, variant, quantity) => {
-                                            if (quantity) {
-                                                setChildProductSelection((previousState) => ({
-                                                    ...previousState,
-                                                    [product.id]: {
-                                                        product,
-                                                        variant,
-                                                        quantity: isProductABundle ? childQuantity : quantity
-                                                    }
-                                                }))
-                                            } else {
-                                                const selections = {...childProductSelection}
-                                                delete selections[product.id]
-                                                setChildProductSelection(selections)
+                                            addToWishlist={
+                                                isProductASet ? handleAddToWishlist : null
                                             }
-                                        }}
-                                        isProductLoading={isProductLoading}
-                                        isWishlistLoading={isWishlistLoading}
-                                        setChildProductOrderability={setChildProductOrderability}
-                                    />
-                                    <InformationAccordion product={childProduct} />
+                                            onVariantSelected={(product, variant, quantity) => {
+                                                if (quantity) {
+                                                    setChildProductSelection((previousState) => ({
+                                                        ...previousState,
+                                                        [product.id]: {
+                                                            product,
+                                                            variant,
+                                                            quantity: isProductABundle
+                                                                ? childQuantity
+                                                                : quantity
+                                                        }
+                                                    }))
+                                                } else {
+                                                    const selections = {...childProductSelection}
+                                                    delete selections[product.id]
+                                                    setChildProductSelection(selections)
+                                                }
+                                            }}
+                                            isProductLoading={isProductLoading}
+                                            isWishlistLoading={isWishlistLoading}
+                                            setChildProductOrderability={
+                                                setChildProductOrderability
+                                            }
+                                        />
+                                        <InformationAccordion product={childProduct} />
 
-                                    <Box display={['none', 'none', 'none', 'block']}>
-                                        <hr />
+                                        <Box display={['none', 'none', 'none', 'block']}>
+                                            <hr />
+                                        </Box>
                                     </Box>
-                                </Box>
-                            ))
+                                )
+                            )
                         }
                     </Fragment>
                 ) : (

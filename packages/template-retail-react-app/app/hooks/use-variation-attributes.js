@@ -48,7 +48,7 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} location
  * @returns {String} a product url for the current variation value.
  */
-const buildVariantValueHref = ({ // TODO: implement with bundle
+const buildVariantValueHref = ({
     pathname,
     existingParams,
     newParams,
@@ -97,7 +97,11 @@ const isVariantValueOrderable = (product, variationParams) => {
  * @returns {Array} a decorated variation attributes list.
  *
  */
-export const useVariationAttributes = (product = {}, isProductPartOfSet = false, isProductPartOfBundle = false) => {
+export const useVariationAttributes = (
+    product = {},
+    isProductPartOfSet = false,
+    isProductPartOfBundle = false
+) => {
     const {variationAttributes = []} = product
     const location = useLocation()
     const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
