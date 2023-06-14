@@ -30,7 +30,6 @@ env:
 jobs:
   pwa-kit:
     strategy:
-      fail-fast: false
       matrix:
         node: [14, 16, 18]
         npm: [6, 7, 8, 9]
@@ -127,7 +126,6 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   pwa-kit-windows:
     strategy:
-      fail-fast: false
       matrix:
         node: [14, 16, 18]
         npm: [6, 7, 8, 9]
@@ -168,7 +166,6 @@ jobs:
   # with a few extra steps. Can the workflows be merged? (Add `os` to the matrix?)
   generated:
     strategy:
-      fail-fast: false
       matrix:
         template:
           [
@@ -265,7 +262,6 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   generated-windows:
     strategy:
-      fail-fast: false
       matrix:
         template:
           [
