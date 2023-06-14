@@ -59,7 +59,7 @@ describe('Shopper Products query hooks', () => {
 })
 
 describe('global useQuery checks', () => {
-    test.only('setting retry / retryOnMount to true is automatically disabled on the server', async () => {
+    test('setting retry / retryOnMount to true is automatically disabled on the server', async () => {
         // NOTE: the jest mock execution context is a `node` runtime, so `onClient()`
         // returns false, which means attempting to set retry / retryOnMount to true
         // should be impossible in a jest execution context, we verify that's true here
