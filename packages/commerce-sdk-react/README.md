@@ -47,6 +47,7 @@ const AppConfig = ({children}) => {
 
 // Set configuration options for react query.
 // NOTE: This configuration will be used both on the server-side and client-side.
+// retry is always disabled on server side regardless of the value from the options
 const options = {
     queryClientConfig: {
         defaultOptions: {
