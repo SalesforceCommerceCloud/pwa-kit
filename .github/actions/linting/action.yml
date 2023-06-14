@@ -1,0 +1,13 @@
+name: linting
+inputs:
+  cwd:
+    required: false
+    default: "${PWD}"
+runs:
+  using: composite
+  steps:
+  - name: Linting
+    run: |-
+      cd ${{ inputs.cwd }}
+      npm run lint
+    shell: bash
