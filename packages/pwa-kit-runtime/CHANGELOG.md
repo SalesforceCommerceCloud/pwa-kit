@@ -1,7 +1,8 @@
-## v3.0.0-dev (May 12, 2023)
+## v3.0.0
 
 -   Remove usage of `detect-device-type` due to deprecation of user agent string. [#1168](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1168)
 -   Update engines to drop npm 7, and requires Node to start from version 16.11 [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
+-   Minor changes to accomodate Template Extensibility feature read [the upgrade guide](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-to-v3.html)
 
 ## v2.7.1 (May 11, 2023)
 
