@@ -186,6 +186,12 @@ jobs:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 8
 
+      - name: Lint the generated project
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
+        uses: "./.github/actions/linting"
+        with:
+          cwd: ${{ env.PROJECT_DIR }}
+
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/unit_tests"
@@ -276,6 +282,12 @@ jobs:
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 7
+
+      - name: Lint the generated project
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
+        uses: "./.github/actions/linting"
+        with:
+          cwd: ${{ env.PROJECT_DIR }}
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
