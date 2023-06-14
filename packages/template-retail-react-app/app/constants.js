@@ -107,3 +107,8 @@ export const EINSTEIN_RECOMMENDERS = {
     EMPTY_SEARCH_RESULTS_TOP_SELLERS: 'home-top-revenue-for-category',
     EMPTY_SEARCH_RESULTS_MOST_VIEWED: 'products-in-all-categories'
 }
+
+export const PREVIEW_DOMAIN =
+    process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : 'https://runtime.commercecloud.com'

@@ -21,6 +21,8 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import * as queryKeyHelpers from '@salesforce/commerce-sdk-react/hooks/ShopperProducts/queryKeyHelpers'
+
+import {Helmet} from 'react-helmet'
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
@@ -49,7 +51,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 
 // Localization
 import {IntlProvider} from 'react-intl'
-
+console.log('PREVIEW_DOMAIN', PREVIEW_DOMAIN)
 // Others
 import {
     watchOnlineStatus,
@@ -68,6 +70,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
+import {PREVIEW_DOMAIN} from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
 
@@ -102,7 +105,6 @@ const useLazyLoadCategories = () => {
         }
     }
 }
-
 const App = (props) => {
     const {children} = props
     const {data: categoriesTree} = useLazyLoadCategories()
@@ -229,6 +231,17 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
+            <Helmet>
+                <script
+                    id="preview-script"
+                    src={`${PREVIEW_DOMAIN}${getAssetUrl(`static/js/preview.client.js`)}`}
+                    type="text/javascript"
+                />
+                <script
+                    src={`${getAppOrigin()}${getAssetUrl(`static/js/preview-detector.js`)}`}
+                    type="text/javascript"
+                />
+            </Helmet>
             <IntlProvider
                 onError={(err) => {
                     if (!messages) {

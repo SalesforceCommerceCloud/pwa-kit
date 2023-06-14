@@ -24,7 +24,7 @@ const options = {
     mobify: getConfig(),
 
     // The port that the local dev server listens on
-    port: 3000,
+    port: 3001,
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development.
@@ -41,9 +41,19 @@ const {handler} = runtime.createHandler(options, (app) => {
                 useDefaults: true,
                 directives: {
                     'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                    'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
+                    'script-src': [
+                        "'self'",
+                        "'unsafe-eval'",
+                        'storage.googleapis.com',
+                        'localhost:*',
+                        'runtime.commercecloud.com'
+                    ],
                     'connect-src': ["'self'", 'api.cquotient.com'],
-
+                    'frame-ancestors': [
+                        'localhost:*',
+                        'runtime.commercecloud.com',
+                        '*.mobify-storefront-staging.com'
+                    ],
                     // Do not upgrade insecure requests for local development
                     'upgrade-insecure-requests': isRemote() ? [] : null
                 }
