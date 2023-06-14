@@ -6,6 +6,9 @@
  */
 
 import PropTypes from 'prop-types'
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import fetch from 'cross-fetch'
 
 /**
  * Dynamically import the translations/messages for a given locale
@@ -21,11 +24,19 @@ export const fetchTranslations = async (locale) => {
                 : locale
             : locale
 
-    let module
     try {
-        module = await import(
-            `@salesforce/retail-react-app/translations/compiled/${targetLocale}.json`
-        )
+        const file = `${getAppOrigin()}${getAssetUrl(
+            `static/translations/compiled/${targetLocale}.json`
+        )}`
+        const response = await fetch(file)
+
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch ${file}. Received the response: ${response.status} ${response.statusText}`
+            )
+        }
+
+        return await response.json()
     } catch (err) {
         console.error(err)
         console.log(
@@ -33,8 +44,6 @@ export const fetchTranslations = async (locale) => {
         )
         return {}
     }
-
-    return module.default
 }
 
 /**
