@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, { useEffect } from 'react'
-import { useIntl, FormattedMessage } from 'react-intl'
-import { useLocation } from 'react-router-dom'
+import React, {useEffect} from 'react'
+import {useIntl, FormattedMessage} from 'react-intl'
+import {useLocation} from 'react-router-dom'
 
 // Components
-import { Box, Button, Stack, Link } from '@chakra-ui/react'
+import {Box, Button, Stack, Link} from '@chakra-ui/react'
 
 // Project Components
 import Hero from '{{preset.templateSource.id}}/app/components/hero'
@@ -18,7 +18,7 @@ import Section from '{{preset.templateSource.id}}/app/components/section'
 import ProductScroller from '{{preset.templateSource.id}}/app/components/product-scroller'
 
 // Others
-import { getAssetUrl } from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 //Hooks
 import useEinstein from '{{preset.templateSource.id}}/app/hooks/use-einstein'
@@ -31,8 +31,8 @@ import {
     CUSTOM_HOME_TITLE
 } from '../../constants'
 
-import { useServerContext } from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import { useProductSearch } from '@salesforce/commerce-sdk-react'
+import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import {useProductSearch} from '@salesforce/commerce-sdk-react'
 
 /**
  * This is the home page for Retail React App.
@@ -43,18 +43,18 @@ import { useProductSearch } from '@salesforce/commerce-sdk-react'
 const Home = () => {
     const intl = useIntl()
     const einstein = useEinstein()
-    const { pathname } = useLocation()
+    const {pathname} = useLocation()
 
     // useServerContext is a special hook introduced in v3 PWA Kit SDK.
     // It replaces the legacy `getProps` and provide a react hook interface for SSR.
     // it returns the request and response objects on the server side,
     // and these objects are undefined on the client side.
-    const { res } = useServerContext()
+    const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
-    const { data: productSearchResult, isLoading } = useProductSearch({
+    const {data: productSearchResult, isLoading} = useProductSearch({
         parameters: {
             refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
             limit: HOME_SHOP_PRODUCTS_LIMIT
@@ -81,14 +81,14 @@ const Home = () => {
                     alt: 'npx pwa-kit-create-app'
                 }}
                 actions={
-                    <Stack spacing=\{{ base: 4, sm: 6 }} direction=\{{ base: 'column', sm: 'row' }}>
+                    <Stack spacing=\{{base: 4, sm: 6}} direction=\{{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
                             href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
                             target="_blank"
-                            width=\{{ base: 'full', md: 'inherit' }}
+                            width=\{{base: 'full', md: 'inherit'}}
                             paddingX={7}
-                            _hover=\{{ textDecoration: 'none' }}
+                            _hover=\{{textDecoration: 'none'}}
                         >
                             <FormattedMessage
                                 defaultMessage="Get started"
@@ -132,7 +132,7 @@ const Home = () => {
                                         right: 0,
                                         background: 'gray.700'
                                     }}
-                                    _hover=\{{ textDecoration: 'none' }}
+                                    _hover=\{{textDecoration: 'none'}}
                                 >
                                     {intl.formatMessage({
                                         defaultMessage: 'Read docs',
