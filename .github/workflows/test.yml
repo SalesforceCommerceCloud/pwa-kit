@@ -18,10 +18,10 @@ on:
     branches:
       - develop
       # TODO: Should we run on all pushes to release branches, or should we run on GitHub releases?
-      - 'release-*'
+      - "release-*"
   schedule:
     # Run every day at 12pm (PST) - cron uses UTC times
-    - cron: '0 8 * * *'
+    - cron: "0 8 * * *"
 env:
   IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
   DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'develop' }}
@@ -30,6 +30,7 @@ env:
 jobs:
   pwa-kit:
     strategy:
+      fail-fast: false
       matrix:
         node: [14, 16, 18]
         npm: [6, 7, 8, 9]
@@ -126,6 +127,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   pwa-kit-windows:
     strategy:
+      fail-fast: false
       matrix:
         node: [14, 16, 18]
         npm: [6, 7, 8, 9]
@@ -142,32 +144,39 @@ jobs:
       IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 || matrix.node == 18 && matrix.npm == 9 }}
     runs-on: windows-latest
     steps:
-        - name: Checkout
-          uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-        - name: Setup Node
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ matrix.node }}
-            cache: npm
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
 
-        - name: Update NPM version
-          if: env.IS_DEFAULT_NPM == 'false'
-          run: |-
-            npm install -g npm@${{ matrix.npm }}
+      - name: Update NPM version
+        if: env.IS_DEFAULT_NPM == 'false'
+        run: |-
+          npm install -g npm@${{ matrix.npm }}
 
-        - name: Setup Windows Machine
-          uses: "./.github/actions/setup_windows"
+      - name: Setup Windows Machine
+        uses: "./.github/actions/setup_windows"
 
-        - name: Run tests
-          uses: "./.github/actions/unit_tests"
+      - name: Run tests
+        uses: "./.github/actions/unit_tests"
 
   # TODO: The generated workflow is identical to the generated-windows workflow,
   # with a few extra steps. Can the workflows be merged? (Add `os` to the matrix?)
   generated:
     strategy:
+      fail-fast: false
       matrix:
-        template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+        template:
+          [
+            test-project,
+            retail-react-app-demo,
+            express-minimal-test-project,
+            typescript-minimal-test-project,
+          ]
     runs-on: ubuntu-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
@@ -256,8 +265,15 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   generated-windows:
     strategy:
+      fail-fast: false
       matrix:
-        template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+        template:
+          [
+            test-project,
+            retail-react-app-demo,
+            express-minimal-test-project,
+            typescript-minimal-test-project,
+          ]
     runs-on: windows-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
