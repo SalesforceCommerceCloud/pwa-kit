@@ -58,7 +58,7 @@ export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, itemsAdded = [], selectedQuantity} = data || {}
     const isProductABundle = product?.type.bundle
-    const isProductASet = product?.type.set
+
     const intl = useIntl()
     const {
         data: basket = {},
@@ -66,9 +66,9 @@ export const AddToCartModal = () => {
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const {currency, productItems, productSubTotal} = basket
-    let numberOfItemsAdded = isProductASet
-        ? itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
-        : selectedQuantity
+    let numberOfItemsAdded = isProductABundle
+        ? selectedQuantity
+        : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     if (!isOpen) {
         return null

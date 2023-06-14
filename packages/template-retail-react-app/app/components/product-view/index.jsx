@@ -232,7 +232,7 @@ const ProductView = forwardRef(
             }
 
             let disableButton = showInventoryMessage
-            if (isProductASet || isProductABundle) {
+            if ((isProductASet || isProductABundle) && childProductOrderability) {
                 // if any of the children are not orderable, it will disable the add to cart button
                 Object.keys(childProductOrderability).forEach((productId) => {
                     disableButton = !childProductOrderability[productId] || disableButton
