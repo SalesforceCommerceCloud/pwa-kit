@@ -16,7 +16,7 @@ import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
 
-export const DEFAULT_CLOUD_ORIGIN = 'https://cloud-staging.mobify-staging.com'
+export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
 export const DEFAULT_DOCS_URL =
     'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
 
