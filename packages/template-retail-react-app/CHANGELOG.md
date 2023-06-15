@@ -1,4 +1,4 @@
-## v3.0.0-dev
+## v3.0.0
 
 - Upgrade React v18, React DOM v18, React-hook-form v7, and Chakra 2 libraries [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
 - Add app `above-header` and product-list `above-page-header` convenience components [#1183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1183)

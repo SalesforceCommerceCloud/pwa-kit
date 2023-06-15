@@ -1,7 +1,4 @@
 ## v3.0.0 (Jun 14, 2023)
-## v3.0.0-preview.4 (Jun 14, 2023)
-## v3.0.0-preview.3 (Jun 13, 2023)
-## v3.0.0-dev (May 12, 2023)
 
 - Remove usage of `device-context` due to deprecation of user agent string. [#1168](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1168)
 
