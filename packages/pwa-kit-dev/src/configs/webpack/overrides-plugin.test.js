@@ -11,15 +11,16 @@ import OverridesResolverPlugin from './overrides-plugin'
 const PROJECT_DIR = `src/configs/webpack/test`
 const FS_READ_HASHMAP = new Map([
     ['exists', ['src/configs/webpack/test/overrides/exists.jsx', ['.', 'jsx']]],
+    ['newExtension', ['src/configs/webpack/test/overrides/newExtension.tsx', ['.', 'tsx']]],
     ['path/data', ['src/configs/webpack/test/overrides/path/data.js', ['.', 'js']]],
     ['path', ['/index.jsx', ['index', '.', 'jsx']]],
     ['path/nested/icon', ['src/configs/webpack/test/overrides/path/nested/icon.svg', ['.', 'svg']]]
 ])
-const EXTENDS_TARGET = 'retail-react-app'
+const EXTENDS_TARGET = '@salesforce/retail-react-app'
 const REWRITE_DIR = 'src/configs/webpack/test/overrides'
 const options = {
     overridesDir: '/overrides',
-    extends: ['retail-react-app'],
+    extends: ['@salesforce/retail-react-app'],
     projectDir: PROJECT_DIR
 }
 
@@ -184,7 +185,7 @@ describe('overrides plugin', () => {
                     issuer: path.join('./', 'fake-file.js')
                 },
                 path: path.join(REWRITE_DIR, REQUEST_ONE_PATH + REQUEST_ONE_EXTENSION),
-                request: `retail-react-app/exists`
+                request: `${EXTENDS_TARGET}/exists`
             },
             expect.anything(),
             expect.anything(),
@@ -216,13 +217,155 @@ describe('overrides plugin', () => {
         expect(resolver.doResolve).not.toHaveBeenCalledWith()
     })
 
-    test('jsx base template files can be replaced by tsx files', () => {})
+    test('jsx base template files can be replaced by tsx files', () => {
+        const REQUEST_PATH = 'newExtension'
+        const REQUEST_BASE_EXTENSION = '.jsx'
+        const REQUEST_OVERRIDE_EXTENSION = '.tsx'
 
-    test('npm @namespaces resolve correctly', () => {})
+        const testRequestContext = {
+            _ResolverCachePluginCacheMiss: true,
+            context: {
+                issuer: path.join('./', 'fake-file.js')
+            },
+            path: path.join(
+                './',
+                'node_modules',
+                EXTENDS_TARGET,
+                REQUEST_PATH,
+                REQUEST_BASE_EXTENSION
+            ),
+            request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
+        }
 
-    test('overridesDir is normalized with leading slash and forward slashes', () => {})
+        let {resolver, callback} = setupResolverAndCallback(
+            null,
+            testRequestContext,
+            null,
+            {},
+            callback
+        )
 
-    test('projectDir is normalized with forward slashes', () => {})
+        const overridesResolver = new OverridesResolverPlugin(options)
+        overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
-    test('a nested overrides folder path/to/overrides resolves correctly', () => {})
+        expect(callback).toHaveBeenCalled()
+        expect(resolver.ensureHook).toHaveBeenCalled()
+        expect(resolver.doResolve).toHaveBeenCalledWith(
+            null,
+            {
+                _ResolverCachePluginCacheMiss: true,
+                context: {
+                    issuer: path.join('./', 'fake-file.js')
+                },
+                path: path.join(REWRITE_DIR, REQUEST_PATH + REQUEST_OVERRIDE_EXTENSION),
+                request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
+            },
+            expect.anything(),
+            expect.anything(),
+            expect.anything()
+        )
+    })
+
+    // ALL tests now include a namespace
+    // test('npm @namespaces resolve correctly', () => {
+    // })
+
+    test('overridesDir and projectDir are normalized with leading slash and forward slashes', () => {
+        const REQUEST_PATH = 'exists'
+        const REQUEST_EXTENSION = '.jsx'
+        const testRequestContext = {
+            _ResolverCachePluginCacheMiss: true,
+            context: {
+                issuer: path.join('.\\', 'fake-file.js')
+            },
+            path: path.join('.\\', 'node_modules', EXTENDS_TARGET),
+            request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
+        }
+
+        const {resolver, callback} = setupResolverAndCallback(
+            null,
+            testRequestContext,
+            null,
+            {},
+            callback
+        )
+
+        const windowsOptions = {
+            overridesDir: '\\overrides',
+            extends: ['@salesforce/retail-react-app'],
+            projectDir: `src\\configs\\webpack\\test`
+        }
+
+        const overridesResolver = new OverridesResolverPlugin(windowsOptions)
+        overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
+
+        expect(callback).toHaveBeenCalled()
+        expect(resolver.ensureHook).toHaveBeenCalled()
+        expect(resolver.doResolve).toHaveBeenCalledWith(
+            null,
+            {
+                _ResolverCachePluginCacheMiss: true,
+                context: {
+                    issuer: path.join('.\\', 'fake-file.js')
+                },
+                path: path.join(REWRITE_DIR, REQUEST_PATH + REQUEST_EXTENSION),
+                request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
+            },
+            expect.anything(),
+            expect.anything(),
+            expect.anything()
+        )
+    })
+
+    // combined with above
+    //test('projectDir is normalized with forward slashes', () => {})
+
+    test('a nested overrides folder path/to/overrides resolves correctly', () => {
+        const REQUEST_PATH = 'exists'
+        const REQUEST_EXTENSION = '.jsx'
+        const testRequestContext = {
+            _ResolverCachePluginCacheMiss: true,
+            context: {
+                issuer: path.join('./', 'fake-file.js')
+            },
+            path: path.join('./', 'node_modules', EXTENDS_TARGET),
+            request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
+        }
+
+        const {resolver, callback} = setupResolverAndCallback(
+            null,
+            testRequestContext,
+            null,
+            {},
+            callback
+        )
+
+        const nestedOverridesOptions = {
+            overridesDir: '/path/to/overrides',
+            extends: ['@salesforce/retail-react-app'],
+            projectDir: PROJECT_DIR
+        }
+
+        const overridesResolver = new OverridesResolverPlugin(nestedOverridesOptions)
+        overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
+
+        const nestedRewriteDir = 'src/configs/webpack/test/path/to/overrides'
+
+        expect(callback).toHaveBeenCalled()
+        expect(resolver.ensureHook).toHaveBeenCalled()
+        expect(resolver.doResolve).toHaveBeenCalledWith(
+            null,
+            {
+                _ResolverCachePluginCacheMiss: true,
+                context: {
+                    issuer: path.join('./', 'fake-file.js')
+                },
+                path: path.join(nestedRewriteDir, REQUEST_PATH + REQUEST_EXTENSION),
+                request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
+            },
+            expect.anything(),
+            expect.anything(),
+            expect.anything()
+        )
+    })
 })
