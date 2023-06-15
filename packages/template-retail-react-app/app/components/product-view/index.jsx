@@ -176,6 +176,10 @@ const ProductView = forwardRef(
                     defaultMessage: 'Add Set to Cart',
                     id: 'product_view.button.add_set_to_cart'
                 }),
+                addBundleToCart: intl.formatMessage({
+                    defaultMessage: 'Add Bundle to Cart',
+                    id: 'product_view.button.add_bundle_to_cart'
+                }),
                 addToWishlist: intl.formatMessage({
                     defaultMessage: 'Add to Wishlist',
                     id: 'product_view.button.add_to_wishlist'
@@ -183,6 +187,10 @@ const ProductView = forwardRef(
                 addSetToWishlist: intl.formatMessage({
                     defaultMessage: 'Add Set to Wishlist',
                     id: 'product_view.button.add_set_to_wishlist'
+                }),
+                addBundleToWishlist: intl.formatMessage({
+                    defaultMessage: 'Add Bundle to Wishlist',
+                    id: 'product_view.button.add_bundle_to_wishlist'
                 })
             }
 
@@ -253,6 +261,8 @@ const ProductView = forwardRef(
                             ? buttonText.update
                             : isProductASet
                             ? buttonText.addSetToCart
+                            : isProductABundle
+                            ? buttonText.addBundleToCart
                             : buttonText.addToCart}
                     </Button>
                 )
@@ -273,6 +283,8 @@ const ProductView = forwardRef(
                             ? buttonText.update
                             : isProductASet
                             ? buttonText.addSetToWishlist
+                            : isProductABundle
+                            ? buttonText.addBundleToWishlist
                             : buttonText.addToWishlist}
                     </ButtonWithRegistration>
                 )

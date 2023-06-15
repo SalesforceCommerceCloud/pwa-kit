@@ -203,7 +203,7 @@ describe('product bundles', () => {
             {timeout: 5000}
         )
 
-        const buttons = await screen.findAllByText(/add to cart/i)
+        const buttons = await screen.findAllByText(/add bundle to cart/i)
         fireEvent.click(buttons[0])
 
         await waitFor(
@@ -226,7 +226,7 @@ describe('product bundles', () => {
             {timeout: 5000}
         )
 
-        const buttons = await screen.findAllByText(/add to cart/i)
+        const buttons = await screen.findAllByText(/add bundle to cart/i)
         fireEvent.click(buttons[0])
 
         await waitFor(() => {
