@@ -340,7 +340,7 @@ const ProductView = forwardRef(
                                     size={imageSize}
                                     imageGroups={product.imageGroups}
                                     selectedVariationAttributes={variationParams}
-                                    lazy={isProductPartOfSet || isProductABundle}
+                                    lazy={isProductPartOfSet || isProductPartOfBundle}
                                 />
                                 <HideOnMobile>
                                     {showFullLink && product && (

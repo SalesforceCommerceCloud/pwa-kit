@@ -5,7 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {
+    getDisplayVariationValues,
+    normalizeSetBundleProduct
+} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const variationAttributes = [
     {
@@ -47,5 +50,67 @@ test('getDisplayVariationValues', () => {
         Colour: 'Taupe',
         Size: '6.5',
         Width: 'M'
+    })
+})
+
+describe('normalizeSetBundleProduct', () => {
+    test('passing in regular product returns original product', () => {
+        const mockProduct = {
+            name: 'Striped Silk Tie',
+            id: '25752986M',
+            type: {master: true}
+        }
+
+        const normalizedProduct = normalizeSetBundleProduct(mockProduct)
+
+        expect(normalizedProduct).toStrictEqual(mockProduct)
+    })
+
+    test('passing in product set normalizes data', () => {
+        const mockProduct = {
+            name: 'Spring Has Sprung',
+            id: 'Spring-look-2M',
+            type: {set: true},
+            setProducts: [
+                {
+                    name: 'Scoop Neck Tee With Applique',
+                    id: '25565826M'
+                },
+                {
+                    name: 'Extend Tab Straight Leg Pant',
+                    id: '25518009M'
+                }
+            ]
+        }
+
+        const normalizedProduct = normalizeSetBundleProduct(mockProduct)
+
+        for (let i = 0; i < mockProduct.setProducts.length; i++) {
+            expect(normalizedProduct.childProducts[i].quantity).toBeNull()
+            expect(normalizedProduct.childProducts[i].product).toStrictEqual(
+                mockProduct.setProducts[i]
+            )
+        }
+    })
+
+    test('passing in product bundle normalizes data', () => {
+        const mockProduct = {
+            name: 'Turquoise Jewelry Bundle',
+            id: 'womens-jewelry-bundleM',
+            type: {bundle: true},
+            bundledProducts: [
+                {
+                    product: {name: 'Turquoise and Gold Bracelet', id: '013742002836M'},
+                    quantity: 1
+                },
+                {
+                    product: {name: 'Turquoise and Gold Necklace', id: '013742002805M'},
+                    quantity: 1
+                }
+            ]
+        }
+
+        const normalizedProduct = normalizeSetBundleProduct(mockProduct)
+        expect(normalizedProduct.childProducts).toStrictEqual(mockProduct.bundledProducts)
     })
 })
