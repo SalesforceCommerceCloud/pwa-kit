@@ -274,9 +274,9 @@ describe('overrides plugin', () => {
         const testRequestContext = {
             _ResolverCachePluginCacheMiss: true,
             context: {
-                issuer: path.join('.\\', 'fake-file.js')
+                issuer: '.\\fake-file.js'
             },
-            path: path.join('.\\', 'node_modules', EXTENDS_TARGET),
+            path: '.\\node_modules\\' + EXTENDS_TARGET,
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         }
 
@@ -304,7 +304,7 @@ describe('overrides plugin', () => {
             {
                 _ResolverCachePluginCacheMiss: true,
                 context: {
-                    issuer: path.join('.\\', 'fake-file.js')
+                    issuer: '.\\fake-file.js'
                 },
                 path: path.join(REWRITE_DIR, REQUEST_PATH + REQUEST_EXTENSION),
                 request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
