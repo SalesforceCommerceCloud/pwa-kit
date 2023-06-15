@@ -269,6 +269,7 @@ describe('overrides plugin', () => {
     })
 
     test('overridesDir and projectDir are normalized with leading slash and forward slashes', () => {
+        // In this test, all inputs use \\ to simulate Windows file paths
         const REQUEST_PATH = 'exists'
         const REQUEST_EXTENSION = '.jsx'
         const testRequestContext = {
@@ -299,6 +300,9 @@ describe('overrides plugin', () => {
 
         expect(callback).toHaveBeenCalled()
         expect(resolver.ensureHook).toHaveBeenCalled()
+
+        // The assert uses path.join which normalizes '\\' to '/' on non-Windows
+        // We expect issuer to remain unchanged since we do not modify it
         expect(resolver.doResolve).toHaveBeenCalledWith(
             null,
             {
@@ -307,7 +311,7 @@ describe('overrides plugin', () => {
                     issuer: '.\\fake-file.js'
                 },
                 path: path.join(REWRITE_DIR, REQUEST_PATH + REQUEST_EXTENSION),
-                request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
+                request: path.join(EXTENDS_TARGET, REQUEST_PATH)
             },
             expect.anything(),
             expect.anything(),
