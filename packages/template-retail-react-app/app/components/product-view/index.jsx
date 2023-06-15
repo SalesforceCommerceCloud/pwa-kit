@@ -247,7 +247,8 @@ const ProductView = forwardRef(
                 })
             }
 
-            if (addToCart || updateCart) {
+            // child product of bundles do not have add to cart button
+            if ((addToCart || updateCart) && !isProductPartOfBundle) {
                 buttons.push(
                     <Button
                         key="cart-button"
@@ -268,7 +269,8 @@ const ProductView = forwardRef(
                 )
             }
 
-            if (addToWishlist || updateWishlist) {
+            // child product of bundles do not have add to wishlist button
+            if ((addToWishlist || updateWishlist) && !isProductPartOfBundle) {
                 buttons.push(
                     <ButtonWithRegistration
                         key="wishlist-button"
