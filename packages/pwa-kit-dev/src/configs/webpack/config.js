@@ -51,6 +51,7 @@ export const EXT_OVERRIDES_DIR =
         : ''
 export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
+export const EXT_EXTENDS_WIN = pkg?.ccExtensibility?.extends?.replace('/', '\\')
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
 // TODO: can these be handled in package.json as peerDependencies?
@@ -207,7 +208,7 @@ const baseConfig = (target) => {
                                       [extendTarget]: path.resolve(
                                           projectDir,
                                           'node_modules',
-                                          extendTarget
+                                          ...extendTarget.split('/')
                                       )
                                   }))
                               )
@@ -300,19 +301,17 @@ const withChunking = (config) => {
                             if (
                                 EXT_EXTENDS &&
                                 EXT_OVERRIDES_DIR &&
-                                module?.context?.includes(`/${EXT_EXTENDS}/`)
+                                module?.context?.includes(
+                                    `${path.sep}${
+                                        path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
+                                    }${path.sep}`
+                                )
                             ) {
                                 return false
                             }
                             return module?.context?.match?.(/(node_modules)|(packages\/(.*)dist)/)
                         },
                         name: 'vendor',
-                        chunks: 'all'
-                    },
-                    translations: {
-                        priority: 10,
-                        test: (module) => module?.context?.match?.(/\/app\/translations\/compiled/),
-                        name: 'translations',
                         chunks: 'all'
                     }
                 }
@@ -327,7 +326,13 @@ const ruleForBabelLoader = (babelPlugins) => {
         test: /(\.js(x?)|\.ts(x?))$/,
         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
             ? // TODO: handle for array here when that's supported
-              {exclude: new RegExp(`/node_modules(?!/${EXT_EXTENDS})`)}
+              {
+                  exclude: new RegExp(
+                      `${path.sep}node_modules(?!${path.sep}${
+                          path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
+                      })`
+                  )
+              }
             : {exclude: /node_modules/}),
         use: [
             {
@@ -475,7 +480,8 @@ const renderer =
                                         }app/static`
                                     )
                                     .replace(/\\/g, '/'),
-                                to: `static/`
+                                to: `static/`,
+                                noErrorOnMissing: true
                             }
                         ]
                     }),
@@ -485,25 +491,6 @@ const renderer =
                         title: `PWA Kit Project: ${pkg.name}`,
                         excludeWarnings: true,
                         skipFirstNotification: true
-                    }),
-
-                    // Must only appear on one config – this one is the only mandatory one.
-                    new CopyPlugin({
-                        patterns: [
-                            {
-                                from: path
-                                    .resolve(
-                                        `${
-                                            EXT_OVERRIDES_DIR
-                                                ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
-                                                : ''
-                                        }app/static`
-                                    )
-                                    .replace(/\\/g, '/'),
-                                to: `static/`,
-                                noErrorOnMissing: true
-                            }
-                        ]
                     }),
 
                     analyzeBundle && getBundleAnalyzerPlugin('server-renderer')
@@ -529,23 +516,6 @@ const ssr = (() => {
                     },
                     plugins: [
                         ...config.plugins,
-                        // This must only appear on one config – this one is the only mandatory one.
-                        new CopyPlugin({
-                            patterns: [
-                                {
-                                    from: path
-                                        .resolve(
-                                            `${
-                                                EXT_OVERRIDES_DIR
-                                                    ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
-                                                    : ''
-                                            }app/static`
-                                        )
-                                        .replace(/\\/g, '/'),
-                                    to: `static/`
-                                }
-                            ]
-                        }),
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
                     ].filter(Boolean)
                 }

@@ -12,7 +12,9 @@
   },
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
-  "bin": {"pwa-kit-create-app": "scripts/create-mobify-app.js"},
+  "bin": {
+    "pwa-kit-create-app": "scripts/create-mobify-app.js"
+  },
   "files": [
     "assets",
     "templates"
@@ -36,8 +38,8 @@
     "tar": "^6.1.13"
   },
   "devDependencies": {
-    "internal-lib-build": "3.0.0-dev",
     "@salesforce/pwa-kit-dev": "3.0.0-dev",
+    "internal-lib-build": "3.0.0-dev",
     "verdaccio": "^5.22.1"
   },
   "engines": {
