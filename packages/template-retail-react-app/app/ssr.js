@@ -54,8 +54,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'self',
                         'localhost:*',
                         'http://localhost:3000',
-                        '*.mobify-storefront.com',
-                        '*.mobify-storefront-staging.com'
+                        '*.mobify-storefront.com'
                     ],
                     // 'default-src': helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc,
                     // Do not upgrade insecure requests for local development
