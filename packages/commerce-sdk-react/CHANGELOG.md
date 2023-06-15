@@ -1,3 +1,7 @@
+## v1.1.0-dev (Jun 15, 2023)
+## v1.0.1-0 (Jun 15, 2023)
+## v1.0.0 (Jun 15, 2023)
+## v3.1.0-dev (Jun 15, 2023)
 ## v1.0.0 (Jun 15, 2023)
 
 -   First public release of package on npm under `@salesforce/commerce-sdk-react`
