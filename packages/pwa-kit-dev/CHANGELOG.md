@@ -1,5 +1,7 @@
-## v3.0.0 (Jun 14, 2023)
+## v3.0.0 (Jun 15, 2023)
 
+-   Package name changed to `@salesforce/pwa-kit-dev`
+-   Added Template Extensibility feature in `@salesforce/pwa-kit-dev`, follow the [upgrade guide](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-to-v3.html)
 -   Update engines to drop npm 7, and requires Node to start from version 16.11 [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
 
 ## v2.7.1 (May 11, 2023)

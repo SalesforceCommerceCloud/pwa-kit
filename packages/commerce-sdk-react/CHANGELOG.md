@@ -1,7 +1,8 @@
-## v1.0.0 (Jun 14, 2023)
+## v1.0.0 (Jun 15, 2023)
 
-- Add missing cache invalidation for contexts/customers/login/order [#1073](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1073)
-- Upgrade React 18, React DOM 18, @types/react@18, @types/react-dom@v18 Testing library 14 [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
+-   First public release of package on npm under `@salesforce/commerce-sdk-react`
+-   Add missing cache invalidation for contexts/customers/login/order [#1073](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1073)
+-   Upgrade React 18, React DOM 18, @types/react@18, @types/react-dom@v18 Testing library 14 [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
 
 ## v2.7.1 (May 11, 2023)
 

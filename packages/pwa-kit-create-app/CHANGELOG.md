@@ -1,5 +1,6 @@
-## v3.0.0 (June 14, 2023)
+## v3.0.0 (June 15, 2023)
 
+-   Package name changed to `@salesforce/pwa-kit-create-app`
 -   Add `--templateVersion` argument to allow template version selection when generating a project using a template that is hosted on NPM. [#1229](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1229)
 -   Add extensible project generation support. [#1205](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1205)
 
