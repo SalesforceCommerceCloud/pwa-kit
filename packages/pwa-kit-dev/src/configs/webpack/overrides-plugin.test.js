@@ -14,6 +14,7 @@ const FS_READ_HASHMAP = new Map([
     ['newExtension', ['src/configs/webpack/test/overrides/newExtension.tsx', ['.', 'tsx']]],
     ['path/data', ['src/configs/webpack/test/overrides/path/data.js', ['.', 'js']]],
     ['path', ['/index.jsx', ['index', '.', 'jsx']]],
+    ['path/index.test', ['/index.test.jsx', ['.', 'jsx']]],
     ['path/nested/icon', ['src/configs/webpack/test/overrides/path/nested/icon.svg', ['.', 'svg']]]
 ])
 const EXTENDS_TARGET = '@salesforce/retail-react-app'
@@ -24,6 +25,7 @@ const options = {
     projectDir: PROJECT_DIR
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const setupResolverAndCallback = (target, requestContext, msg, resolveContext) => {
     const callback = jest.fn(() => null)
     const resolver = {
@@ -305,6 +307,47 @@ describe('overrides plugin', () => {
                     issuer: path.join('.\\', 'fake-file.js')
                 },
                 path: path.join(REWRITE_DIR, REQUEST_PATH + REQUEST_EXTENSION),
+                request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
+            },
+            expect.anything(),
+            expect.anything(),
+            expect.anything()
+        )
+    })
+
+    test('overrides do not return .test files', () => {
+        // FS_READ_HASHMAP above has both index.jsx and index.test.jsx
+        // This test checks that index.jsx is returned by the override
+        const REQUEST_PATH = `path`
+        const testRequestContext = {
+            _ResolverCachePluginCacheMiss: true,
+            context: {
+                issuer: path.join('./', 'fake-file.js')
+            },
+            path: path.join('./', 'node_modules', EXTENDS_TARGET),
+            request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
+        }
+
+        const {resolver, callback} = setupResolverAndCallback(
+            null,
+            testRequestContext,
+            null,
+            {},
+            callback
+        )
+        const overridesResolver = new OverridesResolverPlugin(options)
+        overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
+
+        expect(callback).toHaveBeenCalled()
+        expect(resolver.ensureHook).toHaveBeenCalled()
+        expect(resolver.doResolve).toHaveBeenCalledWith(
+            null,
+            {
+                _ResolverCachePluginCacheMiss: true,
+                context: {
+                    issuer: path.join('./', 'fake-file.js')
+                },
+                path: path.join(REWRITE_DIR, REQUEST_PATH + `/index.jsx`),
                 request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
             },
             expect.anything(),
