@@ -17,6 +17,7 @@ import {
     OmitNullableParameters
 } from './types'
 import {hasAllKeys} from './utils'
+import {onClient} from '../utils'
 
 /**
  * Helper for query hooks, contains most of the logic in order to keep individual hooks small.
@@ -56,6 +57,12 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
             // The default `enabled` is "has all required parameters"
             hasAllKeys(apiOptions.parameters, hookConfig.requiredParameters),
         // End users can always completely OVERRIDE the default `enabled` check
-        ...queryOptions
+
+        ...queryOptions,
+        // never retry on server side because it hurts server side rendering performance
+        ...(queryOptions?.retry ? {retry: onClient() ? queryOptions?.retry : false} : {}),
+        ...(queryOptions?.retryOnMount
+            ? {retryOnMount: onClient() ? queryOptions?.retryOnMount : false}
+            : {})
     })
 }
