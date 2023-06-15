@@ -3,8 +3,11 @@
 -   First public release of package on npm under `@salesforce/retail-react-app`
 -   Upgrade React v18, React DOM v18, React-hook-form v7, and Chakra 2 libraries [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
 -   Add app `above-header` and product-list `above-page-header` convenience components [#1183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1183)
--   Remove `cross-fetch` dependency [#1160](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1160)
 -   Migration to "hooks" / `@salesforce/commerce-sdk-react` integration follow the [upgrade guide](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-to-v3.html) and [view the diff](https://github.com/SalesforceCommerceCloud/pwa-kit/compare/release-2.7.x...release-3.0.x?diff=unified#files_bucket)
+
+## Older Versions Without Namespace
+
+The older versions below were published without the `@salesforce` namespace.
 
 ## v2.7.1 (May 11, 2023)
 

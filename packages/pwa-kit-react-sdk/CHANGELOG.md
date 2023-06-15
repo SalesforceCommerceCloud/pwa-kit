@@ -4,6 +4,10 @@
 -   Remove usage of `device-context` due to deprecation of user agent string. [#1168](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1168)
 -   Upgrade React 18, React DOM 18, Remove Enzyme, add Testing library 14 [#1166](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1166)
 
+## Older Versions Without Namespace
+
+The older versions below were published without the `@salesforce` namespace.
+
 ## v2.7.1 (May 11, 2023)
 
 -   Fix `multi-value` params being lost [#1150](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1150)
