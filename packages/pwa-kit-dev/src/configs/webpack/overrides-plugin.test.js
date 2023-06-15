@@ -266,10 +266,6 @@ describe('overrides plugin', () => {
         )
     })
 
-    // ALL tests now include a namespace
-    // test('npm @namespaces resolve correctly', () => {
-    // })
-
     test('overridesDir and projectDir are normalized with leading slash and forward slashes', () => {
         const REQUEST_PATH = 'exists'
         const REQUEST_EXTENSION = '.jsx'
@@ -316,9 +312,6 @@ describe('overrides plugin', () => {
             expect.anything()
         )
     })
-
-    // combined with above
-    //test('projectDir is normalized with forward slashes', () => {})
 
     test('a nested overrides folder path/to/overrides resolves correctly', () => {
         const REQUEST_PATH = 'exists'
