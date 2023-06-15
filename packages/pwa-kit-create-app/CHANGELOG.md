@@ -1,3 +1,4 @@
+## v3.1.0-dev (June 15, 2023)
 ## v3.0.0 (June 15, 2023)
 
 -   Package name changed to `@salesforce/pwa-kit-create-app`
