@@ -14,7 +14,7 @@ const FS_READ_HASHMAP = new Map([
     ['newExtension', ['src/configs/webpack/test/overrides/newExtension.tsx', ['.', 'tsx']]],
     ['path/data', ['src/configs/webpack/test/overrides/path/data.js', ['.', 'js']]],
     ['path', ['/index.jsx', ['index', '.', 'jsx']]],
-    ['path/index.test', ['/index.test.jsx', ['.', 'jsx']]],
+    ['path/index.mock', ['/index.mock.jsx', ['.', 'jsx']]],
     ['path/nested/icon', ['src/configs/webpack/test/overrides/path/nested/icon.svg', ['.', 'svg']]]
 ])
 const EXTENDS_TARGET = '@salesforce/retail-react-app'
@@ -319,8 +319,8 @@ describe('overrides plugin', () => {
         )
     })
 
-    test('overrides do not return .test files', () => {
-        // FS_READ_HASHMAP above has both index.jsx and index.test.jsx
+    test('overrides do not return .mock files', () => {
+        // FS_READ_HASHMAP above has both index.jsx and index.mock.jsx
         // This test checks that index.jsx is returned by the override
         const REQUEST_PATH = `path`
         const testRequestContext = {
