@@ -74,6 +74,10 @@ import {PREVIEW_DOMAIN} from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
 
+const PREVIEW_CLIENT_JS =
+    process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000/mobify/bundle/development/static/js/preview.client.js'
+        : `${PREVIEW_DOMAIN}/mobify/bundle/285/static/js/preview.client.js`
 /* 
 The categories tree can be really large! For performance reasons,
 we only load the level 0 categories on server side, and load the rest
@@ -232,11 +236,7 @@ const App = (props) => {
     return (
         <Box className="sf-app" {...styles.container}>
             <Helmet>
-                <script
-                    id="preview-script"
-                    src={`${PREVIEW_DOMAIN}${getAssetUrl(`static/js/preview.client.js`)}`}
-                    type="text/javascript"
-                />
+                <script id="preview-script" src={PREVIEW_CLIENT_JS} type="text/javascript" />
                 <script
                     src={`${getAppOrigin()}${getAssetUrl(`static/js/preview-detector.js`)}`}
                     type="text/javascript"

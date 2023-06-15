@@ -111,4 +111,4 @@ export const EINSTEIN_RECOMMENDERS = {
 export const PREVIEW_DOMAIN =
     process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : 'https://runtime.commercecloud.com'
+        : 'https://runtime-admin-preview.mobify-storefront.com'

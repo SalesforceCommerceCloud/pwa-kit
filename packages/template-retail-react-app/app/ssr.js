@@ -46,14 +46,18 @@ const {handler} = runtime.createHandler(options, (app) => {
                         "'unsafe-eval'",
                         'storage.googleapis.com',
                         'localhost:*',
-                        'runtime.commercecloud.com'
+                        'runtime.commercecloud.com',
+                        '*.mobify-storefront.com'
                     ],
                     'connect-src': ["'self'", 'api.cquotient.com'],
                     'frame-ancestors': [
+                        'self',
                         'localhost:*',
-                        'runtime.commercecloud.com',
+                        'http://localhost:3000',
+                        '*.mobify-storefront.com',
                         '*.mobify-storefront-staging.com'
                     ],
+                    // 'default-src': helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc,
                     // Do not upgrade insecure requests for local development
                     'upgrade-insecure-requests': isRemote() ? [] : null
                 }
