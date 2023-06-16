@@ -1,3 +1,6 @@
+## v2.8.0-dev (Jun 16, 2023)
+## v2.7.3-dev (Jun 16, 2023)
+## v2.7.2-dev (Jun 16, 2023)
 ## v2.7.2 (May 29, 2023)
 
 -   Add missing babel plugin dependency [#1231](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1231)
