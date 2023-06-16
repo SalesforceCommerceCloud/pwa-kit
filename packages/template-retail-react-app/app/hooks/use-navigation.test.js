@@ -10,6 +10,7 @@ import useNavigation from './use-navigation'
 import mockConfig from '../../config/mocks/default'
 import {renderWithProviders} from '../utils/test-utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import { before } from 'lodash'
 
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {
@@ -32,6 +33,12 @@ jest.mock('react-router', () => {
             }
         })
     }
+})
+
+before(() => {
+    global.window ??= Object.create(window, {
+        writable: true
+    })
 })
 
 afterEach(() => {
