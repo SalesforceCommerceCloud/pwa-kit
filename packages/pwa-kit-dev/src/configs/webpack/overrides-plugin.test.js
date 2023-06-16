@@ -79,13 +79,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(
-            null,
-            testRequestContext,
-            null,
-            {},
-            callback
-        )
+        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
@@ -112,13 +106,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(
-            null,
-            testRequestContext,
-            null,
-            {},
-            callback
-        )
+        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
@@ -143,13 +131,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(
-            null,
-            testRequestContext,
-            null,
-            {},
-            callback
-        )
+        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
@@ -165,13 +147,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_ONE_PATH}`
         })
 
-        let {resolver, callback} = setupResolverAndCallback(
-            null,
-            testOneRequestContext,
-            null,
-            {},
-            callback
-        )
+        let {resolver, callback} = setupResolverAndCallback(null, testOneRequestContext, null, {})
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testOneRequestContext, {}, callback, resolver)
 
@@ -192,15 +168,10 @@ describe('overrides plugin', () => {
         const testTwoRequestContext = createRequestContextWith({
             path: path.join('./'),
             request: REQUEST_TWO_PATH
-        })(
-            ({resolver, callback} = setupResolverAndCallback(
-                null,
-                testTwoRequestContext,
-                null,
-                {},
-                callback
-            ))
-        )
+        })
+
+        ;({resolver, callback} = setupResolverAndCallback(null, testTwoRequestContext, null, {}))
+
         const _overridesResolver = new OverridesResolverPlugin(options)
         _overridesResolver.handleHook(testTwoRequestContext, {}, callback, resolver)
 
@@ -224,13 +195,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        let {resolver, callback} = setupResolverAndCallback(
-            null,
-            testRequestContext,
-            null,
-            {},
-            callback
-        )
+        let {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
 
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
@@ -257,13 +222,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(
-            null,
-            testRequestContext,
-            null,
-            {},
-            callback
-        )
+        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
 
         const windowsOptions = {
             overridesDir: '\\overrides',
@@ -297,13 +256,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(
-            null,
-            testRequestContext,
-            null,
-            {},
-            callback
-        )
+        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
@@ -328,13 +281,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(
-            null,
-            testRequestContext,
-            null,
-            {},
-            callback
-        )
+        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
 
         const nestedOverridesOptions = {
             overridesDir: '/path/to/overrides',
