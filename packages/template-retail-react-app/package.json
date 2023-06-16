@@ -15,7 +15,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@formatjs/cli": "^4.8.4",
-    "@lhci/cli": "^0.7.0",
+    "@lhci/cli": "^0.12.0",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
     "@testing-library/dom": "^9.0.1",
