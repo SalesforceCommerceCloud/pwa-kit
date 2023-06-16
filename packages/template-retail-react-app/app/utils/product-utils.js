@@ -35,7 +35,7 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
 }
 
 /**
- * Normalizes data for set products and bundle products into the same format
+ * Normalizes data for product sets and product bundles into the same format
  * Useful for operations that apply to both product sets and product bundles
  *
  * @param {Object} product - A product set or product bundle

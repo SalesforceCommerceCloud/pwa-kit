@@ -9,6 +9,8 @@ import {
     getDisplayVariationValues,
     normalizeSetBundleProduct
 } from '@salesforce/retail-react-app/app/utils/product-utils'
+import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
 
 const variationAttributes = [
     {
@@ -67,50 +69,18 @@ describe('normalizeSetBundleProduct', () => {
     })
 
     test('passing in product set normalizes data', () => {
-        const mockProduct = {
-            name: 'Spring Has Sprung',
-            id: 'Spring-look-2M',
-            type: {set: true},
-            setProducts: [
-                {
-                    name: 'Scoop Neck Tee With Applique',
-                    id: '25565826M'
-                },
-                {
-                    name: 'Extend Tab Straight Leg Pant',
-                    id: '25518009M'
-                }
-            ]
-        }
+        const normalizedProduct = normalizeSetBundleProduct(mockProductSet)
 
-        const normalizedProduct = normalizeSetBundleProduct(mockProduct)
-
-        for (let i = 0; i < mockProduct.setProducts.length; i++) {
+        for (let i = 0; i < mockProductSet.setProducts.length; i++) {
             expect(normalizedProduct.childProducts[i].quantity).toBeNull()
             expect(normalizedProduct.childProducts[i].product).toStrictEqual(
-                mockProduct.setProducts[i]
+                mockProductSet.setProducts[i]
             )
         }
     })
 
     test('passing in product bundle normalizes data', () => {
-        const mockProduct = {
-            name: 'Turquoise Jewelry Bundle',
-            id: 'womens-jewelry-bundleM',
-            type: {bundle: true},
-            bundledProducts: [
-                {
-                    product: {name: 'Turquoise and Gold Bracelet', id: '013742002836M'},
-                    quantity: 1
-                },
-                {
-                    product: {name: 'Turquoise and Gold Necklace', id: '013742002805M'},
-                    quantity: 1
-                }
-            ]
-        }
-
-        const normalizedProduct = normalizeSetBundleProduct(mockProduct)
-        expect(normalizedProduct.childProducts).toStrictEqual(mockProduct.bundledProducts)
+        const normalizedProduct = normalizeSetBundleProduct(mockProductBundle)
+        expect(normalizedProduct.childProducts).toStrictEqual(mockProductBundle.bundledProducts)
     })
 })

@@ -17,7 +17,7 @@ import ProductDetail from '.'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {basketWithProductSet} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
-import mockedProductBundle from '@salesforce/retail-react-app/app/mocks/product-bundle-mock'
+import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
 
 jest.setTimeout(60000)
 
@@ -167,7 +167,7 @@ describe('product bundles', () => {
         global.server.use(
             // Use product bundle instead of product set
             rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductBundle))
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundle))
             }),
             // For adding items to basket
             rest.post('*/baskets/:basketId/items', (req, res, ctx) => {

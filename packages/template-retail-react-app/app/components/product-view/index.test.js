@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
-import mockProductBundle from '@salesforce/retail-react-app/app/mocks/product-bundle-mock'
+import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
@@ -259,9 +259,6 @@ test('renders a product bundle properly - child item', () => {
             setChildProductOrderability={() => {}}
         />
     )
-
-    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
-    // (they're hidden with display:none style)
 
     const addToCartButton = screen.queryByRole('button', {name: /add to cart/i})
     const addToWishlistButton = screen.queryByRole('button', {name: /add to wishlist/i})
