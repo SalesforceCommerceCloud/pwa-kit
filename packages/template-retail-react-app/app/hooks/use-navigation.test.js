@@ -21,7 +21,7 @@ const mockHistoryPush = jest.fn()
 const mockHistoryReplace = jest.fn()
 
 /**
- * There's an open bug with jest on Node 18.16 that prevents modification of global objects. 
+ * There's an open bug with jest on Node 18.16 that prevents modification of global objects.
  * The issue has been fixed in Node 19 but is not yet back-ported to Node 18.x.
  * TODO: Remove this property when the bugfix is available for Node 18.x.
  */
