@@ -321,24 +321,25 @@ describe('OverridePlugin.isFromExtends Windows', () => {
         {
             name: 'Import from a package in extends',
             request: '@salesforce/retail-react-app/exists',
-            filepath: './node_modules/@salesforce/retail-react-app',
+            filepath: '.\\node_modules\\@salesforce\\retail-react-app',
             result: true
         },
         {
             name: 'Import from a package not in extends',
             request: '@salesforce/express-minimal/notExists',
-            filepath: './node_modules/@salesforce/retail-react-app',
+            filepath: '.\\node_modules\\@salesforce\\retail-react-app',
             result: false
         },
         {
             name: 'Do not trigger override if filepath of issuer contains overrides directory',
             request: '@salesforce/retail-react-app/exists',
-            filepath: 'src/configs/webpack/test/overrides/exists',
+            filepath: 'src\\configs\\webpack\\test\\overrides\\exists',
             result: false
         }
     ]
 
     cases.forEach((c) =>
+        // eslint-disable-next-line jest/valid-title
         test(c.name, () => {
             const result = plugin.isFromExtends(c.request, c.filepath)
             expect(result).toBe(c.result)
