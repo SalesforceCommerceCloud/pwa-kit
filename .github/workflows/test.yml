@@ -18,10 +18,10 @@ on:
     branches:
       - develop
       # TODO: Should we run on all pushes to release branches, or should we run on GitHub releases?
-      - 'release-*'
+      - "release-*"
   schedule:
     # Run every day at 12pm (PST) - cron uses UTC times
-    - cron: '0 8 * * *'
+    - cron: "0 8 * * *"
 env:
   IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
   DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'develop' }}
@@ -31,16 +31,20 @@ jobs:
   pwa-kit:
     strategy:
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
+        node: [14, 16, 18]
+        npm: [6, 7, 8, 9]
         exclude:
           - node: 16
             npm: 6
+          - node: 18
+            npm: 6
+          - node: 14
+            npm: 9
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
+      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 || matrix.node == 18 && matrix.npm == 9 }}
       IS_LATEST_NPM: ${{ matrix.node == 16 && matrix.npm == 8 }}
     steps:
       - name: Checkout
@@ -123,43 +127,53 @@ jobs:
   pwa-kit-windows:
     strategy:
       matrix:
-        node: [14, 16]
-        npm: [6, 7, 8]
+        node: [14, 16, 18]
+        npm: [6, 7, 8, 9]
         exclude:
           - node: 16
             npm: 6
+          - node: 18
+            npm: 6
+          - node: 14
+            npm: 9
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
-      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 }}
+      IS_DEFAULT_NPM: ${{ matrix.node == 14 && matrix.npm == 6 || matrix.node == 16 && matrix.npm == 8 || matrix.node == 18 && matrix.npm == 9 }}
     runs-on: windows-latest
     steps:
-        - name: Checkout
-          uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-        - name: Setup Node
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ matrix.node }}
-            cache: npm
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
 
-        - name: Update NPM version
-          if: env.IS_DEFAULT_NPM == 'false'
-          run: |-
-            npm install -g npm@${{ matrix.npm }}
+      - name: Update NPM version
+        if: env.IS_DEFAULT_NPM == 'false'
+        run: |-
+          npm install -g npm@${{ matrix.npm }}
 
-        - name: Setup Windows Machine
-          uses: "./.github/actions/setup_windows"
+      - name: Setup Windows Machine
+        uses: "./.github/actions/setup_windows"
 
-        - name: Run tests
-          uses: "./.github/actions/unit_tests"
+      - name: Run tests
+        uses: "./.github/actions/unit_tests"
 
   # TODO: The generated workflow is identical to the generated-windows workflow,
   # with a few extra steps. Can the workflows be merged? (Add `os` to the matrix?)
   generated:
     strategy:
       matrix:
-        template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+        template:
+          [
+            test-project,
+            retail-react-app-demo,
+            express-minimal-test-project,
+            typescript-minimal-test-project,
+          ]
     runs-on: ubuntu-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
@@ -171,7 +185,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
@@ -249,7 +263,13 @@ jobs:
   generated-windows:
     strategy:
       matrix:
-        template: [test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+        template:
+          [
+            test-project,
+            retail-react-app-demo,
+            express-minimal-test-project,
+            typescript-minimal-test-project,
+          ]
     runs-on: windows-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
@@ -261,7 +281,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Setup Windows Machine
         uses: "./.github/actions/setup_windows"

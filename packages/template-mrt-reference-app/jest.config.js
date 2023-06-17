@@ -16,5 +16,6 @@ module.exports = {
             statements: 85
         }
     },
-    collectCoverageFrom: ['app/**']
+    collectCoverageFrom: ['app/**'],
+    ...(process.env.CI ? {testTimeout: 30000} : {})
 }

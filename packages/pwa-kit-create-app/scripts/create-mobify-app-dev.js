@@ -127,6 +127,12 @@ const runGenerator = () => {
     const foundNpm = cp.spawnSync(npm, ['-v']).stdout.toString().trim()
     const flags = semver.satisfies(foundNpm, '>=7') ? '-y' : ''
 
+    const pathToNpxCache = p.join(sh.exec('npm config get cache', {silent: true}).trim(), '_npx')
+    console.log(`Clearing npx cache at ${pathToNpxCache}`)
+    sh.rm('-rf', pathToNpxCache)
+
+    console.log('Running the generator')
+
     cp.execSync(`npx ${flags} pwa-kit-create-app@latest ${process.argv.slice(2).join(' ')}`, {
         stdio: 'inherit'
     })

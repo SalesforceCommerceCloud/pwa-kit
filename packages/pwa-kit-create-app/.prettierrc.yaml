@@ -5,3 +5,7 @@ bracketSpacing: false
 tabWidth: 4
 arrowParens: 'always'
 trailingComma: 'none'
+overrides:
+    - files: 'package.json'
+      options:
+          tabWidth: 2

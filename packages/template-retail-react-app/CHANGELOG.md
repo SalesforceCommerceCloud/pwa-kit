@@ -1,3 +1,6 @@
+## 2.7.3-preview (Jun 16, 2023)
+-   Support Node 18 and NPM 9 in PWA Kit v2.x [#1265](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1265)
+
 ## v2.7.1 (May 11, 2023)
 
 -   Replace invalid row value with nowrap [#1179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1179)
