@@ -475,11 +475,11 @@ const main = (opts) => {
                 case RETAIL_REACT_APP_DEMO:
                     return Promise.resolve()
                         .then(() => runGenerator(demoProjectAnswers(), opts))
-                        .then((result) => {
+                        .then(() => {
                             console.log(
                                 '\nTo change your ecommerce back end you will need to update your storefront configuration. More information: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options'
                             )
-                            return result
+                            return opts.outputDir
                         })
                 case RETAIL_REACT_APP:
                     console.log(
