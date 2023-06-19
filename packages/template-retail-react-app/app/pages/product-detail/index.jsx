@@ -243,11 +243,20 @@ const ProductDetail = () => {
     // Top level bundle does not have variants
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
+            const childProductSelections = Object.values(childProductSelection)
+            const bundledProductItems = childProductSelections.map((child) => {
+                return {
+                    productId: child.variant.productId,
+                    quantity: child.quantity
+                }
+            })
+
             const productItems = [
                 {
                     productId: product.id,
                     price: product.price,
-                    quantity: selectedQuantity
+                    quantity: selectedQuantity,
+                    bundledProductItems
                 }
             ]
 
@@ -258,7 +267,7 @@ const ProductDetail = () => {
 
             einstein.sendAddToCart(productItems)
 
-            return Object.values(childProductSelection)
+            return childProductSelections
         } catch (error) {
             showError(error)
         }
