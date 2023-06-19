@@ -104,7 +104,7 @@ const ProductView = forwardRef(
             isProductLoading,
             isProductPartOfSet = false,
             isProductPartOfBundle = false,
-            bundleQuantity = 0,
+            childOfBundleQuantity = 0,
             childProductOrderability,
             setChildProductOrderability,
             onVariantSelected = () => {},
@@ -242,8 +242,8 @@ const ProductView = forwardRef(
             let disableButton = showInventoryMessage
             if ((isProductASet || isProductABundle) && childProductOrderability) {
                 // if any of the children are not orderable, it will disable the add to cart button
-                Object.keys(childProductOrderability).forEach((productId) => {
-                    disableButton = !childProductOrderability[productId] || disableButton
+                disableButton = Object.keys(childProductOrderability).some((productId) => {
+                    return !childProductOrderability[productId]
                 })
             }
 
@@ -395,7 +395,7 @@ const ProductView = forwardRef(
                                                 defaultMessage: 'Quantity',
                                                 id: 'product_view.label.quantity'
                                             })}
-                                            : {bundleQuantity}
+                                            : {childOfBundleQuantity}
                                         </label>
                                     </Text>
                                 </Box>
@@ -589,7 +589,7 @@ ProductView.propTypes = {
     product: PropTypes.object,
     isProductPartOfSet: PropTypes.bool,
     isProductPartOfBundle: PropTypes.bool,
-    bundleQuantity: PropTypes.number,
+    childOfBundleQuantity: PropTypes.number,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,

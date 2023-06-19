@@ -209,8 +209,8 @@ const ProductDetail = () => {
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected.
         const selectedProductIds = Object.keys(childProductSelection)
-        const normalizedProduct = normalizeSetBundleProduct(product)
-        const firstUnselectedProduct = normalizedProduct.childProducts.find(
+        const comboProduct = normalizeSetBundleProduct(product)
+        const firstUnselectedProduct = comboProduct.childProducts.find(
             ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
         )?.product
 
@@ -277,7 +277,7 @@ const ProductDetail = () => {
         }
     }, [product])
 
-    const normalizedProduct = normalizeSetBundleProduct(product)
+    const comboProduct = normalizeSetBundleProduct(product)
 
     return (
         <Box
@@ -313,7 +313,7 @@ const ProductDetail = () => {
                         {/* TODO: consider `childProduct.belongsToSet` */}
                         {
                             // Render the child products
-                            normalizedProduct.childProducts.map(
+                            comboProduct.childProducts.map(
                                 ({product: childProduct, quantity: childQuantity}) => (
                                     <Box key={childProduct.id} data-testid="child-product">
                                         <ProductView
@@ -329,7 +329,7 @@ const ProductDetail = () => {
                                             product={childProduct}
                                             isProductPartOfSet={isProductASet}
                                             isProductPartOfBundle={isProductABundle}
-                                            bundleQuantity={childQuantity}
+                                            childOfBundleQuantity={childQuantity}
                                             addToCart={
                                                 isProductASet
                                                     ? (variant, quantity) =>
