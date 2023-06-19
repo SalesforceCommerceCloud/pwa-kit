@@ -202,7 +202,17 @@ const main = async () => {
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
         .action(async ({inspect, noHMR}) => {
-            execSync(`node${inspect ? ' --inspect' : ''} ${resolvedSSRPath}`, {
+
+            // Q: Why is all pwa-kit-dev commands using path.join('..', '..', '..')?
+            const babelNode = p.join(
+                require.resolve('webpack'),
+                '..',
+                '..',
+                '..',
+                '.bin',
+                'babel-node'
+            )
+            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${resolvedSSRPath}`, {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {})
