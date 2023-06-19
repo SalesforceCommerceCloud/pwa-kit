@@ -8,7 +8,7 @@
 'use strict'
 
 import path from 'path'
-import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
