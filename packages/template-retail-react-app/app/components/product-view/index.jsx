@@ -5,14 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useRef, useState} from 'react'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useLocation} from 'react-router-dom'
-import {useIntl} from 'react-intl'
+import { useHistory, useLocation } from 'react-router-dom'
+import { useIntl } from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
-import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
-import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import { Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme } from '@chakra-ui/react'
+import { useDerivedProduct } from '@salesforce/retail-react-app/app/hooks'
+import { useAddToCartModalContext } from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
 // project components
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
@@ -21,16 +21,18 @@ import ImageGallery from '@salesforce/retail-react-app/app/components/image-gall
 import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {Skeleton as ImageGallerySkeleton} from '@salesforce/retail-react-app/app/components/image-gallery'
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
+import { useCurrency } from '@salesforce/retail-react-app/app/hooks'
+import { useCurrentBasket } from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import { Skeleton as ImageGallerySkeleton } from '@salesforce/retail-react-app/app/components/image-gallery'
+import { HideOnDesktop, HideOnMobile } from '@salesforce/retail-react-app/app/components/responsive'
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import { useToast } from '@salesforce/retail-react-app/app/hooks/use-toast'
+import { API_ERROR_MESSAGE } from '@salesforce/retail-react-app/app/constants'
 
-const ProductViewHeader = ({name, price, currency, category, productType}) => {
+const ProductViewHeader = ({ name, price, currency, category, productType }) => {
     const intl = useIntl()
-    const {currency: activeCurrency} = useCurrency()
+    const { currency: activeCurrency } = useCurrency()
+    const { data: basket, derivedData: { hasBasket } } = useCurrentBasket()
     const isProductASet = productType?.set
 
     return (
@@ -93,7 +95,8 @@ const ProductView = forwardRef(
             updateWishlist,
             isProductLoading,
             isProductPartOfSet = false,
-            onVariantSelected = () => {},
+            isBasketLoading = false,
+            onVariantSelected = () => { },
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
         },
@@ -128,7 +131,7 @@ const ProductView = forwardRef(
         const errorContainerRef = useRef(null)
 
         const validateAndShowError = (opts = {}) => {
-            const {scrollErrorIntoView = true} = opts
+            const { scrollErrorIntoView = true } = opts
             // Validate that all attributes are selected before proceeding.
             const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
             const showError = !isProductASet && !hasValidSelection
@@ -220,7 +223,8 @@ const ProductView = forwardRef(
                     <Button
                         key="cart-button"
                         onClick={handleCartItem}
-                        disabled={showInventoryMessage}
+                        disabled={isBasketLoading || showInventoryMessage}
+                        isLoading={isBasketLoading}
                         width="100%"
                         variant="solid"
                         marginBottom={4}
@@ -228,8 +232,8 @@ const ProductView = forwardRef(
                         {updateCart
                             ? buttonText.update
                             : isProductASet
-                            ? buttonText.addSetToCart
-                            : buttonText.addToCart}
+                                ? buttonText.addSetToCart
+                                : buttonText.addToCart}
                     </Button>
                 )
             }
@@ -248,8 +252,8 @@ const ProductView = forwardRef(
                         {updateWishlist
                             ? buttonText.update
                             : isProductASet
-                            ? buttonText.addSetToWishlist
-                            : buttonText.addToWishlist}
+                                ? buttonText.addSetToWishlist
+                                : buttonText.addToWishlist}
                     </ButtonWithRegistration>
                 )
             }
@@ -260,7 +264,7 @@ const ProductView = forwardRef(
         // Bind the reference with our `scope` that includes the internal validate function for this component.
         // Other values can be added to this scope as required.
         if (typeof ref === 'function') {
-            ref = ref.bind({validateOrderability: validateAndShowError})
+            ref = ref.bind({ validateOrderability: validateAndShowError })
         }
 
         useEffect(() => {
@@ -371,7 +375,7 @@ const ProductView = forwardRef(
                                                 label={name}
                                             >
                                                 {values.map(
-                                                    ({href, name, image, value, orderable}) => (
+                                                    ({ href, name, image, value, orderable }) => (
                                                         <Swatch
                                                             key={value}
                                                             href={href}
@@ -389,10 +393,9 @@ const ProductView = forwardRef(
                                                                     backgroundColor={name.toLowerCase()}
                                                                     backgroundImage={
                                                                         image
-                                                                            ? `url(${
-                                                                                  image.disBaseLink ||
-                                                                                  image.link
-                                                                              })`
+                                                                            ? `url(${image.disBaseLink ||
+                                                                            image.link
+                                                                            })`
                                                                             : ''
                                                                     }
                                                                 />
@@ -524,6 +527,7 @@ ProductView.propTypes = {
     isProductPartOfSet: PropTypes.bool,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
+    isBasketLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,
     addToCart: PropTypes.func,
     addToWishlist: PropTypes.func,

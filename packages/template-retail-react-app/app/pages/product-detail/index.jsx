@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useCallback, useEffect, useState} from 'react'
+import React, { Fragment, useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import {Helmet} from 'react-helmet'
-import {FormattedMessage, useIntl} from 'react-intl'
+import { Helmet } from 'react-helmet'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 // Components
-import {Box, Button, Stack} from '@chakra-ui/react'
+import { Box, Button, Stack } from '@chakra-ui/react'
 import {
     useProduct,
     useCategory,
@@ -21,11 +21,11 @@ import {
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useVariant} from '@salesforce/retail-react-app/app/hooks'
+import { useCurrentBasket } from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import { useVariant } from '@salesforce/retail-react-app/app/hooks'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import { useServerContext } from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -39,13 +39,13 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST
 } from '@salesforce/retail-react-app/app/constants'
-import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
-import {useHistory, useLocation, useParams} from 'react-router-dom'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import { rebuildPathWithParams } from '@salesforce/retail-react-app/app/utils/url'
+import { useHistory, useLocation, useParams } from 'react-router-dom'
+import { useToast } from '@salesforce/retail-react-app/app/hooks/use-toast'
+import { useWishList } from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
 const ProductDetail = () => {
-    const {formatMessage} = useIntl()
+    const { formatMessage } = useIntl()
     const history = useHistory()
     const location = useLocation()
     const einstein = useEinstein()
@@ -55,17 +55,17 @@ const ProductDetail = () => {
     const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {data: basket} = useCurrentBasket()
+    const { data: basket, isLoading: isBasketLoading } = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
-    const {res} = useServerContext()
+    const { res } = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
 
     /*************************** Product Detail and Category ********************/
-    const {productId} = useParams()
+    const { productId } = useParams()
     const urlParams = new URLSearchParams(location.search)
-    const {data: product, isLoading: isProductLoading} = useProduct(
+    const { data: product, isLoading: isProductLoading } = useProduct(
         {
             parameters: {
                 id: urlParams.get('pid') || productId,
@@ -81,7 +81,7 @@ const ProductDetail = () => {
     const isProductASet = product?.type.set
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
-    const {data: category} = useCategory({
+    const { data: category } = useCategory({
         parameters: {
             id: product?.primaryCategoryId,
             level: 1
@@ -114,7 +114,7 @@ const ProductDetail = () => {
     }, [variant])
 
     /**************** Wishlist ****************/
-    const {data: wishlist, isLoading: isWishlistLoading} = useWishList()
+    const { data: wishlist, isLoading: isWishlistLoading } = useWishList()
     const createCustomerProductListItem = useShopperCustomersMutation(
         'createCustomerProductListItem'
     )
@@ -138,7 +138,7 @@ const ProductDetail = () => {
             {
                 onSuccess: () => {
                     toast({
-                        title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                        title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, { quantity: 1 }),
                         status: 'success',
                         action: (
                             // it would be better if we could use <Button as={Link}>
@@ -170,14 +170,14 @@ const ProductDetail = () => {
 
     const handleAddToCart = async (productSelectionValues) => {
         try {
-            const productItems = productSelectionValues.map(({variant, quantity}) => ({
+            const productItems = productSelectionValues.map(({ variant, quantity }) => ({
                 productId: variant.productId,
                 price: variant.price,
                 quantity
             }))
 
             await addItemToBasketMutation.mutateAsync({
-                parameters: {basketId: basket.basketId},
+                parameters: { basketId: basket.basketId },
                 body: productItems
             })
 
@@ -195,20 +195,20 @@ const ProductDetail = () => {
     const handleProductSetValidation = useCallback(() => {
         // Run validation for all child products. This will ensure the error
         // messages are shown.
-        Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
-            validateOrderability({scrollErrorIntoView: false})
+        Object.values(childProductRefs.current).forEach(({ validateOrderability }) => {
+            validateOrderability({ scrollErrorIntoView: false })
         })
 
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected.
         const selectedProductIds = Object.keys(productSetSelection)
         const firstUnselectedProduct = product.setProducts.find(
-            ({id}) => !selectedProductIds.includes(id)
+            ({ id }) => !selectedProductIds.includes(id)
         )
 
         if (firstUnselectedProduct) {
             // Get the reference to the product view and scroll to it.
-            const {ref} = childProductRefs.current[firstUnselectedProduct.id]
+            const { ref } = childProductRefs.current[firstUnselectedProduct.id]
 
             if (ref.scrollIntoView) {
                 ref.scrollIntoView({
@@ -264,6 +264,7 @@ const ProductDetail = () => {
                             addToCart={handleProductSetAddToCart}
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
+                            isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
                             validateOrderability={handleProductSetValidation}
                         />
@@ -289,7 +290,7 @@ const ProductDetail = () => {
                                         isProductPartOfSet={true}
                                         addToCart={(variant, quantity) =>
                                             handleAddToCart([
-                                                {product: childProduct, variant, quantity}
+                                                { product: childProduct, variant, quantity }
                                             ])
                                         }
                                         addToWishlist={handleAddToWishlist}
@@ -304,12 +305,13 @@ const ProductDetail = () => {
                                                     }
                                                 }))
                                             } else {
-                                                const selections = {...productSetSelection}
+                                                const selections = { ...productSetSelection }
                                                 delete selections[product.id]
                                                 setProductSetSelection(selections)
                                             }
                                         }}
                                         isProductLoading={isProductLoading}
+                                        isBasketLoading={isBasketLoading}
                                         isWishlistLoading={isWishlistLoading}
                                     />
                                     <InformationAccordion product={childProduct} />
@@ -327,10 +329,11 @@ const ProductDetail = () => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={(variant, quantity) =>
-                                handleAddToCart([{product, variant, quantity}])
+                                handleAddToCart([{ product, variant, quantity }])
                             }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
+                            isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
                         />
                         <InformationAccordion product={product} />
@@ -349,7 +352,7 @@ const ProductDetail = () => {
                             }
                             recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
                             products={[product]}
-                            mx={{base: -4, md: -8, lg: 0}}
+                            mx={{ base: -4, md: -8, lg: 0 }}
                             shouldFetch={() => product?.id}
                         />
                     )}
@@ -362,7 +365,7 @@ const ProductDetail = () => {
                         }
                         recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
                         products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
+                        mx={{ base: -4, md: -8, lg: 0 }}
                         shouldFetch={() => product?.id}
                     />
 
@@ -374,7 +377,7 @@ const ProductDetail = () => {
                             />
                         }
                         recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
-                        mx={{base: -4, md: -8, lg: 0}}
+                        mx={{ base: -4, md: -8, lg: 0 }}
                     />
                 </Stack>
             </Stack>
