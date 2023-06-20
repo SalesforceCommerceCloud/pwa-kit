@@ -353,3 +353,28 @@ describe('OverridePlugin.isFromExtends Windows', () => {
         })
     )
 })
+
+describe.only('OverridePlugin.toOverrideRelative', () => {
+    const plugin = new OverridesResolverPlugin(options)
+
+    test('filepath contains overrides dir', () => {
+        const result = plugin.toOverrideRelative('@salesforce/retail-react-app/path/nesed/icon')
+        console.log(result)
+        //expect(result).toBe('exists')
+    })
+
+    test('filepath does not contain overrides dir', () => {
+        const result = plugin.toOverrideRelative('@salesforce/express-minimal/notExists')
+        console.log(result)
+    })
+
+    test('filepath is relative', () => {
+        const result = plugin.toOverrideRelative('./exists')
+        console.log(result)
+    })
+
+    test('filepath is absolute', () => {
+        const result = plugin.toOverrideRelative('src/configs/webpack/test/overrides/path/data.js')
+        console.log(result)
+    })
+})
