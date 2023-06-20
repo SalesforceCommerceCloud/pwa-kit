@@ -358,7 +358,7 @@ const ProductView = forwardRef(
                                 />
                                 <HideOnMobile>
                                     {showFullLink && product && (
-                                        <Link to={`/product/${product.master.masterId}`}>
+                                        <Link to={`/product/${product.master?.masterId}`}>
                                             <Text color="blue.600">
                                                 {intl.formatMessage({
                                                     defaultMessage: 'See full details',
@@ -532,7 +532,7 @@ const ProductView = forwardRef(
                             </Box>
                             <HideOnDesktop>
                                 {showFullLink && product && (
-                                    <Link to={`/product/${product.master.masterId}`}>
+                                    <Link to={`/product/${product.master?.masterId}`}>
                                         <Text color="blue.600">
                                             {intl.formatMessage({
                                                 defaultMessage: 'See full details',

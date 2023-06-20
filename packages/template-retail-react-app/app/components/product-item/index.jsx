@@ -26,6 +26,8 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Hooks
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import {useProducts} from '@salesforce/commerce-sdk-react'
+import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -43,6 +45,37 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false
 }) => {
+    const isProductABundle = Boolean(product.bundledProductItems)
+
+    // const bundleVariantIds = product.bundledProductItems?.map(({productId}) => productId).join(',')
+    const bundleVariantIds = '701644044220M,701643473991M,701643458509M,701644129330M'
+    const {data: bundledProducts} = useProducts(
+        {
+            parameters: {
+                // DEBUG
+                ids: bundleVariantIds,
+                allImages: true
+            }
+        },
+        {
+            enabled: isProductABundle
+            /*
+            select: (result) => {
+                // Convert array into key/value object with key is the product id
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+            */
+        }
+    )
+    console.log('--- bundledProducts', bundledProducts)
+
+    // TODO: also, fetch the variants in a bundle
+    // GOAL: render the variation attributes (size, color)
+
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
     return (
@@ -61,6 +94,45 @@ const ProductItem = ({
                                         <CartItemVariantPrice align="left" />
                                     </Box>
                                 </HideOnDesktop>
+
+                                {isProductABundle &&
+                                    product.bundledProductItems.map((item, i) => {
+                                        // TODO: merge `item` and `bundledProducts.data[i]` ?
+                                        const child = bundledProducts.data[i]
+
+                                        // console.log('--- child', child)
+                                        // Object.entries(
+                                        //     getDisplayVariationValues(
+                                        //         child.variationAttributes,
+                                        //         child.variationValues
+                                        //     )
+                                        // ).forEach((entry) =>
+                                        //     console.log(`${entry[0]}: ${entry[1]}`)
+                                        // )
+
+                                        // return (
+                                        //     <p key={i}>
+                                        //         <div>{item.productName}</div>
+                                        //         <div>Quantity: {item.quantity}</div>
+                                        //     </p>
+                                        // )
+
+                                        return (
+                                            <ItemVariantProvider variant={child} key={i}>
+                                                {/* TODO: make a new component? */}
+                                                <CartItemVariantName />
+                                                <CartItemVariantAttributes />
+
+                                                <Text lineHeight={1} color="gray.700" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Quantity: {quantity}"
+                                                        values={{quantity: item.quantity}}
+                                                        id="item_attributes.label.quantity"
+                                                    />
+                                                </Text>
+                                            </ItemVariantProvider>
+                                        )
+                                    })}
                             </Stack>
 
                             <Flex align="flex-end" justify="space-between">

@@ -44,12 +44,16 @@ import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
+    useProduct,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
+// DEBUG:
+// PDP link: http://localhost:3000/us/en-US/product/test-bundle?25592770M=color%3DJJGN9A0%26size%3D008&25565139M=color%3DJJ667A8%26size%3D9XL&25565094M=color%3DJJ0CZXX%26size%3D9MD&25565250M=color%3DJJ3KRXX%26size%3D9SM
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+    console.log('--- current basket', basket)
 
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products} = useProducts(
@@ -71,6 +75,7 @@ const Cart = () => {
             }
         }
     )
+
     const {data: customer} = useCurrentCustomer()
     const {customerId, isRegistered} = customer
 

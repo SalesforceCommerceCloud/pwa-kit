@@ -15,7 +15,10 @@ import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-pr
  * A Modal that contains Product View
  */
 const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
+    // TODO
     const productViewModalData = useProductViewModal(product)
+    console.log('--- ProductViewModal receives this product', product)
+    console.log('--- and convert it into', productViewModalData)
     return (
         <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
