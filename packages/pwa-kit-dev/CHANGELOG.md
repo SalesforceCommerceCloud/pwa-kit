@@ -1,6 +1,6 @@
-## v2.7.3-preview.3 (Jun 19, 2023)
-## v2.7.3-preview.2 (Jun 19, 2023)
-## v2.7.3-preview (Jun 16, 2023)
+## v2.7.3-preview.4 (Jun 20, 2023)
+-   Add support for ES module `import` statements in ssr.js [#1284](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1284)
+
 ## v2.7.2 (May 29, 2023)
 
 -   Add missing babel plugin dependency [#1231](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1231)
