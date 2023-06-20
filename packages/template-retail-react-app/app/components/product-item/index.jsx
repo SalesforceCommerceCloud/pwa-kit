@@ -26,9 +26,7 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Hooks
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
-import {
-    useProducts,
-} from '@salesforce/commerce-sdk-react'
+import {useProducts} from '@salesforce/commerce-sdk-react'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -48,41 +46,58 @@ const ProductItem = ({
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
-    console.log('@@@ PRODUCT', product);
+    console.log('@@@ PRODUCT', product)
     const isProductABundle = product?.type?.bundle
     let data = ''
     // if(isProductABundle) {
-        const productIds = product?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
-        const {data: tempData} = useProducts(
-            {
-                parameters: {
-                    ids: productIds,
-                    allImages: true
-                }
-            },
-            {
-                enabled: Boolean(productIds),
-                select: (result) => {
-                    // Convert array into key/value object with key is the product id
-                    return result?.data?.reduce((result, item) => {
-                        const key = item.id
-                        result[key] = item
-                        return result
-                    }, {})
+    const productIds = product?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
+    const {data: productVariantData} = useProducts(
+        {
+            parameters: {
+                ids: productIds,
+                allImages: true
+            }
+        },
+        {
+            enabled: Boolean(productIds),
+            select: (result) => {
+                // Convert array into key/value object with key is the product id
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+    if (productVariantData && Object.keys(productVariantData)?.length) {
+        const asArray = Object.keys(productVariantData)?.map((key) => {
+            const item = productVariantData[key]
+            const flatValues = item?.variationAttributes?.flatMap((item) => {
+                return item.values.map((vals) => {
+                    return {
+                        ...vals,
+                        label: item.name
+                    }
+                })
+            })
+            return {
+                ...item,
+                variationValues: {
+                    ...Object.keys(item?.variationValues).map((variation) => {
+                        const found = flatValues.find(
+                            (obj) => obj?.value === item?.variationValues?.[variation]
+                        )
+                        return {
+                            value: item?.variationValues?.[variation],
+                            label: found?.label,
+                            name: found?.name
+                        }
+                    })
                 }
             }
-        )
-        console.log("tempData", tempData)
-        let keys = []
-        if(Object.keys(tempData).length) {
-            keys = Object.keys(tempData)
-            const flatMap = tempData[keys[0]].variationAttributes.flat()
-            console.log("flatMap", flatMap)
-            flatMap.values = flatMap.values.flat()
-            console.log("flatMap 2", flatMap)
-
-        }
-    // }
+        })
+    }
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>
@@ -94,7 +109,7 @@ const ProductItem = ({
                             <Stack spacing={1}>
                                 <CartItemVariantName />
                                 {/* <h1>HELLO WORLD</h1> */}
-                                <CartItemVariantAttributes className="TESTING"/>
+                                <CartItemVariantAttributes className="TESTING" />
                                 <HideOnDesktop>
                                     <Box marginTop={2}>
                                         <CartItemVariantPrice align="left" />
