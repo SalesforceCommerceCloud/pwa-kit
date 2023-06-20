@@ -7,11 +7,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 'use strict'
 
-const path = require('path')
-const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
-const {isRemote} = require('@salesforce/pwa-kit-runtime/utils/ssr-server')
-const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
-const helmet = require('helmet')
+import path from 'path'
+import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import helmet from 'helmet'
 
 const options = {
     // The build directory (an absolute path)
@@ -67,4 +67,4 @@ const {handler} = runtime.createHandler(options, (app) => {
 })
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
-exports.get = handler
+export const get = handler
