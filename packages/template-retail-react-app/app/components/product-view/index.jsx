@@ -32,7 +32,6 @@ import { API_ERROR_MESSAGE } from '@salesforce/retail-react-app/app/constants'
 const ProductViewHeader = ({ name, price, currency, category, productType }) => {
     const intl = useIntl()
     const { currency: activeCurrency } = useCurrency()
-    const { data: basket, derivedData: { hasBasket } } = useCurrentBasket()
     const isProductASet = productType?.set
 
     return (

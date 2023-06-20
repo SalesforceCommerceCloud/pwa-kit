@@ -55,12 +55,18 @@ const ProductDetail = () => {
     const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const { data: basket, isLoading: isBasketLoading } = useCurrentBasket()
+    const { data: basket } = useCurrentBasket()
+    const [activeBasket, setActiveBasket] = useState(basket)
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const { res } = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
+    let isBasketLoading = !!!basket?.basketId
+    useEffect(() => {
+        isBasketLoading = !!!basket?.basketId
+        setActiveBasket(basket)
+    }, [basket])
 
     /*************************** Product Detail and Category ********************/
     const { productId } = useParams()
@@ -177,7 +183,7 @@ const ProductDetail = () => {
             }))
 
             await addItemToBasketMutation.mutateAsync({
-                parameters: { basketId: basket.basketId },
+                parameters: { basketId: activeBasket.basketId },
                 body: productItems
             })
 
