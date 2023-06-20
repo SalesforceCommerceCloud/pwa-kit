@@ -85,6 +85,7 @@ const ProductDetail = () => {
     )
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
+    const comboProduct = isProductASet || isProductABundle ? normalizeSetBundleProduct(product) : {}
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
@@ -209,7 +210,6 @@ const ProductDetail = () => {
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected.
         const selectedProductIds = Object.keys(childProductSelection)
-        const comboProduct = normalizeSetBundleProduct(product)
         const firstUnselectedProduct = comboProduct.childProducts.find(
             ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
         )?.product
@@ -285,8 +285,6 @@ const ProductDetail = () => {
             einstein.sendViewProduct(product)
         }
     }, [product])
-
-    const comboProduct = normalizeSetBundleProduct(product)
 
     return (
         <Box
