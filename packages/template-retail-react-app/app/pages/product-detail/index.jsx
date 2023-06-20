@@ -134,7 +134,7 @@ const ProductDetail = () => {
                     customerId
                 },
                 body: {
-                    // NOTE: APi does not respect quantity, it always adds 1
+                    // NOTE: API does not respect quantity, it always adds 1
                     quantity,
                     productId: variant?.productId || product?.id,
                     public: false,
@@ -198,7 +198,7 @@ const ProductDetail = () => {
         }
     }
 
-    /**************** Product Set Handlers ****************/
+    /**************** Product Set/Bundles Handlers ****************/
     const handleChildProductValidation = useCallback(() => {
         // Run validation for all child products. This will ensure the error
         // messages are shown.
@@ -231,6 +231,7 @@ const ProductDetail = () => {
         return true
     }, [product, childProductSelection])
 
+    /**************** Product Set Handlers ****************/
     const handleProductSetAddToCart = () => {
         // Get all the selected products, and pass them to the addToCart handler which
         // accepts an array.
@@ -239,7 +240,6 @@ const ProductDetail = () => {
     }
 
     /**************** Product Bundle Handlers ****************/
-
     // Top level bundle does not have variants
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {

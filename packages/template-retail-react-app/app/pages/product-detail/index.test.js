@@ -95,8 +95,7 @@ describe('product set', () => {
         await waitFor(
             () => {
                 expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
-            },
-            {timeout: 5000}
+            }
         )
     })
 
@@ -112,8 +111,7 @@ describe('product set', () => {
         await waitFor(
             () => {
                 expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
-            },
-            {timeout: 5000}
+            }
         )
 
         const buttons = await screen.findAllByText(/add set to cart/i)
@@ -123,11 +121,9 @@ describe('product set', () => {
             () => {
                 const modal = screen.getByTestId('add-to-cart-modal')
                 expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
-            },
-            // Seems like rendering the modal takes a bit more time
-            {timeout: 10000}
+            }
         )
-    }, 30000)
+    })
 
     test('add the set to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
@@ -135,8 +131,7 @@ describe('product set', () => {
         await waitFor(
             () => {
                 expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
-            },
-            {timeout: 5000}
+            }
         )
 
         const buttons = await screen.findAllByText(/add set to cart/i)
@@ -182,8 +177,7 @@ describe('product bundles', () => {
         await waitFor(
             () => {
                 expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
-            },
-            {timeout: 5000}
+            }
         )
     })
 
@@ -199,8 +193,7 @@ describe('product bundles', () => {
         await waitFor(
             () => {
                 expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
-            },
-            {timeout: 5000}
+            }
         )
 
         const buttons = await screen.findAllByText(/add bundle to cart/i)
@@ -210,11 +203,9 @@ describe('product bundles', () => {
             () => {
                 const modal = screen.getByTestId('add-to-cart-modal')
                 expect(within(modal).getByText(/1 item added to cart/i)).toBeInTheDocument()
-            },
-            // Seems like rendering the modal takes a bit more time
-            {timeout: 10000}
+            }
         )
-    }, 30000)
+    })
 
     test('add the bundle to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
@@ -222,8 +213,7 @@ describe('product bundles', () => {
         await waitFor(
             () => {
                 expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
-            },
-            {timeout: 5000}
+            }
         )
 
         const buttons = await screen.findAllByText(/add bundle to cart/i)
