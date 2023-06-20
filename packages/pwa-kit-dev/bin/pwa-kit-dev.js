@@ -194,7 +194,11 @@ const main = async () => {
                 'babel-node'
             )
             execSync(
-                `${babelNode} ${inspect ? '--inspect' : ''} ${p.join(process.cwd(), 'app', 'ssr.js')}`,
+                `${babelNode} ${inspect ? '--inspect' : ''} ${p.join(
+                    process.cwd(),
+                    'app',
+                    'ssr.js'
+                )}`,
                 {
                     env: {
                         ...process.env,
