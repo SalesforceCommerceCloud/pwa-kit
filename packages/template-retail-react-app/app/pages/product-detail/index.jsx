@@ -61,7 +61,7 @@ const ProductDetail = () => {
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
-    let isBasketLoading = !!!basket?.basketId
+    const isBasketLoading = !!!basket?.basketId
 
     /*************************** Product Detail and Category ********************/
     const { productId } = useParams()
