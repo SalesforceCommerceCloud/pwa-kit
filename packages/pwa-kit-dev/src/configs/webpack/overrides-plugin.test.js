@@ -17,14 +17,23 @@ const OVERRIDES_DIR = '/overrides'
 
 // Files in this map are the files we expect to see in overrides,
 // reflecting the files found in src/configs/webpack/test/overrides
-const FS_READ_HASHMAP = new Map([
-    ['exists', ['src/configs/webpack/test/overrides/exists.jsx', ['.', 'jsx']]],
-    ['newExtension', ['src/configs/webpack/test/overrides/newExtension.tsx', ['.', 'tsx']]],
-    ['path/data', ['src/configs/webpack/test/overrides/path/data.js', ['.', 'js']]],
-    ['path', ['/index.jsx', ['index', '.', 'jsx']]],
-    ['path/index.mock', ['/index.mock.jsx', ['.', 'jsx']]],
-    ['path/nested/icon', ['src/configs/webpack/test/overrides/path/nested/icon.svg', ['.', 'svg']]]
-])
+// This map takes the form [key, [end, rest]] where given a string /path/file.jsx
+// we split on the last '.' and the former part becomes the key and the latter becomes rest
+// To determine 'end', we split on '/index' and take the latter part of the substring. If the
+// file does not contain '/index' this becomes the filepath from the root of pwa-kit-dev
+const FS_READ_HASHMAP = new Map(
+    Object.entries({
+        exists: ['src/configs/webpack/test/overrides/exists.jsx', ['.', 'jsx']],
+        newExtension: ['src/configs/webpack/test/overrides/newExtension.tsx', ['.', 'tsx']],
+        'path/data': ['src/configs/webpack/test/overrides/path/data.js', ['.', 'js']],
+        path: ['/index.jsx', ['index', '.', 'jsx']],
+        'path/index.mock': ['/index.mock.jsx', ['.', 'jsx']],
+        'path/nested/icon': [
+            'src/configs/webpack/test/overrides/path/nested/icon.svg',
+            ['.', 'svg']
+        ]
+    })
+)
 const REWRITE_DIR = PROJECT_DIR + OVERRIDES_DIR
 const options = {
     overridesDir: OVERRIDES_DIR,
@@ -39,15 +48,14 @@ const createRequestContextWith = (req) => {
         context: {
             // We don't modify or read the issuer in overrides so we can
             // leave this as a constant here
-            issuer: path.join('./', 'fake-file.js')
+            issuer: 'fake-file.js'
         },
         path: req.path,
         request: req.request
     }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const setupResolverAndCallback = (target, requestContext, msg, resolveContext) => {
+const setupResolverAndCallback = () => {
     const callback = jest.fn(() => null)
     const resolver = {
         ensureHook: jest.fn(() => null),
@@ -75,11 +83,11 @@ describe('overrides plugin', () => {
         const REQUEST_PATH = 'exists'
         const REQUEST_EXTENSION = '.jsx'
         const testRequestContext = createRequestContextWith({
-            path: path.join('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('.', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
+        const {resolver, callback} = setupResolverAndCallback()
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
@@ -102,11 +110,11 @@ describe('overrides plugin', () => {
         const REQUEST_PATH = `path/nested/icon`
         const REQUEST_EXTENSION = '.svg'
         const testRequestContext = createRequestContextWith({
-            path: path.join('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('.', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
+        const {resolver, callback} = setupResolverAndCallback()
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
@@ -127,11 +135,11 @@ describe('overrides plugin', () => {
         const REQUEST_PATH = `path/nested/does_not_exist.svg`
         const REQUEST_EXTENSION = '.svg'
         const testRequestContext = createRequestContextWith({
-            path: path.join('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('.', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}${REQUEST_EXTENSION}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
+        const {resolver, callback} = setupResolverAndCallback()
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
@@ -143,11 +151,11 @@ describe('overrides plugin', () => {
         const REQUEST_ONE_PATH = 'exists'
         const REQUEST_ONE_EXTENSION = '.jsx'
         const testOneRequestContext = createRequestContextWith({
-            path: path.join('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('.', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_ONE_PATH}`
         })
 
-        let {resolver, callback} = setupResolverAndCallback(null, testOneRequestContext, null, {})
+        let {resolver, callback} = setupResolverAndCallback()
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testOneRequestContext, {}, callback, resolver)
 
@@ -163,14 +171,13 @@ describe('overrides plugin', () => {
             expect.anything()
         )
 
-        // TODO: this might be `..\` on Windows?
         const REQUEST_TWO_PATH = `./exists`
         const testTwoRequestContext = createRequestContextWith({
-            path: path.join('./'),
+            path: './',
             request: REQUEST_TWO_PATH
         })
 
-        ;({resolver, callback} = setupResolverAndCallback(null, testTwoRequestContext, null, {}))
+        ;({resolver, callback} = setupResolverAndCallback())
 
         const _overridesResolver = new OverridesResolverPlugin(options)
         _overridesResolver.handleHook(testTwoRequestContext, {}, callback, resolver)
@@ -186,7 +193,7 @@ describe('overrides plugin', () => {
 
         const testRequestContext = createRequestContextWith({
             path: path.join(
-                './',
+                '.',
                 'node_modules',
                 EXTENDS_TARGET,
                 REQUEST_PATH,
@@ -195,7 +202,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        let {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
+        let {resolver, callback} = setupResolverAndCallback()
 
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
@@ -222,7 +229,7 @@ describe('overrides plugin', () => {
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
+        const {resolver, callback} = setupResolverAndCallback()
 
         const windowsOptions = {
             overridesDir: '\\overrides',
@@ -252,11 +259,11 @@ describe('overrides plugin', () => {
         // This test checks that index.jsx is returned by the override
         const REQUEST_PATH = `path`
         const testRequestContext = createRequestContextWith({
-            path: path.join('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('.', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
+        const {resolver, callback} = setupResolverAndCallback()
         const overridesResolver = new OverridesResolverPlugin(options)
         overridesResolver.handleHook(testRequestContext, {}, callback, resolver)
 
@@ -264,7 +271,7 @@ describe('overrides plugin', () => {
         expect(resolver.doResolve).toHaveBeenCalledWith(
             null,
             createRequestContextWith({
-                path: path.join(REWRITE_DIR, REQUEST_PATH + `/index.jsx`),
+                path: path.join(REWRITE_DIR, REQUEST_PATH, `index.jsx`),
                 request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
             }),
             expect.anything(),
@@ -277,11 +284,11 @@ describe('overrides plugin', () => {
         const REQUEST_PATH = 'exists'
         const REQUEST_EXTENSION = '.jsx'
         const testRequestContext = createRequestContextWith({
-            path: path.join('./', 'node_modules', EXTENDS_TARGET),
+            path: path.join('.', 'node_modules', EXTENDS_TARGET),
             request: `${EXTENDS_TARGET}/${REQUEST_PATH}`
         })
 
-        const {resolver, callback} = setupResolverAndCallback(null, testRequestContext, null, {})
+        const {resolver, callback} = setupResolverAndCallback()
 
         const nestedOverridesOptions = {
             overridesDir: '/path/to/overrides',
