@@ -14,7 +14,7 @@ module.exports = {
             locale: 'path',
             showDefaults: true
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'RefArch',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -23,10 +23,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
-                siteId: 'RefArchGlobal'
+                clientId: '3bffaaca-35af-4c2f-ad46-97f9ec01f7b2',
+                organizationId: 'f_ecom_zzrf_014',
+                shortCode: 'kv7kzm78',
+                siteId: 'RefArch'
             }
         },
         einsteinAPI: {
@@ -56,7 +56,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'zzrf-014.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]
