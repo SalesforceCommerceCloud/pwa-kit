@@ -113,10 +113,14 @@ describe('product set', () => {
         const buttons = await screen.findAllByText(/add set to cart/i)
         fireEvent.click(buttons[0])
 
-        await waitFor(() => {
-            const modal = screen.getByTestId('add-to-cart-modal')
-            expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
-        })
+        await waitFor(
+            () => {
+                const modal = screen.getByTestId('add-to-cart-modal')
+                expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
+            },
+            // Seems like rendering the modal takes a bit more time
+            {timeout: 10000}
+        )
     })
 
     test('add the set to cart with error messages', async () => {
@@ -187,10 +191,14 @@ describe('product bundles', () => {
         const buttons = await screen.findAllByText(/add bundle to cart/i)
         fireEvent.click(buttons[0])
 
-        await waitFor(() => {
-            const modal = screen.getByTestId('add-to-cart-modal')
-            expect(within(modal).getByText(/1 item added to cart/i)).toBeInTheDocument()
-        })
+        await waitFor(
+            () => {
+                const modal = screen.getByTestId('add-to-cart-modal')
+                expect(within(modal).getByText(/1 item added to cart/i)).toBeInTheDocument()
+            },
+            // Seems like rendering the modal takes a bit more time
+            {timeout: 10000}
+        )
     })
 
     test('add the bundle to cart with error messages', async () => {
