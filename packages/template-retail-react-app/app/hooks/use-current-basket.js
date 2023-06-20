@@ -6,7 +6,7 @@
  */
 import {useCustomerId, useCustomerBaskets} from '@salesforce/commerce-sdk-react'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
-import {useEffect} from 'react'
+import {useEffect, useState} from 'react'
 
 // if id is not defined, by default use the first basket in the list
 const findCurrentBasket = (id, basketsData) => {
@@ -29,10 +29,12 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         }
     )
 
-    let currentBasket = findCurrentBasket(id, basketsData)
-    // useEffect(() => {
-    //     currentBasket = findCurrentBasket(id, basketsData)
-    // }, [id, basketsData])
+    const [currentBasket, setCurrentBasket] = useState(findCurrentBasket(id, basketsData))
+
+    // let currentBasket = findCurrentBasket(id, basketsData)
+    useEffect(() => {
+        setCurrentBasket(findCurrentBasket(id, basketsData))
+    }, [id, basketsData])
 
     return {
         ...restOfQuery,
