@@ -145,7 +145,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {
             // TODO: Convert invalidate to an update that removes the matching basket
             invalidate: [
-                ...(customerId && !basketId
+                ...(customerId && basketId
                     ? [invalidateCustomerBasketsQuery(customerId, parameters)]
                     : [])
             ],
