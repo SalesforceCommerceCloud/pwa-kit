@@ -58,6 +58,15 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                 </Text>
             ))}
 
+            {/* TODO: remove/modify */}
+            {variant?.bundledProductItems?.map((item) => {
+                return(
+                    <Text lineHeight={1} color="gray.700" fontSize="sm">
+                        {item?.itemText}
+                    </Text>
+                )
+            })}
+
             {includeQuantity && (
                 <Text lineHeight={1} color="gray.700" fontSize="sm">
                     <FormattedMessage
