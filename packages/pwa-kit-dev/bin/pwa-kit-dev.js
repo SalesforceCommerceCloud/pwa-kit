@@ -202,7 +202,16 @@ const main = async () => {
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
         .action(async ({inspect, noHMR}) => {
-            execSync(`node${inspect ? ' --inspect' : ''} ${resolvedSSRPath}`, {
+            // We use @babel/node instead of node because we want to support ES6 import syntax
+            const babelNode = p.join(
+                require.resolve('webpack'),
+                '..',
+                '..',
+                '..',
+                '.bin',
+                'babel-node'
+            )
+            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${resolvedSSRPath}`, {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {})
