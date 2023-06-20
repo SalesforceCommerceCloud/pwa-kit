@@ -33,7 +33,7 @@
     "commander": "^9.5.0",
     "deepmerge": "2.2.1",
     "inquirer": "7.3.3",
-    "semver": "^7.3.8",
+    "semver": "^7.5.2",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
     "tar": "^6.1.13"
