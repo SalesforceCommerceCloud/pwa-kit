@@ -28,7 +28,14 @@ import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
-const ProductViewHeader = ({name, price, currency, category, productType}) => {
+const ProductViewHeader = ({
+    name,
+    price,
+    currency,
+    category,
+    productType,
+    isProductPartOfBundle
+}) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
     const isProductASet = productType?.set
@@ -47,19 +54,21 @@ const ProductViewHeader = ({name, price, currency, category, productType}) => {
             </Skeleton>
 
             {/* Price */}
-            <Skeleton isLoaded={price} minWidth={32}>
-                <Text fontWeight="bold" fontSize="md" aria-label="price">
-                    {isProductASet &&
-                        `${intl.formatMessage({
-                            id: 'product_view.label.starting_at_price',
-                            defaultMessage: 'Starting at'
-                        })} `}
-                    {intl.formatNumber(price, {
-                        style: 'currency',
-                        currency: currency || activeCurrency
-                    })}
-                </Text>
-            </Skeleton>
+            {!isProductPartOfBundle && (
+                <Skeleton isLoaded={price} minWidth={32}>
+                    <Text fontWeight="bold" fontSize="md" aria-label="price">
+                        {isProductASet &&
+                            `${intl.formatMessage({
+                                id: 'product_view.label.starting_at_price',
+                                defaultMessage: 'Starting at'
+                            })} `}
+                        {intl.formatNumber(price, {
+                            style: 'currency',
+                            currency: currency || activeCurrency
+                        })}
+                    </Text>
+                </Skeleton>
+            )}
         </VStack>
     )
 }
@@ -69,7 +78,8 @@ ProductViewHeader.propTypes = {
     price: PropTypes.number,
     currency: PropTypes.string,
     category: PropTypes.array,
-    productType: PropTypes.object
+    productType: PropTypes.object,
+    isProductPartOfBundle: PropTypes.bool
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -93,6 +103,10 @@ const ProductView = forwardRef(
             updateWishlist,
             isProductLoading,
             isProductPartOfSet = false,
+            isProductPartOfBundle = false,
+            childOfBundleQuantity = 0,
+            childProductOrderability,
+            setChildProductOrderability,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
@@ -122,16 +136,17 @@ const ProductView = forwardRef(
             variationAttributes,
             stockLevel,
             stepQuantity
-        } = useDerivedProduct(product, isProductPartOfSet)
+        } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
+        const isProductABundle = product?.type.bundle
         const errorContainerRef = useRef(null)
 
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
             const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
-            const showError = !isProductASet && !hasValidSelection
+            const showError = !isProductASet && !isProductABundle && !hasValidSelection
             const scrollToError = showError && scrollErrorIntoView
 
             toggleShowOptionsMessage(showError)
@@ -161,6 +176,10 @@ const ProductView = forwardRef(
                     defaultMessage: 'Add Set to Cart',
                     id: 'product_view.button.add_set_to_cart'
                 }),
+                addBundleToCart: intl.formatMessage({
+                    defaultMessage: 'Add Bundle to Cart',
+                    id: 'product_view.button.add_bundle_to_cart'
+                }),
                 addToWishlist: intl.formatMessage({
                     defaultMessage: 'Add to Wishlist',
                     id: 'product_view.button.add_to_wishlist'
@@ -168,6 +187,10 @@ const ProductView = forwardRef(
                 addSetToWishlist: intl.formatMessage({
                     defaultMessage: 'Add Set to Wishlist',
                     id: 'product_view.button.add_set_to_wishlist'
+                }),
+                addBundleToWishlist: intl.formatMessage({
+                    defaultMessage: 'Add Bundle to Wishlist',
+                    id: 'product_view.button.add_bundle_to_wishlist'
                 })
             }
 
@@ -198,7 +221,8 @@ const ProductView = forwardRef(
                     if (itemsAdded) {
                         onAddToCartModalOpen({
                             product,
-                            itemsAdded
+                            itemsAdded,
+                            selectedQuantity: quantity
                         })
                     }
                 } catch (e) {
@@ -215,12 +239,21 @@ const ProductView = forwardRef(
                 addToWishlist(product, variant, quantity)
             }
 
-            if (addToCart || updateCart) {
+            let disableButton = showInventoryMessage
+            if ((isProductASet || isProductABundle) && childProductOrderability) {
+                // if any of the children are not orderable, it will disable the add to cart button
+                disableButton = Object.keys(childProductOrderability).some((productId) => {
+                    return !childProductOrderability[productId]
+                })
+            }
+
+            // child product of bundles do not have add to cart button
+            if ((addToCart || updateCart) && !isProductPartOfBundle) {
                 buttons.push(
                     <Button
                         key="cart-button"
                         onClick={handleCartItem}
-                        disabled={showInventoryMessage}
+                        isDisabled={disableButton}
                         width="100%"
                         variant="solid"
                         marginBottom={4}
@@ -229,12 +262,15 @@ const ProductView = forwardRef(
                             ? buttonText.update
                             : isProductASet
                             ? buttonText.addSetToCart
+                            : isProductABundle
+                            ? buttonText.addBundleToCart
                             : buttonText.addToCart}
                     </Button>
                 )
             }
 
-            if (addToWishlist || updateWishlist) {
+            // child product of bundles do not have add to wishlist button
+            if ((addToWishlist || updateWishlist) && !isProductPartOfBundle) {
                 buttons.push(
                     <ButtonWithRegistration
                         key="wishlist-button"
@@ -249,6 +285,8 @@ const ProductView = forwardRef(
                             ? buttonText.update
                             : isProductASet
                             ? buttonText.addSetToWishlist
+                            : isProductABundle
+                            ? buttonText.addBundleToWishlist
                             : buttonText.addToWishlist}
                     </ButtonWithRegistration>
                 )
@@ -270,7 +308,11 @@ const ProductView = forwardRef(
         }, [location.pathname])
 
         useEffect(() => {
-            if (!isProductASet && validateOrderability(variant, quantity, stockLevel)) {
+            if (
+                !isProductASet &&
+                !isProductABundle &&
+                validateOrderability(variant, quantity, stockLevel)
+            ) {
                 toggleShowOptionsMessage(false)
             }
         }, [variationParams])
@@ -280,6 +322,16 @@ const ProductView = forwardRef(
                 onVariantSelected(product, variant, quantity)
             }
         }, [variant?.productId, quantity])
+
+        useEffect(() => {
+            if (isProductPartOfBundle || isProductPartOfSet) {
+                // when showInventoryMessage is true, it means child product is not orderable
+                setChildProductOrderability((previousState) => ({
+                    ...previousState,
+                    [product.id]: !showInventoryMessage
+                }))
+            }
+        }, [showInventoryMessage])
 
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
@@ -291,6 +343,7 @@ const ProductView = forwardRef(
                         productType={product?.type}
                         currency={product?.currency}
                         category={category}
+                        isProductPartOfBundle={isProductPartOfBundle}
                     />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
@@ -301,7 +354,7 @@ const ProductView = forwardRef(
                                     size={imageSize}
                                     imageGroups={product.imageGroups}
                                     selectedVariationAttributes={variationParams}
-                                    lazy={isProductPartOfSet}
+                                    lazy={isProductPartOfSet || isProductPartOfBundle}
                                 />
                                 <HideOnMobile>
                                     {showFullLink && product && (
@@ -330,9 +383,23 @@ const ProductView = forwardRef(
                                 productType={product?.type}
                                 currency={product?.currency}
                                 category={category}
+                                isProductPartOfBundle={isProductPartOfBundle}
                             />
                         </Box>
                         <VStack align="stretch" spacing={4}>
+                            {isProductPartOfBundle && (
+                                <Box>
+                                    <Text fontWeight="medium" fontSize="md" aria-label="price">
+                                        <label>
+                                            {intl.formatMessage({
+                                                defaultMessage: 'Quantity',
+                                                id: 'product_view.label.quantity'
+                                            })}
+                                            : {childOfBundleQuantity}
+                                        </label>
+                                    </Text>
+                                </Box>
+                            )}
                             {/*
                                 Customize the skeletons shown for attributes to suit your needs. At the point
                                 that we show the skeleton we do not know how many variations are selectable. So choose
@@ -408,8 +475,7 @@ const ProductView = forwardRef(
                                 </>
                             )}
 
-                            {/* Quantity Selector */}
-                            {!isProductASet && (
+                            {!isProductASet && !isProductPartOfBundle && (
                                 <VStack align="stretch" maxWidth={'200px'}>
                                     <Box fontWeight="bold">
                                         <label htmlFor="quantity">
@@ -522,6 +588,8 @@ ProductView.displayName = 'ProductView'
 ProductView.propTypes = {
     product: PropTypes.object,
     isProductPartOfSet: PropTypes.bool,
+    isProductPartOfBundle: PropTypes.bool,
+    childOfBundleQuantity: PropTypes.number,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,
@@ -531,6 +599,8 @@ ProductView.propTypes = {
     updateWishlist: PropTypes.func,
     showFullLink: PropTypes.bool,
     imageSize: PropTypes.oneOf(['sm', 'md']),
+    childProductOrderability: PropTypes.object,
+    setChildProductOrderability: PropTypes.func,
     onVariantSelected: PropTypes.func,
     validateOrderability: PropTypes.func
 }
