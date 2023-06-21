@@ -20,10 +20,10 @@
   "devDependencies": {
     "commander": "^9.5.0",
     "eslint-plugin-header": "^3.1.1",
-    "lerna": "^6.6.1",
-    "semver": "^7.3.8",
+    "lerna": "^6.6.2",
+    "semver": "^7.5.2",
     "shelljs": "^0.8.5",
-    "syncpack": "^10.1.0"
+    "syncpack": "^10.6.1"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",
