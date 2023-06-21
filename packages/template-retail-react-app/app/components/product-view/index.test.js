@@ -29,7 +29,8 @@ MockComponent.propTypes = {
     product: PropTypes.object,
     addToCart: PropTypes.func,
     addToWishlist: PropTypes.func,
-    updateWishlist: PropTypes.func
+    updateWishlist: PropTypes.func,
+    isBasketLoading: PropTypes.bool
 }
 
 // Set up and clean up
@@ -220,5 +221,29 @@ test('onVariantSelected callback is called after successfully selected a variant
 
     await waitFor(() => {
         expect(onVariantSelected).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('add to cart button loading tests', () => {
+    test('add to cart button is disabled if isBasketLoading is true', async () => {
+        renderWithProviders(
+            <MockComponent
+                product={mockProductDetail}
+                addToCart={() => {}}
+                isBasketLoading={true}
+            />
+        )
+        expect(screen.getByRole('button', {name: /add to cart/i})).toBeDisabled()
+    })
+
+    test('add to cart button is enabled if isBasketLoading is false', async () => {
+        renderWithProviders(
+            <MockComponent
+                product={mockProductDetail}
+                addToCart={() => {}}
+                isBasketLoading={false}
+            />
+        )
+        expect(screen.getByRole('button', {name: /add to cart/i})).not.toBeDisabled()
     })
 })
