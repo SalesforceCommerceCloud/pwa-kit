@@ -381,3 +381,52 @@ describe('OverridePlugin.toOverrideRelative', () => {
     //     console.log('path/data.js')
     // })
 })
+
+describe.only('OverridePlugin.findFileFromMap', () => {
+    const plugin = new OverridesResolverPlugin(options)
+
+    test('request path contains nested path', () => {
+        const result = plugin.findFileFromMap('path/nested/icon', plugin._allSearchDirs)
+        // console.log(result)
+        expect(result).toBe('src/configs/webpack/test/overrides/path/nested/icon.svg')
+    })
+
+    test('request path does not have file extension or /index finds index', () => {
+        const result = plugin.findFileFromMap('path', plugin._allSearchDirs)
+        // console.log(result)
+        expect(result).toBe('src/configs/webpack/test/overrides/path/index.jsx')
+    })
+
+    test('request path contains file extension not index', () => {
+        const result = plugin.findFileFromMap('path/data.js', plugin._allSearchDirs)
+        // console.log(result)
+        expect(result).toBe('src/configs/webpack/test/overrides/path/data.js')
+    })
+
+    test.only('request path contains index and file extension', () => {
+        const result = plugin.findFileFromMap('path/index.jsx', plugin._allSearchDirs)
+        console.log(result)
+        expect(result).toBe('src/configs/webpack/test/overrides/path/index.jsx')
+    })
+
+    test.only('request path contains index', () => {
+        const result = plugin.findFileFromMap('path/index', plugin._allSearchDirs)
+        console.log(result)
+        expect(result).toBe('src/configs/webpack/test/overrides/path/index.jsx')
+    })
+
+    test.only('request path contains index.mock file', () => {
+        const result = plugin.findFileFromMap('path/index.mock', plugin._allSearchDirs)
+        console.log(result)
+        expect(result).toBe('src/configs/webpack/test/overrides/path/index.mock.jsx')
+    })
+
+    test('request path does not have file extension or extends dir', () => {
+        const result = plugin.findFileFromMap(
+            '@salesforce/express-minimal/notExists',
+            plugin._allSearchDirs
+        )
+        // console.log(result)
+        expect(result).toBe(undefined)
+    })
+})
