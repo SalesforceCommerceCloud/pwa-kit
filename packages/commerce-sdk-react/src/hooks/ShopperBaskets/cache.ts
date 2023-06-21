@@ -51,9 +51,12 @@ const updateCustomerBasketsQuery = (
     return {
         queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
         updater: (oldData: CustomerBasketsResult | undefined) => {
-            // do not update if response basket is not part of existing customer baskets
+            // For createBasket, response basket is not part of existing customer baskets
+            // so we create a new results object
             if (!oldData?.baskets?.some((basket) => basket.basketId === parameters.basketId)) {
-                return undefined
+                return {
+                    baskets: [response]
+                }
             }
             const updatedBaskets = oldData.baskets.map((basket) =>
                 basket.basketId === parameters.basketId ? response : basket
@@ -145,7 +148,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         return {
             // TODO: Convert invalidate to an update that removes the matching basket
             invalidate: [
-                ...(customerId && basketId
+                ...(customerId && !basketId
                     ? [invalidateCustomerBasketsQuery(customerId, parameters)]
                     : [])
             ],
