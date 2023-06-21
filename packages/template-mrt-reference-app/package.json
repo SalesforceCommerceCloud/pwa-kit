@@ -42,7 +42,7 @@
       "node_modules/**/*.*"
     ],
     "ssrShared": [
-      "intentionally-does-not-exist"
+      "static/example.txt"
     ]
   }
 }
