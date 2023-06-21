@@ -354,27 +354,30 @@ describe('OverridePlugin.isFromExtends Windows', () => {
     )
 })
 
-describe.only('OverridePlugin.toOverrideRelative', () => {
+describe('OverridePlugin.toOverrideRelative', () => {
     const plugin = new OverridesResolverPlugin(options)
 
-    test('filepath contains overrides dir', () => {
-        const result = plugin.toOverrideRelative('@salesforce/retail-react-app/path/nesed/icon')
+    test('filepath contains extends package, extends package removed from path', () => {
+        const result = plugin.toOverrideRelative('@salesforce/retail-react-app/path/nested/icon')
         console.log(result)
-        //expect(result).toBe('exists')
+        expect(result).toBe('path/nested/icon')
     })
 
-    test('filepath does not contain overrides dir', () => {
-        const result = plugin.toOverrideRelative('@salesforce/express-minimal/notExists')
-        console.log(result)
-    })
+    // Can omit below since the expectation is that toOverrideRelative is only called if
+    // isFromExtends is true. If isFromExtends is true, the import path will contain an extends package
+    // test('filepath does not contain extends package, filepath is unchanged', () => {
+    //     const result = plugin.toOverrideRelative('@salesforce/express-minimal/notExists')
+    //     console.log(result)
+    //     expect(result).toBe('@salesforce/express-minimal/notExists')
+    // })
 
-    test('filepath is relative', () => {
-        const result = plugin.toOverrideRelative('./exists')
-        console.log(result)
-    })
+    // test('filepath is relative', () => {
+    //     const result = plugin.toOverrideRelative('./exists')
+    //     console.log(result)
+    // })
 
-    test('filepath is absolute', () => {
-        const result = plugin.toOverrideRelative('src/configs/webpack/test/overrides/path/data.js')
-        console.log(result)
-    })
+    // test('filepath is absolute', () => {
+    //     const result = plugin.toOverrideRelative('src/configs/webpack/test/overrides/path/data.js')
+    //     console.log('path/data.js')
+    // })
 })
