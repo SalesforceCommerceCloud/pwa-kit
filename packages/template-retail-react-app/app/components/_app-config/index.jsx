@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {ChakraProvider} from '@chakra-ui/react'
+import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'

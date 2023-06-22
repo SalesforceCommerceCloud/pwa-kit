@@ -17,7 +17,7 @@ import {
     Flex,
     Spacer,
     useStyles
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import LinksList from '@salesforce/retail-react-app/app/components/links-list'
 import {
     VisaIcon,

@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {Box, Checkbox, Stack} from '@chakra-ui/react'
+import {Box, Checkbox, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 
 const CheckboxRefinements = ({filter, toggleFilter, selectedFilters}) => {

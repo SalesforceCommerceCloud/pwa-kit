@@ -15,7 +15,7 @@ import {
     Text,
     Heading,
     Box
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage} from 'react-intl'
 
 const CartItemSkeleton = () => {
