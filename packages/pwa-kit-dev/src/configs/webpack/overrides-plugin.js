@@ -103,7 +103,7 @@ class OverridesResolverPlugin {
 
         TODO: This function is only called if isFromExtends is true. In other words,
         this function is only called if the import request contains a package in extends
-        We can probably simplify this function
+        We can probably simplify this function or rename it
     */
     toOverrideRelative(filepath) {
         const override = this._allSearchDirs.find((dir) => {

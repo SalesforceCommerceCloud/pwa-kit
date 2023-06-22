@@ -315,111 +315,129 @@ describe('overrides plugin', () => {
     })
 })
 
-describe('OverridePlugin.isFromExtends Windows', () => {
-    const windowsOptions = {
-        overridesDir: '\\overrides',
-        extends: ['@salesforce/retail-react-app'],
-        projectDir: `src\\configs\\webpack\\test`
+describe('OverridePlugin.isFromExtends', () => {
+    const separator = path.sep
+
+    let os
+    let opts = options
+    let cases
+
+    if (separator === '\\') {
+        // WINDOWS test cases
+        os = 'windows'
+
+        opts = {
+            overridesDir: '\\overrides',
+            extends: ['@salesforce/retail-react-app'],
+            projectDir: `src\\configs\\webpack\\test`
+        }
+
+        cases = [
+            {
+                name: 'Import from a package in extends',
+                request: '@salesforce/retail-react-app/exists',
+                filepath: '.\\node_modules\\@salesforce\\retail-react-app',
+                result: true
+            },
+            {
+                name: 'Import from a package not in extends',
+                request: '@salesforce/express-minimal/notExists',
+                filepath: '.\\node_modules\\@salesforce\\retail-react-app',
+                result: false
+            },
+            {
+                name: 'Do not trigger override if filepath of issuer contains overrides directory',
+                request: '@salesforce/retail-react-app/exists',
+                filepath: 'src\\configs\\webpack\\test\\overrides\\exists',
+                result: false
+            }
+        ]
+    } else {
+        // POSIX test cases
+        os = 'posix'
+
+        cases = [
+            {
+                name: 'Import from a package in extends',
+                request: '@salesforce/retail-react-app/exists',
+                filepath: './node_modules/@salesforce/retail-react-app',
+                result: true
+            },
+            {
+                name: 'Import from a package not in extends',
+                request: '@salesforce/express-minimal/notExists',
+                filepath: './node_modules/@salesforce/retail-react-app',
+                result: false
+            },
+            {
+                name: 'Do not trigger override if filepath of issuer contains overrides directory',
+                request: '@salesforce/retail-react-app/exists',
+                filepath: 'src/configs/webpack/test/overrides/exists',
+                result: false
+            }
+        ]
     }
 
-    const plugin = new OverridesResolverPlugin(windowsOptions)
+    const plugin = new OverridesResolverPlugin(opts)
 
-    const cases = [
-        {
-            name: 'Import from a package in extends',
-            request: '@salesforce/retail-react-app/exists',
-            filepath: '.\\node_modules\\@salesforce\\retail-react-app',
-            result: true
-        },
-        {
-            name: 'Import from a package not in extends',
-            request: '@salesforce/express-minimal/notExists',
-            filepath: '.\\node_modules\\@salesforce\\retail-react-app',
-            result: false
-        },
-        {
-            name: 'Do not trigger override if filepath of issuer contains overrides directory',
-            request: '@salesforce/retail-react-app/exists',
-            filepath: 'src\\configs\\webpack\\test\\overrides\\exists',
-            result: false
-        }
-    ]
-
-    cases.forEach((c) =>
-        // eslint-disable-next-line jest/valid-title
-        test(c.name, () => {
-            const result = plugin.isFromExtends(c.request, c.filepath)
-            expect(result).toBe(c.result)
-        })
-    )
+    describe('Testing scenarios for: ' + os, () => {
+        cases.forEach((c) =>
+            // eslint-disable-next-line jest/valid-title
+            test(c.name, () => {
+                const result = plugin.isFromExtends(c.request, c.filepath)
+                expect(result).toBe(c.result)
+            })
+        )
+    })
 })
 
 describe('OverridePlugin.toOverrideRelative', () => {
     const plugin = new OverridesResolverPlugin(options)
 
+    // This is the only valid scenario since we only call this if isFromExtends is true
     test('filepath contains extends package, extends package removed from path', () => {
         const result = plugin.toOverrideRelative('@salesforce/retail-react-app/path/nested/icon')
         console.log(result)
         expect(result).toBe('path/nested/icon')
     })
-
-    // Can omit below since the expectation is that toOverrideRelative is only called if
-    // isFromExtends is true. If isFromExtends is true, the import path will contain an extends package
-    // test('filepath does not contain extends package, filepath is unchanged', () => {
-    //     const result = plugin.toOverrideRelative('@salesforce/express-minimal/notExists')
-    //     console.log(result)
-    //     expect(result).toBe('@salesforce/express-minimal/notExists')
-    // })
-
-    // test('filepath is relative', () => {
-    //     const result = plugin.toOverrideRelative('./exists')
-    //     console.log(result)
-    // })
-
-    // test('filepath is absolute', () => {
-    //     const result = plugin.toOverrideRelative('src/configs/webpack/test/overrides/path/data.js')
-    //     console.log('path/data.js')
-    // })
 })
 
-describe.only('OverridePlugin.findFileFromMap', () => {
+describe('OverridePlugin.findFileFromMap', () => {
     const plugin = new OverridesResolverPlugin(options)
 
     test('request path contains nested path', () => {
         const result = plugin.findFileFromMap('path/nested/icon', plugin._allSearchDirs)
-        // console.log(result)
         expect(result).toBe('src/configs/webpack/test/overrides/path/nested/icon.svg')
     })
 
     test('request path does not have file extension or /index finds index', () => {
         const result = plugin.findFileFromMap('path', plugin._allSearchDirs)
-        // console.log(result)
         expect(result).toBe('src/configs/webpack/test/overrides/path/index.jsx')
     })
 
     test('request path contains file extension not index', () => {
         const result = plugin.findFileFromMap('path/data.js', plugin._allSearchDirs)
-        // console.log(result)
         expect(result).toBe('src/configs/webpack/test/overrides/path/data.js')
     })
-
-    // TODO - Fix this in a future task
-    // This reproduces a bug! findFileFromMap treats the .mock as a file extension
-    // and this becomes path/index, which is an invalid key (not only is /index the wrong file,
-    // it will never be a key since we splice on '/index' when making the FS_READ_HASHMAP)
-    // This currently returns undefined rather than the path to the .mock file
-    // test.only('request path contains a '.' ie. index.mock', () => {
-    //     const result = plugin.findFileFromMap('path/index.mock', plugin._allSearchDirs)
-    //     console.log(result)
-    //     expect(result).toBe('src/configs/webpack/test/overrides/path/index.mock.jsx')
-    // })
 
     test('request path does not have file extension or extends dir', () => {
         const result = plugin.findFileFromMap(
             '@salesforce/express-minimal/notExists',
             plugin._allSearchDirs
         )
-        // console.log(result)
-        expect(result).toBe(undefined)
+        expect(result).toBeUndefined()
     })
+
+    // TODO - Fix this in a future task
+    // This reproduces a bug! findFileFromMap treats the .mock as a file extension
+    // and the key becomes path/index, which is invalid (not only is path/index the wrong file,
+    // this is also the wrong key since we splice on '/index' when making the FS_READ_HASHMAP.
+    // the correct key for a path/index.js file is just 'path')
+    // This currently returns undefined rather than the path to the .mock file
+    // eslint-disable-next-line jest/no-commented-out-tests
+    // test('request path contains a '.' ie. index.mock', () => {
+    //     const result = plugin.findFileFromMap('path/index.mock', plugin._allSearchDirs)
+    //     console.log(result)
+    //     expect(result).toBe('src/configs/webpack/test/overrides/path/index.mock.jsx')
+    // })
 })
