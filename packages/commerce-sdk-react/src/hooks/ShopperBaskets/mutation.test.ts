@@ -284,7 +284,7 @@ describe('ShopperBaskets mutations', () => {
     )
     test('`createBasket` adds the basket to the cache on success if customer has no basket', async () => {
         const [mutationName, options] = createTestCase
-        mockQueryEndpoint(basketsEndpoint, emptyBasket) // getBasket
+        mockQueryEndpoint(basketsEndpoint, EMPTY_BASKET) // getBasket
         mockQueryEndpoint(customersEndpoint, emptyCustomerBaskets) // getCustomerBaskets
         mockMutationEndpoints(basketsEndpoint, newBasket) // this mutation
         const {result} = renderHookWithProviders(() => ({
@@ -293,7 +293,7 @@ describe('ShopperBaskets mutations', () => {
             mutation: useShopperBasketsMutation(mutationName)
         }))
         await waitAndExpectSuccess(() => result.current.basket)
-        expect(result.current.basket.data).toEqual(emptyBasket)
+        expect(result.current.basket.data).toEqual(EMPTY_BASKET)
         expect(result.current.customerBaskets.data).toEqual(emptyCustomerBaskets)
         act(() => result.current.mutation.mutate(options))
         await waitAndExpectSuccess(() => result.current.mutation)
