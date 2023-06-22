@@ -424,7 +424,7 @@ describe('OverridePlugin.findFileFromMap', () => {
             {
                 name: 'request path does not have file extension finds index file',
                 requestPath: 'path',
-                expectedResult: 'src\\configs\\webpack\\test\\override\\path\\index.jsx'
+                expectedResult: 'src\\configs\\webpack\\test\\overrides\\path\\index.jsx'
             },
             {
                 name: 'non-index file request path contains file extension',
