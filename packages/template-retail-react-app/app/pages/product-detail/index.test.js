@@ -92,12 +92,9 @@ describe('product set', () => {
     test('render multi-product layout', async () => {
         renderWithProviders(<MockedComponent />)
 
-        await waitFor(
-            () => {
-                expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
-            },
-            {timeout: 5000}
-        )
+        await waitFor(() => {
+            expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+        })
     })
 
     test('add the set to cart successfully', async () => {
@@ -109,12 +106,9 @@ describe('product set', () => {
         const initialBasket = {basketId: 'valid_id'}
         renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
-        await waitFor(
-            () => {
-                expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+        await waitFor(() => {
+            expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
+        })
 
         const buttons = await screen.findAllByText(/add set to cart/i)
         fireEvent.click(buttons[0])
@@ -127,17 +121,14 @@ describe('product set', () => {
             // Seems like rendering the modal takes a bit more time
             {timeout: 10000}
         )
-    }, 30000)
+    })
 
     test('add the set to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
 
-        await waitFor(
-            () => {
-                expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+        await waitFor(() => {
+            expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
+        })
 
         const buttons = await screen.findAllByText(/add set to cart/i)
         fireEvent.click(buttons[0])
@@ -179,12 +170,9 @@ describe('product bundles', () => {
     test('renders multi-product layout', async () => {
         renderWithProviders(<MockedComponent />)
 
-        await waitFor(
-            () => {
-                expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
-            },
-            {timeout: 5000}
-        )
+        await waitFor(() => {
+            expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+        })
     })
 
     test('add the bundle to cart successfully', async () => {
@@ -196,12 +184,9 @@ describe('product bundles', () => {
         const initialBasket = {basketId: 'valid_id'}
         renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
-        await waitFor(
-            () => {
-                expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+        await waitFor(() => {
+            expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
+        })
 
         const buttons = await screen.findAllByText(/add bundle to cart/i)
         fireEvent.click(buttons[0])
@@ -214,17 +199,14 @@ describe('product bundles', () => {
             // Seems like rendering the modal takes a bit more time
             {timeout: 10000}
         )
-    }, 30000)
+    })
 
     test('add the bundle to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
 
-        await waitFor(
-            () => {
-                expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+        await waitFor(() => {
+            expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
+        })
 
         const buttons = await screen.findAllByText(/add bundle to cart/i)
         fireEvent.click(buttons[0])

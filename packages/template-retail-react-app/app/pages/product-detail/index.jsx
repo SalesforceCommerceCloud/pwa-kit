@@ -85,6 +85,7 @@ const ProductDetail = () => {
     )
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
+    const comboProduct = isProductASet || isProductABundle ? normalizeSetBundleProduct(product) : {}
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
@@ -134,7 +135,7 @@ const ProductDetail = () => {
                     customerId
                 },
                 body: {
-                    // NOTE: APi does not respect quantity, it always adds 1
+                    // NOTE: API does not respect quantity, it always adds 1
                     quantity,
                     productId: variant?.productId || product?.id,
                     public: false,
@@ -198,7 +199,7 @@ const ProductDetail = () => {
         }
     }
 
-    /**************** Product Set Handlers ****************/
+    /**************** Product Set/Bundles Handlers ****************/
     const handleChildProductValidation = useCallback(() => {
         // Run validation for all child products. This will ensure the error
         // messages are shown.
@@ -209,7 +210,6 @@ const ProductDetail = () => {
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected.
         const selectedProductIds = Object.keys(childProductSelection)
-        const comboProduct = normalizeSetBundleProduct(product)
         const firstUnselectedProduct = comboProduct.childProducts.find(
             ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
         )?.product
@@ -231,6 +231,7 @@ const ProductDetail = () => {
         return true
     }, [product, childProductSelection])
 
+    /**************** Product Set Handlers ****************/
     const handleProductSetAddToCart = () => {
         // Get all the selected products, and pass them to the addToCart handler which
         // accepts an array.
@@ -239,7 +240,6 @@ const ProductDetail = () => {
     }
 
     /**************** Product Bundle Handlers ****************/
-
     // Top level bundle does not have variants
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
@@ -285,8 +285,6 @@ const ProductDetail = () => {
             einstein.sendViewProduct(product)
         }
     }, [product])
-
-    const comboProduct = normalizeSetBundleProduct(product)
 
     return (
         <Box
