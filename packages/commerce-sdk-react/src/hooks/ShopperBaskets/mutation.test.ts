@@ -46,7 +46,7 @@ const createOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
 const basketsEndpoint = '/checkout/shopper-baskets/'
 const BASKET_ID = 'basket_id'
 const getBasketOptions = createOptions<'getBasket'>(undefined, {})
-const emptyBasket: Basket = {}
+const EMPTY_BASKET: Basket = {}
 const oldBasket: Basket = {basketId: BASKET_ID, mockData: 'old basket'}
 const newBasket: Basket = {basketId: BASKET_ID, mockData: 'new basket'}
 // --- getCustomerBaskets constants --- //
