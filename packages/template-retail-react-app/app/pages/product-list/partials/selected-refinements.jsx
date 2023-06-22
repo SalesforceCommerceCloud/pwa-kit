@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {Box, Button, Wrap, WrapItem} from '@chakra-ui/react'
+import {Box, Button, Wrap, WrapItem} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
 

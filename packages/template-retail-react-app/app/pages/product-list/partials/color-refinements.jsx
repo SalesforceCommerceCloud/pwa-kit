@@ -6,7 +6,15 @@
  */
 
 import React from 'react'
-import {Box, SimpleGrid, HStack, Text, Button, Center, useMultiStyleConfig} from '@chakra-ui/react'
+import {
+    Box,
+    SimpleGrid,
+    HStack,
+    Text,
+    Button,
+    Center,
+    useMultiStyleConfig
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 import {cssColorGroups} from '@salesforce/retail-react-app/app/constants'
 

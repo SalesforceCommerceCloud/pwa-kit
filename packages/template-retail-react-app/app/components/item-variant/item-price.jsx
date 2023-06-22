@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
-import {Stack, Text} from '@chakra-ui/react'
+import {Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useItemVariant} from '.'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'

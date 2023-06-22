@@ -43,7 +43,7 @@ import {
     DrawerOverlay,
     DrawerContent,
     DrawerCloseButton
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
 import Pagination from '@salesforce/retail-react-app/app/components/pagination'
