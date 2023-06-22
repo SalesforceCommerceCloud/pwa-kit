@@ -95,7 +95,8 @@ const ProductItem = ({
                                     </Box>
                                 </HideOnDesktop>
 
-                                {isProductABundle &&
+                                {/* isProductABundle &&
+                                    bundledProducts &&
                                     product.bundledProductItems.map((item, i) => {
                                         // TODO: merge `item` and `bundledProducts.data[i]` ?
                                         const child = bundledProducts.data[i]
@@ -119,7 +120,6 @@ const ProductItem = ({
 
                                         return (
                                             <ItemVariantProvider variant={child} key={i}>
-                                                {/* TODO: make a new component? */}
                                                 <CartItemVariantName />
                                                 <CartItemVariantAttributes />
 
@@ -132,7 +132,7 @@ const ProductItem = ({
                                                 </Text>
                                             </ItemVariantProvider>
                                         )
-                                    })}
+                                    }) */}
                             </Stack>
 
                             <Flex align="flex-end" justify="space-between">
