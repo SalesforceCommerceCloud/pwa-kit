@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useCustomerBaskets} from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCustomerId, useCustomerBaskets} from '@salesforce/commerce-sdk-react'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
@@ -14,8 +13,7 @@ import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
  * @param shouldFetchProductDetail - boolean to indicate if the baskets should fetch product details based on basket items
  */
 export const useCurrentBasket = ({id = ''} = {}) => {
-    const {data: customer} = useCurrentCustomer()
-    const {customerId} = customer
+    const customerId = useCustomerId()
     const {data: basketsData, ...restOfQuery} = useCustomerBaskets(
         {parameters: {customerId}},
         {
@@ -23,9 +21,8 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         }
     )
 
-    // if id is not defined, by default use the first basket in the list
     const currentBasket =
-        basketsData?.baskets?.find((basket) => basket.basketId === id) || basketsData?.baskets?.[0]
+        basketsData?.baskets?.find((basket) => basket?.basketId === id) || basketsData?.baskets?.[0]
 
     return {
         ...restOfQuery,

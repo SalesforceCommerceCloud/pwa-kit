@@ -103,6 +103,7 @@ const ProductView = forwardRef(
             updateWishlist,
             isProductLoading,
             isProductPartOfSet = false,
+            isBasketLoading = false,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
@@ -230,7 +231,8 @@ const ProductView = forwardRef(
                     <Button
                         key="cart-button"
                         onClick={handleCartItem}
-                        disabled={showInventoryMessage}
+                        disabled={isBasketLoading || showInventoryMessage}
+                        isLoading={isBasketLoading}
                         width="100%"
                         variant="solid"
                         marginBottom={4}
@@ -534,6 +536,7 @@ ProductView.propTypes = {
     isProductPartOfSet: PropTypes.bool,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
+    isBasketLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,
     addToCart: PropTypes.func,
     addToWishlist: PropTypes.func,
