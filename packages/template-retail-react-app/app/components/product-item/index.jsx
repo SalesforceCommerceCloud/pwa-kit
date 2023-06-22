@@ -44,12 +44,22 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false
 }) => {
+    /*
+    TODOs:
+        - pull out strings for localization
+        - get quantity to be passed onto the asArrays
+        - remove console.logs
+        - revert default.js
+
+    */
+
+
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
     console.log('@@@ PRODUCT', product)
     const isProductABundle = product?.type?.bundle
-    let data = ''
-    // if(isProductABundle) {
+    // if(isProductABundle) { TODO: figure out if we can make this conditional
+    // TODO: potentially pull out data transform logic into its own helper function
     const productIds = product?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: productVariantData} = useProducts(
         {
@@ -70,8 +80,10 @@ const ProductItem = ({
             }
         }
     )
-    if (productVariantData && Object.keys(productVariantData)?.length) {
-        const asArray = Object.keys(productVariantData)?.map((key) => {
+    let productBundleAsArray = undefined
+    if (isProductABundle && productVariantData && Object.keys(productVariantData)?.length) {
+        // TODO: potentially change conditional
+        productBundleAsArray = Object.keys(productVariantData)?.map((key) => {
             const item = productVariantData[key]
             const flatValues = item?.variationAttributes?.flatMap((item) => {
                 return item.values.map((vals) => {
@@ -83,7 +95,7 @@ const ProductItem = ({
             })
             return {
                 ...item,
-                variationValues: {
+                variationValues: [
                     ...Object.keys(item?.variationValues).map((variation) => {
                         const found = flatValues.find(
                             (obj) => obj?.value === item?.variationValues?.[variation]
@@ -91,13 +103,15 @@ const ProductItem = ({
                         return {
                             value: item?.variationValues?.[variation],
                             label: found?.label,
-                            name: found?.name
+                            name: found?.name,
                         }
                     })
-                }
+                ]
             }
         })
     }
+
+    console.log('!!! asArray', productBundleAsArray)
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>
@@ -108,7 +122,31 @@ const ProductItem = ({
                         <Stack spacing={3} flex={1}>
                             <Stack spacing={1}>
                                 <CartItemVariantName />
-                                {/* <h1>HELLO WORLD</h1> */}
+                                {productBundleAsArray && (
+                                    <Box>
+                                        <Text fontSize={15} marginTop={4} fontWeight={500}>
+                                            Selected Options:
+                                        </Text>
+                                        {productBundleAsArray?.map(({variationValues, name: productName}) => {
+                                            return (
+                                                <Box marginTop={2}>
+                                                    <Text fontSize="sm" color="gray.700" as="b">{productName}</Text>
+                                                    <Text fontSize="sm" color="gray.700">Qty: 1</Text>
+                                                    {variationValues?.map(({label, name}) => {
+                                                        return (
+                                                            <>
+                                                                <Text
+                                                                    fontSize="sm"
+                                                                    color="gray.700"
+                                                                >{`${label} : ${name}`}</Text>
+                                                            </>
+                                                        )
+                                                    })}
+                                                </Box>
+                                            )
+                                        })}
+                                    </Box>
+                                )}
                                 <CartItemVariantAttributes className="TESTING" />
                                 <HideOnDesktop>
                                     <Box marginTop={2}>
