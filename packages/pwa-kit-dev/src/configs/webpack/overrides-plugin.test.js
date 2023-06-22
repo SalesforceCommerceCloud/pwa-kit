@@ -231,6 +231,10 @@ describe('overrides plugin', () => {
 
         const {resolver, callback} = setupResolverAndCallback()
 
+        // NOTE: These options are not valid in package.json as it doesn't accept Windows paths
+        // in the outer calling context in configs/webpack/config.js.
+        // We have this here as the OverridesResolverPlugin technically allows for this
+        // and it lets us test that paths are being normalized
         const windowsOptions = {
             overridesDir: '\\overrides',
             extends: ['@salesforce/retail-react-app'],
@@ -317,18 +321,11 @@ describe('overrides plugin', () => {
 
 describe('OverridePlugin.isFromExtends', () => {
     let os
-    let opts = options
     let cases
 
     if (path.sep === '\\') {
         // WINDOWS test cases
         os = 'windows'
-
-        opts = {
-            overridesDir: '\\overrides',
-            extends: ['@salesforce/retail-react-app'],
-            projectDir: `src\\configs\\webpack\\test`
-        }
 
         cases = [
             {
@@ -353,7 +350,6 @@ describe('OverridePlugin.isFromExtends', () => {
     } else {
         // POSIX test cases
         os = 'posix'
-
         cases = [
             {
                 name: 'Import from a package in extends',
@@ -376,14 +372,14 @@ describe('OverridePlugin.isFromExtends', () => {
         ]
     }
 
-    const plugin = new OverridesResolverPlugin(opts)
+    const plugin = new OverridesResolverPlugin(options)
 
     describe('Testing scenarios for: ' + os, () => {
-        cases.forEach((c) =>
+        cases.forEach((testCase) =>
             // eslint-disable-next-line jest/valid-title
-            test(c.name, () => {
-                const result = plugin.isFromExtends(c.request, c.filepath)
-                expect(result).toBe(c.result)
+            test(testCase.name, () => {
+                const result = plugin.isFromExtends(testCase.request, testCase.filepath)
+                expect(result).toBe(testCase.result)
             })
         )
     })
@@ -408,13 +404,6 @@ describe('OverridePlugin.findFileFromMap', () => {
     if (path.sep === '\\') {
         // WINDOWS test cases
         os = 'windows'
-
-        opts = {
-            overridesDir: '\\overrides',
-            extends: ['@salesforce/retail-react-app'],
-            projectDir: `src\\configs\\webpack\\test`
-        }
-
         cases = [
             {
                 name: 'request path contains nested path',
@@ -454,14 +443,14 @@ describe('OverridePlugin.findFileFromMap', () => {
         ]
     }
 
-    const plugin = new OverridesResolverPlugin(opts)
+    const plugin = new OverridesResolverPlugin(options)
 
     describe('Testing scenarios for: ' + os, () => {
-        cases.forEach((c) =>
+        cases.forEach((testCase) =>
             // eslint-disable-next-line jest/valid-title
-            test(c.name, () => {
-                const result = plugin.findFileFromMap(c.requestPath, plugin._allSearchDirs)
-                expect(result).toBe(c.expectedResult)
+            test(testCase.name, () => {
+                const result = plugin.findFileFromMap(testCase.requestPath, plugin._allSearchDirs)
+                expect(result).toBe(testCase.expectedResult)
             })
         )
     })
