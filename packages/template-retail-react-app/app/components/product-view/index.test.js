@@ -244,6 +244,6 @@ describe('add to cart button loading tests', () => {
                 isBasketLoading={false}
             />
         )
-        expect(screen.getByRole('button', {name: /add to cart/i})).not.toBeDisabled()
+        expect(screen.getByRole('button', {name: /add to cart/i})).toBeEnabled()
     })
 })

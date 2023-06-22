@@ -51,9 +51,7 @@ const updateCustomerBasketsQuery = (
     return {
         queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
         updater: (oldData: CustomerBasketsResult | undefined) => {
-            // For createBasket, response basket is not part of existing customer baskets
-            // so we create a new result with 1 basket
-            if (!oldData?.baskets?.some((basket) => basket.basketId === parameters.basketId)) {
+            if (!oldData?.baskets?.length) {
                 return {
                     baskets: [response],
                     total: 1
