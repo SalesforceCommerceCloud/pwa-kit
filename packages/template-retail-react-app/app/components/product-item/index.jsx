@@ -47,7 +47,8 @@ const ProductItem = ({
     /*
     TODOs:
         - pull out strings for localization
-        - get quantity to be passed onto the asArrays
+            - selected options
+            - qty
         - remove console.logs
         - revert default.js
 
@@ -56,62 +57,52 @@ const ProductItem = ({
 
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
-    console.log('@@@ PRODUCT', product)
-    const isProductABundle = product?.type?.bundle
-    // if(isProductABundle) { TODO: figure out if we can make this conditional
-    // TODO: potentially pull out data transform logic into its own helper function
-    const productIds = product?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: productVariantData} = useProducts(
+
+    const productBundleIds = product?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
+    const {data: productBundleData} = useProducts(
         {
             parameters: {
-                ids: productIds,
+                ids: productBundleIds,
                 allImages: true
             }
         },
         {
-            enabled: Boolean(productIds),
+            enabled: Boolean(productBundleIds),
             select: (result) => {
-                // Convert array into key/value object with key is the product id
-                return result?.data?.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
+                return result?.data?.map((item) => {
+                    const flatValues = item?.variationAttributes?.flatMap((item) => {
+                        return item.values.map((vals) => {
+                            return {
+                                ...vals,
+                                label: item.name
+                            }
+                        })
+                    })
+                    const quantity = product?.bundledProductItems.find((childProduct) =>
+                        childProduct.productId === item.id
+                    )?.quantity;
+                    return {
+                        ...item,
+                        quantity,
+                        variationValues: [
+                            ...Object.keys(item?.variationValues).map((variation) => {
+                                const found = flatValues.find(
+                                    (obj) => obj?.value === item?.variationValues?.[variation]
+                                )
+                                return {
+                                    value: item?.variationValues?.[variation],
+                                    label: found?.label,
+                                    name: found?.name,
+                                }
+                            })
+                        ]
+                    }
+                })
             }
         }
     )
-    let productBundleAsArray = undefined
-    if (isProductABundle && productVariantData && Object.keys(productVariantData)?.length) {
-        // TODO: potentially change conditional
-        productBundleAsArray = Object.keys(productVariantData)?.map((key) => {
-            const item = productVariantData[key]
-            const flatValues = item?.variationAttributes?.flatMap((item) => {
-                return item.values.map((vals) => {
-                    return {
-                        ...vals,
-                        label: item.name
-                    }
-                })
-            })
-            return {
-                ...item,
-                variationValues: [
-                    ...Object.keys(item?.variationValues).map((variation) => {
-                        const found = flatValues.find(
-                            (obj) => obj?.value === item?.variationValues?.[variation]
-                        )
-                        return {
-                            value: item?.variationValues?.[variation],
-                            label: found?.label,
-                            name: found?.name,
-                        }
-                    })
-                ]
-            }
-        })
-    }
+    console.log('productBundleData', productBundleData)
 
-    console.log('!!! asArray', productBundleAsArray)
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>
@@ -122,16 +113,16 @@ const ProductItem = ({
                         <Stack spacing={3} flex={1}>
                             <Stack spacing={1}>
                                 <CartItemVariantName />
-                                {productBundleAsArray && (
+                                {productBundleData && (
                                     <Box>
                                         <Text fontSize={15} marginTop={4} fontWeight={500}>
                                             Selected Options:
                                         </Text>
-                                        {productBundleAsArray?.map(({variationValues, name: productName}) => {
+                                        {productBundleData?.map(({variationValues, name: productName, quantity}) => {
                                             return (
                                                 <Box marginTop={2}>
                                                     <Text fontSize="sm" color="gray.700" as="b">{productName}</Text>
-                                                    <Text fontSize="sm" color="gray.700">Qty: 1</Text>
+                                                    <Text fontSize="sm" color="gray.700">Qty: {quantity}</Text>
                                                     {variationValues?.map(({label, name}) => {
                                                         return (
                                                             <>
