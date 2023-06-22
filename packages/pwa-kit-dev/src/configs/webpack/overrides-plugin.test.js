@@ -316,13 +316,11 @@ describe('overrides plugin', () => {
 })
 
 describe('OverridePlugin.isFromExtends', () => {
-    const separator = path.sep
-
     let os
     let opts = options
     let cases
 
-    if (separator === '\\') {
+    if (path.sep === '\\') {
         // WINDOWS test cases
         os = 'windows'
 
@@ -403,23 +401,72 @@ describe('OverridePlugin.toOverrideRelative', () => {
 })
 
 describe('OverridePlugin.findFileFromMap', () => {
-    const plugin = new OverridesResolverPlugin(options)
+    let os
+    let opts = options
+    let cases
 
-    test('request path contains nested path', () => {
-        const result = plugin.findFileFromMap('path/nested/icon', plugin._allSearchDirs)
-        expect(result).toBe('src/configs/webpack/test/overrides/path/nested/icon.svg')
+    if (path.sep === '\\') {
+        // WINDOWS test cases
+        os = 'windows'
+
+        opts = {
+            overridesDir: '\\overrides',
+            extends: ['@salesforce/retail-react-app'],
+            projectDir: `src\\configs\\webpack\\test`
+        }
+
+        cases = [
+            {
+                name: 'request path contains nested path',
+                requestPath: 'path/nested/icon',
+                expectedResult: 'src\\configs\\webpack\\test\\overrides\\path\\nested\\icon.svg'
+            },
+            {
+                name: 'request path does not have file extension finds index file',
+                requestPath: 'path',
+                expectedResult: 'src\\configs\\webpack\\test\\override\\path\\index.jsx'
+            },
+            {
+                name: 'non-index file request path contains file extension',
+                requestPath: 'path/data.js',
+                expectedResult: 'src\\configs\\webpack\\test\\overrides\\path\\data.js'
+            }
+        ]
+    } else {
+        // POSIX test cases
+        os = 'posix'
+        cases = [
+            {
+                name: 'request path contains nested path',
+                requestPath: 'path/nested/icon',
+                expectedResult: 'src/configs/webpack/test/overrides/path/nested/icon.svg'
+            },
+            {
+                name: 'request path does not have file extension finds index file',
+                requestPath: 'path',
+                expectedResult: 'src/configs/webpack/test/overrides/path/index.jsx'
+            },
+            {
+                name: 'non-index file request path contains file extension',
+                requestPath: 'path/data.js',
+                expectedResult: 'src/configs/webpack/test/overrides/path/data.js'
+            }
+        ]
+    }
+
+    const plugin = new OverridesResolverPlugin(opts)
+
+    describe('Testing scenarios for: ' + os, () => {
+        cases.forEach((c) =>
+            // eslint-disable-next-line jest/valid-title
+            test(c.name, () => {
+                const result = plugin.findFileFromMap(c.requestPath, plugin._allSearchDirs)
+                expect(result).toBe(c.expectedResult)
+            })
+        )
     })
 
-    test('request path does not have file extension or /index finds index', () => {
-        const result = plugin.findFileFromMap('path', plugin._allSearchDirs)
-        expect(result).toBe('src/configs/webpack/test/overrides/path/index.jsx')
-    })
-
-    test('request path contains file extension not index', () => {
-        const result = plugin.findFileFromMap('path/data.js', plugin._allSearchDirs)
-        expect(result).toBe('src/configs/webpack/test/overrides/path/data.js')
-    })
-
+    // The following test's result is the same regardless of OS
     test('request path does not have file extension or extends dir', () => {
         const result = plugin.findFileFromMap(
             '@salesforce/express-minimal/notExists',
