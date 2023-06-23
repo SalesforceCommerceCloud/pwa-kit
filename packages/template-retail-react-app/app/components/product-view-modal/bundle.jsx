@@ -44,13 +44,10 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
             */
         }
     )
-    console.log('--- BundleProductViewModal - childProducts', childProducts)
 
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedChildProducts, setSelectedChildProducts] = useState([])
     console.log('--- selectedChildProducts', selectedChildProducts)
-
-    console.log('--- bundle modal: updateCart', updateCart)
 
     // TODO: mimic ProductDetail in how they `validateOrderability`
     return (

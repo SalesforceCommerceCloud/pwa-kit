@@ -403,10 +403,6 @@ const Cart = () => {
                                                         onAddToWishlistClick={handleAddToWishlist}
                                                         onEditClick={(product) => {
                                                             setSelectedItem(product)
-                                                            console.log(
-                                                                '--- editing this basket item',
-                                                                product
-                                                            )
                                                             onOpen()
                                                         }}
                                                         onRemoveItemClick={handleRemoveItem}
