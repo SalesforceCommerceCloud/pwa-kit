@@ -109,7 +109,8 @@ const ProductView = forwardRef(
             setChildProductOrderability,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
-                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
+                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
+            showImageGallery = true
         },
         ref
     ) => {
@@ -319,6 +320,7 @@ const ProductView = forwardRef(
 
         useEffect(() => {
             if (variant) {
+                console.log('--- onVariantSelected', product, variant, quantity)
                 onVariantSelected(product, variant, quantity)
             }
         }, [variant?.productId, quantity])
@@ -347,32 +349,34 @@ const ProductView = forwardRef(
                     />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
-                    <Box flex={1} mr={[0, 0, 0, 6, 6]}>
-                        {product ? (
-                            <>
-                                <ImageGallery
-                                    size={imageSize}
-                                    imageGroups={product.imageGroups}
-                                    selectedVariationAttributes={variationParams}
-                                    lazy={isProductPartOfSet || isProductPartOfBundle}
-                                />
-                                <HideOnMobile>
-                                    {showFullLink && product && (
-                                        <Link to={`/product/${product.master?.masterId}`}>
-                                            <Text color="blue.600">
-                                                {intl.formatMessage({
-                                                    defaultMessage: 'See full details',
-                                                    id: 'product_view.link.full_details'
-                                                })}
-                                            </Text>
-                                        </Link>
-                                    )}
-                                </HideOnMobile>
-                            </>
-                        ) : (
-                            <ImageGallerySkeleton />
-                        )}
-                    </Box>
+                    {showImageGallery && (
+                        <Box flex={1} mr={[0, 0, 0, 6, 6]}>
+                            {product ? (
+                                <>
+                                    <ImageGallery
+                                        size={imageSize}
+                                        imageGroups={product.imageGroups}
+                                        selectedVariationAttributes={variationParams}
+                                        lazy={isProductPartOfSet || isProductPartOfBundle}
+                                    />
+                                    <HideOnMobile>
+                                        {showFullLink && product && (
+                                            <Link to={`/product/${product.master?.masterId}`}>
+                                                <Text color="blue.600">
+                                                    {intl.formatMessage({
+                                                        defaultMessage: 'See full details',
+                                                        id: 'product_view.link.full_details'
+                                                    })}
+                                                </Text>
+                                            </Link>
+                                        )}
+                                    </HideOnMobile>
+                                </>
+                            ) : (
+                                <ImageGallerySkeleton />
+                            )}
+                        </Box>
+                    )}
 
                     {/* Variations & Quantity Selector & CTA buttons */}
                     <VStack align="stretch" spacing={8} flex={1}>
@@ -602,7 +606,8 @@ ProductView.propTypes = {
     childProductOrderability: PropTypes.object,
     setChildProductOrderability: PropTypes.func,
     onVariantSelected: PropTypes.func,
-    validateOrderability: PropTypes.func
+    validateOrderability: PropTypes.func,
+    showImageGallery: PropTypes.bool
 }
 
 export default ProductView

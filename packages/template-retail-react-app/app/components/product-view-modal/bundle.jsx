@@ -81,6 +81,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                             return (
                                 <ProductView
                                     key={i}
+                                    showImageGallery={false}
                                     isProductPartOfBundle={true}
                                     showFullLink={true}
                                     imageSize="sm"
