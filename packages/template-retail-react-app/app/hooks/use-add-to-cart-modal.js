@@ -66,7 +66,7 @@ export const AddToCartModal = () => {
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const {currency, productItems, productSubTotal} = basket
-    let numberOfItemsAdded = isProductABundle
+    const numberOfItemsAdded = isProductABundle
         ? selectedQuantity
         : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
