@@ -27,7 +27,6 @@ const WishlistPrimaryAction = () => {
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
     const isProductABundle = variant?.type?.bundle
-    console.log('VARIANT', variant) // TODO: remove
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()

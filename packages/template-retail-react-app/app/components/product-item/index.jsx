@@ -44,64 +44,8 @@ const ProductItem = ({
     onItemQuantityChange = noop,
     showLoading = false
 }) => {
-    /*
-    TODOs:
-        - pull out strings for localization
-            - selected options
-            - qty
-        - remove console.logs
-        - revert default.js
-
-    */
-
-
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
-
-    const productBundleIds = product?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: productBundleData} = useProducts(
-        {
-            parameters: {
-                ids: productBundleIds,
-                allImages: true
-            }
-        },
-        {
-            enabled: Boolean(productBundleIds),
-            select: (result) => {
-                return result?.data?.map((item) => {
-                    const flatValues = item?.variationAttributes?.flatMap((item) => {
-                        return item.values.map((vals) => {
-                            return {
-                                ...vals,
-                                label: item.name
-                            }
-                        })
-                    })
-                    const quantity = product?.bundledProductItems.find((childProduct) =>
-                        childProduct.productId === item.id
-                    )?.quantity;
-                    return {
-                        ...item,
-                        quantity,
-                        variationValues: [
-                            ...Object.keys(item?.variationValues).map((variation) => {
-                                const found = flatValues.find(
-                                    (obj) => obj?.value === item?.variationValues?.[variation]
-                                )
-                                return {
-                                    value: item?.variationValues?.[variation],
-                                    label: found?.label,
-                                    name: found?.name,
-                                }
-                            })
-                        ]
-                    }
-                })
-            }
-        }
-    )
-    console.log('productBundleData', productBundleData)
 
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
@@ -113,32 +57,7 @@ const ProductItem = ({
                         <Stack spacing={3} flex={1}>
                             <Stack spacing={1}>
                                 <CartItemVariantName />
-                                {productBundleData && (
-                                    <Box>
-                                        <Text fontSize={15} marginTop={4} fontWeight={500}>
-                                            Selected Options:
-                                        </Text>
-                                        {productBundleData?.map(({variationValues, name: productName, quantity}) => {
-                                            return (
-                                                <Box marginTop={2}>
-                                                    <Text fontSize="sm" color="gray.700" as="b">{productName}</Text>
-                                                    <Text fontSize="sm" color="gray.700">Qty: {quantity}</Text>
-                                                    {variationValues?.map(({label, name}) => {
-                                                        return (
-                                                            <>
-                                                                <Text
-                                                                    fontSize="sm"
-                                                                    color="gray.700"
-                                                                >{`${label} : ${name}`}</Text>
-                                                            </>
-                                                        )
-                                                    })}
-                                                </Box>
-                                            )
-                                        })}
-                                    </Box>
-                                )}
-                                <CartItemVariantAttributes className="TESTING" />
+                                <CartItemVariantAttributes />
                                 <HideOnDesktop>
                                     <Box marginTop={2}>
                                         <CartItemVariantPrice align="left" />
