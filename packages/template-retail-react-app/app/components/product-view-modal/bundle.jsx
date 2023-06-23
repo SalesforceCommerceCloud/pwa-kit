@@ -47,19 +47,12 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     console.log('--- BundleProductViewModal - childProducts', childProducts)
 
     const [childProductOrderability, setChildProductOrderability] = useState({})
+    const [selectedChildProducts, setSelectedChildProducts] = useState([])
+    console.log('--- selectedChildProducts', selectedChildProducts)
 
     console.log('--- bundle modal: updateCart', updateCart)
 
     // TODO: mimic ProductDetail in how they `validateOrderability`
-
-    // TODO: do what PDP does
-    const selectedChildProducts = [
-        {productId: '701644044244M'},
-        {productId: '701643473915M'},
-        {productId: '701643458479M'},
-        {productId: '701644093921M'}
-    ]
-
     return (
         <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -87,6 +80,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                 ...productViewModalData.product.bundledProductItems[i]
                             }
 
+                            // TODO: pass in the correct quantity
                             return (
                                 <ProductView
                                     key={i}
@@ -98,6 +92,13 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                     childProductOrderability={childProductOrderability}
                                     setChildProductOrderability={setChildProductOrderability}
                                     childOfBundleQuantity={100}
+                                    onVariantSelected={(product, variant, quantity) => {
+                                        setSelectedChildProducts((prev) => {
+                                            const newArray = prev.slice(0)
+                                            newArray[i] = {product, variant, quantity}
+                                            return newArray
+                                        })
+                                    }}
                                 />
                             )
                         })}

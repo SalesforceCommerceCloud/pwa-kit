@@ -246,11 +246,14 @@ const Cart = () => {
                 productId: product.productId,
                 quantity,
                 price: product.price,
-                bundledProductItems: product.bundledProductItems.map(({quantity, itemId}, i) => ({
-                    quantity, // TODO: calculate
-                    itemId,
-                    productId: childProducts[i].productId
-                }))
+                bundledProductItems: product.bundledProductItems.map(
+                    ({quantity, itemId, productId}, i) => ({
+                        quantity: 1, // TODO: calculate the right quantity
+                        itemId,
+                        // productId
+                        productId: childProducts[i].variant.productId
+                    })
+                )
             }
             // debugger
             return await updateItemInBasketMutation.mutateAsync({
