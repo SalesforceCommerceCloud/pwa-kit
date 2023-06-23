@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay} from '@chakra-ui/react'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -45,11 +45,10 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
         }
     )
 
+    const childProductRefs = useRef({})
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedChildProducts, setSelectedChildProducts] = useState([])
-    console.log('--- selectedChildProducts', selectedChildProducts)
 
-    // TODO: mimic ProductDetail in how they `validateOrderability`
     return (
         <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -65,7 +64,11 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                         updateCart={(product, quantity) =>
                             updateCart(product, quantity, selectedChildProducts)
                         }
-                        validateOrderability={() => true}
+                        validateOrderability={() => {
+                            return Object.values(childProductRefs.current).every(
+                                ({validateOrderability}) => validateOrderability()
+                            )
+                        }}
                         {...props}
                     />
 
@@ -80,6 +83,14 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                             return (
                                 <ProductView
                                     key={i}
+                                    // Do not use an arrow function as we are manipulating the functions scope.
+                                    ref={function (ref) {
+                                        // Assign the "set" scope of the ref, this is how we access the internal validation.
+                                        childProductRefs.current[product.id] = {
+                                            ref,
+                                            validateOrderability: this.validateOrderability
+                                        }
+                                    }}
                                     showImageGallery={false}
                                     isProductPartOfBundle={true}
                                     showFullLink={true}
