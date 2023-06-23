@@ -210,11 +210,7 @@ const ProductView = forwardRef(
 
                 if (!addToCart && !updateCart) return null
                 if (updateCart) {
-                    if (isProductABundle) {
-                        await updateCart(product, quantity)
-                    } else {
-                        await updateCart(variant, quantity)
-                    }
+                    await updateCart(variant || product, quantity)
                     return
                 }
                 try {
