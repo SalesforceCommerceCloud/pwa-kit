@@ -74,6 +74,7 @@ export const useProductViewModal = (initialProduct) => {
         }
     }, [])
 
+    // TODO: delete this duplicate page-url update
     useEffect(() => {
         if (variant) {
             const {variationValues} = variant
@@ -82,7 +83,6 @@ export const useProductViewModal = (initialProduct) => {
                 ...variationValues,
                 pid: variant.productId
             })
-            // TODO: delete this duplicate page-url update
             // history.replace(updatedUrl)
         }
     }, [variant])

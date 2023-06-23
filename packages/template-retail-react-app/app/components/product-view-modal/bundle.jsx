@@ -70,14 +70,13 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                     />
 
                     {childProducts &&
-                        childProducts.data.map((product, i) => {
-                            // TODO: is this necessary?
-                            const combinedData = {
-                                ...product,
+                        childProducts.data.map((_product, i) => {
+                            const product = {
+                                ..._product,
                                 ...productViewModalData.product.bundledProductItems[i]
                             }
+                            const quantityPerBundle = product.quantity / bundle.quantity
 
-                            // TODO: pass in the correct quantity
                             return (
                                 <ProductView
                                     key={i}
@@ -85,11 +84,11 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                     isProductPartOfBundle={true}
                                     showFullLink={true}
                                     imageSize="sm"
-                                    product={combinedData}
+                                    product={product}
                                     isLoading={isLoading}
                                     childProductOrderability={childProductOrderability}
                                     setChildProductOrderability={setChildProductOrderability}
-                                    childOfBundleQuantity={100}
+                                    childOfBundleQuantity={quantityPerBundle}
                                     onVariantSelected={(product, variant, quantity) => {
                                         setSelectedChildProducts((prev) => {
                                             const newArray = prev.slice(0)
@@ -113,7 +112,8 @@ BundleProductViewModal.propTypes = {
     product: PropTypes.object,
     isLoading: PropTypes.bool,
     actionButtons: PropTypes.node,
-    onModalClose: PropTypes.func
+    onModalClose: PropTypes.func,
+    updateCart: PropTypes.func
 }
 
 export default BundleProductViewModal

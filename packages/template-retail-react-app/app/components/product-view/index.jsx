@@ -320,7 +320,6 @@ const ProductView = forwardRef(
 
         useEffect(() => {
             if (variant) {
-                console.log('--- onVariantSelected', product, variant, quantity)
                 onVariantSelected(product, variant, quantity)
             }
         }, [variant?.productId, quantity])
