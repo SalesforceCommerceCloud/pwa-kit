@@ -71,7 +71,7 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 
 const onClient = typeof window !== 'undefined'
 
-/* 
+/*
 The categories tree can be really large! For performance reasons,
 we only load the level 0 categories on server side, and load the rest
 on client side to reduce SSR page size.
@@ -104,7 +104,7 @@ const useLazyLoadCategories = () => {
 }
 
 const App = (props) => {
-    const {children} = props
+    const {children, envVar} = props
     const {data: categoriesTree} = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')
 
@@ -290,6 +290,7 @@ const App = (props) => {
                         <Box {...styles.headerWrapper}>
                             {!isCheckout ? (
                                 <>
+                                    <h1>envVar: {envVar}</h1>
                                     <AboveHeader />
                                     <Header
                                         onMenuClick={onOpen}
@@ -351,8 +352,24 @@ const App = (props) => {
     )
 }
 
+App.shouldGetProps = () => {
+    // In this case, we only want to fetch data for the app once, on the server.
+    return typeof window === 'undefined'
+}
+
+App.getProps = async () => {
+    //Read env vars
+    //TODO: Encrypt with a key before sending
+    const envVar = process.env.SLAS_CLIENT || 'no value'
+
+    return {
+        envVar
+    }
+}
+
 App.propTypes = {
-    children: PropTypes.node
+    children: PropTypes.node,
+    envVar: PropTypes.string
 }
 
 /**

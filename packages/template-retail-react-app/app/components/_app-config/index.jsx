@@ -22,6 +22,7 @@ import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import {withLegacyGetProps} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
@@ -123,4 +124,4 @@ const options = {
     }
 }
 
-export default withReactQuery(AppConfig, options)
+export default withReactQuery(withLegacyGetProps(AppConfig), options)
