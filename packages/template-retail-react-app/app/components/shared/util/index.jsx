@@ -5,5 +5,5 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export {default as SkipNavContent} from './SkipNavContent'
-export {default as SkipNavLink} from './SkipNavLink/'
+export {SkipNavContent} from './SkipNavContent'
+export {SkipNavLink} from './SkipNavLink/'
