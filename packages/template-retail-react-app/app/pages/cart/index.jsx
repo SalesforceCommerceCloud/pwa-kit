@@ -235,7 +235,7 @@ const Cart = () => {
         }
     }
 
-    const handleUpdateBundle = async (product, quantity, childProducts) => {
+    const handleUpdateBundle = async (bundle, bundleQuantity, childProducts) => {
         // close the modal before handle the change
         onClose()
 
@@ -243,17 +243,21 @@ const Cart = () => {
             setCartItemLoading(true)
 
             const item = {
-                productId: product.productId,
-                quantity,
-                price: product.price,
-                bundledProductItems: product.bundledProductItems.map(({itemId}, i) => ({
-                    itemId,
-                    productId: childProducts[i].variant.productId,
-                    // NOTE: for simpler implementation, let's pass in some number. The API would ignore it and calculate the correct quantity.
-                    quantity: 1
-                }))
+                productId: bundle.productId,
+                quantity: bundleQuantity,
+                price: bundle.price,
+
+                bundledProductItems: bundle.bundledProductItems.map(({itemId}, i) => {
+                    const quantityPerBundle = bundle.bundledProducts[i].quantity
+                    const totalQuantity = bundleQuantity * quantityPerBundle
+
+                    return {
+                        itemId,
+                        productId: childProducts[i].variant.productId,
+                        quantity: totalQuantity
+                    }
+                })
             }
-            // debugger
             return await updateItemInBasketMutation.mutateAsync({
                 parameters: {
                     basketId: basket.basketId,
