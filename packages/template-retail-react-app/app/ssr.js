@@ -38,14 +38,11 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.use(
         helmet({
             contentSecurityPolicy: {
-                useDefaults: true,
                 directives: {
+                    'frame-ancestors': ["'self'", 'localhost:*', '*.mobify-storefront.com'],
                     'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
                     'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
-                    'connect-src': ["'self'", 'api.cquotient.com'],
-
-                    // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null
+                    'default-src': helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc
                 }
             },
             hsts: isRemote()

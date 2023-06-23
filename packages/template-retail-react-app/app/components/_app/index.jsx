@@ -184,6 +184,12 @@ const App = (props) => {
         watchOnlineStatus((isOnline) => {
             setIsOnline(isOnline)
         })
+
+        window.parent.postMessage({
+            source: 'pwa-kit-template-retail-react-app',
+            type: 'dispatch-message',
+            payload: envVar
+        }, 'http://localhost:3443')
     }, [])
 
     useEffect(() => {
@@ -290,7 +296,6 @@ const App = (props) => {
                         <Box {...styles.headerWrapper}>
                             {!isCheckout ? (
                                 <>
-                                    <h1>envVar: {envVar}</h1>
                                     <AboveHeader />
                                     <Header
                                         onMenuClick={onOpen}
@@ -337,6 +342,7 @@ const App = (props) => {
                                     flexDirection="column"
                                     flex="1"
                                 >
+                                    <h1> PWA Kit Storefront envVar: {envVar}</h1>
                                     <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
                                 </Box>
                             </SkipNavContent>
