@@ -17,7 +17,6 @@ import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {PageContext, Region} from '@salesforce/commerce-sdk-react/components'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import fallbackMessages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 // Contexts
 import {CurrencyProvider, MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
@@ -61,6 +60,18 @@ const registeredUserPayload = {
     iat: 1678834301,
     jti: 'C2C4856201860-18906789034805832570666542'
 }
+
+let fallbackMessages = {}
+try {
+    ;(async () => {
+        fallbackMessages = await import(
+            '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
+        ).catch((err) => err)
+    })()
+} catch (err) {
+    console.log('fallback messages file not found')
+}
+
 export const guestToken = jwt.sign(guestPayload, 'secret')
 export const registerUserToken = jwt.sign(registeredUserPayload, 'secret')
 export const DEFAULT_LOCALE = 'en-GB'

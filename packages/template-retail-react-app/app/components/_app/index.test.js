@@ -12,8 +12,19 @@ import App from '@salesforce/retail-react-app/app/components/_app/index.jsx'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {DEFAULT_LOCALE} from '@salesforce/retail-react-app/app/utils/test-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+
+let messages = {}
+try {
+    ;(async () => {
+        messages = await import(
+            '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
+        ).catch((err) => err)
+    })()
+} catch (err) {
+    console.log('fallback messages file not found')
+}
+
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 let windowSpy
 beforeAll(() => {

@@ -18,8 +18,18 @@ import {
     DEFAULT_LOCALE,
     renderWithProviders
 } from '@salesforce/retail-react-app/app/utils/test-utils'
-import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import {rest} from 'msw'
+
+let messages = {}
+try {
+    ;(async () => {
+        messages = await import(
+            '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
+        ).catch((err) => err)
+    })()
+} catch (err) {
+    console.log('fallback messages file not found')
+}
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
