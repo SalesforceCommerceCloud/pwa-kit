@@ -26,7 +26,6 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Hooks
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
-import {useProducts} from '@salesforce/commerce-sdk-react'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -46,7 +45,6 @@ const ProductItem = ({
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
-
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>

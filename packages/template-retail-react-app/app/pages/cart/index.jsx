@@ -354,8 +354,11 @@ const Cart = () => {
                                     {basket.productItems?.map((productItem, idx) => {
                                         // bundles can be different as child products have different selections
                                         const uniqueKey = productItem.bundledProductItems
-                                        ? productItem.productId + productItem.bundledProductItems.map((item) => item.productId).join(',') 
-                                        : productItem.productId
+                                            ? productItem.productId +
+                                              productItem.bundledProductItems
+                                                  .map((item) => item.productId)
+                                                  .join(',')
+                                            : productItem.productId
                                         return (
                                             <ProductItem
                                                 key={uniqueKey}

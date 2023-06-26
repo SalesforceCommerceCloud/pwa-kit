@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export const mockWishListDetails = {
-    limit: 4,
+    limit: 5,
     data: [
         {
             currency: 'GBP',
@@ -1617,7 +1617,72 @@ export const mockWishListDetails = {
             c_size: '008',
             c_width: 'Z',
             quantity: 1
+        },
+        {
+            currency: 'USD',
+            id: 'test-bundle',
+            imageGroups: [
+                {
+                    images: [
+                        {
+                            alt: "Women's clothing test bundle, , large",
+                            disBaseLink:
+                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_014/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7371cdfc/images/large/PG.60119239.JJ887XX.PZ.jpg',
+                            link: 'https://zzrf-014.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7371cdfc/images/large/PG.60119239.JJ887XX.PZ.jpg',
+                            title: "Women's clothing test bundle, "
+                        }
+                    ],
+                    viewType: 'large'
+                },
+                {
+                    images: [
+                        {
+                            alt: "Women's clothing test bundle, , medium",
+                            disBaseLink:
+                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_014/on/demandware.static/-/Sites-apparel-m-catalog/default/dw254de12a/images/medium/PG.60119239.JJ887XX.PZ.jpg',
+                            link: 'https://zzrf-014.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw254de12a/images/medium/PG.60119239.JJ887XX.PZ.jpg',
+                            title: "Women's clothing test bundle, "
+                        }
+                    ],
+                    viewType: 'medium'
+                },
+                {
+                    images: [
+                        {
+                            alt: "Women's clothing test bundle, , small",
+                            disBaseLink:
+                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_014/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4d788f3f/images/small/PG.60119239.JJ887XX.PZ.jpg',
+                            link: 'https://zzrf-014.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4d788f3f/images/small/PG.60119239.JJ887XX.PZ.jpg',
+                            title: "Women's clothing test bundle, "
+                        }
+                    ],
+                    viewType: 'small'
+                }
+            ],
+            inventory: {
+                ats: 91,
+                backorderable: false,
+                id: 'inventory_m',
+                orderable: true,
+                preorderable: false,
+                stockLevel: 91
+            },
+            minOrderQuantity: 1,
+            name: "Women's clothing test bundle",
+            price: 113,
+            pricePerUnit: 113,
+            primaryCategoryId: 'womens-jewelry-earrings',
+            slugUrl:
+                'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArch/womens/jewelry/earrings/test-bundle.html?lang=en_US',
+            stepQuantity: 1,
+            type: {
+                bundle: true
+            },
+            unitQuantity: 0,
+            c_isNewtest: false,
+            c_isSale: false,
+            quantity: 1
         }
     ],
-    total: 4
+    total: 5
 }

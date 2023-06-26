@@ -21,10 +21,7 @@ import {usePromotions, useProducts, useProduct} from '@salesforce/commerce-sdk-r
             - selected options
             - qty
         - remove console.logs
-        - revert default.js
-        - ensure each child of list should have a unique key prop
-        - figure out bug where if you add multiple bundles with different variant choices, 
-        they appear under 1 product line item for order history
+        - write unit test for item-attributes.jsx
 */
 
 /**
@@ -33,8 +30,6 @@ import {usePromotions, useProducts, useProduct} from '@salesforce/commerce-sdk-r
  */
 const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const variant = useItemVariant()
-    console.log('VARIANT IN ITEM ATTRIBUTES', variant) // TODO: remove
-
     const {data: basket} = useCurrentBasket()
     const {currency: activeCurrency} = useCurrency()
     const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
@@ -64,8 +59,9 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
         }
     })
 
-    // bundle logic for cart/order history page
-    const productBundleIds = variant?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
+    // get variant info for bundled products in cart page and order history page
+    const productBundleIds =
+        variant?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: productBundleVariantData} = useProducts(
         {
             parameters: {
@@ -85,9 +81,9 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                             }
                         })
                     })
-                    const quantity = variant?.bundledProductItems.find((childProduct) =>
-                        childProduct.productId === item.id
-                    )?.quantity;
+                    const quantity = variant?.bundledProductItems.find(
+                        (childProduct) => childProduct.productId === item.id
+                    )?.quantity
                     return {
                         ...item,
                         quantity,
@@ -99,7 +95,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                                 return {
                                     value: item?.variationValues?.[variation],
                                     label: found?.label,
-                                    name: found?.name,
+                                    name: found?.name
                                 }
                             })
                         ]
@@ -108,10 +104,8 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             }
         }
     )
-    console.log(`productBundleVariantData for quacker ${variant?.name}`, productBundleVariantData)
 
-
-    // bundle logic for wishlist
+    // get bundle product data for wishlist page
     const {data: productBundleData} = useProduct(
         {
             parameters: {
@@ -123,8 +117,6 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             enabled: Boolean(variant?.type?.bundle && !productBundleIds)
         }
     )
-    // console.log('productBundleVariantData IN ITEM ATTRIBUTES', productBundleVariantData) // TODO: remove
-    console.log(`productBundleData for ${variant?.name}`, productBundleData)
 
     return (
         <Stack spacing={1.5} flex={1} {...props}>
@@ -146,14 +138,16 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
 
             {productBundleData && !productBundleVariantData && (
                 <Box>
-                    {productBundleData?.bundledProducts.map(({product, quantity}) => 
-                        (
-                            <Box marginTop={2} key={product.id}>
-                                <Text fontSize="sm" color="gray.700" as="b">{product?.name}</Text>
-                                <Text fontSize="sm" color="gray.700">Qty: {quantity}</Text>
-                            </Box>
-                        )
-                    )}
+                    {productBundleData?.bundledProducts.map(({product, quantity}) => (
+                        <Box marginTop={2} key={product.id}>
+                            <Text fontSize="sm" color="gray.700" as="b">
+                                {product?.name}
+                            </Text>
+                            <Text fontSize="sm" color="gray.700">
+                                Qty: {quantity}
+                            </Text>
+                        </Box>
+                    ))}
                 </Box>
             )}
 
@@ -162,24 +156,30 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                     <Text fontSize={15} marginTop={3} fontWeight={500}>
                         Selected Options:
                     </Text>
-                    {productBundleVariantData?.map(({variationValues, name: productName, quantity, id}) => {
-                        return (
-                            <Box marginTop={2} key={id}>
-                                <Text fontSize="sm" color="gray.700" as="b">{productName}</Text>
-                                <Text fontSize="sm" color="gray.700">Qty: {quantity}</Text>
-                                {variationValues?.map(({label, name}) => {
-                                    return (
-                                        <>
-                                            <Text
-                                                fontSize="sm"
-                                                color="gray.700"
-                                            >{`${label} : ${name}`}</Text>
-                                        </>
-                                    )
-                                })}
-                            </Box>
-                        )
-                    })}
+                    {productBundleVariantData?.map(
+                        ({variationValues, name: productName, quantity, id}) => {
+                            return (
+                                <Box marginTop={2} key={id}>
+                                    <Text fontSize="sm" color="gray.700" as="b">
+                                        {productName}
+                                    </Text>
+                                    <Text fontSize="sm" color="gray.700">
+                                        Qty: {quantity}
+                                    </Text>
+                                    {variationValues?.map(({label, name}) => {
+                                        return (
+                                            <>
+                                                <Text
+                                                    fontSize="sm"
+                                                    color="gray.700"
+                                                >{`${label} : ${name}`}</Text>
+                                            </>
+                                        )
+                                    })}
+                                </Box>
+                            )
+                        }
+                    )}
                 </Box>
             )}
 

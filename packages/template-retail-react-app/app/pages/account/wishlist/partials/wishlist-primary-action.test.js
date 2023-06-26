@@ -97,3 +97,11 @@ test('the View Options button', async () => {
         {timeout: 5000}
     )
 }, 30000)
+
+test('bundle in wishlist renders the View Full Details button', async () => {
+    const productBundle = mockWishListDetails.data[4]
+    renderWithProviders(<MockedComponent variant={productBundle} />)
+
+    const link = await screen.findByRole('link', {name: /view full details/i})
+    expect(link).toBeInTheDocument()
+})
