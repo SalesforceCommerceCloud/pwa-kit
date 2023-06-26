@@ -944,10 +944,8 @@ export const RemoteServerFactory = {
  */
 const prepNonProxyRequest = (req, res, next) => {
     const options = req.app.options
-    console.log("OBNOXIOUS")
     if (!options.ssrAllowCookies) {
         // Strip cookies from the request
-        console.log("DELETING COOKIES")
         delete req.headers.cookie
         // In an Express Response, all cookie setting ends up
         // calling setHeader, so we override that to allow us
