@@ -39,7 +39,7 @@ import {
     // Hooks
     useBreakpointValue,
     useMultiStyleConfig
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 // Icons

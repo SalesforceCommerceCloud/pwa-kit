@@ -15,7 +15,7 @@ import {
     AccordionButton,
     AccordionPanel,
     AccordionIcon
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 import ColorRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/color-refinements'
 import SizeRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/size-refinements'
