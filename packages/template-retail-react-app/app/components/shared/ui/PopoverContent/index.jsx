@@ -5,4 +5,4 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export {PopoverContent} from '@chakra-ui/react';
+export {PopoverContent} from '@chakra-ui/react'

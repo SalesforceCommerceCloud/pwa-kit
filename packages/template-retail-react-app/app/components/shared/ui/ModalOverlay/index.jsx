@@ -5,4 +5,4 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export {ModalOverlay} from '@chakra-ui/react';
+export {ModalOverlay} from '@chakra-ui/react'

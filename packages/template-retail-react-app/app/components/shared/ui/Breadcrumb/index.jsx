@@ -5,4 +5,4 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export {Breadcrumb} from '@chakra-ui/react';
+export {Breadcrumb} from '@chakra-ui/react'
