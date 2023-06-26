@@ -6,7 +6,12 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Image, Link as ChakraLink, Text} from '@chakra-ui/react'
+import {
+    Box,
+    Image,
+    Link as ChakraLink,
+    Text
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 

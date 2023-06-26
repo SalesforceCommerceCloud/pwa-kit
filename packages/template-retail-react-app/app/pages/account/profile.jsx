@@ -17,7 +17,7 @@ import {
     Stack,
     Text,
     useToast
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {

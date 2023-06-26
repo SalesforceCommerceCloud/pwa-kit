@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {SimpleGrid, Stack} from '@chakra-ui/react'
+import {SimpleGrid, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useProfileFields from '@salesforce/retail-react-app/app/components/forms/useProfileFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 
