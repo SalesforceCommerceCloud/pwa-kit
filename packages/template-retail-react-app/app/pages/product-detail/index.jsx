@@ -261,7 +261,6 @@ const ProductDetail = () => {
                 }
             ]
 
-            console.log('--- adding this bundle to basket', productItems)
             await addItemToBasketMutation.mutateAsync({
                 parameters: {basketId: basket.basketId},
                 body: productItems
