@@ -47,7 +47,8 @@ const OrderProducts = ({productItems, currency}) => {
         }
     )
 
-    const productsMap = products.reduce((map, product) => ({...map, [product.id]: product}), {})
+    const productsMap =
+        products?.reduce((map, product) => ({...map, [product.id]: product}), {}) ?? []
 
     const variants = productItems?.map((productItem) => {
         const product = productsMap[productItem.productId]

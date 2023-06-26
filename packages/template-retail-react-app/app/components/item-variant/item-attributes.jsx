@@ -20,9 +20,32 @@ import {usePromotions, useProducts, useProduct} from '@salesforce/commerce-sdk-r
         - pull out strings for localization
             - selected options
             - qty
-        - remove console.logs
-        - write unit test for item-attributes.jsx
+        - refactor for getVariationValues/getDisplayVariationValues
 */
+
+// TODO: potentially move into util file OR refactor to use getDisplayVariationValues
+export const getVariationValues = (item) => {
+    const flatValues = item?.variationAttributes?.flatMap((item) => {
+        return item.values.map((vals) => {
+            return {
+                ...vals,
+                label: item.name
+            }
+        })
+    })
+    return [
+        ...Object.keys(item?.variationValues).map((variation) => {
+            const found = flatValues.find(
+                (obj) => obj?.value === item?.variationValues?.[variation]
+            )
+            return {
+                value: item?.variationValues?.[variation],
+                label: found?.label,
+                name: found?.name
+            }
+        })
+    ]
+}
 
 /**
  * In the context of a cart product item variant, this component renders a styled
@@ -72,6 +95,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
         {
             enabled: Boolean(productBundleIds),
             select: (result) => {
+                // TODO: replace logic with util function
                 return result?.data?.map((item) => {
                     const flatValues = item?.variationAttributes?.flatMap((item) => {
                         return item.values.map((vals) => {
@@ -158,8 +182,9 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                     </Text>
                     {productBundleVariantData?.map(
                         ({variationValues, name: productName, quantity, id}) => {
+                            // TODO: Warning: Each child in a list should have a unique "key" prop.
                             return (
-                                <Box marginTop={2} key={id}>
+                                <Box key={id} marginTop={2}>
                                     <Text fontSize="sm" color="gray.700" as="b">
                                         {productName}
                                     </Text>
@@ -172,7 +197,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                                                 <Text
                                                     fontSize="sm"
                                                     color="gray.700"
-                                                >{`${label} : ${name}`}</Text>
+                                                >{`${label}: ${name}`}</Text>
                                             </>
                                         )
                                     })}
