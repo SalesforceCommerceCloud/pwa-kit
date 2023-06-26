@@ -7,10 +7,23 @@
 
 import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay} from '@chakra-ui/react'
+import {
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalOverlay,
+    Flex,
+    Box,
+    VStack
+} from '@chakra-ui/react'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
 import {useProducts} from '@salesforce/commerce-sdk-react'
+import ImageGallery, {
+    Skeleton as ImageGallerySkeleton
+} from '@salesforce/retail-react-app/app/components/image-gallery'
+import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 
 /**
  * A Modal that contains Product View for product bundle
@@ -20,29 +33,14 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     console.log('--- BundleProductViewModal receives this product', bundle)
     console.log('--- and convert it into', productViewModalData)
 
+    const {variationParams} = useDerivedProduct(bundle)
+
     const childProductIds = productViewModalData.product?.bundledProductItems
         ?.map(({productId}) => productId)
         .join(',')
     const {data: childProducts, isLoading} = useProducts(
-        {
-            parameters: {
-                ids: childProductIds,
-                allImages: true
-            }
-        },
-        {
-            enabled: Boolean(childProductIds)
-            /*
-            select: (result) => {
-                // Convert array into key/value object with key is the product id
-                return result?.data?.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
-            }
-            */
-        }
+        {parameters: {ids: childProductIds, allImages: true}},
+        {enabled: Boolean(childProductIds)}
     )
 
     const childProductRefs = useRef({})
@@ -55,61 +53,81 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
             <ModalContent containerProps={{'data-testid': 'product-view-modal'}}>
                 <ModalCloseButton />
                 <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
-                    {/* TODO: do not use ProductView for the parent.. use its inner components instead */}
-                    <ProductView
-                        showFullLink={true}
-                        imageSize="sm"
-                        product={productViewModalData.product}
-                        isLoading={productViewModalData.isFetching}
-                        updateCart={(product, quantity) =>
-                            updateCart(product, quantity, selectedChildProducts)
-                        }
-                        validateOrderability={() => {
-                            return Object.values(childProductRefs.current).every(
-                                ({validateOrderability}) => validateOrderability()
-                            )
-                        }}
-                        {...props}
-                    />
+                    <Flex direction={['column', 'column', 'column', 'row']}>
+                        <Box flex={1} mr={[0, 0, 0, 6, 6]}>
+                            {bundle ? (
+                                <>
+                                    <ImageGallery
+                                        size="sm"
+                                        imageGroups={bundle.imageGroups}
+                                        selectedVariationAttributes={variationParams}
+                                    />
+                                </>
+                            ) : (
+                                <ImageGallerySkeleton />
+                            )}
+                        </Box>
 
-                    {childProducts &&
-                        childProducts.data.map((_product, i) => {
-                            const product = {
-                                ..._product,
-                                ...productViewModalData.product.bundledProductItems[i]
-                            }
-                            const quantityPerBundle = product.quantity / bundle.quantity
-
-                            return (
+                        <VStack align="stretch" flex={1}>
+                            <Box marginBottom={6}>
                                 <ProductView
-                                    key={i}
-                                    // Do not use an arrow function as we are manipulating the functions scope.
-                                    ref={function (ref) {
-                                        // Assign the "set" scope of the ref, this is how we access the internal validation.
-                                        childProductRefs.current[product.id] = {
-                                            ref,
-                                            validateOrderability: this.validateOrderability
-                                        }
-                                    }}
+                                    showFullLink={false}
                                     showImageGallery={false}
-                                    isProductPartOfBundle={true}
-                                    showFullLink={true}
-                                    imageSize="sm"
-                                    product={product}
-                                    isLoading={isLoading}
-                                    childProductOrderability={childProductOrderability}
-                                    setChildProductOrderability={setChildProductOrderability}
-                                    childOfBundleQuantity={quantityPerBundle}
-                                    onVariantSelected={(product, variant, quantity) => {
-                                        setSelectedChildProducts((prev) => {
-                                            const newArray = prev.slice(0)
-                                            newArray[i] = {product, variant, quantity}
-                                            return newArray
-                                        })
+                                    product={productViewModalData.product}
+                                    isLoading={productViewModalData.isFetching}
+                                    updateCart={(product, quantity) =>
+                                        updateCart(product, quantity, selectedChildProducts)
+                                    }
+                                    validateOrderability={() => {
+                                        return Object.values(childProductRefs.current).every(
+                                            ({validateOrderability}) => validateOrderability()
+                                        )
                                     }}
+                                    {...props}
                                 />
-                            )
-                        })}
+                            </Box>
+
+                            {childProducts &&
+                                childProducts.data.map((_product, i) => {
+                                    const product = {
+                                        ..._product,
+                                        ...productViewModalData.product.bundledProductItems[i]
+                                    }
+                                    const quantityPerBundle = product.quantity / bundle.quantity
+
+                                    return (
+                                        <ProductView
+                                            key={i}
+                                            // Do not use an arrow function as we are manipulating the functions scope.
+                                            ref={function (ref) {
+                                                // Assign the "set" scope of the ref, this is how we access the internal validation.
+                                                childProductRefs.current[product.id] = {
+                                                    ref,
+                                                    validateOrderability: this.validateOrderability
+                                                }
+                                            }}
+                                            showImageGallery={false}
+                                            isProductPartOfBundle={true}
+                                            showFullLink={false}
+                                            product={product}
+                                            isLoading={isLoading}
+                                            childProductOrderability={childProductOrderability}
+                                            setChildProductOrderability={
+                                                setChildProductOrderability
+                                            }
+                                            childOfBundleQuantity={quantityPerBundle}
+                                            onVariantSelected={(product, variant, quantity) => {
+                                                setSelectedChildProducts((prev) => {
+                                                    const newArray = prev.slice(0)
+                                                    newArray[i] = {product, variant, quantity}
+                                                    return newArray
+                                                })
+                                            }}
+                                        />
+                                    )
+                                })}
+                        </VStack>
+                    </Flex>
                 </ModalBody>
             </ModalContent>
         </Modal>
