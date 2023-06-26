@@ -100,8 +100,13 @@ describe('product set', () => {
     })
 
     test('add the set to cart successfully', async () => {
-        const urlPathAfterSelectingAllVariants =
-            '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
+        const urlPathAfterSelectingAllVariants = `/en-GB/product/winter-lookM?${new URLSearchParams(
+            {
+                '25518447M': 'color=JJ5FUXX&size=9MD',
+                '25518704M': 'color=JJ2XNXX&size=9MD',
+                '25772717M': 'color=TAUPETX&size=070&width=M'
+            }
+        )}`
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
 
         // Initial basket is necessary to add items to it
