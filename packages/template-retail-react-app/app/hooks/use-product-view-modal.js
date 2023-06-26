@@ -6,10 +6,7 @@
  */
 
 import {useEffect, useState} from 'react'
-import {
-    rebuildPathWithParams,
-    removeQueryParamsFromPath
-} from '@salesforce/retail-react-app/app/utils/url'
+import {removeQueryParamsFromPath} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'

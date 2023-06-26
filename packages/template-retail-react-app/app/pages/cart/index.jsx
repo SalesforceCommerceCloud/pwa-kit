@@ -45,7 +45,6 @@ import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
-    useProduct,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
