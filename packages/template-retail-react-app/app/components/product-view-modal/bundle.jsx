@@ -30,7 +30,6 @@ import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
  */
 const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, ...props}) => {
     const productViewModalData = useProductViewModal(bundle)
-
     const {variationParams} = useDerivedProduct(bundle)
 
     const childProductIds = productViewModalData.product?.bundledProductItems
@@ -52,6 +51,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                 <ModalCloseButton />
                 <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                     <Flex direction={['column', 'column', 'column', 'row']}>
+                        {/* Due to desktop layout, we'll need to render the image gallery separately, from outside the ProductView */}
                         <Box flex={1} mr={[0, 0, 0, 6, 6]}>
                             {bundle ? (
                                 <>
@@ -67,6 +67,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                         </Box>
 
                         <VStack align="stretch" flex={1}>
+                            {/* Parent product */}
                             <Box marginBottom={6}>
                                 <ProductView
                                     showFullLink={false}
