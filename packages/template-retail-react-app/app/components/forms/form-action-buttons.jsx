@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Button, Stack} from '@chakra-ui/react'
+import {Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {MESSAGE_PROPTYPE} from '@salesforce/retail-react-app/app/utils/locale.js'
 
 /**

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {forwardRef} from 'react'
-import {Icon, useTheme} from '@chakra-ui/react'
+import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
 // svg-sprite-loader webpack plugin at build time and injected in the <body> tag
