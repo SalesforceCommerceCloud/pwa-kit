@@ -115,7 +115,7 @@ export const RemoteServerFactory = {
             mobify: undefined,
 
             // Toggle cookies being passed and set
-            ssrAllowCookies: false,
+            ssrAllowCookies: false
         }
 
         options = Object.assign({}, defaults, options)
@@ -141,9 +141,11 @@ export const RemoteServerFactory = {
         // This is the ORIGIN under which we are serving the page.
         // because it's an origin, it does not end with a slash.
         options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
-        
-        // Toggle cookies being passed and set
-        options.ssrAllowCookies = process.env.SSR_ALLOW_COOKIES?.toLowerCase() === "true" || options.ssrAllowCookies
+
+        if ("SSR_ALLOW_COOKIES" in process.env) {
+            // Toggle cookies being passed and set
+            options.ssrAllowCookies = process.env.SSR_ALLOW_COOKIES?.toLowerCase() === 'true'
+        }
 
         return options
     },
