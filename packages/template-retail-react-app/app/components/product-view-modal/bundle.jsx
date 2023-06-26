@@ -30,8 +30,6 @@ import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
  */
 const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, ...props}) => {
     const productViewModalData = useProductViewModal(bundle)
-    console.log('--- BundleProductViewModal receives this product', bundle)
-    console.log('--- and convert it into', productViewModalData)
 
     const {variationParams} = useDerivedProduct(bundle)
 
