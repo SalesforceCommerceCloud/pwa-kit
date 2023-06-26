@@ -6,8 +6,7 @@
  */
 /* eslint-env jest */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const path = require('path')
-const mockConfig = require(path.join(__dirname, 'config/mocks/default.js'))
+const mockConfig = require('@salesforce/retail-react-app/config/mocks/default')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
 const {configure: configureTestingLibrary} = require('@testing-library/react')
