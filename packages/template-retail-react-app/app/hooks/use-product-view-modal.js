@@ -57,7 +57,6 @@ export const useProductViewModal = (initialProduct) => {
             }
         }
     )
-    // TODO: not working when dealing with combo products
     const cleanUpVariantParams = () => {
         const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
         const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
@@ -73,19 +72,6 @@ export const useProductViewModal = (initialProduct) => {
             cleanUpVariantParams()
         }
     }, [])
-
-    // TODO: delete this duplicate page-url update
-    useEffect(() => {
-        if (variant) {
-            const {variationValues} = variant
-            // update the url with the new product id and variation values when the variant changes
-            const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
-                ...variationValues,
-                pid: variant.productId
-            })
-            // history.replace(updatedUrl)
-        }
-    }, [variant])
 
     return {
         product,
