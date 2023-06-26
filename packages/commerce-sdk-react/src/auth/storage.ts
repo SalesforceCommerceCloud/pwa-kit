@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import Cookies from 'js-cookie'
+import {onClient} from '../utils'
 
 export type StorageType = 'cookie' | 'local' | 'memory'
 
@@ -48,7 +49,13 @@ export class CookieStorage extends BaseStorage {
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
-        Cookies.set(suffixedKey, value, {...options, secure: true})
+        Cookies.set(suffixedKey, value, {
+            // Deployed sites will always be HTTPS, but the local dev server is served over HTTP.
+            // Ideally, this would be `secure: true`, because Chrome and Firefox both treat
+            // localhost as a Secure context. But Safari doesn't, so here we are.
+            secure: !onClient() || window.location.protocol === 'https:',
+            ...options
+        })
     }
     get(key: string) {
         const suffixedKey = this.getSuffixedKey(key)
