@@ -11,7 +11,7 @@ import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {Box, Button, Stack} from '@chakra-ui/react'
+import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     useProduct,
     useCategory,

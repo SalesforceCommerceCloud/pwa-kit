@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
+
 'use strict'
 
 import path from 'path'
@@ -27,7 +27,8 @@ const options = {
     port: 3000,
 
     // The protocol on which the development Express app listens.
-    // Note that http://localhost is treated as a secure context for development.
+    // Note that http://localhost is treated as a secure context for development,
+    // except by Safari.
     protocol: 'http'
 }
 

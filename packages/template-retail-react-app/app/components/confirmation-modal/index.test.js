@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal/index'
-import {Box, useDisclosure} from '@chakra-ui/react'
+import {Box, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {screen} from '@testing-library/react'
