@@ -62,10 +62,10 @@
   "devDependencies": {
     "@salesforce/pwa-kit-dev": "3.1.0-dev",
     "npm-packlist": "^4.0.0",
-    "typescript": "^4.8.3"
+    "typescript": "4.9.5"
   },
   "peerDependencies": {
-    "typescript": "^4.8.3"
+    "typescript": "4.9.5"
   },
   "peerDependenciesMeta": {
     "typescript": {
