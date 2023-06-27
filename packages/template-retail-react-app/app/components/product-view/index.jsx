@@ -10,7 +10,17 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
+import {
+    Flex,
+    Heading,
+    Button,
+    Skeleton,
+    Box,
+    Text,
+    VStack,
+    Fade,
+    useTheme
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
@@ -93,6 +103,7 @@ const ProductView = forwardRef(
             updateWishlist,
             isProductLoading,
             isProductPartOfSet = false,
+            isBasketLoading = false,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
@@ -220,7 +231,8 @@ const ProductView = forwardRef(
                     <Button
                         key="cart-button"
                         onClick={handleCartItem}
-                        disabled={showInventoryMessage}
+                        disabled={isBasketLoading || showInventoryMessage}
+                        isLoading={isBasketLoading}
                         width="100%"
                         variant="solid"
                         marginBottom={4}
@@ -524,6 +536,7 @@ ProductView.propTypes = {
     isProductPartOfSet: PropTypes.bool,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
+    isBasketLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,
     addToCart: PropTypes.func,
     addToWishlist: PropTypes.func,

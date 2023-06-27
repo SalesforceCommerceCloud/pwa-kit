@@ -7,7 +7,15 @@
 import React from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Box, Flex, Radio, RadioGroup, Stack, Text, Tooltip} from '@chakra-ui/react'
+import {
+    Box,
+    Flex,
+    Radio,
+    RadioGroup,
+    Stack,
+    Text,
+    Tooltip
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {LockIcon, PaypalIcon} from '@salesforce/retail-react-app/app/components/icons'
 import CreditCardFields from '@salesforce/retail-react-app/app/components/forms/credit-card-fields'

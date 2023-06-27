@@ -20,7 +20,8 @@ const options = {
     port: 3000,
 
     // The protocol on which the development Express app listens.
-    // Note that http://localhost is treated as a secure context for development.
+    // Note that http://localhost is treated as a secure context for development,
+    // except by Safari.
     protocol: 'http',
 
     mobify: pkg.mobify

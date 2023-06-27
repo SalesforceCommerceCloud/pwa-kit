@@ -11,7 +11,7 @@ import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {Box, Button, Stack} from '@chakra-ui/react'
+import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     useProduct,
     useCategory,
@@ -61,6 +61,7 @@ const ProductDetail = () => {
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
+    const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -264,6 +265,7 @@ const ProductDetail = () => {
                             addToCart={handleProductSetAddToCart}
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
+                            isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
                             validateOrderability={handleProductSetValidation}
                         />
@@ -310,6 +312,7 @@ const ProductDetail = () => {
                                             }
                                         }}
                                         isProductLoading={isProductLoading}
+                                        isBasketLoading={isBasketLoading}
                                         isWishlistLoading={isWishlistLoading}
                                     />
                                     <InformationAccordion product={childProduct} />
@@ -331,6 +334,7 @@ const ProductDetail = () => {
                             }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
+                            isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
                         />
                         <InformationAccordion product={product} />

@@ -7,7 +7,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Flex, Box, HStack, useStyleConfig} from '@chakra-ui/react'
+import {
+    Flex,
+    Box,
+    HStack,
+    useStyleConfig
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
