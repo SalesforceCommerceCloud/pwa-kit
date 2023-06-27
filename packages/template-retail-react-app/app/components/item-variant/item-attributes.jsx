@@ -7,45 +7,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, FormattedNumber} from 'react-intl'
+import {useIntl, FormattedMessage, FormattedNumber} from 'react-intl'
 import {Flex, Stack, Text, Box} from '@chakra-ui/react'
 import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
 import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {usePromotions, useProducts, useProduct} from '@salesforce/commerce-sdk-react'
-
-/*
-    TODOs:
-        - pull out strings for localization
-            - selected options
-            - qty
-        - refactor for getVariationValues/getDisplayVariationValues
-*/
-
-// TODO: potentially move into util file OR refactor to use getDisplayVariationValues
-export const getVariationValues = (item) => {
-    const flatValues = item?.variationAttributes?.flatMap((item) => {
-        return item.values.map((vals) => {
-            return {
-                ...vals,
-                label: item.name
-            }
-        })
-    })
-    return [
-        ...Object.keys(item?.variationValues).map((variation) => {
-            const found = flatValues.find(
-                (obj) => obj?.value === item?.variationValues?.[variation]
-            )
-            return {
-                value: item?.variationValues?.[variation],
-                label: found?.label,
-                name: found?.name
-            }
-        })
-    ]
-}
+import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 /**
  * In the context of a cart product item variant, this component renders a styled
@@ -56,6 +25,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const {data: basket} = useCurrentBasket()
     const {currency: activeCurrency} = useCurrency()
     const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
+    const intl = useIntl()
 
     // Fetch all the promotions given by price adjustments. We display this info in
     // the promotion info popover when applicable.
@@ -95,34 +65,17 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
         {
             enabled: Boolean(productBundleIds),
             select: (result) => {
-                // TODO: replace logic with util function
                 return result?.data?.map((item) => {
-                    const flatValues = item?.variationAttributes?.flatMap((item) => {
-                        return item.values.map((vals) => {
-                            return {
-                                ...vals,
-                                label: item.name
-                            }
-                        })
-                    })
                     const quantity = variant?.bundledProductItems.find(
                         (childProduct) => childProduct.productId === item.id
                     )?.quantity
                     return {
                         ...item,
                         quantity,
-                        variationValues: [
-                            ...Object.keys(item?.variationValues).map((variation) => {
-                                const found = flatValues.find(
-                                    (obj) => obj?.value === item?.variationValues?.[variation]
-                                )
-                                return {
-                                    value: item?.variationValues?.[variation],
-                                    label: found?.label,
-                                    name: found?.name
-                                }
-                            })
-                        ]
+                        variationValues: getDisplayVariationValues(
+                            item?.variationAttributes,
+                            item?.variationValues
+                        )
                     }
                 })
             }
@@ -168,7 +121,11 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                                 {product?.name}
                             </Text>
                             <Text fontSize="sm" color="gray.700">
-                                Qty: {quantity}
+                                {intl.formatMessage({
+                                    defaultMessage: 'Qty',
+                                    id: 'add_to_cart_modal.label.quantity'
+                                })}
+                                : {quantity}
                             </Text>
                         </Box>
                     ))}
@@ -178,27 +135,36 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             {productBundleVariantData && (
                 <Box>
                     <Text fontSize={15} marginTop={3} fontWeight={500}>
-                        Selected Options:
+                        {intl.formatMessage({
+                            defaultMessage: 'Selected Options',
+                            id: 'item_attributes.label.selected_options'
+                        })}
+                        :
                     </Text>
                     {productBundleVariantData?.map(
                         ({variationValues, name: productName, quantity, id}) => {
-                            // TODO: Warning: Each child in a list should have a unique "key" prop.
                             return (
                                 <Box key={id} marginTop={2}>
                                     <Text fontSize="sm" color="gray.700" as="b">
                                         {productName}
                                     </Text>
                                     <Text fontSize="sm" color="gray.700">
-                                        Qty: {quantity}
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Qty',
+                                            id: 'add_to_cart_modal.label.quantity'
+                                        })}
+                                        : {quantity}
                                     </Text>
-                                    {variationValues?.map(({label, name}) => {
+                                    {Object.keys(variationValues).map((key) => {
+                                        const selectedVariant = `${key}: ${variationValues[key]}`
                                         return (
-                                            <>
-                                                <Text
-                                                    fontSize="sm"
-                                                    color="gray.700"
-                                                >{`${label}: ${name}`}</Text>
-                                            </>
+                                            <Text
+                                                fontSize="sm"
+                                                color="gray.700"
+                                                key={selectedVariant}
+                                            >
+                                                {selectedVariant}
+                                            </Text>
                                         )
                                     })}
                                 </Box>

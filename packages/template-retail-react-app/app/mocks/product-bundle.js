@@ -2562,7 +2562,7 @@ export const mockBundledProductItemsVariant = {
     c_isSale: false
 }
 
-export const mockProductBundleVariantResponse = {
+export const mockProductBundleWithVariants = {
     limit: 4,
     data: [
         {

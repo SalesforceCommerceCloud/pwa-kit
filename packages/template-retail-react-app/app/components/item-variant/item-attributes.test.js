@@ -9,12 +9,12 @@ import ItemVariantProvider from '@salesforce/retail-react-app/app/components/ite
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {screen, waitFor} from '@testing-library/react'
 import ItemAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
-import {getVariationValues} from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
+import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 import PropTypes from 'prop-types'
 import {rest} from 'msw'
 import {
     mockBundledProductItemsVariant,
-    mockProductBundleVariantResponse,
+    mockProductBundleWithVariants,
     mockProductBundle
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 
@@ -32,7 +32,7 @@ MockedComponent.propTypes = {
 beforeEach(() => {
     global.server.use(
         rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundleVariantResponse))
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundleWithVariants))
         }),
         rest.get('*/products/:productId', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundle))
@@ -51,16 +51,20 @@ test('component renders product bundles with variant data', async () => {
         expect(screen.getAllByText(`Qty: ${item.quantity}`)[0]).toBeInTheDocument()
     })
 
-    mockProductBundleVariantResponse.data.forEach((item) => {
-        const variationValues = getVariationValues(item) // potentially refactor to use getDisplayVariationValues
-        variationValues.forEach((variant) => {
-            expect(screen.getAllByText(`${variant.label}: ${variant.name}`)[0]).toBeInTheDocument()
+    mockProductBundleWithVariants.data.forEach((item) => {
+        const variationValues = getDisplayVariationValues(
+            item.variationAttributes,
+            item.variationValues
+        )
+        Object.keys(variationValues).forEach((key) => {
+            expect(screen.getAllByText(`${key}: ${variationValues[key]}`)[0]).toBeInTheDocument()
         })
     })
 })
 
 test('component renders product bundles without variant data', async () => {
-    const {bundledProductItems, ...mockWithoutBundledProductItems} = mockBundledProductItemsVariant
+    const mockWithoutBundledProductItems = {...mockBundledProductItemsVariant}
+    delete mockWithoutBundledProductItems.bundledProductItems
     renderWithProviders(<MockedComponent variant={mockWithoutBundledProductItems} />)
     await waitFor(() => {
         mockProductBundle.bundledProducts.forEach(({product, quantity}) => {
