@@ -142,7 +142,7 @@ export const RemoteServerFactory = {
         // because it's an origin, it does not end with a slash.
         options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
 
-        if ("SSR_ALLOW_COOKIES" in process.env) {
+        if ('SSR_ALLOW_COOKIES' in process.env) {
             // Toggle cookies being passed and set
             options.ssrAllowCookies = process.env.SSR_ALLOW_COOKIES?.toLowerCase() === 'true'
         }
