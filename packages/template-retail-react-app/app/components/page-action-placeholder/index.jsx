@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Button, Stack, Text} from '@chakra-ui/react'
+import {Box, Button, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 const PageActionPlaceHolder = ({heading, text, icon, buttonText, buttonProps, onButtonClick}) => {
