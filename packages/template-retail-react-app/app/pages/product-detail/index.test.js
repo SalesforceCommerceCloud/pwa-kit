@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -15,8 +15,12 @@ import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {basketWithProductSet} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
+import {
+    basketWithProductSet,
+    einsteinRecommendation
+} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+import userEvent from '@testing-library/user-event'
 
 jest.setTimeout(60000)
 
@@ -163,5 +167,57 @@ describe('product set', () => {
             const heroImage = within(child).getAllByRole('img')[0]
             expect(heroImage.getAttribute('loading')).toBe('lazy')
         })
+    })
+})
+
+describe.only('Recommended Products', () => {
+    let fetchMock
+    beforeAll(() => {
+        fetchMock = jest.spyOn(global, 'fetch').mockImplementation(async (url) => {
+            const json = url.endsWith('viewed-recently-einstein') ? einsteinRecommendation : {}
+            return new Response(JSON.stringify(json))
+        })
+    })
+    beforeEach(() => {
+        fetchMock.mockClear()
+    })
+    afterAll(() => {
+        fetchMock.mockRestore()
+    })
+    test('Recently Viewed gets updated when navigating between products', async () => {
+        global.server.use(
+            // Use a single product (and not a product set)
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(productsResponse.data[0]))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.json({}))
+            })
+        )
+        const user = userEvent.setup({
+            advanceTimers: jest.advanceTimersByTime
+        })
+        renderWithProviders(<MockedComponent />)
+
+        let done = false
+        setTimeout(() => (done = true), 150)
+        await waitFor(() => expect(done).toBeTruthy())
+
+        await waitFor(() => {
+            // Main product has loaded
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+            // Recently Viewed has loaded
+            expect(screen.getByText(/Summer Bomber Jacket/)).toBeInTheDocument()
+        })
+
+        // We requested Recently Viewed products on the first page load, but we
+        // only want to check against the second page load
+        fetchMock.mockClear()
+        await user.click(screen.getByText(/Summer Bomber Jacket/))
+
+        expect(fetchMock).toHaveBeenCalledWith(
+            expect.stringMatching(/viewed-recently-einstein$/),
+            expect.any(Object)
+        )
     })
 })
