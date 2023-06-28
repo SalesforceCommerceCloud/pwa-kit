@@ -115,7 +115,7 @@ export const RemoteServerFactory = {
             mobify: undefined,
 
             // Toggle cookies being passed and set
-            ssrAllowCookies: false
+            localAllowCookies: false
         }
 
         options = Object.assign({}, defaults, options)
@@ -142,10 +142,9 @@ export const RemoteServerFactory = {
         // because it's an origin, it does not end with a slash.
         options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
 
-        if ('MRT_ALLOW_COOKIES' in process.env) {
-            // Toggle cookies being passed and set
-            options.ssrAllowCookies = process.env.MRT_ALLOW_COOKIES?.toLowerCase() === 'true'
-        }
+        // Toggle cookies being passed and set. Can be overridden locally,
+        // always uses MRT_ALLOW_COOKIES env remotely
+        options.allowCookies = this._getAllowCookies(options)
 
         return options
     },
@@ -156,6 +155,14 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _logStartupMessage(options) {
         // Hook for the DevServer
+    },
+
+    /**
+     * @private
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _getAllowCookies(options) {
+        return 'MRT_ALLOW_COOKIES' in process.env ? process.env.MRT_ALLOW_COOKIES == 'true' : false
     },
 
     /**
@@ -946,7 +953,7 @@ export const RemoteServerFactory = {
  */
 const prepNonProxyRequest = (req, res, next) => {
     const options = req.app.options
-    if (!options.ssrAllowCookies) {
+    if (!options.allowCookies) {
         // Strip cookies from the request
         delete req.headers.cookie
         // In an Express Response, all cookie setting ends up
