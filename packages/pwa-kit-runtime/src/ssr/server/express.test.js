@@ -328,9 +328,9 @@ describe('SSRServer operation', () => {
             })
     })
 
-    test('SSRServer rendering allows setting cookies with SSR_ALLOW_COOKIES env', () => {
+    test('SSRServer rendering allows setting cookies with MRT_ALLOW_COOKIES env', () => {
         process.env = {
-            SSR_ALLOW_COOKIES: 'true',
+            MRT_ALLOW_COOKIES: 'true'
         }
         const route = (req, res) => {
             res.setHeader('set-cookie', 'blah123')
@@ -548,7 +548,7 @@ describe('SSRServer operation', () => {
     test('should allow cookies in the request with ssrAllowCookies option', () => {
         const app = RemoteServerFactory._createApp(opts({ssrAllowCookies: true}))
         const route = (req, res) => {
-            expect(req.headers.cookie).toEqual('xyz=456')
+            expect(req.headers.cookie).toBe('xyz=456')
             res.sendStatus(200)
         }
         app.get('/*', route)
@@ -561,11 +561,11 @@ describe('SSRServer operation', () => {
             })
     })
 
-    test('should allow cookies in the request with SSR_ALLOW_COOKIES env', () => {
-        process.env = { 'SSR_ALLOW_COOKIES': 'true' }
+    test('should allow cookies in the request with MRT_ALLOW_COOKIES env', () => {
+        process.env = {MRT_ALLOW_COOKIES: 'true'}
         const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
-            expect(req.headers.cookie).toEqual('xyz=456')
+            expect(req.headers.cookie).toBe('xyz=456')
             res.sendStatus(200)
         }
         app.get('/*', route)

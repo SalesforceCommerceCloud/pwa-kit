@@ -181,7 +181,7 @@ const cacheTest = async (req, res) => {
  * diagnostic values.
  */
 const cookieTest = async (req, res) => {
-    if (req.query.hasOwnProperty('name')) {
+    if (Object.hasOwn(req.query, 'name')) {
         res.cookie(req.query.name, req.query?.value)
     }
     res.json(jsonFromRequest(req))
