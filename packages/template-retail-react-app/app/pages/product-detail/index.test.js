@@ -30,7 +30,7 @@ const MockedComponent = () => {
     return (
         <Switch>
             <Route
-                path="/en-GB/product/:productId"
+                path="/uk/en-GB/product/:productId"
                 render={(props) => <ProductDetail {...props} />}
             />
         </Switch>
@@ -55,7 +55,7 @@ beforeEach(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'ProductDetail', '/en-GB/product/test-product')
+    window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/test-product')
 })
 
 afterEach(() => {
@@ -104,7 +104,7 @@ describe('product set', () => {
     })
 
     test('add the set to cart successfully', async () => {
-        const urlPathAfterSelectingAllVariants = `/en-GB/product/winter-lookM?${new URLSearchParams(
+        const urlPathAfterSelectingAllVariants = `/uk/en-GB/product/winter-lookM?${new URLSearchParams(
             {
                 '25518447M': 'color=JJ5FUXX&size=9MD',
                 '25518704M': 'color=JJ2XNXX&size=9MD',
@@ -170,7 +170,7 @@ describe('product set', () => {
     })
 })
 
-describe.only('Recommended Products', () => {
+describe('Recommended Products', () => {
     let fetchMock
     beforeAll(() => {
         fetchMock = jest.spyOn(global, 'fetch').mockImplementation(async (url) => {
@@ -194,21 +194,21 @@ describe.only('Recommended Products', () => {
                 return res(ctx.json({}))
             })
         )
-        const user = userEvent.setup({
-            advanceTimers: jest.advanceTimersByTime
-        })
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
         renderWithProviders(<MockedComponent />)
 
+        // If we poll for updates immediately, the test output is flooded with errors:
+        // "Warning: An update to WrappedComponent inside a test was not wrapped in act(...)."
+        // If we wait to poll until the component is updated, then the errors disappear. Using a
+        // timeout is clearly a suboptimal solution, but I don't know the "correct" way to fix it.
         let done = false
-        setTimeout(() => (done = true), 150)
+        setTimeout(() => (done = true), 200)
         await waitFor(() => expect(done).toBeTruthy())
 
-        await waitFor(() => {
-            // Main product has loaded
-            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-            // Recently Viewed has loaded
-            expect(screen.getByText(/Summer Bomber Jacket/)).toBeInTheDocument()
-        })
+        expect(await screen.findAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+        expect(await screen.findByText(/Summer Bomber Jacket/)).toBeInTheDocument()
+
+        screen.logTestingPlaygroundURL()
 
         // We requested Recently Viewed products on the first page load, but we
         // only want to check against the second page load
