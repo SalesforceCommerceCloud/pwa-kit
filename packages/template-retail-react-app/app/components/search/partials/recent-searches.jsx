@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Button, Box} from '@chakra-ui/react'
+import {Text, Button, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 import {clearSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
 import {RECENT_SEARCH_KEY} from '@salesforce/retail-react-app/app/constants'

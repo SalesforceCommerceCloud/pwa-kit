@@ -7,7 +7,7 @@
         "target": "ES6",
         "baseUrl": "./",
         "paths": {
-            "retail-react-app/*": ["./*"]
+            "@salesforce/retail-react-app/*": ["./*", "./*/index"]
         }
     }
 }

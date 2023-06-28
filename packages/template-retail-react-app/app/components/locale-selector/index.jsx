@@ -19,7 +19,7 @@ import {
 
     // Hooks
     useStyleConfig
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Icons
 import {
