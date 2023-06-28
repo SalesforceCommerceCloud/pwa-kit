@@ -145,7 +145,7 @@ const App = (props) => {
 
     // Workaround for infinite loop if default site locale translation file is missing
     const isDefaultTranslation = new RegExp(
-        `/static/translations/compiled/${site.l10n.defaultLocale}`
+        `/static/translations/compiled/${site.l10n.defaultLocale}.json$`
     ).test(location?.pathname)
 
     // Fetch the translation message data using the target locale.
