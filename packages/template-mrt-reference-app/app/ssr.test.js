@@ -13,6 +13,7 @@ describe('server', () => {
     beforeEach(() => {
         originalEnv = process.env
         process.env = Object.assign({}, process.env, {
+            MRT_ALLOW_COOKIES: 'true',
             LISTEN_ADDRESS: '',
             BUNDLE_ID: '1',
             DEPLOY_TARGET: 'test',
@@ -33,7 +34,8 @@ describe('server', () => {
         ['/', 200, 'application/json; charset=utf-8'],
         ['/tls', 200, 'application/json; charset=utf-8'],
         ['/exception', 500, 'text/html; charset=utf-8'],
-        ['/cache', 200, 'application/json; charset=utf-8']
+        ['/cache', 200, 'application/json; charset=utf-8'],
+        ['/cookie', 200, 'application/json; charset=utf-8']
     ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
         return request(app)
             .get(path)
@@ -43,5 +45,11 @@ describe('server', () => {
 
     test('Path "/cache" has Cache-Control set', () => {
         return request(app).get('/cache').expect('Cache-Control', 's-maxage=60')
+    })
+
+    test('Path "/cookie" sets cookie', () => {
+        return request(app)
+            .get('/cookie?name=test-cookie&value=test-value')
+            .expect('set-cookie', 'test-cookie=test-value; Path=/')
     })
 })
