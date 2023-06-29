@@ -179,7 +179,8 @@ const cacheTest = async (req, res) => {
 /**
  * Express handler that sets a simple cookie and returns a JSON response with
  * diagnostic values. This set cache control to private to prevent CloudFront
- * caching as we expect customers to do for personalized responses.
+ * caching as we expect customers to do for personalized responses. Use
+ * ?name=test-name&value=test-value to set a cookie.
  */
 const cookieTest = async (req, res) => {
     if (Object.hasOwn(req.query, 'name')) {
