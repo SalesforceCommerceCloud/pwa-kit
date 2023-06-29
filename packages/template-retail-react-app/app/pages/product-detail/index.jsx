@@ -371,6 +371,9 @@ const ProductDetail = () => {
                     />
 
                     <RecommendedProducts
+                        // The Recently Viewed recommender doesn't use `products`, so instead we
+                        // provide a key to update the recommendations on navigation.
+                        key={location.key}
                         title={
                             <FormattedMessage
                                 defaultMessage="Recently Viewed"
