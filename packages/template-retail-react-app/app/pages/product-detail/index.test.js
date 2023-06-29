@@ -173,6 +173,8 @@ describe('product set', () => {
 describe('Recommended Products', () => {
     let fetchMock
     beforeAll(() => {
+        // This is probably more complex than it needs to be? I tried using jest-fetch-mock and msw,
+        // but I couldn't get those working...
         fetchMock = jest.spyOn(global, 'fetch').mockImplementation(async (url) => {
             const json = url.endsWith('viewed-recently-einstein') ? einsteinRecommendation : {}
             return new Response(JSON.stringify(json))
