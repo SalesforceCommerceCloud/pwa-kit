@@ -340,7 +340,7 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
-                        price={product?.price}
+                        price={product?.pricePerUnit}
                         productType={product?.type}
                         currency={product?.currency}
                         category={category}
@@ -382,7 +382,7 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
-                                price={product?.price}
+                                price={product?.pricePerUnit}
                                 productType={product?.type}
                                 currency={product?.currency}
                                 category={category}
