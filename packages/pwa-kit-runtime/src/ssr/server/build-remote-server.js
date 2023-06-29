@@ -915,7 +915,7 @@ export const RemoteServerFactory = {
      * contain both the certificate and the private key.
      * @param {function} customizeApp - a callback that takes an express app
      * as an argument. Use this to customize the server.
-     * @param {Boolean} [options.ssrAllowCookies] - This boolean value indicates
+     * @param {Boolean} [options.allowCookies] - This boolean value indicates
      * whether or not we strip cookies from requests and block setting of cookies. Defaults
      * to 'false'.
      */
@@ -939,7 +939,7 @@ export const RemoteServerFactory = {
  * ExpressJS middleware that processes any non-proxy request passing
  * through the Express app.
  *
- * If ssrAllowCookies is false, strips Cookie headers from incoming requests, and
+ * If allowCookies is false, strips Cookie headers from incoming requests, and
  * configures the Response so that it cannot have cookies set on it.
  *
  * Sets the Host header to the application host.

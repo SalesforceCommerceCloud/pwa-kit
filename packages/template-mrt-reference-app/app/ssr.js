@@ -184,6 +184,7 @@ const cookieTest = async (req, res) => {
     if (Object.hasOwn(req.query, 'name')) {
         res.cookie(req.query.name, req.query?.value)
     }
+    res.set('Cache-Control', 'private')
     res.json(jsonFromRequest(req))
 }
 
