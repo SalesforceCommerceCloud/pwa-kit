@@ -40,17 +40,10 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
         }
     )
     const promos = res?.data || []
-    // Create a mapping of variation values to their associated attributes. This allows us
-    // the render the readable names/labels rather than variation value IDs.
-    const variationValues = Object.keys(variant.variationValues || []).map((key) => {
-        const value = variant.variationValues[key]
-        const attr = variant.variationAttributes?.find((attr) => attr.id === key)
-        return {
-            id: key,
-            name: attr?.name || key,
-            value: attr.values.find((val) => val.value === value)?.name || value
-        }
-    })
+    const variationValues = getDisplayVariationValues(
+        variant?.variationAttributes,
+        variant?.variationValues
+    )
 
     // get variant info for bundled products in cart page and order history page
     const productBundleIds =
@@ -97,11 +90,17 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
 
     return (
         <Stack spacing={1.5} flex={1} {...props}>
-            {variationValues?.map((variationValue) => (
-                <Text lineHeight={1} color="gray.700" fontSize="sm" key={variationValue.id}>
-                    {variationValue.name}: {variationValue.value}
-                </Text>
-            ))}
+            {variationValues &&
+                Object.keys(variationValues).map((key) => (
+                    <Text
+                        lineHeight={1}
+                        color="gray.700"
+                        fontSize="sm"
+                        key={`${key}: ${variationValues[key]}`}
+                    >
+                        {key}: {variationValues[key]}
+                    </Text>
+                ))}
 
             {includeQuantity && (
                 <Text lineHeight={1} color="gray.700" fontSize="sm">
