@@ -6,10 +6,11 @@
  */
 /* eslint-env jest */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const path = require('path')
-const mockConfig = require(path.join(__dirname, 'config/mocks/default.js'))
+// fetch polyfill can be removed when node 16 is no longer supported
+require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
+const mockConfig = require('@salesforce/retail-react-app/config/mocks/default')
 const {configure: configureTestingLibrary} = require('@testing-library/react')
 const {Crypto} = require('@peculiar/webcrypto')
 const {setupServer} = require('msw/node')
