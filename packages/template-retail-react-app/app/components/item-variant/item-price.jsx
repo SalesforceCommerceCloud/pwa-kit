@@ -66,7 +66,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
         >
             {basePrice && price !== basePrice && (
                 <HideOnDesktop>
-                    <PricePerItem currency={currency} basePrice={basePrice} basket={basket} />
+                    <PricePerItem currency={currency} basePrice={basePrice.toString()} basket={basket} />
                 </HideOnDesktop>
             )}
             <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
@@ -101,7 +101,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
 
             {basePrice && price !== basePrice && (
                 <HideOnMobile>
-                    <PricePerItem currency={currency} basePrice={basePrice} basket={basket} />
+                    <PricePerItem currency={currency} basePrice={basePrice.toString()} basket={basket} />
                 </HideOnMobile>
             )}
         </Stack>
