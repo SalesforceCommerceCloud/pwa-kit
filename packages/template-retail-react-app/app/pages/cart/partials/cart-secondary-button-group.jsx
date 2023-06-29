@@ -15,7 +15,7 @@ import {
     Flex,
     Stack,
     useDisclosure
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {defineMessage, FormattedMessage} from 'react-intl'
 import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal/index'

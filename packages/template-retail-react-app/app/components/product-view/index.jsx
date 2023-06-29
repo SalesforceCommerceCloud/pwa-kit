@@ -10,7 +10,17 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
+import {
+    Flex,
+    Heading,
+    Button,
+    Skeleton,
+    Box,
+    Text,
+    VStack,
+    Fade,
+    useTheme
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
@@ -289,7 +299,7 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
-                        price={product?.price}
+                        price={product?.pricePerUnit || product?.price}
                         productType={product?.type}
                         currency={product?.currency}
                         category={category}
@@ -328,7 +338,7 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
-                                price={product?.price}
+                                price={product?.pricePerUnit || product?.price}
                                 productType={product?.type}
                                 currency={product?.currency}
                                 category={category}
