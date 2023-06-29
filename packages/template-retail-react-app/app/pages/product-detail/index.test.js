@@ -208,13 +208,13 @@ describe('Recommended Products', () => {
         expect(await screen.findAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
         expect(await screen.findByText(/Summer Bomber Jacket/)).toBeInTheDocument()
 
-        screen.logTestingPlaygroundURL()
-
         // We requested Recently Viewed products on the first page load, but we
         // only want to check against the second page load
         fetchMock.mockClear()
         await user.click(screen.getByText(/Summer Bomber Jacket/))
 
+        // The scope of this test means we just care about the Recently Viewed component being
+        // updated - we don't need to wait for the rest of the page loading
         expect(fetchMock).toHaveBeenCalledWith(
             expect.stringMatching(/viewed-recently-einstein$/),
             expect.any(Object)
