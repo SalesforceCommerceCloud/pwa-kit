@@ -58,6 +58,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
         {
             enabled: Boolean(variant?.type?.bundle && productBundleIds),
             select: (result) => {
+                // formats response so we can easily display child quantity/variant selection
                 return result?.data?.map((item) => {
                     const quantity = variant?.bundledProductItems.find(
                         (childProduct) => childProduct.productId === item.id

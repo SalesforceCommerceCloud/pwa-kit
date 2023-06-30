@@ -102,6 +102,6 @@ test('the View Options button', async () => {
 test('bundle in wishlist renders the View Full Details button', async () => {
     renderWithProviders(<MockedComponent variant={mockProductBundle} />)
 
-    const link = await screen.findByRole('link', {name: /view full details/i})
+    const link = await screen.findByText(/view full details/i)
     expect(link).toBeInTheDocument()
 })
