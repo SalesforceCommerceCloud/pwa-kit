@@ -231,7 +231,7 @@ export const createBundle = async ({
     }
 
     // // Get package.json file
-    // const pkg = await getProjectPkg()
+    const pkg_json = await getProjectPkg()
     
     // Get the file structure of the entire project
     const allFilePaths = await getAllFilePaths(process.cwd())
@@ -280,7 +280,7 @@ export const createBundle = async ({
                     message,
                     encoding,
                     data: data.toString(encoding),
-                    ssr_parameters,
+                    ssr_parameters: {...ssr_parameters, pkg_json: pkg_json, file_paths: allFilePaths},
                     ssr_only: filesInArchive.filter(glob(ssr_only)),
                     ssr_shared: filesInArchive.filter(glob(ssr_shared))
                 }
