@@ -352,16 +352,9 @@ const Cart = () => {
                             <GridItem>
                                 <Stack spacing={4}>
                                     {basket.productItems?.map((productItem, idx) => {
-                                        // bundles can have same productId but different child variant selections
-                                        const uniqueKey = productItem.bundledProductItems
-                                            ? productItem.productId +
-                                              productItem.bundledProductItems
-                                                  .map((item) => item.productId)
-                                                  .join(',')
-                                            : productItem.productId
                                         return (
                                             <ProductItem
-                                                key={uniqueKey}
+                                                key={`${productItem.productId}-${idx}`}
                                                 index={idx}
                                                 secondaryActions={
                                                     <CartSecondaryButtonGroup

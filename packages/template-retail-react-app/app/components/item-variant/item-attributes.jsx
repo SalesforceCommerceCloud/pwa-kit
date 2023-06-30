@@ -48,7 +48,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     // get variant info for bundled products in cart page and order history page
     const productBundleIds =
         variant?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: productBundleVariantData} = useProducts(
+    const {data: productBundleVariantData, isLoading: bundleVariantIsLoading} = useProducts(
         {
             parameters: {
                 ids: productBundleIds,
@@ -56,7 +56,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             }
         },
         {
-            enabled: Boolean(productBundleIds),
+            enabled: Boolean(variant?.type?.bundle && productBundleIds),
             select: (result) => {
                 return result?.data?.map((item) => {
                     const quantity = variant?.bundledProductItems.find(
@@ -76,7 +76,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     )
 
     // get bundle product data for wishlist page
-    const {data: productBundleData} = useProduct(
+    const {data: productBundleData, isLoading: productBundleIsLoading} = useProduct(
         {
             parameters: {
                 id: variant?.id,
@@ -112,7 +112,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                 </Text>
             )}
 
-            {productBundleData && !productBundleVariantData && (
+            {!productBundleIsLoading && productBundleData && !productBundleVariantData && (
                 <Box>
                     {productBundleData?.bundledProducts.map(({product, quantity}) => (
                         <Box marginTop={2} key={product.id}>
@@ -131,7 +131,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                 </Box>
             )}
 
-            {productBundleVariantData && (
+            {!bundleVariantIsLoading && productBundleVariantData && (
                 <Box>
                     <Text fontSize={15} marginTop={3} fontWeight={500}>
                         {intl.formatMessage({
