@@ -321,6 +321,7 @@ const main = async () => {
                 if (!fse.pathExistsSync(buildDirectory)) {
                     throw new Error(`Supplied "buildDirectory" does not exist!`)
                 }
+                console.log('BUILD DIRECTORY: ' + buildDirectory)
 
                 const mobify = getConfig({buildDirectory}) || {}
 

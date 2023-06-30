@@ -6,6 +6,7 @@
  */
 import os from 'os'
 import path from 'path'
+import fs from 'fs'
 import archiver, {EntryData} from 'archiver'
 import {default as _fetch, Response} from 'node-fetch'
 import {URL} from 'url'
@@ -16,7 +17,7 @@ import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
 
-export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
+export const DEFAULT_CLOUD_ORIGIN = 'http://cloud-dev.mobify.com:8000'
 export const DEFAULT_DOCS_URL =
     'https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html'
 
@@ -187,6 +188,21 @@ export const defaultMessage = (gitInstance: typeof git = git): string => {
     }
 }
 
+function getAllFilePaths(dirPath: string, arrayOfFiles: string[] = [], parentDir: string = ''): string[] {
+    const files = fs.readdirSync(dirPath);
+
+    files.forEach((file) => {
+        const fullPath = path.join(dirPath, file)
+        if (fs.statSync(fullPath).isDirectory() && !fullPath.includes('/node_modules')) {
+            arrayOfFiles = getAllFilePaths(fullPath, arrayOfFiles), path.join(parentDir, file);
+        } else {
+            arrayOfFiles.push(path.join(parentDir, file));
+        }
+    });
+
+    return arrayOfFiles;
+}
+
 interface CreateBundleArgs {
     message: string | null | undefined
     ssr_parameters: any
@@ -213,6 +229,12 @@ export const createBundle = async ({
     if (ssr_only.length === 0 || ssr_shared.length === 0) {
         throw new Error('no ssrOnly or ssrShared files are defined')
     }
+
+    // // Get package.json file
+    // const pkg = await getProjectPkg()
+    
+    // Get the file structure of the entire project
+    const allFilePaths = await getAllFilePaths(process.cwd())
 
     return (
         Promise.resolve()
