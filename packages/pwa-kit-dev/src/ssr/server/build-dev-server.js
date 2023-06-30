@@ -47,6 +47,15 @@ export const DevServerMixin = {
     /**
      * @private
      */
+    _getAllowCookies(options) {
+        return 'MRT_ALLOW_COOKIES' in process.env
+            ? process.env.MRT_ALLOW_COOKIES === 'true'
+            : options.localAllowCookies
+    },
+
+    /**
+     * @private
+     */
     _getProtocol(options) {
         return process.env.DEV_SERVER_PROTOCOL || options.protocol
     },
