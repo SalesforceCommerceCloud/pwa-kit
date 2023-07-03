@@ -72,6 +72,7 @@ describe('determineTargetLocale', () => {
 })
 
 describe('fetchTranslations', () => {
+    // The following two tests expect the compiled translation files in app/static/translations/compiled to exist
     test('loading the target locale', async () => {
         const messages = await fetchTranslations(supportedLocale)
         expect(messages[testId2]).toBeDefined()
@@ -126,6 +127,7 @@ describe('getTargetLocale', () => {
         windowSpy.mockImplementation(() => undefined)
 
         const targetLocale = getTargetLocale({l10nConfig})
+        // We expect the compiled translation file in app/static/translations/compiled/en-XA to exist
         const messages = await fetchTranslations(targetLocale)
         // The app should still think its target locale is the default one
         expect(targetLocale).toBe(DEFAULT_LOCALE)
