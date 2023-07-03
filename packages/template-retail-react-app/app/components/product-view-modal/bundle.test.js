@@ -64,9 +64,9 @@ test('renders bundle product view modal', async () => {
     })
 
     await waitFor(() => {
-        const bundleTitleQuery = screen.getAllByText(/Women's clothing test bundle/i);
+        const bundleTitleQuery = screen.getAllByText(/Women's clothing test bundle/i)
         expect(bundleTitleQuery[0]).toBeInTheDocument()
-        expect(bundleTitleQuery.length).toBe(2) // one for desktop and one for mobile
+        expect(bundleTitleQuery).toHaveLength(2) // one for desktop and one for mobile
     })
 
     expect(screen.getByRole('button', {name: /update/i})).toBeInTheDocument()
@@ -74,7 +74,7 @@ test('renders bundle product view modal', async () => {
     mockProductBundleWithVariants.data.forEach((childProduct) => {
         const childProductQuery = screen.getAllByText(childProduct.name)
         expect(childProductQuery[0]).toBeInTheDocument()
-        expect(childProductQuery.length).toBe(2) // one for desktop and one for mobile
+        expect(childProductQuery).toHaveLength(2) // one for desktop and one for mobile
     })
 })
 
