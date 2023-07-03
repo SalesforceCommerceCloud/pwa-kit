@@ -109,7 +109,8 @@ const ProductView = forwardRef(
             setChildProductOrderability,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
-                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel
+                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
+            showImageGallery = true
         },
         ref
     ) => {
@@ -210,7 +211,7 @@ const ProductView = forwardRef(
 
                 if (!addToCart && !updateCart) return null
                 if (updateCart) {
-                    await updateCart(variant, quantity)
+                    await updateCart(variant || product, quantity)
                     return
                 }
                 try {
@@ -339,7 +340,7 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
-                        price={product?.price}
+                        price={product?.pricePerUnit || product?.price}
                         productType={product?.type}
                         currency={product?.currency}
                         category={category}
@@ -347,39 +348,41 @@ const ProductView = forwardRef(
                     />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
-                    <Box flex={1} mr={[0, 0, 0, 6, 6]}>
-                        {product ? (
-                            <>
-                                <ImageGallery
-                                    size={imageSize}
-                                    imageGroups={product.imageGroups}
-                                    selectedVariationAttributes={variationParams}
-                                    lazy={isProductPartOfSet || isProductPartOfBundle}
-                                />
-                                <HideOnMobile>
-                                    {showFullLink && product && (
-                                        <Link to={`/product/${product.master.masterId}`}>
-                                            <Text color="blue.600">
-                                                {intl.formatMessage({
-                                                    defaultMessage: 'See full details',
-                                                    id: 'product_view.link.full_details'
-                                                })}
-                                            </Text>
-                                        </Link>
-                                    )}
-                                </HideOnMobile>
-                            </>
-                        ) : (
-                            <ImageGallerySkeleton />
-                        )}
-                    </Box>
+                    {showImageGallery && (
+                        <Box flex={1} mr={[0, 0, 0, 6, 6]}>
+                            {product ? (
+                                <>
+                                    <ImageGallery
+                                        size={imageSize}
+                                        imageGroups={product.imageGroups}
+                                        selectedVariationAttributes={variationParams}
+                                        lazy={isProductPartOfSet || isProductPartOfBundle}
+                                    />
+                                    <HideOnMobile>
+                                        {showFullLink && product && (
+                                            <Link to={`/product/${product.master?.masterId}`}>
+                                                <Text color="blue.600">
+                                                    {intl.formatMessage({
+                                                        defaultMessage: 'See full details',
+                                                        id: 'product_view.link.full_details'
+                                                    })}
+                                                </Text>
+                                            </Link>
+                                        )}
+                                    </HideOnMobile>
+                                </>
+                            ) : (
+                                <ImageGallerySkeleton />
+                            )}
+                        </Box>
+                    )}
 
                     {/* Variations & Quantity Selector & CTA buttons */}
                     <VStack align="stretch" spacing={8} flex={1}>
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
-                                price={product?.price}
+                                price={product?.pricePerUnit || product?.price}
                                 productType={product?.type}
                                 currency={product?.currency}
                                 category={category}
@@ -532,7 +535,7 @@ const ProductView = forwardRef(
                             </Box>
                             <HideOnDesktop>
                                 {showFullLink && product && (
-                                    <Link to={`/product/${product.master.masterId}`}>
+                                    <Link to={`/product/${product.master?.masterId}`}>
                                         <Text color="blue.600">
                                             {intl.formatMessage({
                                                 defaultMessage: 'See full details',
@@ -602,7 +605,8 @@ ProductView.propTypes = {
     childProductOrderability: PropTypes.object,
     setChildProductOrderability: PropTypes.func,
     onVariantSelected: PropTypes.func,
-    validateOrderability: PropTypes.func
+    validateOrderability: PropTypes.func,
+    showImageGallery: PropTypes.bool
 }
 
 export default ProductView
