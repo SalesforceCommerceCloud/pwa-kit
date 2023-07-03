@@ -1551,6 +1551,12 @@
       "value": "quantity"
     }
   ],
+  "item_attributes.label.selected_options": [
+    {
+      "type": 0,
+      "value": "Selected Options"
+    }
+  ],
   "item_image.label.sale": [
     {
       "type": 0,
