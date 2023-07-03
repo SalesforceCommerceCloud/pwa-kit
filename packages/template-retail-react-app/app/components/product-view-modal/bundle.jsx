@@ -15,7 +15,8 @@ import {
     ModalOverlay,
     Flex,
     Box,
-    VStack
+    VStack,
+    useBreakpointValue
 } from '@chakra-ui/react'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
@@ -44,6 +45,8 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedChildProducts, setSelectedChildProducts] = useState([])
 
+    const trueIfMobile = useBreakpointValue({base: true, lg: false})
+
     return (
         <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -52,7 +55,11 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                 <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                     <Flex direction={['column', 'column', 'column', 'row']}>
                         {/* Due to desktop layout, we'll need to render the image gallery separately, from outside the ProductView */}
-                        <Box flex={1} mr={[0, 0, 0, 6, 6]}>
+                        <Box
+                            flex={1}
+                            mr={[0, 0, 0, 6, 6]}
+                            display={['none', 'none', 'none', 'block']}
+                        >
                             {bundle ? (
                                 <>
                                     <ImageGallery
@@ -71,7 +78,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                             <Box marginBottom={6}>
                                 <ProductView
                                     showFullLink={false}
-                                    showImageGallery={false}
+                                    showImageGallery={trueIfMobile}
                                     product={productViewModalData.product}
                                     isLoading={productViewModalData.isFetching}
                                     updateCart={(product, quantity) =>
