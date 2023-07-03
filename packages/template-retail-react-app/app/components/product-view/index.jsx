@@ -572,7 +572,11 @@ const ProductView = forwardRef(
                     position="fixed"
                     bg="white"
                     width="100%"
-                    display={isProductPartOfSet ? 'none' : ['block', 'block', 'block', 'none']}
+                    display={
+                        isProductPartOfSet || isProductPartOfBundle
+                            ? 'none'
+                            : ['block', 'block', 'block', 'none']
+                    }
                     p={[4, 4, 6]}
                     left={0}
                     bottom={0}
