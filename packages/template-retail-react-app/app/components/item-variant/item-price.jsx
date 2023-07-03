@@ -34,7 +34,7 @@ const PricePerItem = ({currency, basket, basePrice}) => {
 PricePerItem.propTypes = {
     currency: PropTypes.string,
     basket: PropTypes.object,
-    basePrice: PropTypes.string
+    basePrice: PropTypes.number
 }
 
 /**

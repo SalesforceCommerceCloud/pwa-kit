@@ -35,11 +35,7 @@ import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
 const OrderProducts = ({productItems, currency}) => {
-    const productItemsMap = productItems.reduce(
-        (map, item) => ({...map, [item.productId]: item}),
-        {}
-    )
-    const ids = Object.keys(productItemsMap).join(',') ?? ''
+    const ids = productItems?.map((item) => item.productId).join(',') ?? ''
     const {data: {data: products} = {}, isLoading} = useProducts(
         {
             parameters: {
@@ -51,8 +47,11 @@ const OrderProducts = ({productItems, currency}) => {
         }
     )
 
-    const variants = products?.map((product) => {
-        const productItem = productItemsMap[product.id]
+    const productsMap =
+        products?.reduce((map, product) => ({...map, [product.id]: product}), {}) ?? []
+
+    const variants = productItems?.map((productItem) => {
+        const product = productsMap[productItem.productId]
         return {
             ...productItem,
             ...product,

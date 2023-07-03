@@ -652,6 +652,9 @@
   "item_attributes.label.quantity": {
     "defaultMessage": "Quantity: {quantity}"
   },
+  "item_attributes.label.selected_options": {
+    "defaultMessage": "Selected Options"
+  },
   "item_image.label.sale": {
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"

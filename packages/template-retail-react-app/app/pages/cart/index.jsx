@@ -354,7 +354,7 @@ const Cart = () => {
                                     {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem
-                                                key={productItem.productId}
+                                                key={`${productItem.productId}-${idx}`}
                                                 index={idx}
                                                 secondaryActions={
                                                     <CartSecondaryButtonGroup
