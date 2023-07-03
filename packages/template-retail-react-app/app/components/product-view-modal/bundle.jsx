@@ -139,7 +139,6 @@ BundleProductViewModal.propTypes = {
     onClose: PropTypes.func.isRequired,
     product: PropTypes.object,
     isLoading: PropTypes.bool,
-    actionButtons: PropTypes.node,
     updateCart: PropTypes.func
 }
 
