@@ -82,6 +82,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                             ({validateOrderability}) => validateOrderability()
                                         )
                                     }}
+                                    childProductOrderability={childProductOrderability}
                                     {...props}
                                 />
                             </Box>
@@ -110,7 +111,6 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                             showFullLink={false}
                                             product={product}
                                             isLoading={isLoading}
-                                            childProductOrderability={childProductOrderability}
                                             setChildProductOrderability={
                                                 setChildProductOrderability
                                             }
