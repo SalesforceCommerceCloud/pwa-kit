@@ -74,6 +74,7 @@ const ENVS_TO_EXPOSE = [
     'deploy_target',
     'external_domain_name',
     'mobify_property_id',
+    'mrt_allow_cookies',
     'node_env',
     'tz'
 ]
