@@ -143,10 +143,20 @@ const App = (props) => {
         l10nConfig: site.l10n
     })
 
+    // Workaround for infinite loop if default site locale translation file is missing
+    const isDefaultTranslation = new RegExp(
+        `/static/translations/compiled/${site.l10n.defaultLocale}\\.json$`
+    ).test(location?.pathname)
+
     // Fetch the translation message data using the target locale.
     const {data: messages} = useQuery({
-        queryKey: ['app', 'translationas', 'messages', targetLocale],
-        queryFn: () => fetchTranslations(targetLocale),
+        queryKey: ['app', 'translations', 'messages', targetLocale],
+        queryFn: () => {
+            if (isDefaultTranslation) {
+                return {}
+            }
+            return fetchTranslations(targetLocale)
+        },
         enabled: isServer
     })
 
