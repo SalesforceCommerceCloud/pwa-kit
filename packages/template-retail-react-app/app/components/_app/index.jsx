@@ -143,6 +143,8 @@ const App = (props) => {
         l10nConfig: site.l10n
     })
 
+    // If the translation file exists, it'll be served directly from static folder (and won't reach this code here).
+    // However, if the file is missing, the App would render a 404 page.
     const is404ForMissingTranslationFile = /\/static\/translations\/compiled\/[^.]+\.json$/.test(
         location?.pathname
     )
