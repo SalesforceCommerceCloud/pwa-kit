@@ -44,7 +44,7 @@ const AccountWishlist = () => {
     // If a product is added to the wishlist many times, it gets collapased into 1 line item
     const wishListItems = wishListData?.customerProductListItems?.reduce((itemsData, item) => {
         const productData = productsData?.data?.find((product) => product.id === item.productId)
-        return {...itemsData, [item.productId]: {item, product: productData}}
+        return {...itemsData, [item.productId]: {...item, product: productData}}
     }, {})
 
     const updateCustomerProductListItem = useShopperCustomersMutation(
