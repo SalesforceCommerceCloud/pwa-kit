@@ -178,6 +178,18 @@ const cacheTest = async (req, res) => {
 }
 
 /**
+ * Express handler that enables the cache to a duration and returns a JSON response with diagnostic values.
+ */
+const cacheTestWithDuration = async (req, res) => {
+    let duration = req.params.duration || ''
+    if (!duration.match(/[0-9]\d*/)) {
+        return res.sendStatus(400)
+    }
+    res.set('Cache-Control', `pubic, maxage=${duration}`)
+    res.json(jsonFromRequest(req))
+}
+
+/**
  * Express handler that sets a simple cookie and returns a JSON response with
  * diagnostic values. This set cache control to private to prevent CloudFront
  * caching as we expect customers to do for personalized responses. Use
@@ -256,6 +268,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
     app.get('/cache', cacheTest)
+    app.get('/cache/:duration', cacheTestWithDuration)
     app.get('/cookie', cookieTest)
     app.get('/headers', headerTest)
 
