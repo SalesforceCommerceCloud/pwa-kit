@@ -143,10 +143,23 @@ const App = (props) => {
         l10nConfig: site.l10n
     })
 
+    // If the translation file exists, it'll be served directly from static folder (and won't reach this code here).
+    // However, if the file is missing, the App would render a 404 page.
+    const is404ForMissingTranslationFile = /\/static\/translations\/compiled\/[^.]+\.json$/.test(
+        location?.pathname
+    )
+
     // Fetch the translation message data using the target locale.
     const {data: messages} = useQuery({
-        queryKey: ['app', 'translationas', 'messages', targetLocale],
-        queryFn: () => fetchTranslations(targetLocale),
+        queryKey: ['app', 'translations', 'messages', targetLocale],
+        queryFn: () => {
+            if (is404ForMissingTranslationFile) {
+                // Return early to prevent an infinite loop
+                // Otherwise, it'll continue to fetch the missing translation file again
+                return {}
+            }
+            return fetchTranslations(targetLocale)
+        },
         enabled: isServer
     })
 

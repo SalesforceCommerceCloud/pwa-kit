@@ -112,7 +112,10 @@ export const RemoteServerFactory = {
             // be no use-case for SDK users to set this.
             strictSSL: true,
 
-            mobify: undefined
+            mobify: undefined,
+
+            // Toggle cookies being passed and set
+            localAllowCookies: false
         }
 
         options = Object.assign({}, defaults, options)
@@ -138,6 +141,11 @@ export const RemoteServerFactory = {
         // This is the ORIGIN under which we are serving the page.
         // because it's an origin, it does not end with a slash.
         options.appOrigin = process.env.APP_ORIGIN = `${options.protocol}://${options.appHostname}`
+
+        // Toggle cookies being passed and set. Can be overridden locally,
+        // always uses MRT_ALLOW_COOKIES env remotely
+        options.allowCookies = this._getAllowCookies(options)
+
         return options
     },
 
@@ -147,6 +155,14 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _logStartupMessage(options) {
         // Hook for the DevServer
+    },
+
+    /**
+     * @private
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _getAllowCookies(options) {
+        return 'MRT_ALLOW_COOKIES' in process.env ? process.env.MRT_ALLOW_COOKIES == 'true' : false
     },
 
     /**
@@ -899,6 +915,9 @@ export const RemoteServerFactory = {
      * contain both the certificate and the private key.
      * @param {function} customizeApp - a callback that takes an express app
      * as an argument. Use this to customize the server.
+     * @param {Boolean} [options.allowCookies] - This boolean value indicates
+     * whether or not we strip cookies from requests and block setting of cookies. Defaults
+     * to 'false'.
      */
     createHandler(options, customizeApp) {
         process.on('unhandledRejection', catchAndLog)
@@ -920,8 +939,9 @@ export const RemoteServerFactory = {
  * ExpressJS middleware that processes any non-proxy request passing
  * through the Express app.
  *
- * Strips Cookie headers from incoming requests, and configures the
- * Response so that it cannot have cookies set on it.
+ * If allowCookies is false, strips Cookie headers from incoming requests, and
+ * configures the Response so that it cannot have cookies set on it.
+ *
  * Sets the Host header to the application host.
  * If there's an Origin header, rewrites it to be the application
  * Origin.
@@ -933,8 +953,27 @@ export const RemoteServerFactory = {
  */
 const prepNonProxyRequest = (req, res, next) => {
     const options = req.app.options
-    // Strip cookies from the request
-    delete req.headers.cookie
+    if (!options.allowCookies) {
+        // Strip cookies from the request
+        delete req.headers.cookie
+        // In an Express Response, all cookie setting ends up
+        // calling setHeader, so we override that to allow us
+        // to intercept and discard cookie setting.
+        const setHeader = Object.getPrototypeOf(res).setHeader
+        const remote = isRemote()
+        res.setHeader = function (header, value) {
+            /* istanbul ignore else */
+            if (header && header.toLowerCase() !== SET_COOKIE && value) {
+                setHeader.call(this, header, value)
+            } /* istanbul ignore else */ else if (!remote) {
+                console.warn(
+                    `Req ${res.locals.requestId}: ` +
+                        `Cookies cannot be set on responses sent from ` +
+                        `the SSR Server. Discarding "Set-Cookie: ${value}"`
+                )
+            }
+        }
+    }
 
     // Set the Host header
     req.headers.host = options.appHostname
@@ -944,23 +983,6 @@ const prepNonProxyRequest = (req, res, next) => {
         req.headers.origin = options.appOrigin
     }
 
-    // In an Express Response, all cookie setting ends up
-    // calling setHeader, so we override that to allow us
-    // to intercept and discard cookie setting.
-    const setHeader = Object.getPrototypeOf(res).setHeader
-    const remote = isRemote()
-    res.setHeader = function (header, value) {
-        /* istanbul ignore else */
-        if (header && header.toLowerCase() !== SET_COOKIE && value) {
-            setHeader.call(this, header, value)
-        } /* istanbul ignore else */ else if (!remote) {
-            console.warn(
-                `Req ${res.locals.requestId}: ` +
-                    `Cookies cannot be set on responses sent from ` +
-                    `the SSR Server. Discarding "Set-Cookie: ${value}"`
-            )
-        }
-    }
     next()
 }
 
