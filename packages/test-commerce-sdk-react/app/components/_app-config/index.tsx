@@ -7,6 +7,7 @@
 import React, {useState, ReactElement} from 'react'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import {withLegacyGetProps} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 interface AppConfigProps {
@@ -91,4 +92,4 @@ const options = {
     }
 }
 
-export default withReactQuery(AppConfig, options)
+export default withReactQuery(withLegacyGetProps(AppConfig), options)

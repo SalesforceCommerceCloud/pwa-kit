@@ -298,4 +298,21 @@ const Home = () => {
 
 Home.getTemplateName = () => 'home'
 
+Home.shouldGetProps = () => typeof window === 'undefined'
+
+Home.getProps = async ({res, api}) => {
+    console.log('~res', res)
+    if (res) {
+        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+    }
+
+    const productSearchResult = await api.shopperSearch.productSearch({
+        parameters: {
+            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
+            limit: HOME_SHOP_PRODUCTS_LIMIT
+        }
+    })
+
+    return {productSearchResult}
+}
 export default Home
