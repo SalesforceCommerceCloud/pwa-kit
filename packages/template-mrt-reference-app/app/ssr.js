@@ -192,6 +192,14 @@ const cookieTest = async (req, res) => {
 }
 
 /**
+ * Express handler that echoes back headers supplied with request.
+ */
+
+const headerTest = async (req, res) => {
+    res.json({headers: redactAndSortObjectKeys(req.headers)})
+}
+
+/**
  * Logging middleware; logs request and response headers (and response status).
  */
 const loggingMiddleware = (req, res, next) => {
@@ -249,6 +257,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/tls', tlsVersionTest)
     app.get('/cache', cacheTest)
     app.get('/cookie', cookieTest)
+    app.get('/headers', headerTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
