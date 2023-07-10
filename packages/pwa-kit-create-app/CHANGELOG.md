@@ -1,3 +1,6 @@
+## v2.7.4-preview.0 (Jul 10, 2023)
+-   Fix security vulnerability in `semver` dependency [#1356](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1356)
+
 ## v2.7.1 (May 11, 2023)
 
 -   Moved the MRT reference app to the SDKs, so that we can verify eg. Node support [#966](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/966)
