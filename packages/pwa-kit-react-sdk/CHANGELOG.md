@@ -1,3 +1,4 @@
+## v3.0.1-preview.0 (Jul 10, 2023)
 ## v3.0.0 (Jun 15, 2023)
 
 -   Package name changed to `@salesforce/pwa-kit-react-sdk`
