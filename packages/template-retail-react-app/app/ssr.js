@@ -35,7 +35,6 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-
     const getCSP = (nodeEnv, site) => {
         const trustedMap = {
             development: [
@@ -66,20 +65,10 @@ const {handler} = runtime.createHandler(options, (app) => {
         const trusted = ["'self'", ...trustedMap[nodeEnv]]
         return {
             directives: {
-                'connect-src': [
-                    'api.cquotient.com',
-                    ...trusted
-                ],
+                'connect-src': ['api.cquotient.com', ...trusted],
                 'frame-ancestors': [...trusted],
-                'img-src': [
-                    'data:',
-                    ...trusted
-                ],
-                'script-src': [
-                    'unsafe-eval',
-                    'storage.googleapis.com',
-                    ...trusted
-                ],
+                'img-src': ['data:', ...trusted],
+                'script-src': ['unsafe-eval', 'storage.googleapis.com', ...trusted],
 
                 // Do not upgrade insecure requests for local development
                 'upgrade-insecure-requests': isRemote() ? [] : null
