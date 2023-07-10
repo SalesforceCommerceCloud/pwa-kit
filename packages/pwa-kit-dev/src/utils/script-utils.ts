@@ -48,6 +48,8 @@ interface Bundle {
 interface Pkg {
     name: string
     version: string
+    dependencies?: {[key: string]: string}
+    devDependencies?: {[key: string]: string}
 }
 
 /**
@@ -251,6 +253,13 @@ export const createBundle = async ({
                         archive.finalize()
                     })
             )
+            .then(async () => {
+                const {dependencies = {}, devDependencies = {}} = await getProjectPkg()
+                ssr_parameters = {
+                    ...ssr_parameters,
+                    bundle_metadata: {dependencies: {...dependencies, ...devDependencies}}
+                }
+            })
             .then(() => readFile(destination))
             .then((data) => {
                 const encoding = 'base64'
