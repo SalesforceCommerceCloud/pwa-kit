@@ -1,5 +1,7 @@
 ## v1.0.1-preview.0 (Jul 10, 2023)
-## v1.0.1-preview.0 (Jul 10, 2023)
+
+-   Fix security vulnerability in `semver` dependency [#1357](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1357)
+
 ## v1.0.0 (Jun 15, 2023)
 
 -   First public release of package on npm under `@salesforce/commerce-sdk-react`
