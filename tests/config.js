@@ -5,23 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-module.exports = {
+export default {
   GET_GIT_SHA_CMD: "git rev-parse HEAD",
-  GENERATE_PROJECTS: [
-    // "RETAIL_REACT_APP_DEMO",
-    "RETAIL_REACT_APP_EXT",
-    // "RETAIL_REACT_APP_NO_EXT",
-  ],
+  GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
   GENERATOR_CMD:
     "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir",
   CLI_RESPONSES: {
-    RETAIL_REACT_APP_DEMO: [
+    "retail-app-demo": [
       {
         expectedPrompt: /Choose a project preset to get started:/i,
         response: "2\n",
       },
     ],
-    RETAIL_REACT_APP_EXT: [
+    "retail-app-ext": [
       {
         expectedPrompt: /Choose a project preset to get started:/i,
         response: "1\n",
@@ -57,7 +53,7 @@ module.exports = {
         response: "kv7kzm78\n",
       },
     ],
-    RETAIL_REACT_APP_NO_EXT: [
+    "retail-app-no-ext": [
       {
         expectedPrompt: /Choose a project preset to get started:/i,
         response: "1\n",
