@@ -36,7 +36,7 @@ jobs:
         run: |-
           npm install -g npm@${{ matrix.npm }}
 
-      - name: Install Dependencies
+      - name: Install Monorepo Dependencies
         run: |-
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
@@ -77,7 +77,7 @@ jobs:
         run: |-
           npm install -g npm@${{ matrix.npm }}
 
-      - name: Install Dependencies
+      - name: Install Monorepo Dependencies
         run: |-
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
@@ -86,6 +86,11 @@ jobs:
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-ext"
+
+      - name: Verify generated project
+        run: |-
+          # List file list from output dir
+          ls -d ../generated-projects/*/*
   run-generator-retail-app-no-ext:
     strategy:
       fail-fast: false
@@ -113,7 +118,7 @@ jobs:
         run: |-
           npm install -g npm@${{ matrix.npm }}
 
-      - name: Install Dependencies
+      - name: Install Monorepo Dependencies
         run: |-
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
@@ -122,3 +127,8 @@ jobs:
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-no-ext"
+
+      - name: Verify generated project
+        run: |-
+          # List file list from output dir
+          ls -d ../generated-projects/*/*
