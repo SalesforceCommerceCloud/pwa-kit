@@ -27,6 +27,6 @@ jobs:
           cache: npm
 
       - name: Generate Retail App Demo
-        uses: ./actions/e2e_generate_app
+        uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-demo"
