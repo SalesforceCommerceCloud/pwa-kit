@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   root: true,
   plugins: ["header"],
   rules: {
@@ -18,5 +18,5 @@ export default {
         " ",
       ],
     ],
-  }
+  },
 };
