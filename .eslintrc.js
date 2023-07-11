@@ -1,21 +1,21 @@
 module.exports = {
   root: true,
-  plugins: ["header"],
+  plugins: ['header'],
   rules: {
-    "header/header": [
+    'header/header': [
       2,
-      "block",
+      'block',
       [
-        "",
+        '',
         {
           pattern:
-            "^ \\* Copyright \\(c\\) \\d{4}, (salesforce.com, inc|Salesforce, Inc)\\.$",
+            '^ \\* Copyright \\(c\\) \\d{4}, (salesforce.com, inc|Salesforce, Inc)\\.$',
           template: ` * Copyright (c) ${new Date().getFullYear()}, Salesforce, Inc.`,
         },
-        " * All rights reserved.",
-        " * SPDX-License-Identifier: BSD-3-Clause",
-        " * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause",
-        " ",
+        ' * All rights reserved.',
+        ' * SPDX-License-Identifier: BSD-3-Clause',
+        ' * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause',
+        ' ',
       ],
     ],
   },
