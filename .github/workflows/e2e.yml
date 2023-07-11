@@ -45,6 +45,11 @@ jobs:
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-demo"
+
+      - name: Verify generated project
+        run: |-
+          # List file list from output dir
+          ls -d ../generated-projects/*/*
   run-generator-retail-app-ext:
     strategy:
       fail-fast: false
