@@ -1,0 +1,26 @@
+name: SalesforceCommerceCloud/pwa-kit/e2e
+on:
+  workflow_dispatch:
+  schedule:
+    # Run every day at 12pm (PST) - cron uses UTC times
+    - cron: "0 8 * * *"
+
+jobs:
+  run-generator:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Generate Retail App Demo
+        uses: ./.github/actions/e2e_generate_app
+        with:
+          PROJECT_KEY: "retail-app-demo"

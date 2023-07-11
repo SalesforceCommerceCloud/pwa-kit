@@ -1,0 +1,12 @@
+name: e2e_generate_app
+inputs:
+  PROJECT_KEY:
+    description: "Project key to specify generator mode ("retail-app-demo", "retail-app-ext" or "retail-app-no-ext")"
+    required: true
+    type: string
+runs:
+  using: composite
+  steps:
+  - name: Generate new project based on project-key
+    run: node tests/scripts/generate-project.js ${{ inputs.PROJECT_KEY }}
+    shell: bash
