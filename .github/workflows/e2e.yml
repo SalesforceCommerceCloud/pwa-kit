@@ -16,6 +16,11 @@ jobs:
         node: [16, 18]
         npm: [8, 9]
     runs-on: ubuntu-latest
+    env:
+      # The "default" npm is the one that ships with a given version of node.
+      # For more: https://nodejs.org/en/download/releases/
+      # (We also use this env var for making sure a step runs once for the current node version)
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -23,8 +28,16 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: ${{ matrix.node }}
           cache: npm
+
+      - name: Update NPM version
+        if: env.IS_DEFAULT_NPM == 'false'
+        run: |-
+          npm install -g npm@${{ matrix.npm }}
+
+      - name: Setup Ubuntu Machine
+        uses: "./.github/actions/setup_ubuntu"
 
       - name: Generate Retail App Demo
         uses: ./.github/actions/e2e_generate_app
