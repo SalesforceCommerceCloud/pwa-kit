@@ -36,8 +36,10 @@ jobs:
         run: |-
           npm install -g npm@${{ matrix.npm }}
 
-      - name: Setup Ubuntu Machine
-        uses: "./.github/actions/setup_ubuntu"
+      - name: Install Dependencies
+        run: |-
+          # Install node dependencies
+          node ./scripts/gtime.js monorepo_install npm ci
 
       - name: Generate Retail App Demo
         uses: ./.github/actions/e2e_generate_app
