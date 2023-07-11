@@ -5,17 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
+const {
   runGeneratorWithResponses,
   executeCommand,
-} from "./execute-shell-commands.js";
-import config from "../config.js";
-import { program, Argument } from "commander";
+} = require("./execute-shell-commands.js");
+const config = require("../config.js");
+const { program, Argument } = require("commander");
 
 const main = async (opts) => {
   const { args } = opts;
   const [project] = args;
-  console.log("Input", args);
   if (opts.args.length !== 1) {
     console.log(program.helpInformation());
     process.exit(1);

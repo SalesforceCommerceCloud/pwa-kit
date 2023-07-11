@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { exec } from "child_process";
-import { isPrompt } from "./utils.js";
+const { exec } = require("child_process");
+const { isPrompt } = require("./utils.js");
 
-export const runGeneratorWithResponses = (cmd, cliResponses) => {
+const runGeneratorWithResponses = (cmd, cliResponses) => {
   const child = exec(cmd);
   return new Promise((resolve, reject) => {
     let { expectedPrompt, response } = cliResponses.shift();
@@ -32,7 +32,7 @@ export const runGeneratorWithResponses = (cmd, cliResponses) => {
   });
 };
 
-export const executeCommand = (cmd) => {
+const executeCommand = (cmd) => {
   return new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
@@ -45,4 +45,9 @@ export const executeCommand = (cmd) => {
       resolve(stdout);
     });
   });
+};
+
+module.exports = {
+  runGeneratorWithResponses,
+  executeCommand,
 };

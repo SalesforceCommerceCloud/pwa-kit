@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { types } from "util";
+const { types } = require("util");
 
-export const isPrompt = (streamData, expectedText) => {
+const isPrompt = (streamData, expectedText) => {
   if (!streamData || !expectedText) return;
 
   if (types.isRegExp(expectedText)) {
@@ -14,3 +14,6 @@ export const isPrompt = (streamData, expectedText) => {
   } else return streamData.includes(expectedText);
 };
 
+module.exports = {
+  isPrompt,
+};

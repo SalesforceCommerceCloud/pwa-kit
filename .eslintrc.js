@@ -18,9 +18,5 @@ export default {
         " ",
       ],
     ],
-  },
-  parserOptions: {
-    sourceType: "module",
-    ecmaVersion: 2015,
-  },
+  }
 };
