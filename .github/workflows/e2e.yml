@@ -46,7 +46,7 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-demo"
 
-      - name: Verify generated project
+      - name: Verify Generated Project
         run: |-
           # List file list from output dir
           ls -d ../generated-projects/*/*
@@ -87,7 +87,7 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-ext"
 
-      - name: Verify generated project
+      - name: Verify Generated Project
         run: |-
           # List file list from output dir
           ls -d ../generated-projects/*/*
@@ -128,7 +128,7 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-no-ext"
 
-      - name: Verify generated project
+      - name: Verify Generated Project
         run: |-
           # List file list from output dir
           ls -d ../generated-projects/*/*
