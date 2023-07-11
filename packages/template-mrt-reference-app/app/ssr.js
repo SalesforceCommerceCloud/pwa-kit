@@ -126,6 +126,7 @@ const filterAndSortObjectKeys = (o, whitelist) =>
  */
 const jsonFromRequest = (req) => {
     return {
+        args: req.query,
         protocol: req.protocol,
         method: req.method,
         path: req.path,
@@ -185,7 +186,7 @@ const cacheTestWithDuration = async (req, res) => {
     if (!duration.match(/[0-9]\d*/)) {
         return res.sendStatus(400)
     }
-    res.set('Cache-Control', `pubic, maxage=${duration}`)
+    res.set('Cache-Control', `pubic, max-age=${duration}`)
     res.json(jsonFromRequest(req))
 }
 
