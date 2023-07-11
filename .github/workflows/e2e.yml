@@ -9,7 +9,7 @@ on:
     - cron: "0 8 * * *"
 
 jobs:
-  run-generator:
+  run-generator-demo:
     strategy:
       fail-fast: false
       matrix:
@@ -45,3 +45,75 @@ jobs:
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-demo"
+  run-generator-retail-app-ext:
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [16, 18]
+        npm: [8, 9]
+    runs-on: ubuntu-latest
+    env:
+      # The "default" npm is the one that ships with a given version of node.
+      # For more: https://nodejs.org/en/download/releases/
+      # (We also use this env var for making sure a step runs once for the current node version)
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Update NPM version
+        if: env.IS_DEFAULT_NPM == 'false'
+        run: |-
+          npm install -g npm@${{ matrix.npm }}
+
+      - name: Install Dependencies
+        run: |-
+          # Install node dependencies
+          node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Generate Retail App Demo
+        uses: ./.github/actions/e2e_generate_app
+        with:
+          PROJECT_KEY: "retail-app-ext"
+  run-generator-retail-app-no-ext:
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [16, 18]
+        npm: [8, 9]
+    runs-on: ubuntu-latest
+    env:
+      # The "default" npm is the one that ships with a given version of node.
+      # For more: https://nodejs.org/en/download/releases/
+      # (We also use this env var for making sure a step runs once for the current node version)
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Update NPM version
+        if: env.IS_DEFAULT_NPM == 'false'
+        run: |-
+          npm install -g npm@${{ matrix.npm }}
+
+      - name: Install Dependencies
+        run: |-
+          # Install node dependencies
+          node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Generate Retail App Demo
+        uses: ./.github/actions/e2e_generate_app
+        with:
+          PROJECT_KEY: "retail-app-no-ext"
