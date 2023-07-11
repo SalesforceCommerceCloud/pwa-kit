@@ -9,12 +9,12 @@ module.exports = {
                 '',
                 {
                     pattern: '^ \\* Copyright \\(c\\) \\d{4}, (salesforce.com, inc|Salesforce, Inc)\\.$',
-                    template: ` * Copyright (c) ${new Date().getFullYear()}, Salesforce, Inc.`,
+                    template: ` * Copyright (c) ${new Date().getFullYear()}, Salesforce, Inc.`
                 },
                 ' * All rights reserved.',
                 ' * SPDX-License-Identifier: BSD-3-Clause',
                 ' * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause',
-                ' ',
+                ' '
             ]
         ]
     }
