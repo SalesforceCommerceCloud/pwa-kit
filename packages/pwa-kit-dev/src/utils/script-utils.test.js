@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {mkdtemp, rm, writeFile, readJsonSync} from 'fs-extra'
+import * as fsExtra from 'fs-extra'
 import path from 'path'
 import os from 'os'
 import * as scriptUtils from './script-utils'
-const pkg = readJsonSync(path.join(__dirname, '../../package.json'))
+const pkg = fsExtra.readJsonSync(path.join(__dirname, '../../package.json'))
 
 describe('scriptUtils', () => {
     const originalEnv = process.env
@@ -17,12 +17,12 @@ describe('scriptUtils', () => {
 
     beforeEach(async () => {
         process.env = {...originalEnv}
-        tmpDir = await mkdtemp(path.join(os.tmpdir(), 'scriptUtils-tests'))
+        tmpDir = await fsExtra.mkdtemp(path.join(os.tmpdir(), 'scriptUtils-tests'))
     })
 
     afterEach(async () => {
         process.env = originalEnv
-        tmpDir && (await rm(tmpDir, {recursive: true}))
+        tmpDir && (await fsExtra.rm(tmpDir, {recursive: true}))
     })
 
     test('glob() with no patterns matches nothing', () => {
@@ -101,6 +101,20 @@ describe('scriptUtils', () => {
         expect(pkg.name).toBe('@salesforce/pwa-kit-dev')
     })
 
+    describe('getProjectPkg', () => {
+        test('should work', async () => {
+            const pkg = await scriptUtils.getProjectPkg()
+            expect(pkg.name).toBe('@salesforce/pwa-kit-dev')
+        })
+
+        test('should throw', async () => {
+            jest.spyOn(fsExtra, 'readJson').mockRejectedValue(new Error('file not found'))
+            await expect(scriptUtils.getProjectPkg()).rejects.toThrow(
+                `Could not read project package at "${path.join(process.cwd(), 'package.json')}"`
+            )
+        })
+    })
+
     describe('defaultMessage', () => {
         test('works', async () => {
             const mockGit = {branch: () => 'branch', short: () => 'short'}
@@ -144,7 +158,7 @@ describe('scriptUtils', () => {
         test('should work', async () => {
             const creds = {username: 'alice', api_key: 'xyz'}
             const thePath = path.join(tmpDir, '.mobify.test')
-            await writeFile(thePath, JSON.stringify(creds), 'utf8')
+            await fsExtra.writeFile(thePath, JSON.stringify(creds), 'utf8')
             expect(await scriptUtils.readCredentials(thePath)).toEqual(creds)
         })
 
