@@ -96,9 +96,17 @@ describe('scriptUtils', () => {
         })
     })
 
-    test('getPkgJSON', async () => {
-        const pkg = await scriptUtils.getPkgJSON()
-        expect(pkg.name).toBe('@salesforce/pwa-kit-dev')
+    describe('getPkgJSON', () => {
+        test('should work', async () => {
+            const pkg = await scriptUtils.getPkgJSON()
+            expect(pkg.name).toBe('@salesforce/pwa-kit-dev')
+        })
+
+        test('should return default package.json data when no valid file is found', async () => {
+            jest.spyOn(fsExtra, 'readJson').mockRejectedValue(new Error('file not found'))
+            const result = await scriptUtils.getPkgJSON()
+            expect(result).toEqual({name: '@salesforce/pwa-kit-dev', version: 'unknown'})
+        })
     })
 
     describe('getProjectPkg', () => {
