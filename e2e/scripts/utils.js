@@ -22,8 +22,8 @@ const mkdirIfNotExists = (dirname) =>
   statAsync(dirname).catch(() => mkdirAsync(dirname));
 
 const diffArrays = (expectedArr, actualArr) => {
-  const expectedSet = new Set(actualArr);
-  return [...expectedArr].filter((x) => !expectedSet.has(x));
+  const actualSet = new Set(actualArr);
+  return [...expectedArr].filter((x) => !actualSet.has(x));
 };
 
 module.exports = {
