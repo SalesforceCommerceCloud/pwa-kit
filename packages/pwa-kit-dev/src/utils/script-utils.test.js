@@ -333,4 +333,38 @@ describe('scriptUtils', () => {
             }
         )
     })
+
+    describe('createLoggingToken', () => {
+        const username = 'user123'
+        const api_key = '123'
+        test('createLoggingToken passes', async () => {
+            readJson.mockReturnValue(pkg)
+            const projectSlug = 'project-slug'
+            const targetSlug = 'target-slug'
+
+            const text = () => Promise.resolve(JSON.stringify({token: 'token-value'}))
+            const json = () => Promise.resolve({token: 'token-value'})
+            const fetchMock = jest.fn(async () => ({status: 200, text, json}))
+
+            const client = new scriptUtils.CloudAPIClient({
+                credentials: {username, api_key},
+                fetch: fetchMock
+            })
+
+            const fn = async () => await client.createLoggingToken(projectSlug, targetSlug)
+
+            expect(await fn()).toBe('token-value')
+            expect(fetchMock).toHaveBeenCalledTimes(1)
+            expect(fetchMock).toHaveBeenCalledWith(
+                'https://cloud.mobify.com/api/projects/project-slug/target/target-slug/jwt/',
+                expect.objectContaining({
+                    method: 'POST',
+                    headers: {
+                        Authorization: expect.stringMatching(/^Bearer /),
+                        'User-Agent': `${pkg.name}@${pkg.version}`
+                    }
+                })
+            )
+        })
+    })
 })
