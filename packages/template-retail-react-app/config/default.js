@@ -61,8 +61,8 @@ module.exports = {
         ]
     },
     storefrontPreview: {
-        // TODO: When deployed, the path is /mobify/bundle/???/static, with ??? a dynamic number
-        // Can we predict the URL or is this hook implementation a non-starter?
-        hooksSrc: '/mobify/bundle/development/static/test.js'
+        // TODO: When deployed, the path is /mobify/bundle/123, with a new bundle number every time.
+        // Can we work around that, or is this approach a non-starter?
+        hooksSrc: '/mobify/bundle/development/static/storefront-preview-hooks.js'
     }
 }
