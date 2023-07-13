@@ -22,11 +22,15 @@ const main = async (opts) => {
   const latestGitSHA = await executeCommand(config.GET_GIT_SHA_CMD);
   const outputDir = `../generated-projects/${project}-${latestGitSHA}`;
   const generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
-  const stdout = await runGeneratorWithResponses(
-    generateAppCommand,
-    config.CLI_RESPONSES[project]
-  );
-  return stdout;
+  try {
+    const stdout = await runGeneratorWithResponses(
+      generateAppCommand,
+      config.CLI_RESPONSES[project]
+    );
+    return stdout;
+  } catch(err) {
+    console.err(err);
+  }
 };
 
 program.description(
