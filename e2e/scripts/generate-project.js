@@ -20,6 +20,7 @@ const main = async (opts) => {
     process.exit(1);
   }
   const latestGitSHA = await executeCommand(config.GET_GIT_SHA_CMD);
+  await executeCommand('mkdir ../generated-projects')
   const outputDir = `../generated-projects/${project}-${latestGitSHA}`;
   const generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
   try {
