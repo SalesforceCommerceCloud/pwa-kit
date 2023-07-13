@@ -12,7 +12,6 @@ const runGeneratorWithResponses = (cmd, cliResponses) => {
   const child = exec(cmd);
   return new Promise((resolve, reject) => {
     let { expectedPrompt, response } = cliResponses.shift();
-    child.stdout.setEncoding('utf8');
 
     child.stdout.on("data", (data) => {
       console.log(data);
@@ -24,8 +23,8 @@ const runGeneratorWithResponses = (cmd, cliResponses) => {
       }
     });
 
-    child.stderr.on("data", (data) => {
-      console.log("Err", data)
+    child.stderr.on("data", (err) => {
+      reject(err)
     })
 
     child.on("error", (code) => {
