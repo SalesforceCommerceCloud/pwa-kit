@@ -21,6 +21,7 @@ const main = async (opts) => {
     // Explicitly create outputDir because generator runs into permissions issue when generating no-ext projects.
     await mkdirIfNotExists(config.GENERATED_PROJECTS_DIR);
     const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
+    // TODO: Update script to setup local verdaccio npm repo to allow running 'npx @salesforce/pwa-kit-create-app' to generate apps
     const generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
     const stdout = await runGeneratorWithResponses(
       generateAppCommand,
