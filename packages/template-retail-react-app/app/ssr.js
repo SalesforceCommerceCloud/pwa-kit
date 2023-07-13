@@ -62,7 +62,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 'runtime.commercecloud.com'
             ]
         }
-        const trusted = ["'self'", ...trustedMap[nodeEnv]]
+        const trusted = ["'self'", ...(trustedMap[nodeEnv] ? trustedMap[nodeEnv] : [])]
         return {
             directives: {
                 'connect-src': ['api.cquotient.com', ...trusted],
