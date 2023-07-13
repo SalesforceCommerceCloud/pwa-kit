@@ -12,9 +12,13 @@ const runGeneratorWithResponses = (cmd, cliResponses) => {
   const child = exec(cmd);
   return new Promise((resolve, reject) => {
     let { expectedPrompt, response } = cliResponses.shift();
-
+    let isGenratorRunning = false;
     child.stdout.on("data", (data) => {
       console.log(data);
+      if (isPrompt(data, /Running the generator/i)) {
+        isGenratorRunning = true;
+        return;
+      }
       if (isPrompt(data, expectedPrompt)) {
         child.stdin.write(response);
         if (cliResponses.length > 0) {
@@ -24,9 +28,11 @@ const runGeneratorWithResponses = (cmd, cliResponses) => {
     });
 
     child.stderr.on("data", (err) => {
-      console.error(err)
-      reject(err)
-    })
+      if (isGenratorRunning) {
+        console.error(err);
+        reject(err);
+      }
+    });
 
     child.on("error", (code) => {
       reject(`Child process exited with code ${code}.`);
