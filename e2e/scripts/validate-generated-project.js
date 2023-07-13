@@ -34,6 +34,30 @@ const validateGeneratedArtifacts = async (project) => {
   });
 };
 
+const validateExtensibilityConfig = async (project) => {
+  const pkgPath = path.join(
+    process.cwd(),
+    config.GENERATED_PROJECTS_DIR,
+    project,
+    "package.json"
+  );
+  const pkg = require(pkgPath);
+  return new Promise((resolve, reject) => {
+    if (
+      pkg.hasOwnProperty("ccExtensibility") &&
+      pkg["ccExtensibility"].hasOwnProperty("extends") &&
+      pkg["ccExtensibility"].hasOwnProperty("overridesDir") &&
+      pkg["ccExtensibility"].extends === "@salesforce/retail-react-app" &&
+      pkg["ccExtensibility"].overridesDir === "overrides"
+    ) {
+      resolve(`Successfully validated extensibility config for ${project}`);
+    }
+    reject(
+      `Generated project ${project} is missing extensibility config in package.json`
+    );
+  });
+};
+
 const main = async (opts) => {
   const { args } = opts;
   const [project] = args;
@@ -44,6 +68,9 @@ const main = async (opts) => {
 
   try {
     console.log(await validateGeneratedArtifacts(project));
+    if (project === "retail-app-ext" || project === "retail-app-ext") {
+      console.log(await validateExtensibilityConfig(project));
+    }
   } catch (err) {
     console.error(err);
   }
