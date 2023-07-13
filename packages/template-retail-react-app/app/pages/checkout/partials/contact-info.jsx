@@ -103,6 +103,8 @@ const ContactInfo = () => {
     }, [showPasswordField])
 
     useEffect(() => {
+        // Registered customer baskets don't always have an email set in basket.customerInfo,
+        // which results in orders with no email. This ensures that an email is set in the basket.
         if (
             basket &&
             customer.isRegistered &&
@@ -114,7 +116,7 @@ const ContactInfo = () => {
                 body: {email: customer.email}
             })
         }
-    }, [basket])
+    }, [])
 
     return (
         <ToggleCard
