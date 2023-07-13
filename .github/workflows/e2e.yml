@@ -1,12 +1,12 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
-  workflow_dispatch:
   push:
     branches:
       - setup-e2e-testing
   schedule:
-    # Run every day at 12pm (PST) - cron uses UTC times
+    # Run every day at 12am (PST) - cron uses UTC times
     - cron: "0 8 * * *"
+  workflow_dispatch:
 
 jobs:
   run-generator-demo:
