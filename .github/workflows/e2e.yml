@@ -12,7 +12,6 @@ jobs:
   run-generator-demo:
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
         node: [16, 18]
         npm: [8, 9]
@@ -54,6 +53,7 @@ jobs:
   run-generator-retail-app-ext:
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         node: [16, 18]
         npm: [8, 9]
@@ -93,8 +93,12 @@ jobs:
           # List file list from output dir
           ls -d ../generated-projects/*/*
   run-generator-retail-app-no-ext:
+    # Run after the previous job completes irrespective of its result
+    if: ${{ always() }}
+    needs: [run-generator-retail-app-ext]
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         node: [16, 18]
         npm: [8, 9]
