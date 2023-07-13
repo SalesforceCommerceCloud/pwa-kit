@@ -6,7 +6,6 @@
  */
 
 module.exports = {
-  GET_GIT_SHA_CMD: "git rev-parse HEAD",
   GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
   GENERATOR_CMD:
     "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir",
