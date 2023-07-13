@@ -102,6 +102,20 @@ const ContactInfo = () => {
         }
     }, [showPasswordField])
 
+    useEffect(() => {
+        if (
+            basket &&
+            customer.isRegistered &&
+            customer.customerId === basket.customerInfo.customerId &&
+            customer.email !== basket.customerInfo.email
+        ) {
+            updateCustomerForBasket.mutate({
+                parameters: {basketId: basket.basketId},
+                body: {email: customer.email}
+            })
+        }
+    }, [basket])
+
     return (
         <ToggleCard
             id="step-0"
