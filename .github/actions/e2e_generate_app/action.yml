@@ -1,7 +1,7 @@
 name: e2e_generate_app
 inputs:
   PROJECT_KEY:
-    description: Project key to specify generator mode ("retail-app-demo", "retail-app-ext" or "retail-app-no-ext")
+    description: Project key to specify project to generate ("retail-app-demo", "retail-app-ext" or "retail-app-no-ext")
     required: true
     type: string
 runs:

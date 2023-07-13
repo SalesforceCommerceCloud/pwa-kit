@@ -4,13 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-const {
-  runGeneratorWithResponses,
-  executeCommand,
-} = require("./execute-shell-commands.js");
+const { runGeneratorWithResponses } = require("./execute-shell-commands.js");
 const config = require("../config.js");
 const { program, Argument } = require("commander");
-const projects_dir = "../generated-projects";
 const { mkdirIfNotExists } = require("./utils.js");
 
 const main = async (opts) => {
@@ -23,8 +19,8 @@ const main = async (opts) => {
 
   try {
     // Explicitly create outputDir because generator runs into permissions issue when generating no-ext projects.
-    await mkdirIfNotExists(projects_dir);
-    const outputDir = `${projects_dir}/${project}`;
+    await mkdirIfNotExists(config.GENERATED_PROJECTS_DIR);
+    const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
     const generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
     const stdout = await runGeneratorWithResponses(
       generateAppCommand,

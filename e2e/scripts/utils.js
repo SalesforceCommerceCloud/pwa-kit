@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const { types } = require("util");
-const fs = require('fs')
+const fs = require("fs");
 const promisify = require("util").promisify;
-const statAsync = promisify(fs.stat)
+const statAsync = promisify(fs.stat);
 const mkdirAsync = promisify(fs.mkdir);
 
 const isPrompt = (streamData, expectedText) => {
@@ -21,7 +21,13 @@ const isPrompt = (streamData, expectedText) => {
 const mkdirIfNotExists = (dirname) =>
   statAsync(dirname).catch(() => mkdirAsync(dirname));
 
+const diffArrays = (expectedArr, actualArr) => {
+  const expectedSet = new Set(actualArr);
+  return [...expectedArr].filter((x) => !expectedSet.has(x));
+};
+
 module.exports = {
   isPrompt,
   mkdirIfNotExists,
+  diffArrays,
 };

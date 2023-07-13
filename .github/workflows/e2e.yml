@@ -47,10 +47,10 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-demo"
 
-      - name: Verify Generated Project
-        run: |-
-          # List file list from output dir
-          ls -d ../generated-projects/*/*
+      - name: Validated Generated Retail App Demo
+        uses: ./.github/actions/e2e_validate_generated_app
+        with:
+          PROJECT_KEY: "retail-app-demo"
   run-generator-retail-app-ext:
     strategy:
       fail-fast: false
@@ -90,10 +90,10 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-ext"
 
-      - name: Verify Generated Project
-        run: |-
-          # List file list from output dir
-          ls -d ../generated-projects/*/*
+      - name: Validated Generated Retail App Demo
+        uses: ./.github/actions/e2e_validate_generated_app
+        with:
+          PROJECT_KEY: "retail-app-ext"
   run-generator-retail-app-no-ext:
     # Run after the previous job completes irrespective of its result
     if: ${{ always() }}
@@ -136,7 +136,7 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-no-ext"
 
-      - name: Verify Generated Project
-        run: |-
-          # List file list from output dir
-          ls -d ../generated-projects/*/*
+      - name: Validated Generated Retail App Demo
+        uses: ./.github/actions/e2e_validate_generated_app
+        with:
+          PROJECT_KEY: "retail-app-no-ext"
