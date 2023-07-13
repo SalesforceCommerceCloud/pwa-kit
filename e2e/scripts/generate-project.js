@@ -20,7 +20,8 @@ const main = async (opts) => {
     process.exit(1);
   }
   const latestGitSHA = await executeCommand(config.GET_GIT_SHA_CMD);
-  await executeCommand('mkdir ../generated-projects')
+  // Explicitly create outputDir because generator runs into permissions issue when generating no-ext projects.
+  await executeCommand("mkdir ../generated-projects");
   const outputDir = `../generated-projects/${project}-${latestGitSHA}`;
   const generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
   try {
@@ -29,8 +30,10 @@ const main = async (opts) => {
       config.CLI_RESPONSES[project]
     );
     return stdout;
-  } catch(err) {
+  } catch (err) {
     // Generator failed to create project
+    console.log("Generator failed to create project");
+    process.exit(1);
   }
 };
 
