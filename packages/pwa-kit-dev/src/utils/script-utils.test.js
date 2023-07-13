@@ -5,11 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import * as fsExtra from 'fs-extra'
+import {mkdtemp, rm, writeFile, readJsonSync, readJson} from 'fs-extra'
 import path from 'path'
 import os from 'os'
 import * as scriptUtils from './script-utils'
-const pkg = fsExtra.readJsonSync(path.join(__dirname, '../../package.json'))
+const pkg = readJsonSync(path.join(__dirname, '../../package.json'))
+
+jest.mock('fs-extra', () => {
+    return {
+        ...jest.requireActual('fs-extra'),
+        readJson: jest.fn()
+    }
+})
 
 describe('scriptUtils', () => {
     const originalEnv = process.env
@@ -17,12 +24,13 @@ describe('scriptUtils', () => {
 
     beforeEach(async () => {
         process.env = {...originalEnv}
-        tmpDir = await fsExtra.mkdtemp(path.join(os.tmpdir(), 'scriptUtils-tests'))
+        tmpDir = await mkdtemp(path.join(os.tmpdir(), 'scriptUtils-tests'))
     })
 
     afterEach(async () => {
         process.env = originalEnv
-        tmpDir && (await fsExtra.rm(tmpDir, {recursive: true}))
+        tmpDir && (await rm(tmpDir, {recursive: true}))
+        jest.resetAllMocks()
     })
 
     test('glob() with no patterns matches nothing', () => {
@@ -88,6 +96,7 @@ describe('scriptUtils', () => {
         })
 
         test('getHeaders', async () => {
+            readJson.mockReturnValue(pkg)
             const client = new scriptUtils.CloudAPIClient({credentials: {username, api_key}})
             expect(await client.getHeaders()).toEqual({
                 'User-Agent': `${pkg.name}@${pkg.version}`,
@@ -98,12 +107,13 @@ describe('scriptUtils', () => {
 
     describe('getPkgJSON', () => {
         test('should work', async () => {
-            const pkg = await scriptUtils.getPkgJSON()
-            expect(pkg.name).toBe('@salesforce/pwa-kit-dev')
+            readJson.mockReturnValue(pkg)
+            const pkgJson = await scriptUtils.getPkgJSON()
+            expect(pkgJson.name).toBe('@salesforce/pwa-kit-dev')
         })
 
         test('should return default package.json data when no valid file is found', async () => {
-            jest.spyOn(fsExtra, 'readJson').mockRejectedValue(new Error('file not found'))
+            readJson.mockRejectedValue(Error)
             const result = await scriptUtils.getPkgJSON()
             expect(result).toEqual({name: '@salesforce/pwa-kit-dev', version: 'unknown'})
         })
@@ -111,18 +121,20 @@ describe('scriptUtils', () => {
 
     describe('getProjectPkg', () => {
         test('should work', async () => {
-            const pkg = await scriptUtils.getProjectPkg()
-            expect(pkg.name).toBe('@salesforce/pwa-kit-dev')
+            readJson.mockReturnValue(pkg)
+            const pkgJson = await scriptUtils.getProjectPkg()
+            expect(pkgJson.name).toBe('@salesforce/pwa-kit-dev')
         })
 
         test('should throw', async () => {
-            jest.spyOn(fsExtra, 'readJson').mockRejectedValue(new Error('file not found'))
+            readJson.mockRejectedValue(Error)
             await expect(scriptUtils.getProjectPkg()).rejects.toThrow(
                 `Could not read project package at "${path.join(process.cwd(), 'package.json')}"`
             )
         })
     })
 
+    jest.unmock('fs-extra')
     describe('defaultMessage', () => {
         test('works', async () => {
             const mockGit = {branch: () => 'branch', short: () => 'short'}
@@ -164,9 +176,10 @@ describe('scriptUtils', () => {
 
     describe('readCredentials', () => {
         test('should work', async () => {
+            readJson.mockReturnValue({username: 'alice', api_key: 'xyz'})
             const creds = {username: 'alice', api_key: 'xyz'}
             const thePath = path.join(tmpDir, '.mobify.test')
-            await fsExtra.writeFile(thePath, JSON.stringify(creds), 'utf8')
+            await writeFile(thePath, JSON.stringify(creds), 'utf8')
             expect(await scriptUtils.readCredentials(thePath)).toEqual(creds)
         })
 
@@ -208,6 +221,7 @@ describe('scriptUtils', () => {
         })
 
         test('should archive a bundle', async () => {
+            readJson.mockReturnValue(pkg)
             const message = 'message'
             const bundle = await scriptUtils.createBundle({
                 message,
@@ -259,6 +273,7 @@ describe('scriptUtils', () => {
         ])(
             'should push a built bundle and handle status codes (%p)',
             async ({projectSlug, targetSlug, expectedURL, status}) => {
+                readJson.mockReturnValue(pkg)
                 const message = 'message'
                 const bundle = await scriptUtils.createBundle({
                     message,
