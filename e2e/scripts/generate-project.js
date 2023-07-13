@@ -11,6 +11,8 @@ const {
 } = require("./execute-shell-commands.js");
 const config = require("../config.js");
 const { program, Argument } = require("commander");
+const projects_dir = "../generated-projects";
+const { mkdirIfNotExists } = require("./utils.js");
 
 const main = async (opts) => {
   const { args } = opts;
@@ -19,11 +21,12 @@ const main = async (opts) => {
     console.log(program.helpInformation());
     process.exit(1);
   }
-  // Explicitly create outputDir because generator runs into permissions issue when generating no-ext projects.
-  await executeCommand("mkdir ../generated-projects");
-  const outputDir = `../generated-projects/${project}`;
-  const generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
+
   try {
+    // Explicitly create outputDir because generator runs into permissions issue when generating no-ext projects.
+    await mkdirIfNotExists(projects_dir);
+    const outputDir = `${projects_dir}/${project}`;
+    const generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
     const stdout = await runGeneratorWithResponses(
       generateAppCommand,
       config.CLI_RESPONSES[project]
@@ -31,7 +34,7 @@ const main = async (opts) => {
     return stdout;
   } catch (err) {
     // Generator failed to create project
-    console.log("Generator failed to create project");
+    console.log("Generator failed to create project", err);
     process.exit(1);
   }
 };
