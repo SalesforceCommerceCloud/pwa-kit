@@ -12,6 +12,7 @@ jobs:
   run-generator-demo:
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         node: [16, 18]
         npm: [8, 9]
@@ -82,7 +83,7 @@ jobs:
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
 
-      - name: Generate Retail App Demo
+      - name: Generate Retail App With Extensibility
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-ext"
@@ -123,7 +124,7 @@ jobs:
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
 
-      - name: Generate Retail App Demo
+      - name: Generate Retail App Without Extensibility
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-no-ext"
