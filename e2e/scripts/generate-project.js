@@ -29,7 +29,7 @@ const main = async (opts) => {
     );
     return stdout;
   } catch(err) {
-    console.log(err);
+    // Generator failed to create project
   }
 };
 

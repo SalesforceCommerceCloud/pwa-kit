@@ -24,6 +24,7 @@ const runGeneratorWithResponses = (cmd, cliResponses) => {
     });
 
     child.stderr.on("data", (err) => {
+      console.error(err)
       reject(err)
     })
 
