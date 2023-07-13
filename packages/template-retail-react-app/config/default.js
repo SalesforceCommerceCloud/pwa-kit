@@ -59,5 +59,10 @@ module.exports = {
                 path: 'ocapi'
             }
         ]
+    },
+    storefrontPreview: {
+        // TODO: When deployed, the path is /mobify/bundle/???/static, with ??? a dynamic number
+        // Can we predict the URL or is this hook implementation a non-starter?
+        hooksSrc: '/mobify/bundle/development/static/test.js'
     }
 }

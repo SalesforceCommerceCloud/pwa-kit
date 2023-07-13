@@ -33,19 +33,53 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
+    const getCSP = (nodeEnv) => {
+        const trustedMap = {
+            development: [
+                'localhost:*',
+                '*.commercecloud.salesforce.com',
+                '*.demandware.net',
+                '*.mobify-staging.com',
+                '*.mobify-storefront-staging.com',
+                '*.mobify-storefront.com',
+                'runtime.commercecloud.com'
+            ],
+            staging: [
+                '*.demandware.net',
+                '*.mobify-staging.com',
+                '*.mobify-storefront-staging.com',
+                '*.mobify-storefront.com',
+                '*.commercecloud.salesforce.com',
+                'runtime.commercecloud.com'
+            ],
+            production: [
+                '*.demandware.com',
+                '*.mobify.com',
+                '*.mobify-storefront.com',
+                '*.commercecloud.salesforce.com',
+                'runtime.commercecloud.com'
+            ]
+        }
+        const trusted = ["'self'", ...(trustedMap[nodeEnv] ? trustedMap[nodeEnv] : [])]
+        return {
+            directives: {
+                'connect-src': ['api.cquotient.com', ...trusted],
+                'frame-ancestors': [...trusted],
+                'img-src': ['data:', ...trusted],
+                'script-src': ['unsafe-eval', 'storage.googleapis.com', ...trusted],
+
+                // Do not upgrade insecure requests for local development
+                'upgrade-insecure-requests': isRemote() ? [] : null
+            }
+        }
+    }
+
     // Set HTTP security headers
     app.use(
         helmet({
             contentSecurityPolicy: {
                 useDefaults: true,
-                directives: {
-                    'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                    'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
-                    'connect-src': ["'self'", 'api.cquotient.com'],
-
-                    // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null
-                }
+                directives: getCSP(process.env.NODE_ENV)
             },
             hsts: isRemote()
         })

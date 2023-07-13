@@ -48,12 +48,30 @@ export const Page = (props) => {
         })
     }, [components])
 
+    // A major pain point for the current development of Storefront Preview is that we don't have
+    // static URLs on deployed sites. The path /mobify/bundle/123/static/storefront-preview.js
+    // changes to a different number with every deployment. Once we figure out the static URL we can
+    // update it for production, but will still need to come up with something for staging...
+
+    const storefrontPreviewClientScript =
+        process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000/mobify/bundle/development/static/storefront-preview.js'
+            : // Gotta update this manually for now... :(
+              // : 'https://runtime.commercecloud.com/storefront-preview.js'
+              null
+
+    if (!storefrontPreviewClientScript) {
+        // Deliberately aggressive because this branch exists solely for Storefront Preview development
+        throw new Error('Hey! You forgot to set a Storefront Preview client script URL!')
+    }
+
     return (
         <PageContext.Provider value={contextValue}>
             <Helmet>
                 {pageTitle && <title>{pageTitle}</title>}
                 {pageDescription && <meta name="description" content={pageDescription} />}
                 {pageKeywords && <meta name="keywords" content={pageKeywords} />}
+                <script src={storefrontPreviewClientScript} type="text/javascript"></script>
             </Helmet>
             <div id={id} className={`page ${className}`} {...rest}>
                 <div className="container">
