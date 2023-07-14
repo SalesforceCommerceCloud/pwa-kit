@@ -163,7 +163,11 @@ const App = (props) => {
 
     if (!storefrontPreviewClientScript) {
         // Deliberately aggressive because this branch exists solely for Storefront Preview development
-        throw new Error('Hey! You forgot to set a Storefront Preview client script URL!')
+        return (
+            <Box className="sf-app">
+                Hey! You forgot to set a Storefront Preview client script URL!
+            </Box>
+        )
     }
 
     return (
