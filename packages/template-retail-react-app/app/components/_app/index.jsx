@@ -72,6 +72,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 const onClient = typeof window !== 'undefined'
 
@@ -177,8 +178,11 @@ const App = (props) => {
         {parameters: {customerId: customer.customerId}},
         {enabled: !!customer.customerId && !isServer}
     )
+    const {data: basket} = useCurrentBasket()
+
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
+    const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
 
     useEffect(() => {
         // Create a new basket if the current customer doesn't have one.
@@ -187,14 +191,62 @@ const App = (props) => {
                 body: {}
             })
         }
+    }, [baskets])
+
+    useEffect(() => {
         // update the basket currency if it doesn't match the current locale currency
-        if (baskets?.baskets?.[0]?.currency && baskets.baskets[0].currency !== currency) {
+        if (basket?.currency && basket?.currency !== currency) {
             updateBasket.mutate({
-                parameters: {basketId: baskets.baskets[0].basketId},
+                parameters: {basketId: basket.basketId},
                 body: {currency}
             })
         }
-    }, [baskets])
+
+        // update the basket customer email
+        if (
+            basket &&
+            customer?.isRegistered &&
+            customer?.customerId === basket?.customerInfo?.customerId &&
+            customer?.email &&
+            customer?.email !== basket?.customerInfo?.email
+        ) {
+            updateCustomerForBasket.mutate({
+                parameters: {basketId: basket.basketId},
+                body: {
+                    email: customer?.email
+                }
+            })
+        }
+    }, [
+        basket?.currency,
+        basket?.customerInfo?.customerId,
+        customer?.isRegistered,
+        customer?.customerId,
+        customer?.email,
+        basket?.customerInfo?.email
+    ])
+
+    // useEffect(() => {
+    //     // Registered customer baskets don't always have an email set in basket.customerInfo,
+    //     // which results in orders with no email. This ensures that an email is set in the basket.
+    //     if (
+    //         basket &&
+    //         customer?.isRegistered &&
+    //         customer?.customerId === basket?.customerInfo?.customerId &&
+    //         customer?.email !== basket?.customerInfo?.email
+    //     ) {
+    //         updateCustomerForBasket.mutate({
+    //             parameters: { basketId: basket?.basketId },
+    //             body: { email: customer?.email }
+    //         })
+    //     }
+    // }, [
+    //     basket?.customerInfo?.customerId,
+    //     customer?.isRegistered,
+    //     customer?.customerId,
+    //     customer?.email,
+    //     basket?.customerInfo?.email
+    // ])
 
     useEffect(() => {
         // Listen for online status changes.
