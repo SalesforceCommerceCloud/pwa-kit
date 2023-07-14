@@ -64,7 +64,8 @@ const {handler} = runtime.createHandler(options, (app) => {
 
         return {
             'connect-src': ['api.cquotient.com', ...trusted],
-            'frame-ancestors': [...trusted],
+            // TODO: Revert once we have a Runtime Admin we can use that's not in staging
+            'frame-ancestors': [...trusted, '*.mobify-storefront-staging.com'],
             'img-src': ['data:', ...trusted],
             'script-src': ["'unsafe-eval'", 'storage.googleapis.com', ...trusted],
 
