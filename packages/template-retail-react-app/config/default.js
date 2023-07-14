@@ -59,10 +59,5 @@ module.exports = {
                 path: 'ocapi'
             }
         ]
-    },
-    storefrontPreview: {
-        // TODO: When deployed, the path is /mobify/bundle/123, with a new bundle number every time.
-        // Can we work around that, or is this approach a non-starter?
-        hooksSrc: '/mobify/bundle/development/static/storefront-preview-hooks.js'
     }
 }
