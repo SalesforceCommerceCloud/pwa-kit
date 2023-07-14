@@ -66,7 +66,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             'connect-src': ['api.cquotient.com', ...trusted],
             'frame-ancestors': [...trusted],
             'img-src': ['data:', ...trusted],
-            'script-src': ['unsafe-eval', 'storage.googleapis.com', ...trusted],
+            'script-src': ["'unsafe-eval'", 'storage.googleapis.com', ...trusted],
 
             // Do not upgrade insecure requests for local development
             'upgrade-insecure-requests': isRemote() ? [] : null
