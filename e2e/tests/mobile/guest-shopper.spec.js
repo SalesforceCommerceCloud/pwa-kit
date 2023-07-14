@@ -22,6 +22,9 @@ test.describe("Guest shopper can checkout items as guest", () => {
 
     await page.getByRole("button", { name: "Womens" }).click();
 
+    // Wait for accoridion open animation to end
+    await page.waitForLoadState('domcontentloaded')
+
     await page.getByRole("button", { name: "Clothing" }).click();
 
     await page.getByRole("link", { name: "Dresses" }).click();
