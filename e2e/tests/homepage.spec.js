@@ -14,19 +14,15 @@ test.describe("Retail app home page loads", () => {
   });
 
   test("has title", async ({ page }) => {
-    // Expect a title "to contain" a substring.
     await expect(page).toHaveTitle(/Home Page/);
   });
 
   test("get started link", async ({ page }) => {
-    // Click the get started link.
     await page.getByRole("link", { name: "Get started" }).click();
 
-    // Wait for Get Started page to load in a new tab/browser
     const getStartedPage = await page.waitForEvent("popup");
     await getStartedPage.waitForLoadState();
 
-    // Expects the URL to contain intro.
     await expect(getStartedPage).toHaveURL(/.*getting-started/);
   });
 });
