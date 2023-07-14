@@ -57,15 +57,16 @@ const {handler} = runtime.createHandler(options, (app) => {
                 '*.mobify.com',
                 '*.mobify-storefront.com',
                 '*.commercecloud.salesforce.com',
-                'runtime.commercecloud.com'
+                'runtime.commercecloud.com',
+                // TODO: Revert once we have a Runtime Admin we can use that's not in staging
+                '*.mobify-storefront-staging.com'
             ]
         }
         const trusted = ["'self'", ...(trustedMap[nodeEnv] ? trustedMap[nodeEnv] : [])]
 
         return {
             'connect-src': ['api.cquotient.com', ...trusted],
-            // TODO: Revert once we have a Runtime Admin we can use that's not in staging
-            'frame-ancestors': [...trusted, '*.mobify-storefront-staging.com'],
+            'frame-ancestors': [...trusted],
             'img-src': ['data:', ...trusted],
             'script-src': ["'unsafe-eval'", 'storage.googleapis.com', ...trusted],
 
