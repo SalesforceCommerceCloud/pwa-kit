@@ -226,28 +226,6 @@ const App = (props) => {
         basket?.customerInfo?.email
     ])
 
-    // useEffect(() => {
-    //     // Registered customer baskets don't always have an email set in basket.customerInfo,
-    //     // which results in orders with no email. This ensures that an email is set in the basket.
-    //     if (
-    //         basket &&
-    //         customer?.isRegistered &&
-    //         customer?.customerId === basket?.customerInfo?.customerId &&
-    //         customer?.email !== basket?.customerInfo?.email
-    //     ) {
-    //         updateCustomerForBasket.mutate({
-    //             parameters: { basketId: basket?.basketId },
-    //             body: { email: customer?.email }
-    //         })
-    //     }
-    // }, [
-    //     basket?.customerInfo?.customerId,
-    //     customer?.isRegistered,
-    //     customer?.customerId,
-    //     customer?.email,
-    //     basket?.customerInfo?.email
-    // ])
-
     useEffect(() => {
         // Listen for online status changes.
         watchOnlineStatus((isOnline) => {
