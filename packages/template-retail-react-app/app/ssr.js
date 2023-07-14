@@ -61,16 +61,15 @@ const {handler} = runtime.createHandler(options, (app) => {
             ]
         }
         const trusted = ["'self'", ...(trustedMap[nodeEnv] ? trustedMap[nodeEnv] : [])]
-        return {
-            directives: {
-                'connect-src': ['api.cquotient.com', ...trusted],
-                'frame-ancestors': [...trusted],
-                'img-src': ['data:', ...trusted],
-                'script-src': ['unsafe-eval', 'storage.googleapis.com', ...trusted],
 
-                // Do not upgrade insecure requests for local development
-                'upgrade-insecure-requests': isRemote() ? [] : null
-            }
+        return {
+            'connect-src': ['api.cquotient.com', ...trusted],
+            'frame-ancestors': [...trusted],
+            'img-src': ['data:', ...trusted],
+            'script-src': ['unsafe-eval', 'storage.googleapis.com', ...trusted],
+
+            // Do not upgrade insecure requests for local development
+            'upgrade-insecure-requests': isRemote() ? [] : null
         }
     }
 
@@ -79,7 +78,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         helmet({
             contentSecurityPolicy: {
                 useDefaults: true,
-                directives: getCSP(process.env.NODE_ENV)
+                directives: getCSP(process.env.NODE_ENV ?? 'development')
             },
             hsts: isRemote()
         })
