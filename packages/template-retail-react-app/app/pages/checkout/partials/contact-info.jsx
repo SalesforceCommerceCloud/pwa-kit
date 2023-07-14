@@ -107,21 +107,21 @@ const ContactInfo = () => {
         // which results in orders with no email. This ensures that an email is set in the basket.
         if (
             basket &&
-            customer.isRegistered &&
-            customer.customerId === basket.customerInfo.customerId &&
-            customer.email !== basket.customerInfo.email
+            customer?.isRegistered &&
+            customer?.customerId === basket?.customerInfo?.customerId &&
+            customer?.email !== basket?.customerInfo?.email
         ) {
             updateCustomerForBasket.mutate({
-                parameters: {basketId: basket.basketId},
-                body: {email: customer.email}
+                parameters: {basketId: basket?.basketId},
+                body: {email: customer?.email}
             })
         }
     }, [
-        basket.customerInfo.customerId,
-        customer.isRegistered,
-        customer.customerId,
-        customer.email,
-        basket.customerInfo.email
+        basket?.customerInfo?.customerId,
+        customer?.isRegistered,
+        customer?.customerId,
+        customer?.email,
+        basket?.customerInfo?.email
     ])
 
     return (
