@@ -49,11 +49,21 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await page.getByRole("button", { name: /Add to Cart/i }).click();
 
-  const addedToCartModal = page.locator(
-    "[role='dialog'] heading:has-text('2 items added to cart')"
-  );
+  const addedToCartModal = page.getByText(/2 items added to cart/i);
 
-  page.on("dialog", async (_) => {
-    await expect(addedToCartModal).toBeVisible();
-  });
+  await addedToCartModal.waitFor();
+
+  await page.getByLabel("Close").click();
+
+  await page.getByLabel(/My cart/i).click();
+
+  await expect(
+    page.getByRole("link", { name: /Drape Neck Dress/i })
+  ).toBeVisible();
+
+  await page.getByRole("link", { name: "Proceed to Checkout" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: /Contact Info/i })
+  ).toBeVisible();
 });
