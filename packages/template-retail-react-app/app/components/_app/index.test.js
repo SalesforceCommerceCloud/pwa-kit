@@ -5,8 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {screen, act} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
+import {rest} from 'msw'
 
 import App from '@salesforce/retail-react-app/app/components/_app/index.jsx'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
@@ -14,7 +15,9 @@ import {DEFAULT_LOCALE} from '@salesforce/retail-react-app/app/utils/test-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
+
 let windowSpy
 beforeAll(() => {
     jest.spyOn(console, 'log').mockImplementation(jest.fn())
@@ -81,5 +84,69 @@ describe('App', () => {
 
         expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
         expect(hreflangLinks.some((link) => link.hrefLang === 'x-default')).toBe(true)
+    })
+
+    test('App component updates the basket with correct currency and customer email', async () => {
+        // Test basket. _app will be manipulating this basket for this test
+        const basket = {
+            basketId: 'asdfgh',
+            currency: 'CAD',
+            customerInfo: {
+                customerId: '12345'
+            }
+        }
+
+        jest.spyOn(
+            jest.requireActual('@salesforce/retail-react-app/app/hooks/use-current-customer'),
+            'useCurrentCustomer'
+        ).mockImplementation(() => {
+            return {
+                data: {
+                    customerId: '12345',
+                    email: 'email@test.com',
+                    isRegistered: true
+                }
+            }
+        })
+
+        jest.spyOn(
+            jest.requireActual('@salesforce/retail-react-app/app/hooks/use-current-basket'),
+            'useCurrentBasket'
+        ).mockImplementation(() => {
+            return {
+                data: basket,
+                derivedData: {
+                    hasBasket: true,
+                    totalItems: 0
+                }
+            }
+        })
+
+        global.server.use(
+            // mock updating basket currency
+            rest.patch('*/baskets/:basketId', (req, res, ctx) => {
+                basket.currency = 'GBP'
+                return res(ctx.json(basket))
+            }),
+            // mock adding guest email to basket
+            rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
+                basket.customerInfo.email = 'customer@test.com'
+                return res(ctx.json(basket))
+            })
+        )
+
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        await act(() =>
+            renderWithProviders(
+                <App
+                    targetLocale={DEFAULT_LOCALE}
+                    defaultLocale={DEFAULT_LOCALE}
+                    messages={messages}
+                />
+            )
+        )
+
+        expect(basket.currency).toBe('GBP')
+        expect(basket.customerInfo.email).toBe('customer@test.com')
     })
 })

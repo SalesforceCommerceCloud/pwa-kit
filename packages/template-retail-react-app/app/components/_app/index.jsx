@@ -50,6 +50,7 @@ import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/us
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -72,7 +73,6 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 const onClient = typeof window !== 'undefined'
 
@@ -88,7 +88,7 @@ const useLazyLoadCategories = () => {
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
 
-    const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
+    const ids = levelZeroCategoriesQuery.data?.[itemsKey]?.map((category) => category.id)
     const queries = useCategoryBulk(ids, {
         enabled: onClient && ids?.length > 0
     })
