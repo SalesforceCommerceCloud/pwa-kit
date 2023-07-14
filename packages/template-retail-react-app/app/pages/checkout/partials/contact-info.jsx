@@ -116,7 +116,13 @@ const ContactInfo = () => {
                 body: {email: customer.email}
             })
         }
-    }, [])
+    }, [
+        basket.customerInfo.customerId,
+        customer.isRegistered,
+        customer.customerId,
+        customer.email,
+        basket.customerInfo.email
+    ])
 
     return (
         <ToggleCard
