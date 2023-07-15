@@ -89,10 +89,10 @@ describe('App', () => {
     test('App component updates the basket with correct currency and customer email', async () => {
         // Test basket. _app will be manipulating this basket for this test
         const basket = {
-            basketId: 'asdfgh',
+            basketId: 'basket_id',
             currency: 'CAD',
             customerInfo: {
-                customerId: '12345'
+                customerId: 'customer_id'
             }
         }
 
@@ -102,7 +102,7 @@ describe('App', () => {
         ).mockImplementation(() => {
             return {
                 data: {
-                    customerId: '12345',
+                    customerId: 'customer_id',
                     email: 'email@test.com',
                     isRegistered: true
                 }

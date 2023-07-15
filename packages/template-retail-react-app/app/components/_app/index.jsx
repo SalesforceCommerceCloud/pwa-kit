@@ -201,30 +201,24 @@ const App = (props) => {
                 body: {currency}
             })
         }
+    }, [basket?.currency])
 
+    useEffect(() => {
         // update the basket customer email
         if (
             basket &&
             customer?.isRegistered &&
-            customer?.customerId === basket?.customerInfo?.customerId &&
             customer?.email &&
             customer?.email !== basket?.customerInfo?.email
         ) {
             updateCustomerForBasket.mutate({
                 parameters: {basketId: basket.basketId},
                 body: {
-                    email: customer?.email
+                    email: customer.email
                 }
             })
         }
-    }, [
-        basket?.currency,
-        basket?.customerInfo?.customerId,
-        customer?.isRegistered,
-        customer?.customerId,
-        customer?.email,
-        basket?.customerInfo?.email
-    ])
+    }, [customer?.isRegistered, customer?.email, basket?.customerInfo?.email])
 
     useEffect(() => {
         // Listen for online status changes.
