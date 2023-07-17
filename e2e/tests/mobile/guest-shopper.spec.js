@@ -71,6 +71,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await page.getByRole("button", { name: /Checkout as guest/i }).click();
 
+  // Confirm the email input toggles to show edit button on clicking "Checkout as guest"
   const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']");
 
   await expect(step0Card.getByRole("button", { name: /Edit/i })).toBeVisible();
