@@ -26,8 +26,16 @@ const diffArrays = (expectedArr, actualArr) => {
   return [...expectedArr].filter((x) => !actualSet.has(x));
 };
 
+const getCreditCardExpiry = (yearsFromNow = 5) => {
+  const padMonth = "00";
+  return `${(padMonth + (new Date().getMonth() + 1)).slice(-padMonth.length)}/${
+    (new Date().getFullYear() % 100) + parseInt(yearsFromNow)
+  }`;
+};
+
 module.exports = {
   isPrompt,
   mkdirIfNotExists,
   diffArrays,
+  getCreditCardExpiry
 };
