@@ -21,10 +21,11 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await page.getByRole("button", { name: "Womens" }).click();
 
-  // Wait for accoridion open animation to end
-  await page.waitForLoadState("domcontentloaded");
+  const clothingNav = page.getByRole("button", { name: "Clothing" });
 
-  await page.getByRole("button", { name: "Clothing" }).click();
+  await clothingNav.waitFor();
+
+  await clothingNav.click();
 
   await page.getByRole("link", { name: "Dresses" }).click();
 
@@ -75,4 +76,32 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']");
 
   await expect(step0Card.getByRole("button", { name: /Edit/i })).toBeVisible();
+
+  await expect(
+    page.getByRole("heading", { name: /Shipping Address/i })
+  ).toBeVisible();
+
+  await page.locator("input#firstName").fill("John");
+  await page.locator("input#lastName").fill("Doe");
+  await page.locator("input#lastName").fill("Doe");
+  await page.locator("input#phone").fill("8572068547");
+  await page.locator("input#address1").fill("5 Wall St.");
+  await page.locator("input#city").fill("Burlington");
+  await page.locator("select#stateCode").selectOption("MA");
+  await page.locator("input#postalCode").fill("01803");
+
+  await page
+    .getByRole("button", { name: /Continue to Shipping Method/i })
+    .click();
+
+  // Confirm the shipping details form toggles to show edit button on clicking "Checkout as guest"
+  const step1Card = page.locator("div[data-testid='sf-toggle-card-step-1']");
+
+  await expect(step1Card.getByRole("button", { name: /Edit/i })).toBeVisible();
+
+  await expect(
+    page.getByRole("heading", { name: /Shipping & Gift Options/i })
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: /Continue to Payment/i }).click();
 });
