@@ -38,19 +38,27 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   const addedToCartModal = page.getByText(/2 items added to cart/i);
 
-  await addedToCartModal.waitFor()
+  await addedToCartModal.waitFor();
 
-  await page.getByLabel('Close').click()
+  await page.getByLabel("Close").click();
 
-  await page.getByLabel(/My cart/i).click()
+  await page.getByLabel(/My cart/i).click();
 
   await expect(
     page.getByRole("link", { name: /Drape Neck Dress/i })
   ).toBeVisible();
 
-  await page.getByRole('link', { name: 'Proceed to Checkout' }).click();
+  await page.getByRole("link", { name: "Proceed to Checkout" }).click();
 
   await expect(
     page.getByRole("heading", { name: /Contact Info/i })
   ).toBeVisible();
+
+  await page.locator("input#email").fill("test@gmail.com");
+
+  await page.getByRole("button", { name: /Checkout as guest/i }).click();
+
+  const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']");
+
+  await expect(step0Card.getByRole("button", { name: /Edit/i })).toBeVisible();
 });
