@@ -87,12 +87,15 @@ describe('App', () => {
     })
 
     test('App component updates the basket with correct currency and customer email', async () => {
-        // Test basket. _app will be manipulating this basket for this test
+        const customerEmail = 'email@test.com'
+
+        // Test basket. _app will be manipulating this basket's currency and customerInfo.email for this test
         const basket = {
             basketId: 'basket_id',
             currency: 'CAD',
             customerInfo: {
-                customerId: 'customer_id'
+                customerId: 'customer_id',
+                email: ''
             }
         }
 
@@ -103,7 +106,7 @@ describe('App', () => {
             return {
                 data: {
                     customerId: 'customer_id',
-                    email: 'email@test.com',
+                    email: customerEmail,
                     isRegistered: true
                 }
             }
@@ -130,7 +133,7 @@ describe('App', () => {
             }),
             // mock adding guest email to basket
             rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
-                basket.customerInfo.email = 'customer@test.com'
+                basket.customerInfo.email = customerEmail
                 return res(ctx.json(basket))
             })
         )
@@ -147,6 +150,6 @@ describe('App', () => {
         )
 
         expect(basket.currency).toBe('GBP')
-        expect(basket.customerInfo.email).toBe('customer@test.com')
+        expect(basket.customerInfo.email).toBe(customerEmail)
     })
 })
