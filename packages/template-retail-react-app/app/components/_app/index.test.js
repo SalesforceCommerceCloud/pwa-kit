@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, act} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
 import {rest} from 'msw'
 
@@ -63,7 +63,6 @@ describe('App', () => {
                 <p>Any children here</p>
             </App>
         )
-        screen.debug()
         expect(screen.getByRole('main')).toBeInTheDocument()
         expect(screen.getByText('Any children here')).toBeInTheDocument()
     })
@@ -99,29 +98,25 @@ describe('App', () => {
             }
         }
 
-        jest.spyOn(
-            jest.requireActual('@salesforce/retail-react-app/app/hooks/use-current-customer'),
-            'useCurrentCustomer'
-        ).mockImplementation(() => {
+        jest.mock('../../hooks/use-current-customer', () => {
             return {
-                data: {
-                    customerId: 'customer_id',
-                    email: customerEmail,
-                    isRegistered: true
-                }
+                useCurrentCustomer: jest.fn().mockImplementation(() => {
+                    return {data: basket, derivedData: {hasBasket: true, totalItems: 0}}
+                })
             }
         })
 
-        jest.spyOn(
-            jest.requireActual('@salesforce/retail-react-app/app/hooks/use-current-basket'),
-            'useCurrentBasket'
-        ).mockImplementation(() => {
+        jest.mock('../../hooks/use-current-basket', () => {
             return {
-                data: basket,
-                derivedData: {
-                    hasBasket: true,
-                    totalItems: 0
-                }
+                useCurrentBasket: jest.fn().mockImplementation(() => {
+                    return {
+                        data: basket,
+                        derivedData: {
+                            hasBasket: true,
+                            totalItems: 0
+                        }
+                    }
+                })
             }
         })
 
@@ -139,17 +134,13 @@ describe('App', () => {
         )
 
         useMultiSite.mockImplementation(() => resultUseMultiSite)
-        await act(() =>
-            renderWithProviders(
-                <App
-                    targetLocale={DEFAULT_LOCALE}
-                    defaultLocale={DEFAULT_LOCALE}
-                    messages={messages}
-                />
-            )
+        renderWithProviders(
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages} />
         )
 
-        expect(basket.currency).toBe('GBP')
-        expect(basket.customerInfo.email).toBe(customerEmail)
+        await waitFor(() => {
+            expect(basket.currency).toBe('GBP')
+            expect(basket.customerInfo.email).toBe(customerEmail)
+        })
     })
 })
