@@ -1,4 +1,7 @@
 ## v1.1.0-dev (June 15, 2023)
+
+-   Registered user checkout should set order with an email [#1363](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1363)
+
 ## v1.0.0 (June 15, 2023)
 
 -   First public release of package on npm under `@salesforce/retail-react-app`
