@@ -105,7 +105,6 @@ jobs:
         with:
           CWD: "../generated-projects/retail-app-no-ext"
           TARGET: e2e-tests-pwa-kit
-          VERSION: ${{ github.sha }}
 
       - name: Wait for MRT Deploy to complete
         uses: "./.github/actions/wait_for_mrt_deploy"
@@ -185,7 +184,6 @@ jobs:
         with:
           CWD: "../generated-projects/retail-app-ext"
           TARGET: e2e-tests-pwa-kit
-          VERSION: ${{ github.sha }}
 
       - name: Wait for MRT Deploy to complete
         uses: "./.github/actions/wait_for_mrt_deploy"

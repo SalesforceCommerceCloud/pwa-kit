@@ -84,7 +84,6 @@ jobs:
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: staging
-          VERSION: ${{ github.sha }}
 
       - name: Push Bundle to MRT (Production)
         if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
@@ -92,7 +91,6 @@ jobs:
         with:
           CWD: "./packages/template-retail-react-app"
           TARGET: production
-          VERSION: ${{ github.sha }}
 
       - name: Push Bundle to MRT (Commerce SDK React)
         if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOPMENT == 'true'
@@ -100,7 +98,6 @@ jobs:
         with:
           CWD: "./packages/test-commerce-sdk-react"
           TARGET: commerce-sdk-react
-          VERSION: ${{ github.sha }}
 
       - name: Check Repository Clean
         if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
@@ -246,7 +243,6 @@ jobs:
         with:
           CWD: ${{ env.PROJECT_DIR }}
           TARGET: generated-pwa
-          VERSION: ${{ github.sha }}
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
