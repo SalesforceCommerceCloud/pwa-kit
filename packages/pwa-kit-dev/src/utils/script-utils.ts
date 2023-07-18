@@ -211,6 +211,7 @@ export const createBundle = async ({
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
     const destination = path.join(tmpDir, 'build.tar')
     const filesInArchive: string[] = []
+    let bundle_metadata: {[key: string]: any} = {}
 
     if (ssr_only.length === 0 || ssr_shared.length === 0) {
         throw new Error('no ssrOnly or ssrShared files are defined')
@@ -255,10 +256,10 @@ export const createBundle = async ({
             )
             .then(async () => {
                 const {dependencies = {}, devDependencies = {}} = await getProjectPkg()
-                ssr_parameters = {
-                    ...ssr_parameters,
-                    bundle_metadata: {dependencies: {...dependencies, ...devDependencies}}
+                bundle_metadata = {
+                    dependencies: {...dependencies, ...devDependencies}
                 }
+                console.log(bundle_metadata)
             })
             .then(() => readFile(destination))
             .then((data) => {
@@ -269,7 +270,8 @@ export const createBundle = async ({
                     data: data.toString(encoding),
                     ssr_parameters,
                     ssr_only: filesInArchive.filter(glob(ssr_only)),
-                    ssr_shared: filesInArchive.filter(glob(ssr_shared))
+                    ssr_shared: filesInArchive.filter(glob(ssr_shared)),
+                    bundle_metadata
                 }
             })
             // This is a false positive. The promise returned by `.finally()` won't resolve until

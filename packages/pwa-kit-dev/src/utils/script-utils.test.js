@@ -234,7 +234,7 @@ describe('scriptUtils', () => {
 
             expect(bundle.message).toEqual(message)
             expect(bundle.encoding).toBe('base64')
-            expect(bundle.ssr_parameters).toHaveProperty('bundle_metadata.dependencies')
+            expect(bundle.ssr_parameters).toEqual({})
             expect(bundle.ssr_only).toEqual(['ssr.js'])
             expect(bundle.ssr_shared).toEqual(['ssr.js', 'static/favicon.ico'])
 

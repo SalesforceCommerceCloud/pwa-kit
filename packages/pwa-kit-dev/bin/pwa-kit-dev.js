@@ -342,6 +342,7 @@ const main = async () => {
                 })
 
                 info(`Beginning upload to ${cloudOrigin}`)
+                info(`BUNDLE METADATA ${JSON.stringify(bundle.bundle_metadata, null, 2)}`)
                 const data = await client.push(bundle, projectSlug, target)
                 const warnings = data.warnings || []
                 warnings.forEach(warn)
