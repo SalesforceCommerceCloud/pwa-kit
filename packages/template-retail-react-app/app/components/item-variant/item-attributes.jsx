@@ -80,7 +80,10 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                             <FormattedNumber
                                 style="currency"
                                 currency={currency || basket?.currency || activeCurrency}
-                                value={variant.priceAdjustments[0].price}
+                                value={variant.priceAdjustments.reduce(
+                                    (acc, adj) => acc + (adj.price ?? 0),
+                                    0
+                                )}
                             />
                         </Text>
                     </Text>
