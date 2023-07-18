@@ -367,4 +367,40 @@ describe('scriptUtils', () => {
             )
         })
     })
+
+    describe('parseLog', () => {
+        it('correctly parses an application log', () => {
+            const log =
+                '2023-07-15T10:00:00Z\t550e8400-e29b-41d4-a716-446655440000\tINFO\tThis is a test log message'
+            const result = scriptUtils.parseLog(log)
+
+            expect(result).toEqual({
+                level: 'INFO',
+                message: 'This is a test log message',
+                shortRequestId: '550e8400'
+            })
+        })
+
+        it('correctly parses a platform log', () => {
+            const log = 'WARN\tThis is a test log message'
+            const result = scriptUtils.parseLog(log)
+
+            expect(result).toEqual({
+                level: 'WARN',
+                message: '\tThis is a test log message',
+                shortRequestId: undefined
+            })
+        })
+
+        it('finds the shortRequestId in the message if not present in the request id', () => {
+            const log = 'INFO\tThis is a test log message 550e8400'
+            const result = scriptUtils.parseLog(log)
+
+            expect(result).toEqual({
+                level: 'INFO',
+                message: '\tThis is a test log message 550e8400',
+                shortRequestId: '550e8400'
+            })
+        })
+    })
 })
