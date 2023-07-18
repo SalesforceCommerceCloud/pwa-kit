@@ -67,7 +67,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
     page.getByRole("heading", { name: /Drape Neck Dress/i })
   ).toBeVisible();
 
-  await page.getByRole("radio", { name: "M", exact: true }).click();
+  await page.getByRole("radio", { name: "L", exact: true }).click();
 
   await page.getByRole("button", { name: "+" }).click();
 
@@ -75,7 +75,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
   // So we need to look at the page URL to verify selected variants
   const updatedPageURL = await page.url();
   const params = updatedPageURL.split("?")[1];
-  expect(params).toMatch(/size=9MD/i);
+  expect(params).toMatch(/size=9LG/i);
   expect(params).toMatch(/color=JJ3WDXX/i);
 
   await page.getByRole("button", { name: /Add to Cart/i }).click();
@@ -94,7 +94,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
 
-  // Confirm the email input toggles to show edit button on clicking "Checkout as guest"
+  // Confirm the email input toggles to show sign out button on clicking "Checkout as guest"
   const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']");
 
   await expect(step0Card.getByRole("button", { name: /Sign Out/i })).toBeVisible();

@@ -38,7 +38,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     page.getByRole("heading", { name: /Drape Neck Dress/i })
   ).toBeVisible();
 
-  await page.getByRole("radio", { name: "M", exact: true }).click();
+  await page.getByRole("radio", { name: "L", exact: true }).click();
 
   await page.getByRole("button", { name: "+" }).click();
 
@@ -46,7 +46,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   // So we need to look at the page URL to verify selected variants
   const updatedPageURL = await page.url();
   const params = updatedPageURL.split("?")[1];
-  expect(params).toMatch(/size=9MD/i);
+  expect(params).toMatch(/size=9LG/i);
   expect(params).toMatch(/color=JJ3WDXX/i);
 
   await page.getByRole("button", { name: /Add to Cart/i }).click();
