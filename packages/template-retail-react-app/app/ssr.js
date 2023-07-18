@@ -24,7 +24,7 @@ const options = {
     mobify: getConfig(),
 
     // The port that the local dev server listens on
-    port: 3002,
+    port: 3001,
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
