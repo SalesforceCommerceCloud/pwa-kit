@@ -7,26 +7,45 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { getCreditCardExpiry } = require("../../scripts/utils.js");
+const { generateUserCredentials, getCreditCardExpiry } = require("../../scripts/utils.js");
 
-test("Guest shopper can checkout items as guest", async ({ page }) => {
+const REGISTERED_USER_CREDENTIALS = generateUserCredentials();
+
+test("Registered shopper can checkout items", async ({ page }) => {
+  // Create Account and Sign In
+  await page.goto(config.RETAIL_APP_HOME + "/registration");
+
+  const registrationFormHeading = page.getByText(/Let's get started!/i);
+  await registrationFormHeading.waitFor();
+
+  await page
+    .locator("input#firstName")
+    .fill(REGISTERED_USER_CREDENTIALS.firstName);
+  await page
+    .locator("input#lastName")
+    .fill(REGISTERED_USER_CREDENTIALS.lastName);
+  await page.locator("input#email").fill(REGISTERED_USER_CREDENTIALS.email);
+  await page
+    .locator("input#password")
+    .fill(REGISTERED_USER_CREDENTIALS.password);
+
+  await page.getByRole("button", { name: /Create Account/i }).click();
+
+  await expect(
+    page.getByRole("heading", { name: /Account Details/i })
+  ).toBeVisible();
+
+  await expect(
+    page.getByRole("heading", { name: /My Account/i })
+  ).toBeVisible();
+
+  await expect(page.getByText(/Email/i)).toBeVisible();
+  await expect(page.getByText(REGISTERED_USER_CREDENTIALS.email)).toBeVisible();
+
+  // Shop for items as registered user
   await page.goto(config.RETAIL_APP_HOME);
 
-  await page.getByLabel("Menu").click();
-
-  // SSR nav loads top level categories as direct links so we wait till all sub-categories load in the accordion
-  const categoryAccordion = page.locator(
-    "#category-nav .chakra-accordion__button svg+:text('Womens')"
-  );
-  await categoryAccordion.waitFor();
-
-  await page.getByRole("button", { name: "Womens" }).click();
-
-  const clothingNav = page.getByRole("button", { name: "Clothing" });
-
-  await clothingNav.waitFor();
-
-  await clothingNav.click();
+  await page.getByRole("link", { name: "Womens" }).hover();
 
   await page.getByRole("link", { name: "Dresses" }).click();
 
@@ -65,26 +84,18 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
 
-  await expect(
-    page.getByRole("heading", { name: /Contact Info/i })
-  ).toBeVisible();
-
-  await page.locator("input#email").fill("test@gmail.com");
-
-  await page.getByRole("button", { name: /Checkout as guest/i }).click();
-
   // Confirm the email input toggles to show edit button on clicking "Checkout as guest"
   const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']");
 
-  await expect(step0Card.getByRole("button", { name: /Edit/i })).toBeVisible();
+  await expect(step0Card.getByRole("button", { name: /Sign Out/i })).toBeVisible();
 
   await expect(
     page.getByRole("heading", { name: /Shipping Address/i })
   ).toBeVisible();
 
-  await page.locator("input#firstName").fill("John");
-  await page.locator("input#lastName").fill("Doe");
-  await page.locator("input#phone").fill("8572068547");
+  await page.locator("input#firstName").fill(REGISTERED_USER_CREDENTIALS.firstName);
+  await page.locator("input#lastName").fill(REGISTERED_USER_CREDENTIALS.lastName);
+  await page.locator("input#phone").fill(REGISTERED_USER_CREDENTIALS.phone);
   await page.locator("input#address1").fill("5 Wall St.");
   await page.locator("input#city").fill("Burlington");
   await page.locator("select#stateCode").selectOption("MA");
@@ -139,7 +150,5 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     page.getByRole("heading", { name: /Order Summary/i })
   ).toBeVisible();
   await expect(page.getByText(/2 Items/i)).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: /Drape Neck Dress/i })
-  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /Drape Neck Dress/i })).toBeVisible();
 });

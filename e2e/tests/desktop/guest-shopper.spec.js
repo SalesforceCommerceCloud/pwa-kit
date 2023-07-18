@@ -70,7 +70,6 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await page.locator("input#firstName").fill("John");
   await page.locator("input#lastName").fill("Doe");
-  await page.locator("input#lastName").fill("Doe");
   await page.locator("input#phone").fill("8572068547");
   await page.locator("input#address1").fill("5 Wall St.");
   await page.locator("input#city").fill("Burlington");

@@ -33,9 +33,69 @@ const getCreditCardExpiry = (yearsFromNow = 5) => {
   }`;
 };
 
+/**
+ * Generates a random string of given length containing uppercase letters, lowercase letters and numbers.
+ * @param {number} length Length of generated string required.
+ * @returns Randomly generated alphanumeric string.
+ */
+var generateRandomString = function (length) {
+  var randomString = '';
+  var characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  var counter = 0;
+  while (counter < length) {
+      randomString += characters.charAt(
+          Math.floor(Math.random() * charactersLength)
+      );
+      counter += 1;
+  }
+  return randomString;
+};
+
+/**
+* Generates a random valid phone number string
+* @param {number} length Length of generated string required.
+* @returns Randomly generated numeric string.
+*/
+var generateRandomPhoneNumber = function (length) {
+  // US Phone numbers must have the format NXX NXX-XXXX
+  // where N cannot be 0 or 1.
+  // The area code cannot have 9 in the 2nd digit
+  // The middle 3 digits cannot be N11
+
+  var randomPhone = '';
+  var validNumbers = '23456789'; // exclude 0 or 1 to keep things simple
+  var validNumbersLength = validNumbers.length;
+  var counter = 0;
+  while (counter < length) {
+      randomPhone += validNumbers.charAt(
+          Math.floor(Math.random() * validNumbersLength)
+      );
+      counter += 1;
+  }
+  return randomPhone;
+};
+
+/**
+* Generates a random user object containing firstName, lastName, phone, email and password based on locale (Supports en_US and en_GB only).
+* @returns Object containing randomly generated user data.
+*/
+var generateUserCredentials = function () {
+  var user = {};
+  user.firstName = generateRandomString(8);
+  user.lastName = generateRandomString(8);
+  user.phone = '857' + generateRandomPhoneNumber(7);
+  user.email = (generateRandomString(12) + '@domain.com').toLowerCase();
+  user.password = generateRandomString(15) + 'Ab1!%&*$#@^+:;=?';
+
+  return user;
+};
+
 module.exports = {
   isPrompt,
   mkdirIfNotExists,
   diffArrays,
-  getCreditCardExpiry
+  getCreditCardExpiry,
+  generateUserCredentials
 };
