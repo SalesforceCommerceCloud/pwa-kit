@@ -50,6 +50,7 @@ import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/us
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -87,7 +88,7 @@ const useLazyLoadCategories = () => {
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
 
-    const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
+    const ids = levelZeroCategoriesQuery.data?.[itemsKey]?.map((category) => category.id)
     const queries = useCategoryBulk(ids, {
         enabled: onClient && ids?.length > 0
     })
@@ -177,8 +178,11 @@ const App = (props) => {
         {parameters: {customerId: customer.customerId}},
         {enabled: !!customer.customerId && !isServer}
     )
+    const {data: basket} = useCurrentBasket()
+
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
+    const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
 
     useEffect(() => {
         // Create a new basket if the current customer doesn't have one.
@@ -187,14 +191,34 @@ const App = (props) => {
                 body: {}
             })
         }
+    }, [baskets])
+
+    useEffect(() => {
         // update the basket currency if it doesn't match the current locale currency
-        if (baskets?.baskets?.[0]?.currency && baskets.baskets[0].currency !== currency) {
+        if (basket?.currency && basket?.currency !== currency) {
             updateBasket.mutate({
-                parameters: {basketId: baskets.baskets[0].basketId},
+                parameters: {basketId: basket.basketId},
                 body: {currency}
             })
         }
-    }, [baskets])
+    }, [basket?.currency])
+
+    useEffect(() => {
+        // update the basket customer email
+        if (
+            basket &&
+            customer?.isRegistered &&
+            customer?.email &&
+            customer?.email !== basket?.customerInfo?.email
+        ) {
+            updateCustomerForBasket.mutate({
+                parameters: {basketId: basket.basketId},
+                body: {
+                    email: customer.email
+                }
+            })
+        }
+    }, [customer?.isRegistered, customer?.email, basket?.customerInfo?.email])
 
     useEffect(() => {
         // Listen for online status changes.

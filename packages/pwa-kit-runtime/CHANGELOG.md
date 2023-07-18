@@ -1,5 +1,6 @@
 ## v3.1.0-dev (Jul 03, 2023)
-## v3.1.0-dev (Jun 15, 2023)
+-   Fix potential security vulnerability in `semver` dependency [#1358](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1358)
+
 ## v3.0.0 (Jun 15, 2023)
 
 -   Package name changed to `@salesforce/pwa-kit-runtime`
