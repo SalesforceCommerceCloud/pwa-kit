@@ -259,7 +259,6 @@ export const createBundle = async ({
                 bundle_metadata = {
                     dependencies: {...dependencies, ...devDependencies}
                 }
-                console.log(bundle_metadata)
             })
             .then(() => readFile(destination))
             .then((data) => {
