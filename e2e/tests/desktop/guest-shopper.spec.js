@@ -14,14 +14,14 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await page.getByRole("link", { name: "Womens" }).hover();
 
-  await page.getByRole("link", { name: "Dresses" }).click();
+  await page.getByRole("link", { name: "Tops" }).click();
 
-  await expect(page.getByRole("heading", { name: "Dresses" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
 
-  await page.getByRole("link", { name: /Drape Neck Dress/i }).click();
+  await page.getByRole("link", { name: /Stripe Shell/i }).click();
 
   await expect(
-    page.getByRole("heading", { name: /Drape Neck Dress/i })
+    page.getByRole("heading", { name: /Stripe Shell/i })
   ).toBeVisible();
 
   await page.getByRole("radio", { name: "L", exact: true }).click();
@@ -33,7 +33,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   const updatedPageURL = await page.url();
   const params = updatedPageURL.split("?")[1];
   expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ3WDXX/i);
+  expect(params).toMatch(/color=JJ5YPA7/i);
 
   await page.getByRole("button", { name: /Add to Cart/i }).click();
 
@@ -46,7 +46,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   await page.getByLabel(/My cart/i).click();
 
   await expect(
-    page.getByRole("link", { name: /Drape Neck Dress/i })
+    page.getByRole("link", { name: /Stripe Shell/i })
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
@@ -125,5 +125,5 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     page.getByRole("heading", { name: /Order Summary/i })
   ).toBeVisible();
   await expect(page.getByText(/2 Items/i)).toBeVisible();
-  await expect(page.getByRole("link", { name: /Drape Neck Dress/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
 });
