@@ -4,6 +4,9 @@ inputs:
     description: Project directory
   TARGET:
     description: MRT target
+  VERSION:
+    description: Git SHA of the version being deployed
+    required: true
 runs:
   using: composite
   steps:
@@ -11,7 +14,7 @@ runs:
       run: |-
         cd ${{ inputs.CWD }}
         project="scaffold-pwa"
-        build="build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
+        build="build ${{ github.run_id }} on ${{ github.ref }} (${{ inputs.VERSION }})"
         if [[ ${{ inputs.TARGET }} ]]; then
           npm run push -- -s $project --message "$build" --target ${{ inputs.TARGET }}
         fi
