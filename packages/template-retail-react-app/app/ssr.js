@@ -35,18 +35,10 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    const getCSP = (nodeEnv, site) => {
+    const getCSP = (nodeEnv) => {
         const trustedMap = {
             development: [
                 'localhost:*',
-                '*.mobify-staging.com',
-                '*.demandware.net',
-                '*.mobify-storefront-staging.com',
-                '*.mobify-storefront.com',
-                '*.commercecloud.salesforce.com',
-                'runtime.commercecloud.com'
-            ],
-            staging: [
                 '*.mobify-staging.com',
                 '*.demandware.net',
                 '*.mobify-storefront-staging.com',
@@ -64,13 +56,13 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
         const trusted = ["'self'", ...(trustedMap[nodeEnv] ? trustedMap[nodeEnv] : [])]
         return {
-                'connect-src': ['api.cquotient.com', ...trusted],
-                'frame-ancestors': [...trusted],
-                'img-src': ['data:', ...trusted],
-                'script-src': ['unsafe-eval', 'storage.googleapis.com', ...trusted],
+            'connect-src': ['api.cquotient.com', ...trusted],
+            'frame-ancestors': [...trusted],
+            'img-src': ['data:', ...trusted],
+            'script-src': ['unsafe-eval', 'storage.googleapis.com', ...trusted],
 
-                // Do not upgrade insecure requests for local development
-                'upgrade-insecure-requests': isRemote() ? [] : null
+            // Do not upgrade insecure requests for local development
+            'upgrade-insecure-requests': isRemote() ? [] : null
         }
     }
 
@@ -79,7 +71,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         helmet({
             contentSecurityPolicy: {
                 useDefaults: true,
-                directives: getCSP(process.env.NODE_ENV)
+                directives: getCSP(process.env.NODE_ENV || 'development')
             },
             hsts: isRemote()
         })
