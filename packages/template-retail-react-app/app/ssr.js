@@ -64,7 +64,6 @@ const {handler} = runtime.createHandler(options, (app) => {
         }
         const trusted = ["'self'", ...(trustedMap[nodeEnv] ? trustedMap[nodeEnv] : [])]
         return {
-            directives: {
                 'connect-src': ['api.cquotient.com', ...trusted],
                 'frame-ancestors': [...trusted],
                 'img-src': ['data:', ...trusted],
@@ -72,7 +71,6 @@ const {handler} = runtime.createHandler(options, (app) => {
 
                 // Do not upgrade insecure requests for local development
                 'upgrade-insecure-requests': isRemote() ? [] : null
-            }
         }
     }
 
