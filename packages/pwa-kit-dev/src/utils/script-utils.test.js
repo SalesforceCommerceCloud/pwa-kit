@@ -5,11 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {mkdtemp, rm, writeFile, readJsonSync} from 'fs-extra'
+import {mkdtemp, rm, writeFile, readJsonSync, readJson} from 'fs-extra'
 import path from 'path'
 import os from 'os'
 import * as scriptUtils from './script-utils'
 const pkg = readJsonSync(path.join(__dirname, '../../package.json'))
+
+jest.mock('fs-extra', () => {
+    return {
+        ...jest.requireActual('fs-extra'),
+        readJson: jest.fn()
+    }
+})
 
 describe('scriptUtils', () => {
     const originalEnv = process.env
@@ -23,6 +30,7 @@ describe('scriptUtils', () => {
     afterEach(async () => {
         process.env = originalEnv
         tmpDir && (await rm(tmpDir, {recursive: true}))
+        jest.resetAllMocks()
     })
 
     test('glob() with no patterns matches nothing', () => {
@@ -88,6 +96,7 @@ describe('scriptUtils', () => {
         })
 
         test('getHeaders', async () => {
+            readJson.mockReturnValue(pkg)
             const client = new scriptUtils.CloudAPIClient({credentials: {username, api_key}})
             expect(await client.getHeaders()).toEqual({
                 'User-Agent': `${pkg.name}@${pkg.version}`,
@@ -96,11 +105,36 @@ describe('scriptUtils', () => {
         })
     })
 
-    test('getPkgJSON', async () => {
-        const pkg = await scriptUtils.getPkgJSON()
-        expect(pkg.name).toBe('@salesforce/pwa-kit-dev')
+    describe('getPkgJSON', () => {
+        test('should work', async () => {
+            readJson.mockReturnValue(pkg)
+            const pkgJson = await scriptUtils.getPkgJSON()
+            expect(pkgJson.name).toBe('@salesforce/pwa-kit-dev')
+        })
+
+        test('should return default package.json data when no valid file is found', async () => {
+            readJson.mockRejectedValue(Error)
+            const result = await scriptUtils.getPkgJSON()
+            expect(result).toEqual({name: '@salesforce/pwa-kit-dev', version: 'unknown'})
+        })
     })
 
+    describe('getProjectPkg', () => {
+        test('should work', async () => {
+            readJson.mockReturnValue(pkg)
+            const pkgJson = await scriptUtils.getProjectPkg()
+            expect(pkgJson.name).toBe('@salesforce/pwa-kit-dev')
+        })
+
+        test('should throw', async () => {
+            readJson.mockRejectedValue(Error)
+            await expect(scriptUtils.getProjectPkg()).rejects.toThrow(
+                `Could not read project package at "${path.join(process.cwd(), 'package.json')}"`
+            )
+        })
+    })
+
+    jest.unmock('fs-extra')
     describe('defaultMessage', () => {
         test('works', async () => {
             const mockGit = {branch: () => 'branch', short: () => 'short'}
@@ -142,6 +176,7 @@ describe('scriptUtils', () => {
 
     describe('readCredentials', () => {
         test('should work', async () => {
+            readJson.mockReturnValue({username: 'alice', api_key: 'xyz'})
             const creds = {username: 'alice', api_key: 'xyz'}
             const thePath = path.join(tmpDir, '.mobify.test')
             await writeFile(thePath, JSON.stringify(creds), 'utf8')
@@ -186,6 +221,7 @@ describe('scriptUtils', () => {
         })
 
         test('should archive a bundle', async () => {
+            readJson.mockReturnValue(pkg)
             const message = 'message'
             const bundle = await scriptUtils.createBundle({
                 message,
@@ -237,6 +273,7 @@ describe('scriptUtils', () => {
         ])(
             'should push a built bundle and handle status codes (%p)',
             async ({projectSlug, targetSlug, expectedURL, status}) => {
+                readJson.mockReturnValue(pkg)
                 const message = 'message'
                 const bundle = await scriptUtils.createBundle({
                     message,
@@ -295,5 +332,75 @@ describe('scriptUtils', () => {
                 )
             }
         )
+    })
+
+    describe('createLoggingToken', () => {
+        const username = 'user123'
+        const api_key = '123'
+        test('createLoggingToken passes', async () => {
+            readJson.mockReturnValue(pkg)
+            const projectSlug = 'project-slug'
+            const targetSlug = 'target-slug'
+
+            const text = () => Promise.resolve(JSON.stringify({token: 'token-value'}))
+            const json = () => Promise.resolve({token: 'token-value'})
+            const fetchMock = jest.fn(async () => ({status: 200, text, json}))
+
+            const client = new scriptUtils.CloudAPIClient({
+                credentials: {username, api_key},
+                fetch: fetchMock
+            })
+
+            const fn = async () => await client.createLoggingToken(projectSlug, targetSlug)
+
+            expect(await fn()).toBe('token-value')
+            expect(fetchMock).toHaveBeenCalledTimes(1)
+            expect(fetchMock).toHaveBeenCalledWith(
+                'https://cloud.mobify.com/api/projects/project-slug/target/target-slug/jwt/',
+                expect.objectContaining({
+                    method: 'POST',
+                    headers: {
+                        Authorization: expect.stringMatching(/^Bearer /),
+                        'User-Agent': `${pkg.name}@${pkg.version}`
+                    }
+                })
+            )
+        })
+    })
+
+    describe('parseLog', () => {
+        it('correctly parses an application log', () => {
+            const log =
+                '2023-07-15T10:00:00Z\t550e8400-e29b-41d4-a716-446655440000\tINFO\tThis is a test log message'
+            const result = scriptUtils.parseLog(log)
+
+            expect(result).toEqual({
+                level: 'INFO',
+                message: 'This is a test log message',
+                shortRequestId: '550e8400'
+            })
+        })
+
+        it('correctly parses a platform log', () => {
+            const log = 'WARN\tThis is a test log message'
+            const result = scriptUtils.parseLog(log)
+
+            expect(result).toEqual({
+                level: 'WARN',
+                message: '\tThis is a test log message',
+                shortRequestId: undefined
+            })
+        })
+
+        it('finds the shortRequestId in the message if not present in the request id', () => {
+            const log = 'INFO\tThis is a test log message 550e8400'
+            const result = scriptUtils.parseLog(log)
+
+            expect(result).toEqual({
+                level: 'INFO',
+                message: '\tThis is a test log message 550e8400',
+                shortRequestId: '550e8400'
+            })
+        })
     })
 })
