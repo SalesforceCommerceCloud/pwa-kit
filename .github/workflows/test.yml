@@ -20,7 +20,7 @@ on:
       # TODO: Should we run on all pushes to release branches, or should we run on GitHub releases?
       - 'release-*'
   schedule:
-    # Run every day at 12pm (PST) - cron uses UTC times
+    # Run every day at 12am (PST) - cron uses UTC times
     - cron: '0 8 * * *'
 env:
   IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
