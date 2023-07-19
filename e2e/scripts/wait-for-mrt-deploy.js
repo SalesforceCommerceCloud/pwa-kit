@@ -33,7 +33,7 @@ const doFetch = async (url, apiKey = null, method = "GET") => {
   return apiKey ? response.json() : response.text();
 };
 
-const wait = async (version, targetSlug, apiKey, project) => {
+const waitForDeploy = async (version, targetSlug, apiKey, project) => {
   const target = await doFetch(
     `${DEFAULT_ORIGIN}/api/projects/${project}/target/${targetSlug}`,
     apiKey
@@ -53,7 +53,7 @@ const wait = async (version, targetSlug, apiKey, project) => {
     case "PUBLISH_IN_PROGRESS":
       return new Promise((resolve) => {
         setTimeout(async () => {
-          return resolve(await wait(version, targetSlug, apiKey, project));
+          return resolve(await waitForDeploy(version, targetSlug, apiKey, project));
         }, 30000);
       });
     case "CREATE_FAILED":
@@ -67,7 +67,7 @@ const wait = async (version, targetSlug, apiKey, project) => {
 
 const main = async ({ version, target: targetSlug, apiKey, project }) => {
   console.log(`Waiting for deploy of target ${targetSlug} to finish...`);
-  const target = await wait(version, targetSlug, apiKey, project);
+  const target = await waitForDeploy(version, targetSlug, apiKey, project);
   const expectedBundleId = target.current_deploy.bundle.id;
   const expectedDeployId = target.current_deploy.deploy_id;
   const url = `https://${target.ssr_external_hostname}`;
