@@ -6,6 +6,8 @@
  */
 
 module.exports = {
+  RETAIL_APP_HOME:
+    "https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com",
   GENERATED_PROJECTS_DIR: "../generated-projects",
   GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
   GENERATOR_CMD:
@@ -32,11 +34,11 @@ module.exports = {
       },
       {
         expectedPrompt: /What is the URL for your Commerce Cloud instance?/i,
-        response: "https://zzte-053.dx.commercecloud.salesforce.com\n",
+        response: "https://zzrf-002.dx.commercecloud.salesforce.com\n",
       },
       {
         expectedPrompt: /What is your SLAS Client ID?/i,
-        response: "1d763261-6522-4913-9d52-5d947d3b94c4\n",
+        response: "987fc116-d30c-4537-93cb-c2bd433c3b5a\n",
       },
       {
         expectedPrompt: /What is your Site ID in Business Manager?/i,
@@ -45,7 +47,7 @@ module.exports = {
       {
         expectedPrompt:
           /What is your Commerce API organization ID in Business Manager?/i,
-        response: "f_ecom_zzte_053\n",
+        response: "f_ecom_zzrf_002\n",
       },
       {
         expectedPrompt:
@@ -68,11 +70,11 @@ module.exports = {
       },
       {
         expectedPrompt: /What is the URL for your Commerce Cloud instance?/i,
-        response: "https://zzte-053.dx.commercecloud.salesforce.com\n",
+        response: "https://zzrf-002.dx.commercecloud.salesforce.com\n",
       },
       {
         expectedPrompt: /What is your SLAS Client ID?/i,
-        response: "1d763261-6522-4913-9d52-5d947d3b94c4\n",
+        response: "987fc116-d30c-4537-93cb-c2bd433c3b5a\n",
       },
       {
         expectedPrompt: /What is your Site ID in Business Manager?/i,
@@ -81,7 +83,7 @@ module.exports = {
       {
         expectedPrompt:
           /What is your Commerce API organization ID in Business Manager?/i,
-        response: "f_ecom_zzte_053\n",
+        response: "f_ecom_zzrf_002\n",
       },
       {
         expectedPrompt:

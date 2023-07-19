@@ -1,9 +1,5 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - setup-e2e-testing
   schedule:
     # Run every day at 12am (PST) - cron uses UTC times
     - cron: "0 8 * * *"
@@ -106,6 +102,27 @@ jobs:
         with:
           CWD: "../generated-projects/retail-app-no-ext"
           TARGET: e2e-tests-pwa-kit
+
+      - name: Wait for MRT Deploy to complete
+        uses: "./.github/actions/wait_for_mrt_deploy"
+        with:
+          TARGET: e2e-tests-pwa-kit
+          MRT_API_KEY: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+          VERSION: ${{ github.sha }}
+          PROJECT: scaffold-pwa
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report-retail-app-no-ext
+          path: playwright-report/
+          retention-days: 30
   run-generator-retail-app-ext:
     # Run after the previous job completes irrespective of its result
     if: ${{ always() }}
@@ -164,3 +181,24 @@ jobs:
         with:
           CWD: "../generated-projects/retail-app-ext"
           TARGET: e2e-tests-pwa-kit
+
+      - name: Wait for MRT Deploy to complete
+        uses: "./.github/actions/wait_for_mrt_deploy"
+        with:
+          TARGET: e2e-tests-pwa-kit
+          MRT_API_KEY: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+          VERSION: ${{ github.sha }}
+          PROJECT: scaffold-pwa
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report-retail-app-ext
+          path: playwright-report/
+          retention-days: 30
