@@ -2,7 +2,7 @@ name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
   schedule:
     # Run every day at 12am (PST) - cron uses UTC times
-    - cron: "*/20 * * * *"
+    - cron: "*/5 * * * *"
 
 jobs:
   run-generator-demo:
