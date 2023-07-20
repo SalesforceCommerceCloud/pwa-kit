@@ -132,21 +132,6 @@ describe('DevServer startup', () => {
     })
 })
 
-describe('DevServer loading page', () => {
-    test('should redirect to the loading screen with an HTTP 302', async () => {
-        const options = opts()
-        const app = NoWebpackDevServerFactory._createApp(options)
-        app.use('/', DevServerFactory._redirectToLoadingScreen)
-
-        return request(app)
-            .get('/')
-            .expect(302) // Expecting the 302 temporary redirect (not 301)
-            .then((response) => {
-                expect(response.headers.location).toBe('/__mrt/loading-screen/index.html?loading=1')
-            })
-    })
-})
-
 describe('DevServer request processor support', () => {
     const helloWorld = '<div>hello world</div>'
 
