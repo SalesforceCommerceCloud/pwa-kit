@@ -637,11 +637,14 @@ describe('DevServer helpers', () => {
 })
 
 describe('DevServer rendering', () => {
+    const mockDevMiddleware = {waitUntilValid: (callback) => callback()}
+
     test('uses hot server middleware when ready', () => {
         const req = {
             app: {
                 __webpackReady: jest.fn().mockReturnValue(true),
-                __hotServerMiddleware: jest.fn()
+                __hotServerMiddleware: jest.fn(),
+                __devMiddleware: mockDevMiddleware
             }
         }
         const res = {}
@@ -658,7 +661,10 @@ describe('DevServer rendering', () => {
             _redirectToLoadingScreen: jest.fn()
         }
         const req = {
-            app: {__webpackReady: jest.fn().mockReturnValue(false)}
+            app: {
+                __webpackReady: jest.fn().mockReturnValue(false),
+                __devMiddleware: mockDevMiddleware
+            }
         }
         const res = {}
         const next = jest.fn()
