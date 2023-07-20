@@ -281,11 +281,7 @@ export const DevServerMixin = {
 
         // Ensure that we do not try to render anything until the webpack bundle is valid
         app.__devMiddleware.waitUntilValid(() => {
-            if (app.__webpackReady()) {
-                app.__hotServerMiddleware(req, res, next)
-            } else {
-                this._redirectToLoadingScreen(req, res, next)
-            }
+            app.__hotServerMiddleware(req, res, next)
         })
     },
 
