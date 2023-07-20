@@ -6,4 +6,4 @@
  */
 
 export {SkipNavContent} from './SkipNavContent'
-export {SkipNavLink} from './SkipNavLink/'
+export {SkipNavLink} from './SkipNavLink'

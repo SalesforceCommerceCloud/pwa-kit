@@ -283,7 +283,12 @@ const withChunking = (config) => {
         output: {
             ...config.output,
             filename: '[name].js',
-            chunkFilename: '[name].js' // Support chunking with @loadable/components
+            chunkFilename: '[name].js', // Support chunking with @loadable/components
+            clean: {
+                keep(asset) {
+                    return !asset.includes('@chakra-ui')
+                }
+            }
         },
         optimization: {
             minimize: mode === production,
@@ -298,17 +303,34 @@ const withChunking = (config) => {
                         // 3. If extending another template, don't include the
                         //    baseline route files in vendor.js
                         test: (module) => {
-                            if (
-                                EXT_EXTENDS &&
-                                EXT_OVERRIDES_DIR &&
-                                module?.context?.includes(
-                                    `${path.sep}${
-                                        path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
-                                    }${path.sep}`
-                                )
-                            ) {
+                            // NOTE: this would apply if for v3 project using template extensibility
+                            // https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/template-extensibility.html
+
+                            // if (
+                            //     EXT_EXTENDS &&
+                            //     EXT_OVERRIDES_DIR &&
+                            //     module?.context?.includes(
+                            //         `${path.sep}${
+                            //             path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
+                            //         }${path.sep}`
+                            //     )
+                            // ) {
+                            //     return false
+                            // }
+
+                            // here we make sure to include @chakra-ui/provider since it is required
+                            // for every page via _app-config/index.jsx which wraps all pages
+                            if (module?.request?.includes('@chakra-ui/provider')) {
+                                return true
+                            }
+                            // here we omit all chakra imports (except provider) to push them
+                            // into the route chunks instead of vendor.js
+                            if (module?.request?.includes('@chakra-ui')) {
                                 return false
                             }
+                            // NOTE: other regex-based tests could be added to push other dependencies
+                            // out of the vendor.js bundle
+
                             return module?.context?.match?.(/(node_modules)|(packages\/(.*)dist)/)
                         },
                         name: 'vendor',
