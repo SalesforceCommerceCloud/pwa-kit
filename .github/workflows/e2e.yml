@@ -1,5 +1,6 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
+  workflow_dispatch:
   schedule:
     # Run every day at 12am (PST) - cron uses UTC times
     - cron: "0 8 * * *"

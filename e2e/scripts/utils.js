@@ -39,7 +39,7 @@ const getCreditCardExpiry = (yearsFromNow = 5) => {
  * @returns Randomly generated alphanumeric string.
  */
 const generateRandomString = function (length) {
-  const randomString = "";
+  let randomString = "";
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
