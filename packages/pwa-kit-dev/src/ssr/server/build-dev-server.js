@@ -286,7 +286,7 @@ export const DevServerMixin = {
         } else {
             // Ensure that we do not try to render anything until the webpack bundle is valid.
             // There was a bug previously where developers would refresh the page while webpack was building,
-            // causing them to get redirected to the loading page and sometimes getting stuck, 
+            // causing them to get redirected to the loading page and sometimes getting stuck,
             // requiring them to restart their dev server
             app.__devMiddleware.waitUntilValid(() => {
                 app.__hotServerMiddleware(req, res, next)
