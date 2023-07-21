@@ -142,8 +142,10 @@ export const DevServerMixin = {
         }
         app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
+        app.__isInitialBuild = true
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
         app.__devMiddleware.waitUntilValid(() => {
+            app.__isInitialBuild = false
             // Be just a little more generous before letting eg. Lighthouse hit it!
             setTimeout(() => {
                 console.log(chalk.cyan('First build complete'))
@@ -279,10 +281,17 @@ export const DevServerMixin = {
     render(req, res, next) {
         const app = req.app
 
-        // Ensure that we do not try to render anything until the webpack bundle is valid
-        app.__devMiddleware.waitUntilValid(() => {
-            app.__hotServerMiddleware(req, res, next)
-        })
+        if (app?.__isInitialBuild) {
+            this._redirectToLoadingScreen(req, res, next)
+        } else {
+            // Ensure that we do not try to render anything until the webpack bundle is valid.
+            // There was a bug previously where developers would refresh the page while webpack was building,
+            // causing them to get redirected to the loading page and sometimes getting stuck, 
+            // requiring them to restart their dev server
+            app.__devMiddleware.waitUntilValid(() => {
+                app.__hotServerMiddleware(req, res, next)
+            })
+        }
     },
 
     /**
