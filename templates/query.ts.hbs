@@ -20,6 +20,8 @@ type Client = ApiClients['{{@root.clientInstance}}']
 {{#each model.encodes.endPoints}}{{#each operations}}{{#if (isQuery @root.clientClass this)~}}
 /**
  * {{{formatForTsDoc description}}}
+ * @group {{@root.clientClass}}
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the {{@root.name.original}} `{{name}}` endpoint.
