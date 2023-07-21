@@ -16,7 +16,7 @@ type Client = {{@root.clientClass}}<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
 {{#each model.encodes.endPoints}}{{#each operations}}{{#if (isQuery @root.clientClass this)}}
-  {{name}}: [{{{createQueryKeyFragment (getValue ../path) null}}}, Params<'{{name}}'>];
+  {{name}}: ['/commerce-sdk-react', {{{createQueryKeyFragment (getValue ../path) null}}}, Params<'{{name}}'>];
 {{~/if}}{{/each}}{{/each}}
 }
 
@@ -45,7 +45,7 @@ export const {{name}}: QueryKeyHelper<'{{name}}'> = {
       '{{name}}',
       {{/each}}
     ]),
-  path: (params) => [{{{createQueryKeyFragment (getValue ../path) 'params'}}}],
+  path: (params) => ['/commerce-sdk-react', {{{createQueryKeyFragment (getValue ../path) 'params'}}}],
   queryKey: (params: Params<'{{name}}'>) => [...{{name}}.path(params), {{name}}.parameters(params)]
 }
 {{/if}}{{/each}}{{/each}}

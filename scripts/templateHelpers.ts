@@ -170,12 +170,13 @@ export function assign(
 }
 
 export const createQueryKeyFragment = (
-  url: string,
+  path: string,
   variable: string | null
 ): string =>
   // If the URL ends with a {template} fragment, we end up with a `, ''` that we don't need
-  `'${url.replace(
+  `'${path.replace(
     /\{(\w+)\}/g,
+    // If `variable` is passed, generate JS, else generate TS
     `', ${variable ? `${variable}.$1` : 'string | undefined'}, '`
   )}'`.replace(", ''", '');
 
