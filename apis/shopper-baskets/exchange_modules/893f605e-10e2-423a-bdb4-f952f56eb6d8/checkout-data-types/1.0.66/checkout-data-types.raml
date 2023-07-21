@@ -1,0 +1,2293 @@
+#%RAML 1.0 Library
+#In C4E review
+usage: This library provides all shopper baskets orders data types
+
+uses:
+  CommerceCloudStandards: /exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.26/commerce-cloud-standards.raml
+
+types:
+  Basket:
+    description: |-
+      Document representing a basket.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      adjustedMerchandizeTotalTax?:
+        description: |-
+          The total tax on products in the shipment, including item-level price adjustments but not
+          including service charges such as shipping. If the Discount Taxation preference is set to Tax 
+          Products and Shipping Only Based on Adjusted Price, this amount also includes prorated 
+          order-level price adjustments.
+        type: number
+        format: double
+        example:
+           4.95
+      adjustedShippingTotalTax?:
+        description: |-
+          The total tax on shipping charges in the shipment, including shipping price adjustments.
+        type: number
+        format: double
+        example:
+          0.30
+      agentBasket?:
+        description: |-
+          Is the basket created by an agent?
+        type: boolean
+        example:
+          true
+      basketId?:
+        description: |-
+          The unique identifier for the basket.
+        type: string
+        example:
+          "e78aa5646a8efebdd9cdd38be7"
+      billingAddress?:
+        description: |-
+          The billing address.
+        type: OrderAddress
+      bonusDiscountLineItems?:
+        description: |-
+          The bonus discount line items.
+        type: array
+        items:
+          type: BonusDiscountLineItem
+      channelType?:
+        description: |-
+          The sales channel.
+        type: string
+        enum:
+          - storefront
+          - callcenter
+          - marketplace
+          - dss
+          - store
+          - pinterest
+          - twitter
+          - facebookads
+          - subscriptions
+          - onlinereservation
+          - customerservicecenter
+          - instagramcommerce
+          - tiktok
+          - snapchat
+          - google
+          - whatsapp
+          - youtube
+        example:
+            "storefront"
+      couponItems?:
+        description: |-
+          The coupon items.
+        type: array
+        items:
+          type: CouponItem
+      creationDate?:
+        description: |-
+          The timestamp when the basket was created.
+        type: datetime
+        example:
+          2015-05-19T15:23:18.000Z
+      currency?:
+        description: |-
+          The ISO 4217 mnemonic code of the currency.
+        type: string
+        example:
+          "USD"
+      customerInfo?:
+        description: |-
+          The customer information, if the customer is logged in.
+        type: CustomerInfo
+      giftCertificateItems?:
+        description: |-
+          The gift certificate line items.
+        type: array
+        items:
+          type: GiftCertificateItem
+      inventoryReservationExpiry?:
+        description: |-
+          The expiration datetime of the inventory reservation.
+        type: datetime
+        example:
+          2015-05-19T15:30:18.000Z
+      lastModified?:
+        description: |-
+          The timestamp when the basket was last modified.
+        type: datetime
+        example:
+          2015-05-19T15:25:18.000Z
+      merchandizeTotalTax?:
+        description: |-
+          The total products tax in the purchase currency.
+          Merchandise total price represents the sum of the product prices before
+          services (such as shipping) or adjustments from promotions have
+          been added.
+        type: number
+        format: double
+        example:
+          4.95
+      notes?:
+        description: |-
+          The notes.
+        type: SimpleLink
+      orderPriceAdjustments?:
+        description: |-
+          The order-level price adjustments.
+        type: array
+        items:
+          type: PriceAdjustment
+      orderTotal?:
+        description: |-
+          The total price, including products, shipping and tax.
+        type: number
+        format: double
+        example:
+          110.24
+      paymentInstruments?:
+        description: |-
+          The payment instruments list.
+        type: array
+        items:
+          type: OrderPaymentInstrument
+      productItems?:
+        description: |-
+          The product items.
+        type: array
+        items:
+          type: ProductItem
+      productSubTotal?:
+        description: |-
+          The total price of all products including item-level adjustments, but not including order-level adjustments or shipping 
+          charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          99.00
+      productTotal?:
+        description: |-
+          The total price of all products including adjustments, but not including shipping charges. If the taxation policy is net,
+          it doesn't include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          88.00
+      shipments?:
+        description: |-
+          The shipments.
+        type: array
+        items:
+          type: Shipment
+      shippingItems?:
+        description: |-
+          The shipping items.
+        type: array
+        items:
+          type: ShippingItem
+      shippingTotal?:
+        description: |-
+          The total price of all shipping charges, including shipping adjustments. If the taxation policy is net, it doesn't
+          include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          5.99
+      shippingTotalTax?:
+        description: |-
+          The total tax on all shipping charges, not including shipping adjustments.
+        type: number
+        format: double
+        example:
+          0.30
+      sourceCode?:
+        description: |-
+          The source code assigned to the basket.
+        type: string
+        example:
+          "OUTDOOR1"
+      taxTotal?:
+        description: |-
+          The total tax amount.
+        type: number
+        format: double
+        example:
+          5.25
+      taxation?:
+        description: |-
+          The taxation policy (gross or net).
+        type: string
+        enum:
+          - gross
+          - net
+        example:
+          "net"
+  BasketPaymentInstrumentRequest:
+    description: |-
+      Document representing a basket payment instrument request.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      amount?:
+        description: |-
+          The payment transaction amount.
+        type: number
+        format: double
+        example:
+          130.88
+      bankRoutingNumber?:
+        description: |-
+          The bank routing number.
+        maxLength: 256
+        type: string
+        example:
+          "12030000"
+      giftCertificateCode?:
+        description: |-
+          The gift certificate code.
+        maxLength: 256
+        type: string
+        example:
+          "AFGRTUZ"
+      paymentCard?:
+        description: |-
+          The payment card.
+        type: OrderPaymentCardRequest
+      paymentMethodId?:
+        description: |-
+          The payment method ID.
+        maxLength: 256
+        type: string
+        example:
+          "CREDIT_CARD"
+  BasketsResult:
+    description: |-
+      Result document containing an array of baskets.
+    properties:
+      baskets:
+        description: |-
+          The list of baskets for a customer.
+        type: array
+        items:
+          type: Basket
+      total:
+        description: |-
+          The total number of baskets.
+        type: integer
+        format: int32
+  BonusDiscountLineItem:
+    description: |-
+      Document representing a bonus discount line item.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      bonusProducts?:
+        description: |-
+          The bonus products the customer can choose from.
+        type: array
+        items:
+          type: ProductDetailsLink
+      couponCode?:
+        description: |-
+          The coupon code that triggered the promotion, if applicable.
+        type: string
+        example:
+          "5ties"
+      id?:
+        description: |-
+          The ID of the line item.
+        type: string
+        example:
+          "91f4dd8bfa0653d58b7783b04f"
+      maxBonusItems?:
+        description: |-
+          The maximum number of bonus items the user can select for this promotion.
+        type: integer
+        format: int32
+      promotionId?:
+        description: |-
+          The ID of the promotion that triggered the creation of the line item.
+        type: string
+        example:
+          "Buy1Get2"
+  CouponItem:
+    description: |-
+      Document representing a coupon item.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      code:
+        description: |-
+          The coupon code.
+        maxLength: 256
+        type: string
+        example:
+          "5ties"
+      couponItemId?:
+        description: |-
+          The coupon item ID.
+        type: string
+        example:
+          "d4c9c0141e9c74c150225580f3"
+      statusCode?:
+        description: |-
+          The status of the coupon item.
+        type: string
+        enum:
+          - coupon_code_already_in_basket
+          - coupon_code_already_redeemed
+          - coupon_code_unknown
+          - coupon_disabled
+          - redemption_limit_exceeded
+          - customer_redemption_limit_exceeded
+          - timeframe_redemption_limit_exceeded
+          - no_active_promotion
+          - coupon_already_in_basket
+          - no_applicable_promotion
+          - applied
+          - adhoc
+        example:
+          "no_applicable_promotion"
+      valid?:
+        description: |-
+          A flag indicating whether the coupon item is valid. A coupon line item is valid if
+          the status code is "applied" or "no_applicable_promotion".
+        type: boolean
+        example:
+          true
+  CustomerInfo:
+    description: |-
+      The customer information for guest or logged-in customers.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      customerId?:
+        description: |-
+          The customer ID.
+        maxLength: 100
+        type: string
+        example:
+          "abMKqMaNYOBMnNdDNzyC5oNTi5"
+      customerName?:
+        description: |-
+          The customer name.
+        type: string
+        example:
+          "Max Mustermann"
+      customerNo?:
+        description: |-
+          The customer number.
+        maxLength: 100
+        type: string
+        example:
+          "0002352"
+      email:
+        description: |-
+          The customer's email address.
+        type: string
+        example:
+          no-reply@salesforce.com
+  Discount:
+    description: |-
+      Document representing a discount.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      amount?:
+        description: |-
+          The discount amount for discount types that define specific discount amounts.
+        type: number
+        format: double
+        example:
+          130.88
+      percentage?:
+        description: |-
+          The discount percent for discount types that define percentage discounts.
+        type: number
+        format: double
+        example:
+          0.19
+      priceBookId?:
+        description: |-
+          The price book ID that is used with some types.
+        type: string
+        example:
+          "usd-sale-prices"
+      type:
+        description: |-
+          The type of discount.
+        type: string
+        enum:
+          - percentage
+          - fixed_price
+          - amount
+          - free
+          - price_book_price
+          - bonus
+          - total_fixed_price
+          - bonus_choice
+          - percentage_off_options
+        example:
+          "fixed_price"
+  DiscountRequest:
+    description: |-
+      Request that represents a discount to be applied to a custom price adjustment. 
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      type:
+        description: |-
+          The type of discount.
+          - `amount` describes a (unit) price discount, and its corresponding value (positive) defines the amount each unit is to be reduced by. Example: For a $10 discount, set `type` to `amount` and `value` to `10.00`.
+          - `percentage` describes a percentage discount, and its corresponding value (positive) defines the percentage reduction. Example: For a 5% discount, set `type` to `percentage` and `value` to `5.00`.
+          - `fixed_price` describes a fixed price discount, and its corresponding value (positive) defines the resulting fixed price for the item. Only one `fixed_price` discount can be set for each item. Example: To set a fixed price of $15, set `type` to `fixed_price` and `value` to `15.00`. **Important**: Setting `type` to `fixed_price` is not supported when `level` is set to `order`.
+        type: string
+        enum:
+          - percentage
+          - fixed_price
+          - amount
+        example:
+          "percentage"
+      value:
+        description: |-
+          The amount of the discount.
+        type: number
+        format: double
+        example:
+          20.00
+  GiftCertificateItem:
+    description: |-
+      A gift certificate item.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      amount:
+        description: |-
+          The gift certificate item amount.
+        type: number
+        format: double
+        example:
+          20.00
+      giftCertificateItemId?:
+        description: |-
+          The item ID.
+        type: string
+        example:
+          "629dea6e7b61e58da629b57b21"
+      message?:
+        description: |-
+          The gift certificate message.
+        maxLength: 4000
+        type: string
+        example:
+          "Birthday present."
+      recipientEmail:
+        description: |-
+          The recipient email.
+        minLength: 1
+        type: string
+        example:
+          no-reply@salesforce.com
+      recipientName?:
+        description: |-
+          The recipient's name.
+        type: string
+        example:
+          "Daniel Mustermann"
+      senderName?:
+        description: |-
+          The sender's name.
+        type: string
+        example:
+          "Max Mustermann"
+      shipmentId?:
+        description: |-
+          The ID of the shipment this item belongs to.
+        type: string
+        example:
+          "me"
+  Note:
+    description: |-
+      Document representing a note.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      createdBy?:
+        description: |-
+          The author of the note.
+        type: string
+        example:
+          "Support"
+      creationDate?:
+        description: |-
+          The timestamp when the note was created.
+        type: datetime
+        example:
+          2021-02-25T09:58:04.691Z
+      id?:
+        description: |-
+          The ID of the note.
+        type: string
+        example:
+          "49b5c6c8340e432a7bfab9ff3a"
+      subject?:
+        description: |-
+          The note subject.
+        maxLength: 256
+        type: string
+        example:
+          "Order was created."
+      text?:
+        description: |-
+          The note text.
+        maxLength: 4000
+        type: string
+        example:
+          "Order was created."
+  NotesResult:
+    description: |-
+      A result of a note request.
+      Contains notes for an object - for example, for a basket.
+    properties:
+      notes?:
+        description: |-
+          The notes.
+        type: array
+        items:
+          type: Note
+  OptionItem:
+    description: |-
+      An option item represents an optional purchase related to a product item, and is always associated with that parent product
+      item. An option item can have different values from which to select. For example, a refrigerator item can have an option item representing an extended warranty, with a set of option item values representing different warranty lengths. When a shopper purchases the warranty option item together with the parent refrigerator item, they select one of the available warranty option item values.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      adjustedTax?:
+        description: |-
+          The tax on the line item, including any adjustments.
+        type: number
+        format: double
+        example:
+          19.00
+      basePrice?:
+        description: |-
+          The base price of the line item, which is the unit price not including adjustments. 
+          If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          50.00
+      bonusDiscountLineItemId?:
+        description: |-
+          The ID of the bonus discount line item this bonus product relates to.
+        type: string
+        example:
+          "ba248414e3eee797f062162f8b"
+      bonusProductLineItem?:
+        description: |-
+          A flag indicating whether the product item is a bonus.
+        type: boolean
+        example:
+          false
+      bundledProductItems?:
+        description: |-
+          The bundled product items.
+        type: array
+        items:
+          type: ProductItem
+      gift?:
+        description: |-
+          Returns true if the item is a gift.
+        type: boolean
+        example: 
+          false
+      giftMessage?:
+        description: |-
+          The gift message.
+        type: string
+        example:
+          "Happy Birthday"
+      inventoryId?:
+        description: |-
+          The inventory list ID associated with this item.
+        maxLength: 256
+        type: string
+        example:
+          "inventory"
+      itemId?:
+        description: |-
+          The product item ID. Use it to identify this item when updating its quantity or creating a custom price adjustment for it.
+        type: string
+        example:
+          "430ef5aad3a24de59378458434"
+      itemText?:
+        description: |-
+          The text describing the item.
+        type: string
+        example:
+          "The item text."
+      optionId:
+        description: |-
+          The ID of the option.
+        maxLength: 256
+        type: string
+        example:
+          consoleWarranty
+      optionItems?:
+        description: |-
+          The option items.
+        type: array
+        items:
+          type: OptionItem
+      optionValueId:
+        description: |-
+          The ID of the option value.
+        maxLength: 256
+        type: string
+        example:
+          "000"
+      price?:
+        description: |-
+          The price of the line item before applying any adjustments. If the taxation policy is net, it doesn't include tax. 
+          If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          150.99
+      priceAdjustments?:
+        description: |-
+          The price adjustments.
+        type: array
+        items:
+          type: PriceAdjustment
+      priceAfterItemDiscount?:
+        description: |-
+          The price of the product line item including item-level adjustments, but not including order-level adjustments or
+          shipping charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          50.99
+      priceAfterOrderDiscount?:
+        description: |-
+          The price of the product line item including item-level adjustments and prorated order-level adjustments, but not 
+          including shipping charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it
+          includes tax.
+        type: number
+        format: double
+        example:
+          40.50
+      productId?:
+        description: |-
+          The ID of the product.
+        maxLength: 100
+        type: string
+        example:
+          "nintendo-ds-console"
+      productListItem?:
+        description: |-
+          If this product line item was added from a product list, this value is a reference to the corresponding product list item.
+        type: ProductListItemReference
+      productName?:
+        description: |-
+          The name of the product.
+        type: string
+        example:
+          "Nintendo DS Game Console"
+      quantity?:
+        description: |-
+          The ordered quantity of the products represented by this item.
+        maximum: 999
+        minimum: 0
+        type: number
+        format: double
+        example:
+          1
+      shipmentId?:
+        description: |-
+          The ID of the shipment this item belongs to.
+        type: string
+        example:
+          "me"
+      shippingItemId?:
+        description: |-
+          If the product line item has a related shipping item, this value is its ID. A related shipping item represents a 
+          surcharge applied to individual products using a particular shipping method.
+        type: string
+        example:
+          "006490dcc338feeafc71c964bf"
+      tax?:
+        description: |-
+          The tax on the line item before applying any adjustments.
+        type: number
+        format: double
+        example:
+          0.00
+      taxBasis?:
+        description: |-
+          The amount used to calculate the tax for this item.
+        type: number
+        format: double
+        example:
+          50.00
+      taxClassId?:
+        description: |-
+          The tax class ID for the product item, or null
+          if no tax class ID is associated with the product item.
+        type: string
+      taxRate?:
+        description: |-
+          The tax rate, which is the decimal tax rate to be applied
+          to the product represented by this item.
+        type: number
+        format: double
+        example:
+          0.19
+  Order:
+    description: |-
+      Document representing an order.
+    properties:
+      adjustedMerchandizeTotalTax?:
+        description: |-
+          The total tax on products in the order, including price adjustments, but not including service charges such as 
+          shipping.
+        type: number
+        format: double
+        example:
+          1.50
+      adjustedShippingTotalTax?:
+        description: |-
+          The total tax on shipping charges in the order, including shipping price adjustments.
+        type: number
+        format: double
+        example:
+          0.30
+      billingAddress?:
+        description: |-
+          The billing address.
+        type: OrderAddress
+      bonusDiscountLineItems?:
+        description: |-
+          The bonus discount line items.
+        type: array
+        items:
+          type: BonusDiscountLineItem
+      channelType?:
+        description: |-
+          The sales channel.
+        type: string
+        enum:
+          - storefront
+          - callcenter
+          - marketplace
+          - dss
+          - store
+          - pinterest
+          - twitter
+          - facebookads
+          - subscriptions
+          - onlinereservation
+          - customerservicecenter
+          - instagramcommerce
+          - tiktok
+          - snapchat
+          - google
+          - whatsapp
+          - youtube
+        example:
+          "storefront"
+      confirmationStatus?:
+        description: |-
+          The confirmation status.
+        type: string
+        enum:
+          - not_confirmed
+          - confirmed
+        example:
+          "confirmed"
+      couponItems?:
+        description: |-
+          The coupon items.
+        type: array
+        items:
+          type: CouponItem
+      createdBy?:
+        description: |-
+          This value depends on how the order was created. If a shopper created the order, this value is Customer. 
+          If a job created the order, this value is System. Otherwise, this value is the name of the user who created the order.
+        type: string
+        example:
+          "Customer"
+      creationDate?:
+        description: |-
+          The timestamp when the order was created.
+        type: datetime
+        example:
+          2015-05-19T15:23:18.000Z
+      currency?:
+        description: |-
+          The ISO 4217 mnemonic code of the currency.
+        type: string
+        example:
+          "USD"
+      customerInfo?:
+        description: |-
+          The customer information for guest or logged-in customers.
+        type: CustomerInfo
+      customerName?:
+        description: |-
+          The customer name.
+        type: string
+        example:
+          "Max Mustermann"
+      exportStatus?:
+        description: |-
+          The export status of the order.
+        type: string
+        enum:
+          - not_exported
+          - exported
+          - ready
+          - failed
+        example:
+            "exported"
+      externalOrderStatus?:
+        description: |-
+          The external status of the order.
+        type: string
+        example:
+          "Submitted"
+      giftCertificateItems?:
+        description: |-
+          The gift certificate line items.
+        type: array
+        items:
+          type: GiftCertificateItem
+      globalPartyId?:
+        description: |-
+          The Customer 360 Global Party ID associated with the shopper.
+        type: string
+        example:
+          "GP_1234"
+      lastModified?:
+        description: |-
+          The timestamp when the order was last modified.
+        type: datetime
+        example:
+          2021-02-25T09:58:08.715Z
+      merchandizeTotalTax?:
+        description: |-
+          The total products tax in the purchase currency. Merchandise total prices represent the sum of product prices 
+          not including shipping or adjustments.
+        type: number
+        format: double
+        example:
+          1.50
+      notes?:
+        description: |-
+          The notes.
+        type: SimpleLink
+      orderNo?:
+        description: |-
+          The order number.
+        type: string
+        example:
+          "00000410"
+      orderPriceAdjustments?:
+        description: |-
+          The order-level price adjustments.
+        type: array
+        items:
+          type: PriceAdjustment
+      orderToken?:
+        description: |-
+          The order token used to secure the lookup of an order on base of the
+          plain order number. The order token contains only URL safe characters.
+        type: string
+      orderTotal?:
+        description: |-
+          The total price, including products, shipping, and tax.
+        type: number
+        format: double
+        example:
+          110.24
+      paymentInstruments?:
+        description: |-
+          The payment instruments list.
+        type: array
+        items:
+          type: OrderPaymentInstrument
+      paymentStatus?:
+        description: |-
+          The payment status.
+        type: string
+        enum:
+          - not_paid
+          - part_paid
+          - paid
+        example:
+          "paid"
+      productItems?:
+        description: |-
+          The product items.
+        type: array
+        items:
+          type: ProductItem
+      productSubTotal?:
+        description: |-
+          The total price of all products including item-level adjustments, but not including 
+          order-level adjustments or shipping charges. If the taxation policy is net, it doesn't include tax. 
+          If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          99.00
+      productTotal?:
+        description: |-
+          The total price of all products in the shipment including item-level adjustments and prorated 
+          order-level adjustments, but not including shipping charges. If the taxation policy is net, 
+          it doesn't include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          99.00
+      shipments?:
+        description: |-
+          The shipments.
+        type: array
+        items:
+          type: Shipment
+      shippingItems?:
+        description: |-
+          The shipping items.
+        type: array
+        items:
+          type: ShippingItem
+      shippingStatus?:
+        description: |-
+          The shipping status.
+        type: string
+        enum:
+          - not_shipped
+          - part_shipped
+          - shipped
+        example:
+          "shipped"
+      shippingTotal?:
+        description: |-
+          The total price of all shipping charges, including shipping adjustments. If the taxation policy is net, 
+          it doesn't include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          5.99
+      shippingTotalTax?:
+        description: |-
+          The total tax on all shipping charges, not including shipping adjustments.
+        type: number
+        format: double
+        example:
+          0.30
+      siteId?:
+        description: |-
+          The order's site.
+        type: string
+        example:
+          "ShoppingSite"
+      sourceCode?:
+        description: |-
+          The source code assigned to the basket from which this order was created.
+        type: string
+        example:
+          "OUTDOOR1"
+      status?:
+        description: |-
+          The status.
+        type: string
+        enum:
+          - created
+          - new
+          - completed
+          - cancelled
+          - replaced
+          - failed
+        example:
+          "created"
+      taxTotal?:
+        description: |-
+          The total tax amount.
+        type: number
+        format: double
+        example:
+          5.25
+      taxation?:
+        description: |-
+           The taxation policy (gross or net).
+        type: string
+        enum:
+          - gross
+          - net
+        example:
+          "net"
+  OrderAddress:
+    description: |-
+      Document representing an order address.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      address1?:
+        description: |-
+          The first address line.
+        type: string
+        example:
+          "45 Main Rd."
+      address2?:
+        description: |-
+          The second address line.
+        type: string
+        example:
+          "Apartment 204"
+      city?:
+        description: |-
+          The city.
+        type: string
+        example:
+          "Boston"
+      companyName?:
+        description: |-
+          The company name.
+        type: string
+        example:
+          "Salesforce"
+      countryCode?:
+        description: |-
+          The ISO Country Code.
+        type: CommerceCloudStandards.CountryCode
+        example:
+          "US"
+      firstName?:
+        description: |-
+          The first name.
+        type: string
+        example:
+          "Max"
+      fullName?:
+        description: |-
+          The full name.
+        type: string
+        example:
+          "Max Mustermann"
+      id?:
+        description: |-
+          The ID of the address.
+        type: string
+        example:
+          "me"
+      jobTitle?:
+        description: |-
+          The job title.
+        type: string
+        example:
+          "Software Engineer"
+      lastName?:
+        description: |-
+          The last name.
+        type: string
+        example:
+          "Mustermann"
+      phone?:
+        description: |-
+          The phone number.
+        type: string
+        example:
+          "6175555555"
+      postBox?:
+        description: |-
+          The post office box.
+        type: string
+        example:
+          "PO BOX 109"
+      postalCode?:
+        description: |-
+          The postal code.
+        type: string
+        example:
+          "05408"
+      salutation?:
+        description: |-
+          The salutation.
+        type: string
+        example:
+          "Mr"
+      secondName?:
+        description: |-
+          The second name.
+        type: string
+      stateCode?:
+        description: |-
+          The state code.
+        type: string
+        example:
+          "MA"
+      suffix?:
+        description: |-
+          The suffix.
+        type: string
+        example:
+          "Sr"
+      suite?:
+        description: |-
+          The suite.
+        type: string
+        example:
+          "24A"
+      title?:
+        description: |-
+          The title.
+        type: string
+        example:
+          "Dr."
+  OrderPaymentCardRequest:
+    description: |-
+      Document representing an order payment card request.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      cardType?:
+        description: |-
+          The payment card type (for example: Visa).
+        maxLength: 256
+        type: string
+        example:
+          "Visa"
+      creditCardToken?:
+        description: |-
+          A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data
+          in the token store.
+        type: string
+        example:
+          "E67TY8GQ27X"
+      expirationMonth?:
+        description: |-
+          The month when the payment card expires.
+        type: integer
+        format: int32
+        example: 
+          3
+      expirationYear?:
+        description: |-
+          The year when the payment card expires.
+        type: integer
+        format: int32
+        example:
+          2025
+      holder?:
+        description: |-
+          The payment card holder.
+        maxLength: 256
+        type: string
+        example:
+          Max Mustermann
+      issueNumber?:
+        description: |-
+          The payment card issue number.
+        maxLength: 256
+        type: string
+        example:
+          "2"
+      maskedNumber?:
+        description: |-
+          The masked payment card number.
+        maxLength: 25
+        type: string
+        pattern: '^[0-9 -]{0,7}\D{6,15}\d{0,4}$'
+        example:
+          "*********4422"
+      validFromMonth?:
+        description: |-
+          The month the payment card is valid from.
+        maximum: 12
+        minimum: 1
+        type: integer
+        format: int32
+        example:
+          5
+      validFromYear?:
+        description: |-
+          The year the payment card is valid from.
+        type: integer
+        format: int32
+        example:
+          2019
+  OrderPaymentInstrument:
+    description: |-
+      Document representing an order payment instrument.
+    properties:
+      amount?:
+        description: |-
+          The payment transaction amount.
+        type: number
+        format: double
+        example:
+          130.88
+      authorizationStatus?:
+        description: |-
+          The authorization status of the payment transaction.
+        type: Status
+      bankRoutingNumber?:
+        description: |-
+          The bank routing number.
+        maxLength: 256
+        type: string
+        example:
+         "12030000"
+      maskedGiftCertificateCode?:
+        description: |-
+          The gift certificate code with the last 4 characters not masked.
+        type: string
+        example:
+          "******Gzzy"
+      paymentCard?:
+        description: |-
+          The payment card.
+        type: PaymentCard
+      paymentInstrumentId?:
+        description: |-
+          The payment instrument ID.
+        type: string
+        example:
+          "ba248424e3eee797f062162f8b"
+      paymentMethodId?:
+        description: |-
+          The payment method ID.
+        maxLength: 256
+        type: string
+        example:
+          "CREDIT_CARD"
+  OrderPaymentInstrumentRequest:
+    description: |-
+      Document representing an order payment instrument request.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      amount?:
+        description: |-
+          The payment transaction amount.
+        type: number
+        format: double
+        example:
+          130.88
+      bankRoutingNumber?:
+        description: |-
+          The bank routing number.
+        maxLength: 256
+        type: string
+        example:
+          "12030000"
+      giftCertificateCode?:
+        description: |-
+          The gift certificate code.
+        maxLength: 256
+        type: string
+      paymentCard?:
+        description: |-
+          The payment card.
+        type: OrderPaymentCardRequest
+      paymentMethodId?:
+        description: |-
+          The payment method ID.
+        maxLength: 256
+        type: string
+        example:
+          CREDIT_CARD
+  PaymentCard:
+    description: |-
+      Document representing a payment card.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      cardType?:
+        description: |-
+          The payment card type.
+        maxLength: 256
+        type: string
+        example:
+          "Visa"
+      creditCardExpired?:
+        description: |-
+          A flag indicating if the credit card is expired.
+        type: boolean
+        example:
+          true
+      creditCardToken?:
+        description: |-
+          A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data
+          in the token store.
+        type: string
+        example:
+          "E67TY8GQ27X"
+      expirationMonth?:
+        description: |-
+          The month when the payment card expires.
+        type: integer
+        format: int32
+        example:
+          3
+      expirationYear?:
+        description: |-
+          The year when the payment card expires.
+        type: integer
+        format: int32
+        example:
+          2025
+      holder?:
+        description: |-
+          The payment card holder.
+        maxLength: 256
+        type: string
+        example:
+          "Max Mustermann"
+      issueNumber?:
+        description: |-
+          The payment card issue number.
+        maxLength: 256
+        type: string
+        example:
+          "2"
+      maskedNumber?:
+        description: |-
+          The masked payment card number.
+        maxLength: 4000
+        type: string
+        example:
+          "*********4422"
+      numberLastDigits?:
+        description: |-
+          The last digits of the payment card number.
+        maxLength: 4000
+        type: string
+        example:
+          "4422"
+      validFromMonth?:
+        description: |-
+          The month the payment card is valid from.
+        maximum: 12
+        minimum: 1
+        type: integer
+        format: int32
+        example:
+          5
+      validFromYear?:
+        description: |-
+          The year the payment card is valid from.
+        type: integer
+        format: int32
+        example:
+          2015
+  PaymentCardSpec:
+    description: |-
+      Document representing the specification for a payment card.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      cardType?:
+        description: |-
+          The payment card type.
+        type: string
+        example:
+          "Visa"
+      checksumVerificationEnabled?:
+        description: |-
+          A flag indicating whether the card number is verified using the Luhn checksum algorithm.
+        type: boolean
+        example:
+          true
+      description?:
+        description: |-
+          The localized description of the payment card.
+        type: string
+      image?:
+        description: |-
+          The URL to the image that represents the payment card.
+        type: string
+      name?:
+        description: |-
+          The localized name of the payment card.
+        type: string
+      numberLengths?:
+        description: |-
+          The sorted list of number lengths (individual lengths as well as
+          length ranges).
+        type: array
+        items:
+          type: string
+      numberPrefixes?:
+        description: |-
+          The sorted list of number prefixes (individual prefixes as well
+          as prefix ranges).
+        type: array
+        items:
+          type: string
+  PaymentMethod:
+    description: |-
+      Document representing a payment method.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      cards?:
+        description: |-
+          The sorted array of payment cards (included only when the system payment method is CREDIT_CARD).
+        type: array
+        items:
+          type: PaymentCardSpec
+      description?:
+        description: |-
+          The localized description of the payment method or card.
+        type: string
+      id:
+        description: |-
+          The ID of the payment method or card.
+        maxLength: 256
+        type: string
+      image?:
+        description: |-
+          The URL to the image that represents the payment method or card.
+        type: string
+      name?:
+        description: |-
+          The localized name of the payment method or card.
+        type: string
+      paymentProcessorId?:
+        description: |-
+          The payment processor ID.
+        type: string
+  PaymentMethodResult:
+    description: |-
+      Result document of payment methods applicable for a basket.
+    properties:
+      applicablePaymentMethods?:
+        description: |-
+          The applicable payment methods.
+        type: array
+        items:
+          type: PaymentMethod
+  PriceAdjustment:
+    description: |-
+      Document representing a price adjustment within a basket or order. Price adjustments
+      can be assigned at the order, product, or shipping level.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      appliedDiscount?:
+        description: |-
+          Details describing the discount this price adjustment is based on. For adjustments
+          not based on a discount, this value is null.
+        type: Discount
+      couponCode?:
+        description: |-
+          The coupon code of the coupon this price adjustment is based on. For adjustments 
+          not based on a coupon, this value is null.
+        type: string
+        example:
+          "5ties"
+      createdBy?:
+        description: |-
+          The user who created the price adjustment.
+        type: string
+        example:
+          "Support"
+      creationDate?:
+        description: |-
+          The timestamp when the price adjustment was created.
+        type: datetime
+        example:
+          2015-05-19T15:23:18.000Z
+      custom?:
+        description: |-
+          A flag indicating whether this price adjustment was created by custom logic. This 
+          flag is set to true unless the price adjustment was created by the promotion 
+          engine.
+        type: boolean
+        example:
+          true
+      itemText?:
+        description: |-
+          The text describing the item.
+        type: string
+      lastModified?:
+        description: |-
+          The timestamp when the price adjustment was last modified.
+        type: datetime
+        example:
+          2021-02-25T09:58:08.715Z
+      manual?:
+        description: |-
+          A flag indicating whether this price adjustment was created by a manual process.
+          If the price adjustment was created by the promotion engine, this value is always
+          false.
+        type: boolean
+        example:
+          true
+      price?:
+        description: |-
+          The adjustment price.
+        type: number
+        format: double
+        example:
+          120.88
+      priceAdjustmentId?:
+        description: |-
+          The price adjustment ID.
+        type: string
+        example:
+          "ba248424e3eee797f062161f8b"
+      promotionId?:
+        description: |-
+          The ID of the related promotion. Custom price adjustments
+          can be assigned any promotion ID so long it is not
+          used by a price adjustment belonging to the same item,
+          and is not used by a promotion defined in the promotion engine.
+          If not specified, a promotion ID is generated.
+        type: string
+      promotionLink?:
+        description: |-
+          The URL addressing the related promotion.
+        type: string
+      reasonCode?:
+        description: |-
+          The reason for the price adjustment.
+        type: string
+  PriceAdjustmentRequest:
+    description: |-
+      Request that represents a price adjustment.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      discount?:
+        description: |-
+          A discount that can be specified instead of a price.
+        type: DiscountRequest
+      itemId?:
+        description: |-
+          The item to which the price adjustment should be added, depending on the specified level. If the level is ´order´, item id is not needed. If `shipping`, specify the UUID of the shipping item. If `product`, specify the UUID of the product item.
+        type: string
+        example:
+          "93196fae953cbedbe54d67e760"
+      itemText?:
+        description: |-
+          The text describing the item in more detail.
+        type: string
+        example:
+          "A discounted item"
+      level:
+        description: |-
+          The level at which the adjustment is applied.
+          - `order` indicates that the price adjustment should be added directly to basket. 
+          - `product` indicates that the price adjustment should be added to the product item.
+          - `shipping` indicates that the price adjustment is added to the shipping item.
+        type: string
+        enum:
+          - product
+          - shipping
+          - order
+        example:
+          "order"
+      promotionId?:
+        description: |-
+          The ID of the related promotion. Custom price adjustments can be assigned any promotion ID as long as it's not used by a price adjustment belonging to the same item and isn't used by a promotion defined in the promotion engine. If not specified, a promotion ID is generated.
+        type: string
+        example:
+          "Shipping100"
+      reasonCode?:
+        description: |-
+          The reason for the price adjustment.
+        type: string
+        example:
+          "Shipping promotion on order above $1,000 USD"
+  PriceBookIds:
+    description: |-
+      Array of price book IDs to use for the basket calculation.
+    type: array
+    maxItems: 10
+    items:
+      type: string
+      maxLength: 256
+  ProductDetailsLink:
+    description: |-
+      Document representing a link to the resource for product details.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      productDescription?:
+        description: |-
+          The description of the product.
+        type: string
+        example:
+          "Nintendo DS revolutionizes handheld gameplay."
+      productId:
+        description: |-
+          The ID of the product.
+        type: string
+        example:
+          "nintendo-ds-console"
+      productName?:
+        description: |-
+          The name of the product.
+        type: string
+        example:
+          "Nintendo DS Game Console"
+      title?:
+        description: |-
+          The link title.
+        type: string
+        example:
+          "Nintendo DS Game Console"
+  ProductItem:
+    description: |-
+      Document representing a product item.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      adjustedTax?:
+        description: |-
+          The tax on the line item, including any adjustments.
+        type: number
+        format: double
+        example:
+          19.00
+      basePrice?:
+        description: |-
+          The base price of the line item, which is the unit price not including 
+          adjustments. If the taxation policy is net, it doesn't include tax. If the
+          taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          130.00
+      bonusDiscountLineItemId?:
+        description: |-
+          The ID of the bonus discount line item this bonus product relates to.
+        type: string
+      bonusProductLineItem?:
+        description: |-
+          A flag indicating whether the product item is a bonus.
+        type: boolean
+        example:
+          true
+      bundledProductItems?:
+        description: |-
+          The bundled product items.
+        type: array
+        items:
+          type: ProductItem
+      gift?:
+        description: |-
+          Returns true if the item is a gift.
+        type: boolean
+        example:
+          true
+      giftMessage?:
+        description: |-
+          The gift message.
+        type: string
+        example:
+          "Happy Birthday"
+      inventoryId?:
+        description: |-
+          The inventory list ID associated with this item.
+        maxLength: 256
+        type: string
+        example:
+          "inventory"
+      itemId?:
+        description: |-
+          The product item ID. Use it to identify this item when updating its quantity or 
+          creating a custom price adjustment for it.
+        type: string
+        example:
+          "430ef5aad3a24de59378458434"
+      itemText?:
+        description: |-
+          The text describing the item.
+        type: string
+      optionItems?:
+        description: |-
+          The option items.
+        type: array
+        items:
+          type: OptionItem
+      price?:
+        description: |-
+          The price of the line item before applying any adjustments. If the line item is based on net pricing
+          then the net price is returned. If the line item is based on gross
+          pricing then the gross price is returned.
+        type: number
+        format: double
+      priceAdjustments?:
+        description: |-
+          The price adjustments.
+        type: array
+        items:
+          type: PriceAdjustment
+      priceAfterItemDiscount?:
+        description: |-
+          The price of the product line item including item-level adjustments, but not 
+          including order-level adjustments or shipping charges. If the taxation policy is 
+          net, it doesn't include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          20.99
+      priceAfterOrderDiscount?:
+        description: |-
+          The price of the product line item including item-level adjustments and prorated
+          order-level adjustments, but not including shipping charges. If the taxation 
+          policy is net, it doesn't include tax. If the taxation policy is gross, it 
+          includes tax.
+        type: number
+        format: double
+        example:
+          15.50
+      productId?:
+        description: |-
+          The ID of the product.
+        maxLength: 100
+        type: string
+        example:
+          "nintendo-ds-console"
+      productListItem?:
+        description: |-
+          If this product line item was added from a product list, this value is a reference
+          to the corresponding product list item.
+        type: ProductListItemReference
+      productName?:
+        description: |-
+          The name of the product.
+        type: string
+        example:
+          "Nintendo DS Game Console"
+      quantity?:
+        description: |-
+          The quantity of the products represented by this item.
+        maximum: 999
+        minimum: 0
+        type: number
+        format: double
+        example:
+          1
+      shipmentId?:
+        description: |-
+          The ID of the shipment this item belongs to.
+        type: string
+        example:
+          "me"
+      shippingItemId?:
+        description: |-
+          If the product line item has a related shipping item, this value is its ID. A 
+          related shipping item represents a surcharge applied to individual products using
+          a particular shipping method.
+        type: string
+        example:
+          "006490dcc338feeafc71c964bf"
+      tax?:
+        description: |-
+          The tax for the product item, not including price adjustments.
+        type: number
+        format: double
+        example:
+          0.30
+      taxBasis?:
+        description: |-
+          The price used to calculate the tax for this product item.
+        type: number
+        format: double
+        example:
+          30.00
+      taxClassId?:
+        description: |-
+          The tax class ID for the product item, or null
+          if no tax class ID is associated with the product item.
+        type: string
+      taxRate?:
+        description: |-
+          The tax rate, which is the decimal tax rate to be applied
+          to the product represented by this item.
+        type: number
+        format: double
+        example:
+          0.90
+  ProductListItemReference:
+    description: |-
+      Document representing product list item details.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      id:
+        description: |-
+          The ID of the product list item.
+        type: string
+        example:
+          "ba248424e3fee797f062162f8b"
+      priority?:
+        description: |-
+          The priority of the product list item.
+        type: integer
+        format: int32
+        example:
+          1
+      productDetailsLink?:
+        type: ProductDetailsLink
+      productList?:
+        description: |-
+          A reference to the associated product list.
+        type: ProductListLink
+      public?:
+        type: boolean
+        example:
+          false
+      purchasedQuantity?:
+        description: |-
+          The total quantity of this item purchased from the product list.
+        type: number
+        format: double
+        example:
+          0.00
+      quantity?:
+        description: |-
+          The number of products or gift certificates that get shipped when purchasing this product list item.
+        minimum: 0
+        type: number
+        format: double
+        example:
+          1.0
+      type?:
+        description: |-
+          Specifies whether the item is a product or a gift certificate.
+        type: string
+        enum:
+          - product
+          - gift_certificate
+        example:
+          product
+  ProductListLink:
+    description: |-
+      Document representing a link to a product list.
+    properties:
+      description?:
+        description: |-
+          The description of this product list.
+        type: string
+      name?:
+        description: |-
+          The name of this product list.
+        type: string
+      public?:
+        description: |-
+          A flag indicating whether the owner made this product list available for access
+          by other customers.
+        type: boolean
+        example:
+          true
+      title?:
+        description: |-
+          The link title.
+        type: string
+      type?:
+        description: |-
+          The type of the product list.
+        type: string
+        enum:
+          - wish_list
+          - gift_registry
+          - shopping_list
+          - custom_1
+          - custom_2
+          - custom_3
+        example:
+          "shopping_list"
+  PromotionLink:
+    description: |-
+      Document representing a promotion link.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      calloutMsg?:
+        description: |-
+          The localized callout message of the promotion.
+        type: string
+        example:
+          "$50 Fixed Products Amount Above 100"
+      name?:
+        description: |-
+          The localized name of the promotion.
+        type: string
+        example:
+          "$50 Fixed Products Amount Above 100"
+      promotionId?:
+        description: |-
+          The unique ID of the promotion.
+        type: string
+        example:
+          "$50FixedProductsAmountAbove100"
+      title?:
+        description: |-
+          The title.
+        type: string
+  Shipment:
+    description: |-
+      Document representing a shipment.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      adjustedMerchandizeTotalTax?:
+        description: |-
+          The total tax on products in the shipment, including item-level price adjustments but not including
+          service charges such as shipping. If the Discount Taxation preference is set to Tax Products and 
+          Shipping Only Based on Adjusted Price, this amount also includes prorated order-level price adjustments.
+        type: number
+        format: double
+        example:
+          4.95
+      adjustedShippingTotalTax?:
+        description: |-
+          The total tax on shipping charges in the shipment, including shipping price adjustments.
+        type: number
+        format: double
+        example:
+          0.30
+      gift?:
+        description: |-
+          A flag indicating whether the shipment is a gift.
+        type: boolean
+        example:
+          true
+      giftMessage?:
+        description: |-
+          The gift message.
+        type: string
+        example:
+          "Happy Birthday"
+      merchandizeTotalTax?:
+        description: |-
+          The total tax on products in the shipment, not including price adjustments or service charges such as 
+          shipping.
+        type: number
+        format: double
+        example:
+          4.95
+      productSubTotal?:
+        description: |-
+          The total price of all products in the shipment, including item-level adjustments, but not including
+          order-level adjustments or shipping charges. If the taxation policy is net, it doesn't include tax. If
+          the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          99.00
+      productTotal?:
+        description: |-
+          The total price of all products in the shipment including item-level adjustments and prorated 
+          order-level adjustments, but not including shipping charges. If the taxation policy is net, it doesn't
+          include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          99.00
+      shipmentId?:
+        description: |-
+          The order-specific ID of the shipment. The default value is 'me'.
+        type: string
+        example:
+          "me"
+      shipmentNo?:
+        description: |-
+          The shipment number of this shipment. This number is automatically generated.
+        type: string
+      shipmentTotal?:
+        description: |-
+          The total price of all products in the shipment including item-level adjustments, shipping charges, 
+          and tax.
+        type: number
+        format: double
+        example:
+          39.99
+      shippingAddress?:
+        description: |-
+          The shipping address.
+        type: OrderAddress
+      shippingMethod?:
+        description: |-
+          The shipping method.
+        type: ShippingMethod
+      shippingStatus?:
+        description: |-
+          The shipping status of the shipment.
+        type: string
+        enum:
+          - not_shipped
+          - shipped
+        example:
+          "shipped"
+      shippingTotal?:
+        description: |-
+          The total price of all shipping charges in the shipment, including shipping adjustments. If the 
+          taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          5.99
+      shippingTotalTax?:
+        description: |-
+          The total tax on shipping charges in the shipment, not including shipping price adjustments.
+        type: number
+        format: double
+        example:
+          0.30
+      taxTotal?:
+        description: |-
+          The total tax on the shipment, including item-level price adjustments and service charges such as
+          shipping. If the Discount Taxation preference is set to Tax Products and Shipping Only Based on 
+          Adjusted Price, this amount also includes prorated order-level price adjustments.
+        type: number
+        format: double
+        example:
+          1.80
+      trackingNumber?:
+        description: |-
+          The tracking number of the shipment.
+        type: string
+        example:
+          "1Z204E380338943508"
+  ShippingItem:
+    description: |-
+      Document representing a shipping item.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      adjustedTax?:
+        description: |-
+          The tax for the shipping item, including price adjustments.
+        type: number
+        format: double
+        example:
+          19.00
+      basePrice?:
+        description: |-
+          The base price of the shipping item, which is the unit price not including adjustments. 
+          If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+        example:
+          50.00
+      itemId?:
+        description: |-
+          The shipping item ID. Use it to identify this shipping item when updating its quantity or creating a
+          custom price adjustment for it.
+        type: string
+        example:
+          "430ef5aad3a24de59378458434"
+      itemText?:
+        description: |-
+          The text describing the shipping item.
+        type: string
+        example:
+          "Shipping"
+      price?:
+        description: |-
+          The price of the line item before applying any adjustments. If the line item is based on net pricing
+          then the net price is returned. If the line item is based on gross
+          pricing then the gross price is returned.
+        type: number
+        format: double
+      priceAdjustments?:
+        description: |-
+          The price adjustments.
+        type: array
+        items:
+          type: PriceAdjustment
+      priceAfterItemDiscount?:
+        description: |-
+          The price of the shipping item including item-level adjustments, but not including order-level
+          adjustments or shipping charges. If the taxation policy is net, it doesn't include tax. 
+          If the taxation policy is gross, it includes tax.
+        type: number
+        format: double
+      shipmentId?:
+        description: |-
+          The identifier of the shipment to which this item belongs.
+        type: string
+        example:
+          "me"
+      tax?:
+        description: |-
+          The tax on the product item, not including adjustments.
+        type: number
+        format: double
+        example:
+          0.19
+      taxBasis?:
+        description: |-
+          The price used to calculate the tax for this shipping item.
+        type: number
+        format: double
+      taxClassId?:
+        description: |-
+          The tax class ID for the product item, or null
+          if no tax class ID is associated with the product item.
+        type: string
+      taxRate?:
+        description: |-
+          The tax rate applicable to this product line item. For a 10% tax rate, the value is 0.1.
+        type: number
+        format: double
+  ShippingMethod:
+    description: |-
+      Document representing a shipping method.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      description?:
+        description: |-
+          The localized description of the shipping method.
+        type: string
+        example:
+          "Order received within 7-10 business days"
+      externalShippingMethod?:
+        description: |-
+          The external shipping method.
+        type: string
+      id:
+        description: |-
+          The shipping method ID.
+        maxLength: 256
+        type: string
+        example:
+          "001"
+      name?:
+        description: |-
+          The localized name of the shipping method.
+        type: string
+        example:
+          "Ground"
+      price?:
+        description: |-
+          The shipping cost total, including shipment level costs,
+          product level fix, and surcharge costs.
+        type: number
+        format: double
+        example:
+          15.00
+      shippingPromotions?:
+        description: |-
+          The array of active customer shipping promotions for this shipping
+          method. This array can be empty.
+        type: array
+        items:
+          type: ShippingPromotion
+  ShippingMethodResult:
+    description: |-
+      Result document containing shipping methods.
+    properties:
+      applicableShippingMethods?:
+        description: |-
+          The applicable shipping method documents.
+        type: array
+        items:
+          type: ShippingMethod
+      defaultShippingMethodId?:
+        description: |-
+          The default shipping method.
+        type: string
+        example:
+          "me"
+  ShippingPromotion:
+    description: |-
+      Document representing a shipping promotion.
+    type:
+      CommerceCloudStandards.OpenObject
+    properties:
+      calloutMsg?:
+        description: |-
+          The localized callout message of the promotion.
+        type: string
+        example:
+          "$30 Fixed Shipping Amount Above 150"
+      promotionId?:
+        description: |-
+          The unique ID of the promotion.
+        type: string
+        example:
+          "$30FixedShippingAmountAbove150"
+      promotionName?:
+        description: |-
+          The localized promotion name.
+        type: string
+        example:
+          "$30 Fixed Shipping Amount Above 150"
+  SimpleLink:
+    description: |-
+      Document representing a link to another resource.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+  Status:
+    description: |-
+      Document representing an object status.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      code?:
+        description: |-
+          The status code.
+        type: string
+      message?:
+        description: |-
+          The status message.
+        type: string
+      status?:
+        description: |-
+          The status.
+          For more information on the status values see Status.OK and Status.ERROR.
+        type: integer
+        format: int32
+  Taxes:
+    description: |-
+      Document representing the tax rates and (optionally) amounts for all items in a basket.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      taxes:
+        description: |-
+          Map containing the TaxItems for the line item ids: Map<LineItemId, TaxItems []>
+        properties:
+          /^\w{10,100}$/?:
+            type: TaxItems
+  TaxItems:
+    description: |-
+      Taxation for a line item.
+    properties:
+      taxItems?:
+        description: |-
+          The list of tax items.
+        type: array
+        items:
+          type: TaxItem
+  TaxItem:
+    description: |-
+      Object representing the taxation.
+    type:
+      CommerceCloudStandards.ClosedObject
+    properties:
+      id:
+        description: |-
+          The taxation identifier.
+        type: string
+      rate:
+        description: |-
+          The taxation rate.
+        type: number
+        format: double
+        example:
+          0.13
+      value?:
+        description: |-
+          The tax amount. Will be computed if not set.
+        type: number
+        format: double 

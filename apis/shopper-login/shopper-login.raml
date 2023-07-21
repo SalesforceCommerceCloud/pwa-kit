@@ -63,7 +63,7 @@ types:
   PasswordActionModes:
     type: string
     description: Password Action delivery modes
-    enum: [callback]
+    enum: [callback, sms]
   TrustedOnBehalf:
     type: string
     description: Type of system used for Trusted System On Behalf of requests (external or interal).
@@ -155,6 +155,11 @@ types:
         type: string
         description: MD5 Hashed ECOM user ID in uppercase.
         example: "45D39A8499A95288F82855427EBA99B5"
+      idp_access_token:
+        type: string
+        description: This is the access token that is returned from the IDP. The IDP access token is returned to be able to make calls into the IDP outside of SLAS.
+        example: "eyJraWQiOiJYS21HbHVuSm0zSlBTMHNjQXZXV19XQlYtRi1wMkxLSDR0V05UMHVVSjVJIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULjFMY0xxTWhqM2t0N1FKeFhxQ0VtdGZOOVV2eUcweW1meDFxZG9BdzF1NWMub2FyeXhveHF0QUtxaVFMbkM1ZDYiLCJpc3MiOiJodHRwczovL2Rldi05NTY1MjM2Lm9rdGEuY29tIiwiYXVkIjoiaHR0cHM6Ly9kZXYtOTU2NTIzNi5va3RhLmNvbSIsInN1YiI6Im9rdGEuc2xhcy50ZXN0IiwiaWF0IjoxNjc5Njk4MzA4LCJleHAiOjE2Nzk3MDE5MDgsImNpZCI6IjBvYTJrNXNma0JXZ0poTEVHNWQ2IiwidWlkIjoiMDB1MzhxZGpuU2NMT0IxbXE1ZDYiLCJzY3AiOlsib2ZmbGluZV9hY2Nlc3MiLCJvcGVuaWQiLCJlbWFpbCIsInByb2ZpbGUiXSwiYXV0aF90aW1lIjoxNjc5Njk4MzA2fQ.FDbGsnZGwTYVKGSlAo6jqcjG2HQ_BqQKRk72M5h69DRHyOM4wngsEELN_Wtgj3E77sP7IOmIKjiK5SFP17ADMbKZptVr2pqaMVF3PuU3Cbl_MgXZValfT-z12jHRq9sHMfsdTjY2RnvG44ZDFKc2no8mdL6IJ1MfCaZT5Tql5Ktq_UgudaWFsYqad3ETcmp5Y8ivz1bFnqud0sO9D9JzYOtfd9h71JKcsSC2rXc_Si-INPKKaGl8CDgaLXxu_Am9twJpUenHLpy0BerhcVvdFz7_611E53xOT_Esrc1pe-XAZtlYsJFnhxTBDT342ukiSWk2m6juVappv1GsRfUf2g"
+
   TokenActionRequest:
     type: object
     properties:
@@ -325,7 +330,7 @@ types:
         example: 18cda486-fe32-4e27-888b-6e4f89938e67
   PasswordlessLoginRequest:
     type: object
-    description: A request for a passwordless login token.
+    description: A request for a passwordless login token. This is only available for resgistered users using ECOM.
     properties:
       user_id:
         description: User ID for logging in.
@@ -333,7 +338,7 @@ types:
         maxLength: 128
         example: "samantha.sampleson@example.com"
       mode:
-        description: Notification mode for sending the passwordless token to the user. Only `callback` is supported at this time.
+        description: Notification mode for sending the passwordless token to the user. Using `callback` SLAS will make  POST request to the given callback_uri. Using `sms` requires Marketing Cloud to be configured for SLAS and have a `sms` password action template also configured.
         type: PasswordActionModes
         example: "callback"
       locale:
@@ -358,7 +363,7 @@ types:
         example: "http://localhost:9050/passwordless/login/callback"
   PasswordActionRequest:
     type: object
-    description: A request for a password reset token.
+    description: A request for a password reset token. This is only available for resgistered users using ECOM.
     properties:
       user_id:
         description: User ID for logging in. This is the id that is used to log into SFCC.
@@ -366,7 +371,7 @@ types:
         maxLength: 128
         example: "samantha.sampleson@example.com"
       mode:
-        description: Notification mode for sending the passwordless token to the user. Only `callback` is supported at this time.
+        description: Notification mode for sending the passwordless token to the user. Using `callback` SLAS will make  POST request to the given callback_uri. Using `sms` requires Marketing Cloud to be configured for SLAS and have a `sms` password action template also configured.
         type: PasswordActionModes
         example: "callback"
       channel_id:
@@ -666,6 +671,7 @@ types:
       description: |
         **Deprecation notice**: The `GET` method is deprecated for this endpoint. Please use `POST` instead.
         Get authorization code after authenticating a user using a B2C Commerce (ECOM) instance.
+
       post:
         description: |
           Logs in a shopper with credentials that are managed by a B2C Commerce instance (ECOM). It follows the authorization code grant flow as defined by the OAuth 2.1 standard. It also uses a proof key for code exchange (PKCE).
@@ -674,20 +680,23 @@ types:
           - The `code_verifier` string is a random string used for the `/token` endpoint request.
           - The `code_challenge` is an encoded version of the `code_verifier` string using an SHA-256 hash.
 
-          The request must include a basic authorization header that contains a Base64 encoded version of the following string: `<shopperUserID>:<shopperPassword>`.
+            The request must include a basic authorization header that contains a Base64 encoded version of the following string: `<shopperUserID>:<shopperPassword>`.
 
-          Required parameters: `code_challenge`, `channel_id`, `client_id`, and `redirect_uri`.
+            Required parameters: `code_challenge`, `channel_id`, `client_id`, and `redirect_uri`.
 
-          Optional parameters: `usid``.
+            Optional parameters: `usid``.
 
-          The SLAS `/login`` endpoint redirects back to the redirect URI and returns an authorization code.
+            The SLAS `/login` endpoint redirects back to the redirect URI and returns an authorization code.
+
+            Calls to `/login` made with the same loginId and tenantId within 1 second will result in a conflict.
         displayName: authenticateCustomer
         is:
           - SlasRateLimit:
               responseStatus: 303
               responseStatus2: 400
               responseStatus3: 401
-              responseStatus4: 500
+              responseStatus4: 401
+              responseStatus5: 500
         headers:
           Authorization:
             displayName: Login
@@ -728,6 +737,16 @@ types:
                   {
                   "error": "invalid_client",
                   "error_description": "Basic Authorization failed."
+                  }
+          409:
+            description: Conflict
+            body:
+              application/problem+json:
+                type: Oauth2ErrorResponse
+                example: |
+                  {
+                  "error": "conflict",
+                  "error_description": "The same loginId and tenantId tried to login twice within 1 second."
                   }
           500:
             description: Internal Server Error
@@ -857,7 +876,8 @@ types:
                       "token_type": "Bearer",
                       "usid": "null",
                       "customer_id": "null",
-                      "enc_user_id": "null"
+                      "enc_user_id": "null",
+                      "idp_access_token": ""
                   }
           400:
             description: Bad Request
@@ -1057,7 +1077,8 @@ types:
                     "token_type": "Bearer",
                     "usid": "18cda486-fe32-4e27-888b-6e4f89938e67",
                     "customer_id": "1000005",
-                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5"               
+                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5",
+                    "idp_access_token": "eyJraWQiOiJYS21HbHVuSm0zSlBTMHNjQXZXV19XQlYtRi1wMkxLSDR0V05UMHVVSjVJIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULjFMY0xxTWhqM2t0N1FKeFhxQ0VtdGZOOVV2eUcweW1meDFxZG9BdzF1NWMub2FyeXhveHF0QUtxaVFMbkM1ZDYiLCJpc3MiOiJodHRwczovL2Rldi05NTY1MjM2Lm9rdGEuY29tIiwiYXVkIjoiaHR0cHM6Ly9kZXYtOTU2NTIzNi5va3RhLmNvbSIsInN1YiI6Im9rdGEuc2xhcy50ZXN0IiwiaWF0IjoxNjc5Njk4MzA4LCJleHAiOjE2Nzk3MDE5MDgsImNpZCI6IjBvYTJrNXNma0JXZ0poTEVHNWQ2IiwidWlkIjoiMDB1MzhxZGpuU2NMT0IxbXE1ZDYiLCJzY3AiOlsib2ZmbGluZV9hY2Nlc3MiLCJvcGVuaWQiLCJlbWFpbCIsInByb2ZpbGUiXSwiYXV0aF90aW1lIjoxNjc5Njk4MzA2fQ.FDbGsnZGwTYVKGSlAo6jqcjG2HQ_BqQKRk72M5h69DRHyOM4wngsEELN_Wtgj3E77sP7IOmIKjiK5SFP17ADMbKZptVr2pqaMVF3PuU3Cbl_MgXZValfT-z12jHRq9sHMfsdTjY2RnvG44ZDFKc2no8mdL6IJ1MfCaZT5Tql5Ktq_UgudaWFsYqad3ETcmp5Y8ivz1bFnqud0sO9D9JzYOtfd9h71JKcsSC2rXc_Si-INPKKaGl8CDgaLXxu_Am9twJpUenHLpy0BerhcVvdFz7_611E53xOT_Esrc1pe-XAZtlYsJFnhxTBDT342ukiSWk2m6juVappv1GsRfUf2g"            
                   }
           400:
             description: Bad Request
@@ -1124,7 +1145,8 @@ types:
                     "token_type": "Bearer",
                     "usid": "18cda486-fe32-4e27-888b-6e4f89938e67",
                     "customer_id": "1000005",
-                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5"               
+                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5",
+                    "idp_access_token": ""             
                   }
           400:
             description: Bad Request
@@ -1197,7 +1219,8 @@ types:
                     "token_type": "Bearer",
                     "usid": "18cda486-fe32-4e27-888b-6e4f89938e67",
                     "customer_id": "1000005",
-                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5"               
+                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5",
+                    "idp_access_token": ""               
                   }
           400:
             description: Bad Request
@@ -1242,7 +1265,7 @@ types:
               responseStatus4: 500
         queryParameters:
           client_id:
-            description: The SLAS public client ID or SLAS private client ID for use with internal, trusted-agent requests.
+            description: The SLAS public client ID or SLAS private client ID for use with internal, trusted-agent requests. When using a private client ID a PKCE code challenge is not required.
             type: string
             required: true
             maxLength: 40
@@ -1356,7 +1379,7 @@ types:
             description: |-
               "Base64-encoded string of client credentials. The string is composed of a client ID and client secret, separated by a colon (`:`), like this: `clientId:clientSecret`. (Do not add the string `"Basic"`.)
 
-              The `_sfdc_client_auth` header is required when using a SLAS private client ID."
+              The `_sfdc_client_auth` header is only required when using a SLAS private client ID."
             type: string
             required: false
             example: "<Base64-encoded client credentials>"
@@ -1378,7 +1401,8 @@ types:
                     "token_type": "Bearer",
                     "usid": "18cda486-fe32-4e27-888b-6e4f89938e67",
                     "customer_id": "1000005",
-                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5"               
+                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5",
+                    "idp_access_token": ""              
                   }
           400:
             description: Bad Request
@@ -1549,7 +1573,8 @@ types:
                     "token_type": "Bearer",
                     "usid": "18cda486-fe32-4e27-888b-6e4f89938e67",
                     "customer_id": "1000005",
-                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5"               
+                    "enc_user_id": "45D39A8499A95288F82855427EBA99B5",
+                    "idp_access_token": ""      
                   }
           400:
             description: Bad Request
@@ -1617,7 +1642,8 @@ types:
                       "token_type": "Bearer",
                       "usid": "null",
                       "customer_id": "null",
-                      "enc_user_id": "null"
+                      "enc_user_id": "null",
+                      "idp_access_token": ""
                   }
           400:
             description: Bad Request
@@ -1778,7 +1804,10 @@ types:
                   }
 
     /.well-known/openid-configuration:
-      description: OpenID Connect (OIDC) is an identity layer built on top of the OAuth 2.1 standard and supported by some OAuth 2.1 providers, such as Google. It defines a sign-in flow that enables a client application to authenticate a user, and to obtain information (or "claims") about that user, such as the username, email, and so on. User identity information is encoded in a secure JSON Web Token (JWT).
+      description: | 
+          OpenID Connect (OIDC) is an identity layer built on top of the OAuth 2.1 standard and supported by some OAuth 2.1 providers, such as Google. It defines a sign-in flow that enables a client application to authenticate a user, and to obtain information (or "claims") about that user, such as the username, email, and so on. User identity information is encoded in a secure JSON Web Token (JWT). 
+          
+          For performance purposes the `/.well-known/openid-configuration` endpoint will be rate limited to 25 call per minute. 
       get:
         description: Returns a JSON listing of the OpenID/OAuth endpoints, supported scopes and claims, public keys used to sign the tokens, and other details.
         displayName: getWellknownOpenidConfiguration
@@ -1850,7 +1879,10 @@ types:
                   "error_description": "The server has encountered a situation that it doesn't know how to handle."
                   }
     /jwks:
-      description: The JSON Web Key Set (JWKS) is a set of keys that contains the public keys used to verify any JSON Web Token (JWT) issued by the authorization server and signed using the EC256 signing algorithm.
+      description: |
+          The JSON Web Key Set (JWKS) is a set of keys that contains the public keys used to verify any JSON Web Token (JWT) issued by the authorization server and signed using the EC256 signing algorithm. 
+          
+          For performance purposes the `/jwks` endpoint will be rate limited to 25 call per minute. 
       get:
         description: Returns a JSON Web Key Set (JWKS) containing the current, past, and future public keys. The key set enables clients to validate the Shopper JSON Web Token (JWT) issued by SLAS.
         displayName: getJwksUri

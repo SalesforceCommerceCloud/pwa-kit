@@ -10,19 +10,19 @@ baseUriParameters:
     example: 0dnz6oep
     pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
 
-description: !include shopper-customers-description.md 
+description: !include shopper-customers-description.md
 
 uses:
-  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.15/api-standards.raml
   CustomerTraits: Customer-traits-library.raml
-  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.20/commerce-cloud-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.24/commerce-cloud-standards.raml
 
 types:
   AuthRequest:
     description: Document representing the authentication request type.
     properties:
       type:
-        description: 'Type of authentication request: guest, credentials or refresh'
+        description: "Type of authentication request: guest, credentials or refresh"
         type: string
         enum:
           - guest
@@ -30,18 +30,18 @@ types:
           - refresh
         required: false
         example: credentials
-  Basket:   
+  Basket:
     description: |-
       Document representing a basket.
-       
+
     properties:
       adjustedMerchandizeTotalTax:
         description: |-
-          The products tax after applying discounts in the purchase currency.
+          The tax after applying discounts in the purchase currency.
 
-           Adjusted merchandize prices represent the sum of product prices before
-           services (such as shipping) have been added, but after adjustments from
-           promotions have been added.
+          Adjusted merchandize prices represent the sum of product prices before
+          services (such as shipping) have been added, but after adjustments from
+          promotions have been added.
         type: number
         format: double
         example: 20.3
@@ -117,7 +117,7 @@ types:
         type: datetime
       merchandizeTotalTax:
         description: |-
-          The products total tax in purchase currency.
+          The total tax in the purchase currency.
 
            Merchandize total prices represent the sum of product prices before
            services (such as shipping) or adjustments from promotions have
@@ -154,14 +154,16 @@ types:
       productSubTotal:
         description: |-
           The total price of all product items after all product discounts.
-           Depending on taxation policy the returned price is net or gross.
+
+          Depending on taxation policy, the returned price is net or gross.
         type: number
         format: double
         example: 150.99
       productTotal:
         description: |-
           The total price of all product items after all product and order discounts.
-           Depending on taxation policy the returned price is net or gross.
+
+          Depending on taxation policy, the returned price is net or gross.
         type: number
         format: double
         example: 99.99
@@ -178,14 +180,14 @@ types:
       shippingTotal:
         description: |-
           The total shipping price of the order after all shipping discounts. Excludes tax if the taxation policy is net. Includes
-           tax if the taxation policy is gross. This property is part of the basket checkout information only.
+          tax if the taxation policy is gross. This property is part of the basket checkout information only.
         type: number
         format: double
         example: 12.99
       shippingTotalTax:
         description: |-
           The tax of all shipping line items of the line item container, before
-           shipping adjustments have been applied.
+          shipping adjustments have been applied.
         type: number
         format: double
         example: 2.99
@@ -245,7 +247,7 @@ types:
         description: The ID of the promotion which triggered the creation of the line item.
         type: string
         example: "summer-sale"
-      
+
   BundledProduct:
     description: Document representing a bundled product within a product bundle.
     properties:
@@ -293,7 +295,7 @@ types:
       valid:
         description: |-
           A flag indicating whether the coupon item is valid. A coupon line item is valid if
-           the status code is 'applied' or 'no_applicable_promotion'.
+          the status code is `applied` or `no_applicable_promotion`.
         type: boolean
         required: false
         example: true
@@ -308,8 +310,8 @@ types:
         required: false
       authType:
         description: |-
-          The customer's authorization type (indicates if the customer is a guest
-           or a registered customer).
+          The customer's authorization type (indicates whether the customer is a guest
+          or a registered customer).
         type: string
         enum:
           - guest
@@ -374,9 +376,6 @@ types:
         description: The customer's gender.
         type: integer
         format: int32
-        enum:
-          - 1
-          - 2
         required: false
         example: 1
       jobTitle:
@@ -678,7 +677,7 @@ types:
       creditCardToken:
         description: |-
           A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data at the
-           token store.
+          token store.
         type: string
         required: false
         example: "hk2jh293484"
@@ -1011,12 +1010,7 @@ types:
       customer:
         description: The customer registration information. The mandatory properties for registration are login, last name and email.
         type: Customer
-        example: 
-          {
-            "login": "jsmith",
-            "email":"jsmith@test.com",
-            "last_name":"Smith"
-          }
+        example: {"login": "jsmith", "email": "jsmith@test.com", "last_name": "Smith"}
       password:
         description: The login password
         type: string
@@ -1088,7 +1082,7 @@ types:
         items:
           type: Image
       variationAttributes:
-        description: Returns a list of variation attributes applying to this image group.
+        description: Returns a list of variation attributes applied to this image group.
         type: array
         items:
           type: VariationAttribute
@@ -1102,8 +1096,8 @@ types:
     properties:
       ats:
         description: |-
-          The Available To Sell (ATS) of the product. If it is infinity, the return value is 999999. The value can be overwritten by the
-           OCAPI setting 'product.inventory.ats.max_threshold'.
+          The Available To Sell (ATS) of the product. If it is infinity, the return value is `999999`. The value can be overwritten by the
+          OCAPI setting `product.inventory.ats.max_threshold`.
         type: number
         format: double
         required: false
@@ -1134,8 +1128,8 @@ types:
         example: true
       stockLevel:
         description: |-
-          The stock level of the product. If it is infinity, the return value is 999999. The value can be overwritten by the
-           OCAPI setting 'product.inventory.stock_level.max_threshold'.
+          The stock level of the product. If it is infinity, the return value is `999999`. The value can be overwritten by the
+           OCAPI setting `product.inventory.stock_level.max_threshold`.
         type: number
         format: double
         required: false
@@ -1203,7 +1197,7 @@ types:
     description: Document representing an option item.
     properties:
       adjustedTax:
-        description: The tax of the product item after adjustments applying.
+        description: The tax of the product item after adjustments are applied.
         type: number
         format: double
         required: false
@@ -1211,9 +1205,8 @@ types:
       basePrice:
         description: |-
           The base price for the line item, which is the
-           price of the unit before applying adjustments, in the purchase
-           currency. The base price may be net or gross of tax depending
-           on the configured taxation policy.
+          price of the unit before applying adjustments, in the purchase
+          currency. Depending on the configured taxation policy, the base price may be net or gross of tax.
         type: number
         format: double
         required: false
@@ -1328,7 +1321,7 @@ types:
         required: false
         example: "Nice Shirt"
       quantity:
-        description: The quantity of the products represented by this item.
+        description: The quantity of products represented by this item.
         maximum: 999
         minimum: 0
         type: number
@@ -1342,13 +1335,13 @@ types:
         example: "Express"
       shippingItemId:
         description: |-
-          The reference to the related shipping item if it exists. This is the case, if for example, when a surcharge is
-           defined for individual products using a particular a shipping method.
+          The reference to the related shipping item, if it exists. This is the case, if for example, when a surcharge is
+          defined for individual products using a particular a shipping method.
         type: string
         required: false
         example: "Express"
       tax:
-        description: The tax of the product item before adjustments applying.
+        description: The tax of the product item before adjustments are applied.
         type: number
         format: double
         required: false
@@ -1361,7 +1354,7 @@ types:
         example: 10
       taxClassId:
         description: |-
-          The tax class ID for the product item, or null
+          The tax class ID for the product item, or `null`
            if no tax class ID is associated with the product item.
         type: string
         required: false
@@ -1404,7 +1397,7 @@ types:
     properties:
       adjustedMerchandizeTotalTax:
         description: |-
-          The products tax after discounts applying in purchase currency.
+          The tax after discounts applied in the purchase currency.
 
            Adjusted merchandize prices represent the sum of product prices before
            services (such as shipping) have been added, but after adjustments from
@@ -1516,7 +1509,7 @@ types:
         example: 9999-12-31T00:00:00.0Z
       merchandizeTotalTax:
         description: |-
-          The products total tax in purchase currency.
+          The total tax in the purchase currency.
 
            Merchandize total prices represent the sum of product prices before
            services (such as shipping) or adjustments from promotions have
@@ -1858,14 +1851,14 @@ types:
     properties:
       driversLicenseLastDigits:
         description: |-
-          The last 4 characters of the decrypted drivers license number of the bank account associated with this payment
-           instrument.
+          The last 4 characters of the decrypted driver’s license number of the bank account associated with this payment
+          instrument.
         maxLength: 256
         type: string
         required: false
         example: "7435"
       driversLicenseStateCode:
-        description: The driver license state code.
+        description: The driver’s license state code.
         maxLength: 256
         type: string
         required: false
@@ -1878,8 +1871,8 @@ types:
         example: "John Smith"
       maskedDriversLicense:
         description: |-
-          The decrypted drivers license number of the bank account with all but the last 4 characters replaced with a '*'.
-           character.
+          The decrypted driver’s license number of the bank account with all but the last 4 characters replaced with `*`
+          characters.
         maxLength: 256
         type: string
         required: false
@@ -1900,12 +1893,12 @@ types:
     description: Document representing a payment bank account request.
     properties:
       driversLicense:
-        description: The drivers license.
+        description: The driver’s license.
         maxLength: 256
         type: string
         example: "84736485"
       driversLicenseStateCode:
-        description: The driver license state code.
+        description: The driver’s license state code.
         maxLength: 256
         type: string
         example: "UT"
@@ -1934,8 +1927,8 @@ types:
         example: false
       creditCardToken:
         description: |-
-          A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data at the
-           token store.
+          A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data in the
+          token store.
         type: string
         required: false
         example: "969kJSD9"
@@ -1992,22 +1985,22 @@ types:
   PriceAdjustment:
     description: |-
       Document representing a price adjustment within a basket or order. Price adjustments
-       are assigned at the order, product, or shipping level. They are created by the
-       promotion engine if the custom flag is set to false, or are added by custom logic if the custom
-       flag is set to true. For custom price adjustments created by a user, the manual flag should be
-       set to true. This is always the case for price adjustments created using OCAPI.   
+      are assigned at the order, product, or shipping level. They are created by the
+      promotion engine if the custom flag is set to false, or are added by custom logic if the custom
+      flag is set to `true`. For custom price adjustments created by a user, the manual flag should be
+      set to `true`. This is always the case for price adjustments created using OCAPI.
     properties:
       appliedDiscount:
         description: |-
           A price adjustment that provides details of the discount that was applied.
-           This is null for custom price adjustments created
-           without discount details.
+          This adjustment is `null` for custom price adjustments created
+          without discount details.
         type: Discount
       couponCode:
         description: |-
           The coupon code that triggered the promotion, provided
-           the price adjustment was created as the result of a promotion
-           being triggered by a coupon.
+          the price adjustment was created as the result of a promotion
+          being triggered by a coupon.
         type: string
         example: "free"
       createdBy:
@@ -2015,7 +2008,7 @@ types:
         type: string
         example: "John Smith"
       creationDate:
-        description: Returns the value of attribute 'creationDate'.
+        description: Returns the value of the `creationDate` attribute.
         type: datetime
         example: 9999-12-31T00:00:00.0Z
       custom:
@@ -2029,16 +2022,16 @@ types:
         type: string
         example: "Brand New Item"
       lastModified:
-        description: Returns the value of attribute 'lastModified'.
+        description: Returns the value of the `lastModified` attribute.
         type: datetime
         example: 9999-12-31T00:00:00.0Z
       manual:
         description: |-
           A flag indicating whether this price adjustment was created in a manual process.
            
-           For custom price adjustments created using the Shop API, this always
-           returns true. Using the scripting API, however, it is possible to set this to true
-           or false, according to the use case.
+          For custom price adjustments created using the Shop API, this always
+          returns `true`. Using the scripting API, however, it is possible to set this to `true`
+          or `false`, according to the use case.
         type: boolean
         example: true
       price:
@@ -2075,7 +2068,7 @@ types:
     description: Document representing a product.
     properties:
       brand:
-        description: The product's brand.
+        description: The product’s brand.
         type: string
         required: false
         example: "Apple"
@@ -2114,8 +2107,8 @@ types:
         required: false
       inventories:
         description: |-
-          The array of product inventories explicitly requested via 'inventory_ids' query parameter. This property
-           is only returned in context of the 'availability' expansion.
+          The array of product inventories explicitly requested via the `inventory_ids` query parameter. This property
+          is only returned in the context of the `availability` expansion.
         type: array
         items:
           type: Inventory
@@ -2123,7 +2116,7 @@ types:
       inventory:
         description: |-
           The site default inventory information. This property is only
-           returned in context of the 'availability' expansion.
+           returned in the context of the `availability` expansion.
         type: Inventory
         required: false
       longDescription:
@@ -2132,12 +2125,12 @@ types:
         required: false
         example: "Best Product Ever"
       manufacturerName:
-        description: The product's manufacturer name.
+        description: The product’s manufacturer name.
         type: string
         required: false
         example: "Apple"
       manufacturerSku:
-        description: The product's manufacturer SKU.
+        description: The product’s manufacturer SKU.
         type: string
         required: false
         example: "938579345"
@@ -2199,7 +2192,7 @@ types:
             format: double
         required: false
       primaryCategoryId:
-        description: The ID of the products primary category.
+        description: The ID of the product’s primary category.
         type: string
         required: false
         example: "Mens"
@@ -2243,7 +2236,7 @@ types:
         required: false
         example: 1
       type:
-        description: 'The product type information. Can be one or multiple of the following values: item, master, variation_group, variant,bundle, and set.'
+        description: "The product type information. Can be one or multiple of the following values: item, master, variation_group, variant, bundle, and set."
         type: ProductType
         required: false
       unit:
@@ -2416,9 +2409,9 @@ types:
   ProductListRegistrant:
     description: |-
 
-       A ProductListRegistrant is typically associated with an event related product list such as a gift registry. It holds
-       information about a person associated with the event such as a bride or groom.
-       
+      A `ProductListRegistrant` is typically associated with an event-related product list, such as a gift registry. It holds
+      information about a person associated with the event, such as a bride or groom.
+
     properties:
       firstName:
         description: The first name of the registrant.
@@ -2495,7 +2488,7 @@ types:
     description: Document representing a product item.
     properties:
       adjustedTax:
-        description: The tax of the product item after adjustments applying.
+        description: The tax of the product item after adjustments are applied.
         type: number
         format: double
         required: false
@@ -2511,7 +2504,7 @@ types:
         required: false
         example: 29.99
       bonusDiscountLineItemId:
-        description: The ID of the bonus discount line item this bonus product relates to.
+        description: The ID of the bonus discount line item that the bonus product relates to.
         type: string
         required: false
         example: "someId"
@@ -2527,7 +2520,7 @@ types:
           type: ProductItem
         required: false
       gift:
-        description: Returns true if the item is a gift.
+        description: Returns `true` if the item is a gift.
         type: boolean
         required: false
         example: true
@@ -2544,8 +2537,7 @@ types:
         example: "someInventory"
       itemId:
         description: |-
-          The item identifier. Use this to identify an item when updating the item quantity or creating a custom price
-           adjustment for an item.
+          The item identifier. Use this to identify an item when updating the item quantity or creating a custom price adjustment for an item.
         type: string
         required: false
         example: "simpleItemId"
@@ -2563,8 +2555,8 @@ types:
       price:
         description: |-
           The price of the line item before applying any adjustments. If the line item is based on net pricing
-           then the net price is returned. If the line item is based on gross
-           pricing then the gross price is returned.
+          then the net price is returned. If the line item is based on gross
+          pricing then the gross price is returned.
         type: number
         format: double
         required: false
@@ -2610,7 +2602,7 @@ types:
         required: false
         example: "Shirt"
       quantity:
-        description: The quantity of the products represented by this item.
+        description: The quantity of products represented by this item.
         maximum: 999
         minimum: 0
         type: number
@@ -2629,7 +2621,7 @@ types:
         required: false
         example: "Express"
       tax:
-        description: The tax of the product item before adjustments applying.
+        description: The tax of the product item before adjustments are applied.
         type: number
         format: double
         required: false
@@ -2642,7 +2634,7 @@ types:
         example: 39.99
       taxClassId:
         description: |-
-          The tax class ID for the product item, or null
+          The tax class ID for the product item, or `null`
            if no tax class ID is associated with the product item.
         type: string
         required: false
@@ -2793,7 +2785,7 @@ types:
         type: array
         items:
           type: PublicProductListItem
-        required: false  
+        required: false
       productListShippingAddress:
         description: The abbreviated shipping address of this product list representing what anonymous users see.
         type: ProductListShippingAddress
@@ -2897,12 +2889,11 @@ types:
     properties:
       adjustedMerchandizeTotalTax:
         description: |-
-          The products tax after applying discounts in the purchase currency. Adjusted merchandize prices represent the sum of
-           product prices before services (such as shipping) have been added, but after adjustments from promotions have been
-           added.
+          The tax after applying discounts in the purchase currency. Adjusted merchandize prices represent the sum of
+          product prices before services (such as shipping) have been added, but after adjustments from promotions have been added.
 
-           Note that order level adjustments are considered if the Discount Taxation preference is set to
-           "Tax Products and Shipping Only Based on Adjusted Price".
+          Order level adjustments are considered if the Discount Taxation preference is set to
+          "Tax Products and Shipping Only Based on Adjusted Price."
         type: number
         format: double
         required: false
@@ -2925,7 +2916,7 @@ types:
         example: "Enjoy the Gift"
       merchandizeTotalTax:
         description: |-
-          The products total tax in purchase currency. Merchandize total prices represent the sum of product prices before
+          The total tax in the purchase currency. Merchandize total prices represent the sum of product prices before
            services (such as shipping), or adjustments from promotions, have been added.
         type: number
         format: double
@@ -2933,16 +2924,14 @@ types:
         example: 5.5
       productSubTotal:
         description: |-
-          The total price of all product items after all product discounts. Depending on taxation policy the returned price
-           is net or gross.
+          The total price of all product items after all product discounts. Depending on taxation policy, the returned price is net or gross.
         type: number
         format: double
         required: false
         example: 15.99
       productTotal:
         description: |-
-          The total price of all product items after all product and order discounts. Depending on taxation policy the
-           returned price is net or gross.
+          The total price of all product items after all product and order discounts. Depending on taxation policy, the returned price is net or gross.
         type: number
         format: double
         required: false
@@ -2956,15 +2945,15 @@ types:
         description: |-
           Returns the shipment number for this shipment.
 
-           This number is automatically generated.
+          This number is automatically generated.
         type: string
         required: false
         example: "38453345"
       shipmentTotal:
         description: |-
-          The total price of the shipment, including products, shipping and tax.
+          The total price of the shipment, including products, shipping, and tax.
 
-           Note that order level adjustments are not considered.
+          Order level adjustments are not considered.
         type: number
         format: double
         required: false
@@ -3017,7 +3006,7 @@ types:
     description: Document representing a shipping item.
     properties:
       adjustedTax:
-        description: The tax of the product item after adjustments applying.
+        description: The tax of the product item after adjustments are applied.
         type: number
         format: double
         example: 5.5
@@ -3033,8 +3022,7 @@ types:
       itemId:
         description: |-
           The item identifier. Use this to identify an item when
-           updating the item quantity or creating a custom price adjustment for an
-           item.
+          updating the item quantity or creating a custom price adjustment for an item.
         type: string
         example: "3984"
       itemText:
@@ -3044,8 +3032,8 @@ types:
       price:
         description: |-
           The price of the line item before applying any adjustments. If the line item is based on net pricing
-           then the net price is returned. If the line item is based on gross
-           pricing then the gross price is returned.
+          then the net price is returned. If the line item is based on gross
+          pricing then the gross price is returned.
         type: number
         format: double
         example: 29.99
@@ -3067,7 +3055,7 @@ types:
         type: string
         example: "ssdf9sd34f"
       tax:
-        description: The tax of the product item before adjustments applying.
+        description: The tax of the product item before adjustments are applied.
         type: number
         format: double
         example: 7.99
@@ -3078,14 +3066,13 @@ types:
         example: 29.99
       taxClassId:
         description: |-
-          The tax class ID for the product item, or null
-           if no tax class ID is associated with the product item.
+          The tax class ID for the product item, or `null`
+          if no tax class ID is associated with the product item.
         type: string
         example: "standard"
       taxRate:
         description: |-
-          The decimal tax rate to be applied
-           to the product represented by this item.
+          The decimal tax rate to be applied to the product represented by this item.
         type: number
         format: double
         example: 12.5
@@ -3165,8 +3152,8 @@ types:
         description: |-
           The status.
            
-           For more information on the status values see dw.system.Status.OK and
-           dw.system.Status.ERROR.
+          For more information on status values see, `dw.system.Status.OK` and
+          `dw.system.Status.ERROR`.
         type: integer
         format: int32
         example: 2
@@ -3176,8 +3163,8 @@ types:
       clientId:
         description: |-
           The client ID of the shopping application to be encoded in the customer JSON Web Token (JWT).
-           This is not the same as the OAuth Client ID used to authenticate the API call, as
-           the OAuth Client ID is the trusted and private ID and this is the untrusted and public ID.
+          This is not the same as the OAuth Client ID used to authenticate the API call, as
+          the OAuth Client ID is the trusted and private ID and this is the untrusted and public ID.
         pattern: ^(?!\s*$).+
         type: string
         example: "349534859384534"
@@ -3291,7 +3278,7 @@ types:
     description: Document representing the External Profile Request.
     properties:
       authenticationProviderId:
-        description: The authentication Provider Id 
+        description: The authentication Provider Id
         type: string
         minLength: 1
         required: true
@@ -3334,7 +3321,7 @@ types:
   type: CommerceCloudStandards.Organization
   /customers:
     post:
-      description: Registers a new customer. The mandatory data are the credentials, profile last name, and email. This requires a JSON Web Token (JWT) which needs to be obtained using the POST /customers/auth API with type "guest".
+      description: Registers a new customer. The mandatory data are the credentials, profile last name, and email. This requires a JSON Web Token (JWT) which needs to be obtained using the POST /customers/auth API with type "guest", or from the Shopper Login (SLAS) API.
       displayName: registerCustomer
       is:
         - CommerceCloudStandards.SiteSpecific:
@@ -3347,11 +3334,11 @@ types:
         - CustomerTraits.BadRequest
         - CustomerTraits.CustomerAuthenticationFailed
       responses:
-        '200':
+        "200":
           description: Success
           body:
             application/json:
-              type: Customer    
+              type: Customer
               examples:
                 customer: !include Examples/CustomerRegistrationResponse.raml
       body:
@@ -3364,77 +3351,50 @@ types:
       /logout:
         delete:
           description: |-
-            **DEPRECATION NOTICE**
+            🚨 **DEPRECATION NOTICE**
 
-            To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
+            To enhance the security and availability of Salesforce services, this endpoint is now **deprecated**, and **we plan to remove it in mid-2022**. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-login:Summary) (SLAS) because they meet our rigorous standards for security and availability.
 
             ---
 
             Log the user out.
           displayName: invalidateCustomerAuth
-          is: 
+          is:
             - CommerceCloudStandards.SiteSpecific:
             - ApiStandards.RateLimited:
-                responseStatus: 204            
+                responseStatus: 204
           responses:
-            '204':
+            "204":
               description: No Content
           securedBy:
             - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-customers.login] }
       /login:
         post:
           description: |-
-            **DEPRECATION NOTICE**
+            🚨 **DEPRECATION NOTICE**
 
-            To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
+            To enhance the security and availability of Salesforce services, this endpoint is now **deprecated**, and **we plan to remove it in mid-2022**. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-login:Summary) (SLAS) because they meet our rigorous standards for security and availability.
 
             ---
 
-            Obtains a new JSON Web Token (JWT)for a guest or registered
-            customer. Tokens are returned as an HTTP Authorization:Bearer response
-            header entry. These kinds of request are supported, as specified by the
-            type:
-            
-            Type guest - creates a guest (non-authenticated) customer
-            and returns a token for the customer.
-            Request Body for guest : {"type": "guest"}
-            Type credentials - authenticates credentials passed in the
-            HTTP Authorization:Basic request header, returning a token for a
-            successfully authenticated customer, otherwise it throws an
-            AuthenticationFailedException.
-            Request Body for guest : {"type": "credentials"}
-            Type refresh - examines the token passed in the HTTP
-            Authorization:Bearer request header and when valid returns a new token
-            with an updated expiry time.
-            Request Body for guest : {"type": "refresh"}
+            Obtains a new JSON Web Token (JWT) for a guest or registered
+            customer. Tokens are returned as an HTTP `Authorization: Bearer` response
+            header entry. The following kinds of request are supported, as specified by the
+            `type`:
 
-            For a request of type credentials:
-            
-            Updates profile attributes for the customer (for example,
-            "last-visited").
-            Handles the maximum number of failed login attempts.
-            
-            About JWT The token contains 3 sections:
-            
-            The header section (specifies token type and algorithm used),
-            the payload section (contains customer information, client ID,
-            issue, and expiration time),
-            finally the signature section records the token signature.
-            
-            A token is created and returned to the client whenever a registered
-            customer logs in (type "credentials") or a guest customer requests it (type
-            "guest"). The token is returned in the response header as 
-            Authorization: Bearer --token--
-            
-            The client has to include the token in the request header as 
-            Authorization: Bearer --token-- 
-            in any follow-up request. The server declines any follow-up requests
-            without a token or which cannot be verified based on the token signature
-            or expiration time. A token nearing its expiration time should be
-            exchanged for a new one (type "refresh").
-            
-            See "API Usage > JWT" for more details on using JWT as an authentication
-            mechanism.
+            - `{"type": "guest"}` → Creates a guest (non-authenticated) customer and returns a token for the customer.
+            - `{"type": "credentials"}` → Authenticates credentials passed in the `HTTP Authorization: Basic` request header and returns a token for a successfully authenticated customer (otherwise, it throws an `AuthenticationFailedException`). This type of request also updates profile attributes for the customer (for example, `last-visited`) and handles the maximum number of failed login attempts.
+            - `{"type": "refresh"}` → Examines the token passed in the `HTTP Authorization: Bearer` request header. If valid, a new token is returned with an updated expiry time.
+
+            The JWT contains 3 sections:
+
+            1. Header: Specifies token type and algorithm used.
+            2. Payload: Contains customer information, client ID, issue, and expiration time.
+            3. Signature: Records the token signature.
+
+            A token is created and returned to the client whenever a registered customer logs in (`credentials` type) or a guest customer requests it (`guest` type). The token is returned in the response header as `Authorization: Bearer --token--`.
+
+            The client has to include the token in the request header as `Authorization: Bearer --token--` in any follow-up request. The server declines any follow-up requests without a token. The server declines any requests that cannot be verified based on the token signature or expiration time. A token nearing its expiration time should be exchanged for a new one (`refresh` type).
           displayName: authorizeCustomer
           is:
             - CommerceCloudStandards.SiteSpecific:
@@ -3447,11 +3407,11 @@ types:
             - CustomerTraits.BadRequest
             - CustomerTraits.CustomerAuthenticationFailed
           responses:
-            '200':
+            "200":
               headers:
-                authorization: 
+                authorization:
                   type: string
-                  example: 'Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1ODE3MTM4MzYsImlhdCI6MTU4MTcxMjAzNiwiaXNzIjoiZjY2ZjBlNGYtZmE0NC00MWViLTliMzUtODlkZTllZTY3ZTcxIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYmRScUlHTzdYeVFZR1JjTTlhbThKQTBHYWJcIixcImd1ZXN0XCI6dHJ1ZX19In0.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JsdfsgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRTy6Zh6rbi49JGjiXOvrVFjcqaztf64RUB41sWgQuORV30ic8a5D2bQta-TfsiCZTCBbXaKSnJCcdLdvbxTuppzLF0fW-yzpLi4caFUidewTrFoFBUj7M4UpF2gd0DtJhX2YEJCTn5jA4y-ue4oY7Vcp6Y2NpG_mOX_gOmYm_m7hJzKuY4zU90SGc-GYkbBKfRPK3GthTr0LNXVsknydirpsZDI1hlBjrCxNz689-ogulwX0CfkFVMfuEEr9Ac89UqOyfYkFg6VJ42htDRGVRpZR9T5sG6g49jnvkS9U-3-RoGsk4N6kLozoGuuA2mwZbgOr9uPQAHTGMF4XbA_zjhU62q4xiRFJs-L-ZpRyQfmjy50vHCU9wuriBAdc5zDJo7hjNMQSmsJGA774WTDA'
+                  example: "Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1ODE3MTM4MzYsImlhdCI6MTU4MTcxMjAzNiwiaXNzIjoiZjY2ZjBlNGYtZmE0NC00MWViLTliMzUtODlkZTllZTY3ZTcxIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYmRScUlHTzdYeVFZR1JjTTlhbThKQTBHYWJcIixcImd1ZXN0XCI6dHJ1ZX19In0.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JsdfsgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRTy6Zh6rbi49JGjiXOvrVFjcqaztf64RUB41sWgQuORV30ic8a5D2bQta-TfsiCZTCBbXaKSnJCcdLdvbxTuppzLF0fW-yzpLi4caFUidewTrFoFBUj7M4UpF2gd0DtJhX2YEJCTn5jA4y-ue4oY7Vcp6Y2NpG_mOX_gOmYm_m7hJzKuY4zU90SGc-GYkbBKfRPK3GthTr0LNXVsknydirpsZDI1hlBjrCxNz689-ogulwX0CfkFVMfuEEr9Ac89UqOyfYkFg6VJ42htDRGVRpZR9T5sG6g49jnvkS9U-3-RoGsk4N6kLozoGuuA2mwZbgOr9uPQAHTGMF4XbA_zjhU62q4xiRFJs-L-ZpRyQfmjy50vHCU9wuriBAdc5zDJo7hjNMQSmsJGA774WTDA"
               description: Success
               body:
                 application/json:
@@ -3461,8 +3421,8 @@ types:
           headers:
             Authorization:
               description: |-
-                                Authorization:Basic for type credentials
-                                Authorization:Bearer for type refresh
+                Use `Authorization:Basic` for type `credentials` and use
+                `Authorization:Bearer` for type `refresh`
               type: string
               required: false
           queryParameters:
@@ -3470,38 +3430,36 @@ types:
               type: string
               description: Client ID for application identification
               required: true
-              example: "f45f0e4f-fa44-63gh-9b35-91dc1dd78e82" 
+              example: "f45f0e4f-fa44-63gh-9b35-91dc1dd78e82"
           body:
             application/json:
               type: AuthRequest
-              example:  { 
-                  "type" : "guest" 
-                }
+              example: {"type": "guest"}
     /trusted-system/actions/login:
       post:
         description: |-
-            **DEPRECATION NOTICE**
+          🚨 **DEPRECATION NOTICE**
 
-            To enhance the security and availability of Salesforce services, this endpoint is now _**deprecated**_, and _**we plan to remove it in mid-2022**_. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.commercecloud.com/s/api-details/a003k00000VWfNDAA1/commerce-cloud-developer-centershopperloginandapiaccessservice) (SLAS) because they meet our rigorous standards for security and availability.
+          To enhance the security and availability of Salesforce services, this endpoint is now **deprecated**, and **we plan to remove it in mid-2022**. This endpoint is not available to new customers, and we discourage existing customers from using it. Instead, we strongly recommend using the endpoints of the [Shopper Login and API Access Service](https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-login:Summary) (SLAS) because they meet our rigorous standards for security and availability.
 
-            ---
+          ---
 
-            Obtain the JSON Web Token (JWT) for registered customers whose credentials are stored using a third party system. Accepts loginId and 
-            clientId, returns a customer object in the response body and the JWT generated against the clientId in the response header.
+          Obtain the JSON Web Token (JWT) for registered customers whose credentials are stored using a third party system. Accepts `loginId` and 
+          `clientId`, returns a customer object in the response body and the JWT generated against the `clientId` in the response header.
         displayName: authorizeTrustedSystem
         is:
           - CommerceCloudStandards.SiteSpecific:
           - ApiStandards.RateLimited:
               responseStatus: 200
           - ApiStandards.RateLimited:
-              responseStatus: 401            
+              responseStatus: 401
           - CustomerTraits.CustomerAuthenticationFailed
         responses:
-          '200':
+          "200":
             headers:
-              authorization: 
+              authorization:
                 type: string
-                example: 'Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1ODE3MTM4MzYsImlhdCI6MTU4MTcxMjAzNiwiaXNzIjoiZjY2ZjBlNGYtZmE0NC00MWViLTliMzUtODlkZTllZTY3ZTcxIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYmRScUlHTzdYeVFZR1JjTTlhbThKQTBHYWJcIixcImd1ZXN0XCI6dHJ1ZX19In0.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JsdfsgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRTy6Zh6rbi49JGjiXOvrVFjcqaztf64RUB41sWgQuORV30ic8a5D2bQta-TfsiCZTCBbXaKSnJCcdLdvbxTuppzLF0fW-yzpLi4caFUidewTrFoFBUj7M4UpF2gd0DtJhX2YEJCTn5jA4y-ue4oY7Vcp6Y2NpG_mOX_gOmYm_m7hJzKuY4zU90SGc-GYkbBKfRPK3GthTr0LNXVsknydirpsZDI1hlBjrCxNz689-ogulwX0CfkFVMfuEEr9Ac89UqOyfYkFg6VJ42htDRGVRpZR9T5sG6g49jnvkS9U-3-RoGsk4N6kLozoGuuA2mwZbgOr9uPQAHTGMF4XbA_zjhU62q4xiRFJs-L-ZpRyQfmjy50vHCU9wuriBAdc5zDJo7hjNMQSmsJGA774WTDA'            
+                example: "Bearer eyJfdiI6IjEiLCJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfdiI6IjEiLCJleHAiOjE1ODE3MTM4MzYsImlhdCI6MTU4MTcxMjAzNiwiaXNzIjoiZjY2ZjBlNGYtZmE0NC00MWViLTliMzUtODlkZTllZTY3ZTcxIiwic3ViIjoie1wiX3ZcIjpcIjFcIixcImN1c3RvbWVyX2luZm9cIjp7XCJjdXN0b21lcl9pZFwiOlwiYmRScUlHTzdYeVFZR1JjTTlhbThKQTBHYWJcIixcImd1ZXN0XCI6dHJ1ZX19In0.dl8XgldAVo8SGRDrrSAdnbD_tnRnfYwIrohjhsPW78JsdfsgTif2kukQqnB74RgKHRx6U5CTBee8ktTVwqnmtguRTy6Zh6rbi49JGjiXOvrVFjcqaztf64RUB41sWgQuORV30ic8a5D2bQta-TfsiCZTCBbXaKSnJCcdLdvbxTuppzLF0fW-yzpLi4caFUidewTrFoFBUj7M4UpF2gd0DtJhX2YEJCTn5jA4y-ue4oY7Vcp6Y2NpG_mOX_gOmYm_m7hJzKuY4zU90SGc-GYkbBKfRPK3GthTr0LNXVsknydirpsZDI1hlBjrCxNz689-ogulwX0CfkFVMfuEEr9Ac89UqOyfYkFg6VJ42htDRGVRpZR9T5sG6g49jnvkS9U-3-RoGsk4N6kLozoGuuA2mwZbgOr9uPQAHTGMF4XbA_zjhU62q4xiRFJs-L-ZpRyQfmjy50vHCU9wuriBAdc5zDJo7hjNMQSmsJGA774WTDA"
             description: Success
             body:
               application/json:
@@ -3514,9 +3472,10 @@ types:
         body:
           application/json:
             type: TrustedSystemAuthRequest
-            example: { 
-                "login" : "f0a43dc2-692a-43bf-b008-e10918ea935d",
-                "clientId": "abdtkZzH6sqInJGIHNR1yUw90A" 
+            example:
+              {
+                "login": "f0a43dc2-692a-43bf-b008-e10918ea935d",
+                "clientId": "abdtkZzH6sqInJGIHNR1yUw90A"
               }
     /password/actions:
       /reset:
@@ -3531,11 +3490,11 @@ types:
                 responseStatus: 400
             - CustomerTraits.BadRequest
           responses:
-            '204':
+            "204":
               description: Reset password successful. No Content
           securedBy:
-              - CommerceCloudStandards.BearerToken: { scopes: [sfcc.shopper-customers.login] }
-              - CommerceCloudStandards.AmOAuth2
+            - CommerceCloudStandards.BearerToken: { scopes: [sfcc.shopper-customers.login] }
+            - CommerceCloudStandards.AmOAuth2
           body:
             application/json:
               type: ResetPasswordRequest
@@ -3552,24 +3511,22 @@ types:
                 responseStatus: 400
             - CustomerTraits.BadRequest
           responses:
-            '200':
+            "200":
               description: Reset password token generated and returned successfully.
               body:
                 application/json:
                   type: ResetPasswordToken
                   example: !include Examples/ResetTokenResult.raml
           securedBy:
-              - CommerceCloudStandards.BearerToken: { scopes: [sfcc.shopper-customers.login] }
-              - CommerceCloudStandards.AmOAuth2
+            - CommerceCloudStandards.BearerToken: { scopes: [sfcc.shopper-customers.login] }
+            - CommerceCloudStandards.AmOAuth2
           body:
             application/json:
               type: ResetPasswordTokenRequest
-              example: {
-                "login": "janedoe@test.com"
-              }
+              example: {"login": "janedoe@test.com"}
     /external-profile:
       post:
-        description: Registers a new external profile for a customer. This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
+        description: Registers a new external profile for a customer. This endpoint accepts a guest customer ShopperToken (JWT) only.
         displayName: registerExternalProfile
         is:
           - CommerceCloudStandards.SiteSpecific:
@@ -3578,11 +3535,11 @@ types:
           - ApiStandards.RateLimited:
               responseStatus: 400
           - ApiStandards.RateLimited:
-              responseStatus: 401 
+              responseStatus: 401
           - CustomerTraits.BadRequest
           - CustomerTraits.CustomerAuthenticationFailed
         responses:
-          '200':
+          "200":
             description: Success
             body:
               application/json:
@@ -3595,7 +3552,7 @@ types:
             type: CustomerExtProfileRequest
             example: !include Examples/ExternalProfileRequest.raml
       get:
-        description: Gets the new external profile for a customer.This endpoint is in closed beta, available to select few customers. Please get in touch with your Account Team if you'd like to participate in the beta program
+        description: Gets the new external profile for a customer. This endpoint accepts a registered customer ShopperToken (JWT) only.
         displayName: getExternalProfile
         is:
           - CommerceCloudStandards.SiteSpecific:
@@ -3608,7 +3565,7 @@ types:
           - CustomerTraits.CustomerExtProfileBadRequest
           - CustomerTraits.CustomerExtProfileNotFound
         queryParameters:
-          externalId: 
+          externalId:
             description: The External ID of the customer.
             type: string
             required: true
@@ -3621,7 +3578,7 @@ types:
             required: true
             example: "Google"
         responses:
-          '200':
+          "200":
             description: Success
             body:
               application/json:
@@ -3631,10 +3588,9 @@ types:
           - CommerceCloudStandards.BearerToken: { scopes: [sfcc.shopper-customers.login] }
           - CommerceCloudStandards.AmOAuth2
 
-
     /{customerId}:
       get:
-        description: Gets a customer with all existing addresses and payment instruments associated with the requested customer.
+        description: Gets a customer with all existing addresses and payment instruments associated with the requested customer. This endpoint accepts a registered customer ShopperToken (JWT) only.
         displayName: getCustomer
         is:
           - CommerceCloudStandards.SiteSpecific:
@@ -3643,11 +3599,11 @@ types:
           - ApiStandards.RateLimited:
               responseStatus: 400
           - ApiStandards.RateLimited:
-              responseStatus: 404 
+              responseStatus: 404
           - CustomerTraits.BadRequest
           - CustomerTraits.NotFound
         responses:
-          '200':
+          "200":
             description: Success
             body:
               application/json:
@@ -3656,7 +3612,7 @@ types:
         securedBy:
           - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount,sfcc.shopper-myaccount.rw] }
       patch:
-        description: Updates a customer.
+        description: Updates a customer. This endpoint accepts a registered customer ShopperToken (JWT) only.
         displayName: updateCustomer
         is:
           - CommerceCloudStandards.SiteSpecific:
@@ -3665,23 +3621,23 @@ types:
           - ApiStandards.RateLimited:
               responseStatus: 400
           - ApiStandards.RateLimited:
-              responseStatus: 404           
+              responseStatus: 404
           - CustomerTraits.BadRequest
           - CustomerTraits.NotFound
         responses:
-          '200':
+          "200":
             description: Success
             body:
               application/json:
                 type: Customer
-                examples: 
+                examples:
                   customer: !include Examples/UpdateCustomerResponse.raml
         securedBy:
           - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.rw] }
         body:
           application/json:
             type: Customer
-            example: 
+            example:
               customer: !include Examples/UpdateCustomerRequest.raml
       uriParameters:
         customerId:
@@ -3691,7 +3647,7 @@ types:
           example: abfTEMDZOgi3JPrkHjv9IhoziM
       /addresses:
         post:
-          description: Creates a new address with the given name for the given customer.
+          description: Creates a new address with the given name for the given customer. This endpoint accepts a registered customer ShopperToken (JWT) only.
           displayName: createCustomerAddress
           is:
             - CommerceCloudStandards.SiteSpecific:
@@ -3700,27 +3656,27 @@ types:
             - ApiStandards.RateLimited:
                 responseStatus: 400
             - ApiStandards.RateLimited:
-                responseStatus: 404 
+                responseStatus: 404
             - CustomerTraits.BadRequest
             - CustomerTraits.NotFound
           responses:
-            '200':
+            "200":
               description: Success
               body:
                 application/json:
                   type: CustomerAddress
-                  examples: 
+                  examples:
                     customerAddress: !include Examples/CustomerAddressResponse.raml
           securedBy:
             - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.addresses.rw] }
           body:
             application/json:
               type: CustomerAddress
-              examples: 
+              examples:
                 body: !include Examples/CustomerAddressRequest.raml
         /{addressName}:
           get:
-            description: Retrieves a customer's address by address name.
+            description: Retrieves a customer's address by address name. This endpoint accepts a registered customer ShopperToken (JWT) only.
             displayName: getCustomerAddress
             is:
               - CommerceCloudStandards.SiteSpecific:
@@ -3733,7 +3689,7 @@ types:
               - CustomerTraits.BadRequest
               - CustomerTraits.NotFound
             responses:
-              '200':
+              "200":
                 description: Success
                 body:
                   application/json:
@@ -3743,7 +3699,7 @@ types:
             securedBy:
               - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.addresses,sfcc.shopper-myaccount.addresses.rw] }
           delete:
-            description: Deletes a customer's address by address name.
+            description: Deletes a customer's address by address name. This endpoint accepts a registered customer ShopperToken (JWT) only.
             displayName: removeCustomerAddress
             is:
               - CommerceCloudStandards.SiteSpecific:
@@ -3756,12 +3712,12 @@ types:
               - CustomerTraits.BadRequest
               - CustomerTraits.NotFound
             responses:
-              '204':
+              "204":
                 description: No Content
             securedBy:
               - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.addresses.rw] }
           patch:
-            description: Updates a customer's address by address name.
+            description: Updates a customer's address by address name. This endpoint accepts a registered customer ShopperToken (JWT) only.
             displayName: updateCustomerAddress
             is:
               - CommerceCloudStandards.SiteSpecific:
@@ -3774,19 +3730,19 @@ types:
               - CustomerTraits.BadRequest
               - CustomerTraits.NotFound
             responses:
-              '200':
+              "200":
                 description: Success
                 body:
                   application/json:
                     type: CustomerAddress
-                    examples: 
+                    examples:
                       customerAddress: !include Examples/CustomerAddressRequest.raml
             securedBy:
               - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.addresses.rw] }
             body:
               application/json:
                 type: CustomerAddress
-                examples: 
+                examples:
                   body: !include Examples/CustomerAddressResponse.raml
           uriParameters:
             addressName:
@@ -3795,10 +3751,10 @@ types:
               minLength: 1
               type: string
               example: home_address
-    
+
       /baskets:
         get:
-          description: Gets the baskets of a customer.
+          description: Gets the baskets of a customer. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
           displayName: getCustomerBaskets
           is:
             - CommerceCloudStandards.SiteSpecific:
@@ -3811,18 +3767,18 @@ types:
             - CustomerTraits.BadRequest
             - CustomerTraits.NotFound
           responses:
-            '200':
+            "200":
               description: Success
               body:
                 application/json:
                   type: BasketsResult
-                  examples: 
+                  examples:
                     basketsResult: !include Examples/CustomerBasketsResult.raml
           securedBy:
             - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.baskets] }
       /orders:
         get:
-          description: Returns a pageable list of all customer's orders. The default page size is 10.
+          description: Returns a pageable list of all customer's orders. The default page size is 10. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
           displayName: getCustomerOrders
           is:
             - CommerceCloudStandards.SiteSpecific:
@@ -3853,20 +3809,20 @@ types:
             status:
               type: string
               required: false
-              example: new  
+              example: new
           responses:
-            '200':
+            "200":
               description: Success
               body:
                 application/json:
                   type: CustomerOrderResult
-                  examples: 
+                  examples:
                     customerOrderResult: !include Examples/CustomersOrdersResult.raml
           securedBy:
             - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.orders] }
       /password:
         put:
-          description: Updates the customer's password.
+          description: Updates the customer's password. This endpoint accepts a registered customer ShopperToken (JWT) only.
           displayName: updateCustomerPassword
           is:
             - CommerceCloudStandards.SiteSpecific:
@@ -3879,20 +3835,17 @@ types:
             - CustomerTraits.BadRequest
             - CustomerTraits.NotFound
           responses:
-            '204':
+            "204":
               description: No Content
           body:
             application/json:
               type: PasswordChangeRequest
-              example: {
-                  "currentPassword": "01dpass", 
-                  "password": "newpass"
-                }
+              example: {"currentPassword": "01dpass", "password": "newpass"}
           securedBy:
             - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-customers.login] }
       /payment-instruments:
         post:
-          description: Adds a payment instrument to the customer information.
+          description: Adds a payment instrument to the customer information. This endpoint accepts a registered customer ShopperToken (JWT) only.
           displayName: createCustomerPaymentInstrument
           is:
             - CommerceCloudStandards.SiteSpecific:
@@ -3905,23 +3858,23 @@ types:
             - CustomerTraits.BadRequest
             - CustomerTraits.NotFound
           responses:
-            '200':
+            "200":
               description: Success
               body:
                 application/json:
                   type: CustomerPaymentInstrument
-                  examples: 
+                  examples:
                     customerPaymentInstrument: !include Examples/CustomerPaymentInstrument.raml
           securedBy:
             - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.paymentinstruments.rw] }
           body:
             application/json:
               type: CustomerPaymentInstrumentRequest
-              examples: 
+              examples:
                 customerPaymentInstrumentRequest: !include Examples/CustomerPaymentInstrumentRequest.raml
         /{paymentInstrumentId}:
           delete:
-            description: Deletes a customer's payment instrument.
+            description: Deletes a customer's payment instrument. This endpoint accepts a registered customer ShopperToken (JWT) only.
             displayName: deleteCustomerPaymentInstrument
             is:
               - CommerceCloudStandards.SiteSpecific:
@@ -3934,12 +3887,12 @@ types:
               - CustomerTraits.BadRequest
               - CustomerTraits.NotFound
             responses:
-              '204':
+              "204":
                 description: No Content
             securedBy:
               - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.paymentinstruments.rw] }
           get:
-            description: Retrieves a customer's payment instrument by its ID.
+            description: Retrieves a customer's payment instrument by its ID. This endpoint accepts a registered customer ShopperToken (JWT) only.
             displayName: getCustomerPaymentInstrument
             is:
               - CommerceCloudStandards.SiteSpecific:
@@ -3968,7 +3921,7 @@ types:
               example: cdOLciWbOsYl6aaadkwcsx9xHH
       /product-lists:
         get:
-          description: Returns all customer product lists.
+          description: Returns all customer product lists. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
           displayName: getCustomerProductLists
           is:
             - CommerceCloudStandards.SiteSpecific:
@@ -3981,17 +3934,17 @@ types:
             - CustomerTraits.BadRequest
             - CustomerTraits.NotFound
           responses:
-            '200':
+            "200":
               description: Success
               body:
                 application/json:
                   type: CustomerProductListResult
-                  examples: 
+                  examples:
                     customerProductListResult: !include Examples/CustomerProductListResult.raml
           securedBy:
             - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists,sfcc.shopper-myaccount.productlists.rw] }
         post:
-          description: Creates a customer product list.
+          description: Creates a customer product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
           displayName: createCustomerProductList
           is:
             - CommerceCloudStandards.SiteSpecific:
@@ -4004,23 +3957,23 @@ types:
             - CustomerTraits.BadRequest
             - CustomerTraits.NotFound
           responses:
-            '200':
+            "200":
               description: Success
               body:
                 application/json:
                   type: CustomerProductList
-                  examples: 
+                  examples:
                     customerProductList: !include Examples/PostCustomerProductList.raml
           securedBy:
             - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
           body:
             application/json:
               type: CustomerProductList
-              examples: 
+              examples:
                 customerProductList: !include Examples/PostCustomerProductList.raml
         /{listId}:
           delete:
-            description: Deletes a customer product list.
+            description: Deletes a customer product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer  ShopperToken.
             displayName: deleteCustomerProductList
             is:
               - CommerceCloudStandards.SiteSpecific:
@@ -4033,12 +3986,12 @@ types:
               - CustomerTraits.BadRequest
               - CustomerTraits.NotFound
             responses:
-              '204':
+              "204":
                 description: No Content
             securedBy:
               - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
           get:
-            description: Returns a customer product list of the given customer and the items in the list.
+            description: Returns a customer product list of the given customer and the items in the list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
             displayName: getCustomerProductList
             is:
               - CommerceCloudStandards.SiteSpecific:
@@ -4051,17 +4004,17 @@ types:
               - CustomerTraits.BadRequest
               - CustomerTraits.NotFound
             responses:
-              '200':
+              "200":
                 description: Success
                 body:
                   application/json:
                     type: CustomerProductList
-                    examples: 
+                    examples:
                       customerProductList: !include Examples/GetCustomerProductListByListId.raml
             securedBy:
               - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists,sfcc.shopper-myaccount.productlists.rw] }
           patch:
-            description: Changes a product list. Changeable properties are the name, description, and if the list is public.
+            description: Changes a product list. Changeable properties are the name, description, and if the list is public. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
             displayName: updateCustomerProductList
             is:
               - CommerceCloudStandards.SiteSpecific:
@@ -4074,21 +4027,19 @@ types:
               - CustomerTraits.BadRequest
               - CustomerTraits.NotFound
             responses:
-              '200':
+              "200":
                 description: Success
                 body:
                   application/json:
                     type: CustomerProductList
-                    examples: 
+                    examples:
                       customerProductList: !include Examples/UpdateCustomerProductListByListId.raml
             securedBy:
               - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
             body:
               application/json:
                 type: CustomerProductList
-                example: {
-                    "description": "Description"
-                  }
+                example: {"description": "Description"}
           uriParameters:
             listId:
               description: The product list ID.
@@ -4099,23 +4050,18 @@ types:
           /items:
             post:
               description: |-
-                Adds an item to the customer's product list. Considered values from the request body are:
-                
-                type: A valid type, mandatory. This is the type of the item to be added to the customer's product.
+                Adds an item to the customer's product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
+
+                Considered values from the request body are:
+
+                - `type` → The type of the item to be added to the customer's product. Must be a valid type. Mandatory.
                 list.
-                priority: This is the priority of the item to be added to the customer's product list.
-                public: This is the flag whether the item to be added to the customer's product list is public.
-                product_id: A valid product ID, used for product item type only. This is the ID (SKU)
-                of the product related to the item to be added to the customer's product list. It is mandatory for
-                product item type, and it must be a valid product id, otherwise
-                ProductListProductIdMissingException or ProductListProductNotFoundException
-                will be thrown.
-                quantity: Used for product item type only. This is the quantity of the item to be
-                added to the customer's product list.
-                custom properties in the form c_<CUSTOM_NAME>: The custom property must correspond to a custom
-                attribute (<CUSTOM_NAME>) defined for ProductListItem. The value of this property must be valid for the
-                type of custom attribute defined for ProductListItem.
-                
+                - `priority` → The priority of the item to be added to the customer's product list.
+                - `public` → The flag that determines whether the item to be added to the customer's product list is public.
+                - `product_id` → The ID (SKU) of the product related to the item to be added to the customer's product list. A valid product ID, used for product item type only. Must be a valid product ID; otherwise, a `ProductListProductIdMissingException` or `ProductListProductNotFoundException` is thrown. Mandatory when item type is `product`.
+                - `quantity` → Used for product item type only. This is the quantity of the item to be added to the customer's product list.
+
+                You can also use a custom property of the form `c_<CUSTOM_NAME>`. The custom property must correspond to a custom attribute (`<CUSTOM_NAME>`) that is defined for `ProductListItem`. The value of this property must be valid for the type of custom attribute defined for `ProductListItem`.
               displayName: createCustomerProductListItem
               is:
                 - CommerceCloudStandards.SiteSpecific:
@@ -4128,23 +4074,23 @@ types:
                 - CustomerTraits.BadRequest
                 - CustomerTraits.NotFound
               responses:
-                '200':
+                "200":
                   description: Success
                   body:
                     application/json:
                       type: CustomerProductListItem
-                      examples: 
+                      examples:
                         customerProductListItem: !include Examples/UpdateCustomerProductListItem.raml
               securedBy:
                 - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
               body:
                 application/json:
                   type: CustomerProductListItem
-                  examples: 
-                      customerProductListItem: !include Examples/UpdateCustomerProductListItem.raml
+                  examples:
+                    customerProductListItem: !include Examples/UpdateCustomerProductListItem.raml
             /{itemId}:
               delete:
-                description: Removes an item from a customer product list.
+                description: Removes an item from a customer product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
                 displayName: deleteCustomerProductListItem
                 is:
                   - CommerceCloudStandards.SiteSpecific:
@@ -4154,12 +4100,12 @@ types:
                       responseStatus: 404
                   - CustomerTraits.NotFound
                 responses:
-                  '204':
+                  "204":
                     description: No Content
                 securedBy:
                   - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists.rw] }
               get:
-                description: Returns an item of a customer product list and the actual product details like image, availability and price.
+                description: Returns an item of a customer product list and the actual product details like image, availability and price. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
                 displayName: getCustomerProductListItem
                 is:
                   - CommerceCloudStandards.SiteSpecific:
@@ -4169,10 +4115,10 @@ types:
                       responseStatus: 400
                   - ApiStandards.RateLimited:
                       responseStatus: 404
-                  - CustomerTraits.BadRequest              
+                  - CustomerTraits.BadRequest
                   - CustomerTraits.NotFound
                 responses:
-                  '200':
+                  "200":
                     description: Success
                     body:
                       application/json:
@@ -4182,9 +4128,9 @@ types:
                   - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-myaccount.productlists,sfcc.shopper-myaccount.productlists.rw] }
               patch:
                 description: |-
-                  Updates an item of a customer's product list.
+                  Updates an item of a customer's product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
                   Considered values from the request body are:
-                  
+
                   priority: This is the priority of the customer's product list item.
                   public: This is the flag whether the customer's product list item is public.
                   quantity: This is the quantity of
@@ -4192,7 +4138,7 @@ types:
                   custom properties in the form c_<CUSTOM_NAME>: The custom property
                   must correspond to a custom attribute (<CUSTOM_NAME>) defined for ProductListItem.
                   The value of this property must be valid for the type of custom attribute defined for ProductListItem.
-                  
+
                 displayName: updateCustomerProductListItem
                 is:
                   - CommerceCloudStandards.SiteSpecific:
@@ -4202,7 +4148,7 @@ types:
                       responseStatus: 404
                   - CustomerTraits.NotFound
                 responses:
-                  '200':
+                  "200":
                     description: Success
                     body:
                       application/json:
@@ -4223,7 +4169,7 @@ types:
                   example: "nikon-d90-wlens"
   /product-lists:
     get:
-      description: Retrieves all public product lists as defined by the given search term (for example, email OR first name and last name).
+      description: Retrieves all public product lists as defined by the given search term (for example, email OR first name and last name). This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
       displayName: getPublicProductListsBySearchTerm
       queryParameters:
         email:
@@ -4235,7 +4181,7 @@ types:
           description: The first name of the customer the product lists belong to.
           type: string
           required: false
-          example : John
+          example: John
         lastName:
           description: The last name of the customer the product lists belong to.
           type: string
@@ -4255,18 +4201,18 @@ types:
         - CustomerTraits.NotFound
         - CustomerTraits.Unauthorized
       responses:
-        '200':
+        "200":
           description: Success
           body:
             application/json:
               type: PublicProductListResult
-              examples: 
+              examples:
                 publicProductListResult: !include Examples/productLists-result-example.raml
       securedBy:
         - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-productlists] }
     /{listId}:
       get:
-        description: Retrieves a public product list by ID and the items under that product list.
+        description: Retrieves a public product list by ID and the items under that product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
         displayName: getPublicProductList
         is:
           - CommerceCloudStandards.SiteSpecific:
@@ -4282,13 +4228,13 @@ types:
           - CustomerTraits.NotFound
           - CustomerTraits.Unauthorized
         responses:
-          '200':
+          "200":
             description: Success
             body:
               application/json:
                 type: PublicProductList
-                examples: 
-                  publicProductList:  !include Examples/productListsID-result-example.raml
+                examples:
+                  publicProductList: !include Examples/productListsID-result-example.raml
         securedBy:
           - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-productlists] }
       uriParameters:
@@ -4301,16 +4247,16 @@ types:
       /items:
         /{itemId}:
           get:
-            description: Retrieves an item from a public product list and the actual product details like product, image, availability and price.
+            description: Retrieves an item from a public product list and the actual product details like product, image, availability and price. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
             displayName: getProductListItem
             responses:
-              '200':
+              "200":
                 description: Success
                 body:
                   application/json:
                     type: PublicProductListItem
-                    examples: 
-                      PublicProductListItem : !include Examples/PublicProductListItem.raml
+                    examples:
+                      PublicProductListItem: !include Examples/PublicProductListItem.raml
             is:
               - CommerceCloudStandards.SiteSpecific:
               - ApiStandards.RateLimited:
@@ -4323,7 +4269,7 @@ types:
                   responseStatus: 404
               - CustomerTraits.BadRequest
               - CustomerTraits.NotFound
-              - CustomerTraits.Unauthorized      
+              - CustomerTraits.Unauthorized
             securedBy:
               - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-productlists] }
           uriParameters:
@@ -4332,5 +4278,3 @@ types:
               minLength: 1
               type: string
               example: 023513f915fad06573f330fb0d
-
-                      

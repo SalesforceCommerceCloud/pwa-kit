@@ -1,6 +1,6 @@
 #%RAML 1.0
-title: Shopper Contexts
-description: Shopper Context APIs to create, update and delete shoppeer context i.e non-sensitive data that describes Shopper.
+title: Shopper Context
+description: !include shopper-context-description.md
 version: v1
 mediaType: application/json
 protocols: HTTPS
@@ -12,25 +12,35 @@ baseUriParameters:
     pattern: ^([a-z0-9]+)(-[a-z0-9]+)*$
 traits:
 uses:
-  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/api-standards.raml
-  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.17/commerce-cloud-standards.raml
+  ApiStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.15/api-standards.raml
+  CommerceCloudStandards: exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/commerce-cloud-standards/1.0.24/commerce-cloud-standards.raml
 types:
-  ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/api-standards/1.1.13/dataTypes/error-response.raml
   ShopperContext:
-    description: A Shoppers' context represented as key-value string pairs.
+    description: A shoppers' context represented as key-value string pairs.
     type: object
     properties:
       effectiveDateTime: 
         required: false
         type: datetime | nil
-        description: Qualifier to set the effective date time for the context to apply. For example -> Shop the Future use cases. If not provided, current dateTime will be assumed.
+        description: Qualifier to set the effective date time for the context to apply. For example, "Shop the Future" use cases. If not provided, the current dateTime will be assumed.
+      sourceCode: 
+        required: false
+        type: string | nil
+        description: Qualifier to set the source code for the context to apply. Set the source code to evaluate source code group that triggers the promotion (campaign assignment) and Price books (assigned to Source code group).        
       customQualifiers:
         type: object
-        description: Map of qualifiers for the shopper context
+        description: Map of custom qualifiers for the shopper context. Set this object to trigger pricing and promotion experiences using a dynamic session-based customer group. Object size is limited to 20 key-value pairs (properties).
         properties:
           //:
             type: string | nil
-        required: true
+        required: false
+      assignmentQualifiers:
+        type: object
+        description: Map of assignment qualifiers for the shopper context. Set this object when using the assignment framework to activate experiences based on assignment qualifiers. Currently, only pricing and promotion experiences are supported. Object size is limited to 20 key-value pairs (properties).
+        properties:
+          //:
+            type: string | nil
+        required: false
     example: !include Examples/shopper-context-example.raml
       
 
@@ -38,8 +48,16 @@ types:
   type: CommerceCloudStandards.Organization
   /shopper-context/{usid}:
     get:
-      description: Gets the shopper's context based on the shopperJWT. ******** This API is currently a work in progress, and not available to use yet. ********
+      description: Gets the shopper's context based on the shopperJWT.
       displayName: getShopperContext
+      queryParameters:
+        siteId: 
+          description: The identifer of the site that a request is being made in the context of. It is strongly recommended to pass in the siteId in the call.
+          example:
+            SiteGenesis
+          type: string
+          required: false
+          minLength: 1
       responses: 
         '200':
           description: Success retrieving Shopper Context.
@@ -47,43 +65,123 @@ types:
             application/json:
               type: ShopperContext
               examples:
-                shopperContext: !include Examples/shopper-context-example.raml 
+                shopperContext: !include Examples/shopper-context-example.raml
+        '400':
+          description: Usid in incoming request does not match Usid in token.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-400-example.raml
+        '401':
+          description: Your shopper JWT is invalid and could not be used to identify the API client.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-401-example.raml
+        '403':
+          description: Your shopper JWT is valid, but you have no permissions to access the resource.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-403-example.raml              
+        '404':
+          description: Shopper Context for ORGANIZATION_ID - f_ecom_bhbv_prd and USID - 7e1f65fb-185c-4788-8cec-05fef8dac77d not found in Repository.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-404-example.raml                 
       securedBy:
         - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-context, sfcc.shopper-context.rw] }    
     put:
       description: Creates the shopper's context based on shopperJWT.
       displayName: createShopperContext
+      queryParameters:
+        siteId: 
+          description: The identifer of the site that a request is being made in the context of. It is strongly recommended to pass in the siteId in the call.
+          example:
+            SiteGenesis
+          type: string
+          required: false
+          minLength: 1
       body:
         application/json:
           type: ShopperContext
       responses: 
         '201':
           description: Created Shopper Context.
-          body: 
-            application/json:
-              type: ShopperContext
-              examples:
-                shopperContext: !include Examples/shopper-context-example.raml
         '200':
           description: Updated Shopper Context.
-          body: 
+        '400':
+          description: Usid in incoming request does not match Usid in token.
+          body:
             application/json:
-              type: ShopperContext
-              examples:
-                shopperContext: !include Examples/shopper-context-example.raml         
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-400-example.raml
+        '401':
+          description: Your shopper JWT is invalid and could not be used to identify the API client.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-401-example.raml
+        '403':
+          description: Your shopper JWT is valid, but you have no permissions to access the resource.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-403-example.raml                                              
       securedBy:
         - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-context.rw] }  
     delete:
       description: Gets the shopper's context based on the shopperJWT.
       displayName: deleteShopperContext
+      queryParameters:
+        siteId: 
+          description: The identifer of the site that a request is being made in the context of. It is strongly recommended to pass in the siteId in the call.
+          example:
+            SiteGenesis
+          type: string
+          required: false
+          minLength: 1
       responses: 
         '204':
           description: Delete successfull.
+        '400':
+          description: Usid in incoming request does not match Usid in token.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-400-example.raml
+        '401':
+          description: Your shopper JWT is invalid and could not be used to identify the API client.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-401-example.raml
+        '403':
+          description: Your shopper JWT is valid, but you have no permissions to access the resource.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-403-example.raml                                              
+        '404':
+          description: Shopper Context for ORGANIZATION_ID - f_ecom_bhbv_prd and USID - 7e1f65fb-185c-4788-8cec-05fef8dac77d not found in Repository.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-404-example.raml                        
       securedBy:
         - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-context.rw] }    
     patch:
       description: Updates the shopper's context based on the Shopper JWT. If the shopper context exists, it's updated with the patch body. If a customer qualifier or an `effectiveDateTime` is already present in the existing shopper context, its value is replaced by the corresponding value from the patch body. If a customer qualifers' value is set to `null` it's deleted from existing shopper context. If `effectiveDateTime` value is set to set to an empty string (""), it's deleted from existing shopper context. If `effectiveDateTime` value is set to `null` it's ignored. If an `effectiveDateTime` or customer qualifiiers' value is new, it's added to the existing Shopper context. 
       displayName: updateShopperContext
+      queryParameters:
+        siteId: 
+          description: The identifer of the site that a request is being made in the context of. It is strongly recommended to pass in the siteId in the call.
+          example:
+            SiteGenesis
+          type: string
+          required: false
+          minLength: 1
       body:
         application/json:
           type: ShopperContext
@@ -96,13 +194,31 @@ types:
             application/json:
               type: ShopperContext
               examples:
-                shopperContext: !include Examples/shopper-context-update-response-example.raml         
+                shopperContext: !include Examples/shopper-context-update-response-example.raml
+        '400':
+          description: Usid in incoming request does not match Usid in token.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-400-example.raml
+        '401':
+          description: Your shopper JWT is invalid and could not be used to identify the API client.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-401-example.raml
+        '403':
+          description: Your shopper JWT is valid, but you have no permissions to access the resource.
+          body:
+            application/json:
+              type: ApiStandards.ErrorResponse
+              example: !include Examples/shopper-context-403-example.raml                                              
       securedBy:
         - CommerceCloudStandards.ShopperToken: { scopes: [sfcc.shopper-context.rw] }
     uriParameters:
       usid:
-        description: The Shopper's unique identifier if known. This is an optional field, a new shopper ID will be generated if this field is empty.
+        description: The Shopper's unique identifier, if known. This is an optional field, a new shopper ID will be generated if this field is empty.
         type: string
         required: true
-        example: "54ad2c5a-91f0-44ab-817c-73d6b86872d9"      
+        example: "54ad2c5a-91f0-44ab-817c-73d6b86872d9"  
     

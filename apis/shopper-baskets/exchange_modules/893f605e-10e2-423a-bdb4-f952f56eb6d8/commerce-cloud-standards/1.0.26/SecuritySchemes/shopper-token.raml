@@ -1,0 +1,46 @@
+#%RAML 1.0 SecurityScheme
+
+description: |
+  `ShopperToken` authentication follows the authorization code grant flow, as defined by the OAuth 2.1 standard. Depending on the type of OAuth client (public or private), this authorization flow has further requirements. For a detailed description of the authorization flow, see the [SLAS overview](https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-login:Summary).
+  A shopper token allows you to access the Shopper API endpoints of both OCAPI and the B2C Commerce API. These endpoints can be used to build headless storefronts and other applications.
+  The `ShopperToken` security scheme is a parent of other security schemes, such as `ShopperTokenTsob`. A Shopper API endpoint can require a specific child scheme (`ShopperTokenTsob`, for example) that cannot be accessed with a regular shopper token.
+
+type: x-custom
+displayName: ShopperToken
+
+uses:
+  
+describedBy:
+  headers:
+    Authorization:
+      description: |
+        Bearer token
+      type: string
+      pattern: "Bearer .*"
+      examples: 
+        authenticatedUser: Bearer b325e95c-2cd7-11e5-b345-feff819cdc9f
+  responses:
+    401:
+      description: Unauthorized. Your access token is invalid or expired and can’t be used to identify a user.
+      headers:
+        WWW-Authenticate: 
+          example: |
+            WWW-Authenticate: Bearer realm="servers",
+                              error="invalid_token",
+                              error_description="The token expired"
+      body:
+        application/json:
+          type: !include ../Types/error-response.raml
+          example:
+            type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized"
+            title: Unauthorized
+            detail: Your access token is invalid or expired and can’t be used to identify a user.
+    403:
+      description: Forbidden. Your access token is valid, but you don’t have the required permissions to access the resource.
+      body:
+        application/json:
+          type: !include ../Types/error-response.raml
+          example:
+            type: "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/forbidden"
+            title: Forbidden
+            detail: Your token is valid, but you have no permissions to access the resource.
