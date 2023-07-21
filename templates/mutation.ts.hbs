@@ -17,7 +17,12 @@ import {cacheUpdateMatrix} from './cache'
 
 type Client = ApiClients['{{@root.clientInstance}}']
 
-/** Mutations available for {{@root.name.original}}. */
+/**
+ * Mutations available for {{@root.name.original}}
+ * @group {{@root.clientClass}}
+ * @category Mutation
+ * @enum
+ */
 export const {{@root.clientClass}}Mutations = {
   {{~#each model.encodes.endPoints}}{{#each operations}}{{#if (isMutation @root.clientClass this)}}
   /**
