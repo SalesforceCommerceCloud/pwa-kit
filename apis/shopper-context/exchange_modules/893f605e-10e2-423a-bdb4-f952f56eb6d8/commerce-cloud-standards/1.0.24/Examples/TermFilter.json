@@ -1,7 +1,0 @@
-{
-  "field": "id",
-  "operator": "is",
-  "values": [
-    "myId"
-  ]
-}
