@@ -297,10 +297,10 @@ export const DevServerMixin = {
     /**
      * @private
      */
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _redirectToLoadingScreen(req, res, next) {
-        res.redirect('/__mrt/loading-screen/index.html?loading=1')
+        const path = encodeURIComponent(req.originalUrl)
+        res.redirect(`/__mrt/loading-screen/index.html?loading=1&path=${path}`)
     },
 
     /**
