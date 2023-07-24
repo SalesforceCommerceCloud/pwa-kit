@@ -86,8 +86,9 @@
                 }
 
                 waitForReady().then(() => {
-                    // Redirect to homepage
-                    window.location = url.origin
+                    // Redirect to homepage if path is not defined
+                    const path = url.searchParams.get('path') ?? ''
+                    window.location = new URL(path, url.origin)
                 })
             }
 

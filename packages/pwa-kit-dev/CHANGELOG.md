@@ -1,4 +1,6 @@
 ## v3.1.0-dev (Jul 03, 2023)
+-   Fix loading screen bug on refresh [#1370](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1370)
+
 ## v3.1.0-dev (Jun 15, 2023)
 ## v3.0.0 (Jun 15, 2023)
 
