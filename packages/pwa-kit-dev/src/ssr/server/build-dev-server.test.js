@@ -132,6 +132,39 @@ describe('DevServer startup', () => {
     })
 })
 
+describe('DevServer loading page', () => {
+    test('should redirect to the loading screen with an HTTP 302', async () => {
+        const options = opts()
+        const app = NoWebpackDevServerFactory._createApp(options)
+        app.use('/', DevServerFactory._redirectToLoadingScreen)
+        const expectedPath = '/__mrt/loading-screen/index.html?loading=1&path=%2F'
+
+        return request(app)
+            .get('/')
+            .expect(302) // Expecting the 302 temporary redirect (not 301)
+            .then((response) => {
+                expect(response.headers.location).toBe(expectedPath)
+            })
+    })
+
+    test('should contain path query parameter with encoded original url', async () => {
+        const options = opts()
+        const app = NoWebpackDevServerFactory._createApp(options)
+        app.use('/', DevServerFactory._redirectToLoadingScreen)
+        const originalUrl =
+            '/global/en-GB/product/25519318M?color=JJ8UTXX&size=9MD&pid=701642923497M'
+        const expectedPath = `/__mrt/loading-screen/index.html?loading=1&path=${encodeURIComponent(
+            originalUrl
+        )}`
+
+        return request(app)
+            .get(originalUrl)
+            .then((response) => {
+                expect(response.headers.location).toBe(expectedPath)
+            })
+    })
+})
+
 describe('DevServer request processor support', () => {
     const helloWorld = '<div>hello world</div>'
 
@@ -636,6 +669,24 @@ describe('DevServer rendering', () => {
         NoWebpackDevServerFactory.render(req, res, next)
 
         expect(req.app.__hotServerMiddleware).toHaveBeenCalledWith(req, res, next)
+    })
+
+    test('redirects to loading screen during the inital build', () => {
+        const TestFactory = {
+            ...NoWebpackDevServerFactory,
+            _redirectToLoadingScreen: jest.fn()
+        }
+        const req = {
+            app: {
+                __isInitialBuild: true
+            }
+        }
+        const res = {}
+        const next = jest.fn()
+
+        TestFactory.render(req, res, next)
+
+        expect(TestFactory._redirectToLoadingScreen).toHaveBeenCalledWith(req, res, next)
     })
 })
 
