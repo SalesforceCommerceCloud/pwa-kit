@@ -137,12 +137,30 @@ describe('DevServer loading page', () => {
         const options = opts()
         const app = NoWebpackDevServerFactory._createApp(options)
         app.use('/', DevServerFactory._redirectToLoadingScreen)
+        const expectedPath = '/__mrt/loading-screen/index.html?loading=1&path=%2F'
 
         return request(app)
             .get('/')
             .expect(302) // Expecting the 302 temporary redirect (not 301)
             .then((response) => {
-                expect(response.headers.location).toBe('/__mrt/loading-screen/index.html?loading=1')
+                expect(response.headers.location).toBe(expectedPath)
+            })
+    })
+
+    test('should contain path query parameter with encoded original url', async () => {
+        const options = opts()
+        const app = NoWebpackDevServerFactory._createApp(options)
+        app.use('/', DevServerFactory._redirectToLoadingScreen)
+        const originalUrl =
+            '/global/en-GB/product/25519318M?color=JJ8UTXX&size=9MD&pid=701642923497M'
+        const expectedPath = `/__mrt/loading-screen/index.html?loading=1&path=${encodeURIComponent(
+            originalUrl
+        )}`
+
+        return request(app)
+            .get(originalUrl)
+            .then((response) => {
+                expect(response.headers.location).toBe(expectedPath)
             })
     })
 })
@@ -641,7 +659,8 @@ describe('DevServer rendering', () => {
         const req = {
             app: {
                 __webpackReady: jest.fn().mockReturnValue(true),
-                __hotServerMiddleware: jest.fn()
+                __hotServerMiddleware: jest.fn(),
+                __devMiddleware: {waitUntilValid: (callback) => callback()}
             }
         }
         const res = {}
@@ -652,13 +671,15 @@ describe('DevServer rendering', () => {
         expect(req.app.__hotServerMiddleware).toHaveBeenCalledWith(req, res, next)
     })
 
-    test('redirects to loading screen when not ready', () => {
+    test('redirects to loading screen during the inital build', () => {
         const TestFactory = {
             ...NoWebpackDevServerFactory,
             _redirectToLoadingScreen: jest.fn()
         }
         const req = {
-            app: {__webpackReady: jest.fn().mockReturnValue(false)}
+            app: {
+                __isInitialBuild: true
+            }
         }
         const res = {}
         const next = jest.fn()

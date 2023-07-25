@@ -13,7 +13,6 @@ const WebSocket = require('ws')
 const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
-const projectPkg = require(process.cwd() + '/package.json')
 const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
 
 // Scripts in ./bin have never gone through babel, so we
@@ -179,20 +178,18 @@ const main = async () => {
         })
 
     const appSSRpath = p.join(process.cwd(), 'app', 'ssr.js')
-    const appSSRjs = fse.pathExistsSync(appSSRpath)
+    const appSSRexists = fse.pathExistsSync(appSSRpath)
+    const {overridesDir} = scriptUtils.getProjectPkg()?.ccExtensibility ?? {}
     const overrideSSRpath = p.join(
         process.cwd(),
-        typeof projectPkg?.ccExtensibility?.overridesDir === 'string' &&
-            !projectPkg?.ccExtensibility?.overridesDir?.startsWith(p.sep)
-            ? p.sep + projectPkg?.ccExtensibility?.overridesDir
-            : projectPkg?.ccExtensibility?.overridesDir
-            ? projectPkg?.ccExtensibility?.overridesDir
-            : '',
+        typeof overridesDir === 'string' && !overridesDir?.startsWith(p.sep)
+            ? p.sep + overridesDir
+            : overridesDir || '',
         'app',
         'ssr.js'
     )
-    const overrideSSRjs = fse.pathExistsSync(overrideSSRpath)
-    const resolvedSSRPath = appSSRjs ? appSSRpath : overrideSSRjs ? overrideSSRpath : null
+    const overrideSSRexists = fse.pathExistsSync(overrideSSRpath)
+    const resolvedSSRPath = appSSRexists ? appSSRpath : overrideSSRexists ? overrideSSRpath : null
 
     program
         .command('start')

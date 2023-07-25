@@ -398,7 +398,6 @@ describe('OverridePlugin.toOverrideRelative', () => {
 
 describe('OverridePlugin.findFileFromMap', () => {
     let os
-    let opts = options
     let cases
 
     if (path.sep === '\\') {
