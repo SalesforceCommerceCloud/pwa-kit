@@ -59,6 +59,19 @@ const getProjectName = async () => {
     return projectPkg.name
 }
 
+const getAppEntrypoint = async () => {
+    const defaultPath = p.join(process.cwd(), 'app', 'ssr.js')
+    if (await fse.pathExists(defaultPath)) return defaultPath
+
+    const projectPkg = await scriptUtils.getProjectPkg()
+    const {overridesDir} = projectPkg?.ccExtensibility ?? {}
+    if (!overridesDir || typeof overridesDir !== 'string') return null
+
+    const overridePath = p.join(process.cwd(), p.sep + overridesDir, 'app', 'ssr.js')
+    if (await fse.pathExists(overridePath)) return overridePath
+    return null
+}
+
 const main = async () => {
     const pkgRoot = p.join(__dirname, '..')
     process.env.CONTEXT = process.cwd()
@@ -177,20 +190,6 @@ const main = async () => {
             }
         })
 
-    const appSSRpath = p.join(process.cwd(), 'app', 'ssr.js')
-    const appSSRexists = fse.pathExistsSync(appSSRpath)
-    const {overridesDir} = scriptUtils.getProjectPkg()?.ccExtensibility ?? {}
-    const overrideSSRpath = p.join(
-        process.cwd(),
-        typeof overridesDir === 'string' && !overridesDir?.startsWith(p.sep)
-            ? p.sep + overridesDir
-            : overridesDir || '',
-        'app',
-        'ssr.js'
-    )
-    const overrideSSRexists = fse.pathExistsSync(overrideSSRpath)
-    const resolvedSSRPath = appSSRexists ? appSSRpath : overrideSSRexists ? overrideSSRpath : null
-
     program
         .command('start')
         .description(`develop your app locally`)
@@ -208,7 +207,14 @@ const main = async () => {
                 '.bin',
                 'babel-node'
             )
-            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${resolvedSSRPath}`, {
+
+            const entrypoint = await getAppEntrypoint()
+            if (!entrypoint) {
+                error('Could not determine app entrypoint.')
+                process.exit(1)
+            }
+
+            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {})
