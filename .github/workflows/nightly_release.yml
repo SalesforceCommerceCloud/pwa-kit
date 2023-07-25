@@ -23,7 +23,7 @@ jobs:
         id: read_root_package_json
         run: |-
           pkg=`cat package.json`
-          echo "::set-output name=packageJson::$pkg"
+          echo "packageJson=$pkg" >> "$GITHUB_OUTPUT"
 
       - id: get_monorepo_version
         run: |-
