@@ -46,22 +46,22 @@ jobs:
           node ./scripts/gtime.js monorepo_install npm ci
 
       - name: Create Release Branch
-        run: git checkout -b release-${{ env.monorepo_version_base }}-nightly.${{ env.release_timestamp }}
+        run: git checkout -b release-${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}
 
       - name: Bump version (monorepo)
         run: |-
-          npm run bump-version -- "${{ env.monorepo_version_base }}-nightly.${{ env.release_timestamp }}"
+          npm run bump-version -- "${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}"
 
       - name: Bump version (retail-react-app)
         run: |-
-          npm run bump-version:retail-react-app -- "${{ env.retail_app_version_base }}-nightly.${{ env.release_timestamp }}"
+          npm run bump-version:retail-react-app -- "${{ env.retail_app_version_base }}-nightly-${{ env.release_timestamp }}"
 
       - name: Bump version (commerce-sdk-react)
         run: |-
-          npm run bump-version:commerce-sdk-react -- "${{ env.commerce_sdk_react_version_base }}-nightly.${{ env.release_timestamp }}"
+          npm run bump-version:commerce-sdk-react -- "${{ env.commerce_sdk_react_version_base }}-nightly-${{ env.release_timestamp }}"
 
       - name: Push branch to origin (Publish to NPM)
         run: |-
           git add .
-          git commit -m "Release ${{ env.monorepo_version_base }}-nightly.${{ env.release_timestamp }}"
-          git push --set-upstream origin release-${{ env.monorepo_version_base }}-nightly.${{ env.release_timestamp }}
+          git commit -m "Release ${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}"
+          git push --set-upstream origin release-${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}
