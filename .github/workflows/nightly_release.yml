@@ -11,6 +11,8 @@ on:
 jobs:
   create_nightly_release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -62,6 +64,7 @@ jobs:
 
       - name: Push branch to origin (Publish to NPM)
         run: |-
-          git add .
-          git commit -m "Release ${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}"
+          git config --global user.name 'Jainam Sheth'
+          git config --global user.email 'j.sheth@salesforce.com'
+          git commit -am "Release ${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}"
           git push --set-upstream origin release-${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}
