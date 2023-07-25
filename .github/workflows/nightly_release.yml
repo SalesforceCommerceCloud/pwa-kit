@@ -15,6 +15,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Get Timestamp
+        run: |-
+          echo "release_timestamp=$(date +'%m%d%Y%H%M%S')" >> "$GITHUB_ENV"
+
+      - name: Get monorepo version
+        id: read_root_package_json
+        run: |-
+          pkg=`cat package.json`
+          echo "::set-output name=packageJson::$pkg"
+
+      - id: get_monorepo_version
+        run: |-
+          echo "monorepo_version_base=${{fromJson(steps.read_root_package_json.outputs.packageJson).version}} | cut -d '-' -f 1" >> "$GITHUB_ENV"
+
+      - name: Get Retail App Version
+        id: read_retail_app_package_json
+        run: |-
+          pkg=`cat packages/template-retail-react-app/package.json`
+          echo "::set-output name=packageJson::$pkg"
+
+      - id: get_retail_app_version
+        run: |-
+          echo "retail_app_version_base=${{fromJson(steps.read_retail_app_package_json.outputs.packageJson).version}} | cut -d '-' -f 1" >> "$GITHUB_ENV"
+
+      - name: Get Commerce SDK Version
+        id: read_commerce_sdk_react_package_json
+        run: |-
+          pkg=`cat packages/commerce_sdk_react/package.json`
+          echo "::set-output name=packageJson::$pkg"
+
+      - id: get_commerce_sdk_react_version
+        run: |-
+          echo "commerce_sdk_react_version_base=${{fromJson(steps.read_commerce_sdk_react_package_json.outputs.packageJson).version}} | cut -d '-' -f 1" >> "$GITHUB_ENV"    
+          echo "ENV: ${{ env }}"
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -25,35 +60,3 @@ jobs:
         run: |-
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
-
-      - name: Get Timestamp
-        run: |-
-          echo "release_timestamp=$(date +'%m%d%Y%H%M%S')" >> "$GITHUB_ENV"
-
-      - id: read_root_package_json
-        run: |-
-          pkg=`cat package.json`
-          echo "::set-output name=packageJson::$pkg"
-
-      - id: get_monorepo_version
-        run: |-
-          echo "monorepo_version_base=${{fromJson(steps.read_root_package_json.outputs.packageJson).version}} | cut -d '-' -f 1" >> "$GITHUB_ENV"    
-
-      - id: read_retail_app_package_json
-        run: |-
-          pkg=`cat packages/template-retail-react-app/package.json`
-          echo "::set-output name=packageJson::$pkg"
-
-      - id: get_retail_app_version
-        run: |-
-          echo "retail_app_version_base=${{fromJson(steps.read_retail_app_package_json.outputs.packageJson).version}} | cut -d '-' -f 1" >> "$GITHUB_ENV"    
-
-      - id: read_commerce_sdk_react_package_json
-        run: |-
-          pkg=`cat packages/commerce_sdk_react/package.json`
-          echo "::set-output name=packageJson::$pkg"
-
-      - id: get_commerce_sdk_react_version
-        run: |-
-          echo "commerce_sdk_react_version_base=${{fromJson(steps.read_commerce_sdk_react_package_json.outputs.packageJson).version}} | cut -d '-' -f 1" >> "$GITHUB_ENV"    
-          echo "ENV: ${{ env }}"
