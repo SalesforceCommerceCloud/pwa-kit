@@ -22,13 +22,9 @@ jobs:
       - name: Get monorepo version
         id: read_root_package_json
         run: |-
-          pkg=`cat package.json`
-          # the following lines are only required for multi line json
-          pkg="${pkg//'%'/'%25'}"
-          pkg="${pkg//$'\n'/'%0A'}"
-          pkg="${pkg//$'\r'/'%0D'}"
-          # end of optional handling for multi line json
-          echo "packageJson=$pkg" >> "$GITHUB_OUTPUT"
+          version=`cat package.json | jq -r ".version"`
+          echo $version
+          # echo "packageJson=$pkg" >> "$GITHUB_OUTPUT"
 
       - id: get_monorepo_version
         run: |-
