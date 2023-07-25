@@ -1,4 +1,4 @@
-## v1.1.0-dev.3
+## v1.1.0-preview.0
 
 - Fix price display when a discounted price is zero [#1361](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1361)
 - Fix price adjustments of a line item when more than one is present [#1362](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1362)
