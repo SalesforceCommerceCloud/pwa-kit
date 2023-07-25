@@ -44,3 +44,6 @@ jobs:
         run: |-
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Create Release Branch
+        run: git checkout -b release-${{ env.monorepo_version_base }}-nightly.${{ env.release_timestamp }}
