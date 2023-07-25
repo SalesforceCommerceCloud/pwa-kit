@@ -31,7 +31,7 @@ jobs:
       
       - name: Get commerce-sdk-react version
         run: |-
-          version=`cat packages/commerce_sdk_react/package.json | jq -r ".version" | cat -d "-" -f 1`
+          version=`cat packages/commerce-sdk-react/package.json | jq -r ".version" | cat -d "-" -f 1`
           # echo "commerce_sdk_react_version_base=$version" >> "$GITHUB_ENV"
       
       - name: Setup Node
