@@ -1,3 +1,4 @@
+## v3.1.0-nightly-07252023210823 (Jul 25, 2023)
 ## v3.1.0-dev (Jul 03, 2023)
 -   Fix potential security vulnerability in `semver` dependency [#1358](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1358)
 
