@@ -1,6 +1,6 @@
 {
   "name": "typescript-minimal",
-  "version": "3.1.0-dev",
+  "version": "3.1.0-nightly-07252023205547",
   "private": true,
   "scripts": {
     "build": "pwa-kit-dev build",
@@ -18,9 +18,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "3.1.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.1.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.1.0-dev",
+    "@salesforce/pwa-kit-dev": "3.1.0-nightly-07252023205547",
+    "@salesforce/pwa-kit-react-sdk": "3.1.0-nightly-07252023205547",
+    "@salesforce/pwa-kit-runtime": "3.1.0-nightly-07252023205547",
     "@tanstack/react-query": "^4.28.0",
     "@types/loadable__component": "^5.13.4",
     "@types/react": "^18.2.0",
