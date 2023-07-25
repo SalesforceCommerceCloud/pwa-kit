@@ -1,4 +1,4 @@
-## v3.1.0-preview.4 (Jul 24, 2023)
+## v3.1.0-preview.4 (Jul 25, 2023)
 
 - Send package versions as bundle metadata [#1354](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1354)
 - Fix loading screen sometimes hanging on refresh [#1370](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1370)

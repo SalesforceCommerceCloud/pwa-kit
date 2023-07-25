@@ -1,4 +1,4 @@
-## v1.1.0-dev.3 (Jul 24, 2023)
+## v1.0.1-preview.0 (Jul 25, 2023)
 
 - Updated the expiry of the guest refresh token cookie to 30 days, to match the actual [duration of the token](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas.html?q=refresh+token#access-tokens-and-refresh-tokens). [#1342](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1342)
 - Fix potential security vulnerability in `semver` dependency [#1358](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1358)
