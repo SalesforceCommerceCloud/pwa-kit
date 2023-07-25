@@ -27,9 +27,7 @@ jobs:
 
       - id: get_monorepo_version
         run: |-
-          echo "version=${{fromJson(steps.read_root_package_json.outputs.packageJson).version}}"
-          echo "$version" | cut -d "-" -f 1
-          echo "monorepo_version_base=$version" >> "$GITHUB_ENV"
+          echo "${{fromJson(steps.read_root_package_json.outputs.packageJson).version}}"
 
       - name: Get Retail App Version
         id: read_retail_app_package_json
