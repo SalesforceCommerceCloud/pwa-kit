@@ -22,17 +22,17 @@ jobs:
       - name: Get monorepo version
         run: |-
           version=`cat package.json | jq -r ".version" | cut -d "-" -f 1`
-          # echo "monorepo_version_base=$version" >> "$GITHUB_ENV"
+          echo "monorepo_version_base=$version" >> "$GITHUB_ENV"
 
       - name: Get retail-react-app version
         run: |-
           version=`cat packages/template-retail-react-app/package.json | jq -r ".version" | cut -d "-" -f 1`
-          # echo "retail_app_version_base=$version" >> "$GITHUB_ENV"
+          echo "retail_app_version_base=$version" >> "$GITHUB_ENV"
       
       - name: Get commerce-sdk-react version
         run: |-
           version=`cat packages/commerce-sdk-react/package.json | jq -r ".version" | cut -d "-" -f 1`
-          # echo "commerce_sdk_react_version_base=$version" >> "$GITHUB_ENV"
+          echo "commerce_sdk_react_version_base=$version" >> "$GITHUB_ENV"
       
       - name: Setup Node
         uses: actions/setup-node@v3
