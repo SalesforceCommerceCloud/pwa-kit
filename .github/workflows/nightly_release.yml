@@ -50,15 +50,15 @@ jobs:
 
       - name: Bump version (monorepo)
         run: |-
-          npm run bump-version -- ${{ env.monorepo_version_base }}-nightly.${{ env.release_timestamp }}
+          npm run bump-version -- "${{ env.monorepo_version_base }}-nightly.${{ env.release_timestamp }}"
 
       - name: Bump version (retail-react-app)
         run: |-
-          npm run bump-version:retail-react-app -- ${{ env.retail_app_version_base }}-nightly.${{ env.release_timestamp }}
+          npm run bump-version:retail-react-app -- "${{ env.retail_app_version_base }}-nightly.${{ env.release_timestamp }}"
 
       - name: Bump version (commerce-sdk-react)
         run: |-
-          npm run bump-version:commerce-sdk-react -- ${{ env.commerce_sdk_react_version_base }}-nightly.${{ env.release_timestamp }}
+          npm run bump-version:commerce-sdk-react -- "${{ env.commerce_sdk_react_version_base }}-nightly.${{ env.release_timestamp }}"
 
       - name: Push branch to origin (Publish to NPM)
         run: |-
