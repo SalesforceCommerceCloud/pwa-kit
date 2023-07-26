@@ -1,10 +1,7 @@
-## v1.1.0-preview.0
+## v1.0.1 (Jul 26, 2023)
 
 - Fix price display when a discounted price is zero [#1361](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1361)
 - Fix price adjustments of a line item when more than one is present [#1362](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1362)
-
-## v1.1.0-dev (June 15, 2023)
-
 - Registered user checkout should set order with an email [#1363](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1363)
 
 ## v1.0.0 (June 15, 2023)
@@ -16,9 +13,9 @@
 
 ## Older Versions Without Namespace
 
-The older versions below were published without the `@salesforce` namespace.
+The versions published below were not published on npm, and the versioning matched that of the PWA Kit SDK. These versions did not use the `@salesforce` namespace.
 
-## v2.7.1 (May 11, 2023)
+### v2.7.1 (May 11, 2023)
 
 - Replace invalid row value with nowrap [#1179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1179)
 - Add a redirect to login page after user signs out from checkout page [#1172](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1172)
@@ -32,7 +29,7 @@ The older versions below were published without the `@salesforce` namespace.
 - Fix addresses not having preferred address first. [#1051](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1051)
 - Changed type of the phone number field to bring up numberic keyboard on mobile devices - W-9871940 [#1016)](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1016)
 
-## v2.7.0 (Mar 03, 2023)
+### v2.7.0 (Mar 03, 2023)
 
 - Add Page Designer ImageTile component [#967](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/967)
 - Add Page Designer ImageWithText component [#991](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/991)
@@ -40,7 +37,7 @@ The older versions below were published without the `@salesforce` namespace.
 - Add Page Designer layout components [#993](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/993)
 - Support the product-set type [#1019](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1019)
 
-## v2.6.0 (Jan 25, 2023)
+### v2.6.0 (Jan 25, 2023)
 
 - Mega menu fixes [#875](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/875) and [#910](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/910)
 - Cache SLAS callback using request processor [#884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/884)
@@ -49,14 +46,14 @@ The older versions below were published without the `@salesforce` namespace.
 - Fix PropTypes [#924](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/924)
 - Remove unnecessary map statement [#929](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/929)
 
-## v2.5.0 (Jan 5, 2023)
+### v2.5.0 (Jan 5, 2023)
 
 - Add instanceType to Einstein activity body [#858](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/858)
 - Do not use a proxy to call Einstein [#857](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/857)
 - Einstein handle variants [#867](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/867)
 - Fix cc exp year [#874](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/874)
 
-## v2.4.0 (Dec 1, 2022)
+### v2.4.0 (Dec 1, 2022)
 
 - Dynamic footer Copyright date [#741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/741)
 - Footer copyright: remove the remaining hardcoded year [#760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/760)
@@ -66,7 +63,7 @@ The older versions below were published without the `@salesforce` namespace.
 - pwa-kit-dev command for tailing logs [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
 - Update usages of zzrf-001 ODS instance to the new short URL format [#816](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/816)
 
-## v2.3.0 (Oct 27, 2022)
+### v2.3.0 (Oct 27, 2022)
 
 - Fix locale `alias` by including `locale` object inside the MultiSite Context. [#716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/716)
 - Updated translations. [#725](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/725)
@@ -77,20 +74,20 @@ The older versions below were published without the `@salesforce` namespace.
 - Bugfix: image gallery thumbnails not working without DIS [#786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/786)
 - Ensure that a valid target locale is use if none is provided [#788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/788)
 
-## v2.2.0 (Aug 25, 2022)
+### v2.2.0 (Aug 25, 2022)
 
 - Update zzrf-001 url [#694](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/694)
 - Optimize Server-side performance [#667](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/667)
 - Remove references to session bridging [#684](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/684)
 
-## v2.1.0 (Jul 05, 2022)
+### v2.1.0 (Jul 05, 2022)
 
 - Update translations [#643](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/643)
 - Update translations [#653](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/653)
 - Add bundlesize test back into CI [#652](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/652)
 - Fix UI bug on notifications badge [#620](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/620)
 
-## v2.0.0 (May 16, 2022)
+### v2.0.0 (May 16, 2022)
 
 - Update translation docs [#570](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/570)
 - Fixed loading correct amount of skeletons [#576] (<https://github.com/SalesforceCommerceCloud/pwa-kit/pull/576>)
@@ -110,7 +107,7 @@ The older versions below were published without the `@salesforce` namespace.
 - Service worker loading for dev server [#464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/464)
 - Environment Specific Configuration Support [#477](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/447)
 
-## v1.5.0 (Mar 17, 2022)
+### v1.5.0 (Mar 17, 2022)
 
 - Support storing authentication tokens in cookie [#429](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/429)
 - Make sure the forgot-password modal also shows up in the checkout flow [#373](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/373)
@@ -118,7 +115,7 @@ The older versions below were published without the `@salesforce` namespace.
 - Import cross-fetch to make OCAPI client isomorphic [#382](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/382)
 - Multi-site implementation for Retail React App [#391](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/391)
 
-## v1.4.0 (Jan 27, 2022)
+### v1.4.0 (Jan 27, 2022)
 
 - Do not send HSTS header during local development [#288](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/288)
 - Add constants for `<meta>` tags `theme-color` and `apple-mobile-web-app-title` [#287](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/287)
@@ -126,7 +123,7 @@ The older versions below were published without the `@salesforce` namespace.
 - Import preliminary translations [#324](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/324)
 - Remove old dependencies that are no longer used [#317](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/317)
 
-## v1.3.0 (Jan 06, 2022)
+### v1.3.0 (Jan 06, 2022)
 
 - Remove Einstein from home page [#208](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/208)
 - Add git2gus config to allow git2gus integration [210](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/210)
@@ -148,7 +145,7 @@ The older versions below were published without the `@salesforce` namespace.
 - Fix show applied promotion codes case sensitive issue [#224](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/224)
 - Fix section subtitle incorrect prop warning [#282](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/282)
 
-## v1.2.0 (Nov 18, 2021)
+### v1.2.0 (Nov 18, 2021)
 
 - Simplify homepage for Retail React App [#201](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/201)
 - Ensure `cookieId` value is sent always for Einstein recommendations [#179](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/179)
@@ -169,7 +166,7 @@ The older versions below were published without the `@salesforce` namespace.
 - Add cache control header to product details page [#172](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/172)
 - Clear SLAS tokens when OID is changed [#178](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/178)
 
-## v1.1.0 (Sep 27, 2021)
+### v1.1.0 (Sep 27, 2021)
 
 - Fix wishlist bugs and provide better hooks for wishlist features. [#64](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/64)
 - Lazy load Popover component. [#134](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/134)
@@ -182,6 +179,6 @@ The older versions below were published without the `@salesforce` namespace.
 - Security - `inquirer` package upgrade. [#121](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/121)
 - New quantity picker. [#102](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/102)
 
-## v1.0.0 (Sep 08, 2021)
+### v1.0.0 (Sep 08, 2021)
 
 - PWA Kit General Availability and open source. 🎉

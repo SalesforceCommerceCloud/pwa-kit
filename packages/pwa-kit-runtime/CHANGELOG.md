@@ -1,12 +1,7 @@
-## v3.1.0-preview.4 (Jul 25, 2023)
+## v3.1.0 (Jul 26, 2023)
 
+- Allow setting cookies using the `MRT_ALLOW_COOKIES` environment variable [#1318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1318)
 - Fix potential security vulnerability in `semver` dependency [#1358](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1358)
-
-## v3.1.0-preview.3 (Jul 06, 2023)
-
-## v3.1.0-preview.2 (Jul 03, 2023)
-
-## v3.1.0-preview.1 (Jun 26, 2023)
 
 ## v3.0.0 (Jun 15, 2023)
 

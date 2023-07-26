@@ -1,16 +1,9 @@
-## v3.1.0-preview.4 (Jul 25, 2023)
+## v3.1.0 (Jul 26, 2023)
 
+- Allow setting cookies using the `MRT_ALLOW_COOKIES` environment variable [#1318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1318)
 - Send package versions as bundle metadata [#1354](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1354)
 - Fix loading screen sometimes hanging on refresh [#1370](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1370)
-- Avoid an error when using `pwa-kit-dev` outside a directory with a `package.json` file if the command does not require one [#1376](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1376)
-
-## v3.1.0-preview.3 (Jul 06, 2023)
-
-## v3.1.0-preview.2 (Jul 03, 2023)
-
-- Fix loading screen bug on refresh [#1370](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1370)
-
-## v3.1.0-preview.1 (Jun 26, 2023)
+- Avoid an error when using `pwa-kit-dev` outside a directory with a `package.json` file if the command does not require one [#1376](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1376) [#1380](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1380)
 
 ## v3.0.0 (Jun 15, 2023)
 
