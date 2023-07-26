@@ -1,3 +1,5 @@
+## v1.1.0-dev (TBD)
+
 ## v1.0.1 (Jul 26, 2023)
 
 - Fix price display when a discounted price is zero [#1361](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1361)
