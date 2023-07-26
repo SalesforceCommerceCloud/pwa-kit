@@ -275,7 +275,7 @@ const App = (props) => {
 
     const storefrontPreviewClientScript =
         process.env.NODE_ENV === 'development'
-            ? 'http://localhost:3000/mobify/bundle/development/static/storefront-preview.js'
+            ? 'http://localhost:4000/mobify/bundle/development/static/storefront-preview.js'
             : // Gotta update this manually for now... :(
               // : 'https://runtime.commercecloud.com/storefront-preview.js'
               null
