@@ -1,4 +1,4 @@
-## v1.0.1 (Jun 25, 2023)
+## v1.0.1 (Jul 26, 2023)
 
 - Fix price display when a discounted price is zero [#1361](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1361)
 - Fix price adjustments of a line item when more than one is present [#1362](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1362)
