@@ -22,6 +22,8 @@ jobs:
         run: |-
           version=`cat package.json | jq -r ".version" | cut -d "-" -f 1`
           echo "monorepo_version_base=$version" >> "$GITHUB_ENV"
+          version_major=`echo "$version" | cut -d "." -f 1`
+          echo "monorepo_version_major=$version_major" >> "$GITHUB_ENV"
 
       - name: Get retail-react-app version
         run: |-
@@ -45,7 +47,10 @@ jobs:
           node ./scripts/gtime.js monorepo_install npm ci
 
       - name: Create Release Branch
-        run: git checkout -b release-${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}
+        run: git switch -c release-nightly-${{ env.monorepo_version_major }}.x
+
+      - name: Pull latest changes from develop
+        run: git merge develop
 
       - name: Bump version (monorepo)
         run: |-
@@ -64,4 +69,4 @@ jobs:
           git config --global user.name ${{ secrets.GIT_CONFIG_USERNAME }}
           git config --global user.email ${{ secrets.GIT_CONFIG_EMAIL }}
           git commit -am "Release ${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}"
-          git push --set-upstream origin release-${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}
+          git push --set-upstream origin release-nightly-${{ env.monorepo_version_major }}.x
