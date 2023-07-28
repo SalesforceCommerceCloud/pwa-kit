@@ -26,7 +26,7 @@ const main = () => {
     const isNightly = branchName === 'nightly-releases'
 
     if (isNightly) {
-        console.log('--- Releasing all packages...')
+        console.log('--- Nightly release detected. Releasing all packages...')
         publishPackages([], true)
     } else {
         const matched = branchName.match(RELEASE_ONE_PACKAGE)
