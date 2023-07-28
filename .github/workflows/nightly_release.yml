@@ -26,7 +26,7 @@ jobs:
           echo "monorepo_version_major=$version_major" >> "$GITHUB_ENV"
 
       - name: Get nightly version
-        run:  echo "nightly_version=${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}" ?? "$GITHUB_ENV"
+        run:  echo "nightly_version=${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}" >> "$GITHUB_ENV"
 
       - name: Get retail-react-app version
         run: |-
