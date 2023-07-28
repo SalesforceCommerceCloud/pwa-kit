@@ -97,7 +97,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Successfully released PWA Kit v${{ env.nightly_version }}"
+              "message": "Successfully released PWA Kit v${{ env.nightly_version }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -109,7 +109,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Failed to release PWA Kit v${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }} (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+              "message": "Failed to release PWA Kit v${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }} (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
