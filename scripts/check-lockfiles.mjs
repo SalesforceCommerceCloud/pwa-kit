@@ -6,6 +6,7 @@
  */
 import path from 'node:path'
 import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
 
 const LOCKFILE_VERSION_TARGET = 2
 const guidance =
@@ -14,7 +15,7 @@ const guidance =
     ' run `npm install` in the monorepo root.'
 
 // __filename isn't available directly in ESM files
-const __filename = new URL(import.meta.url).pathname
+const __filename = fileURLToPath(import.meta.url)
 const projectDir = path.join(__filename, '../..')
 const packagesDir = path.join(projectDir, 'packages')
 const dirs = fs
