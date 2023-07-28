@@ -16,7 +16,7 @@ jobs:
 
       - name: Get Timestamp
         run: |-
-          echo "release_timestamp=$(date +'%m%d%Y%H%M%S')" >> "$GITHUB_ENV"
+          echo "release_timestamp=$(date +'%Y%m%d%H%M%S')" >> "$GITHUB_ENV"
 
       - name: Get monorepo version
         run: |-
