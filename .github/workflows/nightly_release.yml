@@ -75,3 +75,26 @@ jobs:
         run: |-
           git tag v${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}
           git push origin --tags
+
+      - name: Send GitHub Action data to Slack workflow (Generated)
+        id: slack-success
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "test": "Successfully released PWA Kit v${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send GitHub Action data to Slack workflow (Generated)
+        id: slack-failure
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "test": "Failed to release PWA Kit v${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
