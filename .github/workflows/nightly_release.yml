@@ -51,12 +51,14 @@ jobs:
           node ./scripts/gtime.js monorepo_install npm ci
 
       - name: Create Release Branch
-        run: git switch release-nightly-${{ env.monorepo_version_major }}.x || git switch -c release-nightly-${{ env.monorepo_version_major }}.x
+        run: |-
+          git fetch
+          git switch develop
+          git switch release-nightly-${{ env.monorepo_version_major }}.x || git switch -c release-nightly-${{ env.monorepo_version_major }}.x
 
         # Pull all changes from develop and keep changes from develop in case of merge-conflicts
       - name: Pull latest changes from develop
         run: |-
-          git fetch
           git switch develop
           git merge -s ours release-nightly-${{ env.monorepo_version_major }}.x
           git switch release-nightly-${{ env.monorepo_version_major }}.x
