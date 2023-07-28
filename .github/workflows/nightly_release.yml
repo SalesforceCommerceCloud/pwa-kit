@@ -57,7 +57,6 @@ jobs:
           git merge -s ours release-nightly-${{ env.monorepo_version_major }}.x
           git switch release-nightly-${{ env.monorepo_version_major }}.x
           git merge develop
-          git switch release-nightly-${{ env.monorepo_version_major }}.x
 
       - name: Bump version (monorepo)
         run: |-
