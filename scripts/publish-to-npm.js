@@ -23,7 +23,7 @@ const main = () => {
 
     console.log('--- Given the current branch:', branchName)
 
-    const isNightly = branchName === 'hotfix/nightly-releases'
+    const isNightly = branchName === 'nightly-releases'
 
     if (isNightly) {
         console.log('--- Nightly release detected. Releasing all packages...')
