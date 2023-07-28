@@ -65,6 +65,14 @@ The PWA Kit is licensed under a BSD 3-Clause license. See the [license](./LICENS
 
 Your contributions are welcome! Refer to the [CONTRIBUTING](./CONTRIBUTING.md) guide to get started. If you like `pwa-kit`, consider adding a ⭐ on the [GitHub Repo](https://github.com/SalesforceCommerceCloud/pwa-kit/). It helps other people discover PWA Kit!
 
+## 🛠️ Nightly Builds
+
+The nightly builds are interim PWA Kit builds that are untested and unsupported. Use at your own risk!
+We do not recommend using nightly builds in production.
+Some feature included in the nightly builds may not be included in final PWA Kit releases.
+These unreleased builds may not even load, may have undocumented features, known defects, and any number of other issues.
+They are intended for use by developers and others wishing to get early access to planned PWA Kit features.
+
 ## 📖 Documentation
 
 The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
