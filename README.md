@@ -68,7 +68,7 @@ Your contributions are welcome! Refer to the [CONTRIBUTING](./CONTRIBUTING.md) g
 ## 🛠️ Nightly Builds
 
 ⚠️ PWA Kit releases nightly builds on a nightly cadence for better visibility about upcoming features and a chance for implementers to test code integrations via a "preview" release. These builds are untested and unsupported. Use at your own risk!
-We do not recommend using nightly builds in production.
+Nightly builds carry none of our guarantees associated with well-tested software. **Do not use these builds in production**.
 Some feature included in the nightly builds may not be included in final PWA Kit releases.
 These unreleased builds may not even load, may have undocumented features, known defects, and any number of other issues.
 They are intended for use by developers and others wishing to get early access to planned PWA Kit features.
