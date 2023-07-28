@@ -2,8 +2,8 @@ name: SalesforceCommerceCloud/pwa-kit/nightly_release
 on:
   workflow_dispatch:
   schedule:
-    # Run every day at 12am (PST) - cron uses UTC times
-    - cron: "0 8 * * *"
+    # Run weekdays at 12am (PST) - cron uses UTC times
+    - cron: "0 8 * * 1-5"
 
 jobs:
   create_nightly_release:
