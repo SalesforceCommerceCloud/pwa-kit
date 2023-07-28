@@ -1,6 +1,9 @@
 name: SalesforceCommerceCloud/pwa-kit/nightly_release
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - feature/nightly-releases
   schedule:
     # Run weekdays at 12am (PST) - cron uses UTC times
     - cron: "0 8 * * 1-5"
@@ -70,3 +73,8 @@ jobs:
           git config --global user.email ${{ secrets.GIT_CONFIG_EMAIL }}
           git commit -am "Release ${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}"
           git push --set-upstream origin release-nightly-${{ env.monorepo_version_major }}.x
+
+      - name: Create git tag
+        run: |-
+          git tag v${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}
+          git push origin --tags
