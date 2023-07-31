@@ -357,7 +357,7 @@ export const DevServerMixin = {
     _getWebpackAsset(req, compilerName, fileName) {
         if (req.app.__webpackReady()) {
             const outputFileSystem = req.app.__devMiddleware.context.outputFileSystem
-            const jsonWebpackStats = req.app.__devMiddleware.context.stats.toJson()
+            const jsonWebpackStats = req.app.__devMiddleware.context.stats.toJson({preset: 'none', outputPath: true})
 
             try {
                 const rp = jsonWebpackStats.children.find((child) => child.name === compilerName)
