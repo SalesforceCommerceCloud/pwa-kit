@@ -14,7 +14,6 @@ import {
     Skeleton as ChakraSkeleton
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-// TODO: remove this no-longer-used skeleton
 const Skeleton = () => {
     const styles = useMultiStyleConfig('ProductTile')
     return (

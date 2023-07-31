@@ -11,13 +11,12 @@ import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/compon
 
 // Components
 import {
-    AspectRatio,
     Box,
     Text,
     useMultiStyleConfig,
     IconButton
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
+import Image from '@salesforce/retail-react-app/app/components/product-tile/image'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -67,19 +66,7 @@ const ProductTile = (props) => {
             {...rest}
         >
             <Box {...styles.imageWrapper}>
-                {/* TODO: extract image */}
-                {image && (
-                    <AspectRatio {...styles.image}>
-                        <DynamicImage
-                            src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
-                            widths={dynamicImageProps?.widths}
-                            imageProps={{
-                                alt: image.alt,
-                                ...dynamicImageProps?.imageProps
-                            }}
-                        />
-                    </AspectRatio>
-                )}
+                {image && <Image image={image} dynamicImageProps={dynamicImageProps} />}
 
                 {/* TODO: extract favourite icon */}
                 {enableFavourite && (
