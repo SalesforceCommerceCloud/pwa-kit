@@ -5,17 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 // Components
-import {
-    Box,
-    Text,
-    useMultiStyleConfig,
-    IconButton
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Text, useMultiStyleConfig} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Image from '@salesforce/retail-react-app/app/components/product-tile/image'
 
 // Hooks
@@ -24,10 +18,9 @@ import {useIntl} from 'react-intl'
 // Other
 import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-
-const IconButtonWithRegistration = withRegistration(IconButton)
+// TODO: do we need to sort by sections for these imports?
+import FavouriteButton from '@salesforce/retail-react-app/app/components/product-tile/favourite-button'
 
 /**
  * The ProductTile is a simple visual representation of a
@@ -55,7 +48,6 @@ const ProductTile = (props) => {
     const localizedProductName = product.name ?? product.productName
 
     const {currency: activeCurrency} = useCurrency()
-    const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
 
     return (
@@ -68,31 +60,11 @@ const ProductTile = (props) => {
             <Box {...styles.imageWrapper}>
                 {image && <Image image={image} dynamicImageProps={dynamicImageProps} />}
 
-                {/* TODO: extract favourite icon */}
                 {enableFavourite && (
-                    <Box
-                        onClick={(e) => {
-                            // stop click event from bubbling
-                            // to avoid user from clicking the underlying
-                            // product while the favourite icon is disabled
-                            e.preventDefault()
-                        }}
-                    >
-                        <IconButtonWithRegistration
-                            aria-label={intl.formatMessage({
-                                id: 'product_tile.assistive_msg.wishlist',
-                                defaultMessage: 'Wishlist'
-                            })}
-                            icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
-                            {...styles.favIcon}
-                            disabled={isFavouriteLoading}
-                            onClick={async () => {
-                                setFavouriteLoading(true)
-                                await onFavouriteToggle(!isFavourite)
-                                setFavouriteLoading(false)
-                            }}
-                        />
-                    </Box>
+                    <FavouriteButton
+                        isFavourite={isFavourite}
+                        onFavouriteToggle={onFavouriteToggle}
+                    />
                 )}
             </Box>
 
