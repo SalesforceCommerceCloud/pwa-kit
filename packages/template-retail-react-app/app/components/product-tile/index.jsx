@@ -18,7 +18,7 @@ import {useIntl} from 'react-intl'
 // Other
 import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
-// TODO: do we need to sort by sections for these imports?
+// TODO: use auto-sorting eslint plugin like https://github.com/lydell/eslint-plugin-simple-import-sort/
 import FavouriteButton from '@salesforce/retail-react-app/app/components/product-tile/favourite-button'
 import Title from '@salesforce/retail-react-app/app/components/product-tile/title'
 import Price from '@salesforce/retail-react-app/app/components/product-tile/price'

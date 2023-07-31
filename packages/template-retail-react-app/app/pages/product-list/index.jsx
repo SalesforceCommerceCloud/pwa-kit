@@ -47,9 +47,8 @@ import {
 
 // Project Components
 import Pagination from '@salesforce/retail-react-app/app/components/pagination'
-import ProductTile, {
-    Skeleton as ProductTileSkeleton
-} from '@salesforce/retail-react-app/app/components/product-tile'
+import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'
+import ProductTileSkeleton from '@salesforce/retail-react-app/app/components/product-tile/skeleton'
 import {HideOnDesktop} from '@salesforce/retail-react-app/app/components/responsive'
 import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
 import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/selected-refinements'
