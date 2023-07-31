@@ -23,20 +23,22 @@ const main = () => {
 
     console.log('--- Given the current branch:', branchName)
 
-    const matched = branchName.match(RELEASE_ONE_PACKAGE)
-    const packageName = matched && matched[1]
+    const isNightly = branchName === 'nightly-releases'
 
-    if (packageName) {
-        if (packageName === 'nightly') {
-            console.log('--- Releasing all packages...')
-            publishPackages([], true)
-        } else {
+    if (isNightly) {
+        console.log('--- Nightly release detected. Releasing all packages...')
+        publishPackages([], true)
+    } else {
+        const matched = branchName.match(RELEASE_ONE_PACKAGE)
+        const packageName = matched && matched[1]
+
+        if (packageName) {
             console.log(`--- Releasing ${packageName}...`)
             publishPackages([packageName])
+        } else {
+            console.log('--- Releasing all packages...')
+            publishPackages()
         }
-    } else {
-        console.log('--- Releasing all packages...')
-        publishPackages()
     }
 }
 
