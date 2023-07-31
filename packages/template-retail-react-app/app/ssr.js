@@ -10,6 +10,7 @@ import path from 'path'
 import {getRuntime} from 'pwa-kit-runtime/ssr/server/express'
 import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import helmet from 'helmet'
 
 const options = {
@@ -33,7 +34,17 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    const getCSP = (nodeEnv) => {
+    const getRuntimeEnv = () => {
+        if (process.env.NODE_ENV !== 'production') return process.env.NODE_ENV ?? 'development'
+        const origin = getAppOrigin()
+        // mobify-storefront-staging sites have NODE_ENV set to production, but for the purposes
+        // of CSP we consider the sites to be staging.
+        return origin.endsWith('.mobify-storefront-staging.com') ? 'staging' : 'production'
+    }
+
+    // This is a temporary solution while we work on Storefront Preview - a full solution will
+    // prevent required CSP headers from being modified.
+    const getCSP = () => {
         const trustedMap = {
             development: [
                 'localhost:*',
@@ -57,12 +68,12 @@ const {handler} = runtime.createHandler(options, (app) => {
                 '*.mobify.com',
                 '*.mobify-storefront.com',
                 '*.commercecloud.salesforce.com',
-                'runtime.commercecloud.com',
-                // TODO: Revert once we have a Runtime Admin we can use that's not in staging
-                '*.mobify-storefront-staging.com'
+                'runtime.commercecloud.com'
             ]
         }
-        const trusted = ["'self'", ...(trustedMap[nodeEnv] ? trustedMap[nodeEnv] : [])]
+
+        const env = getRuntimeEnv()
+        const trusted = ["'self'", ...(trustedMap[env] ? trustedMap[env] : [])]
 
         return {
             'connect-src': ['api.cquotient.com', ...trusted],
@@ -80,7 +91,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         helmet({
             contentSecurityPolicy: {
                 useDefaults: true,
-                directives: getCSP(process.env.NODE_ENV ?? 'development')
+                directives: getCSP()
             },
             hsts: isRemote()
         })
