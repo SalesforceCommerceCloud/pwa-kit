@@ -43,7 +43,7 @@ const main = (program) => {
         sh.exec(`node ${script1} ${targetVersion} ${opts.package}`)
 
         const script2 = path.join(__dirname, 'pwa-kit-deps-version.js')
-        const updateDepsBehaviour = /-dev\b/.test(targetVersion) ? 'sync' : 'latest'
+        const updateDepsBehaviour = opts.pwaKitDeps
         sh.exec(`node ${script2} ${updateDepsBehaviour} ${opts.package}`)
 
         // After updating the dependencies, let's update the package lock files
@@ -119,11 +119,20 @@ const updateDeps = (pkgJson) => {
 program.description('Bump the version of a package in our monorepo')
 program.arguments('<target-version>')
 
-program.option(
-    '-p, --package <package-name>',
-    'the package name or an alias to a group of packages',
-    'sdk'
-)
+program
+    .option(
+        '-p, --package <package-name>',
+        'the package name or an alias to a group of packages',
+        'sdk'
+    )
+    .addOption(
+        new program.Option(
+            '-d, --pwa-kit-deps <update-behavior>',
+            'for non-sdk packages, choose how to update their pwa-kit dependencies: either sync with repo or grab @latest from npm'
+        )
+            .choices(['sync', 'latest'])
+            .default('sync')
+    )
 
 program.parse(process.argv)
 main(program)

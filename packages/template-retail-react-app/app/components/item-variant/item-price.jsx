@@ -50,7 +50,8 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
     const {price, basePrice, priceAfterItemDiscount} = variant
     const isProductASet = variant?.type?.set
 
-    const displayPrice = priceAfterItemDiscount ? Math.min(price, priceAfterItemDiscount) : price
+    const displayPrice =
+        typeof priceAfterItemDiscount === 'number' ? Math.min(price, priceAfterItemDiscount) : price
 
     const hasDiscount = displayPrice !== price
 

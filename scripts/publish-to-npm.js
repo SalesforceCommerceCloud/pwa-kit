@@ -23,22 +23,30 @@ const main = () => {
 
     console.log('--- Given the current branch:', branchName)
 
-    const matched = branchName.match(RELEASE_ONE_PACKAGE)
-    const packageName = matched && matched[1]
+    const isNightly = branchName === 'nightly-releases'
 
-    if (packageName) {
-        console.log(`--- Releasing ${packageName}...`)
-        publishPackages([packageName])
+    if (isNightly) {
+        console.log('--- Nightly release detected. Releasing all packages...')
+        publishPackages([], true)
     } else {
-        console.log('--- Releasing all packages...')
-        publishPackages()
+        const matched = branchName.match(RELEASE_ONE_PACKAGE)
+        const packageName = matched && matched[1]
+
+        if (packageName) {
+            console.log(`--- Releasing ${packageName}...`)
+            publishPackages([packageName])
+        } else {
+            console.log('--- Releasing all packages...')
+            publishPackages()
+        }
     }
 }
 
 /**
  * @param {string[]} packages - a list of package names without the "@salesforce" namespace
+ * @param {boolean} isNightly - boolean value suggesting if packages are being published as a nightly release (affects NPM tag)
  */
-const publishPackages = (packages = []) => {
+const publishPackages = (packages = [], isNightly = false) => {
     verifyCleanWorkingTree()
 
     const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
@@ -70,9 +78,9 @@ const publishPackages = (packages = []) => {
     // https://github.com/lerna/lerna/tree/main/libs/commands/publish#publishconfigdirectory
 
     const {stderr, code} = sh.exec(
-        `npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag next ${
-            process.env.CI ? '' : '--registry http://localhost:4873/'
-        }`
+        `npm run lerna -- publish from-package --yes --no-verify-access --pre-dist-tag ${
+            isNightly ? 'nightly-next' : 'next'
+        } ${process.env.CI ? '' : '--registry http://localhost:4873/'}`
     )
     // DEBUG
     // console.log('--- Would publish these public packages to npm:')
