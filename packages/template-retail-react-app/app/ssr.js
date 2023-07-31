@@ -35,7 +35,14 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    const getCSP = (nodeEnv) => {
+    const getRuntimeEnv = () => {
+        if (process.env.NODE_ENV !== 'production') return process.env.NODE_ENV ?? 'development'
+        const origin = getAppOrigin()
+        // mobify-storefront-staging sites have NODE_ENV set to production, but for the purposes
+        // of CSP we consider the sites to be staging.
+        return origin.endsWith('.mobify-storefront-staging.com') ? 'staging' : 'production'
+    }
+    const getCSP = () => {
         const trustedMap = {
             development: [
                 'localhost:*',
@@ -64,7 +71,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                 '*.mobify-storefront-staging.com'
             ]
         }
-        const trusted = ["'self'", ...(trustedMap[nodeEnv] ? trustedMap[nodeEnv] : [])]
+
+        const env = getRuntimeEnv()
+        const trusted = ["'self'", ...(trustedMap[env] ? trustedMap[env] : [])]
 
         return {
             'connect-src': ['api.cquotient.com', ...trusted],
