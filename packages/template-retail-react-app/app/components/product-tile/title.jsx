@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Text, useMultiStyleConfig} from '@salesforce/retail-react-app/app/components/shared/ui'
 
-const Title = ({product}) => {
+const Title = ({product, ...rest}) => {
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
@@ -18,7 +18,11 @@ const Title = ({product}) => {
 
     const styles = useMultiStyleConfig('ProductTile')
 
-    return <Text {...styles.title}>{localizedProductName}</Text>
+    return (
+        <Text {...styles.title} {...rest}>
+            {localizedProductName}
+        </Text>
+    )
 }
 
 Title.propTypes = {

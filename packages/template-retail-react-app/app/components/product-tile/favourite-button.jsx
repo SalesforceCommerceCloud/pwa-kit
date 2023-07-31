@@ -18,7 +18,7 @@ import {useIntl} from 'react-intl'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
-const FavouriteButton = ({isFavourite, onFavouriteToggle}) => {
+const FavouriteButton = ({isFavourite, onFavouriteToggle, ...rest}) => {
     const intl = useIntl()
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
@@ -31,6 +31,7 @@ const FavouriteButton = ({isFavourite, onFavouriteToggle}) => {
                 // product while the favourite icon is disabled
                 e.preventDefault()
             }}
+            {...rest}
         >
             <IconButtonWithRegistration
                 aria-label={intl.formatMessage({

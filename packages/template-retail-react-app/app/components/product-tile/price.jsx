@@ -11,14 +11,14 @@ import {Text, useMultiStyleConfig} from '@salesforce/retail-react-app/app/compon
 import {useIntl} from 'react-intl'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 
-const Price = ({product}) => {
+const Price = ({product, ...rest}) => {
     const {price, currency, hitType} = product
     const intl = useIntl()
     const styles = useMultiStyleConfig('ProductTile')
     const {currency: activeCurrency} = useCurrency()
 
     return (
-        <Text {...styles.price} data-testid="product-tile-price">
+        <Text {...styles.price} data-testid="product-tile-price" {...rest}>
             {hitType === 'set' &&
                 intl.formatMessage({
                     id: 'product_tile.label.starting_at_price',

@@ -13,10 +13,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 
-const Image = ({image, dynamicImageProps}) => {
+const Image = ({image, dynamicImageProps, ...rest}) => {
     const styles = useMultiStyleConfig('ProductTile')
     return (
-        <AspectRatio {...styles.image}>
+        <AspectRatio {...styles.image} {...rest}>
             <DynamicImage
                 src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
                 widths={dynamicImageProps?.widths}

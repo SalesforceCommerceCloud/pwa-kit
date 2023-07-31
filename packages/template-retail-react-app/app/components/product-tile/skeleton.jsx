@@ -14,10 +14,10 @@ import {
     Skeleton as ChakraSkeleton
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-const Skeleton = () => {
+const Skeleton = ({...rest}) => {
     const styles = useMultiStyleConfig('ProductTile')
     return (
-        <Box data-testid="sf-product-tile-skeleton">
+        <Box data-testid="sf-product-tile-skeleton" {...rest}>
             <Stack spacing={2}>
                 <Box {...styles.imageWrapper}>
                     <AspectRatio ratio={1} {...styles.image}>
