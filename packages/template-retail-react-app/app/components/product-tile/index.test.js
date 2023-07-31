@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components/product-tile/index'
+import ProductTile from '@salesforce/retail-react-app/app/components/product-tile/index'
+import Skeleton from '@salesforce/retail-react-app/app/components/product-tile/skeleton'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 const mockProductSearchItem = {

@@ -13,9 +13,7 @@ import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/compon
 import {
     AspectRatio,
     Box,
-    Skeleton as ChakraSkeleton,
     Text,
-    Stack,
     useMultiStyleConfig,
     IconButton
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -32,24 +30,6 @@ import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
-// Component Skeleton
-export const Skeleton = () => {
-    const styles = useMultiStyleConfig('ProductTile')
-    return (
-        <Box data-testid="sf-product-tile-skeleton">
-            <Stack spacing={2}>
-                <Box {...styles.imageWrapper}>
-                    <AspectRatio ratio={1} {...styles.image}>
-                        <ChakraSkeleton />
-                    </AspectRatio>
-                </Box>
-                <ChakraSkeleton width="80px" height="20px" />
-                <ChakraSkeleton width={{base: '120px', md: '220px'}} height="12px" />
-            </Stack>
-        </Box>
-    )
-}
-
 /**
  * The ProductTile is a simple visual representation of a
  * product object. It will show it's default image, name and price.
@@ -63,6 +43,7 @@ const ProductTile = (props) => {
         isFavourite,
         onFavouriteToggle,
         dynamicImageProps,
+        // NOTE: this is good for allowing Chakra style props
         ...rest
     } = props
 
@@ -86,6 +67,7 @@ const ProductTile = (props) => {
             {...rest}
         >
             <Box {...styles.imageWrapper}>
+                {/* TODO: extract image */}
                 {image && (
                     <AspectRatio {...styles.image}>
                         <DynamicImage
@@ -99,6 +81,7 @@ const ProductTile = (props) => {
                     </AspectRatio>
                 )}
 
+                {/* TODO: extract favourite icon */}
                 {enableFavourite && (
                     <Box
                         onClick={(e) => {
@@ -126,9 +109,11 @@ const ProductTile = (props) => {
                 )}
             </Box>
 
+            {/* TODO: extract title */}
             {/* Title */}
             <Text {...styles.title}>{localizedProductName}</Text>
 
+            {/* TODO: extract price */}
             {/* Price */}
             <Text {...styles.price} data-testid="product-tile-price">
                 {hitType === 'set' &&
