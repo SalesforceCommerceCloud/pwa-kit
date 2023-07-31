@@ -18,6 +18,7 @@ import {useIntl} from 'react-intl'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
+// TODO: allows for custom heart icons
 const FavouriteButton = ({isFavourite, onFavouriteToggle, ...rest}) => {
     const intl = useIntl()
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)

@@ -17,6 +17,7 @@ const Price = ({product, ...rest}) => {
     const styles = useMultiStyleConfig('ProductTile')
     const {currency: activeCurrency} = useCurrency()
 
+    // TODO: allows for custom label
     return (
         <Text {...styles.price} data-testid="product-tile-price" {...rest}>
             {hitType === 'set' &&
