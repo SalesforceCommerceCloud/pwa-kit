@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 // Components
-import {Box, Text, useMultiStyleConfig} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, useMultiStyleConfig} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Image from '@salesforce/retail-react-app/app/components/product-tile/image'
 
 // Hooks
@@ -18,10 +18,10 @@ import {useIntl} from 'react-intl'
 // Other
 import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 // TODO: do we need to sort by sections for these imports?
 import FavouriteButton from '@salesforce/retail-react-app/app/components/product-tile/favourite-button'
 import Title from '@salesforce/retail-react-app/app/components/product-tile/title'
+import Price from '@salesforce/retail-react-app/app/components/product-tile/price'
 
 /**
  * The ProductTile is a simple visual representation of a
@@ -40,9 +40,7 @@ const ProductTile = (props) => {
         ...rest
     } = props
 
-    const {currency, image, price, productId, hitType} = product
-
-    const {currency: activeCurrency} = useCurrency()
+    const {image, productId} = product
     const styles = useMultiStyleConfig('ProductTile')
 
     return (
@@ -64,20 +62,7 @@ const ProductTile = (props) => {
             </Box>
 
             <Title product={product} />
-
-            {/* TODO: extract price */}
-            {/* Price */}
-            <Text {...styles.price} data-testid="product-tile-price">
-                {hitType === 'set' &&
-                    intl.formatMessage({
-                        id: 'product_tile.label.starting_at_price',
-                        defaultMessage: 'Starting at'
-                    })}{' '}
-                {intl.formatNumber(price, {
-                    style: 'currency',
-                    currency: currency || activeCurrency
-                })}
-            </Text>
+            <Price product={product} />
         </Link>
     )
 }
