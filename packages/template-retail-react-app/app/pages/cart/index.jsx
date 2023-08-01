@@ -55,6 +55,10 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {
+    HideOnDesktop,
+    HideOnMobile
+} from '@salesforce/retail-react-app/app/components/responsive/index'
 
 const Cart = () => {
     // TODO: useData ?
@@ -359,6 +363,7 @@ const Cart = () => {
                             gap={{base: 10, xl: 20}}
                         >
                             <GridItem>
+                                {/* TODO: extract product items */}
                                 <Stack spacing={4}>
                                     {basket.productItems?.map((productItem, idx) => {
                                         return (
@@ -398,6 +403,7 @@ const Cart = () => {
                                     })}
                                 </Stack>
                                 <Box>
+                                    {/* TODO: extract modal */}
                                     {isOpen && (
                                         <ProductViewModal
                                             isOpen={isOpen}
@@ -418,14 +424,14 @@ const Cart = () => {
                                         isEstimate={true}
                                         basket={basket}
                                     />
-                                    <Box display={{base: 'none', lg: 'block'}}>
+                                    <HideOnMobile>
                                         <CartCta />
-                                    </Box>
+                                    </HideOnMobile>
                                 </Stack>
                             </GridItem>
                         </Grid>
 
-                        {/* Product Recommendations */}
+                        {/* TODO: extract Product Recommendations */}
                         <Stack spacing={16}>
                             <RecommendedProducts
                                 title={
@@ -457,16 +463,9 @@ const Cart = () => {
                 </Stack>
             </Container>
 
-            <Box
-                h="130px"
-                position="sticky"
-                bottom={0}
-                bg="white"
-                display={{base: 'block', lg: 'none'}}
-                align="center"
-            >
+            <HideOnDesktop h="130px" position="sticky" bottom={0} bg="white" align="center">
                 <CartCta />
-            </Box>
+            </HideOnDesktop>
 
             <ConfirmationModal
                 {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}

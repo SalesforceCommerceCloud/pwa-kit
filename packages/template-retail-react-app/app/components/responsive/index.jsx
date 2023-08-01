@@ -12,8 +12,10 @@ import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
  * Render the children in the DOM but visually hide them on desktop
  * @param children - isomorphic components used within a responsive design
  */
-export const HideOnDesktop = ({children}) => (
-    <Box display={{base: 'block', lg: 'none'}}>{children}</Box>
+export const HideOnDesktop = ({children, ...rest}) => (
+    <Box display={{base: 'block', lg: 'none'}} {...rest}>
+        {children}
+    </Box>
 )
 HideOnDesktop.propTypes = {children: PropTypes.node}
 
@@ -21,8 +23,10 @@ HideOnDesktop.propTypes = {children: PropTypes.node}
  * Render the children in the DOM but visually hide them on mobile
  * @param children - isomorphic components used within a responsive design
  */
-export const HideOnMobile = ({children}) => (
-    <Box display={{base: 'none', lg: 'block'}}>{children}</Box>
+export const HideOnMobile = ({children, ...rest}) => (
+    <Box display={{base: 'none', lg: 'block'}} {...rest}>
+        {children}
+    </Box>
 )
 HideOnMobile.propTypes = {children: PropTypes.node}
 
