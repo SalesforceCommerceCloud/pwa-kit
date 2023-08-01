@@ -13,7 +13,6 @@ const WebSocket = require('ws')
 const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
-const projectPkg = require(process.cwd() + '/package.json')
 const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
 
 // Scripts in ./bin have never gone through babel, so we
@@ -58,6 +57,19 @@ const getProjectName = async () => {
         throw new Error(`Missing "name" field in "package.json"`)
     }
     return projectPkg.name
+}
+
+const getAppEntrypoint = async () => {
+    const defaultPath = p.join(process.cwd(), 'app', 'ssr.js')
+    if (await fse.pathExists(defaultPath)) return defaultPath
+
+    const projectPkg = await scriptUtils.getProjectPkg()
+    const {overridesDir} = projectPkg?.ccExtensibility ?? {}
+    if (!overridesDir || typeof overridesDir !== 'string') return null
+
+    const overridePath = p.join(process.cwd(), p.sep + overridesDir, 'app', 'ssr.js')
+    if (await fse.pathExists(overridePath)) return overridePath
+    return null
 }
 
 const main = async () => {
@@ -178,22 +190,6 @@ const main = async () => {
             }
         })
 
-    const appSSRpath = p.join(process.cwd(), 'app', 'ssr.js')
-    const appSSRjs = fse.pathExistsSync(appSSRpath)
-    const overrideSSRpath = p.join(
-        process.cwd(),
-        typeof projectPkg?.ccExtensibility?.overridesDir === 'string' &&
-            !projectPkg?.ccExtensibility?.overridesDir?.startsWith(p.sep)
-            ? p.sep + projectPkg?.ccExtensibility?.overridesDir
-            : projectPkg?.ccExtensibility?.overridesDir
-            ? projectPkg?.ccExtensibility?.overridesDir
-            : '',
-        'app',
-        'ssr.js'
-    )
-    const overrideSSRjs = fse.pathExistsSync(overrideSSRpath)
-    const resolvedSSRPath = appSSRjs ? appSSRpath : overrideSSRjs ? overrideSSRpath : null
-
     program
         .command('start')
         .description(`develop your app locally`)
@@ -211,7 +207,14 @@ const main = async () => {
                 '.bin',
                 'babel-node'
             )
-            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${resolvedSSRPath}`, {
+
+            const entrypoint = await getAppEntrypoint()
+            if (!entrypoint) {
+                error('Could not determine app entrypoint.')
+                process.exit(1)
+            }
+
+            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {})
