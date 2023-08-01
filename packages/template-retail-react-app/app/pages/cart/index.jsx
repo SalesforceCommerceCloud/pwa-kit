@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 
 // Chakra Components
 import {
@@ -28,7 +28,6 @@ import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empt
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
-import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 
 // Hooks
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -38,7 +37,6 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 // Constants
 import {
     API_ERROR_MESSAGE,
-    EINSTEIN_RECOMMENDERS,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
@@ -59,6 +57,7 @@ import {
     HideOnDesktop,
     HideOnMobile
 } from '@salesforce/retail-react-app/app/components/responsive/index'
+import ProductRecommendations from '@salesforce/retail-react-app/app/pages/cart/product-recommendations'
 
 const Cart = () => {
     // TODO: useData ?
@@ -431,34 +430,7 @@ const Cart = () => {
                             </GridItem>
                         </Grid>
 
-                        {/* TODO: extract Product Recommendations */}
-                        <Stack spacing={16}>
-                            <RecommendedProducts
-                                title={
-                                    <FormattedMessage
-                                        defaultMessage="Recently Viewed"
-                                        id="cart.recommended_products.title.recently_viewed"
-                                    />
-                                }
-                                recommender={EINSTEIN_RECOMMENDERS.CART_RECENTLY_VIEWED}
-                                mx={{base: -4, sm: -6, lg: 0}}
-                            />
-
-                            <RecommendedProducts
-                                title={
-                                    <FormattedMessage
-                                        defaultMessage="You May Also Like"
-                                        id="cart.recommended_products.title.may_also_like"
-                                    />
-                                }
-                                recommender={EINSTEIN_RECOMMENDERS.CART_MAY_ALSO_LIKE}
-                                products={basket?.productItems}
-                                shouldFetch={() =>
-                                    basket?.basketId && basket.productItems?.length > 0
-                                }
-                                mx={{base: -4, sm: -6, lg: 0}}
-                            />
-                        </Stack>
+                        <ProductRecommendations />
                     </Stack>
                 </Stack>
             </Container>
