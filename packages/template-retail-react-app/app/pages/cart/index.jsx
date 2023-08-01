@@ -57,6 +57,7 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const Cart = () => {
+    // TODO: useData ?
     const {data: basket, isLoading} = useCurrentBasket()
 
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
