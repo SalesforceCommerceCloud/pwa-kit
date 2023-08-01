@@ -1,0 +1,3212 @@
+{
+  "account.accordion.button.my_account": [
+    {
+      "type": 0,
+      "value": "我的账户"
+    }
+  ],
+  "account.heading.my_account": [
+    {
+      "type": 0,
+      "value": "我的账户"
+    }
+  ],
+  "account.logout_button.button.log_out": [
+    {
+      "type": 0,
+      "value": "登出"
+    }
+  ],
+  "account_addresses.badge.default": [
+    {
+      "type": 0,
+      "value": "默认"
+    }
+  ],
+  "account_addresses.button.add_address": [
+    {
+      "type": 0,
+      "value": "添加地址"
+    }
+  ],
+  "account_addresses.info.address_updated": [
+    {
+      "type": 0,
+      "value": "已更新地址"
+    }
+  ],
+  "account_addresses.info.new_address_saved": [
+    {
+      "type": 0,
+      "value": "已保存新地址"
+    }
+  ],
+  "account_addresses.page_action_placeholder.button.add_address": [
+    {
+      "type": 0,
+      "value": "添加地址"
+    }
+  ],
+  "account_addresses.page_action_placeholder.heading.no_saved_addresses": [
+    {
+      "type": 0,
+      "value": "没有保存的地址"
+    }
+  ],
+  "account_addresses.page_action_placeholder.message.add_new_address": [
+    {
+      "type": 0,
+      "value": "添加新地址方式，加快结账速度。"
+    }
+  ],
+  "account_addresses.title.addresses": [
+    {
+      "type": 0,
+      "value": "地址"
+    }
+  ],
+  "account_detail.title.account_details": [
+    {
+      "type": 0,
+      "value": "账户详情"
+    }
+  ],
+  "account_order_detail.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "账单地址"
+    }
+  ],
+  "account_order_detail.heading.num_of_items": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " 件商品"
+    }
+  ],
+  "account_order_detail.heading.payment_method": [
+    {
+      "type": 0,
+      "value": "付款方式"
+    }
+  ],
+  "account_order_detail.heading.shipping_address": [
+    {
+      "type": 0,
+      "value": "送货地址"
+    }
+  ],
+  "account_order_detail.heading.shipping_method": [
+    {
+      "type": 0,
+      "value": "送货方式"
+    }
+  ],
+  "account_order_detail.label.order_number": [
+    {
+      "type": 0,
+      "value": "订单编号："
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
+    }
+  ],
+  "account_order_detail.label.ordered_date": [
+    {
+      "type": 0,
+      "value": "下单日期："
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "account_order_detail.label.pending_tracking_number": [
+    {
+      "type": 0,
+      "value": "待处理"
+    }
+  ],
+  "account_order_detail.label.tracking_number": [
+    {
+      "type": 0,
+      "value": "跟踪编号"
+    }
+  ],
+  "account_order_detail.link.back_to_history": [
+    {
+      "type": 0,
+      "value": "返回订单记录"
+    }
+  ],
+  "account_order_detail.title.order_details": [
+    {
+      "type": 0,
+      "value": "订单详情"
+    }
+  ],
+  "account_order_history.button.continue_shopping": [
+    {
+      "type": 0,
+      "value": "继续购物"
+    }
+  ],
+  "account_order_history.description.once_you_place_order": [
+    {
+      "type": 0,
+      "value": "下订单后，详细信息将显示在此处。"
+    }
+  ],
+  "account_order_history.heading.no_order_yet": [
+    {
+      "type": 0,
+      "value": "您尚未下订单。"
+    }
+  ],
+  "account_order_history.label.num_of_items": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " 件商品"
+    }
+  ],
+  "account_order_history.label.order_number": [
+    {
+      "type": 0,
+      "value": "订单编号："
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
+    }
+  ],
+  "account_order_history.label.ordered_date": [
+    {
+      "type": 0,
+      "value": "下单日期："
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "account_order_history.label.shipped_to": [
+    {
+      "type": 0,
+      "value": "送货至："
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "account_order_history.link.view_details": [
+    {
+      "type": 0,
+      "value": "查看详情"
+    }
+  ],
+  "account_order_history.title.order_history": [
+    {
+      "type": 0,
+      "value": "订单记录"
+    }
+  ],
+  "account_payment_methods.button.add_method": [
+    {
+      "type": 0,
+      "value": "添加付款方式"
+    }
+  ],
+  "account_payment_methods.description.add_method_for_faster_checkout": [
+    {
+      "type": 0,
+      "value": "添加新付款方式，加快结账速度。"
+    }
+  ],
+  "account_payment_methods.heading.no_saved_methods": [
+    {
+      "type": 0,
+      "value": "没有保存的付款方式"
+    }
+  ],
+  "account_payment_methods.info.new_method_saved": [
+    {
+      "type": 0,
+      "value": "已保存新付款方式"
+    }
+  ],
+  "account_payment_methods.title.payment_methods": [
+    {
+      "type": 0,
+      "value": "付款方式"
+    }
+  ],
+  "account_wishlist.button.continue_shopping": [
+    {
+      "type": 0,
+      "value": "继续购物"
+    }
+  ],
+  "account_wishlist.description.continue_shopping": [
+    {
+      "type": 0,
+      "value": "继续购物并将商品加入愿望清单。"
+    }
+  ],
+  "account_wishlist.heading.no_wishlist": [
+    {
+      "type": 0,
+      "value": "没有愿望清单商品"
+    }
+  ],
+  "account_wishlist.title.wishlist": [
+    {
+      "type": 0,
+      "value": "愿望清单"
+    }
+  ],
+  "action_card.action.edit": [
+    {
+      "type": 0,
+      "value": "编辑"
+    }
+  ],
+  "action_card.action.remove": [
+    {
+      "type": 0,
+      "value": "移除"
+    }
+  ],
+  "add_to_cart_modal.info.added_to_cart": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "已添加至购物车"
+    }
+  ],
+  "add_to_cart_modal.label.cart_subtotal": [
+    {
+      "type": 0,
+      "value": "购物车小计（"
+    },
+    {
+      "type": 1,
+      "value": "itemAccumulatedCount"
+    },
+    {
+      "type": 0,
+      "value": " 件商品）"
+    }
+  ],
+  "add_to_cart_modal.label.quantity": [
+    {
+      "type": 0,
+      "value": "数量"
+    }
+  ],
+  "add_to_cart_modal.link.checkout": [
+    {
+      "type": 0,
+      "value": "继续以结账"
+    }
+  ],
+  "add_to_cart_modal.link.view_cart": [
+    {
+      "type": 0,
+      "value": "查看购物车"
+    }
+  ],
+  "add_to_cart_modal.recommended_products.title.might_also_like": [
+    {
+      "type": 0,
+      "value": "您可能还喜欢"
+    }
+  ],
+  "auth_modal.description.now_signed_in": [
+    {
+      "type": 0,
+      "value": "您现在已登录。"
+    }
+  ],
+  "auth_modal.error.incorrect_email_or_password": [
+    {
+      "type": 0,
+      "value": "您的电子邮件或密码有问题。重试"
+    }
+  ],
+  "auth_modal.info.welcome_user": [
+    {
+      "type": 0,
+      "value": "欢迎 "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": "，"
+    }
+  ],
+  "auth_modal.password_reset_success.button.back_to_sign_in": [
+    {
+      "type": 0,
+      "value": "返回登录"
+    }
+  ],
+  "auth_modal.password_reset_success.info.will_email_shortly": [
+    {
+      "type": 0,
+      "value": "您将通过 "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " 收到包含重置密码链接的电子邮件。"
+    }
+  ],
+  "auth_modal.password_reset_success.title.password_reset": [
+    {
+      "type": 0,
+      "value": "密码重置"
+    }
+  ],
+  "card_payment_form.heading.new_payment_method": [
+    {
+      "type": 0,
+      "value": "添加新付款方式"
+    }
+  ],
+  "cart.info.removed_from_cart": [
+    {
+      "type": 0,
+      "value": "从购物车中移除商品"
+    }
+  ],
+  "cart.recommended_products.title.may_also_like": [
+    {
+      "type": 0,
+      "value": "您可能还喜欢"
+    }
+  ],
+  "cart.recommended_products.title.recently_viewed": [
+    {
+      "type": 0,
+      "value": "最近查看"
+    }
+  ],
+  "cart_cta.link.checkout": [
+    {
+      "type": 0,
+      "value": "继续以结账"
+    }
+  ],
+  "cart_secondary_button_group.action.added_to_wishlist": [
+    {
+      "type": 0,
+      "value": "添加到愿望清单"
+    }
+  ],
+  "cart_secondary_button_group.action.edit": [
+    {
+      "type": 0,
+      "value": "编辑"
+    }
+  ],
+  "cart_secondary_button_group.action.remove": [
+    {
+      "type": 0,
+      "value": "移除"
+    }
+  ],
+  "cart_secondary_button_group.label.this_is_gift": [
+    {
+      "type": 0,
+      "value": "这是礼品。"
+    }
+  ],
+  "cart_secondary_button_group.link_learn_more": [
+    {
+      "type": 0,
+      "value": "了解更多"
+    }
+  ],
+  "cart_skeleton.heading.order_summary": [
+    {
+      "type": 0,
+      "value": "订单摘要"
+    }
+  ],
+  "cart_skeleton.title.cart": [
+    {
+      "type": 0,
+      "value": "购物车"
+    }
+  ],
+  "cart_title.title.cart_num_of_items": [
+    {
+      "type": 0,
+      "value": "购物车（"
+    },
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 件商品"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": "）"
+    }
+  ],
+  "cc_radio_group.action.remove": [
+    {
+      "type": 0,
+      "value": "移除"
+    }
+  ],
+  "cc_radio_group.button.add_new_card": [
+    {
+      "type": 0,
+      "value": "添加新卡"
+    }
+  ],
+  "checkout.button.place_order": [
+    {
+      "type": 0,
+      "value": "下订单"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "结帐期间发生意外错误。"
+    }
+  ],
+  "checkout_confirmation.button.create_account": [
+    {
+      "type": 0,
+      "value": "创建账户"
+    }
+  ],
+  "checkout_confirmation.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "账单地址"
+    }
+  ],
+  "checkout_confirmation.heading.create_account": [
+    {
+      "type": 0,
+      "value": "创建账户，加快结账速度"
+    }
+  ],
+  "checkout_confirmation.heading.credit_card": [
+    {
+      "type": 0,
+      "value": "信用卡"
+    }
+  ],
+  "checkout_confirmation.heading.delivery_details": [
+    {
+      "type": 0,
+      "value": "交货详情"
+    }
+  ],
+  "checkout_confirmation.heading.order_summary": [
+    {
+      "type": 0,
+      "value": "订单摘要"
+    }
+  ],
+  "checkout_confirmation.heading.payment_details": [
+    {
+      "type": 0,
+      "value": "付款详情"
+    }
+  ],
+  "checkout_confirmation.heading.shipping_address": [
+    {
+      "type": 0,
+      "value": "送货地址"
+    }
+  ],
+  "checkout_confirmation.heading.shipping_method": [
+    {
+      "type": 0,
+      "value": "送货方式"
+    }
+  ],
+  "checkout_confirmation.heading.thank_you_for_order": [
+    {
+      "type": 0,
+      "value": "感谢您订购商品！"
+    }
+  ],
+  "checkout_confirmation.label.free": [
+    {
+      "type": 0,
+      "value": "免费"
+    }
+  ],
+  "checkout_confirmation.label.order_number": [
+    {
+      "type": 0,
+      "value": "订单编号"
+    }
+  ],
+  "checkout_confirmation.label.order_total": [
+    {
+      "type": 0,
+      "value": "订单总额"
+    }
+  ],
+  "checkout_confirmation.label.promo_applied": [
+    {
+      "type": 0,
+      "value": "已应用促销"
+    }
+  ],
+  "checkout_confirmation.label.shipping": [
+    {
+      "type": 0,
+      "value": "送货"
+    }
+  ],
+  "checkout_confirmation.label.subtotal": [
+    {
+      "type": 0,
+      "value": "小计"
+    }
+  ],
+  "checkout_confirmation.label.tax": [
+    {
+      "type": 0,
+      "value": "税项"
+    }
+  ],
+  "checkout_confirmation.link.continue_shopping": [
+    {
+      "type": 0,
+      "value": "继续购物"
+    }
+  ],
+  "checkout_confirmation.link.login": [
+    {
+      "type": 0,
+      "value": "在此处登录"
+    }
+  ],
+  "checkout_confirmation.message.already_has_account": [
+    {
+      "type": 0,
+      "value": "此电子邮件地址已注册账户。"
+    }
+  ],
+  "checkout_confirmation.message.num_of_items_in_order": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 件商品"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    }
+  ],
+  "checkout_confirmation.message.will_email_shortly": [
+    {
+      "type": 0,
+      "value": "我们会尽快向 "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " 发送带有您的确认号码和收据的电子邮件。"
+    }
+  ],
+  "checkout_footer.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "隐私政策"
+    }
+  ],
+  "checkout_footer.link.returns_exchanges": [
+    {
+      "type": 0,
+      "value": "退货与换货"
+    }
+  ],
+  "checkout_footer.link.shipping": [
+    {
+      "type": 0,
+      "value": "送货"
+    }
+  ],
+  "checkout_footer.link.site_map": [
+    {
+      "type": 0,
+      "value": "站点地图"
+    }
+  ],
+  "checkout_footer.link.terms_conditions": [
+    {
+      "type": 0,
+      "value": "条款与条件"
+    }
+  ],
+  "checkout_footer.message.copyright": [
+    {
+      "type": 0,
+      "value": "Salesforce 或其附属公司。保留所有权利。此仅为示范商店。所下订单不会被处理。"
+    }
+  ],
+  "checkout_header.link.cart": [
+    {
+      "type": 0,
+      "value": "返回购物车"
+    }
+  ],
+  "checkout_payment.action.remove": [
+    {
+      "type": 0,
+      "value": "移除"
+    }
+  ],
+  "checkout_payment.button.review_order": [
+    {
+      "type": 0,
+      "value": "检查订单"
+    }
+  ],
+  "checkout_payment.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "账单地址"
+    }
+  ],
+  "checkout_payment.heading.credit_card": [
+    {
+      "type": 0,
+      "value": "信用卡"
+    }
+  ],
+  "checkout_payment.label.same_as_shipping": [
+    {
+      "type": 0,
+      "value": "与送货地址相同"
+    }
+  ],
+  "checkout_payment.title.payment": [
+    {
+      "type": 0,
+      "value": "付款"
+    }
+  ],
+  "confirmation_modal.default.action.no": [
+    {
+      "type": 0,
+      "value": "否"
+    }
+  ],
+  "confirmation_modal.default.action.yes": [
+    {
+      "type": 0,
+      "value": "是"
+    }
+  ],
+  "confirmation_modal.default.message.you_want_to_continue": [
+    {
+      "type": 0,
+      "value": "是否确定要继续？"
+    }
+  ],
+  "confirmation_modal.default.title.confirm_action": [
+    {
+      "type": 0,
+      "value": "确认操作"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.action.no": [
+    {
+      "type": 0,
+      "value": "否，保留商品"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.action.yes": [
+    {
+      "type": 0,
+      "value": "是，移除商品"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.message.sure_to_remove": [
+    {
+      "type": 0,
+      "value": "是否确定要从购物车移除此商品？"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "确认移除商品"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.action.no": [
+    {
+      "type": 0,
+      "value": "否，保留商品"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.action.yes": [
+    {
+      "type": 0,
+      "value": "是，移除商品"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.message.sure_to_remove": [
+    {
+      "type": 0,
+      "value": "是否确定要从愿望清单移除此商品？"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "确认移除商品"
+    }
+  ],
+  "contact_info.action.sign_out": [
+    {
+      "type": 0,
+      "value": "注销"
+    }
+  ],
+  "contact_info.button.already_have_account": [
+    {
+      "type": 0,
+      "value": "已有账户？登录"
+    }
+  ],
+  "contact_info.button.checkout_as_guest": [
+    {
+      "type": 0,
+      "value": "以访客身份结算"
+    }
+  ],
+  "contact_info.button.login": [
+    {
+      "type": 0,
+      "value": "登录"
+    }
+  ],
+  "contact_info.error.incorrect_username_or_password": [
+    {
+      "type": 0,
+      "value": "用户名或密码错误，请重试。"
+    }
+  ],
+  "contact_info.link.forgot_password": [
+    {
+      "type": 0,
+      "value": "忘记密码？"
+    }
+  ],
+  "contact_info.title.contact_info": [
+    {
+      "type": 0,
+      "value": "联系信息"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code": [
+    {
+      "type": 0,
+      "value": "此 3 位数代码可在卡的背面找到。"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
+    {
+      "type": 0,
+      "value": "此 4 位数代码可在卡的正面找到。"
+    }
+  ],
+  "drawer_menu.button.account_details": [
+    {
+      "type": 0,
+      "value": "账户详情"
+    }
+  ],
+  "drawer_menu.button.addresses": [
+    {
+      "type": 0,
+      "value": "地址"
+    }
+  ],
+  "drawer_menu.button.log_out": [
+    {
+      "type": 0,
+      "value": "退出"
+    }
+  ],
+  "drawer_menu.button.my_account": [
+    {
+      "type": 0,
+      "value": "我的账户"
+    }
+  ],
+  "drawer_menu.button.order_history": [
+    {
+      "type": 0,
+      "value": "订单记录"
+    }
+  ],
+  "drawer_menu.button.payment_methods": [
+    {
+      "type": 0,
+      "value": "付款方式"
+    }
+  ],
+  "drawer_menu.link.about_us": [
+    {
+      "type": 0,
+      "value": "关于我们"
+    }
+  ],
+  "drawer_menu.link.customer_support": [
+    {
+      "type": 0,
+      "value": "客户支持"
+    }
+  ],
+  "drawer_menu.link.customer_support.contact_us": [
+    {
+      "type": 0,
+      "value": "联系我们"
+    }
+  ],
+  "drawer_menu.link.customer_support.shipping_and_returns": [
+    {
+      "type": 0,
+      "value": "送货与退货"
+    }
+  ],
+  "drawer_menu.link.our_company": [
+    {
+      "type": 0,
+      "value": "我们的公司"
+    }
+  ],
+  "drawer_menu.link.privacy_and_security": [
+    {
+      "type": 0,
+      "value": "隐私及安全"
+    }
+  ],
+  "drawer_menu.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "隐私政策"
+    }
+  ],
+  "drawer_menu.link.shop_all": [
+    {
+      "type": 0,
+      "value": "购买全部"
+    }
+  ],
+  "drawer_menu.link.sign_in": [
+    {
+      "type": 0,
+      "value": "登录"
+    }
+  ],
+  "drawer_menu.link.site_map": [
+    {
+      "type": 0,
+      "value": "站点地图"
+    }
+  ],
+  "drawer_menu.link.store_locator": [
+    {
+      "type": 0,
+      "value": "实体店地址搜索"
+    }
+  ],
+  "drawer_menu.link.terms_and_conditions": [
+    {
+      "type": 0,
+      "value": "条款与条件"
+    }
+  ],
+  "empty_cart.description.empty_cart": [
+    {
+      "type": 0,
+      "value": "购物车内没有商品。"
+    }
+  ],
+  "empty_cart.link.continue_shopping": [
+    {
+      "type": 0,
+      "value": "继续购物"
+    }
+  ],
+  "empty_cart.link.sign_in": [
+    {
+      "type": 0,
+      "value": "登录"
+    }
+  ],
+  "empty_cart.message.continue_shopping": [
+    {
+      "type": 0,
+      "value": "继续购物并将商品加入购物车。"
+    }
+  ],
+  "empty_cart.message.sign_in_or_continue_shopping": [
+    {
+      "type": 0,
+      "value": "登录以检索您保存的商品或继续购物。"
+    }
+  ],
+  "empty_search_results.info.cant_find_anything_for_category": [
+    {
+      "type": 0,
+      "value": "我们找不到"
+    },
+    {
+      "type": 1,
+      "value": "category"
+    },
+    {
+      "type": 0,
+      "value": "的任何内容。尝试搜索产品或"
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "。"
+    }
+  ],
+  "empty_search_results.info.cant_find_anything_for_query": [
+    {
+      "type": 0,
+      "value": "我们找不到“"
+    },
+    {
+      "type": 1,
+      "value": "searchQuery"
+    },
+    {
+      "type": 0,
+      "value": "”的任何内容。"
+    }
+  ],
+  "empty_search_results.info.double_check_spelling": [
+    {
+      "type": 0,
+      "value": "请仔细检查您的拼写并重试或"
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "。"
+    }
+  ],
+  "empty_search_results.link.contact_us": [
+    {
+      "type": 0,
+      "value": "联系我们"
+    }
+  ],
+  "empty_search_results.recommended_products.title.most_viewed": [
+    {
+      "type": 0,
+      "value": "查看最多的商品"
+    }
+  ],
+  "empty_search_results.recommended_products.title.top_sellers": [
+    {
+      "type": 0,
+      "value": "最畅销"
+    }
+  ],
+  "footer.column.account": [
+    {
+      "type": 0,
+      "value": "账户"
+    }
+  ],
+  "footer.column.customer_support": [
+    {
+      "type": 0,
+      "value": "客户支持"
+    }
+  ],
+  "footer.column.our_company": [
+    {
+      "type": 0,
+      "value": "我们的公司"
+    }
+  ],
+  "footer.link.about_us": [
+    {
+      "type": 0,
+      "value": "关于我们"
+    }
+  ],
+  "footer.link.contact_us": [
+    {
+      "type": 0,
+      "value": "联系我们"
+    }
+  ],
+  "footer.link.order_status": [
+    {
+      "type": 0,
+      "value": "订单状态"
+    }
+  ],
+  "footer.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "隐私政策"
+    }
+  ],
+  "footer.link.shipping": [
+    {
+      "type": 0,
+      "value": "送货"
+    }
+  ],
+  "footer.link.signin_create_account": [
+    {
+      "type": 0,
+      "value": "登录或创建账户"
+    }
+  ],
+  "footer.link.site_map": [
+    {
+      "type": 0,
+      "value": "站点地图"
+    }
+  ],
+  "footer.link.store_locator": [
+    {
+      "type": 0,
+      "value": "实体店地址搜索"
+    }
+  ],
+  "footer.link.terms_conditions": [
+    {
+      "type": 0,
+      "value": "条款与条件"
+    }
+  ],
+  "footer.message.copyright": [
+    {
+      "type": 0,
+      "value": "Salesforce 或其附属公司。保留所有权利。此仅为示范商店。所下订单不会被处理。"
+    }
+  ],
+  "footer.subscribe.button.sign_up": [
+    {
+      "type": 0,
+      "value": "注册"
+    }
+  ],
+  "footer.subscribe.description.sign_up": [
+    {
+      "type": 0,
+      "value": "注册以随时了解最热门的交易"
+    }
+  ],
+  "footer.subscribe.heading.first_to_know": [
+    {
+      "type": 0,
+      "value": "率先了解"
+    }
+  ],
+  "form_action_buttons.button.cancel": [
+    {
+      "type": 0,
+      "value": "取消"
+    }
+  ],
+  "form_action_buttons.button.save": [
+    {
+      "type": 0,
+      "value": "保存"
+    }
+  ],
+  "global.account.link.account_details": [
+    {
+      "type": 0,
+      "value": "账户详情"
+    }
+  ],
+  "global.account.link.addresses": [
+    {
+      "type": 0,
+      "value": "地址"
+    }
+  ],
+  "global.account.link.order_history": [
+    {
+      "type": 0,
+      "value": "订单记录"
+    }
+  ],
+  "global.account.link.payment_methods": [
+    {
+      "type": 0,
+      "value": "付款方式"
+    }
+  ],
+  "global.account.link.wishlist": [
+    {
+      "type": 0,
+      "value": "愿望清单"
+    }
+  ],
+  "global.error.something_went_wrong": [
+    {
+      "type": 0,
+      "value": "出现错误。重试。"
+    }
+  ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "已添加至愿望清单"
+    }
+  ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "从愿望清单中移除商品"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "查看"
+    }
+  ],
+  "header.button.assistive_msg.logo": [
+    {
+      "type": 0,
+      "value": "标志"
+    }
+  ],
+  "header.button.assistive_msg.menu": [
+    {
+      "type": 0,
+      "value": "菜单"
+    }
+  ],
+  "header.button.assistive_msg.my_account": [
+    {
+      "type": 0,
+      "value": "我的账户"
+    }
+  ],
+  "header.button.assistive_msg.my_cart": [
+    {
+      "type": 0,
+      "value": "我的购物车"
+    }
+  ],
+  "header.button.assistive_msg.wishlist": [
+    {
+      "type": 0,
+      "value": "愿望清单"
+    }
+  ],
+  "header.field.placeholder.search_for_products": [
+    {
+      "type": 0,
+      "value": "搜索产品..."
+    }
+  ],
+  "header.popover.action.log_out": [
+    {
+      "type": 0,
+      "value": "登出"
+    }
+  ],
+  "header.popover.title.my_account": [
+    {
+      "type": 0,
+      "value": "我的账户"
+    }
+  ],
+  "home.description.features": [
+    {
+      "type": 0,
+      "value": "开箱即用的功能，让您只需专注于添加增强功能。"
+    }
+  ],
+  "home.description.here_to_help": [
+    {
+      "type": 0,
+      "value": "联系我们的支持人员。"
+    }
+  ],
+  "home.description.here_to_help_line_2": [
+    {
+      "type": 0,
+      "value": "他们将为您提供适当指导。"
+    }
+  ],
+  "home.description.shop_products": [
+    {
+      "type": 0,
+      "value": "本节包含目录中的内容。"
+    },
+    {
+      "type": 1,
+      "value": "docLink"
+    },
+    {
+      "type": 0,
+      "value": "（关于如何进行更换）"
+    }
+  ],
+  "home.features.description.cart_checkout": [
+    {
+      "type": 0,
+      "value": "购物者购物车和结账体验的电子商务最佳实践。"
+    }
+  ],
+  "home.features.description.components": [
+    {
+      "type": 0,
+      "value": "使用 Chakra UI 构建，Chakra UI 是一个简单、模块化且可访问的 React 组件库。"
+    }
+  ],
+  "home.features.description.einstein_recommendations": [
+    {
+      "type": 0,
+      "value": "通过产品推荐向每位购物者提供下一个最佳产品或优惠。"
+    }
+  ],
+  "home.features.description.my_account": [
+    {
+      "type": 0,
+      "value": "购物者可以管理账户信息，例如个人概况、地址、付款和订单。"
+    }
+  ],
+  "home.features.description.shopper_login": [
+    {
+      "type": 0,
+      "value": "使购物者能够轻松登录并获得更加个性化的购物体验。"
+    }
+  ],
+  "home.features.description.wishlist": [
+    {
+      "type": 0,
+      "value": "已注册的购物者可以将产品添加到愿望清单，以便日后购买。"
+    }
+  ],
+  "home.features.heading.cart_checkout": [
+    {
+      "type": 0,
+      "value": "购物车和结账"
+    }
+  ],
+  "home.features.heading.components": [
+    {
+      "type": 0,
+      "value": "组件和 Design Kit"
+    }
+  ],
+  "home.features.heading.einstein_recommendations": [
+    {
+      "type": 0,
+      "value": "Einstein 推荐"
+    }
+  ],
+  "home.features.heading.my_account": [
+    {
+      "type": 0,
+      "value": "我的账户"
+    }
+  ],
+  "home.features.heading.shopper_login": [
+    {
+      "type": 0,
+      "value": "Shopper Login and API Access Service"
+    }
+  ],
+  "home.features.heading.wishlist": [
+    {
+      "type": 0,
+      "value": "愿望清单"
+    }
+  ],
+  "home.heading.features": [
+    {
+      "type": 0,
+      "value": "功能"
+    }
+  ],
+  "home.heading.here_to_help": [
+    {
+      "type": 0,
+      "value": "我们随时提供帮助"
+    }
+  ],
+  "home.heading.shop_products": [
+    {
+      "type": 0,
+      "value": "购买产品"
+    }
+  ],
+  "home.hero_features.link.design_kit": [
+    {
+      "type": 0,
+      "value": "采用 Figma PWA Design Kit 创建"
+    }
+  ],
+  "home.hero_features.link.on_github": [
+    {
+      "type": 0,
+      "value": "在 Github 下载"
+    }
+  ],
+  "home.hero_features.link.on_managed_runtime": [
+    {
+      "type": 0,
+      "value": "Managed Runtime 部署"
+    }
+  ],
+  "home.link.contact_us": [
+    {
+      "type": 0,
+      "value": "联系我们"
+    }
+  ],
+  "home.link.get_started": [
+    {
+      "type": 0,
+      "value": "入门指南"
+    }
+  ],
+  "home.link.read_docs": [
+    {
+      "type": 0,
+      "value": "阅读文档"
+    }
+  ],
+  "home.title.react_starter_store": [
+    {
+      "type": 0,
+      "value": "零售 React PWA 入门商铺"
+    }
+  ],
+  "item_attributes.label.promotions": [
+    {
+      "type": 0,
+      "value": "促销"
+    }
+  ],
+  "item_attributes.label.quantity": [
+    {
+      "type": 0,
+      "value": "数量："
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_image.label.sale": [
+    {
+      "type": 0,
+      "value": "销售"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "请在上面选择所有选项"
+    }
+  ],
+  "locale_text.message.ar-SA": [
+    {
+      "type": 0,
+      "value": "阿拉伯语（沙特阿拉伯）"
+    }
+  ],
+  "locale_text.message.bn-BD": [
+    {
+      "type": 0,
+      "value": "孟加拉语（孟加拉国）"
+    }
+  ],
+  "locale_text.message.bn-IN": [
+    {
+      "type": 0,
+      "value": "孟加拉语（印度）"
+    }
+  ],
+  "locale_text.message.cs-CZ": [
+    {
+      "type": 0,
+      "value": "捷克语（捷克共和国）"
+    }
+  ],
+  "locale_text.message.da-DK": [
+    {
+      "type": 0,
+      "value": "丹麦语（丹麦）"
+    }
+  ],
+  "locale_text.message.de-AT": [
+    {
+      "type": 0,
+      "value": "德语（奥地利）"
+    }
+  ],
+  "locale_text.message.de-CH": [
+    {
+      "type": 0,
+      "value": "德语（瑞士）"
+    }
+  ],
+  "locale_text.message.de-DE": [
+    {
+      "type": 0,
+      "value": "德语（德国）"
+    }
+  ],
+  "locale_text.message.el-GR": [
+    {
+      "type": 0,
+      "value": "希腊语（希腊）"
+    }
+  ],
+  "locale_text.message.en-AU": [
+    {
+      "type": 0,
+      "value": "英语（澳大利亚）"
+    }
+  ],
+  "locale_text.message.en-CA": [
+    {
+      "type": 0,
+      "value": "英语（加拿大）"
+    }
+  ],
+  "locale_text.message.en-GB": [
+    {
+      "type": 0,
+      "value": "英语（英国）"
+    }
+  ],
+  "locale_text.message.en-IE": [
+    {
+      "type": 0,
+      "value": "英语（爱尔兰）"
+    }
+  ],
+  "locale_text.message.en-IN": [
+    {
+      "type": 0,
+      "value": "英语（印度）"
+    }
+  ],
+  "locale_text.message.en-NZ": [
+    {
+      "type": 0,
+      "value": "英语（新西兰）"
+    }
+  ],
+  "locale_text.message.en-US": [
+    {
+      "type": 0,
+      "value": "英语（美国）"
+    }
+  ],
+  "locale_text.message.en-ZA": [
+    {
+      "type": 0,
+      "value": "英语（南非）"
+    }
+  ],
+  "locale_text.message.es-AR": [
+    {
+      "type": 0,
+      "value": "西班牙语（阿根廷）"
+    }
+  ],
+  "locale_text.message.es-CL": [
+    {
+      "type": 0,
+      "value": "西班牙语（智利）"
+    }
+  ],
+  "locale_text.message.es-CO": [
+    {
+      "type": 0,
+      "value": "西班牙语（哥伦比亚）"
+    }
+  ],
+  "locale_text.message.es-ES": [
+    {
+      "type": 0,
+      "value": "西班牙语（西班牙）"
+    }
+  ],
+  "locale_text.message.es-MX": [
+    {
+      "type": 0,
+      "value": "西班牙语（墨西哥）"
+    }
+  ],
+  "locale_text.message.es-US": [
+    {
+      "type": 0,
+      "value": "西班牙语（美国）"
+    }
+  ],
+  "locale_text.message.fi-FI": [
+    {
+      "type": 0,
+      "value": "芬兰语（芬兰）"
+    }
+  ],
+  "locale_text.message.fr-BE": [
+    {
+      "type": 0,
+      "value": "法语（比利时）"
+    }
+  ],
+  "locale_text.message.fr-CA": [
+    {
+      "type": 0,
+      "value": "法语（加拿大）"
+    }
+  ],
+  "locale_text.message.fr-CH": [
+    {
+      "type": 0,
+      "value": "法语（瑞士）"
+    }
+  ],
+  "locale_text.message.fr-FR": [
+    {
+      "type": 0,
+      "value": "法语（法国）"
+    }
+  ],
+  "locale_text.message.he-IL": [
+    {
+      "type": 0,
+      "value": "希伯来语（以色列）"
+    }
+  ],
+  "locale_text.message.hi-IN": [
+    {
+      "type": 0,
+      "value": "印地语（印度）"
+    }
+  ],
+  "locale_text.message.hu-HU": [
+    {
+      "type": 0,
+      "value": "匈牙利语（匈牙利）"
+    }
+  ],
+  "locale_text.message.id-ID": [
+    {
+      "type": 0,
+      "value": "印尼语（印度尼西亚）"
+    }
+  ],
+  "locale_text.message.it-CH": [
+    {
+      "type": 0,
+      "value": "意大利语（瑞士）"
+    }
+  ],
+  "locale_text.message.it-IT": [
+    {
+      "type": 0,
+      "value": "意大利语（意大利）"
+    }
+  ],
+  "locale_text.message.ja-JP": [
+    {
+      "type": 0,
+      "value": "日语（日本）"
+    }
+  ],
+  "locale_text.message.ko-KR": [
+    {
+      "type": 0,
+      "value": "韩语（韩国）"
+    }
+  ],
+  "locale_text.message.nl-BE": [
+    {
+      "type": 0,
+      "value": "荷兰语（比利时）"
+    }
+  ],
+  "locale_text.message.nl-NL": [
+    {
+      "type": 0,
+      "value": "荷兰语（荷兰）"
+    }
+  ],
+  "locale_text.message.no-NO": [
+    {
+      "type": 0,
+      "value": "挪威语（挪威）"
+    }
+  ],
+  "locale_text.message.pl-PL": [
+    {
+      "type": 0,
+      "value": "波兰语（波兰）"
+    }
+  ],
+  "locale_text.message.pt-BR": [
+    {
+      "type": 0,
+      "value": "葡萄牙语（巴西）"
+    }
+  ],
+  "locale_text.message.pt-PT": [
+    {
+      "type": 0,
+      "value": "葡萄牙语（葡萄牙）"
+    }
+  ],
+  "locale_text.message.ro-RO": [
+    {
+      "type": 0,
+      "value": "罗马尼亚语（罗马尼亚）"
+    }
+  ],
+  "locale_text.message.ru-RU": [
+    {
+      "type": 0,
+      "value": "俄语（俄罗斯联邦）"
+    }
+  ],
+  "locale_text.message.sk-SK": [
+    {
+      "type": 0,
+      "value": "斯洛伐克语（斯洛伐克）"
+    }
+  ],
+  "locale_text.message.sv-SE": [
+    {
+      "type": 0,
+      "value": "瑞典语（瑞典）"
+    }
+  ],
+  "locale_text.message.ta-IN": [
+    {
+      "type": 0,
+      "value": "泰米尔语（印度）"
+    }
+  ],
+  "locale_text.message.ta-LK": [
+    {
+      "type": 0,
+      "value": "泰米尔语（斯里兰卡）"
+    }
+  ],
+  "locale_text.message.th-TH": [
+    {
+      "type": 0,
+      "value": "泰语（泰国）"
+    }
+  ],
+  "locale_text.message.tr-TR": [
+    {
+      "type": 0,
+      "value": "土耳其语（土耳其）"
+    }
+  ],
+  "locale_text.message.zh-CN": [
+    {
+      "type": 0,
+      "value": "中文（中国）"
+    }
+  ],
+  "locale_text.message.zh-HK": [
+    {
+      "type": 0,
+      "value": "中文（香港）"
+    }
+  ],
+  "locale_text.message.zh-TW": [
+    {
+      "type": 0,
+      "value": "中文（台湾）"
+    }
+  ],
+  "login_form.action.create_account": [
+    {
+      "type": 0,
+      "value": "创建账户"
+    }
+  ],
+  "login_form.button.sign_in": [
+    {
+      "type": 0,
+      "value": "登录"
+    }
+  ],
+  "login_form.link.forgot_password": [
+    {
+      "type": 0,
+      "value": "忘记密码？"
+    }
+  ],
+  "login_form.message.dont_have_account": [
+    {
+      "type": 0,
+      "value": "没有账户？"
+    }
+  ],
+  "login_form.message.welcome_back": [
+    {
+      "type": 0,
+      "value": "欢迎回来"
+    }
+  ],
+  "login_page.error.incorrect_username_or_password": [
+    {
+      "type": 0,
+      "value": "用户名或密码错误，请重试。"
+    }
+  ],
+  "offline_banner.description.browsing_offline_mode": [
+    {
+      "type": 0,
+      "value": "您正在离线模式下浏览"
+    }
+  ],
+  "order_summary.action.remove_promo": [
+    {
+      "type": 0,
+      "value": "移除"
+    }
+  ],
+  "order_summary.cart_items.action.num_of_items_in_cart": [
+    {
+      "type": 0,
+      "value": "购物车内有 "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 件商品"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    }
+  ],
+  "order_summary.cart_items.link.edit_cart": [
+    {
+      "type": 0,
+      "value": "编辑购物车"
+    }
+  ],
+  "order_summary.heading.order_summary": [
+    {
+      "type": 0,
+      "value": "订单摘要"
+    }
+  ],
+  "order_summary.label.estimated_total": [
+    {
+      "type": 0,
+      "value": "预计总数"
+    }
+  ],
+  "order_summary.label.free": [
+    {
+      "type": 0,
+      "value": "免费"
+    }
+  ],
+  "order_summary.label.order_total": [
+    {
+      "type": 0,
+      "value": "订单总额"
+    }
+  ],
+  "order_summary.label.promo_applied": [
+    {
+      "type": 0,
+      "value": "已应用促销"
+    }
+  ],
+  "order_summary.label.promotions_applied": [
+    {
+      "type": 0,
+      "value": "已应用促销"
+    }
+  ],
+  "order_summary.label.shipping": [
+    {
+      "type": 0,
+      "value": "送货"
+    }
+  ],
+  "order_summary.label.subtotal": [
+    {
+      "type": 0,
+      "value": "小计"
+    }
+  ],
+  "order_summary.label.tax": [
+    {
+      "type": 0,
+      "value": "税项"
+    }
+  ],
+  "page_not_found.action.go_back": [
+    {
+      "type": 0,
+      "value": "返回上一页"
+    }
+  ],
+  "page_not_found.link.homepage": [
+    {
+      "type": 0,
+      "value": "返回主页"
+    }
+  ],
+  "page_not_found.message.suggestion_to_try": [
+    {
+      "type": 0,
+      "value": "请尝试重新输入地址、返回上一页或返回主页。"
+    }
+  ],
+  "page_not_found.title.page_cant_be_found": [
+    {
+      "type": 0,
+      "value": "找不到您要查找的页面。"
+    }
+  ],
+  "pagination.field.num_of_pages": [
+    {
+      "type": 0,
+      "value": "/ "
+    },
+    {
+      "type": 1,
+      "value": "numOfPages"
+    }
+  ],
+  "pagination.link.next": [
+    {
+      "type": 0,
+      "value": "下一步"
+    }
+  ],
+  "pagination.link.prev": [
+    {
+      "type": 0,
+      "value": "上一步"
+    }
+  ],
+  "password_card.info.password_updated": [
+    {
+      "type": 0,
+      "value": "密码已更新"
+    }
+  ],
+  "password_card.label.password": [
+    {
+      "type": 0,
+      "value": "密码"
+    }
+  ],
+  "password_card.title.password": [
+    {
+      "type": 0,
+      "value": "密码"
+    }
+  ],
+  "password_requirements.error.eight_letter_minimum": [
+    {
+      "type": 0,
+      "value": "最短 8 个字符"
+    }
+  ],
+  "password_requirements.error.one_lowercase_letter": [
+    {
+      "type": 0,
+      "value": "1 个小写字母"
+    }
+  ],
+  "password_requirements.error.one_number": [
+    {
+      "type": 0,
+      "value": "1 个数字"
+    }
+  ],
+  "password_requirements.error.one_special_character": [
+    {
+      "type": 0,
+      "value": "1 个特殊字符（例如：, S ! %）"
+    }
+  ],
+  "password_requirements.error.one_uppercase_letter": [
+    {
+      "type": 0,
+      "value": "1 个大写字母"
+    }
+  ],
+  "payment_selection.button.save_and_continue": [
+    {
+      "type": 0,
+      "value": "保存并继续"
+    }
+  ],
+  "payment_selection.heading.add_new_card": [
+    {
+      "type": 0,
+      "value": "添加新卡"
+    }
+  ],
+  "payment_selection.heading.credit_card": [
+    {
+      "type": 0,
+      "value": "信用卡"
+    }
+  ],
+  "payment_selection.message.select_payment_method": [
+    {
+      "type": 0,
+      "value": "请选择付款方式。"
+    }
+  ],
+  "payment_selection.tooltip.secure_payment": [
+    {
+      "type": 0,
+      "value": "这是一种安全的 SSL 加密支付。"
+    }
+  ],
+  "price_per_item.label.each": [
+    {
+      "type": 0,
+      "value": "每件"
+    }
+  ],
+  "product_detail.accordion.button.product_detail": [
+    {
+      "type": 0,
+      "value": "产品详情"
+    }
+  ],
+  "product_detail.accordion.button.questions": [
+    {
+      "type": 0,
+      "value": "问题"
+    }
+  ],
+  "product_detail.accordion.button.reviews": [
+    {
+      "type": 0,
+      "value": "点评"
+    }
+  ],
+  "product_detail.accordion.button.size_fit": [
+    {
+      "type": 0,
+      "value": "尺寸与合身"
+    }
+  ],
+  "product_detail.accordion.message.coming_soon": [
+    {
+      "type": 0,
+      "value": "即将到货"
+    }
+  ],
+  "product_detail.recommended_products.title.complete_set": [
+    {
+      "type": 0,
+      "value": "Complete the Set（完成组合）"
+    }
+  ],
+  "product_detail.recommended_products.title.might_also_like": [
+    {
+      "type": 0,
+      "value": "您可能还喜欢"
+    }
+  ],
+  "product_detail.recommended_products.title.recently_viewed": [
+    {
+      "type": 0,
+      "value": "最近查看"
+    }
+  ],
+  "product_item.label.quantity": [
+    {
+      "type": 0,
+      "value": "数量："
+    }
+  ],
+  "product_list.button.filter": [
+    {
+      "type": 0,
+      "value": "筛选器"
+    }
+  ],
+  "product_list.button.sort_by": [
+    {
+      "type": 0,
+      "value": "排序标准："
+    },
+    {
+      "type": 1,
+      "value": "sortOption"
+    }
+  ],
+  "product_list.drawer.title.sort_by": [
+    {
+      "type": 0,
+      "value": "排序标准"
+    }
+  ],
+  "product_list.modal.button.clear_filters": [
+    {
+      "type": 0,
+      "value": "清除筛选器"
+    }
+  ],
+  "product_list.modal.button.view_items": [
+    {
+      "type": 0,
+      "value": "查看 "
+    },
+    {
+      "type": 1,
+      "value": "prroductCount"
+    },
+    {
+      "type": 0,
+      "value": " 件商品"
+    }
+  ],
+  "product_list.modal.title.filter": [
+    {
+      "type": 0,
+      "value": "筛选器"
+    }
+  ],
+  "product_list.select.sort_by": [
+    {
+      "type": 0,
+      "value": "排序标准："
+    },
+    {
+      "type": 1,
+      "value": "sortOption"
+    }
+  ],
+  "product_tile.assistive_msg.wishlist": [
+    {
+      "type": 0,
+      "value": "愿望清单"
+    }
+  ],
+  "product_view.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "添加到购物车"
+    }
+  ],
+  "product_view.button.add_to_wishlist": [
+    {
+      "type": 0,
+      "value": "添加到愿望清单"
+    }
+  ],
+  "product_view.button.update": [
+    {
+      "type": 0,
+      "value": "更新"
+    }
+  ],
+  "product_view.label.quantity": [
+    {
+      "type": 0,
+      "value": "数量"
+    }
+  ],
+  "product_view.link.full_details": [
+    {
+      "type": 0,
+      "value": "查看完整详情"
+    }
+  ],
+  "profile_card.info.profile_updated": [
+    {
+      "type": 0,
+      "value": "已更新概况"
+    }
+  ],
+  "profile_card.label.email": [
+    {
+      "type": 0,
+      "value": "电子邮件"
+    }
+  ],
+  "profile_card.label.full_name": [
+    {
+      "type": 0,
+      "value": "全名"
+    }
+  ],
+  "profile_card.label.phone": [
+    {
+      "type": 0,
+      "value": "电话号码"
+    }
+  ],
+  "profile_card.message.not_provided": [
+    {
+      "type": 0,
+      "value": "未提供"
+    }
+  ],
+  "profile_card.title.my_profile": [
+    {
+      "type": 0,
+      "value": "我的概况"
+    }
+  ],
+  "promo_code_fields.button.apply": [
+    {
+      "type": 0,
+      "value": "确定"
+    }
+  ],
+  "promo_popover.heading.promo_applied": [
+    {
+      "type": 0,
+      "value": "已应用促销"
+    }
+  ],
+  "promocode.accordion.button.have_promocode": [
+    {
+      "type": 0,
+      "value": "您是否有促销码？"
+    }
+  ],
+  "recent_searches.action.clear_searches": [
+    {
+      "type": 0,
+      "value": "清除最近搜索"
+    }
+  ],
+  "recent_searches.heading.recent_searches": [
+    {
+      "type": 0,
+      "value": "最近搜索"
+    }
+  ],
+  "register_form.action.sign_in": [
+    {
+      "type": 0,
+      "value": "登录"
+    }
+  ],
+  "register_form.button.create_account": [
+    {
+      "type": 0,
+      "value": "创建账户"
+    }
+  ],
+  "register_form.heading.lets_get_started": [
+    {
+      "type": 0,
+      "value": "开始使用！"
+    }
+  ],
+  "register_form.message.agree_to_policy_terms": [
+    {
+      "type": 0,
+      "value": "隐私创建账户即表明您同意 Salesforce "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "隐私政策"
+        }
+      ],
+      "type": 8,
+      "value": "policy"
+    },
+    {
+      "type": 0,
+      "value": "和"
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "条款与条件"
+        }
+      ],
+      "type": 8,
+      "value": "terms"
+    }
+  ],
+  "register_form.message.already_have_account": [
+    {
+      "type": 0,
+      "value": "已有账户？"
+    }
+  ],
+  "register_form.message.create_an_account": [
+    {
+      "type": 0,
+      "value": "创建账户并首先查看最佳产品、妙招和虚拟社区。"
+    }
+  ],
+  "reset_password.button.back_to_sign_in": [
+    {
+      "type": 0,
+      "value": "返回登录"
+    }
+  ],
+  "reset_password.info.receive_email_shortly": [
+    {
+      "type": 0,
+      "value": "您将通过 "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " 收到包含重置密码链接的电子邮件。"
+    }
+  ],
+  "reset_password.title.password_reset": [
+    {
+      "type": 0,
+      "value": "密码重置"
+    }
+  ],
+  "reset_password_form.action.sign_in": [
+    {
+      "type": 0,
+      "value": "登录"
+    }
+  ],
+  "reset_password_form.button.reset_password": [
+    {
+      "type": 0,
+      "value": "重置密码"
+    }
+  ],
+  "reset_password_form.message.enter_your_email": [
+    {
+      "type": 0,
+      "value": "进入您的电子邮件，获取重置密码说明"
+    }
+  ],
+  "reset_password_form.message.return_to_sign_in": [
+    {
+      "type": 0,
+      "value": "或返回"
+    }
+  ],
+  "reset_password_form.title.reset_password": [
+    {
+      "type": 0,
+      "value": "重置密码"
+    }
+  ],
+  "search.action.cancel": [
+    {
+      "type": 0,
+      "value": "取消"
+    }
+  ],
+  "selected_refinements.action.clear_all": [
+    {
+      "type": 0,
+      "value": "全部清除"
+    }
+  ],
+  "shipping_address.button.continue_to_shipping": [
+    {
+      "type": 0,
+      "value": "继续并选择送货方式"
+    }
+  ],
+  "shipping_address.title.shipping_address": [
+    {
+      "type": 0,
+      "value": "送货地址"
+    }
+  ],
+  "shipping_address_edit_form.button.save_and_continue": [
+    {
+      "type": 0,
+      "value": "保存并继续选择送货方式"
+    }
+  ],
+  "shipping_address_form.heading.edit_address": [
+    {
+      "type": 0,
+      "value": "编辑地址"
+    }
+  ],
+  "shipping_address_form.heading.new_address": [
+    {
+      "type": 0,
+      "value": "添加新地址"
+    }
+  ],
+  "shipping_address_selection.button.add_address": [
+    {
+      "type": 0,
+      "value": "添加新地址"
+    }
+  ],
+  "shipping_address_selection.button.submit": [
+    {
+      "type": 0,
+      "value": "提交"
+    }
+  ],
+  "shipping_address_selection.title.add_address": [
+    {
+      "type": 0,
+      "value": "添加新地址"
+    }
+  ],
+  "shipping_address_selection.title.edit_shipping": [
+    {
+      "type": 0,
+      "value": "编辑送货地址"
+    }
+  ],
+  "shipping_options.action.send_as_a_gift": [
+    {
+      "type": 0,
+      "value": "您想将此作为礼品发送吗？"
+    }
+  ],
+  "shipping_options.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "继续并选择付款"
+    }
+  ],
+  "shipping_options.title.shipping_gift_options": [
+    {
+      "type": 0,
+      "value": "送货与礼品选项"
+    }
+  ],
+  "signout_confirmation_dialog.button.cancel": [
+    {
+      "type": 0,
+      "value": "取消"
+    }
+  ],
+  "signout_confirmation_dialog.button.sign_out": [
+    {
+      "type": 0,
+      "value": "注销"
+    }
+  ],
+  "signout_confirmation_dialog.heading.sign_out": [
+    {
+      "type": 0,
+      "value": "注销"
+    }
+  ],
+  "signout_confirmation_dialog.message.sure_to_sign_out": [
+    {
+      "type": 0,
+      "value": "是否确定要注销？您需要重新登录才能继续处理当前订单。"
+    }
+  ],
+  "toggle_card.action.edit": [
+    {
+      "type": 0,
+      "value": "编辑"
+    }
+  ],
+  "update_password_fields.button.forgot_password": [
+    {
+      "type": 0,
+      "value": "忘记密码？"
+    }
+  ],
+  "use_address_fields.error.please_enter_first_name": [
+    {
+      "type": 0,
+      "value": "请输入您的名字。"
+    }
+  ],
+  "use_address_fields.error.please_enter_last_name": [
+    {
+      "type": 0,
+      "value": "请输入您的姓氏。"
+    }
+  ],
+  "use_address_fields.error.please_enter_phone_number": [
+    {
+      "type": 0,
+      "value": "请输入您的电话号码。"
+    }
+  ],
+  "use_address_fields.error.please_enter_your_postal_or_zip": [
+    {
+      "type": 0,
+      "value": "请输入您的"
+    },
+    {
+      "type": 1,
+      "value": "postalOrZip"
+    },
+    {
+      "type": 0,
+      "value": "。"
+    }
+  ],
+  "use_address_fields.error.please_select_your_address": [
+    {
+      "type": 0,
+      "value": "请输入您的地址。"
+    }
+  ],
+  "use_address_fields.error.please_select_your_city": [
+    {
+      "type": 0,
+      "value": "请输入您所在城市。"
+    }
+  ],
+  "use_address_fields.error.please_select_your_country": [
+    {
+      "type": 0,
+      "value": "请输入您所在国家/地区。"
+    }
+  ],
+  "use_address_fields.error.please_select_your_state_or_province": [
+    {
+      "type": 0,
+      "value": "请选择您所在的"
+    },
+    {
+      "type": 1,
+      "value": "stateOrProvince"
+    },
+    {
+      "type": 0,
+      "value": "。"
+    }
+  ],
+  "use_address_fields.error.required": [
+    {
+      "type": 0,
+      "value": "必填"
+    }
+  ],
+  "use_address_fields.error.state_code_invalid": [
+    {
+      "type": 0,
+      "value": "请输入两个字母的州/省名称。"
+    }
+  ],
+  "use_address_fields.label.address": [
+    {
+      "type": 0,
+      "value": "地址"
+    }
+  ],
+  "use_address_fields.label.city": [
+    {
+      "type": 0,
+      "value": "城市"
+    }
+  ],
+  "use_address_fields.label.country": [
+    {
+      "type": 0,
+      "value": "国家"
+    }
+  ],
+  "use_address_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "名字"
+    }
+  ],
+  "use_address_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "姓氏"
+    }
+  ],
+  "use_address_fields.label.phone": [
+    {
+      "type": 0,
+      "value": "电话"
+    }
+  ],
+  "use_address_fields.label.postal_code": [
+    {
+      "type": 0,
+      "value": "邮政编码"
+    }
+  ],
+  "use_address_fields.label.preferred": [
+    {
+      "type": 0,
+      "value": "设为默认值"
+    }
+  ],
+  "use_address_fields.label.province": [
+    {
+      "type": 0,
+      "value": "省"
+    }
+  ],
+  "use_address_fields.label.state": [
+    {
+      "type": 0,
+      "value": "州/省"
+    }
+  ],
+  "use_address_fields.label.zipCode": [
+    {
+      "type": 0,
+      "value": "邮政编码"
+    }
+  ],
+  "use_credit_card_fields.error.required": [
+    {
+      "type": 0,
+      "value": "必填"
+    }
+  ],
+  "use_credit_card_fields.error.required_card_number": [
+    {
+      "type": 0,
+      "value": "请输入您的卡号。"
+    }
+  ],
+  "use_credit_card_fields.error.required_expiry": [
+    {
+      "type": 0,
+      "value": "请输入卡的到期日期。"
+    }
+  ],
+  "use_credit_card_fields.error.required_name": [
+    {
+      "type": 0,
+      "value": "请输入卡上显示的名字。"
+    }
+  ],
+  "use_credit_card_fields.error.required_security_code": [
+    {
+      "type": 0,
+      "value": "请输入您的安全码。"
+    }
+  ],
+  "use_credit_card_fields.error.valid_card_number": [
+    {
+      "type": 0,
+      "value": "请输入有效的卡号。"
+    }
+  ],
+  "use_credit_card_fields.error.valid_date": [
+    {
+      "type": 0,
+      "value": "请输入有效的日期。"
+    }
+  ],
+  "use_credit_card_fields.error.valid_name": [
+    {
+      "type": 0,
+      "value": "请输入有效的名称。"
+    }
+  ],
+  "use_credit_card_fields.error.valid_security_code": [
+    {
+      "type": 0,
+      "value": "请输入有效的安全码。"
+    }
+  ],
+  "use_credit_card_fields.label.card_number": [
+    {
+      "type": 0,
+      "value": "卡号"
+    }
+  ],
+  "use_credit_card_fields.label.card_type": [
+    {
+      "type": 0,
+      "value": "卡类型"
+    }
+  ],
+  "use_credit_card_fields.label.expiry": [
+    {
+      "type": 0,
+      "value": "到期日期"
+    }
+  ],
+  "use_credit_card_fields.label.name": [
+    {
+      "type": 0,
+      "value": "持卡人姓名"
+    }
+  ],
+  "use_credit_card_fields.label.security_code": [
+    {
+      "type": 0,
+      "value": "安全码"
+    }
+  ],
+  "use_login_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "请输入您的电子邮件地址。"
+    }
+  ],
+  "use_login_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "请输入您的密码。"
+    }
+  ],
+  "use_login_fields.label.email": [
+    {
+      "type": 0,
+      "value": "电子邮件"
+    }
+  ],
+  "use_login_fields.label.password": [
+    {
+      "type": 0,
+      "value": "密码"
+    }
+  ],
+  "use_product.message.inventory_remaining": [
+    {
+      "type": 0,
+      "value": "仅剩 "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": " 件！"
+    }
+  ],
+  "use_product.message.out_of_stock": [
+    {
+      "type": 0,
+      "value": "无库存"
+    }
+  ],
+  "use_profile_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "请输入有效的电子邮件地址。"
+    }
+  ],
+  "use_profile_fields.error.required_first_name": [
+    {
+      "type": 0,
+      "value": "请输入您的名字。"
+    }
+  ],
+  "use_profile_fields.error.required_last_name": [
+    {
+      "type": 0,
+      "value": "请输入您的姓氏。"
+    }
+  ],
+  "use_profile_fields.error.required_phone": [
+    {
+      "type": 0,
+      "value": "请输入您的电话号码。"
+    }
+  ],
+  "use_profile_fields.label.email": [
+    {
+      "type": 0,
+      "value": "电子邮件"
+    }
+  ],
+  "use_profile_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "名字"
+    }
+  ],
+  "use_profile_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "姓氏"
+    }
+  ],
+  "use_profile_fields.label.phone": [
+    {
+      "type": 0,
+      "value": "电话号码"
+    }
+  ],
+  "use_promo_code_fields.error.required_promo_code": [
+    {
+      "type": 0,
+      "value": "请提供有效的促销码。"
+    }
+  ],
+  "use_promo_code_fields.label.promo_code": [
+    {
+      "type": 0,
+      "value": "促销码"
+    }
+  ],
+  "use_promocode.error.check_the_code": [
+    {
+      "type": 0,
+      "value": "检查促销码并重试，该促销码可能已被使用或促销已过期。"
+    }
+  ],
+  "use_promocode.info.promo_applied": [
+    {
+      "type": 0,
+      "value": "已应用促销"
+    }
+  ],
+  "use_promocode.info.promo_removed": [
+    {
+      "type": 0,
+      "value": "已删除促销"
+    }
+  ],
+  "use_registration_fields.error.contain_number": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含一个数字。"
+    }
+  ],
+  "use_registration_fields.error.lowercase_letter": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含一个小写字母。"
+    }
+  ],
+  "use_registration_fields.error.minimum_characters": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含 8 个字符。"
+    }
+  ],
+  "use_registration_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "请输入有效的电子邮件地址。"
+    }
+  ],
+  "use_registration_fields.error.required_first_name": [
+    {
+      "type": 0,
+      "value": "请输入您的名字。"
+    }
+  ],
+  "use_registration_fields.error.required_last_name": [
+    {
+      "type": 0,
+      "value": "请输入您的姓氏。"
+    }
+  ],
+  "use_registration_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "请创建密码。"
+    }
+  ],
+  "use_registration_fields.error.special_character": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含一个特殊字符。"
+    }
+  ],
+  "use_registration_fields.error.uppercase_letter": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含一个大写字母。"
+    }
+  ],
+  "use_registration_fields.label.email": [
+    {
+      "type": 0,
+      "value": "电子邮件"
+    }
+  ],
+  "use_registration_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "名字"
+    }
+  ],
+  "use_registration_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "姓氏"
+    }
+  ],
+  "use_registration_fields.label.password": [
+    {
+      "type": 0,
+      "value": "密码"
+    }
+  ],
+  "use_registration_fields.label.sign_up_to_emails": [
+    {
+      "type": 0,
+      "value": "为我注册 Salesforce 电子邮件（您可以随时取消订阅）"
+    }
+  ],
+  "use_reset_password_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "请输入有效的电子邮件地址。"
+    }
+  ],
+  "use_reset_password_fields.label.email": [
+    {
+      "type": 0,
+      "value": "电子邮件"
+    }
+  ],
+  "use_update_password_fields.error.contain_number": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含一个数字。"
+    }
+  ],
+  "use_update_password_fields.error.lowercase_letter": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含一个小写字母。"
+    }
+  ],
+  "use_update_password_fields.error.minimum_characters": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含 8 个字符。"
+    }
+  ],
+  "use_update_password_fields.error.required_new_password": [
+    {
+      "type": 0,
+      "value": "请提供新密码。"
+    }
+  ],
+  "use_update_password_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "请输入您的密码。"
+    }
+  ],
+  "use_update_password_fields.error.special_character": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含一个特殊字符。"
+    }
+  ],
+  "use_update_password_fields.error.uppercase_letter": [
+    {
+      "type": 0,
+      "value": "密码必须至少包含一个大写字母。"
+    }
+  ],
+  "use_update_password_fields.label.current_password": [
+    {
+      "type": 0,
+      "value": "当前密码"
+    }
+  ],
+  "use_update_password_fields.label.new_password": [
+    {
+      "type": 0,
+      "value": "新密码"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "添加到购物车"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "选择选项"
+    }
+  ],
+  "wishlist_primary_action.info.added_to_cart": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": " 件商品"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "已添加至购物车"
+    }
+  ],
+  "wishlist_secondary_button_group.action.remove": [
+    {
+      "type": 0,
+      "value": "移除"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item_removed": [
+    {
+      "type": 0,
+      "value": "从愿望清单中移除商品"
+    }
+  ],
+  "with_registration.info.please_sign_in": [
+    {
+      "type": 0,
+      "value": "请登录以继续！"
+    }
+  ]
+}

@@ -1,0 +1,3188 @@
+{
+  "account.accordion.button.my_account": [
+    {
+      "type": 0,
+      "value": "Il mio account"
+    }
+  ],
+  "account.heading.my_account": [
+    {
+      "type": 0,
+      "value": "Il mio account"
+    }
+  ],
+  "account.logout_button.button.log_out": [
+    {
+      "type": 0,
+      "value": "Esci"
+    }
+  ],
+  "account_addresses.badge.default": [
+    {
+      "type": 0,
+      "value": "Predefinito"
+    }
+  ],
+  "account_addresses.button.add_address": [
+    {
+      "type": 0,
+      "value": "Aggiungi indirizzo"
+    }
+  ],
+  "account_addresses.info.address_updated": [
+    {
+      "type": 0,
+      "value": "Indirizzo aggiornato"
+    }
+  ],
+  "account_addresses.info.new_address_saved": [
+    {
+      "type": 0,
+      "value": "Nuovo indirizzo salvato"
+    }
+  ],
+  "account_addresses.page_action_placeholder.button.add_address": [
+    {
+      "type": 0,
+      "value": "Aggiungi indirizzo"
+    }
+  ],
+  "account_addresses.page_action_placeholder.heading.no_saved_addresses": [
+    {
+      "type": 0,
+      "value": "Nessun indirizzo salvato"
+    }
+  ],
+  "account_addresses.page_action_placeholder.message.add_new_address": [
+    {
+      "type": 0,
+      "value": "Aggiungi un nuovo indirizzo per un checkout più veloce."
+    }
+  ],
+  "account_addresses.title.addresses": [
+    {
+      "type": 0,
+      "value": "Indirizzi"
+    }
+  ],
+  "account_detail.title.account_details": [
+    {
+      "type": 0,
+      "value": "Dettagli account"
+    }
+  ],
+  "account_order_detail.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "Indirizzo di fatturazione"
+    }
+  ],
+  "account_order_detail.heading.num_of_items": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " articoli"
+    }
+  ],
+  "account_order_detail.heading.payment_method": [
+    {
+      "type": 0,
+      "value": "Metodo di pagamento"
+    }
+  ],
+  "account_order_detail.heading.shipping_address": [
+    {
+      "type": 0,
+      "value": "Indirizzo di spedizione"
+    }
+  ],
+  "account_order_detail.heading.shipping_method": [
+    {
+      "type": 0,
+      "value": "Metodo di spedizione"
+    }
+  ],
+  "account_order_detail.label.order_number": [
+    {
+      "type": 0,
+      "value": "Numero ordine: "
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
+    }
+  ],
+  "account_order_detail.label.ordered_date": [
+    {
+      "type": 0,
+      "value": "Data ordine: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "account_order_detail.label.pending_tracking_number": [
+    {
+      "type": 0,
+      "value": "In sospeso"
+    }
+  ],
+  "account_order_detail.label.tracking_number": [
+    {
+      "type": 0,
+      "value": "Numero di tracking"
+    }
+  ],
+  "account_order_detail.link.back_to_history": [
+    {
+      "type": 0,
+      "value": "Torna alla cronologia ordini"
+    }
+  ],
+  "account_order_detail.title.order_details": [
+    {
+      "type": 0,
+      "value": "Dettagli ordine"
+    }
+  ],
+  "account_order_history.button.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Continua con lo shopping"
+    }
+  ],
+  "account_order_history.description.once_you_place_order": [
+    {
+      "type": 0,
+      "value": "Una volta effettuato un ordine, i dettagli verranno visualizzati qui."
+    }
+  ],
+  "account_order_history.heading.no_order_yet": [
+    {
+      "type": 0,
+      "value": "Non hai ancora effettuato un ordine."
+    }
+  ],
+  "account_order_history.label.num_of_items": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " articoli"
+    }
+  ],
+  "account_order_history.label.order_number": [
+    {
+      "type": 0,
+      "value": "Numero ordine: "
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
+    }
+  ],
+  "account_order_history.label.ordered_date": [
+    {
+      "type": 0,
+      "value": "Data ordine: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "account_order_history.label.shipped_to": [
+    {
+      "type": 0,
+      "value": "Destinatario spedizione: "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "account_order_history.link.view_details": [
+    {
+      "type": 0,
+      "value": "Visualizza dettagli"
+    }
+  ],
+  "account_order_history.title.order_history": [
+    {
+      "type": 0,
+      "value": "Cronologia ordini"
+    }
+  ],
+  "account_payment_methods.button.add_method": [
+    {
+      "type": 0,
+      "value": "Aggiungi metodo di pagamento"
+    }
+  ],
+  "account_payment_methods.description.add_method_for_faster_checkout": [
+    {
+      "type": 0,
+      "value": "Aggiungi un nuovo metodo di pagamento per un checkout più veloce."
+    }
+  ],
+  "account_payment_methods.heading.no_saved_methods": [
+    {
+      "type": 0,
+      "value": "Nessun metodo di pagamento salvato"
+    }
+  ],
+  "account_payment_methods.info.new_method_saved": [
+    {
+      "type": 0,
+      "value": "Nuovo metodo di pagamento salvato"
+    }
+  ],
+  "account_payment_methods.title.payment_methods": [
+    {
+      "type": 0,
+      "value": "Metodi di pagamento"
+    }
+  ],
+  "account_wishlist.button.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Continua con lo shopping"
+    }
+  ],
+  "account_wishlist.description.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Continua con lo shopping e aggiungi articoli alla lista desideri."
+    }
+  ],
+  "account_wishlist.heading.no_wishlist": [
+    {
+      "type": 0,
+      "value": "Nessun articolo nella lista desideri"
+    }
+  ],
+  "account_wishlist.title.wishlist": [
+    {
+      "type": 0,
+      "value": "Lista desideri"
+    }
+  ],
+  "action_card.action.edit": [
+    {
+      "type": 0,
+      "value": "Modifica"
+    }
+  ],
+  "action_card.action.remove": [
+    {
+      "type": 0,
+      "value": "Rimuovi"
+    }
+  ],
+  "add_to_cart_modal.info.added_to_cart": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "articolo aggiunto"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "articoli aggiunti"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " al carrello"
+    }
+  ],
+  "add_to_cart_modal.label.cart_subtotal": [
+    {
+      "type": 0,
+      "value": "Subtotale carrello ("
+    },
+    {
+      "type": 1,
+      "value": "itemAccumulatedCount"
+    },
+    {
+      "type": 0,
+      "value": " articolo)"
+    }
+  ],
+  "add_to_cart_modal.label.quantity": [
+    {
+      "type": 0,
+      "value": "Qtà"
+    }
+  ],
+  "add_to_cart_modal.link.checkout": [
+    {
+      "type": 0,
+      "value": "Passa al checkout"
+    }
+  ],
+  "add_to_cart_modal.link.view_cart": [
+    {
+      "type": 0,
+      "value": "Mostra carrello"
+    }
+  ],
+  "add_to_cart_modal.recommended_products.title.might_also_like": [
+    {
+      "type": 0,
+      "value": "Potrebbe interessarti anche"
+    }
+  ],
+  "auth_modal.description.now_signed_in": [
+    {
+      "type": 0,
+      "value": "hai eseguito l'accesso."
+    }
+  ],
+  "auth_modal.error.incorrect_email_or_password": [
+    {
+      "type": 0,
+      "value": "Qualcosa non va nell'indirizzo email o nella password. Riprova."
+    }
+  ],
+  "auth_modal.info.welcome_user": [
+    {
+      "type": 0,
+      "value": "Ti diamo il benvenuto "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": ","
+    }
+  ],
+  "auth_modal.password_reset_success.button.back_to_sign_in": [
+    {
+      "type": 0,
+      "value": "Torna all'accesso"
+    }
+  ],
+  "auth_modal.password_reset_success.info.will_email_shortly": [
+    {
+      "type": 0,
+      "value": "A breve riceverai un'email all'indirizzo "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " con un link per la reimpostazione della password."
+    }
+  ],
+  "auth_modal.password_reset_success.title.password_reset": [
+    {
+      "type": 0,
+      "value": "Reimpostazione password"
+    }
+  ],
+  "card_payment_form.heading.new_payment_method": [
+    {
+      "type": 0,
+      "value": "Aggiungi nuovo metodo di pagamento"
+    }
+  ],
+  "cart.info.removed_from_cart": [
+    {
+      "type": 0,
+      "value": "Articolo rimosso dal carrello"
+    }
+  ],
+  "cart.recommended_products.title.may_also_like": [
+    {
+      "type": 0,
+      "value": "Potrebbe interessarti anche"
+    }
+  ],
+  "cart.recommended_products.title.recently_viewed": [
+    {
+      "type": 0,
+      "value": "Visualizzati di recente"
+    }
+  ],
+  "cart_cta.link.checkout": [
+    {
+      "type": 0,
+      "value": "Passa al checkout"
+    }
+  ],
+  "cart_secondary_button_group.action.added_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Aggiungi alla lista desideri"
+    }
+  ],
+  "cart_secondary_button_group.action.edit": [
+    {
+      "type": 0,
+      "value": "Modifica"
+    }
+  ],
+  "cart_secondary_button_group.action.remove": [
+    {
+      "type": 0,
+      "value": "Rimuovi"
+    }
+  ],
+  "cart_secondary_button_group.label.this_is_gift": [
+    {
+      "type": 0,
+      "value": "Questo è un regalo."
+    }
+  ],
+  "cart_secondary_button_group.link_learn_more": [
+    {
+      "type": 0,
+      "value": "Scopri di più"
+    }
+  ],
+  "cart_skeleton.heading.order_summary": [
+    {
+      "type": 0,
+      "value": "Riepilogo ordine"
+    }
+  ],
+  "cart_skeleton.title.cart": [
+    {
+      "type": 0,
+      "value": "Carrello"
+    }
+  ],
+  "cart_title.title.cart_num_of_items": [
+    {
+      "type": 0,
+      "value": "Carrello ("
+    },
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 articoli"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " articolo"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " articoli"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "cc_radio_group.action.remove": [
+    {
+      "type": 0,
+      "value": "Rimuovi"
+    }
+  ],
+  "cc_radio_group.button.add_new_card": [
+    {
+      "type": 0,
+      "value": "Aggiungi nuova carta"
+    }
+  ],
+  "checkout.button.place_order": [
+    {
+      "type": 0,
+      "value": "Invia ordine"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "Si è verificato un errore inatteso durante il checkout."
+    }
+  ],
+  "checkout_confirmation.button.create_account": [
+    {
+      "type": 0,
+      "value": "Crea account"
+    }
+  ],
+  "checkout_confirmation.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "Indirizzo di fatturazione"
+    }
+  ],
+  "checkout_confirmation.heading.create_account": [
+    {
+      "type": 0,
+      "value": "Crea un account per un checkout più veloce"
+    }
+  ],
+  "checkout_confirmation.heading.credit_card": [
+    {
+      "type": 0,
+      "value": "Carta di credito"
+    }
+  ],
+  "checkout_confirmation.heading.delivery_details": [
+    {
+      "type": 0,
+      "value": "Dettagli di consegna"
+    }
+  ],
+  "checkout_confirmation.heading.order_summary": [
+    {
+      "type": 0,
+      "value": "Riepilogo ordine"
+    }
+  ],
+  "checkout_confirmation.heading.payment_details": [
+    {
+      "type": 0,
+      "value": "Dettagli di pagamento"
+    }
+  ],
+  "checkout_confirmation.heading.shipping_address": [
+    {
+      "type": 0,
+      "value": "Indirizzo di spedizione"
+    }
+  ],
+  "checkout_confirmation.heading.shipping_method": [
+    {
+      "type": 0,
+      "value": "Metodo di spedizione"
+    }
+  ],
+  "checkout_confirmation.heading.thank_you_for_order": [
+    {
+      "type": 0,
+      "value": "Grazie per il tuo ordine!"
+    }
+  ],
+  "checkout_confirmation.label.free": [
+    {
+      "type": 0,
+      "value": "Gratuita"
+    }
+  ],
+  "checkout_confirmation.label.order_number": [
+    {
+      "type": 0,
+      "value": "Numero ordine"
+    }
+  ],
+  "checkout_confirmation.label.order_total": [
+    {
+      "type": 0,
+      "value": "Totale ordine"
+    }
+  ],
+  "checkout_confirmation.label.promo_applied": [
+    {
+      "type": 0,
+      "value": "promozione applicata"
+    }
+  ],
+  "checkout_confirmation.label.shipping": [
+    {
+      "type": 0,
+      "value": "Spedizione"
+    }
+  ],
+  "checkout_confirmation.label.subtotal": [
+    {
+      "type": 0,
+      "value": "Subtotale"
+    }
+  ],
+  "checkout_confirmation.label.tax": [
+    {
+      "type": 0,
+      "value": "Imposta"
+    }
+  ],
+  "checkout_confirmation.link.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Continua con lo shopping"
+    }
+  ],
+  "checkout_confirmation.link.login": [
+    {
+      "type": 0,
+      "value": "Accedi qui"
+    }
+  ],
+  "checkout_confirmation.message.already_has_account": [
+    {
+      "type": 0,
+      "value": "Questo indirizzo email è già associato a un account."
+    }
+  ],
+  "checkout_confirmation.message.num_of_items_in_order": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 articoli"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " articolo"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " articoli"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    }
+  ],
+  "checkout_confirmation.message.will_email_shortly": [
+    {
+      "type": 0,
+      "value": "A breve invieremo un'email all'indirizzo "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " con il numero di conferma e la ricevuta."
+    }
+  ],
+  "checkout_footer.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Informativa sulla privacy"
+    }
+  ],
+  "checkout_footer.link.returns_exchanges": [
+    {
+      "type": 0,
+      "value": "Resi e cambi"
+    }
+  ],
+  "checkout_footer.link.shipping": [
+    {
+      "type": 0,
+      "value": "Spedizione"
+    }
+  ],
+  "checkout_footer.link.site_map": [
+    {
+      "type": 0,
+      "value": "Mappa del sito"
+    }
+  ],
+  "checkout_footer.link.terms_conditions": [
+    {
+      "type": 0,
+      "value": "Termini e condizioni"
+    }
+  ],
+  "checkout_footer.message.copyright": [
+    {
+      "type": 0,
+      "value": "Salesforce o società affiliate. Tutti i diritti riservati. Questo è un negozio fittizio a scopo dimostrativo. Gli ordini effettuati NON VERRANNO evasi."
+    }
+  ],
+  "checkout_header.link.cart": [
+    {
+      "type": 0,
+      "value": "Torna al carrello"
+    }
+  ],
+  "checkout_payment.action.remove": [
+    {
+      "type": 0,
+      "value": "Rimuovi"
+    }
+  ],
+  "checkout_payment.button.review_order": [
+    {
+      "type": 0,
+      "value": "Rivedi ordine"
+    }
+  ],
+  "checkout_payment.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "Indirizzo di fatturazione"
+    }
+  ],
+  "checkout_payment.heading.credit_card": [
+    {
+      "type": 0,
+      "value": "Carta di credito"
+    }
+  ],
+  "checkout_payment.label.same_as_shipping": [
+    {
+      "type": 0,
+      "value": "Identico all'indirizzo di spedizione"
+    }
+  ],
+  "checkout_payment.title.payment": [
+    {
+      "type": 0,
+      "value": "Pagamento"
+    }
+  ],
+  "confirmation_modal.default.action.no": [
+    {
+      "type": 0,
+      "value": "No"
+    }
+  ],
+  "confirmation_modal.default.action.yes": [
+    {
+      "type": 0,
+      "value": "Sì"
+    }
+  ],
+  "confirmation_modal.default.message.you_want_to_continue": [
+    {
+      "type": 0,
+      "value": "Continuare?"
+    }
+  ],
+  "confirmation_modal.default.title.confirm_action": [
+    {
+      "type": 0,
+      "value": "Conferma azione"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.action.no": [
+    {
+      "type": 0,
+      "value": "No, conserva articolo"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.action.yes": [
+    {
+      "type": 0,
+      "value": "Sì, rimuovi articolo"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.message.sure_to_remove": [
+    {
+      "type": 0,
+      "value": "Rimuovere questo articolo dal carrello?"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "Conferma rimozione articolo"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.action.no": [
+    {
+      "type": 0,
+      "value": "No, conserva articolo"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.action.yes": [
+    {
+      "type": 0,
+      "value": "Sì, rimuovi articolo"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.message.sure_to_remove": [
+    {
+      "type": 0,
+      "value": "Rimuovere questo articolo dalla lista desideri?"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "Conferma rimozione articolo"
+    }
+  ],
+  "contact_info.action.sign_out": [
+    {
+      "type": 0,
+      "value": "Esci"
+    }
+  ],
+  "contact_info.button.already_have_account": [
+    {
+      "type": 0,
+      "value": "Hai già un account? Accedi"
+    }
+  ],
+  "contact_info.button.checkout_as_guest": [
+    {
+      "type": 0,
+      "value": "Checkout come ospite"
+    }
+  ],
+  "contact_info.button.login": [
+    {
+      "type": 0,
+      "value": "Accedi"
+    }
+  ],
+  "contact_info.error.incorrect_username_or_password": [
+    {
+      "type": 0,
+      "value": "Nome utente o password errati. Riprova."
+    }
+  ],
+  "contact_info.link.forgot_password": [
+    {
+      "type": 0,
+      "value": "Password dimenticata?"
+    }
+  ],
+  "contact_info.title.contact_info": [
+    {
+      "type": 0,
+      "value": "Informazioni di contatto"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code": [
+    {
+      "type": 0,
+      "value": "Questo codice a 3 cifre è presente sul retro della carta."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
+    {
+      "type": 0,
+      "value": "Questo codice a 4 cifre è presente sul fronte della carta."
+    }
+  ],
+  "drawer_menu.button.account_details": [
+    {
+      "type": 0,
+      "value": "Dettagli account"
+    }
+  ],
+  "drawer_menu.button.addresses": [
+    {
+      "type": 0,
+      "value": "Indirizzi"
+    }
+  ],
+  "drawer_menu.button.log_out": [
+    {
+      "type": 0,
+      "value": "Esci"
+    }
+  ],
+  "drawer_menu.button.my_account": [
+    {
+      "type": 0,
+      "value": "Il mio account"
+    }
+  ],
+  "drawer_menu.button.order_history": [
+    {
+      "type": 0,
+      "value": "Cronologia ordini"
+    }
+  ],
+  "drawer_menu.button.payment_methods": [
+    {
+      "type": 0,
+      "value": "Metodi di pagamento"
+    }
+  ],
+  "drawer_menu.link.about_us": [
+    {
+      "type": 0,
+      "value": "Chi siamo"
+    }
+  ],
+  "drawer_menu.link.customer_support": [
+    {
+      "type": 0,
+      "value": "Supporto clienti"
+    }
+  ],
+  "drawer_menu.link.customer_support.contact_us": [
+    {
+      "type": 0,
+      "value": "Contattaci"
+    }
+  ],
+  "drawer_menu.link.customer_support.shipping_and_returns": [
+    {
+      "type": 0,
+      "value": "Spedizione e resi"
+    }
+  ],
+  "drawer_menu.link.our_company": [
+    {
+      "type": 0,
+      "value": "La nostra azienda"
+    }
+  ],
+  "drawer_menu.link.privacy_and_security": [
+    {
+      "type": 0,
+      "value": "Privacy e sicurezza"
+    }
+  ],
+  "drawer_menu.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Informativa sulla privacy"
+    }
+  ],
+  "drawer_menu.link.shop_all": [
+    {
+      "type": 0,
+      "value": "Acquista tutto"
+    }
+  ],
+  "drawer_menu.link.sign_in": [
+    {
+      "type": 0,
+      "value": "Accedi"
+    }
+  ],
+  "drawer_menu.link.site_map": [
+    {
+      "type": 0,
+      "value": "Mappa del sito"
+    }
+  ],
+  "drawer_menu.link.store_locator": [
+    {
+      "type": 0,
+      "value": "Store locator"
+    }
+  ],
+  "drawer_menu.link.terms_and_conditions": [
+    {
+      "type": 0,
+      "value": "Termini e condizioni"
+    }
+  ],
+  "empty_cart.description.empty_cart": [
+    {
+      "type": 0,
+      "value": "Il tuo carrello è vuoto."
+    }
+  ],
+  "empty_cart.link.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Continua con lo shopping"
+    }
+  ],
+  "empty_cart.link.sign_in": [
+    {
+      "type": 0,
+      "value": "Accedi"
+    }
+  ],
+  "empty_cart.message.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Continua con lo shopping per aggiungere articoli al carrello."
+    }
+  ],
+  "empty_cart.message.sign_in_or_continue_shopping": [
+    {
+      "type": 0,
+      "value": "Accedi per recuperare gli articoli salvati o continuare con lo shopping."
+    }
+  ],
+  "empty_search_results.info.cant_find_anything_for_category": [
+    {
+      "type": 0,
+      "value": "Non è stato trovato nulla per "
+    },
+    {
+      "type": 1,
+      "value": "category"
+    },
+    {
+      "type": 0,
+      "value": ". Prova a cercare un prodotto o "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "empty_search_results.info.cant_find_anything_for_query": [
+    {
+      "type": 0,
+      "value": "Non è stato trovato nulla per \""
+    },
+    {
+      "type": 1,
+      "value": "searchQuery"
+    },
+    {
+      "type": 0,
+      "value": "\"."
+    }
+  ],
+  "empty_search_results.info.double_check_spelling": [
+    {
+      "type": 0,
+      "value": "Ricontrolla l'ortografia e riprova o "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "empty_search_results.link.contact_us": [
+    {
+      "type": 0,
+      "value": "Contattaci"
+    }
+  ],
+  "empty_search_results.recommended_products.title.most_viewed": [
+    {
+      "type": 0,
+      "value": "I più visualizzati"
+    }
+  ],
+  "empty_search_results.recommended_products.title.top_sellers": [
+    {
+      "type": 0,
+      "value": "I più venduti"
+    }
+  ],
+  "footer.column.account": [
+    {
+      "type": 0,
+      "value": "Account"
+    }
+  ],
+  "footer.column.customer_support": [
+    {
+      "type": 0,
+      "value": "Supporto clienti"
+    }
+  ],
+  "footer.column.our_company": [
+    {
+      "type": 0,
+      "value": "La nostra azienda"
+    }
+  ],
+  "footer.link.about_us": [
+    {
+      "type": 0,
+      "value": "Chi siamo"
+    }
+  ],
+  "footer.link.contact_us": [
+    {
+      "type": 0,
+      "value": "Contattaci"
+    }
+  ],
+  "footer.link.order_status": [
+    {
+      "type": 0,
+      "value": "Stato ordine"
+    }
+  ],
+  "footer.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Informativa sulla privacy"
+    }
+  ],
+  "footer.link.shipping": [
+    {
+      "type": 0,
+      "value": "Spedizione"
+    }
+  ],
+  "footer.link.signin_create_account": [
+    {
+      "type": 0,
+      "value": "Accedi o crea account"
+    }
+  ],
+  "footer.link.site_map": [
+    {
+      "type": 0,
+      "value": "Mappa del sito"
+    }
+  ],
+  "footer.link.store_locator": [
+    {
+      "type": 0,
+      "value": "Store locator"
+    }
+  ],
+  "footer.link.terms_conditions": [
+    {
+      "type": 0,
+      "value": "Termini e condizioni"
+    }
+  ],
+  "footer.message.copyright": [
+    {
+      "type": 0,
+      "value": "Salesforce o società affiliate. Tutti i diritti riservati. Questo è un negozio fittizio a scopo dimostrativo. Gli ordini effettuati NON VERRANNO evasi."
+    }
+  ],
+  "footer.subscribe.button.sign_up": [
+    {
+      "type": 0,
+      "value": "Registrati"
+    }
+  ],
+  "footer.subscribe.description.sign_up": [
+    {
+      "type": 0,
+      "value": "Registrati per gli ultimi aggiornamenti sulle migliori offerte"
+    }
+  ],
+  "footer.subscribe.heading.first_to_know": [
+    {
+      "type": 0,
+      "value": "Ricevi le novità in anteprima"
+    }
+  ],
+  "form_action_buttons.button.cancel": [
+    {
+      "type": 0,
+      "value": "Annulla"
+    }
+  ],
+  "form_action_buttons.button.save": [
+    {
+      "type": 0,
+      "value": "Salva"
+    }
+  ],
+  "global.account.link.account_details": [
+    {
+      "type": 0,
+      "value": "Dettagli account"
+    }
+  ],
+  "global.account.link.addresses": [
+    {
+      "type": 0,
+      "value": "Indirizzi"
+    }
+  ],
+  "global.account.link.order_history": [
+    {
+      "type": 0,
+      "value": "Cronologia ordini"
+    }
+  ],
+  "global.account.link.payment_methods": [
+    {
+      "type": 0,
+      "value": "Metodi di pagamento"
+    }
+  ],
+  "global.account.link.wishlist": [
+    {
+      "type": 0,
+      "value": "Lista desideri"
+    }
+  ],
+  "global.error.something_went_wrong": [
+    {
+      "type": 0,
+      "value": "Si è verificato un problema. Riprova!"
+    }
+  ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "articolo aggiunto"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "articoli aggiunti"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " alla lista desideri"
+    }
+  ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Articolo rimosso dalla lista desideri"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "Visualizza"
+    }
+  ],
+  "header.button.assistive_msg.logo": [
+    {
+      "type": 0,
+      "value": "Logo"
+    }
+  ],
+  "header.button.assistive_msg.menu": [
+    {
+      "type": 0,
+      "value": "Menu"
+    }
+  ],
+  "header.button.assistive_msg.my_account": [
+    {
+      "type": 0,
+      "value": "Il mio account"
+    }
+  ],
+  "header.button.assistive_msg.my_cart": [
+    {
+      "type": 0,
+      "value": "Il mio carrello"
+    }
+  ],
+  "header.button.assistive_msg.wishlist": [
+    {
+      "type": 0,
+      "value": "Lista desideri"
+    }
+  ],
+  "header.field.placeholder.search_for_products": [
+    {
+      "type": 0,
+      "value": "Cerca prodotti..."
+    }
+  ],
+  "header.popover.action.log_out": [
+    {
+      "type": 0,
+      "value": "Esci"
+    }
+  ],
+  "header.popover.title.my_account": [
+    {
+      "type": 0,
+      "value": "Il mio account"
+    }
+  ],
+  "home.description.features": [
+    {
+      "type": 0,
+      "value": "Funzionalità pronte all'uso, così potrai dedicare il tuo tempo all'aggiunta di miglioramenti."
+    }
+  ],
+  "home.description.here_to_help": [
+    {
+      "type": 0,
+      "value": "Contatta il nostro personale di assistenza."
+    }
+  ],
+  "home.description.here_to_help_line_2": [
+    {
+      "type": 0,
+      "value": "Ti fornirà le indicazioni giuste."
+    }
+  ],
+  "home.description.shop_products": [
+    {
+      "type": 0,
+      "value": "Questa sezione presenta contenuti del catalogo. "
+    },
+    {
+      "type": 1,
+      "value": "docLink"
+    },
+    {
+      "type": 0,
+      "value": " su come sostituirli."
+    }
+  ],
+  "home.features.description.cart_checkout": [
+    {
+      "type": 0,
+      "value": "Best practice di e-commerce per l'esperienza di carrello e checkout di un acquirente."
+    }
+  ],
+  "home.features.description.components": [
+    {
+      "type": 0,
+      "value": "Realizzato utilizzando Chakra UI, una libreria di componenti React semplice, modulare e accessibile."
+    }
+  ],
+  "home.features.description.einstein_recommendations": [
+    {
+      "type": 0,
+      "value": "Garantisci a ogni acquirente il miglior prodotto o la migliore offerta con i suggerimenti di prodotto."
+    }
+  ],
+  "home.features.description.my_account": [
+    {
+      "type": 0,
+      "value": "Gli acquirenti possono gestire le informazioni relative all'account come profilo, indirizzi, pagamenti e ordini."
+    }
+  ],
+  "home.features.description.shopper_login": [
+    {
+      "type": 0,
+      "value": "Consenti agli acquirenti di accedere facilmente grazie a un'esperienza di acquisto più personalizzata."
+    }
+  ],
+  "home.features.description.wishlist": [
+    {
+      "type": 0,
+      "value": "Gli acquirenti registrati possono aggiungere voci di prodotto alla lista desideri per acquisti futuri."
+    }
+  ],
+  "home.features.heading.cart_checkout": [
+    {
+      "type": 0,
+      "value": "Carrello e checkout"
+    }
+  ],
+  "home.features.heading.components": [
+    {
+      "type": 0,
+      "value": "Componenti e Design Kit"
+    }
+  ],
+  "home.features.heading.einstein_recommendations": [
+    {
+      "type": 0,
+      "value": "Suggerimenti Einstein"
+    }
+  ],
+  "home.features.heading.my_account": [
+    {
+      "type": 0,
+      "value": "Il mio account"
+    }
+  ],
+  "home.features.heading.shopper_login": [
+    {
+      "type": 0,
+      "value": "Shopper Login and API Access Service (SLAS)"
+    }
+  ],
+  "home.features.heading.wishlist": [
+    {
+      "type": 0,
+      "value": "Lista desideri"
+    }
+  ],
+  "home.heading.features": [
+    {
+      "type": 0,
+      "value": "Funzionalità"
+    }
+  ],
+  "home.heading.here_to_help": [
+    {
+      "type": 0,
+      "value": "Siamo qui per aiutarti"
+    }
+  ],
+  "home.heading.shop_products": [
+    {
+      "type": 0,
+      "value": "Acquista prodotti"
+    }
+  ],
+  "home.hero_features.link.design_kit": [
+    {
+      "type": 0,
+      "value": "Crea con il Figma PWA Design Kit"
+    }
+  ],
+  "home.hero_features.link.on_github": [
+    {
+      "type": 0,
+      "value": "Scarica su GitHub"
+    }
+  ],
+  "home.hero_features.link.on_managed_runtime": [
+    {
+      "type": 0,
+      "value": "Distribuisci su Managed Runtime"
+    }
+  ],
+  "home.link.contact_us": [
+    {
+      "type": 0,
+      "value": "Contattaci"
+    }
+  ],
+  "home.link.get_started": [
+    {
+      "type": 0,
+      "value": "Inizia"
+    }
+  ],
+  "home.link.read_docs": [
+    {
+      "type": 0,
+      "value": "Leggi la documentazione"
+    }
+  ],
+  "home.title.react_starter_store": [
+    {
+      "type": 0,
+      "value": "React PWA Starter Store per il retail"
+    }
+  ],
+  "item_attributes.label.promotions": [
+    {
+      "type": 0,
+      "value": "Promozioni"
+    }
+  ],
+  "item_attributes.label.quantity": [
+    {
+      "type": 0,
+      "value": "Quantità: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_image.label.sale": [
+    {
+      "type": 0,
+      "value": "Saldi"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "Selezionare tutte le opzioni sopra riportate"
+    }
+  ],
+  "locale_text.message.ar-SA": [
+    {
+      "type": 0,
+      "value": "Arabo (Arabia Saudita)"
+    }
+  ],
+  "locale_text.message.bn-BD": [
+    {
+      "type": 0,
+      "value": "Bengalese (Bangladesh)"
+    }
+  ],
+  "locale_text.message.bn-IN": [
+    {
+      "type": 0,
+      "value": "Bengalese (India)"
+    }
+  ],
+  "locale_text.message.cs-CZ": [
+    {
+      "type": 0,
+      "value": "Ceco (Repubblica Ceca)"
+    }
+  ],
+  "locale_text.message.da-DK": [
+    {
+      "type": 0,
+      "value": "Danese (Danimarca)"
+    }
+  ],
+  "locale_text.message.de-AT": [
+    {
+      "type": 0,
+      "value": "Tedesco (Austria)"
+    }
+  ],
+  "locale_text.message.de-CH": [
+    {
+      "type": 0,
+      "value": "Tedesco (Svizzera)"
+    }
+  ],
+  "locale_text.message.de-DE": [
+    {
+      "type": 0,
+      "value": "Tedesco (Germania)"
+    }
+  ],
+  "locale_text.message.el-GR": [
+    {
+      "type": 0,
+      "value": "Greco (Grecia)"
+    }
+  ],
+  "locale_text.message.en-AU": [
+    {
+      "type": 0,
+      "value": "Inglese (Australia)"
+    }
+  ],
+  "locale_text.message.en-CA": [
+    {
+      "type": 0,
+      "value": "Inglese (Canada)"
+    }
+  ],
+  "locale_text.message.en-GB": [
+    {
+      "type": 0,
+      "value": "Inglese (Regno Unito)"
+    }
+  ],
+  "locale_text.message.en-IE": [
+    {
+      "type": 0,
+      "value": "Inglese (Irlanda)"
+    }
+  ],
+  "locale_text.message.en-IN": [
+    {
+      "type": 0,
+      "value": "Inglese (India)"
+    }
+  ],
+  "locale_text.message.en-NZ": [
+    {
+      "type": 0,
+      "value": "Inglese (Nuova Zelanda)"
+    }
+  ],
+  "locale_text.message.en-US": [
+    {
+      "type": 0,
+      "value": "Inglese (Stati Uniti)"
+    }
+  ],
+  "locale_text.message.en-ZA": [
+    {
+      "type": 0,
+      "value": "Inglese (Sudafrica)"
+    }
+  ],
+  "locale_text.message.es-AR": [
+    {
+      "type": 0,
+      "value": "Spagnolo (Argentina)"
+    }
+  ],
+  "locale_text.message.es-CL": [
+    {
+      "type": 0,
+      "value": "Spagnolo (Cile)"
+    }
+  ],
+  "locale_text.message.es-CO": [
+    {
+      "type": 0,
+      "value": "Spagnolo (Colombia)"
+    }
+  ],
+  "locale_text.message.es-ES": [
+    {
+      "type": 0,
+      "value": "Spagnolo (Spagna)"
+    }
+  ],
+  "locale_text.message.es-MX": [
+    {
+      "type": 0,
+      "value": "Spagnolo (Messico)"
+    }
+  ],
+  "locale_text.message.es-US": [
+    {
+      "type": 0,
+      "value": "Spagnolo (Stati Uniti)"
+    }
+  ],
+  "locale_text.message.fi-FI": [
+    {
+      "type": 0,
+      "value": "Finlandese (Finlandia)"
+    }
+  ],
+  "locale_text.message.fr-BE": [
+    {
+      "type": 0,
+      "value": "Francese (Belgio)"
+    }
+  ],
+  "locale_text.message.fr-CA": [
+    {
+      "type": 0,
+      "value": "Francese (Canada)"
+    }
+  ],
+  "locale_text.message.fr-CH": [
+    {
+      "type": 0,
+      "value": "Francese (Svizzera)"
+    }
+  ],
+  "locale_text.message.fr-FR": [
+    {
+      "type": 0,
+      "value": "Francese (Francia)"
+    }
+  ],
+  "locale_text.message.he-IL": [
+    {
+      "type": 0,
+      "value": "Ebraico (Israele)"
+    }
+  ],
+  "locale_text.message.hi-IN": [
+    {
+      "type": 0,
+      "value": "Hindi (India)"
+    }
+  ],
+  "locale_text.message.hu-HU": [
+    {
+      "type": 0,
+      "value": "Ungherese (Ungheria)"
+    }
+  ],
+  "locale_text.message.id-ID": [
+    {
+      "type": 0,
+      "value": "Indonesiano (Indonesia)"
+    }
+  ],
+  "locale_text.message.it-CH": [
+    {
+      "type": 0,
+      "value": "Italiano (Svizzera)"
+    }
+  ],
+  "locale_text.message.it-IT": [
+    {
+      "type": 0,
+      "value": "Italiano (Italia)"
+    }
+  ],
+  "locale_text.message.ja-JP": [
+    {
+      "type": 0,
+      "value": "Giapponese (Giappone)"
+    }
+  ],
+  "locale_text.message.ko-KR": [
+    {
+      "type": 0,
+      "value": "Coreano (Repubblica di Corea)"
+    }
+  ],
+  "locale_text.message.nl-BE": [
+    {
+      "type": 0,
+      "value": "Olandese (Belgio)"
+    }
+  ],
+  "locale_text.message.nl-NL": [
+    {
+      "type": 0,
+      "value": "Olandese (Paesi Bassi)"
+    }
+  ],
+  "locale_text.message.no-NO": [
+    {
+      "type": 0,
+      "value": "Norvegese (Norvegia)"
+    }
+  ],
+  "locale_text.message.pl-PL": [
+    {
+      "type": 0,
+      "value": "Polacco (Polonia)"
+    }
+  ],
+  "locale_text.message.pt-BR": [
+    {
+      "type": 0,
+      "value": "Portoghese (Brasile)"
+    }
+  ],
+  "locale_text.message.pt-PT": [
+    {
+      "type": 0,
+      "value": "Portoghese (Portogallo)"
+    }
+  ],
+  "locale_text.message.ro-RO": [
+    {
+      "type": 0,
+      "value": "Rumeno (Romania)"
+    }
+  ],
+  "locale_text.message.ru-RU": [
+    {
+      "type": 0,
+      "value": "Russo (Federazione Russa)"
+    }
+  ],
+  "locale_text.message.sk-SK": [
+    {
+      "type": 0,
+      "value": "Slovacco (Slovacchia)"
+    }
+  ],
+  "locale_text.message.sv-SE": [
+    {
+      "type": 0,
+      "value": "Svedese (Svezia)"
+    }
+  ],
+  "locale_text.message.ta-IN": [
+    {
+      "type": 0,
+      "value": "Tamil (India)"
+    }
+  ],
+  "locale_text.message.ta-LK": [
+    {
+      "type": 0,
+      "value": "Tamil (Sri Lanka)"
+    }
+  ],
+  "locale_text.message.th-TH": [
+    {
+      "type": 0,
+      "value": "Tailandese (Tailandia)"
+    }
+  ],
+  "locale_text.message.tr-TR": [
+    {
+      "type": 0,
+      "value": "Turco (Turchia)"
+    }
+  ],
+  "locale_text.message.zh-CN": [
+    {
+      "type": 0,
+      "value": "Cinese (Cina)"
+    }
+  ],
+  "locale_text.message.zh-HK": [
+    {
+      "type": 0,
+      "value": "Cinese (Hong Kong)"
+    }
+  ],
+  "locale_text.message.zh-TW": [
+    {
+      "type": 0,
+      "value": "Cinese (Taiwan)"
+    }
+  ],
+  "login_form.action.create_account": [
+    {
+      "type": 0,
+      "value": "Crea account"
+    }
+  ],
+  "login_form.button.sign_in": [
+    {
+      "type": 0,
+      "value": "Accedi"
+    }
+  ],
+  "login_form.link.forgot_password": [
+    {
+      "type": 0,
+      "value": "Password dimenticata?"
+    }
+  ],
+  "login_form.message.dont_have_account": [
+    {
+      "type": 0,
+      "value": "Non hai un account?"
+    }
+  ],
+  "login_form.message.welcome_back": [
+    {
+      "type": 0,
+      "value": "Piacere di rivederti"
+    }
+  ],
+  "login_page.error.incorrect_username_or_password": [
+    {
+      "type": 0,
+      "value": "Nome utente o password errati. Riprova."
+    }
+  ],
+  "offline_banner.description.browsing_offline_mode": [
+    {
+      "type": 0,
+      "value": "Stai navigando in modalità offline"
+    }
+  ],
+  "order_summary.action.remove_promo": [
+    {
+      "type": 0,
+      "value": "Rimuovi"
+    }
+  ],
+  "order_summary.cart_items.action.num_of_items_in_cart": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 articoli"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " articolo"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " articoli"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": " nel carrello"
+    }
+  ],
+  "order_summary.cart_items.link.edit_cart": [
+    {
+      "type": 0,
+      "value": "Modifica carrello"
+    }
+  ],
+  "order_summary.heading.order_summary": [
+    {
+      "type": 0,
+      "value": "Riepilogo ordine"
+    }
+  ],
+  "order_summary.label.estimated_total": [
+    {
+      "type": 0,
+      "value": "Totale stimato"
+    }
+  ],
+  "order_summary.label.free": [
+    {
+      "type": 0,
+      "value": "Gratuita"
+    }
+  ],
+  "order_summary.label.order_total": [
+    {
+      "type": 0,
+      "value": "Totale ordine"
+    }
+  ],
+  "order_summary.label.promo_applied": [
+    {
+      "type": 0,
+      "value": "promozione applicata"
+    }
+  ],
+  "order_summary.label.promotions_applied": [
+    {
+      "type": 0,
+      "value": "Promozioni applicate"
+    }
+  ],
+  "order_summary.label.shipping": [
+    {
+      "type": 0,
+      "value": "Spedizione"
+    }
+  ],
+  "order_summary.label.subtotal": [
+    {
+      "type": 0,
+      "value": "Subtotale"
+    }
+  ],
+  "order_summary.label.tax": [
+    {
+      "type": 0,
+      "value": "Imposta"
+    }
+  ],
+  "page_not_found.action.go_back": [
+    {
+      "type": 0,
+      "value": "Torna alla pagina precedente"
+    }
+  ],
+  "page_not_found.link.homepage": [
+    {
+      "type": 0,
+      "value": "Vai alla pagina principale"
+    }
+  ],
+  "page_not_found.message.suggestion_to_try": [
+    {
+      "type": 0,
+      "value": "Prova a inserire di nuovo l'indirizzo tornando alla pagina precedente o passando alla pagina principale."
+    }
+  ],
+  "page_not_found.title.page_cant_be_found": [
+    {
+      "type": 0,
+      "value": "Impossibile trovare la pagina che stai cercando."
+    }
+  ],
+  "pagination.field.num_of_pages": [
+    {
+      "type": 0,
+      "value": "di "
+    },
+    {
+      "type": 1,
+      "value": "numOfPages"
+    }
+  ],
+  "pagination.link.next": [
+    {
+      "type": 0,
+      "value": "Avanti"
+    }
+  ],
+  "pagination.link.prev": [
+    {
+      "type": 0,
+      "value": "Indietro"
+    }
+  ],
+  "password_card.info.password_updated": [
+    {
+      "type": 0,
+      "value": "Password aggiornata"
+    }
+  ],
+  "password_card.label.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "password_card.title.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "password_requirements.error.eight_letter_minimum": [
+    {
+      "type": 0,
+      "value": "Minimo 8 caratteri"
+    }
+  ],
+  "password_requirements.error.one_lowercase_letter": [
+    {
+      "type": 0,
+      "value": "1 lettera minuscola"
+    }
+  ],
+  "password_requirements.error.one_number": [
+    {
+      "type": 0,
+      "value": "1 numero"
+    }
+  ],
+  "password_requirements.error.one_special_character": [
+    {
+      "type": 0,
+      "value": "1 carattere speciale (ad esempio: , $ ! % #)"
+    }
+  ],
+  "password_requirements.error.one_uppercase_letter": [
+    {
+      "type": 0,
+      "value": "1 lettera maiuscola"
+    }
+  ],
+  "payment_selection.button.save_and_continue": [
+    {
+      "type": 0,
+      "value": "Salva e continua"
+    }
+  ],
+  "payment_selection.heading.add_new_card": [
+    {
+      "type": 0,
+      "value": "Aggiungi nuova carta"
+    }
+  ],
+  "payment_selection.heading.credit_card": [
+    {
+      "type": 0,
+      "value": "Carta di credito"
+    }
+  ],
+  "payment_selection.message.select_payment_method": [
+    {
+      "type": 0,
+      "value": "Seleziona un metodo di pagamento."
+    }
+  ],
+  "payment_selection.tooltip.secure_payment": [
+    {
+      "type": 0,
+      "value": "Questo è un pagamento crittografato con SSL sicuro."
+    }
+  ],
+  "price_per_item.label.each": [
+    {
+      "type": 0,
+      "value": " cad."
+    }
+  ],
+  "product_detail.accordion.button.product_detail": [
+    {
+      "type": 0,
+      "value": "Dettagli prodotto"
+    }
+  ],
+  "product_detail.accordion.button.questions": [
+    {
+      "type": 0,
+      "value": "Domande"
+    }
+  ],
+  "product_detail.accordion.button.reviews": [
+    {
+      "type": 0,
+      "value": "Revisioni"
+    }
+  ],
+  "product_detail.accordion.button.size_fit": [
+    {
+      "type": 0,
+      "value": "Taglie e vestibilità"
+    }
+  ],
+  "product_detail.accordion.message.coming_soon": [
+    {
+      "type": 0,
+      "value": "In arrivo"
+    }
+  ],
+  "product_detail.recommended_products.title.complete_set": [
+    {
+      "type": 0,
+      "value": "Completamento del set"
+    }
+  ],
+  "product_detail.recommended_products.title.might_also_like": [
+    {
+      "type": 0,
+      "value": "Potrebbe interessarti anche"
+    }
+  ],
+  "product_detail.recommended_products.title.recently_viewed": [
+    {
+      "type": 0,
+      "value": "Visualizzati di recente"
+    }
+  ],
+  "product_item.label.quantity": [
+    {
+      "type": 0,
+      "value": "Quantità:"
+    }
+  ],
+  "product_list.button.filter": [
+    {
+      "type": 0,
+      "value": "Filtro"
+    }
+  ],
+  "product_list.button.sort_by": [
+    {
+      "type": 0,
+      "value": "Ordina per: "
+    },
+    {
+      "type": 1,
+      "value": "sortOption"
+    }
+  ],
+  "product_list.drawer.title.sort_by": [
+    {
+      "type": 0,
+      "value": "Ordina per"
+    }
+  ],
+  "product_list.modal.button.clear_filters": [
+    {
+      "type": 0,
+      "value": "Cancella filtri"
+    }
+  ],
+  "product_list.modal.button.view_items": [
+    {
+      "type": 0,
+      "value": "Visualizza "
+    },
+    {
+      "type": 1,
+      "value": "prroductCount"
+    },
+    {
+      "type": 0,
+      "value": " articoli"
+    }
+  ],
+  "product_list.modal.title.filter": [
+    {
+      "type": 0,
+      "value": "Filtro"
+    }
+  ],
+  "product_list.select.sort_by": [
+    {
+      "type": 0,
+      "value": "Ordina per: "
+    },
+    {
+      "type": 1,
+      "value": "sortOption"
+    }
+  ],
+  "product_tile.assistive_msg.wishlist": [
+    {
+      "type": 0,
+      "value": "Lista desideri"
+    }
+  ],
+  "product_view.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "Aggiungi al carrello"
+    }
+  ],
+  "product_view.button.add_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Aggiungi alla lista desideri"
+    }
+  ],
+  "product_view.button.update": [
+    {
+      "type": 0,
+      "value": "Aggiornati"
+    }
+  ],
+  "product_view.label.quantity": [
+    {
+      "type": 0,
+      "value": "Quantità"
+    }
+  ],
+  "product_view.link.full_details": [
+    {
+      "type": 0,
+      "value": "Vedi tutti i dettagli"
+    }
+  ],
+  "profile_card.info.profile_updated": [
+    {
+      "type": 0,
+      "value": "Profilo aggiornato"
+    }
+  ],
+  "profile_card.label.email": [
+    {
+      "type": 0,
+      "value": "E-mail"
+    }
+  ],
+  "profile_card.label.full_name": [
+    {
+      "type": 0,
+      "value": "Nome completo"
+    }
+  ],
+  "profile_card.label.phone": [
+    {
+      "type": 0,
+      "value": "Numero di telefono"
+    }
+  ],
+  "profile_card.message.not_provided": [
+    {
+      "type": 0,
+      "value": "Non specificato"
+    }
+  ],
+  "profile_card.title.my_profile": [
+    {
+      "type": 0,
+      "value": "Il mio profilo"
+    }
+  ],
+  "promo_code_fields.button.apply": [
+    {
+      "type": 0,
+      "value": "Applica"
+    }
+  ],
+  "promo_popover.heading.promo_applied": [
+    {
+      "type": 0,
+      "value": "Promozioni applicate"
+    }
+  ],
+  "promocode.accordion.button.have_promocode": [
+    {
+      "type": 0,
+      "value": "Hai un codice promozionale?"
+    }
+  ],
+  "recent_searches.action.clear_searches": [
+    {
+      "type": 0,
+      "value": "Cancella ricerche recenti"
+    }
+  ],
+  "recent_searches.heading.recent_searches": [
+    {
+      "type": 0,
+      "value": "Ricerche recenti"
+    }
+  ],
+  "register_form.action.sign_in": [
+    {
+      "type": 0,
+      "value": "Accedi"
+    }
+  ],
+  "register_form.button.create_account": [
+    {
+      "type": 0,
+      "value": "Crea account"
+    }
+  ],
+  "register_form.heading.lets_get_started": [
+    {
+      "type": 0,
+      "value": "Iniziamo!"
+    }
+  ],
+  "register_form.message.agree_to_policy_terms": [
+    {
+      "type": 0,
+      "value": "Creando un account, accetti l<policy>Informativa sulla privacy</policy> e i <terms>Termini e condizioni</terms> di Salesforce"
+    }
+  ],
+  "register_form.message.already_have_account": [
+    {
+      "type": 0,
+      "value": "Hai già un account?"
+    }
+  ],
+  "register_form.message.create_an_account": [
+    {
+      "type": 0,
+      "value": "Crea un account e accedi in esclusiva ai prodotti, alle idee e alle community migliori."
+    }
+  ],
+  "reset_password.button.back_to_sign_in": [
+    {
+      "type": 0,
+      "value": "Torna all'accesso"
+    }
+  ],
+  "reset_password.info.receive_email_shortly": [
+    {
+      "type": 0,
+      "value": "A breve riceverai un'email all'indirizzo "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " con un link per la reimpostazione della password."
+    }
+  ],
+  "reset_password.title.password_reset": [
+    {
+      "type": 0,
+      "value": "Reimpostazione password"
+    }
+  ],
+  "reset_password_form.action.sign_in": [
+    {
+      "type": 0,
+      "value": "Accedi"
+    }
+  ],
+  "reset_password_form.button.reset_password": [
+    {
+      "type": 0,
+      "value": "Reimposta password"
+    }
+  ],
+  "reset_password_form.message.enter_your_email": [
+    {
+      "type": 0,
+      "value": "Inserisci il tuo indirizzo email per ricevere istruzioni su come reimpostare la password"
+    }
+  ],
+  "reset_password_form.message.return_to_sign_in": [
+    {
+      "type": 0,
+      "value": "Oppure torna a"
+    }
+  ],
+  "reset_password_form.title.reset_password": [
+    {
+      "type": 0,
+      "value": "Reimposta password"
+    }
+  ],
+  "search.action.cancel": [
+    {
+      "type": 0,
+      "value": "Annulla"
+    }
+  ],
+  "selected_refinements.action.clear_all": [
+    {
+      "type": 0,
+      "value": "Deseleziona tutto"
+    }
+  ],
+  "shipping_address.button.continue_to_shipping": [
+    {
+      "type": 0,
+      "value": "Passa al metodo di spedizione"
+    }
+  ],
+  "shipping_address.title.shipping_address": [
+    {
+      "type": 0,
+      "value": "Indirizzo di spedizione"
+    }
+  ],
+  "shipping_address_edit_form.button.save_and_continue": [
+    {
+      "type": 0,
+      "value": "Salva e passa al metodo di spedizione"
+    }
+  ],
+  "shipping_address_form.heading.edit_address": [
+    {
+      "type": 0,
+      "value": "Modifica indirizzo"
+    }
+  ],
+  "shipping_address_form.heading.new_address": [
+    {
+      "type": 0,
+      "value": "Aggiungi nuovo indirizzo"
+    }
+  ],
+  "shipping_address_selection.button.add_address": [
+    {
+      "type": 0,
+      "value": "Aggiungi nuovo indirizzo"
+    }
+  ],
+  "shipping_address_selection.button.submit": [
+    {
+      "type": 0,
+      "value": "Invia"
+    }
+  ],
+  "shipping_address_selection.title.add_address": [
+    {
+      "type": 0,
+      "value": "Aggiungi nuovo indirizzo"
+    }
+  ],
+  "shipping_address_selection.title.edit_shipping": [
+    {
+      "type": 0,
+      "value": "Modifica indirizzo di spedizione"
+    }
+  ],
+  "shipping_options.action.send_as_a_gift": [
+    {
+      "type": 0,
+      "value": "Inviare come regalo?"
+    }
+  ],
+  "shipping_options.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "Passa al pagamento"
+    }
+  ],
+  "shipping_options.title.shipping_gift_options": [
+    {
+      "type": 0,
+      "value": "Opzioni di spedizione e regalo"
+    }
+  ],
+  "signout_confirmation_dialog.button.cancel": [
+    {
+      "type": 0,
+      "value": "Annulla"
+    }
+  ],
+  "signout_confirmation_dialog.button.sign_out": [
+    {
+      "type": 0,
+      "value": "Esci"
+    }
+  ],
+  "signout_confirmation_dialog.heading.sign_out": [
+    {
+      "type": 0,
+      "value": "Esci"
+    }
+  ],
+  "signout_confirmation_dialog.message.sure_to_sign_out": [
+    {
+      "type": 0,
+      "value": "Uscire? Per procedere con l'ordine corrente devi eseguire di nuovo l'accesso."
+    }
+  ],
+  "toggle_card.action.edit": [
+    {
+      "type": 0,
+      "value": "Modifica"
+    }
+  ],
+  "update_password_fields.button.forgot_password": [
+    {
+      "type": 0,
+      "value": "Password dimenticata?"
+    }
+  ],
+  "use_address_fields.error.please_enter_first_name": [
+    {
+      "type": 0,
+      "value": "Inserisci il nome."
+    }
+  ],
+  "use_address_fields.error.please_enter_last_name": [
+    {
+      "type": 0,
+      "value": "Inserisci il cognome."
+    }
+  ],
+  "use_address_fields.error.please_enter_phone_number": [
+    {
+      "type": 0,
+      "value": "Inserisci il numero di telefono."
+    }
+  ],
+  "use_address_fields.error.please_enter_your_postal_or_zip": [
+    {
+      "type": 0,
+      "value": "Inserisci il "
+    },
+    {
+      "type": 1,
+      "value": "postalOrZip"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "use_address_fields.error.please_select_your_address": [
+    {
+      "type": 0,
+      "value": "Inserisci l'indirizzo."
+    }
+  ],
+  "use_address_fields.error.please_select_your_city": [
+    {
+      "type": 0,
+      "value": "Inserisci la città."
+    }
+  ],
+  "use_address_fields.error.please_select_your_country": [
+    {
+      "type": 0,
+      "value": "Seleziona il Paese."
+    }
+  ],
+  "use_address_fields.error.please_select_your_state_or_province": [
+    {
+      "type": 0,
+      "value": "Seleziona "
+    },
+    {
+      "type": 1,
+      "value": "stateOrProvince"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "use_address_fields.error.required": [
+    {
+      "type": 0,
+      "value": "Obbligatorio"
+    }
+  ],
+  "use_address_fields.error.state_code_invalid": [
+    {
+      "type": 0,
+      "value": "Inserisci la provincia di 2 lettere."
+    }
+  ],
+  "use_address_fields.label.address": [
+    {
+      "type": 0,
+      "value": "Indirizzo"
+    }
+  ],
+  "use_address_fields.label.city": [
+    {
+      "type": 0,
+      "value": "Città"
+    }
+  ],
+  "use_address_fields.label.country": [
+    {
+      "type": 0,
+      "value": "Paese"
+    }
+  ],
+  "use_address_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "Nome"
+    }
+  ],
+  "use_address_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Cognome"
+    }
+  ],
+  "use_address_fields.label.phone": [
+    {
+      "type": 0,
+      "value": "Telefono"
+    }
+  ],
+  "use_address_fields.label.postal_code": [
+    {
+      "type": 0,
+      "value": "Codice postale"
+    }
+  ],
+  "use_address_fields.label.preferred": [
+    {
+      "type": 0,
+      "value": "Imposta come predefinito"
+    }
+  ],
+  "use_address_fields.label.province": [
+    {
+      "type": 0,
+      "value": "Provincia"
+    }
+  ],
+  "use_address_fields.label.state": [
+    {
+      "type": 0,
+      "value": "Stato"
+    }
+  ],
+  "use_address_fields.label.zipCode": [
+    {
+      "type": 0,
+      "value": "CAP"
+    }
+  ],
+  "use_credit_card_fields.error.required": [
+    {
+      "type": 0,
+      "value": "Obbligatorio"
+    }
+  ],
+  "use_credit_card_fields.error.required_card_number": [
+    {
+      "type": 0,
+      "value": "Inserisci il numero di carta."
+    }
+  ],
+  "use_credit_card_fields.error.required_expiry": [
+    {
+      "type": 0,
+      "value": "Inserisci la data di scadenza."
+    }
+  ],
+  "use_credit_card_fields.error.required_name": [
+    {
+      "type": 0,
+      "value": "Inserisci il tuo nome come compare sulla carta."
+    }
+  ],
+  "use_credit_card_fields.error.required_security_code": [
+    {
+      "type": 0,
+      "value": "Inserisci il codice di sicurezza."
+    }
+  ],
+  "use_credit_card_fields.error.valid_card_number": [
+    {
+      "type": 0,
+      "value": "Inserisci un numero di carta valido."
+    }
+  ],
+  "use_credit_card_fields.error.valid_date": [
+    {
+      "type": 0,
+      "value": "Inserisci una data valida."
+    }
+  ],
+  "use_credit_card_fields.error.valid_name": [
+    {
+      "type": 0,
+      "value": "Inserisci un nome valido."
+    }
+  ],
+  "use_credit_card_fields.error.valid_security_code": [
+    {
+      "type": 0,
+      "value": "Inserisci un codice di sicurezza valido."
+    }
+  ],
+  "use_credit_card_fields.label.card_number": [
+    {
+      "type": 0,
+      "value": "Numero carta"
+    }
+  ],
+  "use_credit_card_fields.label.card_type": [
+    {
+      "type": 0,
+      "value": "Tipo di carta"
+    }
+  ],
+  "use_credit_card_fields.label.expiry": [
+    {
+      "type": 0,
+      "value": "Data di scadenza"
+    }
+  ],
+  "use_credit_card_fields.label.name": [
+    {
+      "type": 0,
+      "value": "Nome sulla carta"
+    }
+  ],
+  "use_credit_card_fields.label.security_code": [
+    {
+      "type": 0,
+      "value": "Codice di sicurezza"
+    }
+  ],
+  "use_login_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Inserisci l'indirizzo email."
+    }
+  ],
+  "use_login_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "Inserisci la password."
+    }
+  ],
+  "use_login_fields.label.email": [
+    {
+      "type": 0,
+      "value": "E-mail"
+    }
+  ],
+  "use_login_fields.label.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "use_product.message.inventory_remaining": [
+    {
+      "type": 0,
+      "value": "Solo "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": " rimasti!"
+    }
+  ],
+  "use_product.message.out_of_stock": [
+    {
+      "type": 0,
+      "value": "Esaurito"
+    }
+  ],
+  "use_profile_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Inserisci un indirizzo e-mail valido."
+    }
+  ],
+  "use_profile_fields.error.required_first_name": [
+    {
+      "type": 0,
+      "value": "Inserisci il nome."
+    }
+  ],
+  "use_profile_fields.error.required_last_name": [
+    {
+      "type": 0,
+      "value": "Inserisci il cognome."
+    }
+  ],
+  "use_profile_fields.error.required_phone": [
+    {
+      "type": 0,
+      "value": "Inserisci il numero di telefono."
+    }
+  ],
+  "use_profile_fields.label.email": [
+    {
+      "type": 0,
+      "value": "E-mail"
+    }
+  ],
+  "use_profile_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "Nome"
+    }
+  ],
+  "use_profile_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Cognome"
+    }
+  ],
+  "use_profile_fields.label.phone": [
+    {
+      "type": 0,
+      "value": "Numero di telefono"
+    }
+  ],
+  "use_promo_code_fields.error.required_promo_code": [
+    {
+      "type": 0,
+      "value": "Specifica un codice promozionale valido."
+    }
+  ],
+  "use_promo_code_fields.label.promo_code": [
+    {
+      "type": 0,
+      "value": "Codice promozionale"
+    }
+  ],
+  "use_promocode.error.check_the_code": [
+    {
+      "type": 0,
+      "value": "Controlla il codice e riprova. È possibile che sia già stato applicato o che la promozione sia scaduta."
+    }
+  ],
+  "use_promocode.info.promo_applied": [
+    {
+      "type": 0,
+      "value": "promozione applicata"
+    }
+  ],
+  "use_promocode.info.promo_removed": [
+    {
+      "type": 0,
+      "value": "Promozione eliminata"
+    }
+  ],
+  "use_registration_fields.error.contain_number": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno un numero."
+    }
+  ],
+  "use_registration_fields.error.lowercase_letter": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno una lettera minuscola."
+    }
+  ],
+  "use_registration_fields.error.minimum_characters": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno 8 caratteri."
+    }
+  ],
+  "use_registration_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Inserisci un indirizzo e-mail valido."
+    }
+  ],
+  "use_registration_fields.error.required_first_name": [
+    {
+      "type": 0,
+      "value": "Inserisci il nome."
+    }
+  ],
+  "use_registration_fields.error.required_last_name": [
+    {
+      "type": 0,
+      "value": "Inserisci il cognome."
+    }
+  ],
+  "use_registration_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "Creare una password."
+    }
+  ],
+  "use_registration_fields.error.special_character": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno un carattere speciale."
+    }
+  ],
+  "use_registration_fields.error.uppercase_letter": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno una lettera maiuscola."
+    }
+  ],
+  "use_registration_fields.label.email": [
+    {
+      "type": 0,
+      "value": "E-mail"
+    }
+  ],
+  "use_registration_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "Nome"
+    }
+  ],
+  "use_registration_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Cognome"
+    }
+  ],
+  "use_registration_fields.label.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "use_registration_fields.label.sign_up_to_emails": [
+    {
+      "type": 0,
+      "value": "Iscrivimi alle email di Salesforce (puoi annullare l'iscrizione in qualsiasi momento)"
+    }
+  ],
+  "use_reset_password_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Inserisci un indirizzo e-mail valido."
+    }
+  ],
+  "use_reset_password_fields.label.email": [
+    {
+      "type": 0,
+      "value": "E-mail"
+    }
+  ],
+  "use_update_password_fields.error.contain_number": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno un numero."
+    }
+  ],
+  "use_update_password_fields.error.lowercase_letter": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno una lettera minuscola."
+    }
+  ],
+  "use_update_password_fields.error.minimum_characters": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno 8 caratteri."
+    }
+  ],
+  "use_update_password_fields.error.required_new_password": [
+    {
+      "type": 0,
+      "value": "Specifica una nuova password."
+    }
+  ],
+  "use_update_password_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "Inserisci la password."
+    }
+  ],
+  "use_update_password_fields.error.special_character": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno un carattere speciale."
+    }
+  ],
+  "use_update_password_fields.error.uppercase_letter": [
+    {
+      "type": 0,
+      "value": "La password deve contenere almeno una lettera maiuscola."
+    }
+  ],
+  "use_update_password_fields.label.current_password": [
+    {
+      "type": 0,
+      "value": "Password corrente"
+    }
+  ],
+  "use_update_password_fields.label.new_password": [
+    {
+      "type": 0,
+      "value": "Nuova password"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "Aggiungi al carrello"
+    }
+  ],
+  "wishlist_primary_action.button.select_options": [
+    {
+      "type": 0,
+      "value": "Seleziona opzioni"
+    }
+  ],
+  "wishlist_primary_action.info.added_to_cart": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "articolo aggiunto"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "articoli aggiunti"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " al carrello"
+    }
+  ],
+  "wishlist_secondary_button_group.action.remove": [
+    {
+      "type": 0,
+      "value": "Rimuovi"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item_removed": [
+    {
+      "type": 0,
+      "value": "Articolo rimosso dalla lista desideri"
+    }
+  ],
+  "with_registration.info.please_sign_in": [
+    {
+      "type": 0,
+      "value": "Accedi per continuare!"
+    }
+  ]
+}
