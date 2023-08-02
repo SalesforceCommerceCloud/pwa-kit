@@ -283,6 +283,7 @@ export const createBundle = async ({
                     devDependencies = {},
                     ccExtensibility = {extends: '', overridesDir: ''}
                 } = await getProjectPkg()
+                const extendsTemplate = 'node_modules/' + ccExtensibility.extends
 
                 let cc_overrides: string[] = []
                 if (ccExtensibility.overridesDir) {
@@ -290,16 +291,12 @@ export const createBundle = async ({
                         ccExtensibility.overridesDir,
                         ccExtensibility.overridesDir
                     )
-                    const extends_files = await walkDir(
-                        'node_modules/' + ccExtensibility.extends,
-                        'node_modules/' + ccExtensibility.extends
-                    )
+                    const extends_files = await walkDir(extendsTemplate, extendsTemplate)
                     console.log('overrides files', overrides_files)
                     console.log('extends files', extends_files)
                     cc_overrides = Array.from(overrides_files).filter((item) =>
                         extends_files.has(item)
                     )
-                    console.log('CC OVERRIDES', cc_overrides)
                 }
                 bundle_metadata = {
                     dependencies: {...dependencies, ...devDependencies},
