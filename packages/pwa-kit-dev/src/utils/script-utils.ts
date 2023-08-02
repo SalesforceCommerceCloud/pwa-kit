@@ -90,17 +90,17 @@ export const getProjectPkg = async (): Promise<Pkg> => {
  * @param dir Directory to walk
  * @returns Set of file paths within the directory
  */
-export const walkDir = async (dir: string): Promise<Set<string>> => {
+export const walkDir = async (dir: string, baseDir: string): Promise<Set<string>> => {
     const fileSet: Set<string> = new Set()
     const entries: Dirent[] = await readdir(dir, {withFileTypes: true})
 
     for (const entry of entries) {
         const entryPath: string = path.join(dir, entry.name)
         if (entry.isDirectory()) {
-            const subFileSet: Set<string> = await walkDir(entryPath)
+            const subFileSet: Set<string> = await walkDir(entryPath, baseDir)
             subFileSet.forEach((file) => fileSet.add(file))
         } else {
-            fileSet.add(entryPath)
+            fileSet.add(entryPath.replace(baseDir + path.sep, ''))
         }
     }
 
@@ -286,8 +286,14 @@ export const createBundle = async ({
 
                 let cc_overrides: string[] = []
                 if (ccExtensibility.overridesDir) {
-                    const overrides_files = await walkDir(ccExtensibility.overridesDir)
-                    const extends_files = await walkDir('node_modules/' + ccExtensibility.extends)
+                    const overrides_files = await walkDir(
+                        ccExtensibility.overridesDir,
+                        ccExtensibility.overridesDir
+                    )
+                    const extends_files = await walkDir(
+                        'node_modules/' + ccExtensibility.extends,
+                        'node_modules/' + ccExtensibility.extends
+                    )
                     console.log('overrides files', overrides_files)
                     console.log('extends files', extends_files)
                     cc_overrides = Array.from(overrides_files).filter((item) =>
