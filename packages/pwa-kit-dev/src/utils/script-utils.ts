@@ -9,8 +9,8 @@ import path from 'path'
 import archiver, {EntryData} from 'archiver'
 import {default as _fetch, Response} from 'node-fetch'
 import {URL} from 'url'
-import {readFile, stat, mkdtemp, rm} from 'fs/promises'
-import {createWriteStream, Stats} from 'fs'
+import {readFile, stat, mkdtemp, rm, readdir} from 'fs/promises'
+import {createWriteStream, Stats, Dirent} from 'fs'
 import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
@@ -48,6 +48,7 @@ interface Bundle {
 interface Pkg {
     name: string
     version: string
+    ccExtensibility?: {extends: string; overridesDir: string}
     dependencies?: {[key: string]: string}
     devDependencies?: {[key: string]: string}
 }
@@ -82,6 +83,28 @@ export const getProjectPkg = async (): Promise<Pkg> => {
     } catch {
         throw new Error(`Could not read project package at "${p}"`)
     }
+}
+
+/**
+ * Get the set of file paths within a specific directory
+ * @param dir Directory to walk
+ * @returns Set of file paths within the directory
+ */
+export const walkDir = async (dir: string): Promise<Set<string>> => {
+    const fileSet: Set<string> = new Set()
+    const entries: Dirent[] = await readdir(dir, {withFileTypes: true})
+
+    for (const entry of entries) {
+        const entryPath: string = path.join(dir, entry.name)
+        if (entry.isDirectory()) {
+            const subFileSet: Set<string> = await walkDir(entryPath)
+            subFileSet.forEach((file) => fileSet.add(file))
+        } else {
+            fileSet.add(entryPath)
+        }
+    }
+
+    return fileSet
 }
 
 export class CloudAPIClient {
@@ -255,9 +278,26 @@ export const createBundle = async ({
                     })
             )
             .then(async () => {
-                const {dependencies = {}, devDependencies = {}} = await getProjectPkg()
+                const {
+                    dependencies = {},
+                    devDependencies = {},
+                    ccExtensibility = {extends: '', overridesDir: ''}
+                } = await getProjectPkg()
+
+                let cc_overrides: string[] = []
+                if (ccExtensibility.overridesDir) {
+                    const overrides_files = await walkDir(ccExtensibility.overridesDir)
+                    const extends_files = await walkDir('node_modules/' + ccExtensibility.extends)
+                    console.log('overrides files', overrides_files)
+                    console.log('extends files', extends_files)
+                    cc_overrides = Array.from(overrides_files).filter((item) =>
+                        extends_files.has(item)
+                    )
+                    console.log('CC OVERRIDES', cc_overrides)
+                }
                 bundle_metadata = {
-                    dependencies: {...dependencies, ...devDependencies}
+                    dependencies: {...dependencies, ...devDependencies},
+                    cc_overrides: cc_overrides
                 }
             })
             .then(() => readFile(destination))
