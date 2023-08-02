@@ -344,7 +344,6 @@ const main = async () => {
                     origin: cloudOrigin
                 })
 
-                console.log('BUNDLE METADATA', bundle.bundle_metadata)
                 info(`Beginning upload to ${cloudOrigin}`)
                 const data = await client.push(bundle, projectSlug, target)
                 const warnings = data.warnings || []

@@ -292,8 +292,6 @@ export const createBundle = async ({
                         ccExtensibility.overridesDir
                     )
                     const extends_files = await walkDir(extendsTemplate, extendsTemplate)
-                    console.log('overrides files', overrides_files)
-                    console.log('extends files', extends_files)
                     cc_overrides = Array.from(overrides_files).filter((item) =>
                         extends_files.has(item)
                     )
