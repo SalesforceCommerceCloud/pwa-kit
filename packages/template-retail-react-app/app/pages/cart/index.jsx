@@ -58,6 +58,7 @@ import {
     HideOnMobile
 } from '@salesforce/retail-react-app/app/components/responsive/index'
 import ProductRecommendations from '@salesforce/retail-react-app/app/pages/cart/product-recommendations'
+import {SelectedItemContext} from '@salesforce/retail-react-app/app/pages/cart/use-selected-item'
 
 const Cart = () => {
     // TODO: useData ?
@@ -98,11 +99,11 @@ const Cart = () => {
     const [localQuantity, setLocalQuantity] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {isOpen, onOpen, onClose} = useDisclosure() // for ProductViewModal
     const {formatMessage} = useIntl()
     const toast = useToast()
     const navigate = useNavigation()
-    const modalProps = useDisclosure()
+    const modalProps = useDisclosure() // for ConfirmationModal
 
     /******************* Shipping Methods for basket shipment *******************/
     // do this action only if the basket shipping method is not defined
@@ -189,6 +190,7 @@ const Cart = () => {
     /**************** Wishlist ****************/
 
     /***************************** Update Cart **************************/
+    // TODO: useProductViewModalHandlers()
     const handleUpdateCart = async (variant, quantity) => {
         // close the modal before handle the change
         onClose()
@@ -346,108 +348,112 @@ const Cart = () => {
         return <EmptyCart isRegistered={isRegistered} />
     }
     return (
-        <Box background="gray.50" flex="1" data-testid="sf-cart-container">
-            <Container
-                maxWidth="container.xl"
-                px={[4, 6, 6, 4]}
-                paddingTop={{base: 8, lg: 8}}
-                paddingBottom={{base: 8, lg: 14}}
-            >
-                <Stack spacing={24}>
-                    <Stack spacing={4}>
-                        <CartTitle />
+        <SelectedItemContext.Provider value={{selectedItem, setSelectedItem}}>
+            <Box background="gray.50" flex="1" data-testid="sf-cart-container">
+                <Container
+                    maxWidth="container.xl"
+                    px={[4, 6, 6, 4]}
+                    paddingTop={{base: 8, lg: 8}}
+                    paddingBottom={{base: 8, lg: 14}}
+                >
+                    <Stack spacing={24}>
+                        <Stack spacing={4}>
+                            <CartTitle />
 
-                        <Grid
-                            templateColumns={{base: '1fr', lg: '66% 1fr'}}
-                            gap={{base: 10, xl: 20}}
-                        >
-                            <GridItem>
-                                {/* TODO: extract product items */}
-                                <Stack spacing={4}>
-                                    {basket.productItems?.map((productItem, idx) => {
-                                        return (
-                                            <ProductItem
-                                                key={productItem.productId}
-                                                index={idx}
-                                                secondaryActions={
-                                                    <CartSecondaryButtonGroup
-                                                        onAddToWishlistClick={handleAddToWishlist}
-                                                        onEditClick={(product) => {
-                                                            setSelectedItem(product)
-                                                            onOpen()
-                                                        }}
-                                                        onRemoveItemClick={handleRemoveItem}
-                                                    />
+                            <Grid
+                                templateColumns={{base: '1fr', lg: '66% 1fr'}}
+                                gap={{base: 10, xl: 20}}
+                            >
+                                <GridItem>
+                                    {/* TODO: extract product items */}
+                                    <Stack spacing={4}>
+                                        {basket.productItems?.map((productItem, idx) => {
+                                            return (
+                                                <ProductItem
+                                                    key={productItem.productId}
+                                                    index={idx}
+                                                    secondaryActions={
+                                                        <CartSecondaryButtonGroup
+                                                            onAddToWishlistClick={
+                                                                handleAddToWishlist
+                                                            }
+                                                            onEditClick={(product) => {
+                                                                setSelectedItem(product)
+                                                                onOpen()
+                                                            }}
+                                                            onRemoveItemClick={handleRemoveItem}
+                                                        />
+                                                    }
+                                                    product={{
+                                                        ...productItem,
+                                                        ...(products &&
+                                                            products[productItem.productId]),
+                                                        price: productItem.price,
+                                                        quantity: localQuantity[productItem.itemId]
+                                                            ? localQuantity[productItem.itemId]
+                                                            : productItem.quantity
+                                                    }}
+                                                    onItemQuantityChange={handleChangeItemQuantity.bind(
+                                                        this,
+                                                        productItem
+                                                    )}
+                                                    showLoading={
+                                                        isCartItemLoading &&
+                                                        selectedItem?.itemId === productItem.itemId
+                                                    }
+                                                    handleRemoveItem={handleRemoveItem}
+                                                />
+                                            )
+                                        })}
+                                    </Stack>
+                                    <Box>
+                                        {/* TODO: extract modal */}
+                                        {isOpen && (
+                                            <ProductViewModal
+                                                isOpen={isOpen}
+                                                onOpen={onOpen}
+                                                onClose={onClose}
+                                                product={selectedItem}
+                                                updateCart={(variant, quantity) =>
+                                                    handleUpdateCart(variant, quantity)
                                                 }
-                                                product={{
-                                                    ...productItem,
-                                                    ...(products &&
-                                                        products[productItem.productId]),
-                                                    price: productItem.price,
-                                                    quantity: localQuantity[productItem.itemId]
-                                                        ? localQuantity[productItem.itemId]
-                                                        : productItem.quantity
-                                                }}
-                                                onItemQuantityChange={handleChangeItemQuantity.bind(
-                                                    this,
-                                                    productItem
-                                                )}
-                                                showLoading={
-                                                    isCartItemLoading &&
-                                                    selectedItem?.itemId === productItem.itemId
-                                                }
-                                                handleRemoveItem={handleRemoveItem}
                                             />
-                                        )
-                                    })}
-                                </Stack>
-                                <Box>
-                                    {/* TODO: extract modal */}
-                                    {isOpen && (
-                                        <ProductViewModal
-                                            isOpen={isOpen}
-                                            onOpen={onOpen}
-                                            onClose={onClose}
-                                            product={selectedItem}
-                                            updateCart={(variant, quantity) =>
-                                                handleUpdateCart(variant, quantity)
-                                            }
+                                        )}
+                                    </Box>
+                                </GridItem>
+                                <GridItem>
+                                    <Stack spacing={4}>
+                                        <OrderSummary
+                                            showPromoCodeForm={true}
+                                            isEstimate={true}
+                                            basket={basket}
                                         />
-                                    )}
-                                </Box>
-                            </GridItem>
-                            <GridItem>
-                                <Stack spacing={4}>
-                                    <OrderSummary
-                                        showPromoCodeForm={true}
-                                        isEstimate={true}
-                                        basket={basket}
-                                    />
-                                    <HideOnMobile>
-                                        <CartCta />
-                                    </HideOnMobile>
-                                </Stack>
-                            </GridItem>
-                        </Grid>
+                                        <HideOnMobile>
+                                            <CartCta />
+                                        </HideOnMobile>
+                                    </Stack>
+                                </GridItem>
+                            </Grid>
 
-                        <ProductRecommendations />
+                            <ProductRecommendations />
+                        </Stack>
                     </Stack>
-                </Stack>
-            </Container>
+                </Container>
 
-            <HideOnDesktop h="130px" position="sticky" bottom={0} bg="white" align="center">
-                <CartCta />
-            </HideOnDesktop>
+                <HideOnDesktop h="130px" position="sticky" bottom={0} bg="white" align="center">
+                    <CartCta />
+                </HideOnDesktop>
 
-            <ConfirmationModal
-                {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
-                onPrimaryAction={() => {
-                    handleRemoveItem(selectedItem)
-                }}
-                onAlternateAction={() => {}}
-                {...modalProps}
-            />
-        </Box>
+                <ConfirmationModal
+                    {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
+                    onPrimaryAction={() => {
+                        handleRemoveItem(selectedItem)
+                    }}
+                    onAlternateAction={() => {}}
+                    {...modalProps}
+                />
+            </Box>
+        </SelectedItemContext.Provider>
     )
 }
 

@@ -20,6 +20,8 @@ import debounce from 'lodash/debounce'
 import {useProductItems} from '@salesforce/retail-react-app/app/pages/cart/use-product-items'
 import {useAssignDefaultShippingMethod} from '@salesforce/retail-react-app/app/pages/cart/use-assign-default-shipping-method'
 import {useAddToWishlist} from '@salesforce/retail-react-app/app/pages/cart/use-add-to-wishlist'
+import {useShowGenericError} from '@salesforce/retail-react-app/app/pages/cart/use-show-generic-error'
+import {useChangeItemQuantity} from '@salesforce/retail-react-app/app/pages/cart/use-change-item-quantity'
 
 const ProductItems = () => {
     const {currentBasket, productItems} = useProductItems()
@@ -42,52 +44,15 @@ const ProductItems = () => {
 
     useAssignDefaultShippingMethod(basket)
     const handleAddToWishlist = useAddToWishlist()
+    const showError = useShowGenericError()
 
-    /************************* Error handling ***********************/
-    const showError = () => {
-        toast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            status: 'error'
-        })
-    }
-    /************************* Error handling ***********************/
+    const _changeItemQuantity = useChangeItemQuantity({
+        basket,
+        setLocalQuantity,
+        setCartItemLoading
+    })
+    const changeItemQuantity = debounce(_changeItemQuantity, 750)
 
-    /***************************** Update quantity **************************/
-    const changeItemQuantity = debounce(async (quantity, product) => {
-        // This local state allows the dropdown to show the desired quantity
-        // while the API call to update it is happening.
-        const previousQuantity = localQuantity[product.itemId]
-        setLocalQuantity({...localQuantity, [product.itemId]: quantity})
-        setCartItemLoading(true)
-        setSelectedItem(product)
-
-        await updateItemInBasketMutation.mutateAsync(
-            {
-                parameters: {basketId: basket?.basketId, itemId: product.itemId},
-                body: {
-                    productId: product.id,
-                    quantity: parseInt(quantity)
-                }
-            },
-            {
-                onSettled: () => {
-                    // reset the state
-                    setCartItemLoading(false)
-                    setSelectedItem(undefined)
-                },
-                onSuccess: () => {
-                    setLocalQuantity({...localQuantity, [product.itemId]: undefined})
-                },
-                onError: () => {
-                    // reset the quantity to the previous value
-                    setLocalQuantity({...localQuantity, [product.itemId]: previousQuantity})
-                    showError()
-                }
-            }
-        )
-    }, 750)
-
-    // TODO: useItemQuantityHandler()
     const handleChangeItemQuantity = async (product, value) => {
         const {stockLevel} = products[product.productId].inventory
 
