@@ -9,42 +9,28 @@ import React, {useState} from 'react'
 import {Stack, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useIntl} from 'react-intl'
-import {
-    API_ERROR_MESSAGE,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
-} from '@salesforce/retail-react-app/app/constants'
 import debounce from 'lodash/debounce'
 import {useProductItems} from '@salesforce/retail-react-app/app/pages/cart/use-product-items'
 import {useAssignDefaultShippingMethod} from '@salesforce/retail-react-app/app/pages/cart/use-assign-default-shipping-method'
 import {useAddToWishlist} from '@salesforce/retail-react-app/app/pages/cart/use-add-to-wishlist'
-import {useShowGenericError} from '@salesforce/retail-react-app/app/pages/cart/use-show-generic-error'
 import {useChangeItemQuantity} from '@salesforce/retail-react-app/app/pages/cart/use-change-item-quantity'
+import {useRemoveItem} from '@salesforce/retail-react-app/app/pages/cart/use-remove-item'
 
 const ProductItems = () => {
     const {currentBasket, productItems} = useProductItems()
     const {data: basket} = currentBasket
     const {data: products} = productItems
 
-    /*****************Basket Mutation************************/
-    const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
-    const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
-    /*****************Basket Mutation************************/
-
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
-    const {formatMessage} = useIntl()
-    const toast = useToast()
-    const modalProps = useDisclosure()
+    const discloseProductViewModal = useDisclosure()
+    const discloseConfirmationModal = useDisclosure()
 
     useAssignDefaultShippingMethod(basket)
     const handleAddToWishlist = useAddToWishlist()
-    const showError = useShowGenericError()
+    const handleRemoveItem = useRemoveItem({basket, setCartItemLoading})
 
     const _changeItemQuantity = useChangeItemQuantity({
         basket,
@@ -65,7 +51,7 @@ const ProductItems = () => {
             setSelectedItem(product)
 
             // Show the modal.
-            modalProps.onOpen()
+            discloseConfirmationModal.onOpen()
 
             // Return false as 0 isn't valid section.
             return false
@@ -84,35 +70,6 @@ const ProductItems = () => {
 
         return true
     }
-    /***************************** Update quantity **************************/
-
-    /***************************** Remove Item from basket **************************/
-    // TODO: useItemRemovalHandler()
-    const handleRemoveItem = async (product) => {
-        setSelectedItem(product)
-        setCartItemLoading(true)
-        await removeItemFromBasketMutation.mutateAsync(
-            {
-                parameters: {basketId: basket.basketId, itemId: product.itemId}
-            },
-            {
-                onSettled: () => {
-                    // reset the state
-                    setCartItemLoading(false)
-                    setSelectedItem(undefined)
-                },
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
-                        status: 'success'
-                    })
-                },
-                onError: () => {
-                    showError()
-                }
-            }
-        )
-    }
 
     return (
         <Stack spacing={4}>
@@ -126,7 +83,7 @@ const ProductItems = () => {
                                 onAddToWishlistClick={handleAddToWishlist}
                                 onEditClick={(product) => {
                                     setSelectedItem(product)
-                                    onOpen()
+                                    discloseProductViewModal.onOpen()
                                 }}
                                 onRemoveItemClick={handleRemoveItem}
                             />
