@@ -68,7 +68,12 @@ const ProductDetail = () => {
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
-    const {data: product, isLoading: isProductLoading, isError: isProudctError, error: productError} = useProduct(
+    const {
+        data: product,
+        isLoading: isProductLoading,
+        isError: isProudctError,
+        error: productError
+    } = useProduct(
         {
             parameters: {
                 id: urlParams.get('pid') || productId,
@@ -84,7 +89,11 @@ const ProductDetail = () => {
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
-    const {data: category, isError: isCategoryError, error: categoryError} = useCategory({
+    const {
+        data: category,
+        isError: isCategoryError,
+        error: categoryError
+    } = useCategory({
         parameters: {
             id: product?.primaryCategoryId,
             level: 1
