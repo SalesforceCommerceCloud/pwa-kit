@@ -31,6 +31,8 @@ import RecommendedProducts from '@salesforce/retail-react-app/app/components/rec
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 
+import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
+
 // constant
 import {
     API_ERROR_MESSAGE,
@@ -66,7 +68,7 @@ const ProductDetail = () => {
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
-    const {data: product, isLoading: isProductLoading} = useProduct(
+    const {data: product, isLoading: isProductLoading, isError: isProudctError, error: productError} = useProduct(
         {
             parameters: {
                 id: urlParams.get('pid') || productId,
@@ -79,15 +81,39 @@ const ProductDetail = () => {
             keepPreviousData: true
         }
     )
-    const isProductASet = product?.type.set
+
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
-    const {data: category} = useCategory({
+    const {data: category, isError: isCategoryError, error: categoryError} = useCategory({
         parameters: {
             id: product?.primaryCategoryId,
             level: 1
         }
     })
+
+    /**************** Error Handling ****************/
+
+    if (isProudctError) {
+        const errorStatus = productError?.response?.status
+        switch (errorStatus) {
+            case 404:
+                throw new HTTPNotFound('Product Not Found.')
+            default:
+                throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
+        }
+    }
+    if (isCategoryError) {
+        const errorStatus = categoryError?.response?.status
+        switch (errorStatus) {
+            case 404:
+                throw new HTTPNotFound('Category Not Found.')
+            default:
+                throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
+        }
+    }
+
+    const isProductASet = product?.type.set
+
     const [primaryCategory, setPrimaryCategory] = useState(category)
     const variant = useVariant(product)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
