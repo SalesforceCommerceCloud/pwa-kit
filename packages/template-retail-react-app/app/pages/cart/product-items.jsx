@@ -6,16 +6,12 @@
  */
 
 import React, {useState} from 'react'
-import PropTypes from 'prop-types'
 import {Stack, useDisclosure, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {
     useShopperBasketsMutation,
-    useShippingMethodsForShipment,
-    useProducts,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -29,40 +25,20 @@ import {
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
 } from '@salesforce/retail-react-app/app/constants'
 import debounce from 'lodash/debounce'
+import {useProductItems} from '@salesforce/retail-react-app/app/pages/cart/use-product-items'
+import {useAssignDefaultShippingMethod} from '@salesforce/retail-react-app/app/pages/cart/use-assign-default-shipping-method'
 
 const ProductItems = () => {
-    // TODO: useProductItems()
-    const {data: basket, isLoading} = useCurrentBasket()
+    const {currentBasket, productItems} = useProductItems()
+    const {data: basket} = currentBasket
+    const {data: products} = productItems
 
-    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products} = useProducts(
-        {
-            parameters: {
-                ids: productIds,
-                allImages: true
-            }
-        },
-        {
-            enabled: Boolean(productIds),
-            select: (result) => {
-                // Convert array into key/value object with key is the product id
-                return result?.data?.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
-            }
-        }
-    )
     const {data: customer} = useCurrentCustomer()
     const {customerId, isRegistered} = customer
 
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
-    const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
-        'updateShippingMethodForShipment'
-    )
     /*****************Basket Mutation************************/
 
     const [selectedItem, setSelectedItem] = useState(undefined)
@@ -75,36 +51,7 @@ const ProductItems = () => {
     const navigate = useNavigation()
     const modalProps = useDisclosure()
 
-    /******************* Shipping Methods for basket shipment *******************/
-    // do this action only if the basket shipping method is not defined
-    // we need to fetch the shippment methods to get the default value before we can add it to the basket
-    // TODO: turn into a hook with better name -> useAssignDefaultShippingMethod(basket)
-    useShippingMethodsForShipment(
-        {
-            parameters: {
-                basketId: basket?.basketId,
-                shipmentId: 'me'
-            }
-        },
-        {
-            // only fetch if basket is has no shipping method in the first shipment
-            enabled:
-                !!basket?.basketId &&
-                basket.shipments.length > 0 &&
-                !basket.shipments[0].shippingMethod,
-            onSuccess: (data) => {
-                updateShippingMethodForShipmentsMutation.mutate({
-                    parameters: {
-                        basketId: basket?.basketId,
-                        shipmentId: 'me'
-                    },
-                    body: {
-                        id: data.defaultShippingMethodId
-                    }
-                })
-            }
-        }
-    )
+    useAssignDefaultShippingMethod(basket)
 
     /************************* Error handling ***********************/
     const showError = () => {
