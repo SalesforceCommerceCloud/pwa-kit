@@ -6,35 +6,25 @@
  */
 
 import React, {useState} from 'react'
-import {Stack, useDisclosure, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {
-    useShopperBasketsMutation,
-    useShopperCustomersMutation
-} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useIntl} from 'react-intl'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {
     API_ERROR_MESSAGE,
-    TOAST_ACTION_VIEW_WISHLIST,
-    TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
 } from '@salesforce/retail-react-app/app/constants'
 import debounce from 'lodash/debounce'
 import {useProductItems} from '@salesforce/retail-react-app/app/pages/cart/use-product-items'
 import {useAssignDefaultShippingMethod} from '@salesforce/retail-react-app/app/pages/cart/use-assign-default-shipping-method'
+import {useAddToWishlist} from '@salesforce/retail-react-app/app/pages/cart/use-add-to-wishlist'
 
 const ProductItems = () => {
     const {currentBasket, productItems} = useProductItems()
     const {data: basket} = currentBasket
     const {data: products} = productItems
-
-    const {data: customer} = useCurrentCustomer()
-    const {customerId, isRegistered} = customer
 
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
@@ -48,10 +38,10 @@ const ProductItems = () => {
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const toast = useToast()
-    const navigate = useNavigation()
     const modalProps = useDisclosure()
 
     useAssignDefaultShippingMethod(basket)
+    const handleAddToWishlist = useAddToWishlist()
 
     /************************* Error handling ***********************/
     const showError = () => {
@@ -61,52 +51,6 @@ const ProductItems = () => {
         })
     }
     /************************* Error handling ***********************/
-
-    /**************** Wishlist ****************/
-    const {data: wishlist} = useWishList()
-
-    const createCustomerProductListItem = useShopperCustomersMutation(
-        'createCustomerProductListItem'
-    )
-    // TODO: useWishlistHandler()
-    const handleAddToWishlist = async (product) => {
-        try {
-            if (!customerId || !wishlist) {
-                return
-            }
-            await createCustomerProductListItem.mutateAsync({
-                parameters: {
-                    listId: wishlist.id,
-                    customerId
-                },
-                body: {
-                    // NOTE: APi does not respect quantity, it always adds 1
-                    quantity: product.quantity,
-                    productId: product.productId,
-                    public: false,
-                    priority: 1,
-                    type: 'product'
-                }
-            })
-            toast({
-                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                status: 'success',
-                action: (
-                    // it would be better if we could use <Button as={Link}>
-                    // but unfortunately the Link component is not compatible
-                    // with Chakra Toast, since the ToastManager is rendered via portal
-                    // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                    </Button>
-                )
-            })
-        } catch {
-            showError()
-        }
-    }
-    /**************** Wishlist ****************/
 
     /***************************** Update quantity **************************/
     const changeItemQuantity = debounce(async (quantity, product) => {
