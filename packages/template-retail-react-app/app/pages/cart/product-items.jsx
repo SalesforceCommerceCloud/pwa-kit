@@ -79,10 +79,10 @@ const ProductItems = () => {
     }
 
     return (
-        <Stack spacing={4}>
-            {basket.productItems?.map((productItem, idx) => {
-                return (
-                    <>
+        <>
+            <Stack spacing={4}>
+                {basket.productItems?.map((productItem, idx) => {
+                    return (
                         <ProductItem
                             key={productItem.productId}
                             index={idx}
@@ -110,35 +110,35 @@ const ProductItems = () => {
                             }
                             handleRemoveItem={handleRemoveItem}
                         />
+                    )
+                })}
+            </Stack>
 
-                        <Box>
-                            {discloseProductViewModal.isOpen && (
-                                <ProductViewModal
-                                    isOpen={discloseProductViewModal.isOpen}
-                                    onOpen={discloseProductViewModal.onOpen}
-                                    onClose={discloseProductViewModal.onClose}
-                                    product={selectedItem}
-                                    updateCart={(variant, quantity) => {
-                                        // close the modal before handle the change
-                                        discloseProductViewModal.onClose()
-                                        handleUpdateCart(variant, quantity)
-                                    }}
-                                />
-                            )}
+            <Box>
+                {discloseProductViewModal.isOpen && (
+                    <ProductViewModal
+                        isOpen={discloseProductViewModal.isOpen}
+                        onOpen={discloseProductViewModal.onOpen}
+                        onClose={discloseProductViewModal.onClose}
+                        product={selectedItem}
+                        updateCart={(variant, quantity) => {
+                            // close the modal before handle the change
+                            discloseProductViewModal.onClose()
+                            handleUpdateCart(variant, quantity)
+                        }}
+                    />
+                )}
 
-                            <ConfirmationModal
-                                {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
-                                onPrimaryAction={() => {
-                                    handleRemoveItem(selectedItem)
-                                }}
-                                onAlternateAction={() => {}}
-                                {...discloseConfirmationModal}
-                            />
-                        </Box>
-                    </>
-                )
-            })}
-        </Stack>
+                <ConfirmationModal
+                    {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
+                    onPrimaryAction={() => {
+                        handleRemoveItem(selectedItem)
+                    }}
+                    onAlternateAction={() => {}}
+                    {...discloseConfirmationModal}
+                />
+            </Box>
+        </>
     )
 }
 
