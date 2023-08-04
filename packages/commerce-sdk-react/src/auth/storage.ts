@@ -54,6 +54,7 @@ export class CookieStorage extends BaseStorage {
             // Ideally, this would be `secure: true`, because Chrome and Firefox both treat
             // localhost as a Secure context. But Safari doesn't, so here we are.
             secure: !onClient() || window.location.protocol === 'https:',
+            sameSite: 'none',
             ...options
         })
     }
