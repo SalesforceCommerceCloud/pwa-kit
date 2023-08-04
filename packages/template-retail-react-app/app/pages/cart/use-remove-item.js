@@ -9,7 +9,7 @@ import {useSelectedItem} from '@salesforce/retail-react-app/app/pages/cart/use-s
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useShowGenericError} from '@salesforce/retail-react-app/app/pages/cart/use-show-generic-error'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useIntl} from '@salesforce/retail-react-app/node_modules/react-intl/index'
+import {useIntl} from 'react-intl'
 import {TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '@salesforce/retail-react-app/app/constants'
 
 export const useRemoveItem = ({basket, setCartItemLoading}) => {
