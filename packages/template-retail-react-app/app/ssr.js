@@ -12,6 +12,7 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 
 const options = {
     // The build directory (an absolute path)
