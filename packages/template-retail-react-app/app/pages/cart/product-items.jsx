@@ -6,7 +6,7 @@
  */
 
 import React, {useState} from 'react'
-import {Stack, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Stack, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import debounce from 'lodash/debounce'
@@ -15,6 +15,10 @@ import {useAssignDefaultShippingMethod} from '@salesforce/retail-react-app/app/p
 import {useAddToWishlist} from '@salesforce/retail-react-app/app/pages/cart/use-add-to-wishlist'
 import {useChangeItemQuantity} from '@salesforce/retail-react-app/app/pages/cart/use-change-item-quantity'
 import {useRemoveItem} from '@salesforce/retail-react-app/app/pages/cart/use-remove-item'
+import {useUpdateCart} from '@salesforce/retail-react-app/app/pages/cart/use-update-cart'
+import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/index'
+import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
+import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
 const ProductItems = () => {
     const {currentBasket, productItems} = useProductItems()
@@ -28,6 +32,7 @@ const ProductItems = () => {
     const discloseProductViewModal = useDisclosure()
     const discloseConfirmationModal = useDisclosure()
 
+    // TODO: return a function
     useAssignDefaultShippingMethod(basket)
     const handleAddToWishlist = useAddToWishlist()
     const handleRemoveItem = useRemoveItem({basket, setCartItemLoading})
@@ -38,6 +43,8 @@ const ProductItems = () => {
         setCartItemLoading
     })
     const changeItemQuantity = debounce(_changeItemQuantity, 750)
+
+    const handleUpdateCart = useUpdateCart({basket, setCartItemLoading, setLocalQuantity})
 
     const handleChangeItemQuantity = async (product, value) => {
         const {stockLevel} = products[product.productId].inventory
@@ -75,33 +82,60 @@ const ProductItems = () => {
         <Stack spacing={4}>
             {basket.productItems?.map((productItem, idx) => {
                 return (
-                    <ProductItem
-                        key={productItem.productId}
-                        index={idx}
-                        secondaryActions={
-                            <CartSecondaryButtonGroup
-                                onAddToWishlistClick={handleAddToWishlist}
-                                onEditClick={(product) => {
-                                    setSelectedItem(product)
-                                    discloseProductViewModal.onOpen()
+                    <>
+                        <ProductItem
+                            key={productItem.productId}
+                            index={idx}
+                            secondaryActions={
+                                <CartSecondaryButtonGroup
+                                    onAddToWishlistClick={handleAddToWishlist}
+                                    onEditClick={(product) => {
+                                        setSelectedItem(product)
+                                        discloseProductViewModal.onOpen()
+                                    }}
+                                    onRemoveItemClick={handleRemoveItem}
+                                />
+                            }
+                            product={{
+                                ...productItem,
+                                ...(products && products[productItem.productId]),
+                                price: productItem.price,
+                                quantity: localQuantity[productItem.itemId]
+                                    ? localQuantity[productItem.itemId]
+                                    : productItem.quantity
+                            }}
+                            onItemQuantityChange={handleChangeItemQuantity.bind(this, productItem)}
+                            showLoading={
+                                isCartItemLoading && selectedItem?.itemId === productItem.itemId
+                            }
+                            handleRemoveItem={handleRemoveItem}
+                        />
+
+                        <Box>
+                            {discloseProductViewModal.isOpen && (
+                                <ProductViewModal
+                                    isOpen={discloseProductViewModal.isOpen}
+                                    onOpen={discloseProductViewModal.onOpen}
+                                    onClose={discloseProductViewModal.onClose}
+                                    product={selectedItem}
+                                    updateCart={(variant, quantity) => {
+                                        // close the modal before handle the change
+                                        discloseProductViewModal.onClose()
+                                        handleUpdateCart(variant, quantity)
+                                    }}
+                                />
+                            )}
+
+                            <ConfirmationModal
+                                {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
+                                onPrimaryAction={() => {
+                                    handleRemoveItem(selectedItem)
                                 }}
-                                onRemoveItemClick={handleRemoveItem}
+                                onAlternateAction={() => {}}
+                                {...discloseConfirmationModal}
                             />
-                        }
-                        product={{
-                            ...productItem,
-                            ...(products && products[productItem.productId]),
-                            price: productItem.price,
-                            quantity: localQuantity[productItem.itemId]
-                                ? localQuantity[productItem.itemId]
-                                : productItem.quantity
-                        }}
-                        onItemQuantityChange={handleChangeItemQuantity.bind(this, productItem)}
-                        showLoading={
-                            isCartItemLoading && selectedItem?.itemId === productItem.itemId
-                        }
-                        handleRemoveItem={handleRemoveItem}
-                    />
+                        </Box>
+                    </>
                 )
             })}
         </Stack>
