@@ -19,13 +19,14 @@ import {useUpdateCart} from '@salesforce/retail-react-app/app/pages/cart/use-upd
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/index'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
+import {useSelectedItem} from '@salesforce/retail-react-app/app/pages/cart/use-selected-item'
 
 const ProductItems = () => {
     const {currentBasket, productItems} = useProductItems()
     const {data: basket} = currentBasket
     const {data: products} = productItems
 
-    const [selectedItem, setSelectedItem] = useState(undefined)
+    const {selectedItem, setSelectedItem} = useSelectedItem()
     const [localQuantity, setLocalQuantity] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
 
