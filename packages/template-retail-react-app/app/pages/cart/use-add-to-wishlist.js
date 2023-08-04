@@ -13,11 +13,11 @@ import {useIntl} from 'react-intl'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
     TOAST_ACTION_VIEW_WISHLIST,
-    TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    API_ERROR_MESSAGE
+    TOAST_MESSAGE_ADDED_TO_WISHLIST
 } from '@salesforce/retail-react-app/app/constants'
 import {Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {useShowGenericError} from '@salesforce/retail-react-app/app/pages/cart/use-show-generic-error'
 
 export const useAddToWishlist = () => {
     const {data: wishlist} = useWishList()
@@ -30,12 +30,7 @@ export const useAddToWishlist = () => {
     )
 
     const toast = useToast()
-    const showError = () => {
-        toast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            status: 'error'
-        })
-    }
+    const showError = useShowGenericError()
 
     const handleAddToWishlist = async (product) => {
         try {

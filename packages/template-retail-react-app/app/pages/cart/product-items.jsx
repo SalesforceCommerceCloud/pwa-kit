@@ -32,7 +32,6 @@ const ProductItems = () => {
     const discloseProductViewModal = useDisclosure()
     const discloseConfirmationModal = useDisclosure()
 
-    // TODO: return a function
     useAssignDefaultShippingMethod(basket)
     const handleAddToWishlist = useAddToWishlist()
     const handleRemoveItem = useRemoveItem({basket, setCartItemLoading})
