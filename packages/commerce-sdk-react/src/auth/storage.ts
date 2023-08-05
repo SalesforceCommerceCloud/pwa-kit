@@ -44,16 +44,24 @@ export class CookieStorage extends BaseStorage {
         super(options)
 
         if (typeof document === 'undefined') {
-            throw new Error('CookieStorage is not avaliable on the current environment.')
+            throw new Error('CookieStorage is not available on the current environment.')
         }
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
+        const isInIframe = window.location !== window.parent.location
+        const isLocalHost = window.location.protocol === 'http:'
         Cookies.set(suffixedKey, value, {
             // Deployed sites will always be HTTPS, but the local dev server is served over HTTP.
             // Ideally, this would be `secure: true`, because Chrome and Firefox both treat
             // localhost as a Secure context. But Safari doesn't, so here we are.
             secure: !onClient() || window.location.protocol === 'https:',
+            // By default, Chromes does not allow cookies to be sent/read
+            // when the code is loaded in iframe (e.g storefront preview case)
+            // setting sameSite to none lose that restriction to
+            // make sure that cookies can be read/sent when code is loaded in an iframe
+            // outside of iframe, we want to keep that restriction to avoid security risk
+            sameSite: !isLocalHost && isInIframe ? 'none' : 'strict',
             ...options
         })
     }
