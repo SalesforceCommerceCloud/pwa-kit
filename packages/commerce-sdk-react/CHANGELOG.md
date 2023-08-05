@@ -1,4 +1,5 @@
 ## v1.1.0-dev (TTBD)
+- Setting cookies config `samesite` conditionally when the code is loaded in/outside of an iframe [#1403](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1403)
 
 ## v1.0.1 (Jul 26, 2023)
 
