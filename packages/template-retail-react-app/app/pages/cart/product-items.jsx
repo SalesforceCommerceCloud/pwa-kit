@@ -20,6 +20,7 @@ import ProductViewModal from '@salesforce/retail-react-app/app/components/produc
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import {useSelectedItem} from '@salesforce/retail-react-app/app/pages/cart/use-selected-item'
+import {DEBOUNCE_DELAY} from '@salesforce/retail-react-app/app/pages/cart/constants'
 
 const ProductItems = () => {
     const {currentBasket, productItems} = useProductItems()
@@ -42,7 +43,7 @@ const ProductItems = () => {
         setLocalQuantity,
         setCartItemLoading
     })
-    const changeItemQuantity = debounce(_changeItemQuantity, 750)
+    const changeItemQuantity = debounce(_changeItemQuantity, DEBOUNCE_DELAY)
 
     const handleUpdateCart = useUpdateCart({basket, setCartItemLoading, setLocalQuantity})
 
