@@ -10,7 +10,7 @@ import archiver, {EntryData} from 'archiver'
 import {default as _fetch, Response} from 'node-fetch'
 import {URL} from 'url'
 import {readFile, stat, mkdtemp, rm, readdir} from 'fs/promises'
-import {createWriteStream, Stats, Dirent} from 'fs'
+import {createWriteStream, Stats, Dirent, existsSync} from 'fs'
 import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
@@ -90,19 +90,24 @@ export const getProjectPkg = async (): Promise<Pkg> => {
  * @param dir Directory to walk
  * @returns Set of file paths within the directory
  */
-export const walkDir = async (dir: string, baseDir: string): Promise<Set<string>> => {
-    const fileSet: Set<string> = new Set()
+export const walkDir = async (
+    dir: string,
+    baseDir: string,
+    fileSet?: Set<string>
+): Promise<Set<string>> => {
+    fileSet = fileSet || new Set<string>()
     const entries: Dirent[] = await readdir(dir, {withFileTypes: true})
 
-    for (const entry of entries) {
-        const entryPath: string = path.join(dir, entry.name)
-        if (entry.isDirectory()) {
-            const subFileSet: Set<string> = await walkDir(entryPath, baseDir)
-            subFileSet.forEach((file) => fileSet.add(file))
-        } else {
-            fileSet.add(entryPath.replace(baseDir + path.sep, ''))
-        }
-    }
+    await Promise.all(
+        entries.map(async (entry) => {
+            const entryPath = path.join(dir, entry.name)
+            if (entry.isDirectory()) {
+                await walkDir(entryPath, baseDir, fileSet)
+            } else {
+                fileSet?.add(entryPath.replace(baseDir + path.sep, ''))
+            }
+        })
+    )
 
     return fileSet
 }
@@ -291,10 +296,10 @@ export const createBundle = async ({
                         ccExtensibility.overridesDir,
                         ccExtensibility.overridesDir
                     )
-                    const extends_files = await walkDir(extendsTemplate, extendsTemplate)
                     cc_overrides = Array.from(overrides_files).filter((item) =>
-                        extends_files.has(item)
+                        existsSync(path.join(extendsTemplate, item))
                     )
+                    console.log('CC OVERRIDES: ', cc_overrides)
                 }
                 bundle_metadata = {
                     dependencies: {...dependencies, ...devDependencies},
