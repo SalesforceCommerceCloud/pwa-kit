@@ -299,7 +299,6 @@ export const createBundle = async ({
                     cc_overrides = Array.from(overrides_files).filter((item) =>
                         existsSync(path.join(extendsTemplate, item))
                     )
-                    console.log('CC OVERRIDES: ', cc_overrides)
                 }
                 bundle_metadata = {
                     dependencies: {...dependencies, ...devDependencies},
