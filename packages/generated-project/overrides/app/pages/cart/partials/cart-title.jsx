@@ -7,11 +7,12 @@
 
 import React from 'react'
 import OriginalCartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
+import AboveCartTitle from './cart-title-above'
 
 const CartTitle = () => {
     return (
         <>
-            <div>Above Cart Title</div>
+            <AboveCartTitle />
             <OriginalCartTitle />
         </>
     )
