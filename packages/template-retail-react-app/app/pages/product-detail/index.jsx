@@ -184,6 +184,10 @@ const ProductDetail = ({category, product, isLoading}) => {
         }
     }, [product])
 
+    const promos = product?.productPromotions.map((promo) => promo.promotionId).join('\n')
+
+    console.log('PDP product:',product)
+
     return (
         <Box
             className="sf-product-detail-page"
@@ -196,6 +200,7 @@ const ProductDetail = ({category, product, isLoading}) => {
             </Helmet>
 
             <Stack spacing={16}>
+                {/*<Box>Promotions: {promos}</Box>*/}
                 {isProductASet ? (
                     <Fragment>
                         {/* Product Set: parent product */}
