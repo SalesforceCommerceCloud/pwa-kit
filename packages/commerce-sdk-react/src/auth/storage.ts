@@ -50,7 +50,7 @@ export class CookieStorage extends BaseStorage {
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
         const isInIframe = window.location !== window.parent.location
-        const isLocalHost = window.location.protocol === 'http:'
+        const isLocalHost = window.location.hostname === 'localhost'
         Cookies.set(suffixedKey, value, {
             // Deployed sites will always be HTTPS, but the local dev server is served over HTTP.
             // Ideally, this would be `secure: true`, because Chrome and Firefox both treat
@@ -61,6 +61,7 @@ export class CookieStorage extends BaseStorage {
             // setting sameSite to none lose that restriction to
             // make sure that cookies can be read/sent when code is loaded in an iframe
             // outside of iframe, we want to keep that restriction to avoid security risk
+            // https://web.dev/samesite-cookie-recipes/
             sameSite: !isLocalHost && isInIframe ? 'none' : 'strict',
             ...options
         })
