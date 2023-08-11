@@ -10,7 +10,7 @@ import archiver, {EntryData} from 'archiver'
 import {default as _fetch, Response} from 'node-fetch'
 import {URL} from 'url'
 import {readFile, stat, mkdtemp, rm, readdir} from 'fs/promises'
-import {createWriteStream, Stats, Dirent, existsSync} from 'fs'
+import {createWriteStream, Stats, Dirent, existsSync, readFileSync} from 'fs'
 import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
@@ -290,8 +290,16 @@ export const createBundle = async ({
                 } = await getProjectPkg()
                 const extendsTemplate = 'node_modules/' + ccExtensibility.extends
 
+                const pwaKitDeps = [
+                    '@salesforce/pwa-kit-dev',
+                    '@salesforce/pwa-kit-runtime',
+                    '@salesforce/pwa-kit-react-sdk'
+                ]
+
                 let cc_overrides: string[] = []
-                if (ccExtensibility.overridesDir) {
+                const packageVersions: {[key: string]: string} = {}
+
+                if (ccExtensibility.extends) {
                     const overrides_files = await walkDir(
                         ccExtensibility.overridesDir,
                         ccExtensibility.overridesDir
@@ -299,9 +307,21 @@ export const createBundle = async ({
                     cc_overrides = Array.from(overrides_files).filter((item) =>
                         existsSync(path.join(extendsTemplate, item))
                     )
+
+                    // If the project is using template extensbility, we must look into the base template's package.json to find the versions of pwa-kit packages
+                    const extendsPkgJsonPath = path.join(extendsTemplate, 'package.json')
+                    if (existsSync(extendsPkgJsonPath)) {
+                        const {dependencies = {}, devDependencies = {}} = JSON.parse(
+                            readFileSync(extendsPkgJsonPath, 'utf-8')
+                        )
+
+                        for (const pkg of pwaKitDeps) {
+                            packageVersions[pkg] = dependencies[pkg] || devDependencies[pkg]
+                        }
+                    }
                 }
                 bundle_metadata = {
-                    dependencies: {...dependencies, ...devDependencies},
+                    dependencies: {...dependencies, ...devDependencies, ...packageVersions},
                     cc_overrides: cc_overrides
                 }
             })
