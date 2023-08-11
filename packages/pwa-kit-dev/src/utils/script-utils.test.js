@@ -237,6 +237,8 @@ describe('scriptUtils', () => {
             expect(bundle.ssr_parameters).toEqual({})
             expect(bundle.ssr_only).toEqual(['ssr.js'])
             expect(bundle.ssr_shared).toEqual(['ssr.js', 'static/favicon.ico'])
+            expect(bundle.bundle_metadata).toHaveProperty('dependencies')
+            expect(bundle.bundle_metadata).toHaveProperty('cc_overrides')
 
             // De-code and re-encode gives the same result, to show that it *is* b64 encoded
             expect(Buffer.from(bundle.data, 'base64').toString('base64')).toEqual(bundle.data)
