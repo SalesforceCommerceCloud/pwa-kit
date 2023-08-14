@@ -6,7 +6,7 @@
  */
 import Cookies from 'js-cookie'
 import {onClient} from '../utils'
-import {IFRAME_HOST_ALLOW_LIST} from "../constant";
+import {IFRAME_HOST_ALLOW_LIST} from '../constant'
 
 export type StorageType = 'cookie' | 'local' | 'memory'
 
@@ -34,7 +34,6 @@ export abstract class BaseStorage {
     abstract delete(key: string): void
 }
 
-
 /**
  * A normalized implementation for Cookie store. It implements the BaseStorage interface
  * which allows developers to easily switch between Cookie, LocalStorage, Memory store
@@ -51,7 +50,8 @@ export class CookieStorage extends BaseStorage {
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
-        const parentHostName = new URL(document.location?.ancestorOrigins?.[0] || document.referrer)?.hostname
+        const parentUrl = document.location?.ancestorOrigins?.[0] || document.referrer
+        const parentHostName = parentUrl ? new URL(parentUrl).hostname : ''
         const isInAllowList = IFRAME_HOST_ALLOW_LIST.includes(parentHostName)
 
         const isLocalHost = window.location.hostname === 'localhost'
