@@ -132,9 +132,9 @@ const jsonFromRequest = (req) => {
         query: req.query,
         route_path: req.route.path,
         body: req.body,
-        headers: redactAndSortObjectKeys(req.headers),
+        headers: req.headers,
         ip: req.ip,
-        env: filterAndSortObjectKeys(process.env, ENVS_TO_EXPOSE),
+        env: process.env,
         timestamp: new Date().toISOString()
     }
 }
