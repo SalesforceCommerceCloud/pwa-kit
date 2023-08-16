@@ -777,7 +777,7 @@ export const rewriteProxyRequestHeaders = ({
     const workingHeaders = new Headers({...headers}, headerFormat)
 
     // Strip out some specific X-headers
-    X_HEADERS_TO_REMOVE.forEach((key) => workingHeaders.deleteHeader(key))
+    // X_HEADERS_TO_REMOVE.forEach((key) => workingHeaders.deleteHeader(key))
 
     // For a caching proxy, apply special header processing
     if (caching) {

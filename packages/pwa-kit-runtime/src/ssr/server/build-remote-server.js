@@ -571,9 +571,9 @@ export const RemoteServerFactory = {
             // do that now so that the rest of the code don't have to deal
             // with these headers, which can be large and may be accidentally
             // forwarded to other servers.
-            X_HEADERS_TO_REMOVE.forEach((key) => {
-                delete req.headers[key]
-            })
+            // X_HEADERS_TO_REMOVE.forEach((key) => {
+            //     delete req.headers[key]
+            // })
 
             // Hand off to the next middleware
             next()
