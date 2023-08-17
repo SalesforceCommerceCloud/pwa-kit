@@ -10,7 +10,7 @@ import archiver, {EntryData} from 'archiver'
 import {default as _fetch, Response} from 'node-fetch'
 import {URL} from 'url'
 import {readFile, stat, mkdtemp, rm, readdir} from 'fs/promises'
-import {createWriteStream, Stats, Dirent, existsSync, readFileSync} from 'fs'
+import {createWriteStream, Stats, Dirent, existsSync} from 'fs'
 import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
@@ -309,14 +309,20 @@ export const createBundle = async ({
                     )
 
                     // If the project is using template extensbility, we must look into the base template's package.json to find the versions of pwa-kit packages
-                    const extendsPkgJsonPath = path.join(extendsTemplate, 'package.json')
+                    const extendsPkgJsonPath = path.join(process.cwd(), 'package-lock.json')
                     if (existsSync(extendsPkgJsonPath)) {
-                        const {dependencies = {}, devDependencies = {}} = JSON.parse(
-                            readFileSync(extendsPkgJsonPath, 'utf-8')
-                        )
+                        const {packages = {}} = await readJson(extendsPkgJsonPath)
 
-                        for (const pkg of pwaKitDeps) {
-                            packageVersions[pkg] = dependencies[pkg] || devDependencies[pkg]
+                        for (const pkgKey in packages) {
+                            if (pkgKey.endsWith(extendsTemplate)) {
+                                const pkg = packages[pkgKey]
+                                for (const dep of pwaKitDeps) {
+                                    if (pkg.dependencies[dep]) {
+                                        packageVersions[dep] = pkg.dependencies[dep]
+                                    }
+                                }
+                                break
+                            }
                         }
                     }
                 }
@@ -324,6 +330,7 @@ export const createBundle = async ({
                     dependencies: {...dependencies, ...devDependencies, ...packageVersions},
                     cc_overrides: cc_overrides
                 }
+                console.log(bundle_metadata.dependencies)
             })
             .then(() => readFile(destination))
             .then((data) => {
