@@ -116,7 +116,7 @@ jobs:
         with:
           payload: |
             {
-              "test": "testNode${{ matrix.node }}"
+              "test": "A 'testNode${{ matrix.node }}' task has failed."
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -251,7 +251,7 @@ jobs:
         with:
           payload: |
             {
-              "test": "generated ${{ matrix.template }}"
+              "message": "A 'generated ${{ matrix.template }}' task has failed."
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
