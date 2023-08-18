@@ -15,6 +15,7 @@ import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
+import {execSync} from 'child_process'
 
 export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
 export const DEFAULT_DOCS_URL =
@@ -300,6 +301,9 @@ export const createBundle = async ({
                 const packageVersions: {[key: string]: string} = {}
 
                 if (ccExtensibility.extends) {
+                    const extendsTemplateVersion =
+                        dependencies[ccExtensibility.extends] ||
+                        devDependencies[ccExtensibility.extends]
                     const overrides_files = await walkDir(
                         ccExtensibility.overridesDir,
                         ccExtensibility.overridesDir
@@ -308,29 +312,26 @@ export const createBundle = async ({
                         existsSync(path.join(extendsTemplate, item))
                     )
 
-                    // If the project is using template extensbility, we must look into the base template's package.json to find the versions of pwa-kit packages
-                    const extendsPkgJsonPath = path.join(process.cwd(), 'package-lock.json')
-                    if (existsSync(extendsPkgJsonPath)) {
-                        const {packages = {}} = await readJson(extendsPkgJsonPath)
-
-                        for (const pkgKey in packages) {
-                            if (pkgKey.endsWith(extendsTemplate)) {
-                                const pkg = packages[pkgKey]
-                                for (const dep of pwaKitDeps) {
-                                    if (pkg.dependencies[dep]) {
-                                        packageVersions[dep] = pkg.dependencies[dep]
-                                    }
-                                }
-                                break
+                    // If the project is using template extensbility, we must use 'npm info' to find the versions of pwa-kit packages
+                    try {
+                        const packageInfo = JSON.parse(
+                            execSync(
+                                `npm info ${ccExtensibility.extends}@${extendsTemplateVersion} --json`
+                            ).toString()
+                        )
+                        pwaKitDeps.forEach((dep) => {
+                            if (packageInfo.dependencies?.[dep]) {
+                                packageVersions[dep] = packageInfo.dependencies[dep]
                             }
-                        }
+                        })
+                    } catch (error) {
+                        console.error('Error:', error)
                     }
                 }
                 bundle_metadata = {
                     dependencies: {...dependencies, ...devDependencies, ...packageVersions},
                     cc_overrides: cc_overrides
                 }
-                console.log(bundle_metadata.dependencies)
             })
             .then(() => readFile(destination))
             .then((data) => {
