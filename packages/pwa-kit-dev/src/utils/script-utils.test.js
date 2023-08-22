@@ -6,6 +6,7 @@
  */
 
 import {mkdtemp, rm, writeFile, readJsonSync, readJson} from 'fs-extra'
+import {execSync} from 'child_process'
 import path from 'path'
 import os from 'os'
 import * as scriptUtils from './script-utils'
@@ -15,6 +16,12 @@ jest.mock('fs-extra', () => {
     return {
         ...jest.requireActual('fs-extra'),
         readJson: jest.fn()
+    }
+})
+
+jest.mock('child_process', () => {
+    return {
+        execSync: jest.fn()
     }
 })
 
@@ -131,6 +138,42 @@ describe('scriptUtils', () => {
             await expect(scriptUtils.getProjectPkg()).rejects.toThrow(
                 `Could not read project package at "${path.join(process.cwd(), 'package.json')}"`
             )
+        })
+    })
+
+    describe('findPackageVersionInTree', () => {
+        test('should return the package version if found', () => {
+            const tree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/retail-react-app': {
+                        version: '1.0.0',
+                        dependencies: {'@salesforce/pwa-kit-react-sdk': {version: '3.0.0'}}
+                    }
+                }
+            }
+            expect(
+                scriptUtils.findPackageVersionInTree(tree, '@salesforce/pwa-kit-react-sdk')
+            ).toBe('3.0.0')
+        })
+    })
+
+    describe('getPackageVersion', () => {
+        test('should return the package version if found', () => {
+            execSync.mockReturnValueOnce(
+                JSON.stringify({
+                    version: '0.0.1',
+                    name: 'test',
+                    dependencies: {
+                        '@salesforce/retail-react-app': {
+                            version: '1.0.0',
+                            dependencies: {'@salesforce/pwa-kit-react-sdk': {version: '3.0.0'}}
+                        }
+                    }
+                })
+            )
+            expect(scriptUtils.getPackageVersion('@salesforce/pwa-kit-react-sdk')).toBe('3.0.0')
         })
     })
 

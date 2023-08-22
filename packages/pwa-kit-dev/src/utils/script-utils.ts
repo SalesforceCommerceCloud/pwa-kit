@@ -327,6 +327,17 @@ export const createBundle = async ({
                 let cc_overrides: string[] = []
                 const packageVersions: {[key: string]: string} = {}
 
+                // Use 'npm ls' to find package versions
+                for (const dep of pwaKitDeps) {
+                    const version = getPackageVersion(dep)
+                    if (version) {
+                        packageVersions[dep] = version
+                    } else {
+                        packageVersions[dep] = 'unknown'
+                        console.warn(`Unable to find package version for ${dep}`)
+                    }
+                }
+
                 if (ccExtensibility.extends) {
                     const overrides_files = await walkDir(
                         ccExtensibility.overridesDir,
@@ -335,16 +346,6 @@ export const createBundle = async ({
                     cc_overrides = Array.from(overrides_files).filter((item) =>
                         existsSync(path.join(extendsTemplate, item))
                     )
-
-                    // If the project is using template extensbility, we must use 'npm ls' to find the versions of pwa-kit packages
-                    for (const dep of pwaKitDeps) {
-                        const version = getPackageVersion(dep)
-                        if (version) {
-                            packageVersions[dep] = version
-                        } else {
-                            console.warn(`Unable to find package version for ${dep}`)
-                        }
-                    }
                 }
                 bundle_metadata = {
                     dependencies: {...packageVersions, ...dependencies, ...devDependencies},
