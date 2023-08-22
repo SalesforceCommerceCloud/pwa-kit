@@ -119,11 +119,9 @@ export const findPackageVersionInTree = (tree: any, pkgName: string): string | n
     }
 
     for (const key in tree) {
-        for (const innerKey in tree[key]) {
-            if (tree[key][innerKey].dependencies) {
-                const result = findPackageVersionInTree(tree[key][innerKey].dependencies, pkgName)
-                if (result) return result
-            }
+        if (tree[key].dependencies) {
+            const result = findPackageVersionInTree(tree[key].dependencies, pkgName)
+            if (result) return result
         }
     }
 
@@ -134,7 +132,7 @@ export const getPackageVersion = (pkgName: string) => {
     try {
         const output = execSync(`npm ls ${pkgName} --json`, {encoding: 'utf-8'})
         const parsedOutput = JSON.parse(output)
-        return findPackageVersionInTree(parsedOutput, pkgName)
+        return findPackageVersionInTree(parsedOutput.dependencies, pkgName)
     } catch (err) {
         return null
     }

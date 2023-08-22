@@ -141,24 +141,6 @@ describe('scriptUtils', () => {
         })
     })
 
-    describe('findPackageVersionInTree', () => {
-        test('should return the package version if found', () => {
-            const tree = {
-                version: '0.0.1',
-                name: 'test',
-                dependencies: {
-                    '@salesforce/retail-react-app': {
-                        version: '1.0.0',
-                        dependencies: {'@salesforce/pwa-kit-react-sdk': {version: '3.0.0'}}
-                    }
-                }
-            }
-            expect(
-                scriptUtils.findPackageVersionInTree(tree, '@salesforce/pwa-kit-react-sdk')
-            ).toBe('3.0.0')
-        })
-    })
-
     describe('getPackageVersion', () => {
         test('should return the package version if found', () => {
             execSync.mockReturnValueOnce(
@@ -168,7 +150,16 @@ describe('scriptUtils', () => {
                     dependencies: {
                         '@salesforce/retail-react-app': {
                             version: '1.0.0',
-                            dependencies: {'@salesforce/pwa-kit-react-sdk': {version: '3.0.0'}}
+                            dependencies: {
+                                'some-other-library': {
+                                    version: '2.0.0',
+                                    dependencies: {
+                                        '@salesforce/pwa-kit-react-sdk': {
+                                            version: '3.0.0'
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 })
