@@ -113,6 +113,33 @@ export const walkDir = async (
     return fileSet
 }
 
+export const findPackageVersionInTree = (tree: any, pkgName: string): string | null => {
+    if (tree[pkgName] && tree[pkgName].version) {
+        return tree[pkgName].version
+    }
+
+    for (const key in tree) {
+        for (const innerKey in tree[key]) {
+            if (tree[key][innerKey].dependencies) {
+                const result = findPackageVersionInTree(tree[key][innerKey].dependencies, pkgName)
+                if (result) return result
+            }
+        }
+    }
+
+    return null
+}
+
+export const getPackageVersion = (pkgName: string) => {
+    try {
+        const output = execSync(`npm ls ${pkgName} --json`, {encoding: 'utf-8'})
+        const parsedOutput = JSON.parse(output)
+        return findPackageVersionInTree(parsedOutput, pkgName)
+    } catch (err) {
+        return null
+    }
+}
+
 export class CloudAPIClient {
     private opts: Required<CloudAPIClientOpts>
 
@@ -301,9 +328,6 @@ export const createBundle = async ({
                 const packageVersions: {[key: string]: string} = {}
 
                 if (ccExtensibility.extends) {
-                    const extendsTemplateVersion =
-                        dependencies[ccExtensibility.extends] ||
-                        devDependencies[ccExtensibility.extends]
                     const overrides_files = await walkDir(
                         ccExtensibility.overridesDir,
                         ccExtensibility.overridesDir
@@ -312,24 +336,18 @@ export const createBundle = async ({
                         existsSync(path.join(extendsTemplate, item))
                     )
 
-                    // If the project is using template extensbility, we must use 'npm info' to find the versions of pwa-kit packages
-                    try {
-                        const packageInfo = JSON.parse(
-                            execSync(
-                                `npm info ${ccExtensibility.extends}@${extendsTemplateVersion} --json`
-                            ).toString()
-                        )
-                        pwaKitDeps.forEach((dep) => {
-                            if (packageInfo.dependencies?.[dep]) {
-                                packageVersions[dep] = packageInfo.dependencies[dep]
-                            }
-                        })
-                    } catch (error) {
-                        console.error('Error:', error)
+                    // If the project is using template extensbility, we must use 'npm ls' to find the versions of pwa-kit packages
+                    for (const dep of pwaKitDeps) {
+                        const version = getPackageVersion(dep)
+                        if (version) {
+                            packageVersions[dep] = version
+                        } else {
+                            console.warn(`Unable to find package version for ${dep}`)
+                        }
                     }
                 }
                 bundle_metadata = {
-                    dependencies: {...dependencies, ...devDependencies, ...packageVersions},
+                    dependencies: {...packageVersions, ...dependencies, ...devDependencies},
                     cc_overrides: cc_overrides
                 }
             })
