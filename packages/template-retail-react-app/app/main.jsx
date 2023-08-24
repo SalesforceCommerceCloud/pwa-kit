@@ -12,3 +12,13 @@ const main = () => {
 }
 
 main()
+
+window.onload = () => {
+    window.STOREFRONT_PREVIEW = {}
+
+    if (window.STOREFRONT_PREVIEW) {
+        window.STOREFRONT_PREVIEW.getToken = () => {
+            return window.localStorage.getItem('token')
+        }
+    }
+}
