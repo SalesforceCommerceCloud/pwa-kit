@@ -157,7 +157,7 @@ const App = (props) => {
     const storefrontPreviewClientScript =
         process.env.NODE_ENV === 'development'
             ? 'http://localhost:4000/mobify/bundle/development/static/storefront-preview.js'
-            : 'https://runtime-admin-preview-test.mobify-storefront.com/cc/b2c/preview/preview.client.js'
+            : 'https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js'
 
     if (!storefrontPreviewClientScript) {
         // Deliberately aggressive because this branch exists solely for Storefront Preview development
