@@ -1,3 +1,6 @@
+## v1.0.2 (Aug 28, 2023)
+- Consumes new version of pwa-kit-dev that fixes performance issue caused by potentially large amounts of stats data from webpack [#1423](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1423)
+
 ## v1.0.1 (Jul 26, 2023)
 
 - Fix price display when a discounted price is zero [#1361](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1361)
