@@ -3,7 +3,7 @@
   "packages": [
     "packages/*"
   ],
-  "version": "2.7.4-preview.0",
+  "version": "2.7.4",
   "publish": {
     "allowBranch": [
       "master"
