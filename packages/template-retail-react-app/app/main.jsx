@@ -12,3 +12,10 @@ const main = () => {
 }
 
 main()
+
+window.onload = () => {
+    window.STOREFRONT_PREVIEW = {
+        ...window.STOREFRONT_PREVIEW,
+        getToken: () => window.localStorage.getItem('token')
+    }
+}
