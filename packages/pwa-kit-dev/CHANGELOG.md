@@ -1,5 +1,6 @@
 ## v2.7.4 (Aug 28, 2023)
-## v2.7.4-preview.0 (Jul 31, 2023)
+- Fix performance issue caused by potentially large amounts of stats data from webpack [#1391](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1391/files)
+
 ## v2.7.3 (Jun 20, 2023)
 -   Add support for ES module `import` statements in ssr.js [#1284](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1284)
 -   Support Node 18 and NPM 9. [#1265](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1265)
