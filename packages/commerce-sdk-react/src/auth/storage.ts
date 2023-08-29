@@ -6,7 +6,6 @@
  */
 import Cookies from 'js-cookie'
 import {getCookieSameSiteAttribute, onClient} from '../utils'
-import {IFRAME_HOST_ALLOW_LIST} from '../constant'
 
 export type StorageType = 'cookie' | 'local' | 'memory'
 
@@ -50,7 +49,7 @@ export class CookieStorage extends BaseStorage {
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
-        
+
         Cookies.set(suffixedKey, value, {
             // Deployed sites will always be HTTPS, but the local dev server is served over HTTP.
             // Ideally, this would be `secure: true`, because Chrome and Firefox both treat
