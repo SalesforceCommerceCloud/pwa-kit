@@ -13,6 +13,9 @@ const main = () => {
 
 main()
 
+// since v2 storefront uses localStorage.setItem, which does not trigger eventListener set
+// from preview script which in charge of communication between RA and storefront.
+// we need this customisation to make sure it can work with Storefront Preview feature
 window.onload = () => {
     window.STOREFRONT_PREVIEW = {
         ...window.STOREFRONT_PREVIEW,
