@@ -57,7 +57,7 @@ jobs:
 
       - name: Create Release Branch
         run: |-
-          git fetch
+          git pull
           git switch develop
           git switch nightly-releases || git switch -c nightly-releases
 

@@ -55,7 +55,7 @@ npm run push -- -m "Message to help you recognize this bundle"
 
 ## 🌍 Localization
 
-See the [Localization README.md](./packages/template-retail-react-app/app/translations/README.md) for important setup instructions for localization.
+See the [Localization README.md](./packages/template-retail-react-app/translations/README.md) for important setup instructions for localization.
 
 ## ⚠️ License Information
 
