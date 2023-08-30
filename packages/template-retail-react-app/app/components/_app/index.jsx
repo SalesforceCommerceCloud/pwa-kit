@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
-import {Helmet} from 'react-helmet'
+import React, {useState, useEffect, useReducer} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
@@ -74,6 +73,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
+import StorefrontPreview from '@salesforce/retail-react-app/app/components/storefront-preview'
 
 const onClient = typeof window !== 'undefined'
 
@@ -269,16 +269,11 @@ const App = (props) => {
         history.push(path)
     }
 
-    const storefrontPreviewClientScript =
-        process.env.NODE_ENV === 'development'
-            ? 'http://localhost:4000/mobify/bundle/development/static/storefront-preview.js'
-            : 'https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js'
+    const [, forceUpdate] = useReducer((x) => x + 1, 0)
 
     return (
         <Box className="sf-app" {...styles.container}>
-            <Helmet>
-                <script src={storefrontPreviewClientScript} type="text/javascript"></script>
-            </Helmet>
+            <StorefrontPreview rerender={() => forceUpdate()}></StorefrontPreview>
             <IntlProvider
                 onError={(err) => {
                     if (!messages) {
