@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect, useReducer} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
+import {useStorefrontPreview} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -73,7 +74,6 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import StorefrontPreview from '@salesforce/retail-react-app/app/components/storefront-preview'
 
 const onClient = typeof window !== 'undefined'
 
@@ -269,11 +269,11 @@ const App = (props) => {
         history.push(path)
     }
 
-    const [, forceUpdate] = useReducer((x) => x + 1, 0)
+    const StorefrontPreview = useStorefrontPreview()
 
     return (
         <Box className="sf-app" {...styles.container}>
-            <StorefrontPreview rerender={() => forceUpdate()}></StorefrontPreview>
+            <StorefrontPreview></StorefrontPreview>
             <IntlProvider
                 onError={(err) => {
                     if (!messages) {

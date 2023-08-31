@@ -42,3 +42,5 @@ export const useServerContext = () => {
 
     return serverContext
 }
+
+export {useStorefrontPreview} from './storefront-preview'
