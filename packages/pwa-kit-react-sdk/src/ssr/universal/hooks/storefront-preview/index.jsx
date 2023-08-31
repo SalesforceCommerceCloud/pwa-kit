@@ -48,9 +48,7 @@ export const useStorefrontPreview = (customizations = {}, enabled = detectStoref
         }
         return () => {
             // Avoid exposing the ability to re-render the wrong thing.
-            if (window.STOREFRONT_PREVIEW?.rerender === defaults.rerender) {
-                window.STOREFRONT_PREVIEW.rerender = () => {}
-            }
+            if (window.STOREFRONT_PREVIEW?.rerender) window.STOREFRONT_PREVIEW.rerender = () => {}
         }
     }, [enabled, forceUpdate])
 
