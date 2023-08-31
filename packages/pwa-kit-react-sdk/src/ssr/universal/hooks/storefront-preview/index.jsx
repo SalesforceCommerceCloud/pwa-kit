@@ -10,9 +10,9 @@ import {Helmet} from 'react-helmet'
 
 /** Origins that are allowed to run Storefront Preview. */
 const TRUSTED_ORIGINS = [
-    'runtime.commercecloud.com',
-    'runtime-admin-staging.mobify-storefront.com',
-    'runtime-admin-preview.mobify-storefront.com'
+    'https://runtime.commercecloud.com',
+    'https://runtime-admin-staging.mobify-storefront.com',
+    'https://runtime-admin-preview.mobify-storefront.com'
 ]
 
 /** Detects whether the storefront is running in an iframe as part of Storefront Preview. */
