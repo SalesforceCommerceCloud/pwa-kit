@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useReducer} from 'react'
-import {Helmet} from 'react-helmet'
+import {useEffect, useReducer, useState} from 'react'
 
 /** Origins that are allowed to run Storefront Preview. */
 const TRUSTED_ORIGINS = [
@@ -14,6 +13,9 @@ const TRUSTED_ORIGINS = [
     'https://runtime-admin-staging.mobify-storefront.com',
     'https://runtime-admin-preview.mobify-storefront.com'
 ]
+
+/** Origin used for local Runtime Admin. */
+const DEVELOPMENT_ORIGIN = 'http://localhost:4000'
 
 /** Detects whether the storefront is running in an iframe. */
 const detectInIframe = () => typeof window !== 'undefined' && window.parent !== window.self
@@ -29,7 +31,7 @@ const getParentOrigin = () => {
 
 const isParentOriginTrusted = (parentOrigin) => {
     return window.location.hostname === 'localhost'
-        ? parentOrigin === 'http://localhost:4000' // Development
+        ? parentOrigin === DEVELOPMENT_ORIGIN // Development
         : TRUSTED_ORIGINS.includes(parentOrigin) // Production
 }
 
@@ -42,8 +44,8 @@ const detectStorefrontPreview = () => {
 /** Returns the URL to load the Storefront Preview client script from the parent origin. */
 const getClientScript = () => {
     const parentOrigin = getParentOrigin() ?? 'https://runtime.commercecloud.com'
-    return parentOrigin === 'http://localhost:4000'
-        ? 'http://localhost:4000/mobify/bundle/development/static/storefront-preview.js'
+    return parentOrigin === DEVELOPMENT_ORIGIN
+        ? `${parentOrigin}/mobify/bundle/development/static/storefront-preview.js`
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }
 
@@ -54,9 +56,14 @@ const getClientScript = () => {
  * @param {boolean} enabled - Whether Storefront Preview is enabled. Defaults to detecting whether
  * the storefront is framed by Runtime Admin.
  */
-export const useStorefrontPreview = (customizations = {}, enabled = detectStorefrontPreview()) => {
+export const useStorefrontPreview = (
+    {enabled = detectStorefrontPreview(), ...customizations} = {},
+    dependencies = []
+) => {
     const [, forceUpdate] = useReducer((x) => x + 1, 0)
+    const [initialized, setInitialized] = useState(false)
 
+    // Add customizations to the STOREFRONT_PREVIEW object used by the client script
     useEffect(() => {
         if (enabled) {
             window.STOREFRONT_PREVIEW = {
@@ -69,14 +76,16 @@ export const useStorefrontPreview = (customizations = {}, enabled = detectStoref
             // Avoid exposing the ability to re-render the wrong thing.
             if (window.STOREFRONT_PREVIEW?.rerender) window.STOREFRONT_PREVIEW.rerender = () => {}
         }
-    }, [enabled, forceUpdate])
+    }, [enabled, forceUpdate, ...dependencies])
 
-    const StorefrontPreview = () =>
-        enabled && (
-            <Helmet>
-                <script src={getClientScript()} type="text/javascript"></script>
-            </Helmet>
-        )
-
-    return StorefrontPreview
+    // Inject the client script. We are not using a React component because do not want to make
+    // storefronts responsible for including the script themselves.
+    useEffect(() => {
+        if (enabled && !initialized) {
+            const script = document.createElement('script')
+            script.src = getClientScript()
+            document.head.appendChild(script)
+            setInitialized(true)
+        }
+    }, [enabled])
 }

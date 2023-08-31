@@ -185,6 +185,8 @@ const App = (props) => {
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
 
+    useStorefrontPreview()
+
     useEffect(() => {
         // Create a new basket if the current customer doesn't have one.
         if (baskets?.total === 0) {
@@ -269,11 +271,8 @@ const App = (props) => {
         history.push(path)
     }
 
-    const StorefrontPreview = useStorefrontPreview()
-
     return (
         <Box className="sf-app" {...styles.container}>
-            <StorefrontPreview></StorefrontPreview>
             <IntlProvider
                 onError={(err) => {
                     if (!messages) {
