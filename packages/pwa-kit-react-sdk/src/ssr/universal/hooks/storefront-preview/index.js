@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect, useReducer, useState} from 'react'
+import {useEffect} from 'react'
 
 /** Origins that are allowed to run Storefront Preview. */
 const TRUSTED_ORIGINS = [
@@ -56,36 +56,14 @@ const getClientScript = () => {
  * @param {boolean} enabled - Whether Storefront Preview is enabled. Defaults to detecting whether
  * the storefront is framed by Runtime Admin.
  */
-export const useStorefrontPreview = (
-    {enabled = detectStorefrontPreview(), ...customizations} = {},
-    dependencies = []
-) => {
-    const [, forceUpdate] = useReducer((x) => x + 1, 0)
-    const [initialized, setInitialized] = useState(false)
-
-    // Add customizations to the STOREFRONT_PREVIEW object used by the client script
-    useEffect(() => {
-        if (enabled) {
-            window.STOREFRONT_PREVIEW = {
-                rerender: () => forceUpdate(),
-                ...window.STOREFRONT_PREVIEW,
-                ...customizations
-            }
-        }
-        return () => {
-            // Avoid exposing the ability to re-render the wrong thing.
-            if (window.STOREFRONT_PREVIEW?.rerender) window.STOREFRONT_PREVIEW.rerender = () => {}
-        }
-    }, [enabled, forceUpdate, ...dependencies])
-
+export const useStorefrontPreview = ({enabled = detectStorefrontPreview()} = {}) => {
     // Inject the client script. We are not using a React component because do not want to make
     // storefronts responsible for including the script themselves.
     useEffect(() => {
-        if (enabled && !initialized) {
+        if (enabled) {
             const script = document.createElement('script')
             script.src = getClientScript()
             document.head.appendChild(script)
-            setInitialized(true)
         }
-    }, [enabled])
+    }, [])
 }
