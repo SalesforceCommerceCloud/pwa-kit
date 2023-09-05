@@ -8,7 +8,7 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
-import {useStorefrontPreview} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+// import {useStorefrontPreview} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -184,8 +184,6 @@ const App = (props) => {
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
-
-    useStorefrontPreview()
 
     useEffect(() => {
         // Create a new basket if the current customer doesn't have one.

@@ -36,34 +36,15 @@ const isParentOriginTrusted = (parentOrigin) => {
 }
 
 /** Detects whether the storefront is running in an iframe as part of Storefront Preview. */
-const detectStorefrontPreview = () => {
+export const detectStorefrontPreview = () => {
     const parentOrigin = getParentOrigin()
     return Boolean(parentOrigin) && isParentOriginTrusted(parentOrigin)
 }
 
 /** Returns the URL to load the Storefront Preview client script from the parent origin. */
-const getClientScript = () => {
+export const getClientScript = () => {
     const parentOrigin = getParentOrigin() ?? 'https://runtime.commercecloud.com'
     return parentOrigin === DEVELOPMENT_ORIGIN
         ? `${parentOrigin}/mobify/bundle/development/static/storefront-preview.js`
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
-}
-
-/**
- * Initializes the `window.STOREFRONT_PREVIEW` object and returns a component that will create the
- * connection to Runtime Admin.
- * @param {object} customizations - Customizations to the Storefront Preview behavior
- * @param {boolean} enabled - Whether Storefront Preview is enabled. Defaults to detecting whether
- * the storefront is framed by Runtime Admin.
- */
-export const useStorefrontPreview = ({enabled = detectStorefrontPreview()} = {}) => {
-    // Inject the client script. We are not using a React component because do not want to make
-    // storefronts responsible for including the script themselves.
-    useEffect(() => {
-        if (enabled) {
-            const script = document.createElement('script')
-            script.src = getClientScript()
-            document.head.appendChild(script)
-        }
-    }, [])
 }

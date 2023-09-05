@@ -8,9 +8,13 @@
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
+import {getClientScript, detectStorefrontPreview} from '../hooks/storefront-preview'
+import {Helmet} from 'react-helmet'
+import {isServer} from '@tanstack/react-query'
 
 const CorrelationIdContext = React.createContext()
 const ServerContext = React.createContext()
+const StorefrontPreviewContext = React.createContext()
 
 /**
  * This provider initializes the correlation id,
@@ -61,4 +65,21 @@ CorrelationIdProvider.propTypes = {
     location: PropTypes.object
 }
 
-export {CorrelationIdContext, CorrelationIdProvider, ServerContext}
+const PreviewStorefrontProvider = ({children}) => {
+    const enabled = detectStorefrontPreview()
+    return (
+        <StorefrontPreviewContext.Provider value={{}}>
+            {!isServer && enabled && (
+                <Helmet>
+                    <script src={getClientScript()} type="text/javascript"></script>
+                </Helmet>
+            )}
+            {children}
+        </StorefrontPreviewContext.Provider>
+    )
+}
+
+PreviewStorefrontProvider.propTypes = {
+    children: PropTypes.element.isRequired
+}
+export {CorrelationIdContext, CorrelationIdProvider, ServerContext, PreviewStorefrontProvider}
