@@ -65,21 +65,21 @@ CorrelationIdProvider.propTypes = {
     location: PropTypes.object
 }
 
-const PreviewStorefrontProvider = ({children}) => {
+const StorefrontPreviewProvider = ({children}) => {
     const enabled = detectStorefrontPreview()
     return (
         <StorefrontPreviewContext.Provider value={{}}>
-            {!isServer && enabled && (
-                <Helmet>
-                    <script src={getClientScript()} type="text/javascript"></script>
-                </Helmet>
-            )}
+            {/*{!isServer && enabled && (*/}
+            {/*    <Helmet>*/}
+            {/*        <script src={getClientScript()} type="text/javascript"></script>*/}
+            {/*    </Helmet>*/}
+            {/*)}*/}
             {children}
         </StorefrontPreviewContext.Provider>
     )
 }
 
-PreviewStorefrontProvider.propTypes = {
+StorefrontPreviewProvider.propTypes = {
     children: PropTypes.element.isRequired
 }
-export {CorrelationIdContext, CorrelationIdProvider, ServerContext, PreviewStorefrontProvider}
+export {CorrelationIdContext, CorrelationIdProvider, ServerContext, StorefrontPreviewProvider}
