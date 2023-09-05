@@ -202,6 +202,65 @@ export class CloudAPIClient {
         const data = await res.json()
         return data['token']
     }
+
+    /** Polls MRT for deployment status every 60 seconds. */
+    async waitForDeploy(project: string, environment: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const delay = 60e3 // 60 seconds
+            const onError = (error: string) => {
+                clearInterval(interval)
+                reject(new Error(error))
+            }
+            const onSuccess = () => {
+                clearInterval(interval)
+                resolve()
+            }
+
+            const wait = async () => {
+                const url = new URL(
+                    `/api/projects/${project}/target/${environment}`,
+                    this.opts.origin
+                )
+                const res = await this.opts.fetch(url, {headers: await this.getHeaders()})
+
+                if (!res.ok) {
+                    const text = await res.text()
+                    let json
+                    try {
+                        if (text) json = JSON.parse(text)
+                    } catch (_) {} // eslint-disable-line no-empty
+                    const message = json?.detail ?? text
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                    const detail = message ? `: ${message}` : ''
+                    throw new Error(`${res.status} ${res.statusText}${detail}`)
+                }
+
+                const data = await res.json()
+                if (typeof data.state !== 'string') {
+                    clearInterval(interval)
+                    return onError('An unknown state occurred when polling the deployment.')
+                }
+                switch (data.state) {
+                    case 'CREATE_IN_PROGRESS':
+                    case 'PUBLISH_IN_PROGRESS':
+                        // In progress - let interval continue
+                        break
+                    case 'CREATE_FAILED':
+                    case 'PUBLISH_FAILED':
+                        // Failed - reject with error
+                        return onError('Deploy failed.')
+                    default:
+                        // Not in progress or failed - assume success
+                        return onSuccess()
+                }
+            }
+
+            const interval = setInterval(() => {
+                // Stop the interval if the callback fails
+                wait().catch((err) => onError(err?.message ?? err))
+            }, delay)
+        })
+    }
 }
 
 export const defaultMessage = (gitInstance: typeof git = git): string => {
