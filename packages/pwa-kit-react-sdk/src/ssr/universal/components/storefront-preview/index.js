@@ -70,8 +70,6 @@ export const StorefrontPreview = ({
                     ...window.STOREFRONT_PREVIEW,
                     ...customisation
                 }
-            } else {
-                throw new Error('Parent Origin is not trusted.')
             }
         }
     }, [enabled])
