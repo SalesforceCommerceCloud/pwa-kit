@@ -37,6 +37,19 @@ module.exports = {
             isProduction: false
         }
     },
+    // config for your storefront preview
+    storefrontPreview: {
+        // if your storefront does not want to use preview feature, set it to false so the storefront won't load
+        // storefront preview script from Runtime Admin
+        enabled: true,
+        // customisation you want to adjust for storefront preview feature.
+        // insert document link here
+        customisation: {
+            STOREFRONT_PREVIEW: {
+                hello: () => 'test'
+            }
+        }
+    },
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,

@@ -9,7 +9,6 @@ import PropTypes from 'prop-types'
 import {Switch as RouterSwitch, Route} from 'react-router-dom'
 import AppErrorBoundary from '../app-error-boundary'
 import {UIDReset, UIDFork} from 'react-uid'
-import {StorefrontPreviewProvider} from '../../contexts'
 
 /**
  * The Switch component packages up the bits of rendering that are shared between
@@ -26,22 +25,20 @@ const Switch = (props) => {
         <UIDReset>
             <AppErrorBoundary error={error}>
                 {!error && (
-                    <StorefrontPreviewProvider>
-                        <App preloadedProps={appState.appProps}>
-                            <RouterSwitch>
-                                {routes.map((route, i) => {
-                                    const {component: Component, ...routeProps} = route
-                                    return (
-                                        <Route key={i} {...routeProps}>
-                                            <UIDFork>
-                                                <Component preloadedProps={appState.pageProps} />
-                                            </UIDFork>
-                                        </Route>
-                                    )
-                                })}
-                            </RouterSwitch>
-                        </App>
-                    </StorefrontPreviewProvider>
+                    <App preloadedProps={appState.appProps}>
+                        <RouterSwitch>
+                            {routes.map((route, i) => {
+                                const {component: Component, ...routeProps} = route
+                                return (
+                                    <Route key={i} {...routeProps}>
+                                        <UIDFork>
+                                            <Component preloadedProps={appState.pageProps} />
+                                        </UIDFork>
+                                    </Route>
+                                )
+                            })}
+                        </RouterSwitch>
+                    </App>
                 )}
             </AppErrorBoundary>
         </UIDReset>

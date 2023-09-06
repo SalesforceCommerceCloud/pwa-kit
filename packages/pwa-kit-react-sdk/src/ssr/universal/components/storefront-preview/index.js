@@ -5,7 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect} from 'react'
+import React, {useEffect} from 'react'
+import PropTypes from 'prop-types'
+import {Helmet} from 'react-helmet'
+import {isServer} from '@tanstack/react-query'
 
 /** Origins that are allowed to run Storefront Preview. */
 const TRUSTED_ORIGINS = [
@@ -47,4 +50,28 @@ export const getClientScript = () => {
     return parentOrigin === DEVELOPMENT_ORIGIN
         ? `${parentOrigin}/mobify/bundle/development/static/storefront-preview.js`
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
+}
+const StorefrontPreview = ({enabled = detectStorefrontPreview(), customisation}) => {
+    useEffect(() => {
+        if (enabled) {
+            window.STOREFRONT_PREVIEW = {
+                ...window.STOREFRONT_PREVIEW,
+                ...customisation.STOREFRONT_PREVIEW
+            }
+        }
+    }, [enabled])
+    return (
+        <>
+            {!isServer && enabled && (
+                <Helmet>
+                    <script src={getClientScript()} type="text/javascript"></script>
+                </Helmet>
+            )}
+        </>
+    )
+}
+
+StorefrontPreview.propTypes = {
+    enabled: PropTypes.bool.isRequired,
+    customisation: PropTypes.object
 }
