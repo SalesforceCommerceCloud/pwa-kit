@@ -52,31 +52,26 @@ export const getClientScript = () => {
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }
 export const StorefrontPreview = ({
-    // Note: how to get access to MRT env on client-side?
-    // enabled = process?.env?.STOREFRONT_PREVIEW || false,
-    enabled = false,
+    enabled = typeof window !== 'undefined' ? window.STOREFRONT_PREVIEW.enabled : false,
     customisation
 }) => {
-    // Can we do this? process is not defined on client side.
-    // do not run preview feature if STOREFRONT_PREVIEW variable is not turned on in MRT env
+    console.log('enabled', enabled)
     if (!enabled) {
         return null
     }
+    const isHostTrusted = detectStorefrontPreview()
     useEffect(() => {
-        if (enabled) {
-            const isHostTrusted = detectStorefrontPreview()
-            if (isHostTrusted) {
-                window.STOREFRONT_PREVIEW = {
-                    ...window.STOREFRONT_PREVIEW,
-                    ...customisation
-                }
+        if (enabled && isHostTrusted) {
+            window.STOREFRONT_PREVIEW = {
+                ...window.STOREFRONT_PREVIEW,
+                ...customisation
             }
         }
     }, [enabled])
 
     return (
         <>
-            {!isServer && enabled && (
+            {!isServer && enabled && isHostTrusted && (
                 <Helmet>
                     <script src={getClientScript()} type="text/javascript"></script>
                 </Helmet>
@@ -86,6 +81,6 @@ export const StorefrontPreview = ({
 }
 
 StorefrontPreview.propTypes = {
-    enabled: PropTypes.bool.isRequired,
+    enabled: PropTypes.bool,
     customisation: PropTypes.object
 }
