@@ -268,7 +268,6 @@ const App = (props) => {
         const path = buildUrl('/account/wishlist')
         history.push(path)
     }
-
     return (
         <Box className="sf-app" {...styles.container}>
             <IntlProvider
@@ -295,7 +294,7 @@ const App = (props) => {
                 defaultLocale={DEFAULT_LOCALE}
             >
                 <CurrencyProvider currency={currency}>
-                    <StorefrontPreview />
+                    <StorefrontPreview enabled={true} />
                     <Seo>
                         <meta name="theme-color" content={THEME_COLOR} />
                         <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />

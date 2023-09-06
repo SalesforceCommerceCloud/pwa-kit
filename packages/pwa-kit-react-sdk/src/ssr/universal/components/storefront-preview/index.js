@@ -51,17 +51,27 @@ export const getClientScript = () => {
         ? `${parentOrigin}/mobify/bundle/development/static/storefront-preview.js`
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }
-export const StorefrontPreview = ({enabled = detectStorefrontPreview(), customisation}) => {
+export const StorefrontPreview = ({
+    // Note: how to get access to MRT env on client-side?
+    // enabled = process?.env?.STOREFRONT_PREVIEW || false,
+    enabled = false,
+    customisation
+}) => {
     // Can we do this? process is not defined on client side.
     // do not run preview feature if STOREFRONT_PREVIEW variable is not turned on in MRT env
-    // if (!process.env.STOREFRONT_PREVIEW) {
-    //     return null
-    // }
+    if (!enabled) {
+        return null
+    }
     useEffect(() => {
         if (enabled) {
-            window.STOREFRONT_PREVIEW = {
-                ...window.STOREFRONT_PREVIEW,
-                ...customisation
+            const isHostTrusted = detectStorefrontPreview()
+            if (isHostTrusted) {
+                window.STOREFRONT_PREVIEW = {
+                    ...window.STOREFRONT_PREVIEW,
+                    ...customisation
+                }
+            } else {
+                throw new Error('Parent Origin is not trusted.')
             }
         }
     }, [enabled])
