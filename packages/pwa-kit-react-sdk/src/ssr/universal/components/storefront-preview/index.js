@@ -51,15 +51,21 @@ export const getClientScript = () => {
         ? `${parentOrigin}/mobify/bundle/development/static/storefront-preview.js`
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }
-const StorefrontPreview = ({enabled = detectStorefrontPreview(), customisation}) => {
+export const StorefrontPreview = ({enabled = detectStorefrontPreview(), customisation}) => {
+    // Can we do this? process is not defined on client side.
+    // do not run preview feature if STOREFRONT_PREVIEW variable is not turned on in MRT env
+    // if (!process.env.STOREFRONT_PREVIEW) {
+    //     return null
+    // }
     useEffect(() => {
         if (enabled) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
-                ...customisation.STOREFRONT_PREVIEW
+                ...customisation
             }
         }
     }, [enabled])
+
     return (
         <>
             {!isServer && enabled && (
