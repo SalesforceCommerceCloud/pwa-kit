@@ -244,6 +244,17 @@ const ProductDetail = () => {
         }
     }, [product])
 
+    // TODO: Revert
+    const promos = product?.productPromotions.reduce(
+        (acc, promo) => ({
+            ...acc,
+            [promo.promotionId]: promo
+        }),
+        {}
+    )
+    console.log('PDP product:', product)
+    console.log('promos', promos)
+
     return (
         <Box
             className="sf-product-detail-page"
