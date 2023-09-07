@@ -52,15 +52,15 @@ export const getClientScript = () => {
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }
 export const StorefrontPreview = ({
-    enabled = typeof window !== 'undefined' ? window.STOREFRONT_PREVIEW.enabled : false,
-    customisation
+    enabled = typeof window !== 'undefined' ? Boolean(window.STOREFRONT_PREVIEW?.enabled) : false,
+    getToken
 }) => {
     let isHostTrusted
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
-                ...customisation
+                getToken
             }
         }
     }, [enabled])
@@ -71,16 +71,14 @@ export const StorefrontPreview = ({
 
     return (
         <>
-            {
-                <Helmet>
-                    <script src={getClientScript()} type="text/javascript"></script>
-                </Helmet>
-            }
+            <Helmet>
+                <script src={getClientScript()} type="text/javascript"></script>
+            </Helmet>
         </>
     )
 }
 
 StorefrontPreview.propTypes = {
     enabled: PropTypes.bool,
-    customisation: PropTypes.object
+    getToken: PropTypes.func
 }
