@@ -153,7 +153,7 @@ const App = (props) => {
     const storefrontPreviewClientScript =
         process.env.NODE_ENV === 'development'
             ? 'http://localhost:4000/mobify/bundle/development/static/storefront-preview.js'
-            : 'https://runtime-admin-preview.mobify-storefront.com/cc/b2c/preview/preview.client.js'
+            : 'https://runtime-admin-preview-adam.mobify-storefront.com/cc/b2c/preview/preview.client.js'
 
     return (
         <Box className="sf-app" {...styles.container}>
