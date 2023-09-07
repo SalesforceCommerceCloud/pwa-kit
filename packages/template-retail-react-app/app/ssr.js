@@ -53,7 +53,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 '*.mobify-staging.com',
                 '*.mobify-storefront-staging.com',
                 '*.mobify-storefront.com',
-                'runtime.commercecloud.com'
+                '*.commercecloud.com'
             ],
             staging: [
                 '*.demandware.net',
@@ -61,14 +61,14 @@ const {handler} = runtime.createHandler(options, (app) => {
                 '*.mobify-storefront-staging.com',
                 '*.mobify-storefront.com',
                 '*.commercecloud.salesforce.com',
-                'runtime.commercecloud.com'
+                '*.commercecloud.com'
             ],
             production: [
                 '*.demandware.com',
                 '*.mobify.com',
                 '*.mobify-storefront.com',
                 '*.commercecloud.salesforce.com',
-                'runtime.commercecloud.com'
+                '*.commercecloud.com'
             ]
         }
 
