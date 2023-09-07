@@ -27,12 +27,10 @@ export const StorefrontPreview = ({
         return null
     }
     isHostTrusted = detectStorefrontPreview()
-    console.log('enabled', enabled)
-    console.log('isHostTrusted', isHostTrusted)
     return (
         <>
             <Helmet>
-                <script src={getClientScript()} type="text/javascript"></script>
+                <script src={getClientScript()} async type="text/javascript"></script>
             </Helmet>
         </>
     )
