@@ -6,7 +6,7 @@
  */
 /* global __webpack_require__ */
 import React, {useRef} from 'react'
-import {hydrateRoot} from 'react-dom/client'
+import {createRoot, hydrateRoot} from 'react-dom/client'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
@@ -113,9 +113,17 @@ export const start = () => {
         WrappedApp: routeComponent(App, false, locals)
     }
 
+    const disableSSR = window.STOREFRONT_PREVIEW.enabled
+    window.__HYDRATING__ = disableSSR ? false : true
+
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
         .then(() => {
+            if (disableSSR) {
+                const root = createRoot(rootEl);
+                root.render(<OuterApp {...props}/>)
+                return
+            }
             hydrateRoot(
                 rootEl,
                 <OuterApp
