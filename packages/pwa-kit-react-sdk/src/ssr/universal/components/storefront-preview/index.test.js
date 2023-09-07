@@ -6,10 +6,11 @@
  */
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import {StorefrontPreview, detectStorefrontPreview} from './index'
+import {StorefrontPreview} from './index'
+import {detectStorefrontPreview} from './utils'
 
-jest.mock('./index', () => {
-    const origin = require('./index')
+jest.mock('./utils', () => {
+    const origin = jest.requireActual('./utils')
     return {
         ...origin,
         detectStorefrontPreview: jest.fn()
@@ -24,7 +25,8 @@ describe('Storefront Preview Component', function () {
         process.env = OLD_ENV
     })
     test.only('renders script tag when enabled is on', () => {
-        process.env.STOREFRONT_PREVIEW = true
+        process.env.STOREFRONT_PREVIEW = 'true'
+        detectStorefrontPreview.mockReturnValue(true)
 
         render(<StorefrontPreview />)
     })
