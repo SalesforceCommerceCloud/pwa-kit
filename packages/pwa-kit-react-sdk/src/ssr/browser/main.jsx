@@ -73,7 +73,7 @@ OuterApp.propTypes = {
     onHydrate: PropTypes.func
 }
 /* istanbul ignore next */
-export const start = () => {
+export const start = async () => {
     const AppConfig = getAppConfig()
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)
@@ -113,17 +113,14 @@ export const start = () => {
         WrappedApp: routeComponent(App, false, locals)
     }
 
-    return Promise.resolve()
-        .then(() => new Promise((resolve) => loadableReady(resolve)))
-        .then(() => {
-            hydrateRoot(
-                rootEl,
-                <OuterApp
-                    {...props}
-                    onHydrate={() => {
-                        window.__HYDRATING__ = false
-                    }}
-                />
-            )
-        })
+    await new Promise((resolve) => loadableReady(resolve))
+    const root = await hydrateRoot(
+        rootEl,
+        <OuterApp
+            {...props}
+            onHydrate={() => {
+                window.__HYDRATING__ = false
+            }}
+        />
+    )
 }
