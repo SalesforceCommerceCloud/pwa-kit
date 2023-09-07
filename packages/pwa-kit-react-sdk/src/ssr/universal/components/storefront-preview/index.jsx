@@ -26,6 +26,7 @@ export const StorefrontPreview = ({
     if (!enabled) {
         return null
     }
+    // We only want to run this function when enabled is on
     isHostTrusted = detectStorefrontPreview()
     return (
         <>
