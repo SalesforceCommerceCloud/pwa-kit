@@ -19,7 +19,7 @@ const DEVELOPMENT_ORIGIN = 'http://localhost:4000'
 const detectInIframe = () => typeof window !== 'undefined' && window.parent !== window.self
 
 /** Gets the parent origin when running in an iframe. */
-const getParentOrigin = () => {
+export const getParentOrigin = () => {
     if (detectInIframe()) {
         if (window.location.ancestorOrigins) return window.location.ancestorOrigins[0]
         // ancestorOrigins does not exist in Firefox, so we use referrer as a fallback

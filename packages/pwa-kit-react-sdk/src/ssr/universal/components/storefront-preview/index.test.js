@@ -8,6 +8,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {StorefrontPreview} from './index'
 import {detectStorefrontPreview} from './utils'
+import {Helmet} from 'react-helmet'
 
 jest.mock('./utils', () => {
     const origin = jest.requireActual('./utils')
@@ -17,19 +18,55 @@ jest.mock('./utils', () => {
     }
 })
 describe('Storefront Preview Component', function () {
-    const OLD_ENV = process.env
+    const oldWindow = window
+
     beforeEach(() => {
-        process.env = {...OLD_ENV}
+        window = {...oldWindow}
     })
+
     afterEach(() => {
-        process.env = OLD_ENV
+        window = oldWindow
     })
-    test.only('renders script tag when enabled is on', () => {
-        process.env.STOREFRONT_PREVIEW = 'true'
+    test('renders nothing when enabled is off', async () => {
+        render(<StorefrontPreview enabled={false} />)
+        const helmet = Helmet.peek()
+        await waitFor(() => {
+            expect(helmet).toEqual(undefined)
+        })
+    })
+    test('renders script tag when enabled is on', async () => {
+        detectStorefrontPreview.mockReturnValue(true)
+
+        render(<StorefrontPreview enabled={true} />)
+        // this will return all the markup assigned to helmet
+        // which will get rendered inside head.
+        const helmet = Helmet.peek()
+        await waitFor(() => {
+            expect(helmet.scriptTags[0].src).toEqual(
+                'https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js'
+            )
+            expect(helmet.scriptTags[0].async).toEqual(true)
+            expect(helmet.scriptTags[0].type).toEqual('text/javascript')
+        })
+    })
+
+    test('renders script tag when window.STOREFRONT_PREVIEW.enabled is on', async () => {
+        window.STOREFRONT_PREVIEW.enabled = true
         detectStorefrontPreview.mockReturnValue(true)
 
         render(<StorefrontPreview />)
+        // this will return all the markup assigned to helmet
+        // which will get rendered inside head.
+        const helmet = Helmet.peek()
+        console.log('helmet', helmet)
+        await waitFor(() => {
+            expect(helmet.scriptTags[0].src).toEqual(
+                'https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js'
+            )
+            expect(helmet.scriptTags[0].async).toEqual(true)
+            expect(helmet.scriptTags[0].type).toEqual('text/javascript')
+        })
     })
-
-    test('renders nothing when enabled is off', () => {})
 })
+
+describe('Test', function () {})
