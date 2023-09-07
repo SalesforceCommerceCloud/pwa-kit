@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import {StorefrontPreview} from './index'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
@@ -21,17 +21,19 @@ describe('Storefront Preview Component', function () {
     const oldWindow = window
 
     beforeEach(() => {
+        // eslint-disable-next-line
         window = {...oldWindow}
     })
 
     afterEach(() => {
+        // eslint-disable-next-line
         window = oldWindow
     })
     test('not renders nothing when enabled is off', async () => {
         render(<StorefrontPreview enabled={false} />)
         const helmet = Helmet.peek()
         await waitFor(() => {
-            expect(helmet).toEqual(undefined)
+            expect(helmet).toBeUndefined()
         })
     })
     test('renders script tag when enabled is on', async () => {
@@ -42,11 +44,11 @@ describe('Storefront Preview Component', function () {
         // which will get rendered inside head.
         const helmet = Helmet.peek()
         await waitFor(() => {
-            expect(helmet.scriptTags[0].src).toEqual(
+            expect(helmet.scriptTags[0].src).toBe(
                 'https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js'
             )
-            expect(helmet.scriptTags[0].async).toEqual(true)
-            expect(helmet.scriptTags[0].type).toEqual('text/javascript')
+            expect(helmet.scriptTags[0].async).toBe(true)
+            expect(helmet.scriptTags[0].type).toBe('text/javascript')
         })
     })
 
@@ -61,11 +63,11 @@ describe('Storefront Preview Component', function () {
         // which will get rendered inside head.
         const helmet = Helmet.peek()
         await waitFor(() => {
-            expect(helmet.scriptTags[0].src).toEqual(
+            expect(helmet.scriptTags[0].src).toBe(
                 'https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js'
             )
-            expect(helmet.scriptTags[0].async).toEqual(true)
-            expect(helmet.scriptTags[0].type).toEqual('text/javascript')
+            expect(helmet.scriptTags[0].async).toBe(true)
+            expect(helmet.scriptTags[0].type).toBe('text/javascript')
         })
     })
 
@@ -78,5 +80,3 @@ describe('Storefront Preview Component', function () {
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
     })
 })
-
-describe('Test', function () {})

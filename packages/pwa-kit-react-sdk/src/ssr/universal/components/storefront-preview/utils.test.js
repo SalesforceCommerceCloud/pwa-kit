@@ -11,15 +11,17 @@ describe('getClientScript', function () {
     const oldWindow = window
 
     beforeEach(() => {
+        // eslint-disable-next-line
         window = {...oldWindow}
     })
 
     afterEach(() => {
+        // eslint-disable-next-line
         window = oldWindow
     })
     test('returns client script src with prod origin', () => {
         const src = getClientScript()
-        expect(src).toEqual('https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js')
+        expect(src).toBe('https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js')
     })
 
     test('returns client script src with localhost origin', () => {
@@ -30,7 +32,7 @@ describe('getClientScript', function () {
         window.location.ancestorOrigins = ['http://localhost:4000']
         const src = getClientScript()
 
-        expect(src).toEqual(
+        expect(src).toBe(
             'http://localhost:4000/mobify/bundle/development/static/storefront-preview.js'
         )
     })
