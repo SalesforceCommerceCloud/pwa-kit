@@ -55,6 +55,7 @@ export const StorefrontPreview = ({
     enabled = typeof window !== 'undefined' ? window.STOREFRONT_PREVIEW.enabled : false,
     customisation
 }) => {
+    let isHostTrusted
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
@@ -63,19 +64,18 @@ export const StorefrontPreview = ({
             }
         }
     }, [enabled])
-
     if (!enabled) {
         return null
     }
+    isHostTrusted = detectStorefrontPreview()
 
-    const isHostTrusted = detectStorefrontPreview()
     return (
         <>
-            {!isServer && enabled && isHostTrusted && (
+            {
                 <Helmet>
                     <script src={getClientScript()} type="text/javascript"></script>
                 </Helmet>
-            )}
+            }
         </>
     )
 }
