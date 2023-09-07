@@ -96,16 +96,6 @@ export const start = () => {
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
 
-    // We need to tell the routeComponent HOC when the app is hydrating in order to
-    // prevent pages from re-fetching data on the first client-side render. The
-    // reason we do this is that we expect a render to have taken place
-    // on the server already. That server-side render already called getProps()
-    // and froze the application state as a JSON blob on the page.
-    //
-    // This is VERY fiddly – don't go crazy with window.__HYDRATING__. You have
-    // been warned.
-    window.__HYDRATING__ = true
-
     const props = {
         error: window.__ERROR__,
         locals: locals,
@@ -114,6 +104,15 @@ export const start = () => {
     }
 
     const disableSSR = window.STOREFRONT_PREVIEW.enabled
+
+    // We need to tell the routeComponent HOC when the app is hydrating in order to
+    // prevent pages from re-fetching data on the first client-side render. The
+    // reason we do this is that we expect a render to have taken place
+    // on the server already. That server-side render already called getProps()
+    // and froze the application state as a JSON blob on the page.
+    //
+    // This is VERY fiddly – don't go crazy with window.__HYDRATING__. You have
+    // been warned.
     window.__HYDRATING__ = disableSSR ? false : true
 
     return Promise.resolve()
