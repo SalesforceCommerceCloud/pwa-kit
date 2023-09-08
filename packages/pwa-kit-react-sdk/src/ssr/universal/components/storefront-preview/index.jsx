@@ -32,7 +32,12 @@ export const StorefrontPreview = ({enabled = true, getToken}) => {
     isHostTrusted = detectStorefrontPreview()
     return isHostTrusted ? (
         <Helmet>
-            <script src={getClientScript()} async type="text/javascript"></script>
+            <script
+                id="storefront_preview"
+                src={getClientScript()}
+                async
+                type="text/javascript"
+            ></script>
         </Helmet>
     ) : null
 }
