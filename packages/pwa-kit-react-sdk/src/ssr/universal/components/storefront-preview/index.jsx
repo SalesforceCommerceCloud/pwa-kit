@@ -13,7 +13,7 @@ import {detectStorefrontPreview, getClientScript} from './utils'
 /**
  *
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
- * @param {function} getToken - a STOREFRONT_PREVIEW customised function that fetches token of storefront
+ * @param {{function():string}} getToken - a STOREFRONT_PREVIEW customised function that fetches token of storefront
  */
 export const StorefrontPreview = ({enabled = true, getToken}) => {
     let isHostTrusted
