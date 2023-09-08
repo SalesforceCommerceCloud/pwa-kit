@@ -6,9 +6,10 @@
  */
 
 /**
- * This list contain domains that can host code in iframe
+ * This list contains domains that can host code in iframe
  */
 export const IFRAME_HOST_ALLOW_LIST = [
     'runtime.commercecloud.com',
+    'runtime-admin-staging.mobify-storefront.com',
     'runtime-admin-preview.mobify-storefront.com'
 ]
