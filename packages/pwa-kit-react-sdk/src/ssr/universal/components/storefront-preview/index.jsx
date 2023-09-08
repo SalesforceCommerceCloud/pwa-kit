@@ -30,13 +30,11 @@ export const StorefrontPreview = ({enabled = true, getToken}) => {
     }
     // We only want to run this function when enabled is on
     isHostTrusted = detectStorefrontPreview()
-    return (
-        isHostTrusted && (
-            <Helmet>
-                <script src={getClientScript()} async type="text/javascript"></script>
-            </Helmet>
-        )
-    )
+    return isHostTrusted ? (
+        <Helmet>
+            <script src={getClientScript()} async type="text/javascript"></script>
+        </Helmet>
+    ) : null
 }
 
 StorefrontPreview.propTypes = {
