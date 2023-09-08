@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {mount} from 'enzyme'
 import {StorefrontPreview} from './index'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
@@ -35,7 +35,6 @@ describe('Storefront Preview Component', function () {
         // which will get rendered inside head.
         const helmet = Helmet.peek()
         expect(helmet).toBeUndefined()
-
     })
     test('renders script tag when enabled is on but host is not trusted', async () => {
         detectStorefrontPreview.mockReturnValue(false)

@@ -89,4 +89,3 @@ describe('detectStorefrontPreview', function () {
         expect(detectStorefrontPreview()).toBe(true)
     })
 })
-
