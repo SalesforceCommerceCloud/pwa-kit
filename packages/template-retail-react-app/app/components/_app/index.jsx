@@ -8,9 +8,9 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
-import {Helmet} from 'react-helmet'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import StorefrontPreview from 'pwa-kit-react-sdk/storefront-preview'
 
 // Chakra
 import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
@@ -149,17 +149,8 @@ const App = (props) => {
         history.push(path)
     }
 
-    // Storefront Preview script. Your storefront needs to load this script for Storefront Preview feature
-    const storefrontPreviewClientScript =
-        process.env.NODE_ENV === 'development'
-            ? 'http://localhost:4000/mobify/bundle/development/static/storefront-preview.js'
-            : 'https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js'
-
     return (
         <Box className="sf-app" {...styles.container}>
-            <Helmet>
-                <script src={storefrontPreviewClientScript} type="text/javascript"></script>
-            </Helmet>
             <IntlProvider
                 onError={(err) => {
                     if (err.code === 'MISSING_TRANSLATION') {
@@ -180,6 +171,7 @@ const App = (props) => {
             >
                 <CategoriesProvider treeRoot={allCategories} locale={targetLocale}>
                     <CurrencyProvider currency={currency}>
+                        <StorefrontPreview getToken={() => window.localStorage.getItem('token')} />
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
                             <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
