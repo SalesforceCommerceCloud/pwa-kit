@@ -10,10 +10,7 @@ import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {detectStorefrontPreview, getClientScript} from './utils'
 
-export const StorefrontPreview = ({
-    enabled = typeof window !== 'undefined' ? Boolean(window.STOREFRONT_PREVIEW?.enabled) : false,
-    getToken
-}) => {
+export const StorefrontPreview = ({enabled = true, getToken}) => {
     let isHostTrusted
     useEffect(() => {
         if (enabled && isHostTrusted) {

@@ -310,11 +310,6 @@ const renderApp = (args) => {
         __CONFIG__: config,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
-        // process.env.STOREFRONT_PREVIEW is an MRT env, by default it will be turned off/undefined, customer will need to set it on
-        // for env that they want to use Preview
-        STOREFRONT_PREVIEW: {
-            enabled: process.env.STOREFRONT_PREVIEW
-        },
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
