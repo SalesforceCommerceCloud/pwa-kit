@@ -36,29 +36,21 @@ describe('Storefront Preview Component', function () {
             expect(helmet).toBeUndefined()
         })
     })
-    test('renders script tag when enabled is on', async () => {
-        detectStorefrontPreview.mockReturnValue(true)
+    test('renders script tag when enabled is on but host is not trusted', async () => {
+        detectStorefrontPreview.mockReturnValue(false)
 
-        render(<StorefrontPreview enabled={true} />)
+        render(<StorefrontPreview />)
         // this will return all the markup assigned to helmet
         // which will get rendered inside head.
         const helmet = Helmet.peek()
         await waitFor(() => {
-            expect(helmet.scriptTags[0].src).toBe(
-                'https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js'
-            )
-            expect(helmet.scriptTags[0].async).toBe(true)
-            expect(helmet.scriptTags[0].type).toBe('text/javascript')
+            expect(helmet).toBeUndefined()
         })
     })
-
-    test('renders script tag when window.STOREFRONT_PREVIEW.enabled is on', async () => {
-        delete window.STOREFRONT_PREVIEW
-        window.STOREFRONT_PREVIEW = {}
-        window.STOREFRONT_PREVIEW.enabled = true
+    test('renders script tag when enabled is on', async () => {
         detectStorefrontPreview.mockReturnValue(true)
 
-        render(<StorefrontPreview />)
+        render(<StorefrontPreview enabled={true} />)
         // this will return all the markup assigned to helmet
         // which will get rendered inside head.
         const helmet = Helmet.peek()
