@@ -15,6 +15,9 @@ import useMultiSite from '../../hooks/use-multi-site'
 import messages from '../../translations/compiled/en-GB.json'
 import mockConfig from '../../../config/mocks/default'
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
+jest.mock('pwa-kit-react-sdk/storefront-preview', () => {
+    return () => null
+})
 let windowSpy
 beforeAll(() => {
     jest.spyOn(console, 'log').mockImplementation(jest.fn())
@@ -60,7 +63,6 @@ describe('App', () => {
                 <p>Any children here</p>
             </App>
         )
-        screen.debug()
         expect(screen.getByRole('main')).toBeInTheDocument()
         expect(screen.getByText('Any children here')).toBeInTheDocument()
     })
