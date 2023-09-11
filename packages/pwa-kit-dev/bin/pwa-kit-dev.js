@@ -321,6 +321,10 @@ const main = async () => {
                 // string value.
                 if (target) {
                     process.env.DEPLOY_TARGET = target
+                } else if (wait) {
+                    throw new Error(
+                        'You must provide a target to deploy to when using --wait to wait for deployment to finish.'
+                    )
                 }
 
                 const credentials = await scriptUtils.readCredentials(credentialsFile)
