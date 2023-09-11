@@ -17,7 +17,8 @@
     "LICENSE",
     "scripts",
     "ssr",
-    "utils"
+    "utils",
+    "storefront-preview"
   ],
   "scripts": {
     "build": "cross-env NODE_ENV=production internal-lib-build build",
