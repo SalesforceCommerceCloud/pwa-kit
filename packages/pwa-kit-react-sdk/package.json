@@ -11,7 +11,8 @@
     "LICENSE",
     "scripts",
     "ssr",
-    "utils"
+    "utils",
+    "storefront-preview"
   ],
   "publishConfig": {
     "directory": "dist"
