@@ -268,6 +268,76 @@ const App = (props) => {
         const path = buildUrl('/account/wishlist')
         history.push(path)
     }
+
+    const trackPage = () => {
+        var dw = window.dw || {}
+        dw.ac = {
+            _analytics: null,
+            _events: [],
+            _category: '',
+            _searchData: '',
+            _anact: '',
+            _anact_nohit_tag: '',
+            _analytics_enabled: 'true',
+            _timeZone: 'Etc/UTC',
+            _capture: function (configs) {
+                if (Object.prototype.toString.call(configs) === '[object Array]') {
+                    configs.forEach(captureObject)
+                    return
+                }
+                dw.ac._events.push(configs)
+            },
+            capture: function () {
+                dw.ac._capture(arguments)
+                // send to CQ as well:
+                if (window.CQuotient) {
+                    window.CQuotient.trackEventsFromAC(arguments)
+                }
+            },
+            EV_PRD_SEARCHHIT: 'searchhit',
+            EV_PRD_DETAIL: 'detail',
+            EV_PRD_RECOMMENDATION: 'recommendation',
+            EV_PRD_SETPRODUCT: 'setproduct',
+            applyContext: function (context) {
+                if (typeof context === 'object' && context.hasOwnProperty('category')) {
+                    dw.ac._category = context.category
+                }
+                if (typeof context === 'object' && context.hasOwnProperty('searchData')) {
+                    dw.ac._searchData = context.searchData
+                }
+            },
+            setDWAnalytics: function (analytics) {
+                dw.ac._analytics = analytics
+            },
+            eventsIsEmpty: function () {
+                return 0 == dw.ac._events.length
+            }
+        }
+        try {
+            var activeDataUrl =
+                '/mobify/proxy/ocapi/on/demandware.store/Sites-' +
+                site.id +
+                '-Site/' +
+                locale.id +
+                '/__Analytics-Start'
+            console.log('Tracking enabled for ' + activeDataUrl)
+            var dwAnalytics = dw.__dwAnalytics.getTracker(activeDataUrl)
+            if (typeof dw.ac == 'undefined') {
+                console.log('Tracking page view')
+                dwAnalytics.trackPageView()
+            } else {
+                dw.ac.setDWAnalytics(dwAnalytics)
+                dwAnalytics.trackPageViewWithProducts()
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    useEffect(() => {
+        trackPage()
+    }, [location])
+
     return (
         <Box className="sf-app" {...styles.container}>
             <IntlProvider
@@ -389,6 +459,17 @@ const App = (props) => {
                     </Box>
                 </CurrencyProvider>
             </IntlProvider>
+            <script
+                type="text/javascript"
+                src={getAssetUrl('static/dwanalytics-22.2.js')}
+                async="async"
+                onLoad={trackPage}
+            ></script>
+            <script
+                src={getAssetUrl('static/dwac-21.7.js')}
+                type="text/javascript"
+                async="async"
+            ></script>
         </Box>
     )
 }
