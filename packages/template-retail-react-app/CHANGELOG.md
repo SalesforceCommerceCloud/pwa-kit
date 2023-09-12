@@ -1,3 +1,7 @@
+## v2.0.0-preview.1
+
+- V3 Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)
+
 ## v1.0.1 (Jul 26, 2023)
 
 - Fix price display when a discounted price is zero [#1361](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1361)
