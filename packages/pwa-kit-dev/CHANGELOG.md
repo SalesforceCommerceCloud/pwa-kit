@@ -1,3 +1,4 @@
+## v3.1.1-preview.0 (Sep 12, 2023)
 ## 3.1.1
 
 - Bugfix: Resolve performance issue due to webpack stats [#1391] https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1391
