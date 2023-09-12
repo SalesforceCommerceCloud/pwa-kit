@@ -78,7 +78,8 @@ OuterApp.propTypes = {
 /* istanbul ignore next */
 /**
  * Start the app!
- * @param {boolean} [disableSSR=false] Flag to disable server-side rendering
+ * @param {boolean} [disableSSR] Flag to disable server-side rendering. By default, SSR is disabled
+ * only when the app is running in Storefront Preview.
  */
 export const start = async (disableSSR) => {
     const AppConfig = getAppConfig()
