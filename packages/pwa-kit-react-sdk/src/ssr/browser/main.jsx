@@ -122,10 +122,10 @@ export const start = async (disableSSR) => {
 
     await loadableReady()
 
-    const shouldHydrate = typeof disableSSR === 'boolean' ? disableSSR : !detectStorefrontPreview()
+    const shouldHydrate = typeof disableSSR === 'boolean' ? !disableSSR : !detectStorefrontPreview()
 
     if (shouldHydrate) {
-        await hydrateRoot(
+        hydrateRoot(
             rootEl,
             <OuterApp
                 {...props}
@@ -135,9 +135,8 @@ export const start = async (disableSSR) => {
             />
         )
     } else {
+        window.__HYDRATING__ = false
         const root = createRoot(rootEl)
         root.render(<OuterApp {...props} />)
-        // Clean up analogous to `onHydrate`
-        window.__HYDRATING__ = false
     }
 }
