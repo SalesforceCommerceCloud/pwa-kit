@@ -9,13 +9,15 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {detectStorefrontPreview, getClientScript} from './utils'
-
+const defaultGetToken = () => {
+    return window.localStorage.getItem('token')
+}
 /**
  *
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
- * @param {{function():string}} getToken - a STOREFRONT_PREVIEW customised function that fetches token of storefront
+ * @param {function(): string} getToken - a STOREFRONT_PREVIEW customised function that fetches token of storefront
  */
-export const StorefrontPreview = ({enabled = true, getToken}) => {
+export const StorefrontPreview = ({enabled = true, getToken = defaultGetToken}) => {
     let isHostTrusted
     useEffect(() => {
         if (enabled && isHostTrusted) {

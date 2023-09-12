@@ -173,7 +173,7 @@ const App = (props) => {
                     <CurrencyProvider currency={currency}>
                         {/* For pwa-kit v2, we need to use this getToken prop to make sure it can work properly
                          with Storefront Preview feature*/}
-                        <StorefrontPreview getToken={() => window.localStorage.getItem('token')} />
+                        <StorefrontPreview />
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
                             <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
