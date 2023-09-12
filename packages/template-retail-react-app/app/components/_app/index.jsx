@@ -171,8 +171,6 @@ const App = (props) => {
             >
                 <CategoriesProvider treeRoot={allCategories} locale={targetLocale}>
                     <CurrencyProvider currency={currency}>
-                        {/* For pwa-kit v2, we need to use this getToken prop to make sure it can work properly
-                         with Storefront Preview feature*/}
                         <StorefrontPreview />
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
