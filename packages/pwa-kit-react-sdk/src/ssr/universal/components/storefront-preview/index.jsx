@@ -15,7 +15,7 @@ const defaultGetToken = () => {
 /**
  *
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
- * @param {function(): string} getToken - a STOREFRONT_PREVIEW customised function that fetches token of storefront
+ * @param {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  */
 export const StorefrontPreview = ({enabled = true, getToken = defaultGetToken}) => {
     let isHostTrusted
