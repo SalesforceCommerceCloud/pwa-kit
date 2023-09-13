@@ -6,7 +6,7 @@
  */
 /* global __webpack_require__ */
 import React, {useRef} from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot, hydrateRoot} from 'react-dom/client'
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
