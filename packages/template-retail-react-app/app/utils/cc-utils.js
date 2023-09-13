@@ -83,6 +83,21 @@ export const getPaymentInstrumentCardType = (type) => {
     }[type]
 }
 
+/**
+ * Returns the masked credit card number by removing white spaces,
+ * replacing all digits except the last 4 using the '*' character.
+ * @param cardNumber - The card number unmasked
+ * @returns {string} - The masked card number
+ */
+export const getMaskCreditCardNumber = (cardNumber) => {
+    const trimmedCardNumber = cardNumber.replace(/\s/g, '')
+
+    const maskedDigits = trimmedCardNumber.slice(0, -4).replace(/\d/g, '*')
+    const lastFourDigits = trimmedCardNumber.slice(-4)
+
+    return maskedDigits + lastFourDigits
+}
+
 export const createCreditCardPaymentBodyFromForm = (paymentFormData) => {
     // Using destructuring to omit properties
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
