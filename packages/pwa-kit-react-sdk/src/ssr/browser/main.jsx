@@ -76,12 +76,7 @@ OuterApp.propTypes = {
 }
 
 /* istanbul ignore next */
-/**
- * Start the app!
- * @param {boolean} [disableSSR] Flag to disable server-side rendering. By default, SSR is disabled
- * only when the app is running in Storefront Preview.
- */
-export const start = async (disableSSR) => {
+export const start = async () => {
     const AppConfig = getAppConfig()
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)
@@ -123,9 +118,11 @@ export const start = async (disableSSR) => {
 
     await loadableReady()
 
-    const shouldHydrate = typeof disableSSR === 'boolean' ? !disableSSR : !detectStorefrontPreview()
-
-    if (shouldHydrate) {
+    if (detectStorefrontPreview()) {
+        window.__HYDRATING__ = false
+        const root = createRoot(rootEl)
+        root.render(<OuterApp {...props} />)
+    } else {
         hydrateRoot(
             rootEl,
             <OuterApp
@@ -135,9 +132,5 @@ export const start = async (disableSSR) => {
                 }}
             />
         )
-    } else {
-        window.__HYDRATING__ = false
-        const root = createRoot(rootEl)
-        root.render(<OuterApp {...props} />)
     }
 }
