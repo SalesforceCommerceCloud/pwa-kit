@@ -6,7 +6,7 @@
  */
 /* global __webpack_require__ */
 import React, {useRef} from 'react'
-import {createRoot, hydrateRoot} from 'react-dom/client'
+import ReactDOM from 'react-dom'
 import {BrowserRouter as Router} from 'react-router-dom'
 import DeviceContext from '../universal/device-context'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
@@ -120,10 +120,10 @@ export const start = async () => {
 
     if (detectStorefrontPreview()) {
         window.__HYDRATING__ = false
-        const root = createRoot(rootEl)
+        const root = ReactDOM.createRoot(rootEl)
         root.render(<OuterApp {...props} />)
     } else {
-        hydrateRoot(
+        ReactDOM.hydrateRoot(
             rootEl,
             <OuterApp
                 {...props}
