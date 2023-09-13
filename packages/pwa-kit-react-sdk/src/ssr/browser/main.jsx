@@ -116,7 +116,6 @@ export const start = async () => {
         WrappedApp: routeComponent(App, false, locals)
     }
 
-
     await loadableReady()
 
     if (detectStorefrontPreview()) {
