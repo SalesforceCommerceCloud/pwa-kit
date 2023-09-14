@@ -120,17 +120,10 @@ export const start = async () => {
 
     if (detectStorefrontPreview()) {
         window.__HYDRATING__ = false
-        const root = ReactDOM.createRoot(rootEl)
-        root.render(<OuterApp {...props} />)
+        ReactDOM.render(<OuterApp {...props} />, rootEl)
     } else {
-        ReactDOM.hydrateRoot(
-            rootEl,
-            <OuterApp
-                {...props}
-                onHydrate={() => {
-                    window.__HYDRATING__ = false
-                }}
-            />
-        )
+        ReactDOM.hydrate(<OuterApp {...props} />, rootEl, () => {
+            window.__HYDRATING__ = false
+        })
     }
 }
