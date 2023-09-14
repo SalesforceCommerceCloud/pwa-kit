@@ -12,8 +12,8 @@ import {detectStorefrontPreview, getClientScript} from './utils'
 
 /**
  *
- * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
- * @param {{function():string}} getToken - a STOREFRONT_PREVIEW customised function that fetches token of storefront
+ * @param {boolean} enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true
+ * @param {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  */
 export const StorefrontPreview = ({enabled = true, getToken}) => {
     let isHostTrusted
@@ -42,7 +42,19 @@ export const StorefrontPreview = ({enabled = true, getToken}) => {
     ) : null
 }
 
+StorefrontPreview.defaultProps = {
+    enabled: true
+}
+
 StorefrontPreview.propTypes = {
     enabled: PropTypes.bool,
-    getToken: PropTypes.func
+    // a custom prop type function to only require this prop if enabled is true.
+    getToken: function (props, propName, componentName) {
+        if (
+            props['enabled'] === true &&
+            (props[propName] === undefined || typeof props[propName] !== 'function')
+        ) {
+            return new Error(`${propName} is required for ${componentName} when enabled is true`)
+        }
+    }
 }
