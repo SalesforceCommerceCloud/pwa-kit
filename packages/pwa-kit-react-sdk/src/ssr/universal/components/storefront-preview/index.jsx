@@ -54,7 +54,9 @@ StorefrontPreview.propTypes = {
             props['enabled'] === true &&
             (props[propName] === undefined || typeof props[propName] !== 'function')
         ) {
-            return new Error(`${propName} is required for ${componentName} when enabled is true`)
+            return new Error(
+                `${propName} is a required function for ${componentName} when enabled is true`
+            )
         }
     }
 }
