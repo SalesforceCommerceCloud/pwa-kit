@@ -10,7 +10,7 @@ import {
     stateOptions,
     provinceOptions
 } from '@salesforce/retail-react-app/app/components/forms/state-province-options'
-
+import {countryCodes} from '@salesforce/retail-react-app/app/components/forms/address-fields-country-codes'
 const messages = defineMessages({
     required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},
     firstName: {defaultMessage: 'First Name', id: 'use_address_fields.label.first_name'},
@@ -103,10 +103,7 @@ export default function useAddressFields({
             label: formatMessage(messages.country),
             defaultValue: 'US',
             type: 'select',
-            options: [
-                {value: 'CA', label: 'Canada'},
-                {value: 'US', label: 'United States'}
-            ],
+            options: countryCodes,
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please select your country.',
