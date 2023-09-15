@@ -84,7 +84,7 @@ VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
  * @param {string} name - the filename of the imported svg (does not include extension)
  */
 /* istanbul ignore next */
-const icon = (name, passProps) => {
+export const icon = (name, passProps) => {
     const displayName = name
         .toLowerCase()
         .replace(/(?:^|[\s-/])\w/g, (match) => match.toUpperCase())
