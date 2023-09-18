@@ -12,7 +12,8 @@ import {detectStorefrontPreview, getClientScript} from './utils'
 
 /**
  *
- * @param {boolean} enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true
+ * @param {boolean} enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true.
+ * This flag only applies if storefront is ran in Runtime Admin iframe.
  * @param {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  */
 export const StorefrontPreview = ({enabled = true, getToken}) => {

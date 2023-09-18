@@ -294,12 +294,7 @@ const App = (props) => {
                 defaultLocale={DEFAULT_LOCALE}
             >
                 <CurrencyProvider currency={currency}>
-                    <StorefrontPreview
-                        getToken={async () => {
-                            const token = await getTokenWhenReady()
-                            return token
-                        }}
-                    />
+                    <StorefrontPreview getToken={getTokenWhenReady} />
                     <Seo>
                         <meta name="theme-color" content={THEME_COLOR} />
                         <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
