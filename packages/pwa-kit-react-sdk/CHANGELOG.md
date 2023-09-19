@@ -1,5 +1,10 @@
 ## 2.7.5-dev (Aug 29, 2023)
+-   Make getToken prop mandatory for StorefrontPreview [#1443](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1443)
+-   Fix render/hydrate for rendering pipeline in v2 [#1442](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1442)
+-   Conditionally disable hydration for Storefront Preview [#1439](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1439)
+-   Disable hydration in storefront preview [#1437](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1437)
 -   Support Storefront Preview [#1426](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1426)
+
 ## v2.7.4 (Aug 28, 2023)
 ## v2.7.3 (Jun 20, 2023)
 -   Support Node 18 and NPM 9. [#1265](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1265)
