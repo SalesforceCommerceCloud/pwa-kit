@@ -104,7 +104,7 @@ export default function useAddressFields({
             label: formatMessage(messages.country),
             defaultValue: 'US',
             type: 'select',
-            options: countryCodes,
+            options: CHECKOUT_DROPDOWN_COUNTRY_CODES,
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please select your country.',
