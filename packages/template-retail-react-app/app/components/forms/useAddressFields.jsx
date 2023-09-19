@@ -10,7 +10,8 @@ import {
     stateOptions,
     provinceOptions
 } from '@salesforce/retail-react-app/app/components/forms/state-province-options'
-import {countryCodes} from '@salesforce/retail-react-app/app/components/forms/address-fields-country-codes'
+import {CHECKOUT_DROPDOWN_COUNTRY_CODES} from '@salesforce/retail-react-app/app/constants'
+
 const messages = defineMessages({
     required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},
     firstName: {defaultMessage: 'First Name', id: 'use_address_fields.label.first_name'},
