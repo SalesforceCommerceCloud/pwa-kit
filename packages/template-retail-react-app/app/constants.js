@@ -107,3 +107,8 @@ export const EINSTEIN_RECOMMENDERS = {
     EMPTY_SEARCH_RESULTS_TOP_SELLERS: 'home-top-revenue-for-category',
     EMPTY_SEARCH_RESULTS_MOST_VIEWED: 'products-in-all-categories'
 }
+
+export const SHIPPING_COUNTRY_CODES = [
+    {value: 'CA', label: 'Canada'},
+    {value: 'US', label: 'United States'}
+]
