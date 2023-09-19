@@ -108,7 +108,7 @@ export const EINSTEIN_RECOMMENDERS = {
     EMPTY_SEARCH_RESULTS_MOST_VIEWED: 'products-in-all-categories'
 }
 
-export const CHECKOUT_DROPDOWN_COUNTRY_CODES = [
+export const SHIPPING_COUNTRY_CODES = [
     {value: 'CA', label: 'Canada'},
     {value: 'US', label: 'United States'}
 ]
