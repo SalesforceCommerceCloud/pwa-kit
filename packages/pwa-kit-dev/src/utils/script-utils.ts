@@ -15,6 +15,7 @@ import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
+import {execSync} from 'child_process'
 
 export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
 export const DEFAULT_DOCS_URL =
@@ -110,6 +111,54 @@ export const walkDir = async (
     )
 
     return fileSet
+}
+
+export const getAllPackageVersions = (): {[x: string]: any} => {
+    /**
+     * Returns the versions of all packages.
+     *
+     * @returns An object representing the dependency tree
+     */
+    return JSON.parse(execSync(`npm ls --all --json`, {encoding: 'utf-8'}))
+}
+
+export const getLowestPackageVersion = (
+    packageName: string,
+    dependencyTree: {[x: string]: any}
+): string => {
+    /**
+     * Returns the lowest version of a package installed.
+     *
+     * @param packageName - The name of the package to get the lowest version for
+     * @param dependencyTree - The dependency tree including all package versions
+     * @returns The lowest version of the given package that is installed
+     */
+    console.log(dependencyTree)
+    let lowestVersion: string | null = null
+
+    function search(dependencyTree: {[x: string]: any}) {
+        for (const key in dependencyTree) {
+            if (key === packageName && dependencyTree[key].version) {
+                const version = dependencyTree[key].version
+                if (!lowestVersion || version < lowestVersion) {
+                    lowestVersion = version
+                }
+            }
+
+            if (typeof dependencyTree[key] === 'object') {
+                search(dependencyTree[key])
+            }
+        }
+    }
+
+    search(dependencyTree)
+
+    if (lowestVersion) {
+        return lowestVersion
+    } else {
+        console.warn(`Unable to find package version for ${packageName}`)
+        return 'unknown'
+    }
 }
 
 export class CloudAPIClient {
@@ -289,6 +338,11 @@ export const createBundle = async ({
                     ccExtensibility = {extends: '', overridesDir: ''}
                 } = await getProjectPkg()
                 const extendsTemplate = 'node_modules/' + ccExtensibility.extends
+                const pwaKitDependencies = [
+                    '@salesforce/pwa-kit-react-sdk',
+                    '@salesforce/pwa-kit-runtime',
+                    '@salesforce/pwa-kit-dev'
+                ]
 
                 let cc_overrides: string[] = []
                 if (ccExtensibility.overridesDir) {
@@ -300,8 +354,26 @@ export const createBundle = async ({
                         existsSync(path.join(extendsTemplate, item))
                     )
                 }
+
+                // pwa-kit package versions are not listed as dependencies in package.json
+                // when a bundle is using template extensibility
+                const nestedPwaKitDependencies: {[key: string]: string} = {}
+                if (ccExtensibility.extends) {
+                    const dependencyTree = getAllPackageVersions()
+                    pwaKitDependencies.forEach((packageName) => {
+                        nestedPwaKitDependencies[packageName] = getLowestPackageVersion(
+                            packageName,
+                            dependencyTree
+                        )
+                    })
+                }
+
                 bundle_metadata = {
-                    dependencies: {...dependencies, ...devDependencies},
+                    dependencies: {
+                        ...dependencies,
+                        ...devDependencies,
+                        ...nestedPwaKitDependencies
+                    },
                     cc_overrides: cc_overrides
                 }
             })
