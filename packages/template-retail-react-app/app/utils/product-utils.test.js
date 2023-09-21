@@ -5,7 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {
+    getDisplayPrice,
+    getDisplayVariationValues
+} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {mockedCustomerProductListsDetails} from '@salesforce/retail-react-app/app/mocks/mock-data'
 
 const variationAttributes = [
     {
@@ -48,4 +52,11 @@ test('getDisplayVariationValues', () => {
         Size: '6.5',
         Width: 'M'
     })
+})
+
+test('getDisplayPrice', () => {
+    const {basePrice, discountPrice} = getDisplayPrice(mockedCustomerProductListsDetails.data[0])
+
+    expect(basePrice).toBe(199.0)
+    expect(discountPrice).toBe(189.0)
 })

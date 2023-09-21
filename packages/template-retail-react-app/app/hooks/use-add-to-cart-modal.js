@@ -61,15 +61,13 @@ AddToCartModalProvider.propTypes = {
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, itemsAdded = []} = data || {}
-    console.log('product', product)
-    console.log('itemsAdded', itemsAdded)
     const intl = useIntl()
     const {
         data: basket = {},
         derivedData: {totalItems}
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const {currency, productItems, productSubTotal} = basket
+    const {currency, productSubTotal} = basket
     const numerOfItemsAdded = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     if (!isOpen) {
@@ -116,15 +114,7 @@ export const AddToCartModal = () => {
                                     viewType: 'small',
                                     selectedVariationAttributes: variant.variationValues
                                 })?.images?.[0]
-                                console.log('productItems', productItems)
-                                const lineItemPrice =
-                                    productItems?.find(
-                                        (item) => item.productId === variant.productId
-                                    )?.basePrice * quantity
-                                console.log('product', product)
                                 const {basePrice, discountPrice} = getDisplayPrice(product)
-                                console.log('basePrice', basePrice)
-                                console.log('discountPrice', discountPrice)
                                 const variationAttributeValues = getDisplayVariationValues(
                                     product.variationAttributes,
                                     variant.variationValues

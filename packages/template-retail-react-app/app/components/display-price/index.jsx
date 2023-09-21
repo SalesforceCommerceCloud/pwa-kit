@@ -20,7 +20,6 @@ const DisplayPrice = ({
     basePriceProps,
     skeletonProps
 }) => {
-    console.log('basePriceProps', basePriceProps)
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
     return (
