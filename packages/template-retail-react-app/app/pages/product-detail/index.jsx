@@ -71,7 +71,7 @@ const ProductDetail = () => {
     const {
         data: product,
         isLoading: isProductLoading,
-        isError: isProudctError,
+        isError: isProductError,
         error: productError
     } = useProduct(
         {
@@ -102,7 +102,7 @@ const ProductDetail = () => {
 
     /**************** Error Handling ****************/
 
-    if (isProudctError) {
+    if (isProductError) {
         const errorStatus = productError?.response?.status
         switch (errorStatus) {
             case 404:

@@ -37,10 +37,9 @@ import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/comp
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import Price from '@salesforce/retail-react-app/app/pages/product-detail/partials/price'
 
-const ProductViewHeader = ({name, price, currency, category, productType}) => {
-    const intl = useIntl()
-    const {currency: activeCurrency} = useCurrency()
+const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, productType}) => {
     const isProductASet = productType?.set
 
     return (
@@ -56,27 +55,20 @@ const ProductViewHeader = ({name, price, currency, category, productType}) => {
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            {/* Price */}
-            <Skeleton isLoaded={price} minWidth={32}>
-                <Text fontWeight="bold" fontSize="md" aria-label="price">
-                    {isProductASet &&
-                        `${intl.formatMessage({
-                            id: 'product_view.label.starting_at_price',
-                            defaultMessage: 'Starting at'
-                        })} `}
-                    {intl.formatNumber(price, {
-                        style: 'currency',
-                        currency: currency || activeCurrency
-                    })}
-                </Text>
-            </Skeleton>
+            <Price
+                basePrice={basePrice}
+                discountPrice={discountPrice}
+                currency={currency}
+                isProductASet={isProductASet}
+            />
         </VStack>
     )
 }
 
 ProductViewHeader.propTypes = {
     name: PropTypes.string,
-    price: PropTypes.number,
+    basePrice: PropTypes.number,
+    discountPrice: PropTypes.number,
     currency: PropTypes.string,
     category: PropTypes.array,
     productType: PropTypes.object
@@ -132,7 +124,9 @@ const ProductView = forwardRef(
             variationParams,
             variationAttributes,
             stockLevel,
-            stepQuantity
+            stepQuantity,
+            basePrice,
+            discountPrice
         } = useDerivedProduct(product, isProductPartOfSet)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
@@ -338,7 +332,8 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
-                                price={product?.pricePerUnit || product?.price}
+                                basePrice={basePrice}
+                                discountPrice={discountPrice}
                                 productType={product?.type}
                                 currency={product?.currency}
                                 category={category}

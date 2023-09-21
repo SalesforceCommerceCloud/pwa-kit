@@ -54,6 +54,13 @@ export const useDerivedProduct = (product, isProductPartOfSet = false) => {
         (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
         (unfulfillable && inventoryMessages[UNFULFILLABLE])
 
+    const basePrice = product?.pricePerUnit || product?.price
+    const promotionalPriceList = product?.productPromotions
+        ?.map((promo) => promo.promotionalPrice)
+        .filter(Boolean)
+    // choose the smallest price among the promotionalPrice
+    const discountPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : 0
+
     // If the `initialQuantity` changes, update the state. This typically happens
     // when either the master product changes, or the inventory of the product changes
     // from out-of-stock to in-stock or vice versa.
@@ -72,6 +79,8 @@ export const useDerivedProduct = (product, isProductPartOfSet = false) => {
         variationParams,
         setQuantity,
         variant,
-        stockLevel
+        stockLevel,
+        basePrice,
+        discountPrice
     }
 }
