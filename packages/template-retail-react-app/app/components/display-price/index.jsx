@@ -40,9 +40,10 @@ const DisplayPrice = ({
                 </Text>
             )}
             <Text
-                as={discountPrice ? 's' : 'b'}
-                ml={discountPrice ? 2 : 0}
+                as={discountPrice > 0 ? 's' : 'b'}
+                ml={discountPrice > 0 ? 2 : 0}
                 fontWeight={discountPrice ? 500 : 'bold'}
+                {...basePriceProps}
             >
                 {intl.formatNumber(basePrice, {
                     style: 'currency',

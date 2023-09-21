@@ -127,6 +127,8 @@ const ProductView = forwardRef(
             stepQuantity
         } = useDerivedProduct(product, isProductPartOfSet)
         const {basePrice, discountPrice} = getDisplayPrice(product)
+        console.log('basePrice', basePrice)
+        console.log('discountPrice', discountPrice)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)
@@ -292,7 +294,8 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
-                        price={product?.pricePerUnit || product?.price}
+                        basePrice={basePrice}
+                        discountPrice={discountPrice}
                         productType={product?.type}
                         currency={product?.currency}
                         category={category}
