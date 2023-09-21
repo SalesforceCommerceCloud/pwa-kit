@@ -5,6 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {Page, pageType} from '@salesforce/retail-react-app/app/page-designer/core'
+import {Page, pageType} from '@salesforce/commerce-sdk-react/components'
 
 export {Page, pageType}
