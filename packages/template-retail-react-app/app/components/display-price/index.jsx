@@ -11,11 +11,19 @@ import {Skeleton, Text} from '@salesforce/retail-react-app/app/components/shared
 import {useIntl} from 'react-intl'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
-const Price = ({basePrice, discountPrice, isProductASet, currency}) => {
+const DisplayPrice = ({
+    basePrice,
+    discountPrice,
+    isProductASet = false,
+    currency,
+    discountPriceProps,
+    basePriceProps
+}) => {
+    console.log('basePriceProps', basePriceProps)
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
     return (
-        <Skeleton isLoaded={basePrice} minWidth={32}>
+        <Skeleton isLoaded={basePrice} display={'flex'}>
             <Text fontWeight="bold" fontSize="md" aria-label="price">
                 {isProductASet &&
                     `${intl.formatMessage({
@@ -24,14 +32,18 @@ const Price = ({basePrice, discountPrice, isProductASet, currency}) => {
                     })} `}
             </Text>
             {discountPrice > 0 && (
-                <Text as="b">
+                <Text as="b" {...discountPriceProps}>
                     {intl.formatNumber(discountPrice, {
                         style: 'currency',
                         currency: currency || activeCurrency
                     })}
                 </Text>
             )}
-            <Text as={discountPrice ? 's' : 'b'} ml={discountPrice ? 2 : 0}>
+            <Text
+                as={discountPrice ? 's' : 'b'}
+                ml={discountPrice ? 2 : 0}
+                fontWeight={discountPrice ? 500 : 'bold'}
+            >
                 {intl.formatNumber(basePrice, {
                     style: 'currency',
                     currency: currency || activeCurrency
@@ -41,11 +53,13 @@ const Price = ({basePrice, discountPrice, isProductASet, currency}) => {
     )
 }
 
-Price.propTypes = {
+DisplayPrice.propTypes = {
     basePrice: PropTypes.number,
     discountPrice: PropTypes.number,
     currency: PropTypes.string,
-    isProductASet: PropTypes.bool
+    isProductASet: PropTypes.bool,
+    discountPriceProps: PropTypes.object,
+    basePriceProps: PropTypes.object
 }
 
-export default Price
+export default DisplayPrice

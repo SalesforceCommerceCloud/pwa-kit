@@ -33,3 +33,16 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
     }, {})
     return returnVal
 }
+
+export const getDisplayPrice = (product) => {
+    const basePrice = product?.pricePerUnit || product?.price
+    const promotionalPriceList = product?.productPromotions
+        ?.map((promo) => promo.promotionalPrice)
+        .filter(Boolean)
+    // choose the smallest price among the promotionalPrice
+    const discountPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : 0
+    return {
+        basePrice,
+        discountPrice
+    }
+}

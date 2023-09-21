@@ -29,8 +29,12 @@ import Link from '@salesforce/retail-react-app/app/components/link'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import {LockIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
-import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {
+    getDisplayPrice,
+    getDisplayVariationValues
+} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -57,6 +61,8 @@ AddToCartModalProvider.propTypes = {
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, itemsAdded = []} = data || {}
+    console.log('product', product)
+    console.log('itemsAdded', itemsAdded)
     const intl = useIntl()
     const {
         data: basket = {},
@@ -110,10 +116,15 @@ export const AddToCartModal = () => {
                                     viewType: 'small',
                                     selectedVariationAttributes: variant.variationValues
                                 })?.images?.[0]
+                                console.log('productItems', productItems)
                                 const lineItemPrice =
                                     productItems?.find(
                                         (item) => item.productId === variant.productId
                                     )?.basePrice * quantity
+                                console.log('product', product)
+                                const {basePrice, discountPrice} = getDisplayPrice(product)
+                                console.log('basePrice', basePrice)
+                                console.log('discountPrice', discountPrice)
                                 const variationAttributeValues = getDisplayVariationValues(
                                     product.variationAttributes,
                                     variant.variationValues
@@ -165,13 +176,12 @@ export const AddToCartModal = () => {
                                         </Flex>
 
                                         <Box flex="none" alignSelf="flex-end" fontWeight="600">
-                                            <Text>
-                                                {!!lineItemPrice &&
-                                                    intl.formatNumber(lineItemPrice, {
-                                                        style: 'currency',
-                                                        currency: currency
-                                                    })}
-                                            </Text>
+                                            <DisplayPrice
+                                                discountPriceProps={{as: 'p'}}
+                                                basePrice={basePrice * quantity}
+                                                discountPrice={discountPrice * quantity}
+                                                currency={currency}
+                                            />
                                         </Box>
                                     </Flex>
                                 )

@@ -31,13 +31,13 @@ import ImageGallery from '@salesforce/retail-react-app/app/components/image-gall
 import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {Skeleton as ImageGallerySkeleton} from '@salesforce/retail-react-app/app/components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import Price from '@salesforce/retail-react-app/app/pages/product-detail/partials/price'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, productType}) => {
     const isProductASet = productType?.set
@@ -55,7 +55,7 @@ const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, 
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            <Price
+            <DisplayPrice
                 basePrice={basePrice}
                 discountPrice={discountPrice}
                 currency={currency}
@@ -124,10 +124,9 @@ const ProductView = forwardRef(
             variationParams,
             variationAttributes,
             stockLevel,
-            stepQuantity,
-            basePrice,
-            discountPrice
+            stepQuantity
         } = useDerivedProduct(product, isProductPartOfSet)
+        const {basePrice, discountPrice} = getDisplayPrice(product)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)

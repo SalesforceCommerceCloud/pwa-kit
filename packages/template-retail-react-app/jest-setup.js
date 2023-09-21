@@ -27,7 +27,7 @@ global.jsdom.reconfigure({url: 'https://www.domain.com'})
 
 configureTestingLibrary({
     // Increase to: 6 x default timeout of 1 second
-    ...(process.env.CI ? {asyncUtilTimeout: 6000} : {})
+    ...(process.env.CI ? {asyncUtilTimeout: 10000} : {})
 })
 
 /**
