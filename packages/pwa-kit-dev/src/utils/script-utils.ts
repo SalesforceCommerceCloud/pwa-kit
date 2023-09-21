@@ -133,7 +133,6 @@ export const getLowestPackageVersion = (
      * @param dependencyTree - The dependency tree including all package versions
      * @returns The lowest version of the given package that is installed
      */
-    console.log(dependencyTree)
     let lowestVersion: string | null = null
 
     function search(dependencyTree: {[x: string]: any}) {
