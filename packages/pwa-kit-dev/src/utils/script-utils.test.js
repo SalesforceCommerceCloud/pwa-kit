@@ -134,6 +134,46 @@ describe('scriptUtils', () => {
         })
     })
 
+    describe('getLowestPackageVersion', () => {
+        const dependencyTree = {
+            version: '0.0.1',
+            name: 'test',
+            dependencies: {
+                '@salesforce/retail-react-app': {
+                    version: '1.0.0',
+                    dependencies: {
+                        'some-other-library': {
+                            version: '1.0.0',
+                            dependencies: {
+                                '@salesforce/pwa-kit-react-sdk': {
+                                    version: '1.0.0'
+                                }
+                            }
+                        }
+                    }
+                },
+                '@salesforce/pwa-kit-react-sdk': {
+                    version: '3.0.0'
+                }
+            }
+        }
+        test('should work', async () => {
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTree
+            )
+            expect(lowestVersion).toBe('1.0.0')
+        })
+
+        test("should return 'unknown' when package not found", async () => {
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-runtime',
+                dependencyTree
+            )
+            expect(lowestVersion).toBe('unknown')
+        })
+    })
+
     jest.unmock('fs-extra')
     describe('defaultMessage', () => {
         test('works', async () => {

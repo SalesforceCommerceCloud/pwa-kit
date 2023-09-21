@@ -113,9 +113,9 @@ export const walkDir = async (
     return fileSet
 }
 
-export const getAllPackageVersions = (): {[x: string]: any} => {
+export const getAllProjectDependencyVersions = (): {[x: string]: any} => {
     /**
-     * Returns the versions of all packages.
+     * Returns the versions of all packages and their dependencies within the project.
      *
      * @returns An object representing the dependency tree
      */
@@ -358,7 +358,7 @@ export const createBundle = async ({
                 // when a bundle is using template extensibility
                 const nestedPwaKitDependencies: {[key: string]: string} = {}
                 if (ccExtensibility.extends) {
-                    const dependencyTree = getAllPackageVersions()
+                    const dependencyTree = getAllProjectDependencyVersions()
                     pwaKitDependencies.forEach((packageName) => {
                         nestedPwaKitDependencies[packageName] = getLowestPackageVersion(
                             packageName,
