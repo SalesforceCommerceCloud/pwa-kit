@@ -10,18 +10,9 @@ export interface BaseStorageOptions {
 }
 
 export abstract class BaseStorage {
-    static available = true
-    protected options: BaseStorageOptions = {}
-
-    constructor(options?: BaseStorageOptions) {
-        if (!new.target.available) {
-            throw new Error(`${new.target.name} is not available on the current environment.`)
-        }
-        this.options = {
-            keySuffix: options?.keySuffix ?? ''
-        }
+    constructor(protected options: BaseStorageOptions = {}) {
+        if (typeof this.options.keySuffix !== 'string') this.options.keySuffix = ''
     }
-
     protected getSuffixedKey(key: string): string {
         return this.options.keySuffix ? `${key}_${this.options.keySuffix}` : key
     }

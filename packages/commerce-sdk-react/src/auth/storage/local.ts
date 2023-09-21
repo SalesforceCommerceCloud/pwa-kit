@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {BaseStorage} from './base'
+import {detectLocalStorageAvailable} from '../../utils'
+import {BaseStorage, BaseStorageOptions} from './base'
 
 /**
  * A normalized implementation for LocalStorage. It implements the BaseStorage interface
@@ -14,7 +15,12 @@ import {BaseStorage} from './base'
  * to store authentication tokens.
  */
 export class LocalStorage extends BaseStorage {
-    static available = typeof window !== 'undefined'
+    constructor(options?: BaseStorageOptions) {
+        if (!detectLocalStorageAvailable()) {
+            throw new Error('LocalStorage is not available on the current environment.')
+        }
+        super(options)
+    }
     set(key: string, value: string) {
         const oldValue = this.get(key)
         const suffixedKey = this.getSuffixedKey(key)

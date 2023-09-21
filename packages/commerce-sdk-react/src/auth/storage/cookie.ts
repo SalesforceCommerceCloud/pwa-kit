@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import Cookies from 'js-cookie'
-import {getCookieSameSiteAttribute, onClient} from '../../utils'
-import {BaseStorage} from './base'
+import {detectCookiesAvailable, getCookieSameSiteAttribute, onClient} from '../../utils'
+import {BaseStorage, BaseStorageOptions} from './base'
 
 /**
  * A normalized implementation for Cookie store. It implements the BaseStorage interface
@@ -15,7 +15,12 @@ import {BaseStorage} from './base'
  * to store authentication tokens.
  */
 export class CookieStorage extends BaseStorage {
-    static available = typeof document !== 'undefined'
+    constructor(options?: BaseStorageOptions) {
+        if (!detectCookiesAvailable()) {
+            throw new Error('CookieStorage is not available on the current environment.')
+        }
+        super(options)
+    }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
 
