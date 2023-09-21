@@ -1,6 +1,6 @@
 {
   "name": "template-mrt-reference-app",
-  "version": "3.1.0",
+  "version": "3.1.1-preview.0",
   "private": true,
   "license": "See license in LICENSE",
   "scripts": {
@@ -16,8 +16,8 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "3.1.0",
-    "@salesforce/pwa-kit-runtime": "3.1.0",
+    "@salesforce/pwa-kit-dev": "3.1.1-preview.0",
+    "@salesforce/pwa-kit-runtime": "3.1.1-preview.0",
     "cross-fetch": "^3.1.4",
     "express-basic-auth": "^1.2.0",
     "supertest": "^4.0.2"
