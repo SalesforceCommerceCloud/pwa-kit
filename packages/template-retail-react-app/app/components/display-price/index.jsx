@@ -17,13 +17,14 @@ const DisplayPrice = ({
     isProductASet = false,
     currency,
     discountPriceProps,
-    basePriceProps
+    basePriceProps,
+    skeletonProps
 }) => {
     console.log('basePriceProps', basePriceProps)
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
     return (
-        <Skeleton isLoaded={basePrice} display={'flex'}>
+        <Skeleton isLoaded={basePrice} display={'flex'} {...skeletonProps}>
             <Text fontWeight="bold" fontSize="md" aria-label="price">
                 {isProductASet &&
                     `${intl.formatMessage({
@@ -59,7 +60,8 @@ DisplayPrice.propTypes = {
     currency: PropTypes.string,
     isProductASet: PropTypes.bool,
     discountPriceProps: PropTypes.object,
-    basePriceProps: PropTypes.object
+    basePriceProps: PropTypes.object,
+    skeletonProps: PropTypes.object
 }
 
 export default DisplayPrice
