@@ -24,7 +24,7 @@ const DisplayPrice = ({
     const {currency: activeCurrency} = useCurrency()
     return (
         <Skeleton isLoaded={basePrice} display={'flex'} {...skeletonProps}>
-            <Text fontWeight="bold" fontSize="md" aria-label="price">
+            <Text fontWeight="bold" fontSize="md" aria-label="price" mr={1}>
                 {isProductASet &&
                     `${intl.formatMessage({
                         id: 'product_view.label.starting_at_price',
