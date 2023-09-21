@@ -9,7 +9,8 @@
 const TRUSTED_ORIGINS = [
     'https://runtime.commercecloud.com',
     'https://runtime-admin-staging.mobify-storefront.com',
-    'https://runtime-admin-preview.mobify-storefront.com'
+    'https://runtime-admin-preview.mobify-storefront.com',
+    'https://runtime-admin-preview-adam.mobify-storefront.com'
 ]
 
 /** Origin used for local Runtime Admin. */
