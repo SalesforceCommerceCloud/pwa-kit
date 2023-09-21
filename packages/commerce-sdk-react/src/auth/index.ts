@@ -345,7 +345,7 @@ class Auth {
             .finally(() => {
                 this.pendingToken = undefined
             })
-        return this.pendingToken
+        return await this.pendingToken
     }
 
     /**
@@ -369,7 +369,7 @@ class Auth {
             return this.data
         }
         if (this.pendingToken) {
-            return this.pendingToken
+            return await this.pendingToken
         }
         const accessToken = this.get('access_token')
 
@@ -399,7 +399,7 @@ class Auth {
                 }
             }
         }
-        return this.queueRequest(
+        return await this.queueRequest(
             () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
             true
         )
@@ -427,7 +427,7 @@ class Auth {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const isGuest = true
-        return this.queueRequest(
+        return await this.queueRequest(
             () =>
                 helpers.loginGuestUser(this.client, {
                     redirectURI,
@@ -494,7 +494,7 @@ class Auth {
             refreshToken: this.get('refresh_token_registered')
         })
         this.clearStorage()
-        return this.loginGuestUser()
+        return await this.loginGuestUser()
     }
 
     /**
