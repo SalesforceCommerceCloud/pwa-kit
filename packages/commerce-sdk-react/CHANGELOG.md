@@ -1,12 +1,8 @@
 ## v1.0.2 (Sep 21, 2023)
-## v1.0.3-0 (Sep 21, 2023)
-## v1.0.2 (Sep 21, 2023)
-## v3.1.1 (Sep 21, 2023)
-## v1.0.2 (Sep 21, 2023)
-## v1.0.2-preview.1 (Sep 21, 2023)
-## v1.0.2-preview.0 (Sep 21, 2023)
-## v3.1.1-preview.0 (Sep 21, 2023)
-## v1.0.2-preview.0 (Sep 21, 2023)
+
+- commerce-sdk-react: have typedoc-related deps as dev dependencies [#1425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1425)
+- Updated commerce-sdk-isomorphic to v1.10.4 [#137](https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/pull/137)
+
 ## v1.0.1 (Jul 26, 2023)
 
 - Updated the expiry of the guest refresh token cookie to 30 days, to match the actual [duration of the token](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas.html?q=refresh+token#access-tokens-and-refresh-tokens). [#1342](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1342)
