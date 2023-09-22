@@ -39,7 +39,7 @@ export const detectStorefrontPreview = () => {
     return Boolean(parentOrigin) && isParentOriginTrusted(parentOrigin)
 }
 
-export const detectClientOnlyQueryParam = ()=>{
+export const detectClientOnlyQueryParam = () => {
     const queryParams = new URLSearchParams(window.location.search)
     return queryParams.has('__client_only')
 }
