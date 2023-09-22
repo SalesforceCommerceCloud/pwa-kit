@@ -135,22 +135,22 @@ export const getLowestPackageVersion = (
 ): string => {
     let lowestVersion: string | null = null
 
-    function search(dependencyTree: {[x: string]: any}) {
-        for (const key in dependencyTree) {
-            if (key === packageName && dependencyTree[key].version) {
-                const version = dependencyTree[key].version
+    function search(tree: {[x: string]: any}) {
+        for (const key in tree) {
+            if (key === packageName && tree[key].version) {
+                const version = tree[key].version
                 if (!lowestVersion || version < lowestVersion) {
                     lowestVersion = version
                 }
             }
 
-            if (typeof dependencyTree[key] === 'object') {
-                search(dependencyTree[key])
+            if (typeof tree[key] === 'object') {
+                search(tree[key])
             }
         }
     }
 
-   search(dependencyTree)
+    search(dependencyTree)
     return lowestVersion ?? 'unknown'
 }
 
