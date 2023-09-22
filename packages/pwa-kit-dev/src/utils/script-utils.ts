@@ -122,17 +122,17 @@ export const getAllProjectDependencyVersions = (): {[x: string]: any} => {
     return JSON.parse(execSync(`npm ls --all --json`, {encoding: 'utf-8'}))
 }
 
+/**
+ * Returns the lowest version of a package installed.
+ *
+ * @param packageName - The name of the package to get the lowest version for
+ * @param dependencyTree - The dependency tree including all package versions
+ * @returns The lowest version of the given package that is installed
+ */
 export const getLowestPackageVersion = (
     packageName: string,
     dependencyTree: {[x: string]: any}
 ): string => {
-    /**
-     * Returns the lowest version of a package installed.
-     *
-     * @param packageName - The name of the package to get the lowest version for
-     * @param dependencyTree - The dependency tree including all package versions
-     * @returns The lowest version of the given package that is installed
-     */
     let lowestVersion: string | null = null
 
     function search(dependencyTree: {[x: string]: any}) {
