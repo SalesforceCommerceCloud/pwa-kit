@@ -117,7 +117,6 @@ export const start = async () => {
     }
 
     await loadableReady()
-    console.log('detectClientOnlyQueryParam:',detectClientOnlyQueryParam())
 
     if (detectClientOnlyQueryParam()) {
         window.__HYDRATING__ = false
