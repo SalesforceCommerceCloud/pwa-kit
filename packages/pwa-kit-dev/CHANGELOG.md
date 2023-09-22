@@ -1,3 +1,7 @@
+## v3.1.1 (Sep 21, 2023)
+
+- Bugfix: resolve performance issue due to webpack stats [#1418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1418)
+
 ## v3.1.0 (Jul 26, 2023)
 
 - Allow setting cookies using the `MRT_ALLOW_COOKIES` environment variable [#1318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1318)
