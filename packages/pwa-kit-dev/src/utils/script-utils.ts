@@ -150,14 +150,8 @@ export const getLowestPackageVersion = (
         }
     }
 
-    search(dependencyTree)
-
-    if (lowestVersion) {
-        return lowestVersion
-    } else {
-        console.warn(`Unable to find package version for ${packageName}`)
-        return 'unknown'
-    }
+   search(dependencyTree)
+    return lowestVersion ?? 'unknown'
 }
 
 export class CloudAPIClient {
