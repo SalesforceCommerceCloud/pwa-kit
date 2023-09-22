@@ -354,18 +354,16 @@ export const createBundle = async ({
                     )
                 }
 
-                // pwa-kit package versions are not listed as dependencies in package.json
-                // when a bundle is using template extensibility
+                // pwa-kit package versions are not always listed as dependencies in the package.json
+                // such as when a bundle is using template extensibility
                 const nestedPwaKitDependencies: {[key: string]: string} = {}
-                if (ccExtensibility.extends) {
-                    const dependencyTree = getAllProjectDependencyVersions()
-                    pwaKitDependencies.forEach((packageName) => {
-                        nestedPwaKitDependencies[packageName] = getLowestPackageVersion(
-                            packageName,
-                            dependencyTree
-                        )
-                    })
-                }
+                const dependencyTree = getAllProjectDependencyVersions()
+                pwaKitDependencies.forEach((packageName) => {
+                    nestedPwaKitDependencies[packageName] = getLowestPackageVersion(
+                        packageName,
+                        dependencyTree
+                    )
+                })
 
                 bundle_metadata = {
                     dependencies: {
