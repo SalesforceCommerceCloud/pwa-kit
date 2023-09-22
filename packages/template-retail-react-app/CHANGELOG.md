@@ -1,6 +1,8 @@
 ## v1.1.0-dev (TBD)
-- Support Storefront Preview [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
-- Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424/files)
+- Support Storefront Preview 
+  - [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
+  - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
+- Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)
 
 ## v1.0.1 (Jul 26, 2023)
 
