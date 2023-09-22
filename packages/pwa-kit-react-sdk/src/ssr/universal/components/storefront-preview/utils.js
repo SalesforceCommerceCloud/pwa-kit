@@ -40,6 +40,11 @@ export const detectStorefrontPreview = () => {
     return Boolean(parentOrigin) && isParentOriginTrusted(parentOrigin)
 }
 
+export const detectClientOnlyQueryParam = ()=>{
+    const queryParams = new URLSearchParams(window.location.search)
+    return queryParams.has('__client_only')
+}
+
 /** Returns the URL to load the Storefront Preview client script from the parent origin. */
 export const getClientScript = () => {
     const parentOrigin = getParentOrigin() ?? 'https://runtime.commercecloud.com'

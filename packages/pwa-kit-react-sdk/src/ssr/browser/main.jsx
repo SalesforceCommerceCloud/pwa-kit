@@ -14,7 +14,7 @@ import PropTypes from 'prop-types'
 import {getAppConfig} from '../universal/compatibility'
 import App from '../universal/components/_app'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
-import {detectStorefrontPreview} from '../universal/components/storefront-preview/utils'
+import {detectClientOnlyQueryParam} from '../universal/components/storefront-preview/utils'
 import Switch from '../universal/components/switch'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import {uuidv4} from '../../utils/uuidv4.client'
@@ -117,8 +117,9 @@ export const start = async () => {
     }
 
     await loadableReady()
+    console.log('detectClientOnlyQueryParam:',detectClientOnlyQueryParam())
 
-    if (detectStorefrontPreview()) {
+    if (detectClientOnlyQueryParam()) {
         window.__HYDRATING__ = false
         const root = createRoot(rootEl)
         root.render(<OuterApp {...props} />)
