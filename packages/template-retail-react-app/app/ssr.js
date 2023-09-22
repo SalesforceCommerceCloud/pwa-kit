@@ -9,9 +9,8 @@
 
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
-import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
+import {getContentSecurityPolicy, isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import helmet from 'helmet'
 
 const options = {
@@ -36,65 +35,10 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    const getRuntimeEnv = () => {
-        if (process.env.NODE_ENV !== 'production') return process.env.NODE_ENV ?? 'development'
-        const origin = getAppOrigin()
-        // mobify-storefront-staging sites have NODE_ENV set to production, but for the purposes
-        // of CSP we consider the sites to be staging.
-        return origin.endsWith('.mobify-storefront-staging.com') ? 'staging' : 'production'
-    }
-
-    // This is a temporary solution while we work on Storefront Preview - a full solution will
-    // prevent required CSP headers from being modified.
-    const getCSP = () => {
-        const trustedMap = {
-            development: [
-                'localhost:*',
-                '*.commercecloud.salesforce.com',
-                '*.demandware.net',
-                '*.mobify-staging.com',
-                '*.mobify-storefront-staging.com',
-                '*.mobify-storefront.com',
-                'runtime.commercecloud.com'
-            ],
-            staging: [
-                '*.demandware.net',
-                '*.mobify-staging.com',
-                '*.mobify-storefront-staging.com',
-                '*.mobify-storefront.com',
-                '*.commercecloud.salesforce.com',
-                'runtime.commercecloud.com'
-            ],
-            production: [
-                '*.demandware.com',
-                '*.mobify.com',
-                '*.mobify-storefront.com',
-                '*.commercecloud.salesforce.com',
-                'runtime.commercecloud.com'
-            ]
-        }
-
-        const env = getRuntimeEnv()
-        const trusted = ["'self'", ...(trustedMap[env] ? trustedMap[env] : [])]
-
-        return {
-            'connect-src': ['api.cquotient.com', ...trusted],
-            'frame-ancestors': [...trusted],
-            'img-src': ['data:', ...trusted],
-            'script-src': ["'unsafe-eval'", 'storage.googleapis.com', ...trusted],
-
-            // Do not upgrade insecure requests for local development
-            'upgrade-insecure-requests': isRemote() ? [] : null
-        }
-    }
-
     // Set HTTP security headers
     app.use(
         helmet({
-            contentSecurityPolicy: {
-                useDefaults: true,
-                directives: getCSP()
-            },
+            contentSecurityPolicy: getContentSecurityPolicy(),
             hsts: isRemote()
         })
     )

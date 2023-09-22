@@ -18,6 +18,7 @@ import {
     AGENT_OPTIONS_TO_COPY,
     CachedResponse,
     escapeJSText,
+    getContentSecurityPolicy,
     getFullRequestURL,
     MetricsSender,
     outgoingRequestHook,
@@ -1002,5 +1003,38 @@ describe('CachedResponse', () => {
         expect(cached.headers).toEqual(entry.metadata.headers)
         expect(cached.status).toBe(201)
         expect(cached.expiration).toEqual(new Date(entry.expiration))
+    })
+})
+
+describe('Content Security Policy', () => {
+    test('uses localhost for Runtime Admin in development', () => {
+        //
+    })
+    test('uses mobify-storefront.com for Runtime Admin in staging', () => {
+        //
+    })
+    test('uses runtime.commercecloud.com for Runtime Admin in production', () => {
+        //
+    })
+    test("doesn't upgrade insecure requests in development", () => {
+        //
+    })
+    test('does upgrade insecure requests in production', () => {
+        //
+    })
+    test("allows additional directives we don't use to be included", () => {
+        //
+    })
+    test('merges user-provided kebab-case directives with default directives', () => {
+        //
+    })
+    test('merges user-provided camelCase directives with default directives', () => {
+        //
+    })
+    test('does not merge duplicate user-provided directives', () => {
+        //
+    })
+    test('does not allow user to disable required directives', () => {
+        //
     })
 })

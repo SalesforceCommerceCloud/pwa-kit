@@ -12,6 +12,7 @@
 // This file is kept for backwards compatibility / simpler imports.
 export * from './ssr-server/cached-response'
 export * from './ssr-server/configure-proxy'
+export * from './ssr-server/csp'
 export * from './ssr-server/metrics-sender'
 export * from './ssr-server/outgoing-request-hook'
 export * from './ssr-server/parse-end-parameters'
