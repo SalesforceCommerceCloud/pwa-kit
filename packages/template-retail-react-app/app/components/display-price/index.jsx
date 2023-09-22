@@ -31,7 +31,7 @@ const DisplayPrice = ({
                         defaultMessage: 'Starting at'
                     })} `}
             </Text>
-            {discountPrice > 0 && (
+            {typeof discountPrice === 'number' && (
                 <Text as="b" {...discountPriceProps}>
                     {intl.formatNumber(discountPrice, {
                         style: 'currency',
