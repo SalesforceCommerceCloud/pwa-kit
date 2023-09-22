@@ -1,6 +1,10 @@
 ## v2.0.0 (Sep 21, 2023)
 
 - V3 Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)
+- Cleanup wrong import path for page-designer component [#1441](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1441) @clavery
+- Modularize country code source for targeting via extensibility [#1445](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1445) @bfeister
+- Export icon helper function for target via overrides [#1420](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1420) @cbrother-csu
+- Migrate Page Designer core types to commerce-sdk-react [#1441](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1441) @clavery
 
 ## v1.0.1 (Jul 26, 2023)
 
