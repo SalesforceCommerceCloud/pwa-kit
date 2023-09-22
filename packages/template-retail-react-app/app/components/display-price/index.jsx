@@ -55,7 +55,7 @@ const DisplayPrice = ({
 }
 
 DisplayPrice.propTypes = {
-    basePrice: PropTypes.number,
+    basePrice: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     discountPrice: PropTypes.number,
     currency: PropTypes.string,
     isProductASet: PropTypes.bool,
