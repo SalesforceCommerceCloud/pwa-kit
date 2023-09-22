@@ -10,6 +10,7 @@ import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useIntl} from 'react-intl'
 import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
 import {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
+import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
@@ -54,12 +55,7 @@ export const useDerivedProduct = (product, isProductPartOfSet = false) => {
         (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
         (unfulfillable && inventoryMessages[UNFULFILLABLE])
 
-    const basePrice = product?.pricePerUnit || product?.price
-    const promotionalPriceList = product?.productPromotions
-        ?.map((promo) => promo.promotionalPrice)
-        .filter(Boolean)
-    // choose the smallest price among the promotionalPrice
-    const discountPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : 0
+    const {basePrice, discountPrice} = getDisplayPrice(product)
 
     // If the `initialQuantity` changes, update the state. This typically happens
     // when either the master product changes, or the inventory of the product changes

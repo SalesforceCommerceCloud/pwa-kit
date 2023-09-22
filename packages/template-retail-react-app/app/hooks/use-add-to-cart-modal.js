@@ -114,7 +114,10 @@ export const AddToCartModal = () => {
                                     viewType: 'small',
                                     selectedVariationAttributes: variant.variationValues
                                 })?.images?.[0]
-                                const {basePrice, discountPrice} = getDisplayPrice(product)
+                                const {
+                                    basePrice: lineItemBasePrice,
+                                    discountPrice: lineItemDiscountPrice
+                                } = getDisplayPrice(product)
                                 const variationAttributeValues = getDisplayVariationValues(
                                     product.variationAttributes,
                                     variant.variationValues
@@ -168,8 +171,8 @@ export const AddToCartModal = () => {
                                         <Box flex="none" alignSelf="flex-end" fontWeight="600">
                                             <DisplayPrice
                                                 discountPriceProps={{as: 'p'}}
-                                                basePrice={basePrice * quantity}
-                                                discountPrice={discountPrice * quantity}
+                                                basePrice={lineItemBasePrice * quantity}
+                                                discountPrice={lineItemDiscountPrice * quantity}
                                                 currency={currency}
                                             />
                                         </Box>

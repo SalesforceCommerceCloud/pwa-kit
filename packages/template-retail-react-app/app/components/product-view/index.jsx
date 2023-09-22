@@ -127,8 +127,6 @@ const ProductView = forwardRef(
             stepQuantity
         } = useDerivedProduct(product, isProductPartOfSet)
         const {basePrice, discountPrice} = getDisplayPrice(product)
-        console.log('basePrice', basePrice)
-        console.log('discountPrice', discountPrice)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)

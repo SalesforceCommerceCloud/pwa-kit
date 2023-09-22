@@ -91,7 +91,6 @@ test('Allows customer to create an account', async () => {
     await user.type(withinForm.getByLabelText('Last Name'), 'Tester')
     await user.type(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
     await user.type(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
-    screen.logTestingPlaygroundURL()
 
     // login with credentials
     global.server.use(

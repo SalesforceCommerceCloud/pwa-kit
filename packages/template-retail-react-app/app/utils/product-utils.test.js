@@ -54,9 +54,24 @@ test('getDisplayVariationValues', () => {
     })
 })
 
-test('getDisplayPrice', () => {
-    const {basePrice, discountPrice} = getDisplayPrice(mockedCustomerProductListsDetails.data[0])
+describe('getDisplayPrice', function () {
+    test('returns basePrice and discountPrice', () => {
+        const {basePrice, discountPrice} = getDisplayPrice(
+            mockedCustomerProductListsDetails.data[0]
+        )
 
-    expect(basePrice).toBe(199.0)
-    expect(discountPrice).toBe(189.0)
+        expect(basePrice).toBe(199.0)
+        expect(discountPrice).toBe(189.0)
+    })
+
+    test('returns null if there is not discount promotion', () => {
+        const data = {
+            ...mockedCustomerProductListsDetails.data[0],
+            productPromotions: []
+        }
+        const {basePrice, discountPrice} = getDisplayPrice(data)
+
+        expect(basePrice).toBe(199.0)
+        expect(discountPrice).toBeNull()
+    })
 })

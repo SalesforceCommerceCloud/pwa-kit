@@ -74,7 +74,6 @@ test('should render product details page', async () => {
 
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
     await waitFor(() => {
-        // screen.logTestingPlaygroundURL()
         expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
         expect(screen.getAllByText(/14.99/)).toHaveLength(2)
         expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
