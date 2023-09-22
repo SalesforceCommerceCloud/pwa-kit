@@ -135,29 +135,129 @@ describe('scriptUtils', () => {
     })
 
     describe('getLowestPackageVersion', () => {
-        const dependencyTree = {
-            version: '0.0.1',
-            name: 'test',
-            dependencies: {
-                '@salesforce/retail-react-app': {
-                    version: '1.0.0',
-                    dependencies: {
-                        'some-other-library': {
-                            version: '1.0.0',
-                            dependencies: {
-                                '@salesforce/pwa-kit-react-sdk': {
-                                    version: '1.0.0'
+        test('should work when major version is different', async () => {
+            const dependencyTree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/retail-react-app': {
+                        version: '0.0.1',
+                        dependencies: {
+                            'some-other-library': {
+                                version: '0.0.1',
+                                dependencies: {
+                                    '@salesforce/pwa-kit-react-sdk': {
+                                        version: '1.0.0'
+                                    }
                                 }
                             }
                         }
+                    },
+                    '@salesforce/pwa-kit-react-sdk': {
+                        version: '2.0.0'
                     }
-                },
-                '@salesforce/pwa-kit-react-sdk': {
-                    version: '3.0.0'
                 }
             }
-        }
-        test('should work', async () => {
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTree
+            )
+            expect(lowestVersion).toBe('1.0.0')
+        })
+
+        test('should work when minor version is different', async () => {
+            const dependencyTree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/retail-react-app': {
+                        version: '1.0.0',
+                        dependencies: {
+                            '@salesforce/pwa-kit-react-sdk': {
+                                version: '1.0.0'
+                            }
+                        }
+                    },
+                    '@salesforce/pwa-kit-react-sdk': {
+                        version: '1.1.0'
+                    }
+                }
+            }
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTree
+            )
+            expect(lowestVersion).toBe('1.0.0')
+        })
+
+        test('should work when patch version is different', async () => {
+            const dependencyTree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/retail-react-app': {
+                        version: '1.0.0',
+                        dependencies: {
+                            '@salesforce/pwa-kit-react-sdk': {
+                                version: '1.0.0'
+                            }
+                        }
+                    },
+                    '@salesforce/pwa-kit-react-sdk': {
+                        version: '1.0.1'
+                    }
+                }
+            }
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTree
+            )
+            expect(lowestVersion).toBe('1.0.0')
+        })
+
+        test('should work when version contains string', async () => {
+            const dependencyTree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/retail-react-app': {
+                        version: '1.0.0',
+                        dependencies: {
+                            '@salesforce/pwa-kit-react-sdk': {
+                                version: '1.0.0'
+                            }
+                        }
+                    },
+                    '@salesforce/pwa-kit-react-sdk': {
+                        version: '1.0.0-beta.0'
+                    }
+                }
+            }
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTree
+            )
+            expect(lowestVersion).toBe('1.0.0')
+        })
+
+        test('should work when package is deduped', async () => {
+            const dependencyTree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/retail-react-app': {
+                        version: '1.0.0',
+                        dependencies: {
+                            '@salesforce/pwa-kit-react-sdk': {
+                                version: '1.0.0'
+                            }
+                        }
+                    },
+                    '@salesforce/pwa-kit-react-sdk': {
+                        version: '1.0.0'
+                    }
+                }
+            }
             const lowestVersion = await scriptUtils.getLowestPackageVersion(
                 '@salesforce/pwa-kit-react-sdk',
                 dependencyTree
@@ -166,8 +266,17 @@ describe('scriptUtils', () => {
         })
 
         test("should return 'unknown' when package not found", async () => {
+            const dependencyTree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/retail-react-app': {
+                        version: '1.0.0'
+                    }
+                }
+            }
             const lowestVersion = await scriptUtils.getLowestPackageVersion(
-                '@salesforce/pwa-kit-runtime',
+                '@salesforce/pwa-kit-react-sdk',
                 dependencyTree
             )
             expect(lowestVersion).toBe('unknown')
