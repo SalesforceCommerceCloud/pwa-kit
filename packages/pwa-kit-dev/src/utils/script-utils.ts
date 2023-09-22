@@ -113,12 +113,12 @@ export const walkDir = async (
     return fileSet
 }
 
+/**
+ * Returns the versions of all packages including their dependencies within the project.
+ *
+ * @returns An object representing the dependency tree
+ */
 export const getAllProjectDependencyVersions = (): {[x: string]: any} => {
-    /**
-     * Returns the versions of all packages and their dependencies within the project.
-     *
-     * @returns An object representing the dependency tree
-     */
     return JSON.parse(execSync(`npm ls --all --json`, {encoding: 'utf-8'}))
 }
 
