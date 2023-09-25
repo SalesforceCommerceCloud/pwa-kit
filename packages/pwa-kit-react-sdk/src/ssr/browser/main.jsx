@@ -80,6 +80,7 @@ export const start = async () => {
     const AppConfig = getAppConfig()
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)
+    const queryParams = new URLSearchParams(window.location.search)
 
     // Set all globals sent from the server on the window object.
     Object.entries(data).forEach(([key, value]) => {
@@ -118,7 +119,7 @@ export const start = async () => {
 
     await loadableReady()
 
-    if (detectClientOnlyQueryParam()) {
+    if (queryParams.has('__client_only')) {
         window.__HYDRATING__ = false
         const root = createRoot(rootEl)
         root.render(<OuterApp {...props} />)
