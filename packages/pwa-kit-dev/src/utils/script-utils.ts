@@ -113,13 +113,21 @@ export const walkDir = async (
     return fileSet
 }
 
+interface DependencyTree {
+    version: string
+    name?: string
+    dependencies?: Record<string, DependencyTree>
+    resolved?: string
+    overridden?: boolean
+}
+
 /**
  * Returns the versions of all packages including their dependencies within the project.
  *
  * @returns An object representing the dependency tree
  */
-export const getAllProjectDependencyVersions = (): {[x: string]: any} => {
-    return JSON.parse(execSync(`npm ls --all --json`, {encoding: 'utf-8'}))
+export const getAllProjectDependencyVersions = (): DependencyTree => {
+    return JSON.parse(execSync(`npm ls --all --json`, {encoding: 'utf-8'})) as DependencyTree
 }
 
 /**
@@ -131,21 +139,21 @@ export const getAllProjectDependencyVersions = (): {[x: string]: any} => {
  */
 export const getLowestPackageVersion = (
     packageName: string,
-    dependencyTree: {[x: string]: any}
+    dependencyTree: DependencyTree
 ): string => {
     let lowestVersion: string | null = null
 
-    function search(tree: {[x: string]: any}) {
-        for (const key in tree) {
-            if (key === packageName && tree[key].version) {
-                const version = tree[key].version
+    function search(tree: DependencyTree) {
+        for (const key in tree.dependencies) {
+            if (key === packageName) {
+                const version = tree.dependencies[key].version
                 if (!lowestVersion || version < lowestVersion) {
                     lowestVersion = version
                 }
             }
 
-            if (typeof tree[key] === 'object') {
-                search(tree[key])
+            if (tree.dependencies[key].dependencies) {
+                search(tree.dependencies[key])
             }
         }
     }
