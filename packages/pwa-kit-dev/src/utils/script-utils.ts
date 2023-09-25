@@ -16,6 +16,7 @@ import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
 import {execSync} from 'child_process'
+import semver from 'semver'
 
 export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
 export const DEFAULT_DOCS_URL =
@@ -148,7 +149,7 @@ export const getLowestPackageVersion = (
         for (const key in tree.dependencies) {
             if (key === packageName) {
                 const version = tree.dependencies[key].version
-                if (!lowestVersion || version < lowestVersion) {
+                if (!lowestVersion || semver.lt(version, lowestVersion)) {
                     lowestVersion = version
                 }
             }

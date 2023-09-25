@@ -147,14 +147,14 @@ describe('scriptUtils', () => {
                                 version: '0.0.1',
                                 dependencies: {
                                     '@salesforce/pwa-kit-react-sdk': {
-                                        version: '1.0.0'
+                                        version: '10.0.0'
                                     }
                                 }
                             }
                         }
                     },
                     '@salesforce/pwa-kit-react-sdk': {
-                        version: '2.0.0'
+                        version: '9.0.0'
                     }
                 }
             }
@@ -162,7 +162,7 @@ describe('scriptUtils', () => {
                 '@salesforce/pwa-kit-react-sdk',
                 dependencyTree
             )
-            expect(lowestVersion).toBe('1.0.0')
+            expect(lowestVersion).toBe('9.0.0')
         })
 
         test('should work when minor version is different', async () => {
@@ -174,12 +174,12 @@ describe('scriptUtils', () => {
                         version: '1.0.0',
                         dependencies: {
                             '@salesforce/pwa-kit-react-sdk': {
-                                version: '1.0.0'
+                                version: '1.9.0'
                             }
                         }
                     },
                     '@salesforce/pwa-kit-react-sdk': {
-                        version: '1.1.0'
+                        version: '1.10.0'
                     }
                 }
             }
@@ -187,7 +187,7 @@ describe('scriptUtils', () => {
                 '@salesforce/pwa-kit-react-sdk',
                 dependencyTree
             )
-            expect(lowestVersion).toBe('1.0.0')
+            expect(lowestVersion).toBe('1.9.0')
         })
 
         test('should work when patch version is different', async () => {
@@ -199,12 +199,12 @@ describe('scriptUtils', () => {
                         version: '1.0.0',
                         dependencies: {
                             '@salesforce/pwa-kit-react-sdk': {
-                                version: '1.0.0'
+                                version: '1.0.10'
                             }
                         }
                     },
                     '@salesforce/pwa-kit-react-sdk': {
-                        version: '1.0.1'
+                        version: '1.0.9'
                     }
                 }
             }
@@ -212,7 +212,7 @@ describe('scriptUtils', () => {
                 '@salesforce/pwa-kit-react-sdk',
                 dependencyTree
             )
-            expect(lowestVersion).toBe('1.0.0')
+            expect(lowestVersion).toBe('1.0.9')
         })
 
         test('should work when version contains string', async () => {
@@ -229,7 +229,7 @@ describe('scriptUtils', () => {
                         }
                     },
                     '@salesforce/pwa-kit-react-sdk': {
-                        version: '1.0.0-beta.0'
+                        version: '1.0.0-beta'
                     }
                 }
             }
@@ -237,7 +237,7 @@ describe('scriptUtils', () => {
                 '@salesforce/pwa-kit-react-sdk',
                 dependencyTree
             )
-            expect(lowestVersion).toBe('1.0.0')
+            expect(lowestVersion).toBe('1.0.0-beta')
         })
 
         test('should work when package is deduped', async () => {
