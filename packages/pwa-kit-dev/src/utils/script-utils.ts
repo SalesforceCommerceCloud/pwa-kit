@@ -147,15 +147,16 @@ export const getLowestPackageVersion = (
 
     function search(tree: DependencyTree) {
         for (const key in tree.dependencies) {
+            const dependency = tree.dependencies[key]
             if (key === packageName) {
-                const version = tree.dependencies[key].version
+                const version = dependency.version
                 if (!lowestVersion || semver.lt(version, lowestVersion)) {
                     lowestVersion = version
                 }
             }
 
-            if (tree.dependencies[key].dependencies) {
-                search(tree.dependencies[key])
+            if (dependency.dependencies) {
+                search(dependency)
             }
         }
     }
