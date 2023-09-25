@@ -164,12 +164,13 @@ export const getLowestPackageVersion = (
 }
 
 /**
- * Returns all the dependencies of a project including the PWA Kit packages.
+ * Returns the versions of all dependencies of a project.
+ * For PWA Kit packages, this will search the dependency tree for the lowest version.
  *
  * @param dependencies - The package dependencies of the project
  * @param devDependencies - The dependencies required for development of the project
  * @param dependencyTree - The dependency tree including all package versions
- * @returns All the dependenices of the project
+ * @returns The versions of all dependencies of the project.
  */
 export const getDependencies = (
     dependencies: {[key: string]: string},
@@ -182,8 +183,8 @@ export const getDependencies = (
         '@salesforce/pwa-kit-dev'
     ]
 
-    // pwa-kit package versions are not always listed as dependencies in the package.json
-    // such as when a bundle is using template extensibility
+    // pwa-kit package versions are not always listed as direct dependencies
+    // in the package.json such as when a bundle is using template extensibility
     const nestedPwaKitDependencies: {[key: string]: string} = {}
     pwaKitDependencies.forEach((packageName) => {
         nestedPwaKitDependencies[packageName] = getLowestPackageVersion(packageName, dependencyTree)
