@@ -122,7 +122,7 @@ interface DependencyTree {
 }
 
 /**
- * Returns a DependencyTree that includes the versions of all packages 
+ * Returns a DependencyTree that includes the versions of all packages
  * including their dependencies within the project.
  *
  * @returns A DependencyTree with the versions of all dependencies
