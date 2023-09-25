@@ -91,5 +91,5 @@ export const getContentSecurityPolicy = (
             ...getDirective(extraDirectives, 'script-src', 'scriptSrc')
         ]
     }
-    return {directives}
+    return {useDefaults: true, directives}
 }
