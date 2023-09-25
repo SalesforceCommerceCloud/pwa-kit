@@ -113,7 +113,7 @@ const App = (props) => {
     const {children} = props
     const {data: categoriesTree} = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')
-
+    const {getTokenWhenReady} = useAccessToken()
     const appOrigin = getAppOrigin()
 
     const history = useHistory()
@@ -364,7 +364,7 @@ const App = (props) => {
                 defaultLocale={DEFAULT_LOCALE}
             >
                 <CurrencyProvider currency={currency}>
-                    <StorefrontPreview />
+                    <StorefrontPreview getToken={getTokenWhenReady} />
                     <Seo>
                         <meta name="theme-color" content={THEME_COLOR} />
                         <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />

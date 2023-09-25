@@ -24,6 +24,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
+    getMaskCreditCardNumber,
     getCreditCardIcon
 } from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {
@@ -84,7 +85,7 @@ const Payment = () => {
             paymentMethodId: 'CREDIT_CARD',
             paymentCard: {
                 holder: formValue.holder,
-                issueNumber: formValue.number.replace(/ /g, ''),
+                maskedNumber: getMaskCreditCardNumber(formValue.number),
                 cardType: getPaymentInstrumentCardType(formValue.cardType),
                 expirationMonth: parseInt(expirationMonth),
                 expirationYear: parseInt(`20${expirationYear}`)
