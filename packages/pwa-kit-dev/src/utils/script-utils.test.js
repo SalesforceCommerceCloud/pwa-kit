@@ -283,6 +283,94 @@ describe('scriptUtils', () => {
         })
     })
 
+    describe('getDependencies', () => {
+        test('should only return pwa-kit packages if dependencies and devDependencies is empty', async () => {
+            const dependencies = {}
+            const devDependencies = {}
+            const dependencyTree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/retail-react-app': {
+                        version: '1.0.0'
+                    }
+                }
+            }
+            const allDependencies = await scriptUtils.getDependencies(
+                dependencies,
+                devDependencies,
+                dependencyTree
+            )
+            expect(Object.keys(allDependencies)).toHaveLength(3)
+            expect(allDependencies).toHaveProperty('@salesforce/pwa-kit-react-sdk', 'unknown')
+            expect(allDependencies).toHaveProperty('@salesforce/pwa-kit-runtime', 'unknown')
+            expect(allDependencies).toHaveProperty('@salesforce/pwa-kit-dev', 'unknown')
+        })
+
+        test('should work if passed non-empty dependencies and devDependencies', async () => {
+            const dependencies = {'some-dep': '1.0.0'}
+            const devDependencies = {'some-dev-dep': '3.0.1'}
+            const dependencyTree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/pwa-kit-react-sdk': {
+                        version: '1.0.0'
+                    },
+                    '@salesforce/pwa-kit-runtime': {
+                        version: '1.0.0'
+                    },
+                    '@salesforce/pwa-kit-dev': {
+                        version: '1.0.0'
+                    }
+                }
+            }
+            const allDependencies = await scriptUtils.getDependencies(
+                dependencies,
+                devDependencies,
+                dependencyTree
+            )
+            expect(Object.keys(allDependencies)).toHaveLength(5)
+            expect(allDependencies).toMatchObject(dependencies)
+            expect(allDependencies).toMatchObject(devDependencies)
+            expect(allDependencies).toHaveProperty('@salesforce/pwa-kit-react-sdk', '1.0.0')
+            expect(allDependencies).toHaveProperty('@salesforce/pwa-kit-runtime', '1.0.0')
+            expect(allDependencies).toHaveProperty('@salesforce/pwa-kit-dev', '1.0.0')
+        })
+
+        test('should overwrite pwa-kit package version if lower one found in tree', async () => {
+            const dependencies = {
+                '@salesforce/pwa-kit-react-sdk': '3.0.0',
+                '@salesforce/pwa-kit-runtime': '3.0.0'
+            }
+            const devDependencies = {'@salesforce/pwa-kit-dev': '3.0.0'}
+            const dependencyTree = {
+                version: '0.0.1',
+                name: 'test',
+                dependencies: {
+                    '@salesforce/pwa-kit-react-sdk': {
+                        version: '1.0.0'
+                    },
+                    '@salesforce/pwa-kit-runtime': {
+                        version: '1.0.0'
+                    },
+                    '@salesforce/pwa-kit-dev': {
+                        version: '1.0.0'
+                    }
+                }
+            }
+            const allDependencies = await scriptUtils.getDependencies(
+                dependencies,
+                devDependencies,
+                dependencyTree
+            )
+            expect(Object.keys(allDependencies)).toHaveLength(3)
+            expect(allDependencies).toHaveProperty('@salesforce/pwa-kit-react-sdk', '1.0.0')
+            expect(allDependencies).toHaveProperty('@salesforce/pwa-kit-runtime', '1.0.0')
+            expect(allDependencies).toHaveProperty('@salesforce/pwa-kit-dev', '1.0.0')
+        })
+    })
+
     jest.unmock('fs-extra')
     describe('defaultMessage', () => {
         test('works', async () => {

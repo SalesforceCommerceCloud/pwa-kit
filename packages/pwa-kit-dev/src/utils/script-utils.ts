@@ -122,11 +122,12 @@ interface DependencyTree {
 }
 
 /**
- * Returns the versions of all packages including their dependencies within the project.
+ * Returns a DependencyTree that includes the versions of all packages 
+ * including their dependencies within the project.
  *
- * @returns An object representing the dependency tree
+ * @returns A DependencyTree with the versions of all dependencies
  */
-export const getAllProjectDependencyVersions = (): DependencyTree => {
+export const getProjectDependencyTree = (): DependencyTree => {
     return JSON.parse(execSync(`npm ls --all --json`, {encoding: 'utf-8'})) as DependencyTree
 }
 
@@ -160,6 +161,39 @@ export const getLowestPackageVersion = (
 
     search(dependencyTree)
     return lowestVersion ?? 'unknown'
+}
+
+/**
+ * Returns all the dependencies of a project including the PWA Kit packages.
+ *
+ * @param dependencies - The package dependencies of the project
+ * @param devDependencies - The dependencies required for development of the project
+ * @param dependencyTree - The dependency tree including all package versions
+ * @returns All the dependenices of the project
+ */
+export const getDependencies = (
+    dependencies: {[key: string]: string},
+    devDependencies: {[key: string]: string},
+    dependencyTree: DependencyTree
+): {[key: string]: string} => {
+    const pwaKitDependencies = [
+        '@salesforce/pwa-kit-react-sdk',
+        '@salesforce/pwa-kit-runtime',
+        '@salesforce/pwa-kit-dev'
+    ]
+
+    // pwa-kit package versions are not always listed as dependencies in the package.json
+    // such as when a bundle is using template extensibility
+    const nestedPwaKitDependencies: {[key: string]: string} = {}
+    pwaKitDependencies.forEach((packageName) => {
+        nestedPwaKitDependencies[packageName] = getLowestPackageVersion(packageName, dependencyTree)
+    })
+
+    return {
+        ...dependencies,
+        ...devDependencies,
+        ...nestedPwaKitDependencies
+    }
 }
 
 export class CloudAPIClient {
@@ -339,11 +373,6 @@ export const createBundle = async ({
                     ccExtensibility = {extends: '', overridesDir: ''}
                 } = await getProjectPkg()
                 const extendsTemplate = 'node_modules/' + ccExtensibility.extends
-                const pwaKitDependencies = [
-                    '@salesforce/pwa-kit-react-sdk',
-                    '@salesforce/pwa-kit-runtime',
-                    '@salesforce/pwa-kit-dev'
-                ]
 
                 let cc_overrides: string[] = []
                 if (ccExtensibility.overridesDir) {
@@ -356,23 +385,12 @@ export const createBundle = async ({
                     )
                 }
 
-                // pwa-kit package versions are not always listed as dependencies in the package.json
-                // such as when a bundle is using template extensibility
-                const nestedPwaKitDependencies: {[key: string]: string} = {}
-                const dependencyTree = getAllProjectDependencyVersions()
-                pwaKitDependencies.forEach((packageName) => {
-                    nestedPwaKitDependencies[packageName] = getLowestPackageVersion(
-                        packageName,
-                        dependencyTree
-                    )
-                })
-
                 bundle_metadata = {
-                    dependencies: {
-                        ...dependencies,
-                        ...devDependencies,
-                        ...nestedPwaKitDependencies
-                    },
+                    dependencies: getDependencies(
+                        dependencies,
+                        devDependencies,
+                        getProjectDependencyTree()
+                    ),
                     cc_overrides: cc_overrides
                 }
             })
