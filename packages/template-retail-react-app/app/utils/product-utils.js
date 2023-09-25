@@ -33,3 +33,21 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
     }, {})
     return returnVal
 }
+
+/**
+ * This function extract the promotional price from a product. If there are more than one price, the smallest price will be picked
+ * @param {object} product - product detail object
+ * @returns {{discountPrice: number, basePrice: number | string}}
+ */
+export const getDisplayPrice = (product) => {
+    const basePrice = product?.pricePerUnit || product?.price
+    const promotionalPriceList = product?.productPromotions
+        ?.map((promo) => promo.promotionalPrice)
+        .filter((i) => i !== null && i !== undefined)
+    // choose the smallest price among the promotionalPrice
+    const discountPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : null
+    return {
+        basePrice,
+        discountPrice
+    }
+}
