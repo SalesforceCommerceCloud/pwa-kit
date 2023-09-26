@@ -166,19 +166,13 @@ export const getLowestPackageVersion = (
 }
 
 /**
- * Returns the versions of all dependencies of a project.
- * For PWA Kit packages, this will search the dependency tree for the lowest version.
+ * Returns the versions of all PWA Kit dependencies of a project.
+ * This will search the dependency tree for the lowest version of each PWA Kit package.
  *
- * @param dependencies - The package dependencies of the project
- * @param devDependencies - The dependencies required for development of the project
  * @param dependencyTree - The dependency tree including all package versions
  * @returns The versions of all dependencies of the project.
  */
-export const getDependencies = (
-    dependencies: {[key: string]: string},
-    devDependencies: {[key: string]: string},
-    dependencyTree: DependencyTree
-): {[key: string]: string} => {
+export const getPwaKitDependencies = (dependencyTree: DependencyTree): {[key: string]: string} => {
     const pwaKitDependencies = [
         '@salesforce/pwa-kit-react-sdk',
         '@salesforce/pwa-kit-runtime',
@@ -192,11 +186,7 @@ export const getDependencies = (
         nestedPwaKitDependencies[packageName] = getLowestPackageVersion(packageName, dependencyTree)
     })
 
-    return {
-        ...dependencies,
-        ...devDependencies,
-        ...nestedPwaKitDependencies
-    }
+    return nestedPwaKitDependencies
 }
 
 export class CloudAPIClient {
@@ -389,11 +379,11 @@ export const createBundle = async ({
                 }
 
                 bundle_metadata = {
-                    dependencies: getDependencies(
-                        dependencies,
-                        devDependencies,
-                        getProjectDependencyTree()
-                    ),
+                    dependencies: {
+                        ...dependencies,
+                        ...devDependencies,
+                        ...getPwaKitDependencies(getProjectDependencyTree())
+                    },
                     cc_overrides: cc_overrides
                 }
             })
