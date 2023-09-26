@@ -171,7 +171,7 @@ describe('scriptUtils', () => {
         test('should work when package is deduped', async () => {
             const lowestVersion = await scriptUtils.getLowestPackageVersion(
                 '@salesforce/pwa-kit-react-sdk',
-                dependencyTreeMockData.dedeupedVersion
+                dependencyTreeMockData.dedupedVersion
             )
             expect(lowestVersion).toBe('1.0.0')
         })
