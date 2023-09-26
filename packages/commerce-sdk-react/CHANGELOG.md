@@ -1,3 +1,6 @@
+## v1.1.0-dev (Sep 26, 2023)
+## v1.0.2 (Sep 26, 2023)
+## v3.2.0-dev (Sep 26, 2023)
 ## v1.0.2 (Sep 21, 2023)
 
 - commerce-sdk-react: have typedoc-related deps as dev dependencies [#1425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1425)
