@@ -98,7 +98,8 @@ describe('Auth', () => {
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
             usid: 'usid',
-            customer_type: 'guest'
+            customer_type: 'guest',
+            refresh_token_expires_in: 30 * 24 * 3600
         }
         // Convert stored format to exposed format
         const result = {...sample, refresh_token: 'refresh_token_guest'}
@@ -224,7 +225,8 @@ describe('Auth', () => {
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
             usid: 'usid',
-            customer_type: 'guest'
+            customer_type: 'guest',
+            refresh_token_expires_in: 30 * 24 * 3600
         }
         // Convert stored format to exposed format
         const result = {...data, refresh_token: 'refresh_token_guest'}
@@ -310,7 +312,8 @@ describe('Auth', () => {
             idp_access_token: 'idp_access_token',
             token_type: 'token_type',
             usid: 'usid',
-            customer_type: 'guest'
+            customer_type: 'guest',
+            refresh_token_expires_in: 30 * 24 * 3600
         }
 
         Object.keys(data).forEach((key) => {

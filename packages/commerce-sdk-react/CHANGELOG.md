@@ -1,5 +1,7 @@
-## v1.1.0-dev (TTBD)
-- Support storefront preview [#1403](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1403)
+## v1.0.2 (Sep 21, 2023)
+
+- commerce-sdk-react: have typedoc-related deps as dev dependencies [#1425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1425)
+- Updated commerce-sdk-isomorphic to v1.10.4 [#137](https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/pull/137)
 
 ## v1.0.1 (Jul 26, 2023)
 
