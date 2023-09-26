@@ -6,6 +6,7 @@
  */
 
 import {mkdtemp, rm, writeFile, readJsonSync, readJson} from 'fs-extra'
+import {execSync} from 'child_process'
 import path from 'path'
 import os from 'os'
 import * as scriptUtils from './script-utils'
@@ -16,6 +17,13 @@ jest.mock('fs-extra', () => {
     return {
         ...jest.requireActual('fs-extra'),
         readJson: jest.fn()
+    }
+})
+
+jest.mock('child_process', () => {
+    return {
+        ...jest.requireActual('child_process'),
+        execSync: jest.fn()
     }
 })
 
@@ -295,6 +303,7 @@ describe('scriptUtils', () => {
 
         test('should archive a bundle', async () => {
             readJson.mockReturnValue(pkg)
+            execSync.mockReturnValue(JSON.stringify(dependencyTreeMockData.noPwaKitPackages))
             const message = 'message'
             const bundle = await scriptUtils.createBundle({
                 message,
@@ -349,6 +358,7 @@ describe('scriptUtils', () => {
             'should push a built bundle and handle status codes (%p)',
             async ({projectSlug, targetSlug, expectedURL, status}) => {
                 readJson.mockReturnValue(pkg)
+                execSync.mockReturnValue(JSON.stringify(dependencyTreeMockData.noPwaKitPackages))
                 const message = 'message'
                 const bundle = await scriptUtils.createBundle({
                     message,
