@@ -892,6 +892,15 @@ export const RemoteServerFactory = {
     },
 
     /**
+     * Adds middleware that must run *after* custom middleware.
+     * @private
+     * @param {Express.Application} app
+     */
+    _postCustomizeApp(app) {
+        // TODO: Putting app.use(cspSafeguardMiddleware) here doesn't seem to work?
+    },
+
+    /**
      * Create an SSR (Server-Side Rendering) Server.
      *
      * @constructor
@@ -923,6 +932,7 @@ export const RemoteServerFactory = {
         process.on('unhandledRejection', catchAndLog)
         const app = this._createApp(options)
         customizeApp(app)
+        this._postCustomizeApp(app)
         return this._createHandler(app)
     },
 

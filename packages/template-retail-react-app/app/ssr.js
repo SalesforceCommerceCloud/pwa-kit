@@ -36,12 +36,47 @@ const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
-    app.use(
-        helmet({
-            contentSecurityPolicy: getContentSecurityPolicy(),
-            hsts: isRemote()
-        })
-    )
+    app.use(helmet({hsts: isRemote()}))
+
+    app.use((req, res, next) => {
+        // TODO: Special handling for 'upgrade-insecure-requests': isRemote() ? [] : null
+        const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
+        const defaultDirectives = {
+            'connect-src': ["'self'", 'api.cquotient.com', runtimeAdmin],
+            'frame-ancestors': [runtimeAdmin],
+            'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
+            'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com', runtimeAdmin]
+        }
+        // Parse current CSP header
+        const directives = res
+            .getHeader('Content-Security-Policy')
+            .split(';')
+            .reduce((obj, text) => {
+                const [directive, ...values] = text.split(' ')
+                obj[directive] = values
+                return obj
+            }, {})
+        // Add missing default CSP directives
+        for (const [directive, defaultValues] of Object.entries(defaultDirectives)) {
+            directives[directive] = [
+                // Wrapping with `[...new Set(array)]` removes duplicate entries
+                ...new Set([...(directives[directive] ?? []), ...defaultValues])
+            ]
+        }
+        // Always upgrade insecure requests when deployed, never upgrade on local dev server
+        if (isRemote()) {
+            directives['upgrade-insecure-requests'] = []
+        } else {
+            delete directives['upgrade-insecure-requests']
+        }
+        // Re-construct header string
+        const header = Object.entries(directives)
+            .map(([directive, values]) => [directive, ...values].join(' '))
+            .join(';')
+        res.setHeader('Content-Security-Policy', header)
+
+        next()
+    })
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
