@@ -1,3 +1,4 @@
+## v2.1.0-dev (Sep 26, 2023)
 ## v2.0.0 (Sep 21, 2023)
 
 - V3 Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)
