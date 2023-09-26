@@ -9,7 +9,7 @@
 
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
-import {getContentSecurityPolicy, isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
+import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
 
@@ -40,7 +40,8 @@ const {handler} = runtime.createHandler(options, (app) => {
 
     app.use((req, res, next) => {
         // TODO: Special handling for 'upgrade-insecure-requests': isRemote() ? [] : null
-        const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
+        const runtimeAdmin = '*.mobify-storefront.com' // TODO: Revert
+        // const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
         const defaultDirectives = {
             'connect-src': ["'self'", 'api.cquotient.com', runtimeAdmin],
             'frame-ancestors': [runtimeAdmin],
