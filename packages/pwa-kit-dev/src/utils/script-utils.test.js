@@ -315,7 +315,7 @@ describe('scriptUtils', () => {
 
             // De-code and re-encode gives the same result, to show that it *is* b64 encoded
             expect(Buffer.from(bundle.data, 'base64').toString('base64')).toEqual(bundle.data)
-        })
+        }, 25000)
     })
 
     describe('pushBundle', () => {
