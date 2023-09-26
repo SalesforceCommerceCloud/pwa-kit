@@ -1,3 +1,6 @@
+## v1.1.0-nightly-20230926185707 (Sep 26, 2023)
+## v1.1.0-dev (Sep 26, 2023)
+## v3.2.0-nightly-20230926185707 (Sep 26, 2023)
 ## v1.1.0-dev (TTBD)
 - Support storefront preview [#1403](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1403)
 
