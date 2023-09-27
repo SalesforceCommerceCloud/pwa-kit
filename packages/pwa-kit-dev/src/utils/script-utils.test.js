@@ -6,15 +6,24 @@
  */
 
 import {mkdtemp, rm, writeFile, readJsonSync, readJson} from 'fs-extra'
+import {execSync} from 'child_process'
 import path from 'path'
 import os from 'os'
 import * as scriptUtils from './script-utils'
+import * as dependencyTreeMockData from './mocks/dependency-tree-mock-data'
 const pkg = readJsonSync(path.join(__dirname, '../../package.json'))
 
 jest.mock('fs-extra', () => {
     return {
         ...jest.requireActual('fs-extra'),
         readJson: jest.fn()
+    }
+})
+
+jest.mock('child_process', () => {
+    return {
+        ...jest.requireActual('child_process'),
+        execSync: jest.fn()
     }
 })
 
@@ -134,6 +143,78 @@ describe('scriptUtils', () => {
         })
     })
 
+    describe('getLowestPackageVersion', () => {
+        test('should work when major version is different', async () => {
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTreeMockData.differentMajorVersions
+            )
+            expect(lowestVersion).toBe('9.0.0')
+        })
+
+        test('should work when minor version is different', async () => {
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTreeMockData.differentMinorVersions
+            )
+            expect(lowestVersion).toBe('1.9.0')
+        })
+
+        test('should work when patch version is different', async () => {
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTreeMockData.differentPatchVersions
+            )
+            expect(lowestVersion).toBe('1.0.9')
+        })
+
+        test('should work when version contains pre-release version', async () => {
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTreeMockData.preReleaseVersion
+            )
+            expect(lowestVersion).toBe('1.0.0-beta')
+        })
+
+        test('should work when package is deduped', async () => {
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTreeMockData.dedupedVersion
+            )
+            expect(lowestVersion).toBe('1.0.0')
+        })
+
+        test("should return 'unknown' when package not found", async () => {
+            const lowestVersion = await scriptUtils.getLowestPackageVersion(
+                '@salesforce/pwa-kit-react-sdk',
+                dependencyTreeMockData.noPwaKitPackages
+            )
+            expect(lowestVersion).toBe('unknown')
+        })
+    })
+
+    describe('getPwaKitDependencies', () => {
+        test('should return pwa-kit packages with unknown version if not in dependency tree', async () => {
+            const dependencies = await scriptUtils.getPwaKitDependencies(
+                dependencyTreeMockData.noPwaKitPackages
+            )
+            expect(Object.keys(dependencies)).toHaveLength(3)
+            expect(dependencies).toHaveProperty('@salesforce/pwa-kit-react-sdk', 'unknown')
+            expect(dependencies).toHaveProperty('@salesforce/pwa-kit-runtime', 'unknown')
+            expect(dependencies).toHaveProperty('@salesforce/pwa-kit-dev', 'unknown')
+        })
+
+        test('should return pwa-kit packages with version in dependency tree', async () => {
+            const dependencies = await scriptUtils.getPwaKitDependencies(
+                dependencyTreeMockData.includesPwaKitPackages
+            )
+            expect(Object.keys(dependencies)).toHaveLength(3)
+            expect(dependencies).toHaveProperty('@salesforce/pwa-kit-react-sdk', '1.0.0')
+            expect(dependencies).toHaveProperty('@salesforce/pwa-kit-runtime', '1.0.0')
+            expect(dependencies).toHaveProperty('@salesforce/pwa-kit-dev', '1.0.0')
+        })
+    })
+
     jest.unmock('fs-extra')
     describe('defaultMessage', () => {
         test('works', async () => {
@@ -222,6 +303,7 @@ describe('scriptUtils', () => {
 
         test('should archive a bundle', async () => {
             readJson.mockReturnValue(pkg)
+            execSync.mockReturnValue(JSON.stringify(dependencyTreeMockData.noPwaKitPackages))
             const message = 'message'
             const bundle = await scriptUtils.createBundle({
                 message,
@@ -276,6 +358,7 @@ describe('scriptUtils', () => {
             'should push a built bundle and handle status codes (%p)',
             async ({projectSlug, targetSlug, expectedURL, status}) => {
                 readJson.mockReturnValue(pkg)
+                execSync.mockReturnValue(JSON.stringify(dependencyTreeMockData.noPwaKitPackages))
                 const message = 'message'
                 const bundle = await scriptUtils.createBundle({
                     message,
