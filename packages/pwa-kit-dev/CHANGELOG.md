@@ -1,4 +1,7 @@
-## v3.2.0-dev (TBD)
+## v3.2.0-dev (Sep 26, 2023)
+## v3.1.1 (Sep 21, 2023)
+
+- Bugfix: resolve performance issue due to webpack stats [#1418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1418)
 
 ## v3.1.0 (Jul 26, 2023)
 

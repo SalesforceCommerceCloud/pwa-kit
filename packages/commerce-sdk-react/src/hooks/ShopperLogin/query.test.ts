@@ -40,8 +40,6 @@ const OPTIONS = {
 type TestMap = {[K in keyof Queries]: NonNullable<ReturnType<Queries[K]>['data']>}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
-    // Type assertion so that we don't have to implement the full response
-    useCredQualityUserInfo: {credQualityMeasure: 0} as ShopperLoginTypes.CredQualityUserResponse,
     // These endpoints return type `Object`, which isn't helpful, so we just use some mock data
     useJwksUri: {mockJwksUriData: true},
     useUserInfo: {mockUserInfo: true},
