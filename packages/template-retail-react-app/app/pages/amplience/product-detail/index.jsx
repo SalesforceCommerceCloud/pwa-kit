@@ -328,8 +328,12 @@ const ProductDetail = ({category, product, isLoading, productPdp: initialProduct
                     <ProductView
                         product={product}
                         category={primaryCategory?.parentCategoryTree || []}
-                        addToCart={(variant, quantity) => handleAddToCart(variant, quantity)}
-                        addToWishlist={(_, quantity) => handleAddToWishlist(quantity)}
+                        addToCart={(variant, quantity) =>
+                            handleAddToCart([{product, variant, quantity}])
+                        }
+                        addToWishlist={(product, variant, quantity) =>
+                            handleAddToWishlist(product, variant, quantity)
+                        }
                         isProductLoading={isLoading}
                         isCustomerProductListLoading={!wishlist.isInitialized}
                     />
