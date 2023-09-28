@@ -2237,6 +2237,12 @@
       "value": "數量："
     }
   ],
+  "product_list.button.contentfilter": [
+    {
+      "type": 0,
+      "value": "篩選條件"
+    }
+  ],
   "product_list.button.filter": [
     {
       "type": 0,

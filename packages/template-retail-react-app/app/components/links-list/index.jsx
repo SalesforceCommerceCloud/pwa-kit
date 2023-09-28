@@ -22,7 +22,7 @@ const LinksList = ({
     return (
         <Box {...styles.container} {...(color ? {color: color} : {})} {...otherProps}>
             {heading &&
-                (heading.href ? (
+                (heading.href && heading.href !== '$' ? (
                     <Link
                         to={heading.href}
                         onClick={onLinkClick}
@@ -34,7 +34,7 @@ const LinksList = ({
                         </Heading>
                     </Link>
                 ) : (
-                    <Heading {...styles.heading}>{heading}</Heading>
+                    <Heading {...styles.heading}>{heading.text ?? heading}</Heading>
                 ))}
 
             {links && (
@@ -43,6 +43,24 @@ const LinksList = ({
                         <HStack>
                             {links.map((link, i) => (
                                 <ListItem key={i} {...styles.listItem} sx={styles.listItemSx}>
+                                    {link.href && link.href !== '$' ? (
+                                        <Link
+                                            to={link.href}
+                                            onClick={onLinkClick}
+                                            {...(link.styles ? link.styles : {})}
+                                        >
+                                            {link.text}
+                                        </Link>
+                                    ) : (
+                                        <Heading {...styles.footerHeading}>{link?.text}</Heading>
+                                    )}
+                                </ListItem>
+                            ))}
+                        </HStack>
+                    ) : (
+                        links.map((link, i) => (
+                            <ListItem key={i}>
+                                {link.href && link.href !== '$' ? (
                                     <Link
                                         to={link.href}
                                         onClick={onLinkClick}
@@ -50,19 +68,9 @@ const LinksList = ({
                                     >
                                         {link.text}
                                     </Link>
-                                </ListItem>
-                            ))}
-                        </HStack>
-                    ) : (
-                        links.map((link, i) => (
-                            <ListItem key={i}>
-                                <Link
-                                    to={link.href}
-                                    onClick={onLinkClick}
-                                    {...(link.styles ? link.styles : {})}
-                                >
-                                    {link.text}
-                                </Link>
+                                ) : (
+                                    <Heading {...styles.footerHeading}>{link?.text}</Heading>
+                                )}
                             </ListItem>
                         ))
                     )}

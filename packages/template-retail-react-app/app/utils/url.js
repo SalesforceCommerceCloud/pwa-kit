@@ -6,9 +6,10 @@
  */
 
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getLocaleByReference, getParamsFromPath} from './utils'
-import {getDefaultSite, getSiteByReference} from './site-utils'
+import {getLocaleByReference, getParamsFromPath, getUrlConfig} from './utils'
+import {getDefaultSite, getSiteByReference, getSites} from './site-utils'
 import {HOME_HREF, urlPartPositions} from '../constants'
+import {keepVse} from '../hooks/use-navigation'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -106,6 +107,17 @@ export const categoryUrlBuilder = (category) => encodeURI(`/category/${category.
  * @returns {string}
  */
 export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`)
+/**
+ * Given a product and the current locale returns an href to the product detail page.
+ *
+ * @param {Object} product
+ * @returns {string}
+ */
+export const productUrlBuilderAndQuery = (product, locale, baseLocation) => {
+    const location = baseLocation || (window && window.location) || {}
+    const {search = ''} = location
+    return keepVse(search, `/product/${product.id}`)
+}
 
 /**
  * Given a search term, constructs a search url.
@@ -125,7 +137,7 @@ export const searchUrlBuilder = (searchTerm) => '/search?q=' + encodeURIComponen
  * @param {Object} opts.location - location object to replace the default `window.location`
  * @returns {String} url - The relative URL for the specific locale.
  */
-export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
+export const getPathWithLocale = (shortCode, opts = {}) => {
     const location = opts.location ? opts.location : window.location
     let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
@@ -144,29 +156,31 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     search = search.replace(/&$/, '')
 
     const defaultSite = getDefaultSite()
+    const isHomeRef = pathname === HOME_HREF
 
-    // Remove query parameters
-    const {disallowParams = []} = opts
-
-    let queryString = new URLSearchParams(`${search}`)
-
-    if (disallowParams.length) {
-        disallowParams.forEach((param) => {
-            queryString.delete(param)
-        })
-    }
+    const isDefaultLocaleOfDefaultSite = shortCode === defaultSite.l10n.defaultLocale
+    const isDefaultSite = siteRef === defaultSite.alias || siteRef === defaultSite.id
 
     const site = getSiteByReference(siteRef)
 
     const locale = getLocaleByReference(site, shortCode)
 
     // rebuild the url with new locale,
-    const newUrl = buildUrl(
-        `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
-        // By default, as for home page, when the values of site and locale belongs to the default site,
-        // they will be not shown in the url just
-        defaultSite.alias || defaultSite.id,
-        locale?.alias || locale?.id
+    const newUrl = buildPathWithUrlConfig(
+        `${pathname}${search}`,
+        {
+            // By default, as for home page, when the values of site and locale belongs to the default site,
+            // they will be not shown in the url just
+            site:
+                isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
+                    ? ''
+                    : siteRef || defaultSite.alias || defaultSite.id,
+            locale:
+                isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
+                    ? ''
+                    : locale?.alias || locale?.id
+        },
+        opts
     )
     return newUrl
 }
@@ -229,6 +243,31 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
     }
 }
 
+/**
+ * Builds the Home page URL for a given locale and site.
+ * By default, when the values of site and locale belongs to the default site,
+ * they will be not shown in the url.
+ *
+ * Adjust the logic here to fit your cases
+ *
+ * @param homeHref
+ * @param options
+ * @returns {string}
+ */
+export const homeUrlBuilder = (homeHref, options = {}) => {
+    const {locale, site} = options
+    const defaultSite = getDefaultSite()
+    const isDefaultLocaleOfDefaultSite =
+        locale.alias === defaultSite.l10n.defaultLocale ||
+        locale.id === defaultSite.l10n.defaultLocale
+    const isDefaultSite = site.id === defaultSite.id || site.alias === defaultSite.alias
+    const updatedUrl = buildPathWithUrlConfig(homeHref, {
+        locale: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : locale.alias || locale.id,
+        site: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : site.alias || site.id
+    })
+    return encodeURI(updatedUrl)
+}
+
 /*
  * Remove query params from a give url path based on a given list of keys
  *
@@ -258,6 +297,101 @@ export const removeQueryParamsFromPath = (path, keys) => {
     const paramStr = params.toString().replace(/=&/g, '&').replace(/=$/, '')
 
     return `${pathname}${paramStr && '?'}${paramStr}`
+}
+
+/**
+ * Rebuild the path with locale/site values with a given url
+ * The position of those values will based on the url config of your current app configuration.
+ *
+ * @param {string} relativeUrl - the base relative Url to be reconstructed on
+ * @param {object} configValues - object that contains values of url config
+ * @param {Object} [opts] - Options, if there's any.
+ * @param {string[]} opts.disallowParams - URL parameters to remove
+ * @return {string} - an output path that has locale and site
+ *
+ * @example
+ * // configuration
+ * url {
+ *    locale: "query_param",
+ *    site: "path",
+ *    showDefaults: true
+ * }
+ *
+ *
+ * const site = {
+ *   id: 'RefArch',
+ *   alias: 'global'
+ *   l10n: {
+ *     defaultLocale: 'en-GB'
+ *     supportedLocales: [
+ *       {id: 'en-GB', preferCurrency: 'GBP'}
+ *     ]
+ *     // other props
+ *   }
+ * }
+ * buildPathWithUrlConfig('/women/dresses', {locale: 'en-GB', site: 'global'})
+ * => /global/women/dresses?locale=en-GB
+ *
+ */
+export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}) => {
+    const urlConfig = getUrlConfig()
+    const sites = getSites()
+    const defaultSite = getDefaultSite()
+    const site =
+        sites.find((site) => {
+            return site.alias === configValues['site'] || site.id === configValues['site']
+        }) || defaultSite
+    const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale)
+    const defaultLocaleRefs = [defaultLocale.alias, defaultLocale.id].filter(Boolean)
+    const {disallowParams = []} = opts
+    if (!Object.values(configValues).length) return relativeUrl
+    const [pathname, search] = relativeUrl.split('?')
+
+    const params = new URLSearchParams(search)
+    // Remove any disallowed params.
+    if (disallowParams.length) {
+        disallowParams.forEach((param) => {
+            params.delete(param)
+        })
+    }
+
+    const queryParams = {...Object.fromEntries(params)}
+    let basePathSegments = []
+
+    // get the default values for site and locale
+    const showDefaults = urlConfig.showDefaults
+
+    const defaultSiteRefs = [defaultSite.id, defaultSite.alias]
+    const defaultValues = [...defaultSiteRefs, ...defaultLocaleRefs]
+
+    const options = ['site', 'locale']
+    options.forEach((option) => {
+        const position = urlConfig[option] || urlPartPositions.NONE
+        const val = configValues[option]
+        if (position === urlPartPositions.PATH) {
+            // if showDefaults is false, the default value will not be show in the url
+            if (!showDefaults && defaultValues.includes(val)) {
+                return
+            }
+            basePathSegments.push(val)
+        } else if (position === urlPartPositions.QUERY_PARAM) {
+            // if showDefaults is false, the default value will not be show in the url
+            if (!showDefaults && defaultValues.includes(val)) {
+                return
+            }
+            queryParams[option] = val
+        }
+    })
+    // filter out falsy (empty string, undefined, null, etc) values in the array
+    basePathSegments = basePathSegments.filter(Boolean)
+    let updatedPath = `${
+        basePathSegments.length ? `/${basePathSegments.join('/')}` : ''
+    }${pathname}`
+    // append the query param to pathname
+    if (Object.keys(queryParams).length) {
+        updatedPath = rebuildPathWithParams(updatedPath, queryParams)
+    }
+    return updatedPath
 }
 
 /*

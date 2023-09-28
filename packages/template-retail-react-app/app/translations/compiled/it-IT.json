@@ -2241,6 +2241,12 @@
       "value": "Quantità:"
     }
   ],
+  "product_list.button.contentfilter": [
+    {
+      "type": 0,
+      "value": "Content Filtro"
+    }
+  ],
   "product_list.button.filter": [
     {
       "type": 0,

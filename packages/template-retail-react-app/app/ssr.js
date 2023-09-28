@@ -39,10 +39,49 @@ const {handler} = runtime.createHandler(options, (app) => {
             contentSecurityPolicy: {
                 useDefaults: true,
                 directives: {
-                    'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                    'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
-                    'connect-src': ["'self'", 'api.cquotient.com'],
-
+                    'img-src': [
+                        "'self'",
+                        '*.commercecloud.salesforce.com',
+                        'data:',
+                        '*.cdn.content.amplience.net',
+                        'cdn.media.amplience.net',
+                        '*.staging.bigcontent.io',
+                        'i8.amplience.net',
+                        '*.stylitics.com'
+                    ],
+                    'script-src': [
+                        "'self'",
+                        "'unsafe-eval'",
+                        'storage.googleapis.com',
+                        '*.cdn.content.amplience.net',
+                        'cdn.media.amplience.net',
+                        '*.staging.bigcontent.io',
+                        '*.brightcove.net',
+                        '*.stylitics.com',
+                        "'unsafe-inline'"
+                    ],
+                    'connect-src': [
+                        "'self'",
+                        "'unsafe-eval'",
+                        'api.cquotient.com',
+                        '*.cdn.content.amplience.net',
+                        'cdn.media.amplience.net',
+                        'cdn.static.amplience.net',
+                        '*.staging.bigcontent.io',
+                        '*.stylitics.com'
+                    ],
+                    'default-src': [
+                        "'self'",
+                        "'unsafe-eval'",
+                        '*.cdn.content.amplience.net',
+                        'cdn.media.amplience.net',
+                        'cdn.static.amplience.net',
+                        '*.staging.bigcontent.io',
+                        '*.brightcove.net',
+                        '*.stylitics.com',
+                        'data:'
+                    ],
+                    'frame-ancestors': ["'self'", '*.amplience.net'],
                     // Do not upgrade insecure requests for local development
                     'upgrade-insecure-requests': isRemote() ? [] : null
                 }
@@ -50,6 +89,19 @@ const {handler} = runtime.createHandler(options, (app) => {
             hsts: isRemote()
         })
     )
+
+    // Convert %2F to '/' in path coming from category node visualisation
+    app.get('*%2F*', async (req, res) => {
+        const [path, query] = req.url.split('?')
+        res.redirect(`${path.replace(/%2F/, '/')}?${query}`)
+    })
+
+    // If you gave something with a // in the first instance, put in the default locale
+    app.get('//*', async (req, res) => {
+        const [path, query] = req.url.split('?')
+        // TODO: calculate the default locale instead of hard coding to en-US
+        res.redirect(`${path.replace(/^\/\//, '/en-US/')}?${query}`)
+    })
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {

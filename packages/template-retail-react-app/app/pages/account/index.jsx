@@ -61,8 +61,7 @@ const Account = () => {
 
     const onSignoutClick = async () => {
         setShowLoading(true)
-        await customer.logout()
-        navigate('/login')
+        await customer.logout(navigate)
     }
 
     const LogoutButton = () => (

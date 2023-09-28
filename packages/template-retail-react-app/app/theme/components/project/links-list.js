@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export default {
-    parts: ['container', 'list', 'listItem', 'listItemSx', 'heading'],
+    parts: ['container', 'list', 'listItem', 'listItemSx', 'heading', 'footerHeading'],
     baseStyle: {
         container: {
             color: 'white'
@@ -20,6 +20,10 @@ export default {
             fontSize: 'md',
             paddingTop: 3,
             paddingBottom: 3
+        },
+        footerHeading: {
+            fontSize: 'sm',
+            fontWeight: 'regular'
         }
     },
     variants: {

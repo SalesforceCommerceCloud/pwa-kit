@@ -987,6 +987,9 @@
   "product_list.button.filter": {
     "defaultMessage": "フィルター"
   },
+  "product_list.button.contentfilter": {
+    "defaultMessage": "フィルター"
+  },
   "product_list.button.sort_by": {
     "defaultMessage": "並べ替え順: {sortOption}"
   },

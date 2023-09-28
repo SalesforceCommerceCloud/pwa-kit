@@ -32,8 +32,8 @@ import useNavigation from '../../../hooks/use-navigation'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
-    const authModal = useAuthModal('password')
     const navigate = useNavigation()
+    const authModal = useAuthModal('password')
 
     const {
         customer,
@@ -182,7 +182,7 @@ const ContactInfo = () => {
                     isOpen={signOutConfirmDialogIsOpen}
                     onClose={() => setSignOutConfirmDialogIsOpen(false)}
                     onConfirm={async () => {
-                        await customer.logout()
+                        await customer.logout(navigate)
                         navigate('/login')
                         setSignOutConfirmDialogIsOpen(false)
                     }}

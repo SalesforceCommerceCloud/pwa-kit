@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const sites = require('./sites.js')
-
+const amplience = require('./amplience/default.js')
 module.exports = {
     app: {
         url: {
@@ -19,6 +19,7 @@ module.exports = {
             RefArchGlobal: 'global'
         },
         sites,
+        amplience,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
@@ -48,7 +49,7 @@ module.exports = {
         '**/*.json'
     ],
     ssrParameters: {
-        ssrFunctionNodeVersion: '16.x',
+        ssrFunctionNodeVersion: '18.x',
         proxyConfigs: [
             {
                 host: 'kv7kzm78.api.commercecloud.salesforce.com',

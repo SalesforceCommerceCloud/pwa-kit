@@ -987,6 +987,9 @@
   "product_list.button.filter": {
     "defaultMessage": "篩選條件"
   },
+  "product_list.button.contentfilter": {
+    "defaultMessage": "篩選條件"
+  },
   "product_list.button.sort_by": {
     "defaultMessage": "排序方式：{sortOption}"
   },

@@ -987,6 +987,9 @@
   "product_list.button.filter": {
     "defaultMessage": "筛选器"
   },
+  "product_list.button.contentfilter": {
+    "defaultMessage": "筛选器"
+  },
   "product_list.button.sort_by": {
     "defaultMessage": "排序标准：{sortOption}"
   },

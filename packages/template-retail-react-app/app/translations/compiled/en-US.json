@@ -361,6 +361,60 @@
       "value": "You Might Also Like"
     }
   ],
+  "amplience.search.suggestions.categories": [
+    {
+      "type": 0,
+      "value": "Categories"
+    }
+  ],
+  "amplience.search.suggestions.pages": [
+    {
+      "type": 0,
+      "value": "Pages"
+    }
+  ],
+  "amplience.search.suggestions.products": [
+    {
+      "type": 0,
+      "value": "Products"
+    }
+  ],
+  "amplience.search.suggestions.searches": [
+    {
+      "type": 0,
+      "value": "Searches"
+    }
+  ],
+  "amplience.search.suggestions.suggestions": [
+    {
+      "type": 0,
+      "value": "Suggestions"
+    }
+  ],
+  "amplience.shoppable_image.content_key": [
+    {
+      "type": 0,
+      "value": "Click to open..."
+    }
+  ],
+  "amplience.shoppable_image.loading": [
+    {
+      "type": 0,
+      "value": "Loading..."
+    }
+  ],
+  "amplience.shoppable_image.modal": [
+    {
+      "type": 0,
+      "value": "Click to open modal..."
+    }
+  ],
+  "amplience.shoppable_image.product_404": [
+    {
+      "type": 0,
+      "value": "Product not found"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -1395,38 +1449,6 @@
       "value": "My Account"
     }
   ],
-  "home.description.features": [
-    {
-      "type": 0,
-      "value": "Out-of-the-box features so that you focus only on adding enhancements."
-    }
-  ],
-  "home.description.here_to_help": [
-    {
-      "type": 0,
-      "value": "Contact our support staff."
-    }
-  ],
-  "home.description.here_to_help_line_2": [
-    {
-      "type": 0,
-      "value": "They will get you to the right place."
-    }
-  ],
-  "home.description.shop_products": [
-    {
-      "type": 0,
-      "value": "This section contains content from the catalog. "
-    },
-    {
-      "type": 1,
-      "value": "docLink"
-    },
-    {
-      "type": 0,
-      "value": " on how to replace it."
-    }
-  ],
   "home.features.description.cart_checkout": [
     {
       "type": 0,
@@ -1499,24 +1521,6 @@
       "value": "Wishlist"
     }
   ],
-  "home.heading.features": [
-    {
-      "type": 0,
-      "value": "Features"
-    }
-  ],
-  "home.heading.here_to_help": [
-    {
-      "type": 0,
-      "value": "We're here to help"
-    }
-  ],
-  "home.heading.shop_products": [
-    {
-      "type": 0,
-      "value": "Shop Products"
-    }
-  ],
   "home.hero_features.link.design_kit": [
     {
       "type": 0,
@@ -1533,30 +1537,6 @@
     {
       "type": 0,
       "value": "Deploy on Managed Runtime"
-    }
-  ],
-  "home.link.contact_us": [
-    {
-      "type": 0,
-      "value": "Contact Us"
-    }
-  ],
-  "home.link.get_started": [
-    {
-      "type": 0,
-      "value": "Get started"
-    }
-  ],
-  "home.link.read_docs": [
-    {
-      "type": 0,
-      "value": "Read docs"
-    }
-  ],
-  "home.title.react_starter_store": [
-    {
-      "type": 0,
-      "value": "The React PWA Starter Store for Retail"
     }
   ],
   "item_attributes.label.promotions": [
@@ -2665,6 +2645,132 @@
     {
       "type": 0,
       "value": "Edit"
+    }
+  ],
+  "toolbar.about.heading": [
+    {
+      "type": 0,
+      "value": "Toolbar Opacity"
+    }
+  ],
+  "toolbar.additional.default": [
+    {
+      "type": 0,
+      "value": "Default variant"
+    }
+  ],
+  "toolbar.additional.legend": [
+    {
+      "type": 0,
+      "value": "Legend"
+    }
+  ],
+  "toolbar.additional.limit": [
+    {
+      "type": 0,
+      "value": "Match on variant, but ignored (max items reached)"
+    }
+  ],
+  "toolbar.additional.match": [
+    {
+      "type": 0,
+      "value": "Match on default or variant"
+    }
+  ],
+  "toolbar.additional.noMatch": [
+    {
+      "type": 0,
+      "value": "No match on default or variant"
+    }
+  ],
+  "toolbar.additional.variant": [
+    {
+      "type": 0,
+      "value": "Variant"
+    }
+  ],
+  "toolbar.personalisation.heading": [
+    {
+      "type": 0,
+      "value": "Customer groups"
+    }
+  ],
+  "toolbar.preview.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "toolbar.preview.date": [
+    {
+      "type": 0,
+      "value": "Date"
+    }
+  ],
+  "toolbar.preview.time": [
+    {
+      "type": 0,
+      "value": "Time"
+    }
+  ],
+  "toolbar.preview.update": [
+    {
+      "type": 0,
+      "value": "Update"
+    }
+  ],
+  "toolbar.title.about": [
+    {
+      "type": 0,
+      "value": "About The Toolbar"
+    }
+  ],
+  "toolbar.title.environments": [
+    {
+      "type": 0,
+      "value": "Environments"
+    }
+  ],
+  "toolbar.title.personalisation": [
+    {
+      "type": 0,
+      "value": "Personalisation"
+    }
+  ],
+  "toolbar.title.preview": [
+    {
+      "type": 0,
+      "value": "Preview"
+    }
+  ],
+  "toolbar.title.visualisation": [
+    {
+      "type": 0,
+      "value": "Visualisation"
+    }
+  ],
+  "toolbar.visualisation.content": [
+    {
+      "type": 0,
+      "value": "Content ID"
+    }
+  ],
+  "toolbar.visualisation.locale": [
+    {
+      "type": 0,
+      "value": "Locale"
+    }
+  ],
+  "toolbar.visualisation.showMatches": [
+    {
+      "type": 0,
+      "value": "Show information"
+    }
+  ],
+  "toolbar.visualisation.title": [
+    {
+      "type": 0,
+      "value": "Hub Name"
     }
   ],
   "update_password_fields.button.forgot_password": [

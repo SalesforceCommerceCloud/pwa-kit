@@ -16,3 +16,4 @@ export const dwSessionIdKey = 'dwsid'
 export const REFRESH_TOKEN_COOKIE_AGE = 90 // 90 days. This value matches SLAS cartridge.
 export const EXPIRED_TOKEN = 'EXPIRED_TOKEN'
 export const INVALID_TOKEN = 'invalid refresh_token'
+export const customerGroups = 'customer_groups'

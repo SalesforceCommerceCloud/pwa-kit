@@ -2241,6 +2241,12 @@
       "value": "数量："
     }
   ],
+  "product_list.button.contentfilter": [
+    {
+      "type": 0,
+      "value": "筛选器"
+    }
+  ],
   "product_list.button.filter": [
     {
       "type": 0,

@@ -147,6 +147,30 @@
   "add_to_cart_modal.recommended_products.title.might_also_like": {
     "defaultMessage": "Vous aimerez peut-être aussi"
   },
+  "amplience.search.suggestions.categories": {
+    "defaultMessage": "Catégories"
+  },
+  "amplience.search.suggestions.pages": {
+    "defaultMessage": "Pages"
+  },
+  "amplience.search.suggestions.products": {
+    "defaultMessage": "Produits"
+  },
+  "amplience.search.suggestions.searches": {
+    "defaultMessage": "Recherches"
+  },
+  "amplience.search.suggestions.suggestions": {
+    "defaultMessage": "Suggestions"
+  },
+  "amplience.shoppable_image.content_key": {
+    "defaultMessage": "Cliquer pour ouvrir..."
+  },
+  "amplience.shoppable_image.loading": {
+    "defaultMessage": "Chargement..."
+  },
+  "amplience.shoppable_image.product_404": {
+    "defaultMessage": "Impossible de trouver le produit"
+  },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "Vous êtes bien connecté."
   },
@@ -987,6 +1011,9 @@
   "product_list.button.filter": {
     "defaultMessage": "Filtrer"
   },
+  "product_list.button.contentfilter": {
+    "defaultMessage": "Content Filtrer"
+  },
   "product_list.button.sort_by": {
     "defaultMessage": "Trier par : {sortOption}"
   },
@@ -1155,6 +1182,69 @@
   },
   "toggle_card.action.edit": {
     "defaultMessage": "Modifier"
+  },
+  "toolbar.about.heading": {
+    "defaultMessage": "Transparence de la barre d'outils"
+  },
+  "toolbar.additional.default": {
+    "defaultMessage": "Contenu par défault"
+  },
+  "toolbar.additional.legend": {
+    "defaultMessage": "Légende"
+  },
+  "toolbar.additional.limit": {
+    "defaultMessage": "Correspondance sur la variante, mais ignorée (nombre maximal atteint)"
+  },
+  "toolbar.additional.match": {
+    "defaultMessage": "Correspondance par défaut ou variante"
+  },
+  "toolbar.additional.noMatch": {
+    "defaultMessage": "Aucune correspondance par défaut ou variante"
+  },
+  "toolbar.additional.variant": {
+    "defaultMessage": "Variante"
+  },
+  "toolbar.personalisation.heading": {
+    "defaultMessage": "Segments clients"
+  },
+  "toolbar.preview.cancel": {
+    "defaultMessage": "Annuler"
+  },
+  "toolbar.preview.date": {
+    "defaultMessage": "Date"
+  },
+  "toolbar.preview.time": {
+    "defaultMessage": "Heure"
+  },
+  "toolbar.preview.update": {
+    "defaultMessage": "Mettre à jour"
+  },
+  "toolbar.title.about": {
+    "defaultMessage": "À propos de la barre d'outils"
+  },
+  "toolbar.title.environments": {
+    "defaultMessage": "Environnements"
+  },
+  "toolbar.title.personalisation": {
+    "defaultMessage": "Personnalisation"
+  },
+  "toolbar.title.preview": {
+    "defaultMessage": "Pré-visualisation"
+  },
+  "toolbar.title.visualisation": {
+    "defaultMessage": "Visualisation"
+  },
+  "toolbar.visualisation.content": {
+    "defaultMessage": "Content ID"
+  },
+  "toolbar.visualisation.locale": {
+    "defaultMessage": "Locale"
+  },
+  "toolbar.visualisation.showMatches": {
+    "defaultMessage": "Afficher les informations"
+  },
+  "toolbar.visualisation.title": {
+    "defaultMessage": "Nom du Hub"
   },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "Mot de passe oublié ?"
@@ -1400,7 +1490,7 @@
     "defaultMessage": "Ajouter au panier"
   },
   "wishlist_primary_action.button.select_options": {
-    "defaultMessage": "Sélectionner des options"
+    "defaultMessage": "SSélectionner des options"
   },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {article ajouté} other {articles ajoutés}} au panier"

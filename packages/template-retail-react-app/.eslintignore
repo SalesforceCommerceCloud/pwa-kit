@@ -5,3 +5,5 @@ app/static
 jest.config.js
 webpack
 scripts/generator/assets
+app/components/amplience/**
+app/theme/components/amplience/**

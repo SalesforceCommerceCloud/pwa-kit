@@ -61,6 +61,7 @@ export const AuthModal = ({
     const handleLogin = async (data) => {
         try {
             await customer.login(data)
+            navigate()
         } catch (error) {
             const message = /invalid credentials/i.test(error.message)
                 ? formatMessage({

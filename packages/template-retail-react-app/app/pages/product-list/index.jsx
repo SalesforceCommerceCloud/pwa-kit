@@ -93,6 +93,7 @@ const ProductList = (props) => {
         ...rest
     } = props
     const {total, sortingOptions} = productSearchResult || {}
+
     const {isOpen, onOpen, onClose} = useDisclosure()
     const [sortOpen, setSortOpen] = useState(false)
     const {formatMessage} = useIntl()
@@ -291,6 +292,7 @@ const ProductList = (props) => {
                             <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
+                                resetFilters={resetFilters}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
                             />
                         </Box>
@@ -364,6 +366,7 @@ const ProductList = (props) => {
                             <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
+                                resetFilters={resetFilters}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
                             />
                         </Box>

@@ -6,6 +6,7 @@
  */
 import {useContext} from 'react'
 import {CategoriesContext} from '../contexts'
+import {flatten} from '../utils/utils'
 
 /**
  * Custom React hook to get the categories
@@ -17,4 +18,14 @@ export const useCategories = () => {
         throw new Error('useCategories must be used within CategoriesProvider')
     }
     return context
+}
+
+/**
+ * Custom React hook to get the categories in a flattened format
+ * @returns {{categories: Object, setCategories: function}[]}
+ */
+export const useFlattenedCategories = () => {
+    const {root} = useCategories()
+    const cats = flatten(root, 'categories')
+    return cats
 }

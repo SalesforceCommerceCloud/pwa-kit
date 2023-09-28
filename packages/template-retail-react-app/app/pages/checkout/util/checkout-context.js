@@ -13,6 +13,7 @@ import {useCommerceAPI} from '../../../commerce-api/contexts'
 import {getPaymentInstrumentCardType} from '../../../utils/cc-utils'
 import {isMatchingAddress} from '../../../utils/utils'
 import {useIntl} from 'react-intl'
+import useNavigation from '../../../hooks/use-navigation'
 
 const CheckoutContext = React.createContext()
 
@@ -23,6 +24,7 @@ export const CheckoutProvider = ({children}) => {
     const basket = useBasket()
     const {formatMessage} = useIntl()
     const einstein = useEinstein()
+    const navigate = useNavigation()
 
     const [state, setState] = useState({
         step: undefined,
@@ -197,6 +199,7 @@ export const CheckoutProvider = ({children}) => {
                     await basket.updateCustomerInfo({email})
                 } else {
                     await customer.login({email, password})
+                    navigate()
                 }
             },
 

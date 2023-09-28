@@ -2237,6 +2237,12 @@
       "value": "数量: "
     }
   ],
+  "product_list.button.contentfilter": [
+    {
+      "type": 0,
+      "value": "フィルター"
+    }
+  ],
   "product_list.button.filter": [
     {
       "type": 0,

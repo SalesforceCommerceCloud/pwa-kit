@@ -2267,6 +2267,12 @@
       "value": "Quantity:"
     }
   ],
+  "product_list.button.contentfilter": [
+    {
+      "type": 0,
+      "value": "Content Filter"
+    }
+  ],
   "product_list.button.filter": [
     {
       "type": 0,

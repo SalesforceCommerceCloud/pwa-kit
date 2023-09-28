@@ -987,6 +987,9 @@
   "product_list.button.filter": {
     "defaultMessage": "Filtro"
   },
+  "product_list.button.contentfilter": {
+    "defaultMessage": "Content Filtro"
+  },
   "product_list.button.sort_by": {
     "defaultMessage": "Ordina per: {sortOption}"
   },

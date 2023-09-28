@@ -147,6 +147,33 @@
   "add_to_cart_modal.recommended_products.title.might_also_like": {
     "defaultMessage": "You Might Also Like"
   },
+  "amplience.search.suggestions.categories": {
+    "defaultMessage": "Categories"
+  },
+  "amplience.search.suggestions.pages": {
+    "defaultMessage": "Pages"
+  },
+  "amplience.search.suggestions.products": {
+    "defaultMessage": "Products"
+  },
+  "amplience.search.suggestions.searches": {
+    "defaultMessage": "Searches"
+  },
+  "amplience.search.suggestions.suggestions": {
+    "defaultMessage": "Suggestions"
+  },
+  "amplience.shoppable_image.content_key": {
+    "defaultMessage": "Click to open..."
+  },
+  "amplience.shoppable_image.loading": {
+    "defaultMessage": "Loading..."
+  },
+  "amplience.shoppable_image.modal": {
+    "defaultMessage": "Click to open modal..."
+  },
+  "amplience.shoppable_image.product_404": {
+    "defaultMessage": "Product not found"
+  },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "You're now signed in."
   },
@@ -579,19 +606,6 @@
   "header.popover.title.my_account": {
     "defaultMessage": "My Account"
   },
-  "home.description.features": {
-    "defaultMessage": "Out-of-the-box features so that you focus only on adding enhancements."
-  },
-  "home.description.here_to_help": {
-    "defaultMessage": "Contact our support staff."
-  },
-  "home.description.here_to_help_line_2": {
-    "defaultMessage": "They will get you to the right place."
-  },
-  "home.description.shop_products": {
-    "defaultMessage": "This section contains content from the catalog. {docLink} on how to replace it.",
-    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
-  },
   "home.features.description.cart_checkout": {
     "defaultMessage": "Ecommerce best practice for a shopper's cart and checkout experience."
   },
@@ -628,15 +642,6 @@
   "home.features.heading.wishlist": {
     "defaultMessage": "Wishlist"
   },
-  "home.heading.features": {
-    "defaultMessage": "Features"
-  },
-  "home.heading.here_to_help": {
-    "defaultMessage": "We're here to help"
-  },
-  "home.heading.shop_products": {
-    "defaultMessage": "Shop Products"
-  },
   "home.hero_features.link.design_kit": {
     "defaultMessage": "Create with the Figma PWA Design Kit"
   },
@@ -645,18 +650,6 @@
   },
   "home.hero_features.link.on_managed_runtime": {
     "defaultMessage": "Deploy on Managed Runtime"
-  },
-  "home.link.contact_us": {
-    "defaultMessage": "Contact Us"
-  },
-  "home.link.get_started": {
-    "defaultMessage": "Get started"
-  },
-  "home.link.read_docs": {
-    "defaultMessage": "Read docs"
-  },
-  "home.title.react_starter_store": {
-    "defaultMessage": "The React PWA Starter Store for Retail"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"
@@ -1170,6 +1163,69 @@
   },
   "toggle_card.action.edit": {
     "defaultMessage": "Edit"
+  },
+  "toolbar.about.heading": {
+    "defaultMessage": "Toolbar Opacity"
+  },
+  "toolbar.additional.default": {
+    "defaultMessage": "Default variant"
+  },
+  "toolbar.additional.legend": {
+    "defaultMessage": "Legend"
+  },
+  "toolbar.additional.limit": {
+    "defaultMessage": "Match on variant, but ignored (max items reached)"
+  },
+  "toolbar.additional.match": {
+    "defaultMessage": "Match on default or variant"
+  },
+  "toolbar.additional.noMatch": {
+    "defaultMessage": "No match on default or variant"
+  },
+  "toolbar.additional.variant": {
+    "defaultMessage": "Variant"
+  },
+  "toolbar.personalisation.heading": {
+    "defaultMessage": "Customer groups"
+  },
+  "toolbar.preview.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "toolbar.preview.date": {
+    "defaultMessage": "Date"
+  },
+  "toolbar.preview.time": {
+    "defaultMessage": "Time"
+  },
+  "toolbar.preview.update": {
+    "defaultMessage": "Update"
+  },
+  "toolbar.title.about": {
+    "defaultMessage": "About The Toolbar"
+  },
+  "toolbar.title.environments": {
+    "defaultMessage": "Environments"
+  },
+  "toolbar.title.personalisation": {
+    "defaultMessage": "Personalisation"
+  },
+  "toolbar.title.preview": {
+    "defaultMessage": "Preview"
+  },
+  "toolbar.title.visualisation": {
+    "defaultMessage": "Visualisation"
+  },
+  "toolbar.visualisation.content": {
+    "defaultMessage": "Content ID"
+  },
+  "toolbar.visualisation.locale": {
+    "defaultMessage": "Locale"
+  },
+  "toolbar.visualisation.showMatches": {
+    "defaultMessage": "Show information"
+  },
+  "toolbar.visualisation.title": {
+    "defaultMessage": "Hub Name"
   },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "Forgot Password?"

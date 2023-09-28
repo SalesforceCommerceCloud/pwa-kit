@@ -19,6 +19,9 @@ export default {
             position: 'sticky',
             top: 0,
             zIndex: theme.zIndices.sticky
+        },
+        headerAmpPreview: {
+            top: '34px'
         }
     },
     parts: ['container']

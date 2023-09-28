@@ -13,7 +13,7 @@ export const DEFAULT_SITE_TITLE = 'Retail React App'
 export const MAX_CACHE_AGE = 60 * 15 // 15 min
 
 // Constants used in the used for product searching.
-export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
+export const DEFAULT_SEARCH_PARAMS = {limit: 24, offset: 0, sort: 'best-matches', refine: []}
 export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes
 
 // Constants for Search Component
@@ -27,6 +27,7 @@ export const HOME_SHOP_PRODUCTS_LIMIT = 10
 
 // Constants for menu
 export const CAT_MENU_DEFAULT_NAV_DEPTH = 1
+export const AMPLIENCE_CAT_MENU_DEFAULT_NAV_DEPTH = 10
 export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
 export const CAT_MENU_STALE_TIME = 10000 // 10 seconds
 

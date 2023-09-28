@@ -8,20 +8,12 @@
 import React from 'react'
 import {Box, Button, Wrap, WrapItem} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import useNavigation from '../../../hooks/use-navigation'
 import {CloseIcon} from '../../../components/icons'
 
 import {FormattedMessage} from 'react-intl'
-import {useParams} from 'react-router-dom'
 
-const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters}) => {
+const SelectedRefinements = ({toggleFilter, resetFilters, selectedFilterValues, filters}) => {
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
-    const navigate = useNavigation()
-    const params = useParams()
-    const resetFilters = () => {
-        selectedFilters = []
-        navigate(`/category/${params.categoryId}`)
-    }
 
     let selectedFilters = []
     for (const key in selectedFilterValues) {
@@ -101,7 +93,8 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters}) => {
 SelectedRefinements.propTypes = {
     filters: PropTypes.array,
     selectedFilterValues: PropTypes.object,
-    toggleFilter: PropTypes.func
+    toggleFilter: PropTypes.func,
+    resetFilters: PropTypes.func
 }
 
 export default SelectedRefinements

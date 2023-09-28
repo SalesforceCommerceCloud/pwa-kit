@@ -19,6 +19,7 @@ import {
     refreshTokenGuestStorageKey,
     oidStorageKey,
     dwSessionIdKey,
+    customerGroups,
     REFRESH_TOKEN_COOKIE_AGE,
     EXPIRED_TOKEN,
     INVALID_TOKEN
@@ -502,6 +503,7 @@ class Auth {
         this._storage.delete(cidStorageKey)
         this._storage.delete(encUserIdStorageKey)
         this._storage.delete(dwSessionIdKey)
+        this._storage.set(customerGroups, [])
     }
 }
 

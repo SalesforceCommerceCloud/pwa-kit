@@ -17,7 +17,7 @@ export default {
         small: {},
         normal: {
             popper: {
-                width: 286
+                width: 350
             },
             header: {
                 textAlign: 'left',
@@ -34,7 +34,7 @@ export default {
                 borderTop: 'none'
             },
             content: {
-                width: 286
+                width: 350
             },
             body: {
                 py: 0

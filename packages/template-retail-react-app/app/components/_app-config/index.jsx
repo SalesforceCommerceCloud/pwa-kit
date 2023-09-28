@@ -23,7 +23,29 @@ import {MultiSiteProvider} from '../../contexts'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
+import {withLegacyGetProps} from 'pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
+import {withReactQuery} from 'pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {createUrlTemplate} from '../../utils/url'
+import {AmplienceAPI, defaultAmpClient} from '../../amplience-api'
+
+const isServerSide = typeof window === 'undefined'
+
+// Recommended settings for PWA-Kit usages.
+// NOTE: they will be applied on both server and client side.
+const options = {
+    queryClientConfig: {
+        defaultOptions: {
+            queries: {
+                retry: false,
+                staleTime: 2 * 1000,
+                ...(isServerSide ? {retryOnMount: false} : {})
+            },
+            mutations: {
+                retry: false
+            }
+        }
+    }
+}
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -73,6 +95,7 @@ AppConfig.restore = (locals = {}) => {
     locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
     locals.site = site
     locals.locale = locale
+    locals.ampClient = typeof window === 'undefined' ? new AmplienceAPI() : defaultAmpClient
 }
 
 AppConfig.freeze = () => undefined
@@ -80,6 +103,7 @@ AppConfig.freeze = () => undefined
 AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
         api: locals.api,
+        ampClient: locals.ampClient,
         buildUrl: locals.buildUrl,
         site: locals.site,
         locale: locals.locale
@@ -91,4 +115,4 @@ AppConfig.propTypes = {
     locals: PropTypes.object
 }
 
-export default AppConfig
+export default withReactQuery(withLegacyGetProps(AppConfig), options)
