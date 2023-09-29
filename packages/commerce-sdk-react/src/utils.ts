@@ -45,10 +45,14 @@ export function detectLocalStorageAvailable(): boolean {
  */
 export function detectCookiesAvailable() {
     if (typeof document === 'undefined') return false
+    if (!navigator.cookieEnabled) return false
+    // Even if `cookieEnabled` is true, cookies may not work. A site may allow first-party, but not
+    // third-party, a browser extension may block cookies, etc. The most reliable way to detect if
+    // cookies are available
     const testKey = 'commerce-sdk-react-temp'
     const testValue = '1'
     const options: CookieAttributes = {
-        // These options MUST match what is used by CookieStorage for this test to be reliable
+        // These options MUST match the logic in ./auth/storage/cookie for this test to be reliable
         secure: !onClient() || window.location.protocol === 'https:',
         sameSite: getCookieSameSiteAttribute()
     }
