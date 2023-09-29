@@ -6,6 +6,8 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
+import {useLocalStorage} from '@salesforce/commerce-sdk-react/hooks/useLocalStorage'
 import {
     Text,
     Stack,
@@ -16,7 +18,6 @@ import {
     AccordionPanel,
     AccordionIcon
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import PropTypes from 'prop-types'
 import ColorRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/color-refinements'
 import SizeRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/size-refinements'
 import RadioRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/radio-refinements'
@@ -36,11 +37,12 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
     // Getting the indices of filters to open accordions by default
     let filtersIndexes = filters?.map((filter, idx) => idx)
 
+    const [filterAccordionState, setFilterAccordionState] = useLocalStorage(FILTER_ACCORDION_SATE)
+
     // Use saved state for accordions
     if (!isServer) {
         const savedExpandedAccordionIndexes =
-            window.localStorage.getItem(FILTER_ACCORDION_SATE) &&
-            JSON.parse(window.localStorage.getItem(FILTER_ACCORDION_SATE))
+            filterAccordionState && JSON.parse(filterAccordionState)
 
         if (savedExpandedAccordionIndexes) {
             filtersIndexes = filters
@@ -58,7 +60,7 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
         const filterState = filters
             ?.filter((filter, index) => expandedIndex.includes(index))
             .map((filter) => filter.attributeId)
-        window.localStorage.setItem(FILTER_ACCORDION_SATE, JSON.stringify(filterState))
+        setFilterAccordionState(JSON.stringify(filterState))
     }
 
     return (
