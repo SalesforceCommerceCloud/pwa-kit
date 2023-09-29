@@ -15,6 +15,8 @@ import {readJson} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
+import {execSync} from 'child_process'
+import semver from 'semver'
 
 export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
 export const DEFAULT_DOCS_URL =
@@ -110,6 +112,81 @@ export const walkDir = async (
     )
 
     return fileSet
+}
+
+interface DependencyTree {
+    version: string
+    name?: string
+    dependencies?: Record<string, DependencyTree>
+    resolved?: string
+    overridden?: boolean
+}
+
+/**
+ * Returns a DependencyTree that includes the versions of all packages
+ * including their dependencies within the project.
+ *
+ * @returns A DependencyTree with the versions of all dependencies
+ */
+export const getProjectDependencyTree = (): DependencyTree => {
+    return JSON.parse(execSync(`npm ls --all --json`, {encoding: 'utf-8'})) as DependencyTree
+}
+
+/**
+ * Returns the lowest version of a package installed.
+ *
+ * @param packageName - The name of the package to get the lowest version for
+ * @param dependencyTree - The dependency tree including all package versions
+ * @returns The lowest version of the given package that is installed
+ */
+export const getLowestPackageVersion = (
+    packageName: string,
+    dependencyTree: DependencyTree
+): string => {
+    let lowestVersion: string | null = null
+
+    function search(tree: DependencyTree) {
+        for (const key in tree.dependencies) {
+            const dependency = tree.dependencies[key]
+            if (key === packageName) {
+                const version = dependency.version
+                if (!lowestVersion || semver.lt(version, lowestVersion)) {
+                    lowestVersion = version
+                }
+            }
+
+            if (dependency.dependencies) {
+                search(dependency)
+            }
+        }
+    }
+
+    search(dependencyTree)
+    return lowestVersion ?? 'unknown'
+}
+
+/**
+ * Returns the versions of all PWA Kit dependencies of a project.
+ * This will search the dependency tree for the lowest version of each PWA Kit package.
+ *
+ * @param dependencyTree - The dependency tree including all package versions
+ * @returns The versions of all dependencies of the project.
+ */
+export const getPwaKitDependencies = (dependencyTree: DependencyTree): {[key: string]: string} => {
+    const pwaKitDependencies = [
+        '@salesforce/pwa-kit-react-sdk',
+        '@salesforce/pwa-kit-runtime',
+        '@salesforce/pwa-kit-dev'
+    ]
+
+    // pwa-kit package versions are not always listed as direct dependencies
+    // in the package.json such as when a bundle is using template extensibility
+    const nestedPwaKitDependencies: {[key: string]: string} = {}
+    pwaKitDependencies.forEach((packageName) => {
+        nestedPwaKitDependencies[packageName] = getLowestPackageVersion(packageName, dependencyTree)
+    })
+
+    return nestedPwaKitDependencies
 }
 
 export class CloudAPIClient {
@@ -300,8 +377,13 @@ export const createBundle = async ({
                         existsSync(path.join(extendsTemplate, item))
                     )
                 }
+
                 bundle_metadata = {
-                    dependencies: {...dependencies, ...devDependencies},
+                    dependencies: {
+                        ...dependencies,
+                        ...devDependencies,
+                        ...getPwaKitDependencies(getProjectDependencyTree())
+                    },
                     cc_overrides: cc_overrides
                 }
             })

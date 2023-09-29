@@ -156,7 +156,7 @@ export const assertRemoveQuery = (queryResult: UseQueryResult) => {
 }
 
 const getQueryName = (method: string): string => {
-    // Most query endpoints start with 'get'; Shopper Login retrieveCredQualityUserInfo also exists
+    // Most query endpoints start with 'get';
     const prefix = /^get|^retrieve/
     // If it exists, replace the prefix verb with 'use'
     if (prefix.test(method)) return method.replace(prefix, 'use')
