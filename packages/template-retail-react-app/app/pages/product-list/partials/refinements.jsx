@@ -40,9 +40,8 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
     const [filterAccordionState, setFilterAccordionState] = useLocalStorage(FILTER_ACCORDION_SATE)
 
     // Use saved state for accordions
-    if (!isServer) {
-        const savedExpandedAccordionIndexes =
-            filterAccordionState && JSON.parse(filterAccordionState)
+    if (filterAccordionState) {
+        const savedExpandedAccordionIndexes = JSON.parse(filterAccordionState)
 
         if (savedExpandedAccordionIndexes) {
             filtersIndexes = filters
