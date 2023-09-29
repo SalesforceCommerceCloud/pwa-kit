@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useEffect, useState} from 'react'
-import {detectLocalStorageAvailable} from '../utils'
 
 type Value = string | null
 
@@ -15,7 +14,8 @@ type Value = string | null
  */
 function useLocalStorage(key: string): Value {
     const readValue = (): Value => {
-        if (!detectLocalStorageAvailable()) {
+        // TODO: Use detectLocalStorageAvailable when app can better handle clients without storage
+        if (typeof window === 'undefined') {
             return null
         }
 

@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {detectLocalStorageAvailable} from '../../utils'
 import {BaseStorage, BaseStorageOptions} from './base'
 
 /**
@@ -16,7 +15,8 @@ import {BaseStorage, BaseStorageOptions} from './base'
  */
 export class LocalStorage extends BaseStorage {
     constructor(options?: BaseStorageOptions) {
-        if (!detectLocalStorageAvailable()) {
+        // TODO: Use detectLocalStorageAvailable when app can better handle clients without storage
+        if (typeof window === 'undefined') {
             throw new Error('LocalStorage is not available on the current environment.')
         }
         super(options)

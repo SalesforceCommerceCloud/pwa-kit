@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import Cookies from 'js-cookie'
-import {detectCookiesAvailable, getCookieSameSiteAttribute, onClient} from '../../utils'
+import {getCookieSameSiteAttribute, onClient} from '../../utils'
 import {BaseStorage, BaseStorageOptions} from './base'
 
 /**
@@ -16,7 +16,8 @@ import {BaseStorage, BaseStorageOptions} from './base'
  */
 export class CookieStorage extends BaseStorage {
     constructor(options?: BaseStorageOptions) {
-        if (!detectCookiesAvailable()) {
+        // TODO: Use detectCookiesAvailable when app can better handle clients with cookies disabled
+        if (typeof document === 'undefined') {
             throw new Error('CookieStorage is not available on the current environment.')
         }
         super(options)
