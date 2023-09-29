@@ -34,6 +34,9 @@ describe('scriptUtils', () => {
     beforeEach(async () => {
         process.env = {...originalEnv}
         tmpDir = await mkdtemp(path.join(os.tmpdir(), 'scriptUtils-tests'))
+        readJson
+            .mockReset()
+            .mockRejectedValue(new Error('Missing mock implementation for `readJson`.'))
     })
 
     afterEach(async () => {
@@ -215,7 +218,6 @@ describe('scriptUtils', () => {
         })
     })
 
-    jest.unmock('fs-extra')
     describe('defaultMessage', () => {
         test('works', async () => {
             const mockGit = {branch: () => 'branch', short: () => 'short'}
