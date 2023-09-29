@@ -119,6 +119,10 @@ const DATA_MAP: AuthDataMap = {
             store.delete('cc-nx-g')
         }
     },
+    refresh_token_expires_in: {
+        storageType: 'local',
+        key: 'refresh_token_expires_in'
+    },
     // For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
     // So we maintain a copy of the refersh_tokens in the local storage which is compared to the actual refresh_token stored in cookie storage.
     // If the key or value of the refresh_token in local storage is different from the one in cookie storage, this indicates a change in customer auth state and we invalidate the access_token in PWA Kit.
@@ -249,7 +253,8 @@ class Auth {
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
             usid: this.get('usid'),
-            customer_type: this.get('customer_type') as CustomerType
+            customer_type: this.get('customer_type') as CustomerType,
+            refresh_token_expires_in: this.get('refresh_token_expires_in')
         }
     }
 

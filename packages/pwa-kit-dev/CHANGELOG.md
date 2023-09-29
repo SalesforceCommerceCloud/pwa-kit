@@ -1,4 +1,7 @@
-## v3.2.0-dev (TBD)
+## v3.2.0-dev (Sep 26, 2023)
+## v3.1.1 (Sep 21, 2023)
+
+- Bugfix: resolve performance issue due to webpack stats [#1418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1418)
 
 - Added a new `--wait` flag to the `push` command. When `--target` is specified, setting the `--wait` flag will cause the script to exit after the triggered deployment has completed, rather than after the bundle has been pushed.
 
