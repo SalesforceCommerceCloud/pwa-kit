@@ -267,16 +267,14 @@ describe('DevServer request processor support', () => {
 
 describe('DevServer listening on http/https protocol', () => {
     let server
-    let originalEnv
+    let originalEnv = process.env
 
     beforeEach(() => {
-        originalEnv = Object.assign({}, process.env)
+        process.env = {...originalEnv}
     })
 
     afterEach(() => {
-        if (server) {
-            server.close()
-        }
+        server?.close()
         process.env = originalEnv
     })
 
