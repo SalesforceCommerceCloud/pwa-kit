@@ -492,7 +492,7 @@ describe('scriptUtils', () => {
     })
 
     describe('walkDir', () => {
-        const files = ['a', 'b/1', 'b/2', 'c/d/e']
+        const files = ['a', 'b/1', 'b/2', 'c/d/e'].map(path.normalize)
         beforeEach(async () => {
             await Promise.all(files.map(async (file) => await createFile(path.join(tmpDir, file))))
         })
