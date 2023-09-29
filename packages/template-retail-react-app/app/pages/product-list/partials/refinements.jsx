@@ -23,7 +23,6 @@ import SizeRefinements from '@salesforce/retail-react-app/app/pages/product-list
 import RadioRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/radio-refinements'
 import CheckboxRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/checkbox-refinements'
 import LinkRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/link-refinements'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {FILTER_ACCORDION_SATE} from '@salesforce/retail-react-app/app/constants'
 
 const componentMap = {
@@ -39,7 +38,7 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
 
     const [filterAccordionState, setFilterAccordionState] = useLocalStorage(FILTER_ACCORDION_SATE)
 
-    // Use saved state for accordions
+    // Use saved state for accordions - will be null on server
     if (filterAccordionState) {
         const savedExpandedAccordionIndexes = JSON.parse(filterAccordionState)
 
