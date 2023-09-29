@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {mkdtemp, rm, writeFile, readJsonSync, readJson} from 'fs-extra'
+import {mkdtemp, rm, writeFile, readJsonSync, readJson, createFile} from 'fs-extra'
 import {execSync} from 'child_process'
 import path from 'path'
 import os from 'os'
@@ -488,6 +488,21 @@ describe('scriptUtils', () => {
                 message: '\tThis is a test log message 550e8400',
                 shortRequestId: '550e8400'
             })
+        })
+    })
+
+    describe('walkDir', () => {
+        const files = ['a', 'b/1', 'b/2', 'c/d/e']
+        beforeEach(async () => {
+            await Promise.all(files.map(async (file) => await createFile(path.join(tmpDir, file))))
+        })
+        test('finds all files in a directory', async () => {
+            const result = await scriptUtils.walkDir(tmpDir, tmpDir)
+            expect([...result]).toEqual(files)
+        })
+        test('returns file relative to specified path', async () => {
+            const result = await scriptUtils.walkDir(tmpDir, '/')
+            expect([...result]).toEqual(files.map((f) => path.join(tmpDir, f)))
         })
     })
 })
