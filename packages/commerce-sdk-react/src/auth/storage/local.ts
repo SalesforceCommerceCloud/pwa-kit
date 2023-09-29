@@ -25,6 +25,11 @@ export class LocalStorage extends BaseStorage {
         const oldValue = this.get(key)
         const suffixedKey = this.getSuffixedKey(key)
         window.localStorage.setItem(suffixedKey, value)
+        // Changes to localStorage automatically dispatch a storage event in every tab where a site
+        // is loaded, *except* the original tab that made the change. To allow our `useLocalStorage`
+        // hook to work in the originating tab, we must dispatch a copy of the event. This event is
+        // only seen by the originating tab. A key difference with this event is that `isTrusted` is
+        // false, but that should not impact our use case.
         const event = new StorageEvent('storage', {
             key: suffixedKey,
             oldValue: oldValue,
@@ -40,6 +45,11 @@ export class LocalStorage extends BaseStorage {
         const suffixedKey = this.getSuffixedKey(key)
         const oldValue = this.get(suffixedKey)
         window.localStorage.removeItem(suffixedKey)
+        // Changes to localStorage automatically dispatch a storage event in every tab where a site
+        // is loaded, *except* the original tab that made the change. To allow our `useLocalStorage`
+        // hook to work in the originating tab, we must dispatch a copy of the event. This event is
+        // only seen by the originating tab. A key difference with this event is that `isTrusted` is
+        // false, but that should not impact our use case.
         const event = new StorageEvent('storage', {
             key: suffixedKey,
             oldValue: oldValue,
