@@ -305,7 +305,7 @@ export class CloudAPIClient {
                     throw new Error(`${res.status} ${res.statusText}${detail}`)
                 }
 
-                const data = await res.json()
+                const data: {state: string} = await res.json()
                 if (typeof data.state !== 'string') {
                     return reject(
                         new Error('An unknown state occurred when polling the deployment.')
@@ -320,11 +320,14 @@ export class CloudAPIClient {
                         return
                     case 'CREATE_FAILED':
                     case 'PUBLISH_FAILED':
-                        // Failed - reject with error
+                        // Failed - reject with failure
                         return reject(new Error('Deployment failed.'))
-                    default:
-                        // Not in progress or failed - assume success
+                    case 'ACTIVE':
+                        // Success!
                         return resolve()
+                    default:
+                        // Unknown - reject with confusion
+                        return reject(new Error(`Unknown deployment state "${data.state}".`))
                 }
             }
             // Start checking after the first delay!
