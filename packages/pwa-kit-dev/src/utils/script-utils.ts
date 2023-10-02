@@ -284,7 +284,7 @@ export class CloudAPIClient {
     async waitForDeploy(project: string, environment: string): Promise<void> {
         return new Promise((resolve, reject) => {
             /** Milliseconds to wait between checks. */
-            const delay = 30e3
+            const delay = 30_000
             /** Check the deployment status to see whether it has finished. */
             const check = async (): Promise<void> => {
                 const url = new URL(
