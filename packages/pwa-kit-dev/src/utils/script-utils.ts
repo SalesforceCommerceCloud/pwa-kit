@@ -283,17 +283,10 @@ export class CloudAPIClient {
     /** Polls MRT for deployment status every 60 seconds. */
     async waitForDeploy(project: string, environment: string): Promise<void> {
         return new Promise((resolve, reject) => {
-            const delay = 60e3 // 60 seconds
-            const onError = (error: string) => {
-                clearInterval(interval)
-                reject(new Error(error))
-            }
-            const onSuccess = () => {
-                clearInterval(interval)
-                resolve()
-            }
-
-            const wait = async () => {
+            /** Wait 60 seconds between checks. */
+            const delay = 60e3
+            /** Check the deployment status to see whether it has finished. */
+            const check = async (): Promise<void> => {
                 const url = new URL(
                     `/api/projects/${project}/target/${environment}`,
                     this.opts.origin
@@ -314,28 +307,28 @@ export class CloudAPIClient {
 
                 const data = await res.json()
                 if (typeof data.state !== 'string') {
-                    clearInterval(interval)
-                    return onError('An unknown state occurred when polling the deployment.')
+                    return reject(
+                        new Error('An unknown state occurred when polling the deployment.')
+                    )
                 }
                 switch (data.state) {
                     case 'CREATE_IN_PROGRESS':
                     case 'PUBLISH_IN_PROGRESS':
-                        // In progress - let interval continue
-                        break
+                        // In progress - check again after the next delay
+                        // `check` is async, so we need to use .catch to properly handle errors
+                        setTimeout(() => void check().catch(reject), delay)
+                        return
                     case 'CREATE_FAILED':
                     case 'PUBLISH_FAILED':
                         // Failed - reject with error
-                        return onError('Deploy failed.')
+                        return reject(new Error('Deployment failed.'))
                     default:
                         // Not in progress or failed - assume success
-                        return onSuccess()
+                        return resolve()
                 }
             }
-
-            const interval = setInterval(() => {
-                // Stop the interval if the callback fails
-                wait().catch((err) => onError(err?.message ?? err))
-            }, delay)
+            // Start checking after the first delay!
+            setTimeout(() => void check().catch(reject), delay)
         })
     }
 }
