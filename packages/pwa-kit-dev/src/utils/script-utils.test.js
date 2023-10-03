@@ -13,16 +13,23 @@ import * as scriptUtils from './script-utils'
 import * as dependencyTreeMockData from './mocks/dependency-tree-mock-data'
 const pkg = readJsonSync(path.join(__dirname, '../../package.json'))
 
+let actualReadJson
+let actualExecSync
+
 jest.mock('fs-extra', () => {
+    const originalModule = jest.requireActual('fs-extra')
+    actualReadJson = originalModule.readJson
     return {
-        ...jest.requireActual('fs-extra'),
+        ...originalModule,
         readJson: jest.fn()
     }
 })
 
 jest.mock('child_process', () => {
+    const originalModule = jest.requireActual('child_process')
+    actualExecSync = originalModule.execSync
     return {
-        ...jest.requireActual('child_process'),
+        ...originalModule,
         execSync: jest.fn()
     }
 })
@@ -34,9 +41,10 @@ describe('scriptUtils', () => {
     beforeEach(async () => {
         process.env = {...originalEnv}
         tmpDir = await mkdtemp(path.join(os.tmpdir(), 'scriptUtils-tests'))
-        readJson
-            .mockReset()
-            .mockRejectedValue(new Error('Missing mock implementation for `readJson`.'))
+        // This is a workaround for jest.spyOn(), since I guess it doesn't work with our imports?
+        // In any case, using the actual implementation by default prevents subtle bugs in tests.
+        readJson.mockReset().mockImplementation(actualReadJson)
+        execSync.mockReset().mockImplementation(actualExecSync)
     })
 
     afterEach(async () => {
@@ -215,6 +223,29 @@ describe('scriptUtils', () => {
             expect(dependencies).toHaveProperty('@salesforce/pwa-kit-react-sdk', '1.0.0')
             expect(dependencies).toHaveProperty('@salesforce/pwa-kit-runtime', '1.0.0')
             expect(dependencies).toHaveProperty('@salesforce/pwa-kit-dev', '1.0.0')
+        })
+    })
+
+    describe('getProjectDependencyTree', () => {
+        let originalCwd
+        beforeAll(() => {
+            originalCwd = process.cwd()
+        })
+        afterEach(() => process.chdir(originalCwd))
+        test('works in retail-react-app', async () => {
+            execSync.mockImplementation(actualExecSync)
+            readJson.mockImplementation(actualReadJson)
+            expect(await scriptUtils.getProjectDependencyTree()).toMatchObject({
+                name: '@salesforce/pwa-kit-dev',
+                version: pkg.version,
+                dependencies: expect.any(Object)
+            })
+        })
+        test('returns nothing if an error occurs', async () => {
+            execSync.mockImplementation(() => {
+                throw new Error('npm ls did not work')
+            })
+            expect(await scriptUtils.getProjectDependencyTree()).toBeNull()
         })
     })
 
