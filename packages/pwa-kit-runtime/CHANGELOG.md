@@ -1,5 +1,6 @@
-## v3.2.0-dev (TBD)
+## v3.2.0-dev (Sep 26, 2023)
 
+## v3.1.1 (Sep 21, 2023)
 ## v3.1.0 (Jul 26, 2023)
 
 - Allow setting cookies using the `MRT_ALLOW_COOKIES` environment variable [#1318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1318)

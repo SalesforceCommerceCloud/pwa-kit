@@ -23,7 +23,9 @@ const DEVELOPMENT_ORIGIN = 'http://localhost:4000'
 /** Detects whether the storefront is running in an iframe. */
 const detectInIframe = () => typeof window !== 'undefined' && window.parent !== window.self
 
-/** Gets the parent origin when running in an iframe. */
+/** Gets the parent origin when running in an iframe.
+ * @private
+ */
 export const getParentOrigin = () => {
     if (detectInIframe()) {
         if (window.location.ancestorOrigins) return window.location.ancestorOrigins[0]
@@ -38,18 +40,17 @@ const isParentOriginTrusted = (parentOrigin) => {
         : TRUSTED_ORIGINS.includes(parentOrigin) // Production
 }
 
-/** Detects whether the storefront is running in an iframe as part of Storefront Preview. */
+/** Detects whether the storefront is running in an iframe as part of Storefront Preview.
+ * @private
+ */
 export const detectStorefrontPreview = () => {
     const parentOrigin = getParentOrigin()
     return Boolean(parentOrigin) && isParentOriginTrusted(parentOrigin)
 }
 
-export const detectClientOnlyQueryParam = ()=>{
-    const queryParams = new URLSearchParams(window.location.search)
-    return queryParams.has('__client_only')
-}
-
-/** Returns the URL to load the Storefront Preview client script from the parent origin. */
+/** Returns the URL to load the Storefront Preview client script from the parent origin.
+ * @private
+ */
 export const getClientScript = () => {
     const parentOrigin = getParentOrigin() ?? 'https://runtime.commercecloud.com'
     return parentOrigin === DEVELOPMENT_ORIGIN

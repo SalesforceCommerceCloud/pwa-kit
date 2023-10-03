@@ -14,7 +14,6 @@ import PropTypes from 'prop-types'
 import {getAppConfig} from '../universal/compatibility'
 import App from '../universal/components/_app'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
-import {detectClientOnlyQueryParam} from '../universal/components/storefront-preview/utils'
 import Switch from '../universal/components/switch'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import {uuidv4} from '../../utils/uuidv4.client'
@@ -80,6 +79,7 @@ export const start = async () => {
     const AppConfig = getAppConfig()
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)
+    const queryParams = new URLSearchParams(window.location.search)
 
     // Set all globals sent from the server on the window object.
     Object.entries(data).forEach(([key, value]) => {
@@ -117,9 +117,8 @@ export const start = async () => {
     }
 
     await loadableReady()
-    console.log('detectClientOnlyQueryParam:',detectClientOnlyQueryParam())
 
-    if (detectClientOnlyQueryParam()) {
+    if (queryParams.has('__client_only')) {
         window.__HYDRATING__ = false
         const root = createRoot(rootEl)
         root.render(<OuterApp {...props} />)
