@@ -291,7 +291,7 @@ const ProductDetail = () => {
                 try {
                     console.log("Capturing product")
                     if (dw.ac) {
-                        dw.ac._capture({id: product.id, type: product.type});
+                        dw.ac._capture({id: product.id, type: "searchhit"});
                     }
                 } catch (err) {
                     console.log("Error capturing product")
