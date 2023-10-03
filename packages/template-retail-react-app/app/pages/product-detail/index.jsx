@@ -35,6 +35,7 @@ import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/univers
 
 // constant
 import {
+    ACTIVE_DATA_ENABLE,
     API_ERROR_MESSAGE,
     EINSTEIN_RECOMMENDERS,
     MAX_CACHE_AGE,
@@ -273,9 +274,29 @@ const ProductDetail = () => {
             const childrenProducts = product.setProducts
             childrenProducts.map((child) => {
                 einstein.sendViewProduct(child)
+                if (ACTIVE_DATA_ENABLE == 1) {
+                    try {
+                        console.log("Capturing child product")
+                        if (dw.ac) {
+                            dw.ac._capture({id: child.id, type: child.type});
+                        }
+                    } catch (err) {
+                        console.log("Error capturing child product")
+                    }
+                }
             })
         } else if (product) {
             einstein.sendViewProduct(product)
+            if (ACTIVE_DATA_ENABLE == 1) {
+                try {
+                    console.log("Capturing product")
+                    if (dw.ac) {
+                        dw.ac._capture({id: product.id, type: product.type});
+                    }
+                } catch (err) {
+                    console.log("Error capturing product")
+                }
+            }
         }
     }, [product])
 

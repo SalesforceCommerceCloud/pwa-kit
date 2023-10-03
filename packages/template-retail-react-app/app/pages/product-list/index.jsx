@@ -8,6 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
 import {
@@ -81,7 +82,7 @@ import {
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
+    TOAST_MESSAGE_REMOVED_FROM_WISHLIST, ACTIVE_DATA_ENABLE
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -356,9 +357,41 @@ const ProductList = (props) => {
     /**************** Einstein ****************/
     useEffect(() => {
         if (productSearchResult) {
-            isSearch
-                ? einstein.sendViewSearch(searchQuery, productSearchResult)
-                : einstein.sendViewCategory(category, productSearchResult)
+            if (isSearch) {
+                einstein.sendViewSearch(searchQuery, productSearchResult)
+                if (ACTIVE_DATA_ENABLE == 1) {
+                    try {
+                        console.log("Setting DW Search Context")
+                        if (dw.ac) {
+                            console.log("Applying search context")
+                            dw.ac.applyContext({searchData: searchParams});
+                            if (typeof dw.ac._scheduleDataSubmission === "function") {
+                                dw.ac._scheduleDataSubmission();
+                            }
+                        }
+                    } catch (err) {
+                        console.log("Error submitting search data")
+                    }
+                }
+            }
+            else {
+                einstein.sendViewCategory(category, productSearchResult)
+                if (ACTIVE_DATA_ENABLE == 1) {
+                    try {
+                        console.log("Set DW Category Context")
+                        if (dw.ac) {
+                            console.log("Applying category context")
+                            dw.ac.applyContext({category: category.id, searchData: searchParams});
+                            if (typeof dw.ac._scheduleDataSubmission === "function") {
+                                dw.ac._scheduleDataSubmission();
+                            }
+                        }
+                    } catch (err) {
+                        console.log("Error submitting category data")
+
+                    }
+                }
+            }
         }
     }, [productSearchResult])
 

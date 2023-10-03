@@ -70,10 +70,11 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE
+    DEFAULT_LOCALE, ACTIVE_DATA_ENABLE
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
+import {Helmet} from "react-helmet";
 
 const onClient = typeof window !== 'undefined'
 
@@ -270,67 +271,26 @@ const App = (props) => {
     }
 
     const trackPage = () => {
-        var dw = window.dw || {}
-        dw.ac = {
-            _analytics: null,
-            _events: [],
-            _category: '',
-            _searchData: '',
-            _anact: '',
-            _anact_nohit_tag: '',
-            _analytics_enabled: 'true',
-            _timeZone: 'Etc/UTC',
-            _capture: function (configs) {
-                if (Object.prototype.toString.call(configs) === '[object Array]') {
-                    configs.forEach(captureObject)
-                    return
+        if (ACTIVE_DATA_ENABLE == 1) {
+            try {
+                var activeDataUrl =
+                    '/mobify/proxy/ocapi/on/demandware.store/Sites-' +
+                    site.id +
+                    '-Site/' +
+                    locale.id +
+                    '/__Analytics-Start'
+                console.log('Tracking enabled for ' + activeDataUrl)
+                var dwAnalytics = dw.__dwAnalytics.getTracker(activeDataUrl);
+                if (typeof dw.ac == "undefined") {
+                    console.log('Tracking page view')
+                    dwAnalytics.trackPageView();
+                } else {
+                    console.log('Setting DW Analytics')
+                    dw.ac.setDWAnalytics(dwAnalytics);
                 }
-                dw.ac._events.push(configs)
-            },
-            capture: function () {
-                dw.ac._capture(arguments)
-                // send to CQ as well:
-                if (window.CQuotient) {
-                    window.CQuotient.trackEventsFromAC(arguments)
-                }
-            },
-            EV_PRD_SEARCHHIT: 'searchhit',
-            EV_PRD_DETAIL: 'detail',
-            EV_PRD_RECOMMENDATION: 'recommendation',
-            EV_PRD_SETPRODUCT: 'setproduct',
-            applyContext: function (context) {
-                if (typeof context === 'object' && context.hasOwnProperty('category')) {
-                    dw.ac._category = context.category
-                }
-                if (typeof context === 'object' && context.hasOwnProperty('searchData')) {
-                    dw.ac._searchData = context.searchData
-                }
-            },
-            setDWAnalytics: function (analytics) {
-                dw.ac._analytics = analytics
-            },
-            eventsIsEmpty: function () {
-                return 0 == dw.ac._events.length
+            } catch (err) {
+                console.log(err)
             }
-        }
-        try {
-            var activeDataUrl =
-                '/mobify/proxy/ocapi/on/demandware.store/Sites-' +
-                site.id +
-                '-Site/' +
-                locale.id +
-                '/__Analytics-Start'
-            console.log('Tracking enabled for ' + activeDataUrl)
-            var dwAnalytics = dw.__dwAnalytics.getTracker(activeDataUrl)
-            if (typeof dw.ac == 'undefined') {
-                console.log('Tracking page view')
-                dwAnalytics.trackPageView()
-            } else {
-                dw.ac.setDWAnalytics(dwAnalytics)
-                dwAnalytics.trackPageViewWithProducts()
-            }
-        } catch (err) {
-            console.log(err)
         }
     }
 
@@ -340,6 +300,9 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
+            <Helmet>
+                <script src={getAssetUrl('static/head-active_data.js')} type="text/javascript"></script>
+            </Helmet>
             <IntlProvider
                 onError={(err) => {
                     if (!messages) {
