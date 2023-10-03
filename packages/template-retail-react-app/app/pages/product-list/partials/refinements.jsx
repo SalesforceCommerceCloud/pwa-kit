@@ -6,8 +6,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import {useLocalStorage} from '@salesforce/commerce-sdk-react/hooks/useLocalStorage'
 import {
     Text,
     Stack,
@@ -18,11 +16,13 @@ import {
     AccordionPanel,
     AccordionIcon
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import PropTypes from 'prop-types'
 import ColorRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/color-refinements'
 import SizeRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/size-refinements'
 import RadioRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/radio-refinements'
 import CheckboxRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/checkbox-refinements'
 import LinkRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/link-refinements'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {FILTER_ACCORDION_SATE} from '@salesforce/retail-react-app/app/constants'
 
 const componentMap = {
@@ -36,11 +36,12 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
     // Getting the indices of filters to open accordions by default
     let filtersIndexes = filters?.map((filter, idx) => idx)
 
-    const [filterAccordionState, setFilterAccordionState] = useLocalStorage(FILTER_ACCORDION_SATE)
-
-    // Use saved state for accordions - will be null on server
-    if (filterAccordionState) {
-        const savedExpandedAccordionIndexes = JSON.parse(filterAccordionState)
+    // Use saved state for accordions
+    if (!isServer) {
+        // TODO: Change this to `useLocalStorage` hook when localStorage detection is more robust
+        const filterAccordionState = window.localStorage.getItem(FILTER_ACCORDION_SATE)
+        const savedExpandedAccordionIndexes =
+            filterAccordionState && JSON.parse(filterAccordionState)
 
         if (savedExpandedAccordionIndexes) {
             filtersIndexes = filters
@@ -58,7 +59,9 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
         const filterState = filters
             ?.filter((filter, index) => expandedIndex.includes(index))
             .map((filter) => filter.attributeId)
-        setFilterAccordionState(JSON.stringify(filterState))
+
+        // TODO: Update when localStorage detection is more robust? useLocalStorage is only a getter
+        window.localStorage.setItem(FILTER_ACCORDION_SATE, JSON.stringify(filterState))
     }
 
     return (
