@@ -233,8 +233,6 @@ describe('scriptUtils', () => {
         })
         afterEach(() => process.chdir(originalCwd))
         test('works in retail-react-app', async () => {
-            execSync.mockImplementation(actualExecSync)
-            readJson.mockImplementation(actualReadJson)
             expect(await scriptUtils.getProjectDependencyTree()).toMatchObject({
                 name: '@salesforce/pwa-kit-dev',
                 version: pkg.version,
