@@ -8,6 +8,7 @@ runs:
   using: composite
   steps:
     - name: Install Dependencies
+      working-directory: ${{ inputs.cwd }}
       run: |-
         # Install system dependencies
         sudo apt-get update -yq
