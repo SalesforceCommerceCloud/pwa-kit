@@ -16,19 +16,19 @@ runs:
         sudo pip install awscli==1.18.85 datadog==0.40.1
 
         # Install node dependencies
-        node ./scripts/gtime.js monorepo_install npm ci
+        node ${{ inputs.cwd }}/scripts/gtime.js monorepo_install npm ci
 
         # Build the PWA
         npm run lerna -- run analyze-build --scope "@salesforce/retail-react-app"
 
         # Report bundle sizes
-        node ./scripts/report-bundle-size.js
+        node ${{ inputs.cwd }}/scripts/report-bundle-size.js
 
         # Check that packages are all using the same versions of npm dependencies
         npm run check-dep-version
 
         # Install Snyk CLI
-        # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.  
+        # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.
         # TODO: Latest Snyk CLI version is currently failing on npm i. We use the alternative Snyk GitHub integration.
         # sudo npm install -g snyk
 
