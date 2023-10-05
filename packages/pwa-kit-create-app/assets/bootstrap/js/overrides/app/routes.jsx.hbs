@@ -37,11 +37,18 @@ const routes = [
         component: Home,
         exact: true
     },
+    {{#if answers.project.hybrid}}
+    {
+        path: '/home',
+        component: Home,
+        exact: true
+    },
+    {{/if}}
     {
         path: '/my-new-route',
         component: MyNewRoute
     },
-    {{#if answers.project.hybrid}},
+    {{#if answers.project.hybrid}}
     // remove routes from the base template that we want to go to SFRA
     ..._routes.filter((route) => {
         return !(route.path === '/cart' || route.path === '/checkout' || route.path === '*')
