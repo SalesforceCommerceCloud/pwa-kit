@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getDisplayVariationValues} from './product-utils'
+import {getDisplayVariationValues, getDisplayPrice} from './product-utils'
+import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
 
 const variationAttributes = [
     {
@@ -34,6 +35,8 @@ const variationAttributes = [
     },
     {id: 'width', name: 'Width', values: [{name: 'M', orderable: true, value: 'M'}]}
 ]
+const mockedBasePrice = 299.99
+const mockedDiscountPrice = 149.99
 
 test('getDisplayVariationValues', () => {
     const selectedValues = {
@@ -47,5 +50,20 @@ test('getDisplayVariationValues', () => {
         Colour: 'Taupe',
         Size: '6.5',
         Width: 'M'
+    })
+})
+
+describe('getDisplayPrice', function () {
+    test('returns basePrice and discountPrice', () => {
+        const {basePrice, discountPrice} = getDisplayPrice(mockProductDetail)
+        expect(basePrice).toBe(mockedBasePrice)
+        expect(discountPrice).toBe(mockedDiscountPrice)
+    })
+
+    test('returns null if there is not discount promotion', () => {
+        delete mockProductDetail.productPromotions
+        const {basePrice, discountPrice} = getDisplayPrice(mockProductDetail)
+        expect(basePrice).toBe(mockedBasePrice)
+        expect(discountPrice).toBeNull()
     })
 })

@@ -30,6 +30,7 @@ import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
 import {findImageGroupBy} from '../utils/image-groups-utils'
 import {getDisplayVariationValues} from '../utils/product-utils'
+import DisplayPrice from '../components/display-price'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -59,7 +60,7 @@ export const AddToCartModal = () => {
     const intl = useIntl()
     const basket = useBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const {currency, productItems, productSubTotal} = basket
+    const {currency, productSubTotal} = basket
     const totalQuantity = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     if (!isOpen) {
@@ -106,10 +107,6 @@ export const AddToCartModal = () => {
                                     viewType: 'small',
                                     selectedVariationAttributes: variant.variationValues
                                 })?.images?.[0]
-                                const lineItemPrice =
-                                    productItems?.find(
-                                        (item) => item.productId === variant.productId
-                                    )?.basePrice * quantity
                                 const variationAttributeValues = getDisplayVariationValues(
                                     product.variationAttributes,
                                     variant.variationValues
@@ -161,13 +158,11 @@ export const AddToCartModal = () => {
                                         </Flex>
 
                                         <Box flex="none" alignSelf="flex-end" fontWeight="600">
-                                            <Text>
-                                                {!!lineItemPrice &&
-                                                    intl.formatNumber(lineItemPrice, {
-                                                        style: 'currency',
-                                                        currency: currency
-                                                    })}
-                                            </Text>
+                                            <DisplayPrice
+                                                product={product}
+                                                quantity={quantity}
+                                                scope="addToCartModal"
+                                            />
                                         </Box>
                                     </Flex>
                                 )

@@ -139,6 +139,18 @@ export default {
         'This suit is great for any occasion. Add a shirt and a tie and you are ready for any event. ',
     pageTitle: 'Black Single Pleat Athletic Fit Wool Suit',
     price: 299.99,
+    productPromotions: [
+        {
+            calloutMsg: 'Testers get 25% off',
+            promotionalPrice: 224.99,
+            promotionId: 'zTestersGet25Off'
+        },
+        {
+            calloutMsg: 'Employees get 50% off',
+            promotionalPrice: 149.99,
+            promotionId: 'zTestEmployee'
+        }
+    ],
     shortDescription:
         'This suit is great for any occasion. Add a shirt and a tie and you are ready for any event. ',
     stepQuantity: 1,
