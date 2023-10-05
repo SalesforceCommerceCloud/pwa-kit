@@ -287,6 +287,7 @@ const PRESETS = [
             id: '@salesforce/retail-react-app'
         },
         questions: [...EXTENSIBILITY_QUESTIONS, ...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        // TODO: Update these settings once the test hybrid environment is set!
         answers: {
             ['project.extend']: true,
             ['project.hybrid']: true,
