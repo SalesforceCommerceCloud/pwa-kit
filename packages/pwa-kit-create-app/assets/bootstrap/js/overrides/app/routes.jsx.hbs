@@ -8,22 +8,21 @@
 import React from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+{{#if answers.project.hybrid}}
+import { withRouter } from 'react-router-dom'
+{{/if}}
 
 // Components
 import {Skeleton} from '{{preset.templateSource.id}}/app/components/shared/ui'
 import {configureRoutes} from '{{preset.templateSource.id}}/app/utils/routes-utils'
 import {routes as _routes} from '{{preset.templateSource.id}}/app/routes'
 
-{{~#if answers.project.hybrid}}
-import { withRouter } from 'react-router-dom'
-{{/if}}
-
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Create your pages here and add them to the routes array
 // Use loadable to split code into smaller js chunks
 
-{{~#if answers.project.hybrid}}
+{{#if answers.project.hybrid}}
 const Home = loadable(() => import('@salesforce/retail-react-app/app/pages/home'), { fallback })
 {{else}}
 const Home = loadable(() => import('./pages/home'), {fallback})
@@ -31,7 +30,7 @@ const Home = loadable(() => import('./pages/home'), {fallback})
 
 const MyNewRoute = loadable(() => import('./pages/my-new-route'))
 
-{{~#if answers.project.hybrid}}
+{{#if answers.project.hybrid}}
 const PageNotFound = loadable(() => import('@salesforce/retail-react-app/app/pages/page-not-found'))
 {{/if}}
 
@@ -45,7 +44,7 @@ const routes = [
         path: '/my-new-route',
         component: MyNewRoute
     },
-    {{~#if answers.project.hybrid}},
+    {{#if answers.project.hybrid}},
     // remove routes from the base template that we want to go to SFRA
     ..._routes.filter((route) => {
         return !(route.path === '/cart' || route.path === '/checkout' || route.path === '*')
@@ -68,9 +67,8 @@ const routes = [
             }
             return null
         })
-    },
+    }
     {{else}}
-
     ..._routes
     {{/if}}
 ]
