@@ -5,12 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+{{#if answers.project.hybrid}}
+import React, { useEffect } from 'react'
+import { withRouter } from 'react-router-dom'
+{{else}}
 import React from 'react'
+{{/if}}
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-{{#if answers.project.hybrid}}
-import { withRouter } from 'react-router-dom'
-{{/if}}
+
 
 // Components
 import {Skeleton} from '{{preset.templateSource.id}}/app/components/shared/ui'
