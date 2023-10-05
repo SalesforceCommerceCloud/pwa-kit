@@ -22,12 +22,15 @@ const fallback = <Skeleton height="75vh" width="100%" />
 
 // Create your pages here and add them to the routes array
 // Use loadable to split code into smaller js chunks
+
 {{~#if answers.project.hybrid}}
 const Home = loadable(() => import('@salesforce/retail-react-app/app/pages/home'), { fallback })
 {{else}}
 const Home = loadable(() => import('./pages/home'), {fallback})
 {{/if}}
+
 const MyNewRoute = loadable(() => import('./pages/my-new-route'))
+
 {{~#if answers.project.hybrid}}
 const PageNotFound = loadable(() => import('@salesforce/retail-react-app/app/pages/page-not-found'))
 {{/if}}
@@ -67,6 +70,7 @@ const routes = [
         })
     },
     {{else}}
+
     ..._routes
     {{/if}}
 ]
