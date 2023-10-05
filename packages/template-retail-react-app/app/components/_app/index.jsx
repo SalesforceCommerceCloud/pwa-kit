@@ -285,6 +285,11 @@ const App = (props) => {
                     console.log('Tracking page view')
                     dwAnalytics.trackPageView();
                 } else {
+                    try {
+                        dw.ac._setSiteCurrency(currency);
+                    } catch (err) {
+                        console.log(err)
+                    }
                     console.log('Setting DW Analytics')
                     dw.ac.setDWAnalytics(dwAnalytics);
                 }

@@ -431,6 +431,11 @@
         dw.ac._submitTimeout = setTimeout(dw.ac._handleCollectedData, 500);
     };
 
+    // Added specifically for PWA kit to set currency for Analytics Context
+    dw.ac._setSiteCurrency = function setSiteCurrency(currency) {
+        analyticsContext.siteCurrency = currency;
+    };
+
     // replace jQuery.ready() function
     (function onDocumentReady(callback) {
         // Catch cases where $(document).ready() is called after the browser event has already occurred.
