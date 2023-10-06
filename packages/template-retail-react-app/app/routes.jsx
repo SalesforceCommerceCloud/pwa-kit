@@ -44,6 +44,7 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const Loading = loadable(() => import('./pages/loading'))
 
 export const routes = [
     {
@@ -104,6 +105,11 @@ export const routes = [
     {
         path: '/account/wishlist',
         component: Wishlist
+    },
+    {
+        // TODO: create this route from within SDK?
+        path: '/__storefront-preview',
+        component: Loading
     },
     {
         path: '*',
