@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import StorefrontPreview from '@salesforce/pwa-kit-react-sdk/storefront-preview'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useQuery, useQueries} from '@tanstack/react-query'
@@ -70,7 +71,7 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE, ACTIVE_DATA_ENABLE
+    DEFAULT_LOCALE
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -116,6 +117,7 @@ const App = (props) => {
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = getAppOrigin()
+    const activeData = useActiveData()
 
     const history = useHistory()
     const location = useLocation()
@@ -271,32 +273,7 @@ const App = (props) => {
     }
 
     const trackPage = () => {
-        if (ACTIVE_DATA_ENABLE == 1) {
-            try {
-                var activeDataUrl =
-                    '/mobify/proxy/ocapi/on/demandware.store/Sites-' +
-                    site.id +
-                    '-Site/' +
-                    locale.id +
-                    '/__Analytics-Start'
-                console.log('Tracking enabled for ' + activeDataUrl)
-                var dwAnalytics = dw.__dwAnalytics.getTracker(activeDataUrl);
-                if (typeof dw.ac == "undefined") {
-                    console.log('Tracking page view')
-                    dwAnalytics.trackPageView();
-                } else {
-                    try {
-                        dw.ac._setSiteCurrency(currency);
-                    } catch (err) {
-                        console.log(err)
-                    }
-                    console.log('Setting DW Analytics')
-                    dw.ac.setDWAnalytics(dwAnalytics);
-                }
-            } catch (err) {
-                console.log(err)
-            }
-        }
+        activeData.trackPage(site.id, locale.id, currency);
     }
 
     useEffect(() => {

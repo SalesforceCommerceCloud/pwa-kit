@@ -8,7 +8,6 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
-import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
 import {
@@ -71,6 +70,7 @@ import {
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 // import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
@@ -82,7 +82,7 @@ import {
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_FROM_WISHLIST, ACTIVE_DATA_ENABLE
+    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -111,6 +111,7 @@ const ProductList = (props) => {
     const location = useLocation()
     const toast = useToast()
     const einstein = useEinstein()
+    const activeData = useActiveData()
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
@@ -358,39 +359,20 @@ const ProductList = (props) => {
     useEffect(() => {
         if (productSearchResult) {
             if (isSearch) {
-                einstein.sendViewSearch(searchQuery, productSearchResult)
-                if (ACTIVE_DATA_ENABLE == 1) {
-                    try {
-                        console.log("Setting DW Search Context")
-                        if (dw.ac) {
-                            console.log("Applying search context")
-                            dw.ac.applyContext({searchData: searchParams});
-                            if (typeof dw.ac._scheduleDataSubmission === "function") {
-                                dw.ac._scheduleDataSubmission();
-                            }
-                        }
-                    } catch (err) {
-                        console.log("Error submitting search data")
-                    }
+                try {
+                    einstein.sendViewSearch(searchQuery, productSearchResult)
+                } catch (err) {
+                    console.log(err)
                 }
+                activeData.sendViewSearch(searchParams, productSearchResult)
             }
             else {
-                einstein.sendViewCategory(category, productSearchResult)
-                if (ACTIVE_DATA_ENABLE == 1) {
-                    try {
-                        console.log("Set DW Category Context")
-                        if (dw.ac) {
-                            console.log("Applying category context")
-                            dw.ac.applyContext({category: category.id, searchData: searchParams});
-                            if (typeof dw.ac._scheduleDataSubmission === "function") {
-                                dw.ac._scheduleDataSubmission();
-                            }
-                        }
-                    } catch (err) {
-                        console.log("Error submitting category data")
-
-                    }
+                try {
+                    einstein.sendViewCategory(category, productSearchResult)
+                } catch (err) {
+                    console.log(err)
                 }
+                activeData.sendViewCategory(searchParams, category, productSearchResult)
             }
         }
     }, [productSearchResult])

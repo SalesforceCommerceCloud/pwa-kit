@@ -25,6 +25,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useVariant} from '@salesforce/retail-react-app/app/hooks'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
@@ -35,7 +36,6 @@ import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/univers
 
 // constant
 import {
-    ACTIVE_DATA_ENABLE,
     API_ERROR_MESSAGE,
     EINSTEIN_RECOMMENDERS,
     MAX_CACHE_AGE,
@@ -52,6 +52,7 @@ const ProductDetail = () => {
     const history = useHistory()
     const location = useLocation()
     const einstein = useEinstein()
+    const activeData = useActiveData()
     const toast = useToast()
     const navigate = useNavigation()
     const [productSetSelection, setProductSetSelection] = useState({})
@@ -273,30 +274,20 @@ const ProductDetail = () => {
             einstein.sendViewProduct(product)
             const childrenProducts = product.setProducts
             childrenProducts.map((child) => {
-                einstein.sendViewProduct(child)
-                if (ACTIVE_DATA_ENABLE == 1) {
-                    try {
-                        console.log("Capturing child product")
-                        if (dw.ac) {
-                            dw.ac._capture({id: child.id, type: child.type});
-                        }
-                    } catch (err) {
-                        console.log("Error capturing child product")
-                    }
+                try {
+                    einstein.sendViewProduct(child)
+                } catch (err) {
+                    console.log(err)
                 }
+                activeData.sendViewProduct(category, child, "detail")
             })
         } else if (product) {
-            einstein.sendViewProduct(product)
-            if (ACTIVE_DATA_ENABLE == 1) {
-                try {
-                    console.log("Capturing product")
-                    if (dw.ac) {
-                        dw.ac._capture({id: product.id, type: "searchhit"});
-                    }
-                } catch (err) {
-                    console.log("Error capturing product")
-                }
+            try {
+                einstein.sendViewProduct(product)
+            } catch (err) {
+                console.log(err)
             }
+            activeData.sendViewProduct(category, product, "detail")
         }
     }, [product])
 
