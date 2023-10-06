@@ -16,13 +16,14 @@ import {detectStorefrontPreview, getClientScript} from './utils'
  * This flag only applies if storefront is ran in Runtime Admin iframe.
  * @param {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  */
-export const StorefrontPreview = ({enabled = true, getToken}) => {
+export const StorefrontPreview = ({enabled = true, getToken, navigate}) => {
     let isHostTrusted
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
-                getToken
+                getToken,
+                navigate
             }
         }
     }, [enabled, getToken])

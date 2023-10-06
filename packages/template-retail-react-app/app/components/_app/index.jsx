@@ -74,6 +74,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
+import useNavigation from '../../hooks/use-navigation'
 
 const onClient = typeof window !== 'undefined'
 
@@ -126,6 +127,7 @@ const App = (props) => {
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const navigate = useNavigation()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -294,7 +296,7 @@ const App = (props) => {
                 defaultLocale={DEFAULT_LOCALE}
             >
                 <CurrencyProvider currency={currency}>
-                    <StorefrontPreview getToken={getTokenWhenReady} />
+                    <StorefrontPreview getToken={getTokenWhenReady} navigate={navigate} />
                     <Seo>
                         <meta name="theme-color" content={THEME_COLOR} />
                         <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
