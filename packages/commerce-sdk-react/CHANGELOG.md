@@ -1,5 +1,5 @@
 ## v1.1.0-dev (Sep 26, 2023)
-- Using 'login' for authentication instead of 'email' in registration process [#1464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1464)
+- Using `login` for authentication instead of `email` in registration process [#1464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1464)
 
 ## v1.0.2 (Sep 21, 2023)
 
