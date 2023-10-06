@@ -126,6 +126,24 @@ const EXTENSIBILITY_QUESTIONS = [
     }
 ]
 
+const HYBRID_QUESTIONS = [
+    {
+        name: 'project.hybrid',
+        message: 'Do you wish to set up a phased headless rollout?',
+        type: 'list',
+        choices: [
+            {
+                name: 'No',
+                value: false
+            },
+            {
+                name: 'Yes',
+                value: true
+            }
+        ]
+    }
+]
+
 const MRT_REFERENCE_QUESTIONS = [
     {
         name: 'project.name',
@@ -220,6 +238,7 @@ const PRESETS = [
         questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         answers: {
             ['project.extend']: true,
+            ['project.hybrid']: false,
             ['project.name']: 'demo-storefront',
             ['project.commerce.instanceUrl']: 'https://zzte-053.dx.commercecloud.salesforce.com',
             ['project.commerce.clientId']: '1d763261-6522-4913-9d52-5d947d3b94c4',
@@ -243,6 +262,32 @@ const PRESETS = [
         questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         answers: {
             ['project.extend']: true,
+            ['project.hybrid']: false,
+            ['project.name']: 'retail-react-app',
+            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+            ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+            ['project.commerce.siteId']: 'RefArch',
+            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
+            ['project.commerce.shortCode']: 'kv7kzm78',
+            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            ['project.einstein.siteId']: 'aaij-MobileFirst'
+        },
+        assets: ['translations'],
+        private: true
+    },
+    {
+        id: 'retail-react-app-hybrid-test-project',
+        name: 'Retail React App Hybrid Test Project',
+        description: '',
+        templateSource: {
+            type: TEMPLATE_SOURCE_NPM,
+            id: '@salesforce/retail-react-app'
+        },
+        questions: [...EXTENSIBILITY_QUESTIONS, ...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        // TODO: Update these settings once the test hybrid environment is set!
+        answers: {
+            ['project.extend']: true,
+            ['project.hybrid']: true,
             ['project.name']: 'retail-react-app',
             ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
             ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
