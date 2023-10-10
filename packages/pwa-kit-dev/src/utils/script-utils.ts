@@ -9,9 +9,18 @@ import path from 'path'
 import archiver, {EntryData} from 'archiver'
 import {default as _fetch, Response} from 'node-fetch'
 import {URL} from 'url'
-import {readFile, stat, mkdtemp, rm, readdir} from 'fs/promises'
-import {createWriteStream, Stats, Dirent, existsSync} from 'fs'
-import {readJson} from 'fs-extra'
+import {
+    createWriteStream,
+    existsSync,
+    readFile,
+    readJson,
+    stat,
+    mkdtemp,
+    rm,
+    readdir,
+    Stats,
+    Dirent
+} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
@@ -128,8 +137,22 @@ interface DependencyTree {
  *
  * @returns A DependencyTree with the versions of all dependencies
  */
-export const getProjectDependencyTree = (): DependencyTree => {
-    return JSON.parse(execSync(`npm ls --all --json`, {encoding: 'utf-8'})) as DependencyTree
+export const getProjectDependencyTree = async (): Promise<DependencyTree | null> => {
+    // When executing this inside template-retail-react-app, the output of `npm ls` exceeds the
+    // max buffer size that child_process can handle, so we can't use that directly. The max string
+    // size is much larger, so writing/reading a temp file is a functional workaround.
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
+    const destination = path.join(tmpDir, 'npm-ls.json')
+    try {
+        execSync(`npm ls --all --json > ${destination}`)
+        return await readJson(destination, 'utf8')
+    } catch (_) {
+        // Don't prevent bundles from being pushed if this step fails
+        return null
+    } finally {
+        // Remove temp file asynchronously after returning; ignore failures
+        void rm(destination).catch(() => {})
+    }
 }
 
 /**
@@ -377,12 +400,16 @@ export const createBundle = async ({
                         existsSync(path.join(extendsTemplate, item))
                     )
                 }
+                const dependencyTree = await getProjectDependencyTree()
+                // If we can't load the dependency tree, pretend that it's empty.
+                // TODO: Should we report an error?
+                const pwaKitDeps = dependencyTree ? getPwaKitDependencies(dependencyTree) : {}
 
                 bundle_metadata = {
                     dependencies: {
                         ...dependencies,
                         ...devDependencies,
-                        ...getPwaKitDependencies(getProjectDependencyTree())
+                        ...(pwaKitDeps ?? {})
                     },
                     cc_overrides: cc_overrides
                 }
