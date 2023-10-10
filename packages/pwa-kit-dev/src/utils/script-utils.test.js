@@ -238,7 +238,7 @@ describe('scriptUtils', () => {
                 version: pkg.version,
                 dependencies: expect.any(Object)
             })
-        })
+        }, 10_000) // This test can take a while on CI
         test('returns nothing if an error occurs', async () => {
             execSync.mockImplementation(() => {
                 throw new Error('npm ls did not work')
