@@ -455,15 +455,15 @@ class Auth {
      */
     async register(body: ShopperCustomersTypes.CustomerRegistration) {
         const {
-            customer: {email},
+            customer: {login},
             password
         } = body
 
-        // email is optional field from isomorphic library
+        // login is optional field from isomorphic library
         // type CustomerRegistration
         // here we had to guard it to avoid ts error
-        if (!email) {
-            throw new Error('Customer registration is missing email address.')
+        if (!login) {
+            throw new Error('Customer registration is missing login field.')
         }
 
         const res = await this.shopperCustomersClient.registerCustomer({
@@ -472,7 +472,7 @@ class Auth {
             },
             body
         })
-        await this.loginRegisteredUserB2C({username: email, password})
+        await this.loginRegisteredUserB2C({username: login, password})
         return res
     }
 
