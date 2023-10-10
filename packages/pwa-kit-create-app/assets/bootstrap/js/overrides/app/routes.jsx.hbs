@@ -59,7 +59,7 @@ const routes = [
     {
         path: '*',
         component: withRouter((props) => {
-            const { location } = props
+            const { location, history } = props
             const urlParams = new URLSearchParams(location.search)
 
             useEffect(() => {
