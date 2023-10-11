@@ -39,7 +39,8 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.use(helmet({hsts: isRemote()}))
 
     app.use((req, res, next) => {
-        // TODO: Special handling for 'upgrade-insecure-requests': isRemote() ? [] : null
+        /** CSP-compatible origin for Runtime Admin. */
+        // localhost doesn't include a protocol because different browsers behave differently :\
         const runtimeAdmin = '*.mobify-storefront.com' // TODO: Revert
         // const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
         const defaultDirectives = {
@@ -48,7 +49,10 @@ const {handler} = runtime.createHandler(options, (app) => {
             'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
             'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com', runtimeAdmin]
         }
-        // Parse current CSP header
+        /**
+         * Map of existing directives in the Content-Security-Policy header and their associated values.
+         * @type Object.<string, string[]>
+         */
         const directives = res
             .getHeader('Content-Security-Policy')
             .split(';')
