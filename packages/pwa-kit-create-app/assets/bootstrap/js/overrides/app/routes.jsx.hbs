@@ -59,16 +59,14 @@ const routes = [
     {
         path: '*',
         component: withRouter((props) => {
-            const { location, history } = props
+            const { location } = props
             const urlParams = new URLSearchParams(location.search)
 
             useEffect(() => {
+                const newURL = new URL(window.location)
                 if (!urlParams.has('redirected')) {
-                    urlParams.append('redirected', '1')
-                    history.push({
-                        pathname: location.pathname,
-                        search: urlParams.toString()
-                    })
+                    newURL.searchParams.append('redirected', '1')
+                    window.location.href = newURL
                 }
             }, [location.pathname])
             if (urlParams.has('redirected')) {
