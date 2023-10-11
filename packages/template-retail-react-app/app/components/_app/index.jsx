@@ -68,8 +68,7 @@ import Toolbar from '../amplience/toolbar'
 import {defaultAmpClient} from '../../amplience-api'
 import {useAmpRtvNav} from '../../utils/amplience/rtv'
 
-import OcapiApi from '../../ocapi-api'
-import {app} from '../../../config/default'
+import {createOcapiFetch} from '../../commerce-api/utils'
 import useNavigation from '../../hooks/use-navigation'
 
 const App = (props) => {
@@ -415,8 +414,14 @@ Learn more with our localization guide. https://sfdc.co/localization-guide
     // const categories = {root: flatten(rootCategory, 'categories').root}
     const categories = flatten(rootCategory, 'categories')
 
-    const ocapiApi = new OcapiApi(app.commerceAPI)
-    const groupList = await ocapiApi.getAllGroups()
+    const config = api.getConfig()
+    const ocapiFetch = createOcapiFetch({
+        proxyPath: config.proxy.substring(config.proxy.indexOf('/mobify')),
+        parameters: {...config.parameters}
+    })
+    const groupList = await ocapiFetch(`folders/(root)?levels=0`, 'GET', [
+        {headers: {Authorization: api.auth.authToken}}
+    ])
     const customerGroups = groupList?.data[0].c_customerGroups || [
         'Unregistered',
         'Registered',
