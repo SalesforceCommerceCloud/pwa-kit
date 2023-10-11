@@ -19,7 +19,7 @@ const DisplayPrice = ({product, scope = 'pdp', quantity = 1}) => {
     const styles = useMultiStyleConfig('DisplayPrice', {variant: scope})
     const isProductASet = product?.type?.set || product?.hitType === 'set'
     const showDiscount = discountPrice !== null && discountPrice < basePrice
-    const basePriceStyle = showDiscount ? styles.discountPrice : styles.price
+    const basePriceStyle = showDiscount ? styles.strikethroughPrice : styles.price
     return (
         <Skeleton isLoaded={basePrice} display={'flex'}>
             {isProductASet && (

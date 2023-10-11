@@ -9,7 +9,7 @@ export default {
         price: {
             fontWeight: 'bold'
         },
-        discountPrice: {
+        strikethroughPrice: {
             textDecoration: 'line-through',
             marginLeft: 2
         },

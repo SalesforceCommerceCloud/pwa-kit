@@ -6,7 +6,7 @@
  */
 
 import {getDisplayVariationValues, getDisplayPrice} from './product-utils'
-import mockProductDetail from '../commerce-api/mocks/variant-750518699578M'
+import mockProductDetail, {variantWithPromos} from '../commerce-api/mocks/variant-750518699578M'
 
 const variationAttributes = [
     {
@@ -55,13 +55,12 @@ test('getDisplayVariationValues', () => {
 
 describe('getDisplayPrice', function () {
     test('returns basePrice and discountPrice', () => {
-        const {basePrice, discountPrice} = getDisplayPrice(mockProductDetail)
+        const {basePrice, discountPrice} = getDisplayPrice(variantWithPromos)
         expect(basePrice).toBe(mockedBasePrice)
         expect(discountPrice).toBe(mockedDiscountPrice)
     })
 
     test('returns null if there is not discount promotion', () => {
-        delete mockProductDetail.productPromotions
         const {basePrice, discountPrice} = getDisplayPrice(mockProductDetail)
         expect(basePrice).toBe(mockedBasePrice)
         expect(discountPrice).toBeNull()

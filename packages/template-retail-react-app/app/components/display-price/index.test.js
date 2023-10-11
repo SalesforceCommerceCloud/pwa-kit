@@ -8,21 +8,21 @@ import React from 'react'
 import {screen, within} from '@testing-library/react'
 import DisplayPrice from '../display-price/index'
 import {renderWithProviders} from '../../utils/test-utils'
-import mockProductDetail from '../../commerce-api/mocks/variant-750518699578M'
+import mockProductDetail, {variantWithPromos} from '../../commerce-api/mocks/variant-750518699578M'
 
 const mockedBasePrice = /\$299\.99/i
 const mockedDiscountPrice = /\$149\.99/i
 
 describe('DisplayPrice', function () {
     test('should render without error', () => {
-        renderWithProviders(<DisplayPrice product={mockProductDetail} scope="pdp" />)
+        renderWithProviders(<DisplayPrice product={variantWithPromos} scope="pdp" />)
         expect(screen.getByText(mockedBasePrice)).toBeInTheDocument()
         expect(screen.getByText(mockedDiscountPrice)).toBeInTheDocument()
     })
 
     test('should render according html tag for prices', () => {
         const {getByTestId} = renderWithProviders(
-            <DisplayPrice product={mockProductDetail} scope="pdp" />
+            <DisplayPrice product={variantWithPromos} scope="pdp" />
         )
         const basePriceTag = getByTestId('base-price')
         const discountPriceTag = getByTestId('discount-price')
@@ -31,7 +31,6 @@ describe('DisplayPrice', function () {
     })
 
     test('should not render discount price if not available', () => {
-        delete mockProductDetail.productPromotions
         renderWithProviders(<DisplayPrice product={mockProductDetail} scope="pdp" />)
         expect(screen.getByText(mockedBasePrice)).toBeInTheDocument()
         expect(screen.queryByText(mockedDiscountPrice)).not.toBeInTheDocument()

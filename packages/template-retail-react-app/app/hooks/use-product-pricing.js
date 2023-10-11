@@ -20,14 +20,18 @@ import {getDisplayPrice} from '../utils/product-utils'
  * @param {number} quantity
  * @return {ProductPricing}
  */
-function useProductPricing(product, quantity) {
+function useProductPricing(product, quantity = 1) {
+    let qty = Number(quantity)
+    if (qty < 1 || isNaN(qty) || !Number.isInteger(qty)) {
+        qty = 1
+    }
     return useMemo(() => {
         if (product) {
             const {basePrice, discountPrice} = getDisplayPrice(product)
             return {
                 currency: product.currency,
-                basePrice: basePrice !== null ? basePrice * quantity : null,
-                discountPrice: discountPrice !== null ? discountPrice * quantity : null
+                basePrice: basePrice !== null ? basePrice * qty : null,
+                discountPrice: discountPrice !== null ? discountPrice * qty : null
             }
         } else {
             return {
