@@ -8,8 +8,8 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
-import {useHistory} from 'react-router'
 import {detectStorefrontPreview, getClientScript} from './utils'
+import {useHistory} from 'react-router-dom'
 
 /**
  *
@@ -17,21 +17,17 @@ import {detectStorefrontPreview, getClientScript} from './utils'
  * This flag only applies if storefront is ran in Runtime Admin iframe.
  * @param {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  */
-export const StorefrontPreview = ({enabled = true, getToken, navigate}) => {
-    // TODO: why `history` in this case is undefined?
-    // const history = useHistory()
-
+export const StorefrontPreview = ({enabled = true, getToken}) => {
+    const history = useHistory()
     let isHostTrusted
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
-                navigate
-                // TODO: implement `navigate` from within SDK
-                // navigate: (path, action = 'push', ...args) => {
-                //     history[action](path, ...args)
-                // }
+                navigate: (path, action = 'push', ...args) => {
+                    history[action](path, ...args)
+                }
             }
         }
     }, [enabled, getToken])
