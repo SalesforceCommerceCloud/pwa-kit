@@ -118,6 +118,7 @@ export const start = async () => {
 
     await loadableReady()
 
+    // TODO: remove
     if (queryParams.has('__client_only')) {
         window.__HYDRATING__ = false
         const root = createRoot(rootEl)
