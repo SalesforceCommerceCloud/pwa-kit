@@ -107,11 +107,6 @@ export const routes = [
         component: Wishlist
     },
     {
-        // TODO: create this route from within SDK?
-        path: '/__storefront-preview',
-        component: Loading
-    },
-    {
         path: '*',
         component: PageNotFound
     }
