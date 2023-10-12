@@ -264,6 +264,7 @@ export const DevServerMixin = {
 
     serveServiceWorker(req, res) {
         req.app.__devMiddleware.waitUntilValid(() => {
+            this.enforceContentSecurityPolicy(req, res)
             const sourceMap = req.path.endsWith('.map')
             const file = sourceMap ? 'worker.js.map' : 'worker.js'
             const type = sourceMap ? '.js.map' : '.js'
@@ -279,6 +280,7 @@ export const DevServerMixin = {
     },
 
     render(req, res, next) {
+        this.enforceContentSecurityPolicy(req, res)
         const app = req.app
 
         if (app?.__isInitialBuild) {

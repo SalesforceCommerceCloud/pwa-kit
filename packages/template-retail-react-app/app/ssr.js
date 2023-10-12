@@ -38,51 +38,6 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
     app.use(helmet({hsts: isRemote()}))
 
-    app.use((req, res, next) => {
-        /** CSP-compatible origin for Runtime Admin. */
-        // localhost doesn't include a protocol because different browsers behave differently :\
-        const runtimeAdmin = '*.mobify-storefront.com' // TODO: Revert
-        // const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
-        const defaultDirectives = {
-            'connect-src': ["'self'", 'api.cquotient.com', runtimeAdmin],
-            'frame-ancestors': [runtimeAdmin],
-            'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-            'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com', runtimeAdmin]
-        }
-        /**
-         * Map of existing directives in the Content-Security-Policy header and their associated values.
-         * @type Object.<string, string[]>
-         */
-        const directives = res
-            .getHeader('Content-Security-Policy')
-            .split(';')
-            .reduce((obj, text) => {
-                const [directive, ...values] = text.split(' ')
-                obj[directive] = values
-                return obj
-            }, {})
-        // Add missing default CSP directives
-        for (const [directive, defaultValues] of Object.entries(defaultDirectives)) {
-            directives[directive] = [
-                // Wrapping with `[...new Set(array)]` removes duplicate entries
-                ...new Set([...(directives[directive] ?? []), ...defaultValues])
-            ]
-        }
-        // Always upgrade insecure requests when deployed, never upgrade on local dev server
-        if (isRemote()) {
-            directives['upgrade-insecure-requests'] = []
-        } else {
-            delete directives['upgrade-insecure-requests']
-        }
-        // Re-construct header string
-        const header = Object.entries(directives)
-            .map(([directive, values]) => [directive, ...values].join(' '))
-            .join(';')
-        res.setHeader('Content-Security-Policy', header)
-
-        next()
-    })
-
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
         // This endpoint does nothing and is not expected to change
@@ -94,7 +49,6 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
-    app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.

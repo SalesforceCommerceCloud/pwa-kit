@@ -725,6 +725,7 @@ export const RemoteServerFactory = {
      *
      */
     serveServiceWorker(req, res) {
+        this.enforceContentSecurityPolicy(req, res)
         const options = req.app.options
         // We apply this cache-control to all responses (200 and 404)
         res.set(
@@ -771,6 +772,7 @@ export const RemoteServerFactory = {
     _serveStaticFile(req, res, baseDir, filePath, opts = {}) {
         const options = req.app.options
         const file = path.resolve(baseDir, filePath)
+        this.enforceContentSecurityPolicy(req, res)
         res.sendFile(file, {
             headers: {
                 [CACHE_CONTROL]: options.defaultCacheControl
@@ -800,6 +802,7 @@ export const RemoteServerFactory = {
             const stats = _require(path.join(buildDir, 'loadable-stats.json'))
             app.__renderer = serverRenderer(stats)
         }
+        this.enforceContentSecurityPolicy(req, res)
         app.__renderer(req, res, next)
     },
 
@@ -891,13 +894,47 @@ export const RemoteServerFactory = {
         return {handler, server, app}
     },
 
-    /**
-     * Adds middleware that must run *after* custom middleware.
-     * @private
-     * @param {Express.Application} app
-     */
-    _postCustomizeApp(app) {
-        // TODO: Putting app.use(cspSafeguardMiddleware) here doesn't seem to work?
+    enforceContentSecurityPolicy(req, res) {
+        /** CSP-compatible origin for Runtime Admin. */
+        // localhost doesn't include a protocol because different browsers behave differently :\
+        const runtimeAdmin = '*.mobify-storefront.com' // TODO: Revert
+        // const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
+        const defaultDirectives = {
+            'connect-src': ["'self'", 'api.cquotient.com', runtimeAdmin],
+            'frame-ancestors': [runtimeAdmin],
+            'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
+            'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com', runtimeAdmin]
+        }
+        /**
+         * Map of existing directives in the Content-Security-Policy header and their associated values.
+         * @type Object.<string, string[]>
+         */
+        const directives = res
+            .getHeader('Content-Security-Policy')
+            .split(';')
+            .reduce((obj, text) => {
+                const [directive, ...values] = text.split(' ')
+                obj[directive] = values
+                return obj
+            }, {})
+        // Add missing default CSP directives
+        for (const [directive, defaultValues] of Object.entries(defaultDirectives)) {
+            directives[directive] = [
+                // Wrapping with `[...new Set(array)]` removes duplicate entries
+                ...new Set([...(directives[directive] ?? []), ...defaultValues])
+            ]
+        }
+        // Always upgrade insecure requests when deployed, never upgrade on local dev server
+        if (isRemote()) {
+            directives['upgrade-insecure-requests'] = []
+        } else {
+            delete directives['upgrade-insecure-requests']
+        }
+        // Re-construct header string
+        const header = Object.entries(directives)
+            .map(([directive, values]) => [directive, ...values].join(' '))
+            .join(';')
+        res.setHeader('Content-Security-Policy', header)
     },
 
     /**
@@ -932,7 +969,6 @@ export const RemoteServerFactory = {
         process.on('unhandledRejection', catchAndLog)
         const app = this._createApp(options)
         customizeApp(app)
-        this._postCustomizeApp(app)
         return this._createHandler(app)
     },
 
