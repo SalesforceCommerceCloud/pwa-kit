@@ -362,7 +362,7 @@ const ProductList = (props) => {
                 try {
                     einstein.sendViewSearch(searchQuery, productSearchResult)
                 } catch (err) {
-                    console.log(err)
+                    console.error(err)
                 }
                 activeData.sendViewSearch(searchParams, productSearchResult)
             }
@@ -370,7 +370,7 @@ const ProductList = (props) => {
                 try {
                     einstein.sendViewCategory(category, productSearchResult)
                 } catch (err) {
-                    console.log(err)
+                    console.error(err)
                 }
                 activeData.sendViewCategory(searchParams, category, productSearchResult)
             }

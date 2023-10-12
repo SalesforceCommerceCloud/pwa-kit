@@ -277,7 +277,7 @@ const ProductDetail = () => {
                 try {
                     einstein.sendViewProduct(child)
                 } catch (err) {
-                    console.log(err)
+                    console.error(err)
                 }
                 activeData.sendViewProduct(category, child, "detail")
             })
@@ -285,7 +285,7 @@ const ProductDetail = () => {
             try {
                 einstein.sendViewProduct(product)
             } catch (err) {
-                console.log(err)
+                console.error(err)
             }
             activeData.sendViewProduct(category, product, "detail")
         }
