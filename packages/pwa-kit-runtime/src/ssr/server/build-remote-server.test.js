@@ -36,6 +36,7 @@ describe('Content-Security-Policy enforcement', () => {
     beforeEach(() => {
         const headers = {}
         res = {
+            hasHeader: (key) => Object.hasOwn(headers, key),
             getHeader: (key) => headers[key],
             setHeader: (key, val) => (headers[key] = val)
         }
@@ -107,5 +108,14 @@ describe('Content-Security-Policy enforcement', () => {
         enforceSecurityHeaders({}, res, () => {})
         res.setHeader(header, value)
         expect(res.getHeader(header)).toBe(value)
+    })
+    test('blocks Strict-Transport-Security header in development', () => {
+        // TODO
+    })
+    test('allows Strict-Transport-Security header in production', () => {
+        // TODO
+    })
+    test('provides default value for Strict-Transport-Security header in production', () => {
+        // TODO
     })
 })
