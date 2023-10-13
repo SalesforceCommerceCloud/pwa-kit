@@ -968,8 +968,8 @@ export const enforceContentSecurityPolicy = (req, res, next) => {
             // ensure that our required directives will work as expected.
             // Ref: https://w3c.github.io/webappsec-csp/#multiple-policies
             modifiedValue = Array.isArray(value)
-                ? value.map((item) => addRequiredCsp(item, directives))
-                : addRequiredCsp(value, directives)
+                ? value.map((item) => addRequiredDirectives(item, directives))
+                : addRequiredDirectives(value, directives)
         }
         return setHeader.call(res, name, modifiedValue)
     }
@@ -984,7 +984,7 @@ export const enforceContentSecurityPolicy = (req, res, next) => {
  * @returns {string} Modified Content-Security-Policy header
  * @private
  */
-const addRequiredCsp = (original, requiredDirectives) => {
+const addRequiredDirectives = (original, required) => {
     const directives = original
         .trim()
         .split(';')
@@ -997,11 +997,9 @@ const addRequiredCsp = (original, requiredDirectives) => {
             return acc
         }, {})
     // Add missing required CSP directives
-    for (const [name, values] of Object.entries(requiredDirectives)) {
-        directives[name] = [
-            // Wrapping with `[...new Set(array)]` removes duplicate entries
-            ...new Set([...(directives[name] ?? []), ...values])
-        ]
+    for (const [name, values] of Object.entries(required)) {
+        // Wrapping with `[...new Set(array)]` removes duplicate entries
+        directives[name] = [...new Set([...(directives[name] ?? []), ...values])]
     }
     // Always upgrade insecure requests when deployed, never upgrade on local dev server
     if (isRemote()) {
