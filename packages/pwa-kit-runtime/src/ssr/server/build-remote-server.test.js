@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {RemoteServerFactory, once} from './build-remote-server'
+import {enforceContentSecurityPolicy, once} from './build-remote-server'
+import {CONTENT_SECURITY_POLICY as CSP} from './constants'
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
@@ -20,8 +21,8 @@ describe('the once function', () => {
 })
 
 describe('Content-Security-Policy enforcement', () => {
-    const CSP = 'Content-Security-Policy'
-    let req, res, headers
+    let res
+
     /**
      * Helper to make expected CSP more readable. Asserts that the actual CSP header contains each
      * of the expected directives.
@@ -33,8 +34,7 @@ describe('Content-Security-Policy enforcement', () => {
     }
 
     beforeEach(() => {
-        req = {}
-        headers = {'Content-Security-Policy': ''}
+        const headers = {}
         res = {
             getHeader: (key) => headers[key],
             setHeader: (key, val) => (headers[key] = val)
@@ -44,7 +44,8 @@ describe('Content-Security-Policy enforcement', () => {
     afterEach(() => delete process.env.AWS_LAMBDA_FUNCTION_NAME)
 
     test('adds required directives for development', () => {
-        RemoteServerFactory.enforceContentSecurityPolicy(req, res)
+        enforceContentSecurityPolicy({}, res, () => {})
+        res.setHeader(CSP, '')
         expectDirectives([
             "connect-src 'self' api.cquotient.com localhost:*",
             'frame-ancestors localhost:*',
@@ -54,7 +55,8 @@ describe('Content-Security-Policy enforcement', () => {
     })
     test('adds required directives for production', () => {
         process.env.AWS_LAMBDA_FUNCTION_NAME = 'testEnforceCSP'
-        RemoteServerFactory.enforceContentSecurityPolicy(req, res)
+        enforceContentSecurityPolicy({}, res, () => {})
+        res.setHeader(CSP, '')
         expectDirectives([
             "connect-src 'self' api.cquotient.com https://runtime.commercecloud.com",
             'frame-ancestors https://runtime.commercecloud.com',
@@ -64,26 +66,46 @@ describe('Content-Security-Policy enforcement', () => {
         ])
     })
     test('merges with existing CSP directives', () => {
+        enforceContentSecurityPolicy({}, res, () => {})
         res.setHeader(CSP, "connect-src test:* ; script-src 'unsafe-eval' test:*")
-        RemoteServerFactory.enforceContentSecurityPolicy(req, res)
         expectDirectives([
             "connect-src test:* 'self' api.cquotient.com localhost:*",
             "script-src 'unsafe-eval' test:* 'self' storage.googleapis.com localhost:*"
         ])
     })
     test('allows other CSP directives', () => {
+        enforceContentSecurityPolicy({}, res, () => {})
         res.setHeader(CSP, 'fake-directive test:*')
-        RemoteServerFactory.enforceContentSecurityPolicy(req, res)
         expectDirectives(['fake-directive test:*'])
     })
     test('enforces upgrade-insecure-requests disabled on development', () => {
+        enforceContentSecurityPolicy({}, res, () => {})
         res.setHeader(CSP, 'upgrade-insecure-requests')
-        RemoteServerFactory.enforceContentSecurityPolicy(req, res)
         expect(res.getHeader(CSP)).not.toContain('upgrade-insecure-requests')
     })
     test('enforces upgrade-insecure-requests enabled on production', () => {
         process.env.AWS_LAMBDA_FUNCTION_NAME = 'testEnforceCSP'
-        RemoteServerFactory.enforceContentSecurityPolicy(req, res)
+        enforceContentSecurityPolicy({}, res, () => {})
+        res.setHeader(CSP, 'connect-src localhost:*')
         expectDirectives(['upgrade-insecure-requests'])
+    })
+    test('adds directives even if setHeader is never called', () => {
+        enforceContentSecurityPolicy({}, res, () => {})
+        expectDirectives(["img-src 'self' *.commercecloud.salesforce.com data:"])
+    })
+    test('handles multiple CSP headers', () => {
+        enforceContentSecurityPolicy({}, res, () => {})
+        res.setHeader(CSP, ['connect-src first.header', 'script-src second.header'])
+        const headers = res.getHeader(CSP)
+        expect(headers).toHaveLength(2)
+        expect(headers[0]).toContain('connect-src first.header')
+        expect(headers[1]).toContain('script-src second.header')
+    })
+    test('does not modify unrelated headers', () => {
+        const header = 'Contentious-Secret-Police'
+        const value = 'connect-src unmodified fake directive'
+        enforceContentSecurityPolicy({}, res, () => {})
+        res.setHeader(header, value)
+        expect(res.getHeader(header)).toBe(value)
     })
 })
