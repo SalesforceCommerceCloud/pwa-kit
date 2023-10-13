@@ -903,8 +903,7 @@ export const RemoteServerFactory = {
     enforceContentSecurityPolicy(req, res) {
         /** CSP-compatible origin for Runtime Admin. */
         // localhost doesn't include a protocol because different browsers behave differently :\
-        const runtimeAdmin = '*.mobify-storefront.com' // TODO: Revert
-        // const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
+        const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
         const defaultDirectives = {
             'connect-src': ["'self'", 'api.cquotient.com', runtimeAdmin],
             'frame-ancestors': [runtimeAdmin],
