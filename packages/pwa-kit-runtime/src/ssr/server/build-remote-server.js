@@ -918,8 +918,11 @@ export const RemoteServerFactory = {
             .getHeader('Content-Security-Policy')
             .split(';')
             .reduce((obj, text) => {
-                const [directive, ...values] = text.split(' ')
-                obj[directive] = values
+                const trimmed = text.trim()
+                if (trimmed) {
+                    const [directive, ...values] = text.split(/ +/)
+                    obj[directive] = values
+                }
                 return obj
             }, {})
         // Add missing default CSP directives
