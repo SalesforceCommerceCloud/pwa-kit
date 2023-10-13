@@ -365,8 +365,7 @@ const ProductList = (props) => {
                     console.error(err)
                 }
                 activeData.sendViewSearch(searchParams, productSearchResult)
-            }
-            else {
+            } else {
                 try {
                     einstein.sendViewCategory(category, productSearchResult)
                 } catch (err) {

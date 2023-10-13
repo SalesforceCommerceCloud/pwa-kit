@@ -71,11 +71,12 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE
+    DEFAULT_LOCALE,
+    ACTIVE_DATA_ENABLE
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import {Helmet} from "react-helmet";
+import {Helmet} from 'react-helmet'
 
 const onClient = typeof window !== 'undefined'
 
@@ -273,7 +274,7 @@ const App = (props) => {
     }
 
     const trackPage = () => {
-        activeData.trackPage(site.id, locale.id, currency);
+        activeData.trackPage(site.id, locale.id, currency)
     }
 
     useEffect(() => {
@@ -283,7 +284,12 @@ const App = (props) => {
     return (
         <Box className="sf-app" {...styles.container}>
             <Helmet>
-                <script src={getAssetUrl('static/head-active_data.js')} type="text/javascript"></script>
+                {ACTIVE_DATA_ENABLE == 1 && (
+                    <script
+                        src={getAssetUrl('static/head-active_data.js')}
+                        type="text/javascript"
+                    ></script>
+                )}
             </Helmet>
             <IntlProvider
                 onError={(err) => {
@@ -404,17 +410,21 @@ const App = (props) => {
                     </Box>
                 </CurrencyProvider>
             </IntlProvider>
-            <script
-                type="text/javascript"
-                src={getAssetUrl('static/dwanalytics-22.2.js')}
-                async="async"
-                onLoad={trackPage}
-            ></script>
-            <script
-                src={getAssetUrl('static/dwac-21.7.js')}
-                type="text/javascript"
-                async="async"
-            ></script>
+            {ACTIVE_DATA_ENABLE == 1 && (
+                <script
+                    type="text/javascript"
+                    src={getAssetUrl('static/dwanalytics-22.2.js')}
+                    async="async"
+                    onLoad={trackPage}
+                ></script>
+            )}
+            {ACTIVE_DATA_ENABLE == 1 && (
+                <script
+                    src={getAssetUrl('static/dwac-21.7.js')}
+                    type="text/javascript"
+                    async="async"
+                ></script>
+            )}
         </Box>
     )
 }

@@ -279,7 +279,7 @@ const ProductDetail = () => {
                 } catch (err) {
                     console.error(err)
                 }
-                activeData.sendViewProduct(category, child, "detail")
+                activeData.sendViewProduct(category, child, 'detail')
             })
         } else if (product) {
             try {
@@ -287,7 +287,7 @@ const ProductDetail = () => {
             } catch (err) {
                 console.error(err)
             }
-            activeData.sendViewProduct(category, product, "detail")
+            activeData.sendViewProduct(category, product, 'detail')
         }
     }, [product])
 
