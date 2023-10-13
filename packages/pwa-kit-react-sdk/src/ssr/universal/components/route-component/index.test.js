@@ -270,13 +270,17 @@ describe('The routeComponent component', () => {
 describe('getRoutes', () => {
     test('wraps components with the routeComponent HOC', () => {
         const mappedRoutes = getRoutes()
-        expect(mappedRoutes.length).toBe(2)
-        const [first, second] = mappedRoutes
+        expect(mappedRoutes).toHaveLength(3)
+        const [first, second, third] = mappedRoutes
+
+        const expectedLoadingName = 'WithErrorHandling(withRouter(routeComponent(Loading)))'
+        expect(first.component.displayName).toBe(expectedLoadingName)
+
         const expectedName = 'WithErrorHandling(withRouter(routeComponent(Component)))'
-        expect(first.component.displayName).toBe(expectedName)
+        expect(second.component.displayName).toBe(expectedName)
 
         const expected404Name = 'WithErrorHandling(withRouter(routeComponent(Throw404)))'
-        expect(second.component.displayName).toBe(expected404Name)
+        expect(third.component.displayName).toBe(expected404Name)
     })
 })
 

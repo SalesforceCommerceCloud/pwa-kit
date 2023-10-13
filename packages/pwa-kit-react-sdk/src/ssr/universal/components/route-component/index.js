@@ -14,6 +14,7 @@ import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 import {withLegacyGetProps} from '../../components/with-legacy-get-props'
+import Loading from '../loading'
 
 const noop = () => undefined
 
@@ -406,7 +407,11 @@ export const getRoutes = (locals) => {
     if (typeof routes === 'function') {
         _routes = routes()
     }
-    const allRoutes = [..._routes, {path: '*', component: Throw404}]
+    const allRoutes = [
+        {path: '/__storefront-preview', component: Loading},
+        ..._routes,
+        {path: '*', component: Throw404}
+    ]
     return allRoutes.map(({component, ...rest}) => {
         return {
             component: component ? routeComponent(component, true, locals) : component,
