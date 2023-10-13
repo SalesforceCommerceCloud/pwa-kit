@@ -894,6 +894,12 @@ export const RemoteServerFactory = {
         return {handler, server, app}
     },
 
+    /**
+     * Modifies the Content-Security-Policy response header to ensure that all directives required
+     * for PWA Kit to function are included.
+     * @param {express.Request} req Express request object
+     * @param {express.Response} res Express response object
+     */
     enforceContentSecurityPolicy(req, res) {
         /** CSP-compatible origin for Runtime Admin. */
         // localhost doesn't include a protocol because different browsers behave differently :\
@@ -935,6 +941,19 @@ export const RemoteServerFactory = {
             .map(([directive, values]) => [directive, ...values].join(' '))
             .join(';')
         res.setHeader('Content-Security-Policy', header)
+    },
+
+    /**
+     * Middleware for ensuring that the Content-Security-Policy response header is correctly set to
+     * allow PWA Kit to properly function. **MUST** be called after any other middleware that
+     * modifies the header, such as `helmet()`.
+     * @param {express.Request} req Express request object
+     * @param {express.Response} res Express response object
+     * @param {express.NextFunction} next Express next callback
+     */
+    cspMiddleware(req, res, next) {
+        this.enforceContentSecurityPolicy(req, res)
+        next()
     },
 
     /**
