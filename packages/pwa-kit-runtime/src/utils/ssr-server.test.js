@@ -18,7 +18,6 @@ import {
     AGENT_OPTIONS_TO_COPY,
     CachedResponse,
     escapeJSText,
-    getContentSecurityPolicy,
     getFullRequestURL,
     MetricsSender,
     outgoingRequestHook,
