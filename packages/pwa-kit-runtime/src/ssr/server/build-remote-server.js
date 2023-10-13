@@ -917,13 +917,13 @@ export const RemoteServerFactory = {
         const directives = res
             .getHeader('Content-Security-Policy')
             .split(';')
-            .reduce((obj, text) => {
-                const trimmed = text.trim()
-                if (trimmed) {
-                    const [directive, ...values] = text.split(/ +/)
-                    obj[directive] = values
+            .reduce((acc, directive) => {
+                const text = directive.trim()
+                if (text) {
+                    const [name, ...values] = text.split(/ +/)
+                    acc[name] = values
                 }
-                return obj
+                return acc
             }, {})
         // Add missing default CSP directives
         for (const [directive, defaultValues] of Object.entries(defaultDirectives)) {
