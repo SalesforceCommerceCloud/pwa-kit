@@ -11,7 +11,8 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE
+    NO_CACHE,
+    CONTENT_SECURITY_POLICY
 } from './constants'
 import {
     catchAndLog,
@@ -612,6 +613,7 @@ export const RemoteServerFactory = {
 
         // Apply the SSR middleware to any subsequent routes that we expect users
         // to add in their projects, like in any regular Express app.
+        app.use(enforceContentSecurityPolicy) // Must be AFTER prepNonProxyRequest, as they both modify setHeader.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
 
@@ -725,7 +727,6 @@ export const RemoteServerFactory = {
      *
      */
     serveServiceWorker(req, res) {
-        this.enforceContentSecurityPolicy(req, res)
         const options = req.app.options
         // We apply this cache-control to all responses (200 and 404)
         res.set(
@@ -772,7 +773,6 @@ export const RemoteServerFactory = {
     _serveStaticFile(req, res, baseDir, filePath, opts = {}) {
         const options = req.app.options
         const file = path.resolve(baseDir, filePath)
-        this.enforceContentSecurityPolicy(req, res)
         res.sendFile(file, {
             headers: {
                 [CACHE_CONTROL]: options.defaultCacheControl
@@ -802,7 +802,6 @@ export const RemoteServerFactory = {
             const stats = _require(path.join(buildDir, 'loadable-stats.json'))
             app.__renderer = serverRenderer(stats)
         }
-        this.enforceContentSecurityPolicy(req, res)
         app.__renderer(req, res, next)
     },
 
@@ -895,70 +894,6 @@ export const RemoteServerFactory = {
     },
 
     /**
-     * Modifies the Content-Security-Policy response header to ensure that all directives required
-     * for PWA Kit to function are included.
-     * @param {express.Request} req Express request object
-     * @param {express.Response} res Express response object
-     */
-    enforceContentSecurityPolicy(req, res) {
-        /** CSP-compatible origin for Runtime Admin. */
-        // localhost doesn't include a protocol because different browsers behave differently :\
-        const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
-        const defaultDirectives = {
-            'connect-src': ["'self'", 'api.cquotient.com', runtimeAdmin],
-            'frame-ancestors': [runtimeAdmin],
-            'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-            'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com', runtimeAdmin]
-        }
-        /**
-         * Map of existing directives in the Content-Security-Policy header and their associated values.
-         * @type Object.<string, string[]>
-         */
-        const directives = res
-            .getHeader('Content-Security-Policy')
-            .split(';')
-            .reduce((acc, directive) => {
-                const text = directive.trim()
-                if (text) {
-                    const [name, ...values] = text.split(/ +/)
-                    acc[name] = values
-                }
-                return acc
-            }, {})
-        // Add missing default CSP directives
-        for (const [directive, defaultValues] of Object.entries(defaultDirectives)) {
-            directives[directive] = [
-                // Wrapping with `[...new Set(array)]` removes duplicate entries
-                ...new Set([...(directives[directive] ?? []), ...defaultValues])
-            ]
-        }
-        // Always upgrade insecure requests when deployed, never upgrade on local dev server
-        if (isRemote()) {
-            directives['upgrade-insecure-requests'] = []
-        } else {
-            delete directives['upgrade-insecure-requests']
-        }
-        // Re-construct header string
-        const header = Object.entries(directives)
-            .map(([directive, values]) => [directive, ...values].join(' '))
-            .join(';')
-        res.setHeader('Content-Security-Policy', header)
-    },
-
-    /**
-     * Middleware for ensuring that the Content-Security-Policy response header is correctly set to
-     * allow PWA Kit to properly function. **MUST** be called after any other middleware that
-     * modifies the header, such as `helmet()`.
-     * @param {express.Request} req Express request object
-     * @param {express.Response} res Express response object
-     * @param {express.NextFunction} next Express next callback
-     */
-    cspMiddleware(req, res, next) {
-        this.enforceContentSecurityPolicy(req, res)
-        next()
-    },
-
-    /**
      * Create an SSR (Server-Side Rendering) Server.
      *
      * @constructor
@@ -1000,6 +935,84 @@ export const RemoteServerFactory = {
     _getRequestProcessor(req) {
         return null
     }
+}
+
+/**
+ * Patches `res.setHeader` to ensure that the Content-Security-Policy header always includes the
+ * directives required for PWA Kit to work.
+ * @param {express.Request} req Express request object
+ * @param {express.Response} res Express response object
+ * @param {express.NextFunction} next Express next callback
+ */
+export const enforceContentSecurityPolicy = (req, res, next) => {
+    /** CSP-compatible origin for Runtime Admin. */
+    // localhost doesn't include a protocol because different browsers behave differently :\
+    const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
+    /**
+     * Map of directive names/values that are required for PWA Kit to work.
+     * @type Object.<string, string[]>
+     */
+    const directives = {
+        'connect-src': ["'self'", 'api.cquotient.com', runtimeAdmin],
+        'frame-ancestors': [runtimeAdmin],
+        'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
+        'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com', runtimeAdmin]
+    }
+
+    const setHeader = res.setHeader
+    res.setHeader = (name, value) => {
+        let modifiedValue = value
+        if (name?.toLowerCase() === CONTENT_SECURITY_POLICY) {
+            // If multiple Content-Security-Policy headers are provided, then the most restrictive
+            // option is chosen for each directive. Therefore, we must modify *all* directives to
+            // ensure that our required directives will work as expected.
+            // Ref: https://w3c.github.io/webappsec-csp/#multiple-policies
+            modifiedValue = Array.isArray(value)
+                ? value.map((item) => addRequiredCsp(item, directives))
+                : addRequiredCsp(value, directives)
+        }
+        return setHeader.call(res, name, modifiedValue)
+    }
+    // Patch the current CSP or provide initial values
+    res.setHeader(CONTENT_SECURITY_POLICY, res.getHeader(CONTENT_SECURITY_POLICY) ?? '')
+    next()
+}
+
+/**
+ * Updates the given Content-Security-Policy header to include all directives required by PWA Kit.
+ * @param {string} original Original Content-Security-Policy header
+ * @returns {string} Modified Content-Security-Policy header
+ * @private
+ */
+const addRequiredCsp = (original, requiredDirectives) => {
+    const directives = original
+        .trim()
+        .split(';')
+        .reduce((acc, directive) => {
+            const text = directive.trim()
+            if (text) {
+                const [name, ...values] = text.split(/ +/)
+                acc[name] = values
+            }
+            return acc
+        }, {})
+    // Add missing required CSP directives
+    for (const [name, values] of Object.entries(requiredDirectives)) {
+        directives[name] = [
+            // Wrapping with `[...new Set(array)]` removes duplicate entries
+            ...new Set([...(directives[name] ?? []), ...values])
+        ]
+    }
+    // Always upgrade insecure requests when deployed, never upgrade on local dev server
+    if (isRemote()) {
+        directives['upgrade-insecure-requests'] = []
+    } else {
+        delete directives['upgrade-insecure-requests']
+    }
+    // Re-construct header string
+    return Object.entries(directives)
+        .map(([name, values]) => [name, ...values].join(' '))
+        .join(';')
 }
 
 /**
