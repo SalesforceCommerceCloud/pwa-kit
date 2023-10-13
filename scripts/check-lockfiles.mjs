@@ -8,10 +8,10 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
-const LOCKFILE_VERSION_TARGET = 2
+const LOCKFILE_VERSION_TARGET = 3
 const guidance =
     'To regenerate the lockfiles with the correct lockfile version, please run' +
-    ' `rm -rf package-lock.json node_modules/` in each impacted directory, and then use npm 7 or 8 to' +
+    ' `rm -rf package-lock.json node_modules/` in each impacted directory, and then use npm 9 to' +
     ' run `npm install` in the monorepo root.'
 
 // __filename isn't available directly in ESM files

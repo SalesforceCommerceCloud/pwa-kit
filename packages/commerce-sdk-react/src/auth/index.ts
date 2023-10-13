@@ -119,6 +119,10 @@ const DATA_MAP: AuthDataMap = {
             store.delete('cc-nx-g')
         }
     },
+    refresh_token_expires_in: {
+        storageType: 'local',
+        key: 'refresh_token_expires_in'
+    },
     // For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
     // So we maintain a copy of the refersh_tokens in the local storage which is compared to the actual refresh_token stored in cookie storage.
     // If the key or value of the refresh_token in local storage is different from the one in cookie storage, this indicates a change in customer auth state and we invalidate the access_token in PWA Kit.
@@ -249,7 +253,8 @@ class Auth {
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
             usid: this.get('usid'),
-            customer_type: this.get('customer_type') as CustomerType
+            customer_type: this.get('customer_type') as CustomerType,
+            refresh_token_expires_in: this.get('refresh_token_expires_in')
         }
     }
 
@@ -450,15 +455,15 @@ class Auth {
      */
     async register(body: ShopperCustomersTypes.CustomerRegistration) {
         const {
-            customer: {email},
+            customer: {login},
             password
         } = body
 
-        // email is optional field from isomorphic library
+        // login is optional field from isomorphic library
         // type CustomerRegistration
         // here we had to guard it to avoid ts error
-        if (!email) {
-            throw new Error('Customer registration is missing email address.')
+        if (!login) {
+            throw new Error('Customer registration is missing login field.')
         }
 
         const res = await this.shopperCustomersClient.registerCustomer({
@@ -467,7 +472,7 @@ class Auth {
             },
             body
         })
-        await this.loginRegisteredUserB2C({username: email, password})
+        await this.loginRegisteredUserB2C({username: login, password})
         return res
     }
 
