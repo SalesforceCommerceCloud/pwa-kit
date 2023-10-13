@@ -17,10 +17,9 @@ import {getRoutes, routeComponent} from '../universal/components/route-component
 import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
 import PropTypes from 'prop-types'
-import {detectStorefrontPreview} from '../universal/components/storefront-preview/utils'
 
 /* istanbul ignore next */
-export const registerServiceWorker = (url) => {
+export const registerServiceWorker = async (url) => {
     return Promise.resolve().then(() => {
         if ('serviceWorker' in navigator) {
             return Promise.resolve()
@@ -116,14 +115,11 @@ export const start = async () => {
         WrappedApp: routeComponent(App, false, locals)
     }
 
-    await loadableReady()
-
-    if (detectStorefrontPreview()) {
-        window.__HYDRATING__ = false
-        ReactDOM.render(<OuterApp {...props} />, rootEl)
-    } else {
-        ReactDOM.hydrate(<OuterApp {...props} />, rootEl, () => {
-            window.__HYDRATING__ = false
+    return Promise.resolve()
+        .then(() => new Promise((resolve) => loadableReady(resolve)))
+        .then(() => {
+            ReactDOM.hydrate(<OuterApp {...props} />, rootEl, () => {
+                window.__HYDRATING__ = false
+            })
         })
-    }
 }
