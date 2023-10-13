@@ -66,4 +66,29 @@ describe('Storefront Preview Component', function () {
         mount(<StorefrontPreview getToken={() => 'my-token'} />)
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
     })
+
+    test('getSearchParamsToAppend is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
+        detectStorefrontPreview.mockReturnValue(true)
+
+        const searchParamsToAppend = () => {
+            return [
+                {
+                    name: 'vse',
+                    value: 'my-custom-vse-{{effectiveDateTimeUnix}}.staging.bigcontent.io'
+                },
+                {
+                    name: 'vse-timestamp',
+                    value: '{{effectiveDateTimeUnix}}'
+                }
+            ]
+        }
+
+        mount(
+            <StorefrontPreview
+                getToken={() => 'my-token'}
+                getSearchParamsToAppend={searchParamsToAppend}
+            />
+        )
+        expect(window.STOREFRONT_PREVIEW.getSearchParamsToAppend).toBeDefined()
+    })
 })
