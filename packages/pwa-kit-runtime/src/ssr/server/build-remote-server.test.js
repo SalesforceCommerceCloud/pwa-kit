@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {enforceContentSecurityPolicy, once} from './build-remote-server'
+import {enforceSecurityHeaders, once} from './build-remote-server'
 import {CONTENT_SECURITY_POLICY as CSP} from './constants'
 
 describe('the once function', () => {
@@ -44,7 +44,7 @@ describe('Content-Security-Policy enforcement', () => {
     afterEach(() => delete process.env.AWS_LAMBDA_FUNCTION_NAME)
 
     test('adds required directives for development', () => {
-        enforceContentSecurityPolicy({}, res, () => {})
+        enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         expectDirectives([
             "connect-src 'self' api.cquotient.com localhost:*",
@@ -55,7 +55,7 @@ describe('Content-Security-Policy enforcement', () => {
     })
     test('adds required directives for production', () => {
         process.env.AWS_LAMBDA_FUNCTION_NAME = 'testEnforceCSP'
-        enforceContentSecurityPolicy({}, res, () => {})
+        enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         expectDirectives([
             "connect-src 'self' api.cquotient.com https://runtime.commercecloud.com",
@@ -66,7 +66,7 @@ describe('Content-Security-Policy enforcement', () => {
         ])
     })
     test('merges with existing CSP directives', () => {
-        enforceContentSecurityPolicy({}, res, () => {})
+        enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, "connect-src test:* ; script-src 'unsafe-eval' test:*")
         expectDirectives([
             "connect-src test:* 'self' api.cquotient.com localhost:*",
@@ -74,27 +74,27 @@ describe('Content-Security-Policy enforcement', () => {
         ])
     })
     test('allows other CSP directives', () => {
-        enforceContentSecurityPolicy({}, res, () => {})
+        enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, 'fake-directive test:*')
         expectDirectives(['fake-directive test:*'])
     })
     test('enforces upgrade-insecure-requests disabled on development', () => {
-        enforceContentSecurityPolicy({}, res, () => {})
+        enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, 'upgrade-insecure-requests')
         expect(res.getHeader(CSP)).not.toContain('upgrade-insecure-requests')
     })
     test('enforces upgrade-insecure-requests enabled on production', () => {
         process.env.AWS_LAMBDA_FUNCTION_NAME = 'testEnforceCSP'
-        enforceContentSecurityPolicy({}, res, () => {})
+        enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, 'connect-src localhost:*')
         expectDirectives(['upgrade-insecure-requests'])
     })
     test('adds directives even if setHeader is never called', () => {
-        enforceContentSecurityPolicy({}, res, () => {})
+        enforceSecurityHeaders({}, res, () => {})
         expectDirectives(["img-src 'self' *.commercecloud.salesforce.com data:"])
     })
     test('handles multiple CSP headers', () => {
-        enforceContentSecurityPolicy({}, res, () => {})
+        enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, ['connect-src first.header', 'script-src second.header'])
         const headers = res.getHeader(CSP)
         expect(headers).toHaveLength(2)
@@ -104,7 +104,7 @@ describe('Content-Security-Policy enforcement', () => {
     test('does not modify unrelated headers', () => {
         const header = 'Contentious-Secret-Police'
         const value = 'connect-src unmodified fake directive'
-        enforceContentSecurityPolicy({}, res, () => {})
+        enforceSecurityHeaders({}, res, () => {})
         res.setHeader(header, value)
         expect(res.getHeader(header)).toBe(value)
     })

@@ -12,7 +12,8 @@ import {
     SET_COOKIE,
     CACHE_CONTROL,
     NO_CACHE,
-    CONTENT_SECURITY_POLICY
+    CONTENT_SECURITY_POLICY,
+    STRICT_TRANSPORT_SECURITY
 } from './constants'
 import {
     catchAndLog,
@@ -613,7 +614,7 @@ export const RemoteServerFactory = {
 
         // Apply the SSR middleware to any subsequent routes that we expect users
         // to add in their projects, like in any regular Express app.
-        app.use(enforceContentSecurityPolicy) // Must be AFTER prepNonProxyRequest, as they both modify setHeader.
+        app.use(enforceSecurityHeaders) // Must be AFTER prepNonProxyRequest, as they both modify setHeader.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
 
@@ -944,7 +945,7 @@ export const RemoteServerFactory = {
  * @param {express.Response} res Express response object
  * @param {express.NextFunction} next Express next callback
  */
-export const enforceContentSecurityPolicy = (req, res, next) => {
+export const enforceSecurityHeaders = (req, res, next) => {
     /** CSP-compatible origin for Runtime Admin. */
     // localhost doesn't include a protocol because different browsers behave differently :\
     const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
@@ -962,19 +963,34 @@ export const enforceContentSecurityPolicy = (req, res, next) => {
     const setHeader = res.setHeader
     res.setHeader = (name, value) => {
         let modifiedValue = value
-        if (name?.toLowerCase() === CONTENT_SECURITY_POLICY) {
-            // If multiple Content-Security-Policy headers are provided, then the most restrictive
-            // option is chosen for each directive. Therefore, we must modify *all* directives to
-            // ensure that our required directives will work as expected.
-            // Ref: https://w3c.github.io/webappsec-csp/#multiple-policies
-            modifiedValue = Array.isArray(value)
-                ? value.map((item) => addRequiredDirectives(item, directives))
-                : addRequiredDirectives(value, directives)
+        switch (name?.toLowerCase()) {
+            case CONTENT_SECURITY_POLICY: {
+                // If multiple Content-Security-Policy headers are provided, then the most restrictive
+                // option is chosen for each directive. Therefore, we must modify *all* directives to
+                // ensure that our required directives will work as expected.
+                // Ref: https://w3c.github.io/webappsec-csp/#multiple-policies
+                modifiedValue = Array.isArray(value)
+                    ? value.map((item) => addRequiredDirectives(item, directives))
+                    : addRequiredDirectives(value, directives)
+                break
+            }
+            case STRICT_TRANSPORT_SECURITY: {
+                // Block setting this header on local development server - it will break things!
+                if (!isRemote()) return
+                break
+            }
+            default: {
+                break
+            }
         }
         return setHeader.call(res, name, modifiedValue)
     }
-    // Patch the current CSP or provide initial values
+    // Provide an initial CSP (or patch the existing header)
     res.setHeader(CONTENT_SECURITY_POLICY, res.getHeader(CONTENT_SECURITY_POLICY) ?? '')
+    // Provide an initial value for HSTS, if not already set - use default from `helmet`
+    if (!res.hasHeader(STRICT_TRANSPORT_SECURITY)) {
+        res.setHeader(STRICT_TRANSPORT_SECURITY, 'max-age=15552000; includeSubDomains')
+    }
     next()
 }
 

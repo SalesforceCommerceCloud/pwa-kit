@@ -9,9 +9,7 @@
 
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
-import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import helmet from 'helmet'
 
 const options = {
     // The build directory (an absolute path)
@@ -35,9 +33,6 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    // Set HTTP security headers
-    app.use(helmet({hsts: isRemote()}))
-
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
         // This endpoint does nothing and is not expected to change
