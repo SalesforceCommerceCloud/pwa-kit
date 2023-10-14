@@ -38,7 +38,7 @@
     "@babel/register": "^7.21.0",
     "@babel/runtime": "^7.21.0",
     "@babel/runtime-corejs2": "^7.21.0",
-    "@babel/traverse": "^7.21.3",
+    "@babel/traverse": "^7.23.2",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",
     "babel-jest": "^26.6.3",
