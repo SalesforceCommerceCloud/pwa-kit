@@ -12,9 +12,9 @@ module.exports = {
     coverageThreshold: {
         global: {
             branches: 67,
-            functions: 67,
-            lines: 70,
-            statements: 70
+            functions: 75,
+            lines: 75,
+            statements: 75
         }
     },
     testPathIgnorePatterns: ['bin/*', 'dist/*', 'node_modules/*', 'coverage/*'],

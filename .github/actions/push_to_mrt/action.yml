@@ -13,6 +13,6 @@ runs:
         project="scaffold-pwa"
         build="build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
         if [[ ${{ inputs.TARGET }} ]]; then
-          npm run push -- -s $project --message "$build" --target ${{ inputs.TARGET }}
+          npm run push -- -s $project --message "$build" --target ${{ inputs.TARGET }} ${{ inputs.FLAGS }}
         fi
       shell: bash

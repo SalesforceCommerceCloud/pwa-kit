@@ -65,6 +65,9 @@ const validPreset = (preset) => {
 }
 
 const validProjectName = (s) => {
+    if (s.length > PROJECT_ID_MAX_LENGTH) {
+        return `Maximum length is ${PROJECT_ID_MAX_LENGTH} characters.`
+    }
     const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
     return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
 }
