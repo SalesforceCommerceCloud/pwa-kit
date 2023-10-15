@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2021, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +9,6 @@
 
 const path = require('path')
 const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
-const {isRemote} = require('@salesforce/pwa-kit-runtime/utils/ssr-server')
 const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
 const helmet = require('helmet')
 
@@ -38,23 +37,23 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
     app.use(
         helmet({
+            // pwa-kit-runtime ensures that the Content-Security-Policy header always contains the
+            // directives required for PWA Kit to function. Add custom directives here.
             contentSecurityPolicy: {
-                useDefaults: true,
                 directives: {
-                    'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                    'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
-                    'connect-src': ["'self'", 'api.cquotient.com'],
-
-                    // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null
+                    scriptSrc: [
+                        'storage.googleapis.com' // used by the service worker in /worker/main.js
+                    ]
                 }
-            },
-            hsts: isRemote()
+            }
         })
     )
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
+        // This endpoint does nothing and is not expected to change
+        // Thus we cache it for a year to maximize performance
+        res.set('Cache-Control', `max-age=31536000`)
         res.send()
     })
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
