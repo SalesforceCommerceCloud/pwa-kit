@@ -10,6 +10,7 @@
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import helmet from 'helmet'
 
 const options = {
     // The build directory (an absolute path)
@@ -33,6 +34,21 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
+    // Set HTTP security headers
+    app.use(
+        helmet({
+            // pwa-kit-runtime ensures that the Content-Security-Policy header always contains the
+            // directives required for PWA Kit to function. Add custom directives here.
+            contentSecurityPolicy: {
+                directives: {
+                    scriptSrc: [
+                        'storage.googleapis.com' // used by the service worker in /worker/main.js
+                    ]
+                }
+            }
+        })
+    )
+
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
         // This endpoint does nothing and is not expected to change

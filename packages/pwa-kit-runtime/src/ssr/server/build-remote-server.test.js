@@ -51,7 +51,7 @@ describe('Content-Security-Policy enforcement', () => {
             "connect-src 'self' api.cquotient.com localhost:*",
             'frame-ancestors localhost:*',
             "img-src 'self' *.commercecloud.salesforce.com data:",
-            "script-src 'self' 'unsafe-eval' storage.googleapis.com localhost:*"
+            "script-src 'self' 'unsafe-eval' localhost:*"
         ])
     })
     test('adds required directives for production', () => {
@@ -62,7 +62,7 @@ describe('Content-Security-Policy enforcement', () => {
             "connect-src 'self' api.cquotient.com https://runtime.commercecloud.com",
             'frame-ancestors https://runtime.commercecloud.com',
             "img-src 'self' *.commercecloud.salesforce.com data:",
-            "script-src 'self' 'unsafe-eval' storage.googleapis.com https://runtime.commercecloud.com",
+            "script-src 'self' 'unsafe-eval' https://runtime.commercecloud.com",
             'upgrade-insecure-requests'
         ])
     })
@@ -71,7 +71,7 @@ describe('Content-Security-Policy enforcement', () => {
         res.setHeader(CSP, "connect-src test:* ; script-src 'unsafe-eval' test:*")
         expectDirectives([
             "connect-src test:* 'self' api.cquotient.com localhost:*",
-            "script-src 'unsafe-eval' test:* 'self' storage.googleapis.com localhost:*"
+            "script-src 'unsafe-eval' test:* 'self' localhost:*"
         ])
     })
     test('allows other CSP directives', () => {

@@ -957,7 +957,7 @@ export const enforceSecurityHeaders = (req, res, next) => {
         'connect-src': ["'self'", 'api.cquotient.com', runtimeAdmin],
         'frame-ancestors': [runtimeAdmin],
         'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-        'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com', runtimeAdmin]
+        'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin]
     }
 
     const setHeader = res.setHeader
