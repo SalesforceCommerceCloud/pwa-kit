@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {enforceSecurityHeaders, once} from './build-remote-server'
-import {CONTENT_SECURITY_POLICY as CSP} from './constants'
+import {CONTENT_SECURITY_POLICY as CSP, STRICT_TRANSPORT_SECURITY} from './constants'
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
@@ -23,6 +23,10 @@ describe('the once function', () => {
 describe('Content-Security-Policy enforcement', () => {
     let res
 
+    /** Sets the correct values for `isRemote()` to return true */
+    const mockProduction = () => {
+        process.env.AWS_LAMBDA_FUNCTION_NAME = 'testEnforceSecurityHeaders'
+    }
     /**
      * Helper to make expected CSP more readable. Asserts that the actual CSP header contains each
      * of the expected directives.
@@ -55,7 +59,7 @@ describe('Content-Security-Policy enforcement', () => {
         ])
     })
     test('adds required directives for production', () => {
-        process.env.AWS_LAMBDA_FUNCTION_NAME = 'testEnforceCSP'
+        mockProduction()
         enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         expectDirectives([
@@ -85,7 +89,7 @@ describe('Content-Security-Policy enforcement', () => {
         expect(res.getHeader(CSP)).not.toContain('upgrade-insecure-requests')
     })
     test('enforces upgrade-insecure-requests enabled on production', () => {
-        process.env.AWS_LAMBDA_FUNCTION_NAME = 'testEnforceCSP'
+        mockProduction()
         enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, 'connect-src localhost:*')
         expectDirectives(['upgrade-insecure-requests'])
@@ -110,12 +114,19 @@ describe('Content-Security-Policy enforcement', () => {
         expect(res.getHeader(header)).toBe(value)
     })
     test('blocks Strict-Transport-Security header in development', () => {
-        // TODO
+        enforceSecurityHeaders({}, res, () => {})
+        res.setHeader(STRICT_TRANSPORT_SECURITY, 'max-age=12345')
+        expect(res.hasHeader(STRICT_TRANSPORT_SECURITY)).toBe(false)
     })
     test('allows Strict-Transport-Security header in production', () => {
-        // TODO
+        mockProduction()
+        enforceSecurityHeaders({}, res, () => {})
+        res.setHeader(STRICT_TRANSPORT_SECURITY, 'max-age=12345')
+        expect(res.getHeader(STRICT_TRANSPORT_SECURITY)).toBe('max-age=12345')
     })
     test('provides default value for Strict-Transport-Security header in production', () => {
-        // TODO
+        mockProduction()
+        enforceSecurityHeaders({}, res, () => {})
+        expect(res.getHeader(STRICT_TRANSPORT_SECURITY)).toBe('max-age=15552000; includeSubDomains')
     })
 })
