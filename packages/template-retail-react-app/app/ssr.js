@@ -40,9 +40,11 @@ const {handler} = runtime.createHandler(options, (app) => {
             // pwa-kit-runtime ensures that the Content-Security-Policy header always contains the
             // directives required for PWA Kit to function. Add custom directives here.
             contentSecurityPolicy: {
+                useDefaults: true,
                 directives: {
                     scriptSrc: [
-                        'storage.googleapis.com' // used by the service worker in /worker/main.js
+                        // used by the service worker in /worker/main.js
+                        'storage.googleapis.com'
                     ]
                 }
             }
