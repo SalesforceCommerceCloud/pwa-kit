@@ -13,6 +13,11 @@ import {IFRAME_HOST_ALLOW_LIST} from './constant'
  */
 export const onClient = (): boolean => typeof window !== 'undefined'
 
+/**
+ * Gets the value to use for the `sameSite` cookie attribute.
+ * @returns `undefined` if running on the server, `"none"` if running as an iframe on a trusted site
+ * (i.e. Storefront Preview), otherwise `"Lax"`
+ */
 export const getCookieSameSiteAttribute = () => {
     if (!onClient()) return
     // document.location?.ancestorOrigins?.[0] will provide the parent host url, but it only works for Chrome and Safari.
@@ -24,6 +29,25 @@ export const getCookieSameSiteAttribute = () => {
     const isLocalHost = window.location.hostname === 'localhost'
 
     return !isLocalHost && isParentSiteTrusted ? 'none' : 'Lax'
+}
+
+/**
+ * Gets the default cookie attributes. Sets the secure flag unless running on localhost in Safari.
+ * Sets the sameSite attribute to `"none"` when running in a trusted iframe.
+ */
+export const getDefaultCookieAttributes = (): CookieAttributes => {
+    return {
+        // Deployed sites will always be HTTPS, but the local dev server is served over HTTP.
+        // Ideally, this would be `secure: true`, because Chrome and Firefox both treat
+        // localhost as a Secure context. But Safari doesn't, so here we are.
+        secure: !onClient() || window.location.protocol === 'https:',
+        // By default, Chrome does not allow cookies to be sent/read when the code is loaded in
+        // an iframe (e.g storefront preview). Setting sameSite to "none" loosens that
+        // restriction, but we only want to do so when when the iframe parent is in our allow
+        // list. Outside of iframe, we want to keep most browser default value (Chrome or Firefox uses Lax)
+        // https://web.dev/samesite-cookie-recipes/
+        sameSite: getCookieSameSiteAttribute()
+    }
 }
 
 /**
@@ -43,7 +67,7 @@ export function detectLocalStorageAvailable(): boolean {
 /**
  * Determines whether cookies are available by trying to set a test value.
  */
-export function detectCookiesAvailable() {
+export function detectCookiesAvailable(options?: CookieAttributes) {
     if (typeof document === 'undefined') return false
     if (!navigator.cookieEnabled) return false
     // Even if `cookieEnabled` is true, cookies may not work. A site may allow first-party, but not
@@ -51,15 +75,14 @@ export function detectCookiesAvailable() {
     // cookies are available is to try to set one
     const testKey = 'commerce-sdk-react-temp'
     const testValue = '1'
-    const options: CookieAttributes = {
-        // These options MUST match the logic in ./auth/storage/cookie for this test to be reliable
-        secure: !onClient() || window.location.protocol === 'https:',
-        sameSite: getCookieSameSiteAttribute()
+    const netOptions = {
+        ...getDefaultCookieAttributes(),
+        ...options
     }
     try {
-        Cookies.set(testKey, testValue, options)
+        Cookies.set(testKey, testValue, netOptions)
         const success = Cookies.get(testKey) === testValue
-        Cookies.remove(testKey, options)
+        Cookies.remove(testKey, netOptions)
         return success
     } catch {
         return false
