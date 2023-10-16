@@ -8,19 +8,23 @@ import React, {useEffect} from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useQueryClient} from '@tanstack/react-query'
 
+const LOADING_SPINNER_DURATION = 1000
+
 const Loading = () => {
     const history = useHistory()
     const location = useLocation()
 
-    // TODO: can we assume react-query is in use?
     const queryClient = useQueryClient()
-    queryClient.invalidateQueries()
 
     useEffect(() => {
+        queryClient.invalidateQueries()
+
         const searchParams = new URLSearchParams(location.search)
         const referrer = searchParams.get('referrer')
 
-        setTimeout(() => history.replace(referrer), 1000)
+        if (referrer) {
+            setTimeout(() => history.replace(referrer), LOADING_SPINNER_DURATION)
+        }
     }, [])
 
     return (
