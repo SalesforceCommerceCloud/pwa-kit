@@ -6,17 +6,16 @@
  */
 /* global __webpack_require__ */
 import React, {useRef} from 'react'
-import {createRoot, hydrateRoot} from 'react-dom/client'
+import {hydrateRoot} from 'react-dom/client'
 import {BrowserRouter as Router} from 'react-router-dom'
-import {loadableReady} from '@loadable/component'
-import PropTypes from 'prop-types'
-
-import {getAppConfig} from '../universal/compatibility'
-import App from '../universal/components/_app'
-import {getRoutes, routeComponent} from '../universal/components/route-component'
-import Switch from '../universal/components/switch'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
+import App from '../universal/components/_app'
+import {getAppConfig} from '../universal/compatibility'
+import Switch from '../universal/components/switch'
+import {getRoutes, routeComponent} from '../universal/components/route-component'
+import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
+import PropTypes from 'prop-types'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -73,13 +72,11 @@ OuterApp.propTypes = {
     locals: PropTypes.object,
     onHydrate: PropTypes.func
 }
-
 /* istanbul ignore next */
-export const start = async () => {
+export const start = () => {
     const AppConfig = getAppConfig()
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)
-    const queryParams = new URLSearchParams(window.location.search)
 
     // Set all globals sent from the server on the window object.
     Object.entries(data).forEach(([key, value]) => {
@@ -116,22 +113,17 @@ export const start = async () => {
         WrappedApp: routeComponent(App, false, locals)
     }
 
-    await loadableReady()
-
-    // TODO: remove
-    if (queryParams.has('__client_only')) {
-        window.__HYDRATING__ = false
-        const root = createRoot(rootEl)
-        root.render(<OuterApp {...props} />)
-    } else {
-        hydrateRoot(
-            rootEl,
-            <OuterApp
-                {...props}
-                onHydrate={() => {
-                    window.__HYDRATING__ = false
-                }}
-            />
-        )
-    }
+    return Promise.resolve()
+        .then(() => new Promise((resolve) => loadableReady(resolve)))
+        .then(() => {
+            hydrateRoot(
+                rootEl,
+                <OuterApp
+                    {...props}
+                    onHydrate={() => {
+                        window.__HYDRATING__ = false
+                    }}
+                />
+            )
+        })
 }
