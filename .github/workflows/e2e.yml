@@ -103,14 +103,7 @@ jobs:
         with:
           CWD: "../generated-projects/retail-app-no-ext"
           TARGET: e2e-tests-pwa-kit
-
-      - name: Wait for MRT Deploy to complete
-        uses: "./.github/actions/wait_for_mrt_deploy"
-        with:
-          TARGET: e2e-tests-pwa-kit
-          MRT_API_KEY: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-          VERSION: ${{ github.sha }}
-          PROJECT: scaffold-pwa
+          FLAGS: --wait
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
@@ -182,14 +175,7 @@ jobs:
         with:
           CWD: "../generated-projects/retail-app-ext"
           TARGET: e2e-tests-pwa-kit
-
-      - name: Wait for MRT Deploy to complete
-        uses: "./.github/actions/wait_for_mrt_deploy"
-        with:
-          TARGET: e2e-tests-pwa-kit
-          MRT_API_KEY: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-          VERSION: ${{ github.sha }}
-          PROJECT: scaffold-pwa
+          FLAGS: --wait
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps

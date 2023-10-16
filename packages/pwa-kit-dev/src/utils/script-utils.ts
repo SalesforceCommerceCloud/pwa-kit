@@ -9,9 +9,18 @@ import path from 'path'
 import archiver, {EntryData} from 'archiver'
 import {default as _fetch, Response} from 'node-fetch'
 import {URL} from 'url'
-import {readFile, stat, mkdtemp, rm, readdir} from 'fs/promises'
-import {createWriteStream, Stats, Dirent, existsSync} from 'fs'
-import {readJson} from 'fs-extra'
+import {
+    createWriteStream,
+    existsSync,
+    readFile,
+    readJson,
+    stat,
+    mkdtemp,
+    rm,
+    readdir,
+    Stats,
+    Dirent
+} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
@@ -128,8 +137,22 @@ interface DependencyTree {
  *
  * @returns A DependencyTree with the versions of all dependencies
  */
-export const getProjectDependencyTree = (): DependencyTree => {
-    return JSON.parse(execSync(`npm ls --all --json`, {encoding: 'utf-8'})) as DependencyTree
+export const getProjectDependencyTree = async (): Promise<DependencyTree | null> => {
+    // When executing this inside template-retail-react-app, the output of `npm ls` exceeds the
+    // max buffer size that child_process can handle, so we can't use that directly. The max string
+    // size is much larger, so writing/reading a temp file is a functional workaround.
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
+    const destination = path.join(tmpDir, 'npm-ls.json')
+    try {
+        execSync(`npm ls --all --json > ${destination}`)
+        return await readJson(destination, 'utf8')
+    } catch (_) {
+        // Don't prevent bundles from being pushed if this step fails
+        return null
+    } finally {
+        // Remove temp file asynchronously after returning; ignore failures
+        void rm(destination).catch(() => {})
+    }
 }
 
 /**
@@ -279,6 +302,61 @@ export class CloudAPIClient {
         const data = await res.json()
         return data['token']
     }
+
+    /** Polls MRT for deployment status every 30 seconds. */
+    async waitForDeploy(project: string, environment: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            /** Milliseconds to wait between checks. */
+            const delay = 30_000
+            /** Check the deployment status to see whether it has finished. */
+            const check = async (): Promise<void> => {
+                const url = new URL(
+                    `/api/projects/${project}/target/${environment}`,
+                    this.opts.origin
+                )
+                const res = await this.opts.fetch(url, {headers: await this.getHeaders()})
+
+                if (!res.ok) {
+                    const text = await res.text()
+                    let json
+                    try {
+                        if (text) json = JSON.parse(text)
+                    } catch (_) {} // eslint-disable-line no-empty
+                    const message = json?.detail ?? text
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                    const detail = message ? `: ${message}` : ''
+                    throw new Error(`${res.status} ${res.statusText}${detail}`)
+                }
+
+                const data: {state: string} = await res.json()
+                if (typeof data.state !== 'string') {
+                    return reject(
+                        new Error('An unknown state occurred when polling the deployment.')
+                    )
+                }
+                switch (data.state) {
+                    case 'CREATE_IN_PROGRESS':
+                    case 'PUBLISH_IN_PROGRESS':
+                        // In progress - check again after the next delay
+                        // `check` is async, so we need to use .catch to properly handle errors
+                        setTimeout(() => void check().catch(reject), delay)
+                        return
+                    case 'CREATE_FAILED':
+                    case 'PUBLISH_FAILED':
+                        // Failed - reject with failure
+                        return reject(new Error('Deployment failed.'))
+                    case 'ACTIVE':
+                        // Success!
+                        return resolve()
+                    default:
+                        // Unknown - reject with confusion
+                        return reject(new Error(`Unknown deployment state "${data.state}".`))
+                }
+            }
+            // Start checking after the first delay!
+            setTimeout(() => void check().catch(reject), delay)
+        })
+    }
 }
 
 export const defaultMessage = (gitInstance: typeof git = git): string => {
@@ -377,12 +455,16 @@ export const createBundle = async ({
                         existsSync(path.join(extendsTemplate, item))
                     )
                 }
+                const dependencyTree = await getProjectDependencyTree()
+                // If we can't load the dependency tree, pretend that it's empty.
+                // TODO: Should we report an error?
+                const pwaKitDeps = dependencyTree ? getPwaKitDependencies(dependencyTree) : {}
 
                 bundle_metadata = {
                     dependencies: {
                         ...dependencies,
                         ...devDependencies,
-                        ...getPwaKitDependencies(getProjectDependencyTree())
+                        ...(pwaKitDeps ?? {})
                     },
                     cc_overrides: cc_overrides
                 }
