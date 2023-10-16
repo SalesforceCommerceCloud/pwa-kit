@@ -22,7 +22,7 @@ import {getDisplayPrice} from '../utils/product-utils'
  */
 function useProductPricing(product, quantity = 1) {
     let qty = Number(quantity)
-    if (qty < 1 || isNaN(qty) || !Number.isInteger(qty)) {
+    if (qty < 1 || isNaN(qty)) {
         qty = 1
     }
     return useMemo(() => {
