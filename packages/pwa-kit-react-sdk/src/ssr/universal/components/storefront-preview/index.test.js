@@ -67,10 +67,10 @@ describe('Storefront Preview Component', function () {
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
     })
 
-    test('getSearchParamsToAppend is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
+    test('getAdditionalSearchParams is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
         detectStorefrontPreview.mockReturnValue(true)
 
-        const searchParamsToAppend = () => {
+        const searchParamsToAdd = () => {
             return [
                 {
                     name: 'vse',
@@ -86,9 +86,9 @@ describe('Storefront Preview Component', function () {
         mount(
             <StorefrontPreview
                 getToken={() => 'my-token'}
-                getSearchParamsToAppend={searchParamsToAppend}
+                getAdditionalSearchParams={searchParamsToAdd}
             />
         )
-        expect(window.STOREFRONT_PREVIEW.getSearchParamsToAppend).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.getAdditionalSearchParams).toBeDefined()
     })
 })
