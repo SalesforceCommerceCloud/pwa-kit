@@ -10,11 +10,11 @@ import {withRouter} from 'react-router-dom'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
 import Throw404 from '../../components/throw-404'
-import Loading from '../../components/loading'
 import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 import {withLegacyGetProps} from '../../components/with-legacy-get-props'
+import NavigateToReferrer from '../navigate-to-referrer'
 
 const noop = () => undefined
 
@@ -408,7 +408,7 @@ export const getRoutes = (locals) => {
         _routes = routes()
     }
     const allRoutes = [
-        {path: '/__storefront-preview', component: Loading},
+        {path: '/__storefront-preview/refetch-data', component: NavigateToReferrer},
         ..._routes,
         {path: '*', component: Throw404}
     ]

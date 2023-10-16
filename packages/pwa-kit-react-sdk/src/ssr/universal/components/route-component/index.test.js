@@ -291,8 +291,9 @@ describe('getRoutes', () => {
         expect(mappedRoutes).toHaveLength(3)
         const [first, second, third] = mappedRoutes
 
-        const expectedLoadingName = 'WithErrorHandling(withRouter(routeComponent(Loading)))'
-        expect(first.component.displayName).toBe(expectedLoadingName)
+        const expectedNavigateName =
+            'WithErrorHandling(withRouter(routeComponent(NavigateToReferrer)))'
+        expect(first.component.displayName).toBe(expectedNavigateName)
 
         const expectedName = 'WithErrorHandling(withRouter(routeComponent(Component)))'
         expect(second.component.displayName).toBe(expectedName)

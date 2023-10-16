@@ -4,29 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
-import {useHistory, useLocation} from 'react-router-dom'
-import {useQueryClient} from '@tanstack/react-query'
+import React from 'react'
 
-const LOADING_SPINNER_DURATION = 1000
-
-const Loading = () => {
-    const history = useHistory()
-    const location = useLocation()
-
-    const queryClient = useQueryClient()
-
-    useEffect(() => {
-        queryClient.invalidateQueries()
-
-        const searchParams = new URLSearchParams(location.search)
-        const referrer = searchParams.get('referrer')
-
-        if (referrer) {
-            setTimeout(() => history.replace(referrer), LOADING_SPINNER_DURATION)
-        }
-    }, [])
-
+const LoadingSpinner = () => {
+    // TODO: replace all chakra-related references
     return (
         <>
             <style>
@@ -82,6 +63,6 @@ const Loading = () => {
         </>
     )
 }
-Loading.displayName = 'Loading'
+LoadingSpinner.displayName = 'LoadingSpinner'
 
-export default Loading
+export default LoadingSpinner
