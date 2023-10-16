@@ -7,41 +7,39 @@
 import React from 'react'
 
 const LoadingSpinner = () => {
-    // TODO: replace all chakra-related references
     return (
         <>
             <style>
                 {`
-                .css-1iroqzg {
-                    z-index: var(--chakra-zIndices-overlay);
+                .pwa-kit-loading-spinner-outer {
+                    z-index: 1300;
                     position: absolute;
                     top: 0px;
                     left: 0px;
                     right: 0px;
                     bottom: 0px;
-                    background: var(--chakra-colors-whiteAlpha-800);
+                    background: rgba(255, 255, 255, 0.80);
                 }
-                .css-cvzky6 {
+                .pwa-kit-loading-spinner-wrapper {
                     display: inline-block;
                     border-color: currentColor;
                     border-style: solid;
                     border-radius: 99999px;
                     border-width: 4px;
-                    border-bottom-color: var(--chakra-colors-gray-200);
-                    border-left-color: var(--chakra-colors-gray-200);
+                    border-bottom-color: #C9C9C9;
+                    border-left-color: #C9C9C9;
                     -webkit-animation: animation-b7n1on 0.65s linear infinite;
                     animation: animation-b7n1on 0.65s linear infinite;
-                    width: var(--spinner-size);
-                    height: var(--spinner-size);
-                    --spinner-size: var(--chakra-sizes-12);
+                    width: 3rem;
+                    height: 3rem;
                     position: absolute;
                     top: 50%;
                     left: 50%;
                     margin-left: -1.5em;
                     margin-top: -1.5em;
-                    color: var(--chakra-colors-blue-600);
+                    color: #0176D3;
                 }
-                .css-8b45rq {
+                .pwa-kit-loading-spinner-inner {
                     border: 0px;
                     clip: rect(0, 0, 0, 0);
                     width: 1px;
@@ -55,9 +53,9 @@ const LoadingSpinner = () => {
                 `}
             </style>
 
-            <div className="css-1iroqzg">
-                <div className="chakra-spinner css-cvzky6" data-testid="loading">
-                    <span className="css-8b45rq">Loading...</span>
+            <div className="pwa-kit-loading-spinner-outer">
+                <div className="pwa-kit-loading-spinner-wrapper">
+                    <span className="pwa-kit-loading-spinner-inner">Loading...</span>
                 </div>
             </div>
         </>
