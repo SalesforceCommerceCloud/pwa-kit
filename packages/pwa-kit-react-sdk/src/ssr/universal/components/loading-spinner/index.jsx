@@ -53,7 +53,7 @@ const LoadingSpinner = () => {
                 `}
             </style>
 
-            <div className="pwa-kit-loading-spinner-outer">
+            <div className="pwa-kit-loading-spinner-outer" data-testid="loading-spinner">
                 <div className="pwa-kit-loading-spinner-wrapper">
                     <span className="pwa-kit-loading-spinner-inner">Loading...</span>
                 </div>
