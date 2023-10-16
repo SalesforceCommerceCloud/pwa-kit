@@ -12,7 +12,7 @@ import LoadingSpinner from '../loading-spinner'
 // For good UX, show loading spinner long enough for users to see
 const LOADING_SPINNER_DURATION = 1000
 
-const NavigateToReferrer = () => {
+const RefetchData = () => {
     const history = useHistory()
     const location = useLocation()
     const queryClient = useQueryClient()
@@ -33,6 +33,6 @@ const NavigateToReferrer = () => {
 
     return <LoadingSpinner />
 }
-NavigateToReferrer.displayName = 'NavigateToReferrer'
+RefetchData.displayName = 'RefetchData'
 
-export default NavigateToReferrer
+export default RefetchData

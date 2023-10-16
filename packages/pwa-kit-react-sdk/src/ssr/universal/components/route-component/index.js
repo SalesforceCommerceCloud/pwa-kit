@@ -14,7 +14,7 @@ import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 import {withLegacyGetProps} from '../../components/with-legacy-get-props'
-import NavigateToReferrer from '../navigate-to-referrer'
+import RefetchData from '../storefront-preview/refetch-data'
 
 const noop = () => undefined
 
@@ -408,7 +408,7 @@ export const getRoutes = (locals) => {
         _routes = routes()
     }
     const allRoutes = [
-        {path: '/__storefront-preview/refetch-data', component: NavigateToReferrer},
+        {path: '/__storefront-preview/refetch-data', component: RefetchData},
         ..._routes,
         {path: '*', component: Throw404}
     ]
