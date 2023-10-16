@@ -48,7 +48,7 @@ export function detectCookiesAvailable() {
     if (!navigator.cookieEnabled) return false
     // Even if `cookieEnabled` is true, cookies may not work. A site may allow first-party, but not
     // third-party, a browser extension may block cookies, etc. The most reliable way to detect if
-    // cookies are available
+    // cookies are available is to try to set one
     const testKey = 'commerce-sdk-react-temp'
     const testValue = '1'
     const options: CookieAttributes = {
