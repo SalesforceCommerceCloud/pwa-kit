@@ -14,16 +14,16 @@ import {detectStorefrontPreview, getClientScript} from './utils'
  *
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
  * @param  {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
- * @param  {function(): string | Promise<string>} getSearchParamsToAppend - A method that returns an array of key/value search params to append when context changes
+ * @param  {Array} getAdditionalSearchParams - A method that returns an array of key/value search params to append when context changes
  */
-export const StorefrontPreview = ({enabled = true, getToken, getSearchParamsToAppend}) => {
+export const StorefrontPreview = ({enabled = true, getToken, getAdditionalSearchParams}) => {
     let isHostTrusted
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
-                getSearchParamsToAppend
+                getAdditionalSearchParams
             }
         }
     }, [enabled, getToken])
@@ -61,5 +61,5 @@ StorefrontPreview.propTypes = {
             )
         }
     },
-    getSearchParamsToAppend: PropTypes.func
+    getAdditionalSearchParams: PropTypes.array
 }
