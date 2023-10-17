@@ -52,9 +52,9 @@ describe('Content-Security-Policy enforcement', () => {
         enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         expectDirectives([
-            "connect-src 'self' api.cquotient.com localhost:*",
+            "connect-src 'self' localhost:*",
             'frame-ancestors localhost:*',
-            "img-src 'self' *.commercecloud.salesforce.com data:",
+            "img-src 'self' data:",
             "script-src 'self' 'unsafe-eval' localhost:*"
         ])
     })
@@ -63,9 +63,9 @@ describe('Content-Security-Policy enforcement', () => {
         enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         expectDirectives([
-            "connect-src 'self' api.cquotient.com https://runtime.commercecloud.com",
+            "connect-src 'self' https://runtime.commercecloud.com",
             'frame-ancestors https://runtime.commercecloud.com',
-            "img-src 'self' *.commercecloud.salesforce.com data:",
+            "img-src 'self' data:",
             "script-src 'self' 'unsafe-eval' https://runtime.commercecloud.com",
             'upgrade-insecure-requests'
         ])
@@ -74,7 +74,7 @@ describe('Content-Security-Policy enforcement', () => {
         enforceSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, "connect-src test:* ; script-src 'unsafe-eval' test:*")
         expectDirectives([
-            "connect-src test:* 'self' api.cquotient.com localhost:*",
+            "connect-src test:* 'self' localhost:*",
             "script-src 'unsafe-eval' test:* 'self' localhost:*"
         ])
     })
@@ -96,7 +96,7 @@ describe('Content-Security-Policy enforcement', () => {
     })
     test('adds directives even if setHeader is never called', () => {
         enforceSecurityHeaders({}, res, () => {})
-        expectDirectives(["img-src 'self' *.commercecloud.salesforce.com data:"])
+        expectDirectives(["img-src 'self' data:"])
     })
     test('handles multiple CSP headers', () => {
         enforceSecurityHeaders({}, res, () => {})
