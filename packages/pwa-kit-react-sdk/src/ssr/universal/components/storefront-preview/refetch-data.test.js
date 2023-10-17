@@ -7,7 +7,7 @@
 import {useQueryClient} from '@tanstack/react-query'
 import {render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
-import {useHistory} from 'react-router-dom'
+import {useHistory, useLocation} from 'react-router-dom'
 import RefetchData from './refetch-data'
 
 const referrerURL = 'some-url'
@@ -57,4 +57,20 @@ test('wait for soft navigation to the referrer', async () => {
         },
         {timeout: 5000}
     )
+})
+
+test('detects when `referrer` search param cannot be found in the page url', async () => {
+    const _error = console.error
+    console.error = jest.fn()
+
+    useLocation.mockImplementationOnce(() => ({
+        search: ''
+    }))
+
+    render(<RefetchData />)
+
+    await waitFor(() => {
+        expect(console.error).toHaveBeenCalled()
+    })
+    console.error = _error
 })
