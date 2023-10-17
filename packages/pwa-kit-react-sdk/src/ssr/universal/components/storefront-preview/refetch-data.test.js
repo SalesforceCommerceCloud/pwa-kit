@@ -10,6 +10,8 @@ import React from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import RefetchData from './refetch-data'
 
+jest.useFakeTimers()
+
 const referrerURL = 'some-url'
 jest.mock('react-router-dom', () => {
     const replace = jest.fn()
@@ -40,12 +42,9 @@ test('renders a loading spinner initially', () => {
 test('wait for react-query cache to be invalidated', async () => {
     render(<RefetchData />)
 
-    await waitFor(
-        () => {
-            expect(useQueryClient().invalidateQueries).toHaveBeenCalled()
-        },
-        {timeout: 5000}
-    )
+    await waitFor(() => {
+        expect(useQueryClient().invalidateQueries).toHaveBeenCalled()
+    })
 })
 
 test('a project not using react-query', async () => {
@@ -54,40 +53,35 @@ test('a project not using react-query', async () => {
         throw new Error()
     })
     render(<RefetchData />)
+    jest.runAllTimers()
 
-    await waitFor(
-        () => {
-            // Expect to still continue despite the project not using react-query,
-            // specifically continue to navigate back to the referrer.
-            expect(useHistory().replace).toHaveBeenCalledWith(referrerURL)
-        },
-        {timeout: 5000}
-    )
+    await waitFor(() => {
+        // Expect to still continue despite the project not using react-query,
+        // specifically continue to navigate back to the referrer.
+        expect(useHistory().replace).toHaveBeenCalledWith(referrerURL)
+    })
 })
 
 test('wait for soft navigation to the referrer', async () => {
     render(<RefetchData />)
+    jest.runAllTimers()
 
-    await waitFor(
-        () => {
-            expect(useHistory().replace).toHaveBeenCalledWith(referrerURL)
-        },
-        {timeout: 5000}
-    )
+    await waitFor(() => {
+        expect(useHistory().replace).toHaveBeenCalledWith(referrerURL)
+    })
 })
 
-test('detects when `referrer` search param cannot be found in the page url', async () => {
-    const _error = console.error
-    console.error = jest.fn()
+test('navigate to homepage if `referrer` search param cannot be found in the page url', async () => {
+    jest.spyOn(console, 'warn')
 
     useLocation.mockImplementationOnce(() => ({
         search: ''
     }))
-
     render(<RefetchData />)
+    jest.runAllTimers()
 
     await waitFor(() => {
-        expect(console.error).toHaveBeenCalled()
+        expect(console.warn).toHaveBeenCalled()
+        expect(useHistory().replace).toHaveBeenCalledWith('/')
     })
-    console.error = _error
 })
