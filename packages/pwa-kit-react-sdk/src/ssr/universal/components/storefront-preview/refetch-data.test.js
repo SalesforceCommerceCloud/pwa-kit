@@ -48,6 +48,23 @@ test('wait for react-query cache to be invalidated', async () => {
     )
 })
 
+test('a project not using react-query', async () => {
+    // If customer project does not use react-query, calling useQueryClient would throw an error
+    useQueryClient.mockImplementationOnce(() => {
+        throw new Error()
+    })
+    render(<RefetchData />)
+
+    await waitFor(
+        () => {
+            // Expect to still continue despite the project not using react-query,
+            // specifically continue to navigate back to the referrer.
+            expect(useHistory().replace).toHaveBeenCalledWith(referrerURL)
+        },
+        {timeout: 5000}
+    )
+})
+
 test('wait for soft navigation to the referrer', async () => {
     render(<RefetchData />)
 

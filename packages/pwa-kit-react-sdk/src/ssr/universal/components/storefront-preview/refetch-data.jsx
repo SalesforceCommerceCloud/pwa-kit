@@ -15,10 +15,20 @@ const LOADING_SPINNER_DURATION = 1000
 const RefetchData = () => {
     const history = useHistory()
     const location = useLocation()
-    const queryClient = useQueryClient()
+
+    let queryClient
+    try {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        queryClient = useQueryClient()
+    } catch (err) {
+        // Do nothing. Leave queryClient as undefined.
+        // Continue to navigate to the referrer
+    }
 
     useEffect(() => {
-        queryClient.invalidateQueries()
+        if (queryClient) {
+            queryClient.invalidateQueries()
+        }
 
         const searchParams = new URLSearchParams(location.search)
         const referrer = searchParams.get('referrer')
