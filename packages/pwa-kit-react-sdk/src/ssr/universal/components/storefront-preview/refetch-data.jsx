@@ -31,13 +31,16 @@ const RefetchData = () => {
         }
 
         const searchParams = new URLSearchParams(location.search)
-        const referrer = searchParams.get('referrer')
+        let referrer = searchParams.get('referrer')
 
-        if (referrer) {
-            // Soft navigate to the referrer
-            setTimeout(() => history.replace(referrer), LOADING_SPINNER_DURATION)
-        } else {
-            console.error('Expecting to see `referrer` search param in the page url.')
+        if (!referrer) {
+            console.warn('Expecting to see `referrer` search param in the page url.')
+            referrer = '/'
+        }
+        const timeout = setTimeout(() => history.replace(referrer), LOADING_SPINNER_DURATION)
+
+        return () => {
+            clearTimeout(timeout)
         }
     }, [])
 
