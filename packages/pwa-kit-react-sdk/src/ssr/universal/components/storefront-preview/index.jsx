@@ -26,7 +26,7 @@ export const StorefrontPreview = ({enabled = true, getToken, getAdditionalSearch
                 getAdditionalSearchParams
             }
         }
-    }, [enabled, getToken])
+    }, [enabled, getToken, getAdditionalSearchParams])
     if (!enabled) {
         return null
     }
