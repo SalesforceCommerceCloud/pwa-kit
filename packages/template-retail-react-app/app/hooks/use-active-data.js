@@ -9,7 +9,7 @@ import {ACTIVE_DATA_ENABLE} from '@salesforce/retail-react-app/app/constants'
 const useActiveData = () => {
     return {
         async sendViewProduct(category, product, type) {
-            if (ACTIVE_DATA_ENABLE == 0) {
+            if (!ACTIVE_DATA_ENABLE) {
                 return
             }
             try {
@@ -31,7 +31,7 @@ const useActiveData = () => {
             }
         },
         async sendViewSearch(searchParams, productSearchResult) {
-            if (ACTIVE_DATA_ENABLE == 0) {
+            if (!ACTIVE_DATA_ENABLE) {
                 return
             }
             try {
@@ -51,7 +51,7 @@ const useActiveData = () => {
             }
         },
         async sendViewCategory(searchParams, category, productSearchResult) {
-            if (ACTIVE_DATA_ENABLE == 0) {
+            if (!ACTIVE_DATA_ENABLE) {
                 return
             }
             try {
@@ -73,7 +73,7 @@ const useActiveData = () => {
             }
         },
         async trackPage(siteId, localeId, currency) {
-            if (ACTIVE_DATA_ENABLE == 0) {
+            if (!ACTIVE_DATA_ENABLE) {
                 return
             }
             try {

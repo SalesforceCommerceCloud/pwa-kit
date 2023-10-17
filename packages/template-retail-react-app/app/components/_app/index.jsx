@@ -284,7 +284,7 @@ const App = (props) => {
     return (
         <Box className="sf-app" {...styles.container}>
             <Helmet>
-                {ACTIVE_DATA_ENABLE == 1 && (
+                {ACTIVE_DATA_ENABLE && (
                     <script
                         src={getAssetUrl('static/head-active_data.js')}
                         type="text/javascript"
@@ -410,7 +410,7 @@ const App = (props) => {
                     </Box>
                 </CurrencyProvider>
             </IntlProvider>
-            {ACTIVE_DATA_ENABLE == 1 && (
+            {ACTIVE_DATA_ENABLE && (
                 <script
                     type="text/javascript"
                     src={getAssetUrl('static/dwanalytics-22.2.js')}
@@ -418,7 +418,7 @@ const App = (props) => {
                     onLoad={trackPage}
                 ></script>
             )}
-            {ACTIVE_DATA_ENABLE == 1 && (
+            {ACTIVE_DATA_ENABLE && (
                 <script
                     src={getAssetUrl('static/dwac-21.7.js')}
                     type="text/javascript"

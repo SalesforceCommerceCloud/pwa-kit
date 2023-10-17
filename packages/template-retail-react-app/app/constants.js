@@ -114,4 +114,4 @@ export const SHIPPING_COUNTRY_CODES = [
 ]
 
 // Constant to Enable Active Data
-export const ACTIVE_DATA_ENABLE = 1
+export const ACTIVE_DATA_ENABLE = false
