@@ -19,7 +19,7 @@ const options = {
     // The cache time for SSR'd pages (defaults to 600 seconds)
     defaultCacheTimeSeconds: 600,
 
-    // This is the value of the 'mobify' object from package.json
+    // The contents of the config file for the current environment
     mobify: getConfig(),
 
     // The port that the local dev server listens on
@@ -42,9 +42,17 @@ const {handler} = runtime.createHandler(options, (app) => {
             contentSecurityPolicy: {
                 useDefaults: true,
                 directives: {
-                    scriptSrc: [
-                        // used by the service worker in /worker/main.js
+                    'img-src': [
+                        // Default source for product images
+                        '*.commercecloud.salesforce.com'
+                    ],
+                    'script-src': [
+                        // Used by the service worker in /worker/main.js
                         'storage.googleapis.com'
+                    ],
+                    'connect-src': [
+                        // Connect to Einstein APIs
+                        'api.cquotient.com'
                     ]
                 }
             }

@@ -955,9 +955,9 @@ export const enforceSecurityHeaders = (req, res, next) => {
      * @type Object.<string, string[] | boolean>
      */
     const directives = {
-        'connect-src': ["'self'", 'api.cquotient.com', runtimeAdmin],
+        'connect-src': ["'self'", runtimeAdmin],
         'frame-ancestors': [runtimeAdmin],
-        'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
+        'img-src': ["'self'", 'data:'],
         'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin],
         // Always upgrade insecure requests when deployed, never upgrade on local dev server
         'upgrade-insecure-requests': isRemote()
