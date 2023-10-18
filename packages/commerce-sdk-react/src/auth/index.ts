@@ -190,24 +190,17 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
 
-        const storageOptions = {keySuffix: config.siteId}
-        const serverStorageOptions = {
+        const options = {
             keySuffix: config.siteId,
-            sharedContext: true // This allows use to reused guest authentication tokens accross lambda runs.
+            // Setting this to true on the server allows us to reuse guest auth tokens across lambda runs
+            sharedContext: !onClient()
         }
 
-        this.stores = onClient()
-            ? {
-                  cookie: new CookieStorage(storageOptions),
-                  local: new LocalStorage(storageOptions),
-                  memory: new MemoryStorage(storageOptions)
-              }
-            : {
-                  // Always use MemoryStorage on the server.
-                  cookie: new MemoryStorage(serverStorageOptions),
-                  local: new MemoryStorage(serverStorageOptions),
-                  memory: new MemoryStorage(serverStorageOptions)
-              }
+        this.stores = {
+            cookie: onClient() ? new CookieStorage(options) : new MemoryStorage(options),
+            local: onClient() ? new LocalStorage(options) : new MemoryStorage(options),
+            memory: new MemoryStorage(options)
+        }
 
         this.redirectURI = config.redirectURI
 
@@ -357,7 +350,7 @@ class Auth {
             .finally(() => {
                 this.pendingToken = undefined
             })
-        return this.pendingToken
+        return await this.pendingToken
     }
 
     /**
@@ -381,7 +374,7 @@ class Auth {
             return this.data
         }
         if (this.pendingToken) {
-            return this.pendingToken
+            return await this.pendingToken
         }
         const accessToken = this.get('access_token')
 
@@ -411,7 +404,7 @@ class Auth {
                 }
             }
         }
-        return this.queueRequest(
+        return await this.queueRequest(
             () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
             true
         )
@@ -439,7 +432,7 @@ class Auth {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const isGuest = true
-        return this.queueRequest(
+        return await this.queueRequest(
             () =>
                 helpers.loginGuestUser(this.client, {
                     redirectURI,
@@ -506,7 +499,7 @@ class Auth {
             refreshToken: this.get('refresh_token_registered')
         })
         this.clearStorage()
-        return this.loginGuestUser()
+        return await this.loginGuestUser()
     }
 
     /**
