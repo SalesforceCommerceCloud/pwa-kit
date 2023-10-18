@@ -67,14 +67,14 @@ describe('Storefront Preview Component', function () {
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
     })
 
-    test('getAdditionalSearchParams is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
+    test('additionalSearchParams is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
         detectStorefrontPreview.mockReturnValue(true)
 
-        const searchParamsToAdd = () => {
+        const getSearchParamsToAdd = () => {
             return [
                 {
                     name: 'vse',
-                    value: 'my-custom-vse-{{effectiveDateTimeUnix}}.staging.bigcontent.io'
+                    value: 'my-custom-vse-{{effectiveDateTimeUnix}}.staging.content.io'
                 },
                 {
                     name: 'vse-timestamp',
@@ -86,9 +86,10 @@ describe('Storefront Preview Component', function () {
         mount(
             <StorefrontPreview
                 getToken={() => 'my-token'}
-                getAdditionalSearchParams={searchParamsToAdd}
+                additionalSearchParams={getSearchParamsToAdd()}
             />
         )
-        expect(window.STOREFRONT_PREVIEW.getAdditionalSearchParams).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.additionalSearchParams).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.additionalSearchParams.length).toBe(getSearchParamsToAdd().length)
     })
 })
