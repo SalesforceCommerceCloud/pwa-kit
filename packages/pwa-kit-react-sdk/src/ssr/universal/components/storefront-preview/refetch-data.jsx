@@ -10,7 +10,7 @@ import {useQueryClient} from '@tanstack/react-query'
 import LoadingSpinner from '../loading-spinner'
 
 // For good UX, show loading spinner long enough for users to see
-const LOADING_SPINNER_DURATION = 1000
+const LOADING_SPINNER_MIN_DURATION = 500
 
 const RefetchData = () => {
     const history = useHistory()
@@ -26,22 +26,25 @@ const RefetchData = () => {
     }
 
     useEffect(() => {
-        if (queryClient) {
-            queryClient.invalidateQueries()
-        }
+        const refetchData = async () => {
+            const showLoadingSpinner = new Promise((resolve) =>
+                setTimeout(resolve, LOADING_SPINNER_MIN_DURATION)
+            )
+            const invalidateQueries = queryClient
+                ? queryClient.invalidateQueries()
+                : Promise.resolve()
 
-        const searchParams = new URLSearchParams(location.search)
-        let referrer = searchParams.get('referrer')
+            await Promise.all([showLoadingSpinner, invalidateQueries])
 
-        if (!referrer) {
-            console.warn('Expecting to see `referrer` search param in the page url.')
-            referrer = '/'
+            // Soft navigate to the referrer
+            let referrer = new URLSearchParams(location.search).get('referrer')
+            if (!referrer) {
+                console.warn('Expecting to see `referrer` search param in the page url.')
+                referrer = '/'
+            }
+            history.replace(referrer)
         }
-        const timeout = setTimeout(() => history.replace(referrer), LOADING_SPINNER_DURATION)
-
-        return () => {
-            clearTimeout(timeout)
-        }
+        refetchData()
     }, [])
 
     return <LoadingSpinner />
