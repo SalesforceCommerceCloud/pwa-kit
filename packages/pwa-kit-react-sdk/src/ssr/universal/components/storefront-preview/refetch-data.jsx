@@ -12,6 +12,17 @@ import LoadingSpinner from '../loading-spinner'
 // For good UX, show loading spinner long enough for users to see
 const LOADING_SPINNER_MIN_DURATION = 500
 
+/**
+ * Show loading spinner while refetching data on the client-side.
+ * To trigger this refetch, we do soft navigation back to the referrer.
+ * So this component is meant to be used as a route with `referrer` search param.
+ *
+ * @example
+ * const navigate = useNavigation()
+ * navigate(`/__refetch-data?referrer=${encodeURIComponent(urlOfCurrentPage)}`, 'replace')
+ *
+ * @private
+ */
 const RefetchData = () => {
     const history = useHistory()
     const location = useLocation()
