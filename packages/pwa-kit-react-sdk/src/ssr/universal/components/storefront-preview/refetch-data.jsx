@@ -21,8 +21,8 @@ const RefetchData = () => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         queryClient = useQueryClient()
     } catch (err) {
-        // Do nothing. Leave queryClient as undefined.
-        // Continue to navigate to the referrer
+        // `useQueryClient` throws an error if the project does not use react-query.
+        // So in this case, leave `queryClient` as undefined. Continue to navigate to the referrer.
     }
 
     useEffect(() => {
