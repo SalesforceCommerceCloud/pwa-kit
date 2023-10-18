@@ -11,10 +11,5 @@
 export const IFRAME_HOST_ALLOW_LIST = [
     'runtime.commercecloud.com',
     'runtime-admin-staging.mobify-storefront.com',
-    'runtime-admin-preview.mobify-storefront.com',
-    'runtime-admin-preview-adam.mobify-storefront.com',
-    'runtime-admin-preview-demo.mobify-storefront.com',
-    'runtime-admin-preview-sandra.mobify-storefront.com',
-    'runtime-admin-preview-test.mobify-storefront.com',
-    'runtime-admin-ben-test.mobify-storefront.com'
+    'runtime-admin-preview.mobify-storefront.com'
 ]

@@ -69,7 +69,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                 '*.demandware.com',
                 '*.mobify.com',
                 '*.mobify-storefront.com',
-                '*.mobify-storefront-staging.com',
                 '*.commercecloud.salesforce.com',
                 'runtime.commercecloud.com'
             ]
