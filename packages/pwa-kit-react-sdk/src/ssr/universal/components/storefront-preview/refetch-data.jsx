@@ -30,16 +30,14 @@ const RefetchData = () => {
             const showLoadingSpinner = new Promise((resolve) =>
                 setTimeout(resolve, LOADING_SPINNER_MIN_DURATION)
             )
-            const invalidateQueries = queryClient
-                ? queryClient.invalidateQueries()
-                : Promise.resolve()
+            const invalidateQueries = queryClient?.invalidateQueries()
 
             await Promise.all([showLoadingSpinner, invalidateQueries])
 
             // Soft navigate to the referrer
             let referrer = new URLSearchParams(location.search).get('referrer')
             if (!referrer) {
-                console.warn('Expecting to see `referrer` search param in the page url.')
+                console.warn('Could not find `referrer` search param - redirecting to home page.')
                 referrer = '/'
             }
             history.replace(referrer)
