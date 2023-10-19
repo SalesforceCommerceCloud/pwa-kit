@@ -14,6 +14,7 @@ type Value = string | null
  */
 function useLocalStorage(key: string): Value {
     const readValue = (): Value => {
+        // TODO: Use detectLocalStorageAvailable when app can better handle clients without storage
         if (typeof window === 'undefined') {
             return null
         }
