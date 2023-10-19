@@ -2,7 +2,7 @@ name: setup_ubuntu
 inputs:
   cwd:
     required: false
-    default: "${PWD}"
+    default: ${{ github.workspace }}
 description: "Setup Ubuntu Machine"
 runs:
   using: composite
