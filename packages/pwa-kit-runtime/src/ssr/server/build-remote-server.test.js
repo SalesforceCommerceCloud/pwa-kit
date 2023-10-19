@@ -40,7 +40,7 @@ describe('Content-Security-Policy enforcement', () => {
     beforeEach(() => {
         const headers = {}
         res = {
-            hasHeader: (key) => headers.hasOwnProperty(key),
+            hasHeader: (key) => Object.prototype.hasOwnProperty.call(headers, key),
             getHeader: (key) => headers[key],
             setHeader: (key, val) => (headers[key] = val)
         }
