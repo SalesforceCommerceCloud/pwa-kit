@@ -2,7 +2,7 @@ name: linting
 inputs:
   cwd:
     required: false
-    default: ${{ github.workspace }}
+    default: "${PWD}"
 runs:
   using: composite
   steps:

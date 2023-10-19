@@ -6,7 +6,7 @@ inputs:
     description: "Mobify user API key"
   cwd:
     required: false
-    default: ${{ github.workspace }}
+    default: ${PWD}
 runs:
   using: composite
   steps:
