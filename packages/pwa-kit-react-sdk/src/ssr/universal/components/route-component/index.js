@@ -14,7 +14,7 @@ import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 import {withLegacyGetProps} from '../../components/with-legacy-get-props'
-import Loading from '../loading'
+import RefetchData from '../refetch-data'
 
 const noop = () => undefined
 
@@ -408,7 +408,8 @@ export const getRoutes = (locals) => {
         _routes = routes()
     }
     const allRoutes = [
-        {path: '/__storefront-preview', component: Loading},
+        // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
+        {path: '/__mrt/refresh', component: RefetchData},
         ..._routes,
         {path: '*', component: Throw404}
     ]

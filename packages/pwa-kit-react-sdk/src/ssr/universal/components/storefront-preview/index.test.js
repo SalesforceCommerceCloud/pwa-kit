@@ -65,5 +65,6 @@ describe('Storefront Preview Component', function () {
 
         mount(<StorefrontPreview getToken={() => 'my-token'} />)
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.navigate).toBeDefined()
     })
 })
