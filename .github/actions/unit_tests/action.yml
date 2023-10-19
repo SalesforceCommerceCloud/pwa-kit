@@ -2,7 +2,7 @@ name: unit_tests
 inputs:
   cwd:
     required: false
-    default: ${{ github.workspace }}
+    default: "${PWD}"
 description: "Run tests action description"
 runs:
   using: composite
