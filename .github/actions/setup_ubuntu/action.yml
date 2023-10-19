@@ -23,10 +23,10 @@ runs:
         npm run lerna -- run analyze-build --scope "@salesforce/retail-react-app"
 
         # Report bundle sizes
-        # node ./scripts/report-bundle-size.js
+        node ./scripts/report-bundle-size.js
 
         # Check that packages are all using the same versions of npm dependencies
-        # npm run check-dep-version
+        npm run check-dep-version
 
         # Install Snyk CLI
         # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.
@@ -34,5 +34,5 @@ runs:
         # sudo npm install -g snyk
 
         # Install Lighthouse CI CLI
-        # sudo npm install -g @lhci/cli
+        sudo npm install -g @lhci/cli
       shell: bash
