@@ -14,7 +14,7 @@ import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 import {withLegacyGetProps} from '../../components/with-legacy-get-props'
-import RefetchData from '../storefront-preview/refetch-data'
+import RefetchData from '../refetch-data'
 
 const noop = () => undefined
 
