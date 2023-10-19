@@ -302,6 +302,61 @@ export class CloudAPIClient {
         const data = await res.json()
         return data['token']
     }
+
+    /** Polls MRT for deployment status every 30 seconds. */
+    async waitForDeploy(project: string, environment: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            /** Milliseconds to wait between checks. */
+            const delay = 30_000
+            /** Check the deployment status to see whether it has finished. */
+            const check = async (): Promise<void> => {
+                const url = new URL(
+                    `/api/projects/${project}/target/${environment}`,
+                    this.opts.origin
+                )
+                const res = await this.opts.fetch(url, {headers: await this.getHeaders()})
+
+                if (!res.ok) {
+                    const text = await res.text()
+                    let json
+                    try {
+                        if (text) json = JSON.parse(text)
+                    } catch (_) {} // eslint-disable-line no-empty
+                    const message = json?.detail ?? text
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                    const detail = message ? `: ${message}` : ''
+                    throw new Error(`${res.status} ${res.statusText}${detail}`)
+                }
+
+                const data: {state: string} = await res.json()
+                if (typeof data.state !== 'string') {
+                    return reject(
+                        new Error('An unknown state occurred when polling the deployment.')
+                    )
+                }
+                switch (data.state) {
+                    case 'CREATE_IN_PROGRESS':
+                    case 'PUBLISH_IN_PROGRESS':
+                        // In progress - check again after the next delay
+                        // `check` is async, so we need to use .catch to properly handle errors
+                        setTimeout(() => void check().catch(reject), delay)
+                        return
+                    case 'CREATE_FAILED':
+                    case 'PUBLISH_FAILED':
+                        // Failed - reject with failure
+                        return reject(new Error('Deployment failed.'))
+                    case 'ACTIVE':
+                        // Success!
+                        return resolve()
+                    default:
+                        // Unknown - reject with confusion
+                        return reject(new Error(`Unknown deployment state "${data.state}".`))
+                }
+            }
+            // Start checking after the first delay!
+            setTimeout(() => void check().catch(reject), delay)
+        })
+    }
 }
 
 export const defaultMessage = (gitInstance: typeof git = git): string => {

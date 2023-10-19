@@ -302,6 +302,9 @@ const main = async () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
+        .addOption(
+            new program.Option('-w, --wait', 'wait for the deployment to complete before exiting')
+        )
         .action(
             async ({
                 buildDirectory,
@@ -309,7 +312,8 @@ const main = async () => {
                 projectSlug,
                 target,
                 cloudOrigin,
-                credentialsFile
+                credentialsFile,
+                wait
             }) => {
                 // Set the deployment target env var, this is required to ensure we
                 // get the correct configuration object. Do not assign the variable it if
@@ -317,6 +321,10 @@ const main = async () => {
                 // string value.
                 if (target) {
                     process.env.DEPLOY_TARGET = target
+                } else if (wait) {
+                    throw new Error(
+                        'You must provide a target to deploy to when using --wait to wait for deployment to finish.'
+                    )
                 }
 
                 const credentials = await scriptUtils.readCredentials(credentialsFile)
@@ -348,7 +356,12 @@ const main = async () => {
                 const data = await client.push(bundle, projectSlug, target)
                 const warnings = data.warnings || []
                 warnings.forEach(warn)
-                success('Bundle Uploaded')
+                if (wait) {
+                    success('Bundle Uploaded - waiting for deployment to complete')
+                    await client.waitForDeploy()
+                } else {
+                    success('Bundle Uploaded')
+                }
             }
         )
 
