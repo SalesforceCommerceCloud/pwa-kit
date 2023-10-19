@@ -2,7 +2,7 @@ name: setup_windows
 inputs:
   cwd:
     required: false
-    default: ${{ github.workspace }}
+    default: "${PWD}"
 description: "Setup Windows Machine"
 runs:
   using: composite
