@@ -284,16 +284,15 @@ const PRESETS = [
             id: '@salesforce/retail-react-app'
         },
         questions: [...EXTENSIBILITY_QUESTIONS, ...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        // TODO: Update these settings once the test hybrid environment is set!
         answers: {
             ['project.extend']: true,
             ['project.hybrid']: true,
             ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+            ['project.commerce.instanceUrl']: 'https://test.phased-launch-testing.com/',
+            ['project.commerce.clientId']: '50b359ea-4224-4125-b75d-dd80ff4b0f00',
             ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
-            ['project.commerce.shortCode']: 'kv7kzm78',
+            ['project.commerce.organizationId']: 'f_ecom_bdpx_dev',
+            ['project.commerce.shortCode']: 'xitgmcd3',
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             ['project.einstein.siteId']: 'aaij-MobileFirst'
         },
