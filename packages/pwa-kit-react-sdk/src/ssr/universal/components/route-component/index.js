@@ -408,8 +408,8 @@ export const getRoutes = (locals) => {
         _routes = routes()
     }
     const allRoutes = [
-        // NOTE: this storefront preview route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
-        {path: '/__storefront-preview/refetch-data', component: RefetchData},
+        // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
+        {path: '/__mrt/refresh', component: RefetchData},
         ..._routes,
         {path: '*', component: Throw404}
     ]
