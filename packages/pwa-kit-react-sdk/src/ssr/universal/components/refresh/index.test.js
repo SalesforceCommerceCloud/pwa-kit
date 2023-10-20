@@ -6,7 +6,6 @@
  */
 import {useQueryClient} from '@tanstack/react-query'
 import {mount} from 'enzyme'
-// import {render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import Refresh from './index'
