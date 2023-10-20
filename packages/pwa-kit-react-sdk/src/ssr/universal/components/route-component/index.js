@@ -14,7 +14,7 @@ import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 import {withLegacyGetProps} from '../../components/with-legacy-get-props'
-import Refresh from '../refetch-data'
+import Refresh from '../refresh'
 
 const noop = () => undefined
 
