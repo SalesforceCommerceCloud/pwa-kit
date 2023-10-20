@@ -28,7 +28,6 @@ const Refresh = () => {
 
     let queryClient
     try {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
         queryClient = useQueryClient()
     } catch (err) {
         // `useQueryClient` throws an error if the project does not use react-query.
