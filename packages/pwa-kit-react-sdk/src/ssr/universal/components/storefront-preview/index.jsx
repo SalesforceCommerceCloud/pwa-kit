@@ -25,7 +25,6 @@ export const StorefrontPreview = ({enabled = true, getToken}) => {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
                 navigate: (path, action = 'push', ...args) => {
-                    // TODO: test this
                     history[action](path, ...args)
                 }
             }
