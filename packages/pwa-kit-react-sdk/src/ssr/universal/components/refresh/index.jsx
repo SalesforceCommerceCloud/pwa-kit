@@ -7,7 +7,6 @@
 import React, {useEffect} from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useQueryClient} from '@tanstack/react-query'
-import LoadingSpinner from '../loading-spinner'
 
 // For good UX, show loading spinner long enough for users to see
 const LOADING_SPINNER_MIN_DURATION = 500
@@ -59,5 +58,61 @@ const Refresh = () => {
     return <LoadingSpinner />
 }
 Refresh.displayName = 'Refresh'
+
+const LoadingSpinner = () => {
+    return (
+        <>
+            <style>
+                {`
+                .pwa-kit-loading-spinner-outer {
+                    z-index: 1300;
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    right: 0px;
+                    bottom: 0px;
+                    background: rgba(255, 255, 255, 0.80);
+                }
+                .pwa-kit-loading-spinner-wrapper {
+                    display: inline-block;
+                    border-color: currentColor;
+                    border-style: solid;
+                    border-radius: 99999px;
+                    border-width: 4px;
+                    border-bottom-color: #C9C9C9;
+                    border-left-color: #C9C9C9;
+                    -webkit-animation: animation-b7n1on 0.65s linear infinite;
+                    animation: animation-b7n1on 0.65s linear infinite;
+                    width: 3rem;
+                    height: 3rem;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    margin-left: -1.5em;
+                    margin-top: -1.5em;
+                    color: #0176D3;
+                }
+                .pwa-kit-loading-spinner-inner {
+                    border: 0px;
+                    clip: rect(0, 0, 0, 0);
+                    width: 1px;
+                    height: 1px;
+                    margin: -1px;
+                    padding: 0px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    position: absolute;
+                }
+                `}
+            </style>
+
+            <div className="pwa-kit-loading-spinner-outer" data-testid="loading-spinner">
+                <div className="pwa-kit-loading-spinner-wrapper">
+                    <span className="pwa-kit-loading-spinner-inner">Loading...</span>
+                </div>
+            </div>
+        </>
+    )
+}
 
 export default Refresh
