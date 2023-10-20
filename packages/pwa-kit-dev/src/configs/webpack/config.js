@@ -69,8 +69,12 @@ const findInProjectThenSDK = (pkg) => {
     // changes this file's location relative to the package root.
     const candidates = [
         resolve(projectDir, 'node_modules', pkg),
+        // Inside packages/pwa-kit-dev
         resolve(__dirname, '..', '..', 'node_modules', pkg),
-        resolve(__dirname, '..', '..', '..', 'node_modules', pkg)
+        resolve(__dirname, '..', '..', '..', 'node_modules', pkg),
+        // Inside packages/pwa-kit-react-sdk
+        resolve(__dirname, '..', '..', '..', 'pwa-kit-react-sdk', 'node_modules', pkg),
+        resolve(__dirname, '..', '..', '..', '..', 'pwa-kit-react-sdk', 'node_modules', pkg)
     ]
     let candidate
     for (candidate of candidates) {
