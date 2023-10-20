@@ -23,7 +23,7 @@ const LOADING_SPINNER_MIN_DURATION = 500
  *
  * @private
  */
-const RefetchData = () => {
+const Refresh = () => {
     const history = useHistory()
     const location = useLocation()
 
@@ -58,6 +58,6 @@ const RefetchData = () => {
 
     return <LoadingSpinner />
 }
-RefetchData.displayName = 'RefetchData'
+Refresh.displayName = 'Refresh'
 
-export default RefetchData
+export default Refresh

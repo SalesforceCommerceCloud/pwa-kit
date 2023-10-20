@@ -8,7 +8,7 @@ import {useQueryClient} from '@tanstack/react-query'
 import {render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
-import RefetchData from './index'
+import Refresh from './index'
 
 jest.useFakeTimers()
 
@@ -35,12 +35,12 @@ jest.mock('@tanstack/react-query', () => {
 })
 
 test('renders a loading spinner initially', () => {
-    render(<RefetchData />)
+    render(<Refresh />)
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
 })
 
 test('wait for react-query cache to be invalidated', async () => {
-    render(<RefetchData />)
+    render(<Refresh />)
 
     await waitFor(() => {
         expect(useQueryClient().invalidateQueries).toHaveBeenCalled()
@@ -52,7 +52,7 @@ test('a project not using react-query', async () => {
     useQueryClient.mockImplementationOnce(() => {
         throw new Error()
     })
-    render(<RefetchData />)
+    render(<Refresh />)
     jest.runAllTimers()
 
     await waitFor(() => {
@@ -63,7 +63,7 @@ test('a project not using react-query', async () => {
 })
 
 test('wait for soft navigation to the referrer', async () => {
-    render(<RefetchData />)
+    render(<Refresh />)
     jest.runAllTimers()
 
     await waitFor(() => {
@@ -77,7 +77,7 @@ test('navigate to homepage if `referrer` search param cannot be found in the pag
     useLocation.mockImplementationOnce(() => ({
         search: ''
     }))
-    render(<RefetchData />)
+    render(<Refresh />)
     jest.runAllTimers()
 
     await waitFor(() => {
