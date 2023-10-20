@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useQueryClient} from '@tanstack/react-query'
-import {render, screen, waitFor} from '@testing-library/react'
+import {mount} from 'enzyme'
+// import {render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import Refresh from './index'
@@ -34,17 +35,19 @@ jest.mock('@tanstack/react-query', () => {
     }
 })
 
+// Similar to `waitFor` in testing-library/react
+// See: https://www.benmvp.com/blog/asynchronous-testing-with-enzyme-react-jest/
+const runAllPromises = () => new Promise((resolve) => setImmediate(resolve))
+
 test('renders a loading spinner initially', () => {
-    render(<Refresh />)
-    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+    const wrapper = mount(<Refresh />)
+    expect(wrapper.find('[data-testid="loading-spinner"]').length).toBe(1)
 })
 
 test('wait for react-query cache to be invalidated', async () => {
-    render(<Refresh />)
-
-    await waitFor(() => {
-        expect(useQueryClient().invalidateQueries).toHaveBeenCalled()
-    })
+    mount(<Refresh />)
+    await runAllPromises()
+    expect(useQueryClient().invalidateQueries).toHaveBeenCalled()
 })
 
 test('a project not using react-query', async () => {
@@ -52,23 +55,21 @@ test('a project not using react-query', async () => {
     useQueryClient.mockImplementationOnce(() => {
         throw new Error()
     })
-    render(<Refresh />)
+    mount(<Refresh />)
     jest.runAllTimers()
+    await runAllPromises()
 
-    await waitFor(() => {
-        // Expect to still continue despite the project not using react-query,
-        // specifically continue to navigate back to the referrer.
-        expect(useHistory().replace).toHaveBeenCalledWith(referrerURL)
-    })
+    // Expect to still continue despite the project not using react-query,
+    // specifically continue to navigate back to the referrer.
+    expect(useHistory().replace).toHaveBeenCalledWith(referrerURL)
 })
 
 test('wait for soft navigation to the referrer', async () => {
-    render(<Refresh />)
+    mount(<Refresh />)
     jest.runAllTimers()
+    await runAllPromises()
 
-    await waitFor(() => {
-        expect(useHistory().replace).toHaveBeenCalledWith(referrerURL)
-    })
+    expect(useHistory().replace).toHaveBeenCalledWith(referrerURL)
 })
 
 test('navigate to homepage if `referrer` search param cannot be found in the page url', async () => {
@@ -77,11 +78,10 @@ test('navigate to homepage if `referrer` search param cannot be found in the pag
     useLocation.mockImplementationOnce(() => ({
         search: ''
     }))
-    render(<Refresh />)
+    mount(<Refresh />)
     jest.runAllTimers()
+    await runAllPromises()
 
-    await waitFor(() => {
-        expect(console.warn).toHaveBeenCalled()
-        expect(useHistory().replace).toHaveBeenCalledWith('/')
-    })
+    expect(console.warn).toHaveBeenCalled()
+    expect(useHistory().replace).toHaveBeenCalledWith('/')
 })
