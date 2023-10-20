@@ -409,7 +409,7 @@ export const getRoutes = (locals) => {
     }
     const allRoutes = [
         // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
-        {path: '/__mrt/refresh', component: RefetchData},
+        {path: '/__pwa-kit/refresh', component: RefetchData},
         ..._routes,
         {path: '*', component: Throw404}
     ]
