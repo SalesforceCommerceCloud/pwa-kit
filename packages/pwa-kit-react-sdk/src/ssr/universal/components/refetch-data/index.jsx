@@ -13,7 +13,7 @@ import LoadingSpinner from '../loading-spinner'
 const LOADING_SPINNER_MIN_DURATION = 500
 
 /**
- * Show loading spinner while refetching data on the client-side.
+ * A _private_ component to show loading spinner while refetching data on the client-side.
  * To trigger this refetch, we do soft navigation back to the referrer.
  * So this component is meant to be used as a route with `referrer` search param.
  *
