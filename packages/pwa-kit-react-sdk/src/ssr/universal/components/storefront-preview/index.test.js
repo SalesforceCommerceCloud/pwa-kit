@@ -65,10 +65,10 @@ describe('Storefront Preview Component', function () {
 
     test('getToken is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
         window.STOREFRONT_PREVIEW = {}
-        window.STOREFRONT_PREVIEW.enabled = true
         detectStorefrontPreview.mockReturnValue(true)
 
         render(<StorefrontPreview getToken={() => 'my-token'} />)
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.navigate).toBeDefined()
     })
 })
