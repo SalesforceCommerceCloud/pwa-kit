@@ -28,7 +28,7 @@ import {useToast} from '../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../constants'
 import DisplayPrice from '../../components/display-price'
 
-const ProductViewHeader = ({product, name, category}) => {
+const ProductViewHeader = ({product, category}) => {
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -38,8 +38,8 @@ const ProductViewHeader = ({product, name, category}) => {
             )}
 
             {/* Title */}
-            <Skeleton isLoaded={name}>
-                <Heading fontSize="2xl">{`${name}`}</Heading>
+            <Skeleton isLoaded={product?.name}>
+                <Heading fontSize="2xl">{`${product?.name}`}</Heading>
             </Skeleton>
 
             {/* Price */}
@@ -50,11 +50,7 @@ const ProductViewHeader = ({product, name, category}) => {
 
 ProductViewHeader.propTypes = {
     product: PropTypes.object,
-    name: PropTypes.string,
-    price: PropTypes.number,
-    currency: PropTypes.string,
-    category: PropTypes.array,
-    productType: PropTypes.object
+    category: PropTypes.array
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -269,14 +265,7 @@ const ProductView = forwardRef(
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
                 {/* Basic information etc. title, price, breadcrumb*/}
                 <Box display={['block', 'block', 'block', 'none']}>
-                    <ProductViewHeader
-                        product={product}
-                        name={product?.name}
-                        price={product?.price}
-                        productType={product?.type}
-                        currency={product?.currency}
-                        category={category}
-                    />
+                    <ProductViewHeader product={product} category={category} />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
                     <Box flex={1} mr={[0, 0, 0, 6, 6]}>
@@ -309,14 +298,7 @@ const ProductView = forwardRef(
                     {/* Variations & Quantity Selector & CTA buttons */}
                     <VStack align="stretch" spacing={8} flex={1}>
                         <Box display={['none', 'none', 'none', 'block']}>
-                            <ProductViewHeader
-                                product={product}
-                                name={product?.name}
-                                price={product?.price}
-                                productType={product?.type}
-                                currency={product?.currency}
-                                category={category}
-                            />
+                            <ProductViewHeader product={product} category={category} />
                         </Box>
                         <VStack align="stretch" spacing={4}>
                             {/*
