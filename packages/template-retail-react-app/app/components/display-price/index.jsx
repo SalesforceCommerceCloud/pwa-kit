@@ -12,6 +12,14 @@ import {useIntl} from 'react-intl'
 import {useCurrency} from '../../hooks'
 import useProductPricing from '../../hooks/use-product-pricing'
 
+/**
+ * Component representing a product price that can be extended to add additional logic to support sale and promotional pricing.
+ * Currently used on the PDP, product tile, and add to cart modal
+ * @param {Object} product Product to be represented in the pricing component.
+ * @param {string} scope The scope of the product pricing component (pdp, tile, addToCartModal, etc).
+ * @param {number} quantity The quantity of the product to calculate, default to 1.
+ * @returns A JSX element representing product price with strikethrough pricing, if applicable.
+ */
 const DisplayPrice = ({product, scope = 'pdp', quantity = 1}) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
