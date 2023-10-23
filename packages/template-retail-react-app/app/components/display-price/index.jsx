@@ -23,7 +23,11 @@ import useProductPricing from '../../hooks/use-product-pricing'
 const DisplayPrice = ({product, scope = 'pdp', quantity = 1}) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
-    const {currency, basePrice, discountPrice} = useProductPricing(product, quantity)
+    const {
+        currency = activeCurrency,
+        basePrice,
+        discountPrice
+    } = useProductPricing(product, quantity) || {}
     const styles = useMultiStyleConfig('DisplayPrice', {variant: scope})
     const isProductASet = product?.type?.set || product?.hitType === 'set'
     const showDiscount = discountPrice !== null && discountPrice < basePrice
