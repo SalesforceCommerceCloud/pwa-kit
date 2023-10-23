@@ -55,7 +55,13 @@
         "react-router-dom": "^5.3.4"
     },
     "peerDependencies": {
-        "@chakra-ui/system": "^1.12.1"
+        "@chakra-ui/system": "^1.12.1",
+        "@tanstack/react-query": "^4.28.0"
+    },
+    "peerDependenciesMeta": {
+        "@tanstack/react-query": {
+            "optional": true
+        }
     },
     "scripts": {
         "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
