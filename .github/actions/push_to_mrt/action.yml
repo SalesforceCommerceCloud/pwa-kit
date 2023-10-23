@@ -4,6 +4,8 @@ inputs:
     description: Project directory
   TARGET:
     description: MRT target
+  FLAGS:
+    description: Push flags
 runs:
   using: composite
   steps:
