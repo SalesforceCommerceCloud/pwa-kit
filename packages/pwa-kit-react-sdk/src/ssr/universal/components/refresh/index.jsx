@@ -6,7 +6,6 @@
  */
 import React, {useEffect} from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
-import {useQueryClient} from '@tanstack/react-query'
 
 // For good UX, show loading spinner long enough for users to see
 const LOADING_SPINNER_MIN_DURATION = 500
@@ -26,22 +25,13 @@ const Refresh = () => {
     const history = useHistory()
     const location = useLocation()
 
-    let queryClient
-    try {
-        queryClient = useQueryClient()
-    } catch (err) {
-        // `useQueryClient` throws an error if the project does not use react-query.
-        // So in this case, leave `queryClient` as undefined. Continue to navigate to the referrer.
-    }
-
     useEffect(() => {
         const refetchData = async () => {
             const showLoadingSpinner = new Promise((resolve) =>
                 setTimeout(resolve, LOADING_SPINNER_MIN_DURATION)
             )
-            const invalidateQueries = queryClient?.invalidateQueries()
 
-            await Promise.all([showLoadingSpinner, invalidateQueries])
+            await Promise.all([showLoadingSpinner])
 
             // Soft navigate to the referrer
             let referrer = new URLSearchParams(location.search).get('referrer')

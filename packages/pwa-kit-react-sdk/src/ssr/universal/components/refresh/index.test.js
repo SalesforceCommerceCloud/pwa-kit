@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useQueryClient} from '@tanstack/react-query'
 import {mount} from 'enzyme'
 import React from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
@@ -25,15 +24,6 @@ jest.mock('react-router-dom', () => {
     }
 })
 
-jest.mock('@tanstack/react-query', () => {
-    const invalidateQueries = jest.fn()
-    return {
-        useQueryClient: jest.fn(() => ({
-            invalidateQueries
-        }))
-    }
-})
-
 // Similar to `waitFor` in testing-library/react
 // See: https://www.benmvp.com/blog/asynchronous-testing-with-enzyme-react-jest/
 const runAllPromises = () => new Promise((resolve) => setImmediate(resolve))
@@ -43,17 +33,7 @@ test('renders a loading spinner initially', () => {
     expect(wrapper.find('[data-testid="loading-spinner"]').length).toBe(1)
 })
 
-test('wait for react-query cache to be invalidated', async () => {
-    mount(<Refresh />)
-    await runAllPromises()
-    expect(useQueryClient().invalidateQueries).toHaveBeenCalled()
-})
-
 test('a project not using react-query', async () => {
-    // If customer project does not use react-query, calling useQueryClient would throw an error
-    useQueryClient.mockImplementationOnce(() => {
-        throw new Error()
-    })
     mount(<Refresh />)
     jest.runAllTimers()
     await runAllPromises()
