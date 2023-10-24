@@ -421,7 +421,14 @@ const checkOutputDir = (path) => {
     }
 }
 
-const main = (opts) => {
+const main = async (opts) => {
+    console.log('')
+    console.warn('Warning: pwa-kit-create-app has moved to \x1b[1m@salesforce/pwa-kit-create-app\x1b[0m.')
+    console.warn('Please use the new package to use the latest PWA Kit features.')
+    console.log('')
+    // Wait 1 second before continuing to draw attention to the warning
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
     if (!isUsingCompatibleNode) {
         console.log('')
         console.warn(
