@@ -14,6 +14,7 @@ import {getAppConfig} from '../../compatibility'
 import routes from '../../routes'
 import {pages as pageEvents} from '../../events'
 import {withLegacyGetProps} from '../../components/with-legacy-get-props'
+import Refresh from '../refresh'
 
 const noop = () => undefined
 
@@ -406,7 +407,12 @@ export const getRoutes = (locals) => {
     if (typeof routes === 'function') {
         _routes = routes()
     }
-    const allRoutes = [..._routes, {path: '*', component: Throw404}]
+    const allRoutes = [
+        // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
+        {path: '/__pwa-kit/refresh', component: Refresh},
+        ..._routes,
+        {path: '*', component: Throw404}
+    ]
     return allRoutes.map(({component, ...rest}) => {
         return {
             component: component ? routeComponent(component, true, locals) : component,

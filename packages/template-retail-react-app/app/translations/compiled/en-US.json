@@ -2311,12 +2311,6 @@
       "value": "Wishlist"
     }
   ],
-  "product_tile.label.starting_at_price": [
-    {
-      "type": 0,
-      "value": "Starting at"
-    }
-  ],
   "product_view.button.add_set_to_cart": [
     {
       "type": 0,

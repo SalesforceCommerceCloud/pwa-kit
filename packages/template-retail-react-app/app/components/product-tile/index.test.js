@@ -91,6 +91,6 @@ test('Renders Skeleton', () => {
 test('Product set - renders the appropriate price label', async () => {
     const {getByTestId} = renderWithProviders(<ProductTile product={mockProductSet} />)
 
-    const container = getByTestId('product-tile-price')
+    const container = getByTestId('product-set-price')
     expect(container).toHaveTextContent(/starting at/i)
 })

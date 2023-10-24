@@ -9,6 +9,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {detectStorefrontPreview, getClientScript} from './utils'
+import {useHistory} from 'react-router-dom'
 
 /**
  *
@@ -17,12 +18,16 @@ import {detectStorefrontPreview, getClientScript} from './utils'
  * @param  {Array} additionalSearchParams - An array of key/value search params to add when context changes
  */
 export const StorefrontPreview = ({enabled = true, getToken, additionalSearchParams}) => {
+    const history = useHistory()
     let isHostTrusted
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
+                navigate: (path, action = 'push', ...args) => {
+                    history[action](path, ...args)
+                },
                 additionalSearchParams
             }
         }
