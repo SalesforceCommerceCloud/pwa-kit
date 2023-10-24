@@ -79,6 +79,8 @@ describe('Storefront Preview Component', function () {
         mount(<StorefrontPreview getToken={() => 'my-token'} />)
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
         expect(window.STOREFRONT_PREVIEW.navigate).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.additionalSearchParams).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.reloadServerSide).toBeDefined()
     })
 
     test('window.STOREFRONT_PREVIEW.navigate', () => {
@@ -92,7 +94,7 @@ describe('Storefront Preview Component', function () {
         expect(useHistory().push).toHaveBeenCalledWith('/')
     })
 
-    test('additionalSearchParams is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
+    test('window.STOREFRONT_PREVIEW.additionalSearchParams', async () => {
         detectStorefrontPreview.mockReturnValue(true)
 
         const getSearchParamsToAdd = () => {
@@ -115,6 +117,24 @@ describe('Storefront Preview Component', function () {
             />
         )
         expect(window.STOREFRONT_PREVIEW.additionalSearchParams).toBeDefined()
-        expect(window.STOREFRONT_PREVIEW.additionalSearchParams.length).toBe(getSearchParamsToAdd().length)
+        expect(window.STOREFRONT_PREVIEW.additionalSearchParams.length).toBe(
+            getSearchParamsToAdd().length
+        )
+    })
+
+    test('window.STOREFRONT_PREVIEW.reloadServerSide to be false', async () => {
+        detectStorefrontPreview.mockReturnValue(true)
+
+        mount(<StorefrontPreview getToken={() => 'my-token'} />)
+        expect(window.STOREFRONT_PREVIEW.reloadServerSide).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.reloadServerSide).toBe(false)
+    })
+
+    test('window.STOREFRONT_PREVIEW.reloadServerSide to be true', async () => {
+        detectStorefrontPreview.mockReturnValue(true)
+
+        mount(<StorefrontPreview getToken={() => 'my-token'} reloadServerSide={true} />)
+        expect(window.STOREFRONT_PREVIEW.reloadServerSide).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.reloadServerSide).toBe(true)
     })
 })

@@ -16,8 +16,14 @@ import {useHistory} from 'react-router-dom'
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
  * @param  {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  * @param  {Array} additionalSearchParams - An array of key/value search params to add when context changes
+ * @param  {boolean} reloadServerSide - if true, will reload the page on server side when context changes
  */
-export const StorefrontPreview = ({enabled = true, getToken, additionalSearchParams}) => {
+export const StorefrontPreview = ({
+    enabled = true,
+    getToken,
+    additionalSearchParams = [],
+    reloadServerSide = false
+}) => {
     const history = useHistory()
     let isHostTrusted
     useEffect(() => {
@@ -28,10 +34,11 @@ export const StorefrontPreview = ({enabled = true, getToken, additionalSearchPar
                 navigate: (path, action = 'push', ...args) => {
                     history[action](path, ...args)
                 },
-                additionalSearchParams
+                additionalSearchParams,
+                reloadServerSide
             }
         }
-    }, [enabled, getToken, additionalSearchParams])
+    }, [enabled, getToken, additionalSearchParams, reloadServerSide])
     if (!enabled) {
         return null
     }
@@ -50,7 +57,8 @@ export const StorefrontPreview = ({enabled = true, getToken, additionalSearchPar
 }
 
 StorefrontPreview.defaultProps = {
-    enabled: true
+    enabled: true,
+    reloadServerSide: false
 }
 
 StorefrontPreview.propTypes = {
@@ -66,5 +74,6 @@ StorefrontPreview.propTypes = {
             )
         }
     },
-    additionalSearchParams: PropTypes.array
+    additionalSearchParams: PropTypes.array,
+    reloadServerSide: PropTypes.bool
 }
