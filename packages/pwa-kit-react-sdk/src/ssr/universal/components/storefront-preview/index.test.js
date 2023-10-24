@@ -9,6 +9,7 @@ import {mount} from 'enzyme'
 import {StorefrontPreview} from './index'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
+import {useHistory} from 'react-router-dom'
 
 jest.mock('./utils', () => {
     const origin = jest.requireActual('./utils')
@@ -17,6 +18,18 @@ jest.mock('./utils', () => {
         detectStorefrontPreview: jest.fn()
     }
 })
+
+jest.mock('react-router-dom', () => {
+    const replace = jest.fn()
+    const push = jest.fn()
+    return {
+        useHistory: jest.fn(() => ({
+            replace,
+            push
+        }))
+    }
+})
+
 describe('Storefront Preview Component', function () {
     const oldWindow = window
 
@@ -60,10 +73,22 @@ describe('Storefront Preview Component', function () {
         expect(helmet.scriptTags[0].type).toBe('text/javascript')
     })
 
-    test('getToken is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
+    test('properties in window.STOREFRONT_PREVIEW to be defined', async () => {
         detectStorefrontPreview.mockReturnValue(true)
 
         mount(<StorefrontPreview getToken={() => 'my-token'} />)
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.navigate).toBeDefined()
+    })
+
+    test('window.STOREFRONT_PREVIEW.navigate', () => {
+        detectStorefrontPreview.mockReturnValue(true)
+        mount(<StorefrontPreview getToken={() => 'my-token'} />)
+
+        window.STOREFRONT_PREVIEW.navigate('/', 'replace')
+        expect(useHistory().replace).toHaveBeenCalledWith('/')
+
+        window.STOREFRONT_PREVIEW.navigate('/')
+        expect(useHistory().push).toHaveBeenCalledWith('/')
     })
 })

@@ -9,6 +9,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {detectStorefrontPreview, getClientScript} from './utils'
+import {useHistory} from 'react-router-dom'
 
 /**
  *
@@ -16,12 +17,16 @@ import {detectStorefrontPreview, getClientScript} from './utils'
  * @param  {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  */
 export const StorefrontPreview = ({enabled = true, getToken}) => {
+    const history = useHistory()
     let isHostTrusted
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
-                getToken
+                getToken,
+                navigate: (path, action = 'push', ...args) => {
+                    history[action](path, ...args)
+                }
             }
         }
     }, [enabled, getToken])
