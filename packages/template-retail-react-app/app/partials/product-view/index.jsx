@@ -21,18 +21,14 @@ import ImageGallery from '../../components/image-gallery'
 import Breadcrumb from '../../components/breadcrumb'
 import Link from '../../components/link'
 import withRegistration from '../../hoc/with-registration'
-import {useCurrency} from '../../hooks'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
 import {useToast} from '../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../constants'
+import DisplayPrice from '../../components/display-price'
 
-const ProductViewHeader = ({name, price, currency, category, productType}) => {
-    const intl = useIntl()
-    const {currency: activeCurrency} = useCurrency()
-    const isProductASet = productType?.set
-
+const ProductViewHeader = ({product, category}) => {
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -42,34 +38,19 @@ const ProductViewHeader = ({name, price, currency, category, productType}) => {
             )}
 
             {/* Title */}
-            <Skeleton isLoaded={name}>
-                <Heading fontSize="2xl">{`${name}`}</Heading>
+            <Skeleton isLoaded={product?.name}>
+                <Heading fontSize="2xl">{`${product?.name}`}</Heading>
             </Skeleton>
 
             {/* Price */}
-            <Skeleton isLoaded={price} minWidth={32}>
-                <Text fontWeight="bold" fontSize="md" aria-label="price">
-                    {isProductASet &&
-                        `${intl.formatMessage({
-                            id: 'product_view.label.starting_at_price',
-                            defaultMessage: 'Starting at'
-                        })} `}
-                    {intl.formatNumber(price, {
-                        style: 'currency',
-                        currency: currency || activeCurrency
-                    })}
-                </Text>
-            </Skeleton>
+            <DisplayPrice product={product} scope="pdp" />
         </VStack>
     )
 }
 
 ProductViewHeader.propTypes = {
-    name: PropTypes.string,
-    price: PropTypes.number,
-    currency: PropTypes.string,
-    category: PropTypes.array,
-    productType: PropTypes.object
+    product: PropTypes.object,
+    category: PropTypes.array
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -284,13 +265,7 @@ const ProductView = forwardRef(
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
                 {/* Basic information etc. title, price, breadcrumb*/}
                 <Box display={['block', 'block', 'block', 'none']}>
-                    <ProductViewHeader
-                        name={product?.name}
-                        price={product?.price}
-                        productType={product?.type}
-                        currency={product?.currency}
-                        category={category}
-                    />
+                    <ProductViewHeader product={product} category={category} />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
                     <Box flex={1} mr={[0, 0, 0, 6, 6]}>
@@ -323,13 +298,7 @@ const ProductView = forwardRef(
                     {/* Variations & Quantity Selector & CTA buttons */}
                     <VStack align="stretch" spacing={8} flex={1}>
                         <Box display={['none', 'none', 'none', 'block']}>
-                            <ProductViewHeader
-                                name={product?.name}
-                                price={product?.price}
-                                productType={product?.type}
-                                currency={product?.currency}
-                                category={category}
-                            />
+                            <ProductViewHeader product={product} category={category} />
                         </Box>
                         <VStack align="stretch" spacing={4}>
                             {/*

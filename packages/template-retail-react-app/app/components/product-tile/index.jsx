@@ -28,7 +28,7 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder} from '../../utils/url'
 import Link from '../link'
 import withRegistration from '../../hoc/with-registration'
-import {useCurrency} from '../../hooks'
+import DisplayPrice from '../display-price'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -65,16 +65,13 @@ const ProductTile = (props) => {
         dynamicImageProps,
         ...rest
     } = props
-
-    const {currency, image, price, productId, hitType} = product
-
+    const {image, productId} = product
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
 
-    const {currency: activeCurrency} = useCurrency()
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
 
@@ -130,17 +127,7 @@ const ProductTile = (props) => {
             <Text {...styles.title}>{localizedProductName}</Text>
 
             {/* Price */}
-            <Text {...styles.price} data-testid="product-tile-price">
-                {hitType === 'set' &&
-                    intl.formatMessage({
-                        id: 'product_tile.label.starting_at_price',
-                        defaultMessage: 'Starting at'
-                    })}{' '}
-                {intl.formatNumber(price, {
-                    style: 'currency',
-                    currency: currency || activeCurrency
-                })}
-            </Text>
+            <DisplayPrice product={product} scope="tile" />
         </Link>
     )
 }
