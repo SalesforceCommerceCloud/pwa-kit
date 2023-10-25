@@ -2,12 +2,13 @@ name: setup_ubuntu
 inputs:
   cwd:
     required: false
-    default: "${PWD}"
+    default: ${{ github.workspace }}
 description: "Setup Ubuntu Machine"
 runs:
   using: composite
   steps:
     - name: Install Dependencies
+      working-directory: ${{ inputs.cwd }}
       run: |-
         # Install system dependencies
         sudo apt-get update -yq
@@ -28,7 +29,7 @@ runs:
         npm run check-dep-version
 
         # Install Snyk CLI
-        # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.  
+        # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.
         # TODO: Latest Snyk CLI version is currently failing on npm i. We use the alternative Snyk GitHub integration.
         # sudo npm install -g snyk
 
