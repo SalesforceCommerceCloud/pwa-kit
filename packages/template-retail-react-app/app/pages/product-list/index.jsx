@@ -70,6 +70,7 @@ import {
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 // import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
@@ -110,6 +111,7 @@ const ProductList = (props) => {
     const location = useLocation()
     const toast = useToast()
     const einstein = useEinstein()
+    const activeData = useActiveData()
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
@@ -356,9 +358,21 @@ const ProductList = (props) => {
     /**************** Einstein ****************/
     useEffect(() => {
         if (productSearchResult) {
-            isSearch
-                ? einstein.sendViewSearch(searchQuery, productSearchResult)
-                : einstein.sendViewCategory(category, productSearchResult)
+            if (isSearch) {
+                try {
+                    einstein.sendViewSearch(searchQuery, productSearchResult)
+                } catch (err) {
+                    console.error(err)
+                }
+                activeData.sendViewSearch(searchParams, productSearchResult)
+            } else {
+                try {
+                    einstein.sendViewCategory(category, productSearchResult)
+                } catch (err) {
+                    console.error(err)
+                }
+                activeData.sendViewCategory(searchParams, category, productSearchResult)
+            }
         }
     }, [productSearchResult])
 

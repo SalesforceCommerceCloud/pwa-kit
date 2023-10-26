@@ -112,3 +112,6 @@ export const SHIPPING_COUNTRY_CODES = [
     {value: 'CA', label: 'Canada'},
     {value: 'US', label: 'United States'}
 ]
+
+// Constant to Enable Active Data
+export const ACTIVE_DATA_ENABLE = false
