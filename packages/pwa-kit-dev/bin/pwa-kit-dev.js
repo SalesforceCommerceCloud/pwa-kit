@@ -192,7 +192,7 @@ const main = async () => {
         )
         .action(async ({user, key, credentialsFile}) => {
             try {
-                fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
+                await fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
                 success(`Saved Managed Runtime credentials to "${chalk.cyan(credentialsFile)}".`)
             } catch (e) {
                 error('Failed to save credentials.')
