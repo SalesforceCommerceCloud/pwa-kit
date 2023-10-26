@@ -158,27 +158,31 @@ const main = async () => {
 
     managedRuntimeCommand('save-credentials')
         .description(`save API credentials for Managed Runtime`)
-        .requiredOption(
-            '-u, --user <email>',
-            'the e-mail address you used to register with Managed Runtime',
-            (val) => {
-                if (!validator.isEmail(val)) {
-                    throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
-                } else {
-                    return val
+        .addOption(
+            new program.Option(
+                '-u, --user <email>',
+                'the e-mail address you used to register with Managed Runtime',
+                (val) => {
+                    if (!validator.isEmail(val)) {
+                        throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
+                    } else {
+                        return val
+                    }
                 }
-            }
+            ).env('MRT_USER').makeOptionMandatory()
         )
-        .requiredOption(
-            '-k, --key <api-key>',
-            `find your API key at https://runtime.commercecloud.com/account/settings`,
-            (val) => {
-                if (typeof val !== 'string' || val === '') {
-                    throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
-                } else {
-                    return val
+        .addOption(
+            new program.Option(
+                '-k, --key <api-key>',
+                `find your API key at https://runtime.commercecloud.com/account/settings`,
+                (val) => {
+                    if (typeof val !== 'string' || val === '') {
+                        throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
+                    } else {
+                        return val
+                    }
                 }
-            }
+            ).env('MRT_API_KEY').makeOptionMandatory()
         )
         .action(async ({user, key, credentialsFile}) => {
             try {
@@ -305,6 +309,32 @@ const main = async () => {
         .addOption(
             new program.Option('-w, --wait', 'wait for the deployment to complete before exiting')
         )
+        .addOption(
+            new program.Option(
+                '-u, --user <email>',
+                'the e-mail address you used to register with Managed Runtime',
+                (val) => {
+                    if (!validator.isEmail(val)) {
+                        throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
+                    } else {
+                        return val
+                    }
+                }
+            ).env('MRT_USER')
+        )
+        .addOption(
+            new program.Option(
+                '-k, --key <api-key>',
+                `find your API key at https://runtime.commercecloud.com/account/settings`,
+                (val) => {
+                    if (typeof val !== 'string' || val === '') {
+                        throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
+                    } else {
+                        return val
+                    }
+                }
+            ).env('MRT_API_KEY')
+        )
         .action(
             async ({
                 buildDirectory,
@@ -313,7 +343,9 @@ const main = async () => {
                 target,
                 cloudOrigin,
                 credentialsFile,
-                wait
+                wait,
+                user,
+                key
             }) => {
                 // Set the deployment target env var, this is required to ensure we
                 // get the correct configuration object. Do not assign the variable it if
@@ -327,7 +359,16 @@ const main = async () => {
                     )
                 }
 
-                const credentials = await scriptUtils.readCredentials(credentialsFile)
+                /** @type {Credentials} */
+                var credentials
+                if (user && key) {
+                    credentials = {
+                        username: user,
+                        api_key: key
+                    }
+                } else {
+                    credentials = await scriptUtils.readCredentials(credentialsFile)
+                }
 
                 if (!fse.pathExistsSync(buildDirectory)) {
                     throw new Error(`Supplied "buildDirectory" does not exist!`)
@@ -405,12 +446,47 @@ const main = async () => {
             )
         )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
-        .action(async ({project, environment, cloudOrigin, credentialsFile}) => {
+        .addOption(
+            new program.Option(
+                '-u, --user <email>',
+                'the e-mail address you used to register with Managed Runtime',
+                (val) => {
+                    if (!validator.isEmail(val)) {
+                        throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
+                    } else {
+                        return val
+                    }
+                }
+            ).env('MRT_USER')
+        )
+        .addOption(
+            new program.Option(
+                '-k, --key <api-key>',
+                `find your API key at https://runtime.commercecloud.com/account/settings`,
+                (val) => {
+                    if (typeof val !== 'string' || val === '') {
+                        throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
+                    } else {
+                        return val
+                    }
+                }
+            ).env('MRT_API_KEY')
+        )
+        .action(async ({project, environment, cloudOrigin, credentialsFile, user, key}) => {
             if (!project) {
                 project = await getProjectName()
             }
 
-            const credentials = await scriptUtils.readCredentials(credentialsFile)
+            /** @type {Credentials} */
+            var credentials
+            if (user && key) {
+                credentials = {
+                    username: user,
+                    api_key: key
+                }
+            } else {
+                credentials = await scriptUtils.readCredentials(credentialsFile)
+            }
 
             const client = new scriptUtils.CloudAPIClient({
                 credentials,
