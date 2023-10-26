@@ -161,7 +161,6 @@ const main = async () => {
                         }
                     })
                     .env('MRT_USER')
-                    .conflicts('credentialsFile')
             )
             .addOption(
                 new program.Option(
@@ -176,7 +175,6 @@ const main = async () => {
                         }
                     })
                     .env('MRT_API_KEY')
-                    .conflicts('credentialsFile')
             )
             .hook('preAction', (thisCommand, actionCommand) => {
                 let {cloudOrigin, credentialsFile, user, key} = actionCommand.opts()
