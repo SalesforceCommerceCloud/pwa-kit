@@ -171,6 +171,7 @@ const main = async () => {
                 }
             )
                 .env('MRT_USER')
+                .conflicts('credentialsFile')
                 .makeOptionMandatory()
         )
         .addOption(
