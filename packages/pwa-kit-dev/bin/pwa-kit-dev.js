@@ -126,6 +126,9 @@ const main = async () => {
      * All Managed Runtime commands take common opts like --cloud-origin
      * and --credentialsFile. These are set to be split out from the SDK
      * commands here in the near future.
+     *
+     * @param {string} name name of the command
+     * @returns {import('commander').Command}
      */
     const managedRuntimeCommand = (name) => {
         return program
@@ -145,51 +148,66 @@ const main = async () => {
                     .default(undefined)
                     .env('PWA_KIT_CREDENTIALS_FILE')
             )
+            .addOption(
+                new program.Option(
+                    '-u, --user <email>',
+                    'the e-mail address you used to register with Managed Runtime'
+                )
+                    .argParser((val) => {
+                        if (!validator.isEmail(val)) {
+                            throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
+                        } else {
+                            return val
+                        }
+                    })
+                    .env('MRT_USER')
+                    .conflicts('credentialsFile')
+            )
+            .addOption(
+                new program.Option(
+                    '-k, --key <api-key>',
+                    `find your API key at https://runtime.commercecloud.com/account/settings`
+                )
+                    .argParser((val) => {
+                        if (typeof val !== 'string' || val === '') {
+                            throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
+                        } else {
+                            return val
+                        }
+                    })
+                    .env('MRT_API_KEY')
+                    .conflicts('credentialsFile')
+            )
             .hook('preAction', (thisCommand, actionCommand) => {
+                const {cloudOrigin, credentialsFile, user, key} = actionCommand.opts()
+
                 // The final credentialsFile path depends on both cloudOrigin and credentialsFile opts.
                 // Pre-process before passing to the command.
-                const {cloudOrigin, credentialsFile} = actionCommand.opts()
                 actionCommand.setOptionValue(
                     'credentialsFile',
                     scriptUtils.getCredentialsFile(cloudOrigin, credentialsFile)
                 )
+
+                // user and key should always be used together
+                if ((user && !key) || (!user && key)) {
+                    throw new program.InvalidArgumentError(
+                        'You must provide a --user and --key argument together, or neither'
+                    )
+                }
             })
     }
 
     managedRuntimeCommand('save-credentials')
         .description(`save API credentials for Managed Runtime`)
-        .addOption(
-            new program.Option(
-                '-u, --user <email>',
-                'the e-mail address you used to register with Managed Runtime',
-                (val) => {
-                    if (!validator.isEmail(val)) {
-                        throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
-                    } else {
-                        return val
-                    }
-                }
-            )
-                .env('MRT_USER')
-                .conflicts('credentialsFile')
-                .makeOptionMandatory()
-        )
-        .addOption(
-            new program.Option(
-                '-k, --key <api-key>',
-                `find your API key at https://runtime.commercecloud.com/account/settings`,
-                (val) => {
-                    if (typeof val !== 'string' || val === '') {
-                        throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
-                    } else {
-                        return val
-                    }
-                }
-            )
-                .env('MRT_API_KEY')
-                .conflicts('credentialsFile')
-                .makeOptionMandatory()
-        )
+        .hook('preAction', (thisCommand, actionCommand) => {
+            const {user, key} = actionCommand.opts()
+            // user and key are optional for other MRT commands but required here as we need something to save
+            if (!user || !key) {
+                throw new program.InvalidArgumentError(
+                    'You must provide a --user and --key argument to save to the credentials file'
+                )
+            }
+        })
         .action(async ({user, key, credentialsFile}) => {
             try {
                 await fse.writeJson(credentialsFile, {username: user, api_key: key}, {spaces: 4})
@@ -315,32 +333,6 @@ const main = async () => {
         .addOption(
             new program.Option('-w, --wait', 'wait for the deployment to complete before exiting')
         )
-        .addOption(
-            new program.Option(
-                '-u, --user <email>',
-                'the e-mail address you used to register with Managed Runtime',
-                (val) => {
-                    if (!validator.isEmail(val)) {
-                        throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
-                    } else {
-                        return val
-                    }
-                }
-            ).env('MRT_USER')
-        )
-        .addOption(
-            new program.Option(
-                '-k, --key <api-key>',
-                `find your API key at https://runtime.commercecloud.com/account/settings`,
-                (val) => {
-                    if (typeof val !== 'string' || val === '') {
-                        throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
-                    } else {
-                        return val
-                    }
-                }
-            ).env('MRT_API_KEY')
-        )
         .action(
             async ({
                 buildDirectory,
@@ -452,32 +444,6 @@ const main = async () => {
             )
         )
         .requiredOption('-e, --environment <environmentSlug>', 'the environment slug')
-        .addOption(
-            new program.Option(
-                '-u, --user <email>',
-                'the e-mail address you used to register with Managed Runtime',
-                (val) => {
-                    if (!validator.isEmail(val)) {
-                        throw new program.InvalidArgumentError(`"${val}" is not a valid email`)
-                    } else {
-                        return val
-                    }
-                }
-            ).env('MRT_USER')
-        )
-        .addOption(
-            new program.Option(
-                '-k, --key <api-key>',
-                `find your API key at https://runtime.commercecloud.com/account/settings`,
-                (val) => {
-                    if (typeof val !== 'string' || val === '') {
-                        throw new program.InvalidArgumentError(`"api-key" cannot be empty`)
-                    } else {
-                        return val
-                    }
-                }
-            ).env('MRT_API_KEY')
-        )
         .action(async ({project, environment, cloudOrigin, credentialsFile, user, key}) => {
             if (!project) {
                 project = await getProjectName()
