@@ -187,6 +187,7 @@ const main = async () => {
                 }
             )
                 .env('MRT_API_KEY')
+                .conflicts('credentialsFile')
                 .makeOptionMandatory()
         )
         .action(async ({user, key, credentialsFile}) => {
