@@ -146,7 +146,7 @@ const main = async () => {
                     // Must default to undefined in order to trigger automatic-lookup
                     // of a credentials file, based on --cloud-origin.
                     .default(undefined)
-                    .env('PWA_KIT_CREDENTIALS_FILE')
+                    .env('MRT_CREDENTIALS_FILE')
             )
             .addOption(
                 new program.Option(
@@ -179,7 +179,12 @@ const main = async () => {
                     .conflicts('credentialsFile')
             )
             .hook('preAction', (thisCommand, actionCommand) => {
-                const {cloudOrigin, credentialsFile, user, key} = actionCommand.opts()
+                let {cloudOrigin, credentialsFile, user, key} = actionCommand.opts()
+
+                // support older PWA_KIT_CREDENTIALS_FILE env var for credentialsFile
+                if (!credentialsFile && process.env.PWA_KIT_CREDENTIALS_FILE) {
+                    credentialsFile = process.env.PWA_KIT_CREDENTIALS_FILE
+                }
 
                 // The final credentialsFile path depends on both cloudOrigin and credentialsFile opts.
                 // Pre-process before passing to the command.
