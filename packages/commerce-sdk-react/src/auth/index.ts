@@ -514,10 +514,11 @@ class Auth {
      * @returns {Promise}
      */
     createOCAPISession() {
+        // Example URL 'https://test.phased-launch-testing.com/on/demandware.store/Sites-RefArch-Site/en_US/SLASSessionHelper-SyncHybridSession'
         return fetch(this.OCAPISessionsURL, {
-            method: 'POST',
+            method: 'GET',
             headers: {
-                Authorization: 'Bearer ' + this.get('access_token')
+                Authorization: this.get('access_token')
             }
         })
     }

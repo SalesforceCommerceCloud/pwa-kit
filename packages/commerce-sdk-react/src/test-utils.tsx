@@ -31,7 +31,7 @@ export const DEFAULT_TEST_CONFIG = {
     locale: 'en-US',
     currency: 'USD',
     fetchedToken: 'test-token',
-    OCAPISessionsURL: `${DEFAULT_TEST_HOST}/mobify/proxy/ocapi/s/RefArch/dw/shop/v22_8/sessions`
+    OCAPISessionsURL: `${DEFAULT_TEST_HOST}/on/demandware.store/Sites-RefArch-Site/en_US/SLASSessionHelper-SyncHybridSession`
 }
 
 export const createQueryClient = () => {
