@@ -191,7 +191,7 @@ const main = async () => {
                 // user and key should always be used together
                 if ((user && !key) || (!user && key)) {
                     throw new program.InvalidArgumentError(
-                        'You must provide a --user and --key argument together, or neither'
+                        'You must provide a --user and --key option together, or neither'
                     )
                 }
             })
@@ -204,7 +204,7 @@ const main = async () => {
             // user and key are optional for other MRT commands but required here as we need something to save
             if (!user || !key) {
                 throw new program.InvalidArgumentError(
-                    'You must provide a --user and --key argument to save to the credentials file'
+                    'You must provide a --user and --key option to save to the credentials file'
                 )
             }
         })
