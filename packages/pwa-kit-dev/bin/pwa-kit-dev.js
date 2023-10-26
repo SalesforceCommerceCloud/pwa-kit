@@ -403,7 +403,7 @@ const main = async () => {
                 warnings.forEach(warn)
                 if (wait) {
                     success('Bundle Uploaded - waiting for deployment to complete')
-                    await client.waitForDeploy()
+                    await client.waitForDeploy(projectSlug, target)
                 } else {
                     success('Bundle Uploaded')
                 }
