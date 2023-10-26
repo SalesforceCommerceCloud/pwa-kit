@@ -169,7 +169,9 @@ const main = async () => {
                         return val
                     }
                 }
-            ).env('MRT_USER').makeOptionMandatory()
+            )
+                .env('MRT_USER')
+                .makeOptionMandatory()
         )
         .addOption(
             new program.Option(
@@ -182,7 +184,9 @@ const main = async () => {
                         return val
                     }
                 }
-            ).env('MRT_API_KEY').makeOptionMandatory()
+            )
+                .env('MRT_API_KEY')
+                .makeOptionMandatory()
         )
         .action(async ({user, key, credentialsFile}) => {
             try {
