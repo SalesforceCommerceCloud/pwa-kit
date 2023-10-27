@@ -1,3 +1,6 @@
+## v1.1.0-nightly-20231027080143 (Oct 27, 2023)
+## v1.1.0-dev (Oct 27, 2023)
+## v3.2.0-nightly-20231027080143 (Oct 27, 2023)
 ## v1.1.0-dev (Sep 26, 2023)
 - Using `login` for authentication instead of `email` in registration process [#1464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1464)
 
