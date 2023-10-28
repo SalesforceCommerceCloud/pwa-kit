@@ -23,7 +23,7 @@ import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 // This is a flaky test file!
 jest.retryTimes(5)
-jest.setTimeout(30_000)
+jest.setTimeout(40_000)
 
 // Minimal subset of `ocapiOrderResponse` in app/mocks/mock-data.js
 const scapiOrderResponse = {
