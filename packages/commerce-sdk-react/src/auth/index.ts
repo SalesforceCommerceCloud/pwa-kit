@@ -503,7 +503,7 @@ class Auth {
     }
 
     /**
-     * Make a post request to the OCAPI /session endpoint to bridge the session.
+     * Make a get request to the Plugin SLAS SLASSessionHelper-SyncHybridSession controller to bridge the session.
      *
      * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
      * This cookie is used on SFRA, and it allows shoppers to navigate between SFRA and
@@ -518,6 +518,7 @@ class Auth {
         return fetch(this.OCAPISessionsURL, {
             method: 'GET',
             headers: {
+                // We don't require the 'Bearer' prefix as the controller adds it before calling the OCAPI /sessions endpoint
                 Authorization: this.get('access_token')
             }
         })
