@@ -55,9 +55,13 @@ const AppConfig = ({children, locals = {}}) => {
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
-            OCAPISessionsURL={`${appOrigin}/on/demandware.store/Sites-${
-                locals.site?.id
-            }-Site/${locals.locale?.id?.replace('-', '_')}/SLASSessionHelper-SyncHybridSession`}
+            OCAPISessionsURL={
+                locals.site?.id &&
+                locals.locale?.id &&
+                `${appOrigin}/on/demandware.store/Sites-${
+                    locals.site.id
+                }-Site/${locals.locale.id?.replace('-', '_')}/SLASSessionHelper-SyncHybridSession`
+            }
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
