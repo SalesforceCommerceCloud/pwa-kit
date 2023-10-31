@@ -30,10 +30,6 @@ export class MemoryStorage extends BaseStorage {
     }
     delete(key: string) {
         const suffixedKey = this.getSuffixedKey(key)
-        if (this.map.has(suffixedKey)) {
-            this.map.delete(suffixedKey)
-        } else {
-            console.error(`Failed to remove key, key not found: ${suffixedKey}`)
-        }
+        this.map.delete(suffixedKey)
     }
 }

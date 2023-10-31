@@ -33,18 +33,11 @@ export class CookieStorage extends BaseStorage {
         const suffixedKey = this.getSuffixedKey(key)
         return Cookies.get(suffixedKey) || ''
     }
-    delete(key: string) {
+    delete(key: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
-
         Cookies.remove(suffixedKey, {
-          ...getDefaultCookieAttributes(),
-          ...options
+            ...getDefaultCookieAttributes(),
+            ...options
         })
-
-        // Check if the Cookie Doesn't Exist
-        const existingCookie = Cookies.get(suffixedKey)
-        if (existingCookie) {
-            console.error(`Failed to remove the cookie ${suffixedKey}`)
-        }
     }
 }
