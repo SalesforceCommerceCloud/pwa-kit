@@ -39,11 +39,9 @@ export class CookieStorage extends BaseStorage {
         // We usually use `Cookies.remove(key)` from the `js-cookie` library to delete a cookie. But, this
         // method fails when removing a cookie on an iframed website like within StorefrontPreview on WebKit
         // browsers such as Chrome and Safari.
-        const samesite = 'none'
-        const expirationDate = new Date('Thu, 01 Jan 1970 00:00:00 UTC')
 
         // Set the expiration date in the past to delete the cookie
-        document.cookie = `${suffixedKey}=; expires='${expirationDate.toUTCString()}'; secure; samesite=${samesite}`
+        document.cookie = `${suffixedKey}=; expires=Thu, 01 Jan 1970 00:00:01 GMT; secure; samesite=none`
 
         // Check if the Cookie Doesn't Exist
         const existingCookie = Cookies.get(suffixedKey)
