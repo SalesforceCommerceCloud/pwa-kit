@@ -59,9 +59,15 @@ export class LocalStorage extends BaseStorage {
                 newValue: null
             })
             window.dispatchEvent(event)
-
-        } catch (error) {
-            console.error(`Failed to remove the localStorage item: ${error}`)
+        } catch (error: any) {
+            if (error instanceof Error) {
+                console.error(`Failed to remove the localStorage item: ${error.message}`)
+            } else {
+                console.error(
+                    'An unknown error occurred while removing the localStorage item:',
+                    error
+                )
+            }
         }
     }
 }

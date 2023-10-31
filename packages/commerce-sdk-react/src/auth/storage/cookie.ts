@@ -48,8 +48,5 @@ export class CookieStorage extends BaseStorage {
         if (existingCookie) {
             console.error(`Failed to remove the cookie ${suffixedKey}`)
         }
-
     }
-
-
 }
