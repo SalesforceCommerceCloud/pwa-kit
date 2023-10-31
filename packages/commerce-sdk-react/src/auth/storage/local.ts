@@ -60,7 +60,6 @@ export class LocalStorage extends BaseStorage {
             })
             window.dispatchEvent(event)
 
-            console.log(`Successfully removed the localStorage item: ${suffixedKey}`)
         } catch (error) {
             console.error(`Failed to remove the localStorage item: ${error}`)
         }

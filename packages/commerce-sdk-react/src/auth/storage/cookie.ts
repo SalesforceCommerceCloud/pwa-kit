@@ -47,10 +47,7 @@ export class CookieStorage extends BaseStorage {
 
         // Check if the Cookie Doesn't Exist
         const existingCookie = Cookies.get(suffixedKey)
-        console.log(`Successfully removed the cookie ${suffixedKey}`)
-        if (!existingCookie) {
-            console.error(`Successfully removed the cookie ${suffixedKey}`)
-        } else{
+        if (existingCookie) {
             console.error(`Failed to remove the cookie ${suffixedKey}`)
         }
 
