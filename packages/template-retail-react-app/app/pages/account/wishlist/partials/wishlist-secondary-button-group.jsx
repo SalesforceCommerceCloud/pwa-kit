@@ -6,7 +6,11 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
+import {
+    Button,
+    ButtonGroup,
+    useDisclosure
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 

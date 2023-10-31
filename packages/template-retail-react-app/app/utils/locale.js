@@ -40,7 +40,7 @@ export const fetchTranslations = async (locale) => {
     } catch (err) {
         console.error(err)
         console.log(
-            'Loading empty messages, so that react-intl would fall back to the inline default messages'
+            'Translation not found. Loading empty messages, so that react-intl would fall back to the inline default messages'
         )
         return {}
     }

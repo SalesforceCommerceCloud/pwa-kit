@@ -12,7 +12,7 @@ import {
     CloseButton,
     Spacer,
     useToast as useChakraToast
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 /**
  * Display a toast message on the screen.

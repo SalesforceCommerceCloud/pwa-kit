@@ -15,7 +15,7 @@ import {
     AlertDialogContent,
     AlertDialogOverlay,
     Text
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 import PropTypes from 'prop-types'
 import {CONFIRMATION_DIALOG_DEFAULT_CONFIG} from '@salesforce/retail-react-app/app/pages/account/constant'

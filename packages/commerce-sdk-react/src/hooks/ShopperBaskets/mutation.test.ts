@@ -46,6 +46,7 @@ const createOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
 const basketsEndpoint = '/checkout/shopper-baskets/'
 const BASKET_ID = 'basket_id'
 const getBasketOptions = createOptions<'getBasket'>(undefined, {})
+const EMPTY_BASKET: Basket = {}
 const oldBasket: Basket = {basketId: BASKET_ID, mockData: 'old basket'}
 const newBasket: Basket = {basketId: BASKET_ID, mockData: 'new basket'}
 // --- getCustomerBaskets constants --- //
@@ -56,6 +57,14 @@ const getCustomerBasketsOptions: Argument<ApiClients['shopperCustomers']['getCus
     parameters: {
         customerId: CUSTOMER_ID
     }
+}
+const emptyCustomerBaskets: BasketsResult = {
+    baskets: [] as BasketsResult['baskets'],
+    total: 0
+}
+const oneCustomerBasket: BasketsResult = {
+    baskets: [newBasket] as BasketsResult['baskets'],
+    total: 1
 }
 const oldCustomerBaskets: BasketsResult = {
     // We aren't implementing the full basket, so we assert to pretend we are
@@ -141,6 +150,7 @@ const testMap: TestMap = {
         {shipmentId: 'shipmentId'}
     )
 }
+const createTestCase = ['createBasket', createOptions<'createBasket'>({}, {})] as const
 const deleteTestCase = ['deleteBasket', createOptions<'deleteBasket'>(undefined, {})] as const
 const addPriceBooksToBasketTestCase = [
     'addPriceBooksToBasket',
@@ -272,12 +282,30 @@ describe('ShopperBaskets mutations', () => {
             expect(result.current.data).toBeUndefined()
         }
     )
+    test('`createBasket` adds the basket to the cache on success if customer has no basket', async () => {
+        const [mutationName, options] = createTestCase
+        mockQueryEndpoint(basketsEndpoint, EMPTY_BASKET) // getBasket
+        mockQueryEndpoint(customersEndpoint, emptyCustomerBaskets) // getCustomerBaskets
+        mockMutationEndpoints(basketsEndpoint, newBasket) // this mutation
+        const {result} = renderHookWithProviders(() => ({
+            basket: queries.useBasket(getBasketOptions),
+            customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
+            mutation: useShopperBasketsMutation(mutationName)
+        }))
+        await waitAndExpectSuccess(() => result.current.basket)
+        expect(result.current.basket.data).toEqual(EMPTY_BASKET)
+        expect(result.current.customerBaskets.data).toEqual(emptyCustomerBaskets)
+        act(() => result.current.mutation.mutate(options))
+        await waitAndExpectSuccess(() => result.current.mutation)
+        assertUpdateQuery(result.current.basket, newBasket)
+        assertUpdateQuery(result.current.customerBaskets, oneCustomerBasket)
+    })
     test('`deleteBasket` removes the basket from the cache on success', async () => {
         // Almost the standard 'updates cache' test, but the cache changes are different
         const [mutationName, options] = deleteTestCase
         mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
         mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
-        mockMutationEndpoints(basketsEndpoint, newBasket) // tshis mutation
+        mockMutationEndpoints(basketsEndpoint, newBasket) // this mutation
         mockQueryEndpoint(customersEndpoint, deletedCustomerBaskets) // getCustomerBaskets refetch
         const {result} = renderHookWithProviders(() => ({
             basket: queries.useBasket(getBasketOptions),

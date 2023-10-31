@@ -2211,6 +2211,14 @@ export const mockedCustomerProductListsDetails = {
                 {
                     calloutMsg: '$50offOrderCountAbove5',
                     promotionId: '$50offOrderCountAbove5'
+                },
+                {
+                    promotionalPrice: 189.0,
+                    promotionId: '10$offIpod'
+                },
+                {
+                    promotionalPrice: 194.0,
+                    promotionId: '5$offIpod'
                 }
             ],
             shortDescription:

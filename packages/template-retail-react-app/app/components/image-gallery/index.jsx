@@ -21,7 +21,7 @@ import {
     ListItem,
     List,
     useMultiStyleConfig
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 

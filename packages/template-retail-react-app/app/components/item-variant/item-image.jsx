@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AspectRatio, Box, Badge, Image} from '@chakra-ui/react'
+import {AspectRatio, Box, Badge, Image} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useItemVariant} from '.'
 import {FormattedMessage} from 'react-intl'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'

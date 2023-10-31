@@ -7,7 +7,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Box, Button, Stack, StackDivider} from '@chakra-ui/react'
+import {
+    Box,
+    Button,
+    Stack,
+    StackDivider
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useUpdatePasswordFields from '@salesforce/retail-react-app/app/components/forms/useUpdatePasswordFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import PasswordRequirements from '@salesforce/retail-react-app/app/components/forms/password-requirements'

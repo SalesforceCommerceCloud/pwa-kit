@@ -1,0 +1,191 @@
+name: SalesforceCommerceCloud/pwa-kit/e2e
+on:
+  workflow_dispatch:
+  schedule:
+    # Run every day at 12am (PST) - cron uses UTC times
+    - cron: "0 8 * * *"
+
+jobs:
+  run-generator-demo:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Run all matrix env at once because we will not deploy demo app to MRT.
+        node: [16, 18]
+        npm: [8, 9]
+    runs-on: ubuntu-latest
+    env:
+      # The "default" npm is the one that ships with a given version of node.
+      # For more: https://nodejs.org/en/download/releases/
+      # (We also use this env var for making sure a step runs once for the current node version)
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Update NPM version
+        if: env.IS_DEFAULT_NPM == 'false'
+        run: |-
+          npm install -g npm@${{ matrix.npm }}
+
+      - name: Install Monorepo Dependencies
+        run: |-
+          # Install node dependencies
+          node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Generate Retail App Demo
+        uses: ./.github/actions/e2e_generate_app
+        with:
+          PROJECT_KEY: "retail-app-demo"
+
+      - name: Validated Generated Retail App Demo
+        uses: ./.github/actions/e2e_validate_generated_app
+        with:
+          PROJECT_KEY: "retail-app-demo"
+  run-generator-retail-app-no-ext:
+    strategy:
+      fail-fast: false
+      # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
+      max-parallel: 1
+      matrix:
+        node: [16, 18]
+        npm: [8, 9]
+    runs-on: ubuntu-latest
+    env:
+      # The "default" npm is the one that ships with a given version of node.
+      # For more: https://nodejs.org/en/download/releases/
+      # (We also use this env var for making sure a step runs once for the current node version)
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Update NPM version
+        if: env.IS_DEFAULT_NPM == 'false'
+        run: |-
+          npm install -g npm@${{ matrix.npm }}
+
+      - name: Install Monorepo Dependencies
+        run: |-
+          # Install node dependencies
+          node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Generate Retail App Without Extensibility
+        uses: ./.github/actions/e2e_generate_app
+        with:
+          PROJECT_KEY: "retail-app-no-ext"
+
+      - name: Validated Generated Retail App Demo
+        uses: ./.github/actions/e2e_validate_generated_app
+        with:
+          PROJECT_KEY: "retail-app-no-ext"
+
+      - name: Create MRT credentials file
+        uses: "./.github/actions/create_mrt"
+        with:
+          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+
+      - name: Push Bundle to MRT (E2E Test PWA Kit)
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "../generated-projects/retail-app-no-ext"
+          TARGET: e2e-tests-pwa-kit
+          FLAGS: --wait
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report-retail-app-no-ext
+          path: playwright-report/
+          retention-days: 30
+  run-generator-retail-app-ext:
+    # Run after the previous job completes irrespective of its result
+    if: ${{ always() }}
+    needs: [run-generator-retail-app-no-ext]
+    strategy:
+      fail-fast: false
+      # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
+      max-parallel: 1
+      matrix:
+        node: [16, 18]
+        npm: [8, 9]
+    runs-on: ubuntu-latest
+    env:
+      # The "default" npm is the one that ships with a given version of node.
+      # For more: https://nodejs.org/en/download/releases/
+      # (We also use this env var for making sure a step runs once for the current node version)
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Update NPM version
+        if: env.IS_DEFAULT_NPM == 'false'
+        run: |-
+          npm install -g npm@${{ matrix.npm }}
+
+      - name: Install Monorepo Dependencies
+        run: |-
+          # Install node dependencies
+          node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Generate Retail App With Extensibility
+        uses: ./.github/actions/e2e_generate_app
+        with:
+          PROJECT_KEY: "retail-app-ext"
+
+      - name: Validated Generated Retail App Demo
+        uses: ./.github/actions/e2e_validate_generated_app
+        with:
+          PROJECT_KEY: "retail-app-ext"
+
+      - name: Create MRT credentials file
+        uses: "./.github/actions/create_mrt"
+        with:
+          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+
+      - name: Push Bundle to MRT (E2E Test PWA Kit)
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "../generated-projects/retail-app-ext"
+          TARGET: e2e-tests-pwa-kit
+          FLAGS: --wait
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report-retail-app-ext
+          path: playwright-report/
+          retention-days: 30

@@ -6,7 +6,12 @@
  */
 
 import React from 'react'
-import {Button, HStack, Input, useNumberInput} from '@chakra-ui/react'
+import {
+    Button,
+    HStack,
+    Input,
+    useNumberInput
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 /**
  * This is the mobile implementation of the Chakra NumberInput. This simple component essentially

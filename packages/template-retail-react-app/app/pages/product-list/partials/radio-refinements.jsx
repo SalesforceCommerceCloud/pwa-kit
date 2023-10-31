@@ -6,7 +6,13 @@
  */
 
 import React from 'react'
-import {Box, Text, Radio, RadioGroup, Stack} from '@chakra-ui/react'
+import {
+    Box,
+    Text,
+    Radio,
+    RadioGroup,
+    Stack
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 
 const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {

@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit",
-  "version": "3.1.0-dev",
+  "version": "3.2.0-dev",
   "scripts": {
     "bump-version": "node ./scripts/bump-version/index.js",
     "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
@@ -8,25 +8,31 @@
     "publish-to-npm": "node ./scripts/publish-to-npm.js",
     "format": "lerna run --stream format",
     "preinstall": "node ./scripts/check-version.js",
-    "postinstall": "node ./scripts/bootstrap.js",
+    "postinstall": "node ./scripts/bootstrap.js && node ./scripts/check-lockfiles.mjs",
     "lerna": "lerna",
     "lint": "lerna run --stream lint",
     "lint:fix": "lerna run lint:fix",
+    "start": "npm start --prefix packages/template-retail-react-app",
     "pretest": "npm run lint",
     "test": "lerna run --stream --concurrency=1 test",
     "test:max-file-size": "lerna run --stream test:max-file-size",
     "check-dep-version": "syncpack list-mismatches"
   },
   "devDependencies": {
+    "@playwright/test": "^1.36.0",
     "commander": "^9.5.0",
     "eslint-plugin-header": "^3.1.1",
+    "jsdom": "^22.1.0",
     "lerna": "^6.6.1",
-    "semver": "^7.3.8",
+    "semver": "^7.5.2",
     "shelljs": "^0.8.5",
     "syncpack": "^10.1.0"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",
     "npm": "^8.0.0 || ^9.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.9"
   }
 }

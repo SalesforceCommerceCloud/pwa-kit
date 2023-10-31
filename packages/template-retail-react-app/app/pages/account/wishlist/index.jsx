@@ -7,7 +7,7 @@
 import React, {useState} from 'react'
 import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Box, Flex, Skeleton} from '@chakra-ui/react'
+import {Box, Flex, Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'

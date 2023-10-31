@@ -31,7 +31,7 @@ import {
     // Hooks
     useTheme,
     useDisclosure
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Link from '@salesforce/retail-react-app/app/components/link'
 // Others
 import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'

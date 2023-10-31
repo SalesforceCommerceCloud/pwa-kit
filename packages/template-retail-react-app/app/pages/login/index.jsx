@@ -8,7 +8,7 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, defineMessage} from 'react-intl'
-import {Box, Container} from '@chakra-ui/react'
+import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     AuthHelpers,
     useAuthHelper,

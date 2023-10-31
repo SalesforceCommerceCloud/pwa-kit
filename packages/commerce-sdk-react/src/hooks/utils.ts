@@ -78,8 +78,8 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
             ...(options.parameters ? omitNullable(options.parameters) : {})
         },
         headers: {
-            ...client.clientConfig.parameters,
-            ...options.parameters
+            ...client.clientConfig.headers,
+            ...options.headers
         }
     }
     return merged

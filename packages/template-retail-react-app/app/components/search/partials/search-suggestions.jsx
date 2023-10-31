@@ -6,7 +6,7 @@
  */
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
-import {Stack} from '@chakra-ui/react'
+import {Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import RecentSearches from '@salesforce/retail-react-app/app/components/search/partials/recent-searches'
 import Suggestions from '@salesforce/retail-react-app/app/components/search/partials/suggestions'
 

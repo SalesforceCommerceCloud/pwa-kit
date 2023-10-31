@@ -6,7 +6,13 @@
  */
 
 import React, {Fragment} from 'react'
-import {Button, Text, Flex, Stack, Link} from '@chakra-ui/react'
+import {
+    Button,
+    Text,
+    Flex,
+    Stack,
+    Link
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'

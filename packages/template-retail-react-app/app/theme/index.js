@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {extendTheme} from '@chakra-ui/react'
+import {extendTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Foundational style overrides
 import styles from '@salesforce/retail-react-app/app/theme/foundations/styles'

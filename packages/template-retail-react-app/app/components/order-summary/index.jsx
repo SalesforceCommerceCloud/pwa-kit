@@ -7,7 +7,15 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import {Box, Flex, Button, Stack, Text, Heading, Divider} from '@chakra-ui/react'
+import {
+    Box,
+    Flex,
+    Button,
+    Stack,
+    Text,
+    Heading,
+    Divider
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     BasketIcon,
     ChevronDownIcon,

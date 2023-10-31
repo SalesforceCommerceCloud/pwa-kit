@@ -51,9 +51,11 @@ const updateCustomerBasketsQuery = (
     return {
         queryKey: getCustomerBaskets.queryKey({...parameters, customerId}),
         updater: (oldData: CustomerBasketsResult | undefined) => {
-            // do not update if response basket is not part of existing customer baskets
-            if (!oldData?.baskets?.some((basket) => basket.basketId === parameters.basketId)) {
-                return undefined
+            if (!oldData?.baskets?.length) {
+                return {
+                    baskets: [response],
+                    total: 1
+                }
             }
             const updatedBaskets = oldData.baskets.map((basket) =>
                 basket.basketId === parameters.basketId ? response : basket

@@ -59,9 +59,14 @@ class OverridesResolverPlugin {
         })
     }
     /**
+     * This takes an import with the overrides dir / extends package removed and finds
+     * the corresponding path from overridesFsRead
      *
-     * @param requestPath
-     * @param dirs
+     * Ie. Given an import @salesforce/retail-react-app/app/components/header,
+     * requestPath is app/components/header
+     *
+     * @param requestPath - relative import path
+     * @param dirs - this._allSearchDirs
      */
     findFileFromMap(requestPath, dirs) {
         const fileExt = path.extname(requestPath)
@@ -86,6 +91,20 @@ class OverridesResolverPlugin {
         }
     }
 
+    /*
+        Given an import request, this function removes the override dir
+        or the package name defined in extends.
+
+        For example:
+        import * from 'src/configs/webpack/test/overrides/path/data.js resolves to
+            path/data.js
+        import * from '@salesforce/retail-react-app/app/component/header resolves to
+            app/component/header
+
+        TODO: This function is only called if isFromExtends is true. In other words,
+        this function is only called if the import request contains a package in extends
+        We can probably simplify this function or rename it
+    */
     toOverrideRelative(filepath) {
         const override = this._allSearchDirs.find((dir) => {
             return filepath.indexOf(dir) === 0
@@ -93,6 +112,21 @@ class OverridesResolverPlugin {
         return filepath.substring(override?.length + 1)
     }
 
+    /*
+        Helper function that returns true only if the import request points to a package in 'extends'
+        and the issuer path (the file making the import request) is not located in the overrides dir.
+
+        If true, we re-route the import request to the overrides dir.
+        If false, the import request proceeds to the base package in node_modules
+
+        For example, given an import request to a package defined in 'extends'
+            (ie. @salesforce/retail-react-app):
+        This will return true if the issuer is a file in a base template
+        This will return false if the issuer is a file in the overrides dir
+
+        This allow the base template to import from overrides and allows the overrides to import from
+        the base template using the same syntax (ie. import from @salesforce/retail-react-app/...)
+    */
     isFromExtends(request, filepath) {
         const pkgName = request
             .split(/(\/|\\)/)

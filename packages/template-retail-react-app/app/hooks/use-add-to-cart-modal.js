@@ -23,14 +23,18 @@ import {
     ModalOverlay,
     Stack,
     useBreakpointValue
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import {LockIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
-import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {
+    getDisplayPrice,
+    getDisplayVariationValues
+} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -65,7 +69,7 @@ export const AddToCartModal = () => {
         derivedData: {totalItems}
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const {currency, productItems, productSubTotal} = basket
+    const {currency, productSubTotal} = basket
     const numberOfItemsAdded = isProductABundle
         ? selectedQuantity
         : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
@@ -197,78 +201,76 @@ export const AddToCartModal = () => {
                                     </Box>
                                 </Flex>
                             )}
-                            {!isProductABundle &&
-                                itemsAdded.map(({product, variant, quantity}, index) => {
-                                    const image = findImageGroupBy(product.imageGroups, {
-                                        viewType: 'small',
-                                        selectedVariationAttributes: variant.variationValues
-                                    })?.images?.[0]
-                                    const lineItemPrice =
-                                        productItems?.find(
-                                            (item) => item.productId === variant.productId
-                                        )?.basePrice * quantity
-                                    const variationAttributeValues = getDisplayVariationValues(
-                                        product.variationAttributes,
-                                        variant.variationValues
-                                    )
+                            {!isProductABundle && itemsAdded.map(({product, variant, quantity}, index) => {
+                                const image = findImageGroupBy(product.imageGroups, {
+                                    viewType: 'small',
+                                    selectedVariationAttributes: variant.variationValues
+                                })?.images?.[0]
+                                const {
+                                    basePrice: lineItemBasePrice,
+                                    discountPrice: lineItemDiscountPrice
+                                } = getDisplayPrice(product)
+                                const variationAttributeValues = getDisplayVariationValues(
+                                    product.variationAttributes,
+                                    variant.variationValues
+                                )
 
-                                    return (
-                                        <Flex
-                                            key={variant.productId}
-                                            justifyContent="space-between"
-                                            marginBottom={index < itemsAdded - 1 ? 0 : 4}
-                                            paddingBottom={4}
-                                            borderBottomWidth={{base: '1px', lg: '0px'}}
-                                            borderColor="gray.200"
-                                            borderStyle="solid"
-                                            data-testid="product-added"
-                                        >
-                                            <Flex gridGap="4">
-                                                <Box w="24" flex="none">
-                                                    <AspectRatio ratio="1">
-                                                        <img src={image.link} alt={image.alt} />
-                                                    </AspectRatio>
-                                                </Box>
+                                return (
+                                    <Flex
+                                        key={variant.productId}
+                                        justifyContent="space-between"
+                                        marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                                        paddingBottom={4}
+                                        borderBottomWidth={{base: '1px', lg: '0px'}}
+                                        borderColor="gray.200"
+                                        borderStyle="solid"
+                                        data-testid="product-added"
+                                    >
+                                        <Flex gridGap="4">
+                                            <Box w="24" flex="none">
+                                                <AspectRatio ratio="1">
+                                                    <img src={image.link} alt={image.alt} />
+                                                </AspectRatio>
+                                            </Box>
 
-                                                <Box>
-                                                    <Text fontWeight="700">{product.name}</Text>
-                                                    <Box
-                                                        color="gray.600"
-                                                        fontSize="sm"
-                                                        fontWeight="400"
-                                                    >
-                                                        {Object.entries(
-                                                            variationAttributeValues
-                                                        ).map(([name, value]) => {
+                                            <Box>
+                                                <Text fontWeight="700">{product.name}</Text>
+                                                <Box
+                                                    color="gray.600"
+                                                    fontSize="sm"
+                                                    fontWeight="400"
+                                                >
+                                                    {Object.entries(variationAttributeValues).map(
+                                                        ([name, value]) => {
                                                             return (
                                                                 <Text key={value}>
                                                                     {name}: {value}
                                                                 </Text>
                                                             )
+                                                        }
+                                                    )}
+                                                    <Text>
+                                                        {intl.formatMessage({
+                                                            defaultMessage: 'Qty',
+                                                            id: 'add_to_cart_modal.label.quantity'
                                                         })}
-                                                        <Text>
-                                                            {intl.formatMessage({
-                                                                defaultMessage: 'Qty',
-                                                                id: 'add_to_cart_modal.label.quantity'
-                                                            })}
-                                                            : {quantity}
-                                                        </Text>
-                                                    </Box>
+                                                        : {quantity}
+                                                    </Text>
                                                 </Box>
-                                            </Flex>
-
-                                            <Box flex="none" alignSelf="flex-end" fontWeight="600">
-                                                <Text>
-                                                    {!!lineItemPrice &&
-                                                        intl.formatNumber(lineItemPrice, {
-                                                            style: 'currency',
-                                                            currency: currency
-                                                        })}
-                                                </Text>
                                             </Box>
                                         </Flex>
-                                    )
-                                })}
+
+                                        <Box flex="none" alignSelf="flex-end" fontWeight="600">
+                                            <DisplayPrice
+                                                discountPriceProps={{as: 'p'}}
+                                                basePrice={lineItemBasePrice * quantity}
+                                                discountPrice={lineItemDiscountPrice * quantity}
+                                                currency={currency}
+                                            />
+                                        </Box>
+                                    </Flex>
+                                )
+                            })}
                         </Box>
                         <Box
                             display={['none', 'none', 'none', 'block']}

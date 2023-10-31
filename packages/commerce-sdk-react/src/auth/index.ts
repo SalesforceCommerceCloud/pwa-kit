@@ -119,6 +119,10 @@ const DATA_MAP: AuthDataMap = {
             store.delete('cc-nx-g')
         }
     },
+    refresh_token_expires_in: {
+        storageType: 'local',
+        key: 'refresh_token_expires_in'
+    },
     // For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
     // So we maintain a copy of the refersh_tokens in the local storage which is compared to the actual refresh_token stored in cookie storage.
     // If the key or value of the refresh_token in local storage is different from the one in cookie storage, this indicates a change in customer auth state and we invalidate the access_token in PWA Kit.
@@ -156,7 +160,8 @@ class Auth {
     private shopperCustomersClient: ShopperCustomers<ApiClientConfigParams>
     private redirectURI: string
     private pendingToken: Promise<TokenResponse> | undefined
-    private REFRESH_TOKEN_EXPIRATION_DAYS = 90
+    private REFRESH_TOKEN_EXPIRATION_DAYS_REGISTERED = 90
+    private REFRESH_TOKEN_EXPIRATION_DAYS_GUEST = 30
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private OCAPISessionsURL: string
@@ -185,24 +190,17 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
 
-        const storageOptions = {keySuffix: config.siteId}
-        const serverStorageOptions = {
+        const options = {
             keySuffix: config.siteId,
-            sharedContext: true // This allows use to reused guest authentication tokens accross lambda runs.
+            // Setting this to true on the server allows us to reuse guest auth tokens across lambda runs
+            sharedContext: !onClient()
         }
 
-        this.stores = onClient()
-            ? {
-                  cookie: new CookieStorage(storageOptions),
-                  local: new LocalStorage(storageOptions),
-                  memory: new MemoryStorage(storageOptions)
-              }
-            : {
-                  // Always use MemoryStorage on the server.
-                  cookie: new MemoryStorage(serverStorageOptions),
-                  local: new MemoryStorage(serverStorageOptions),
-                  memory: new MemoryStorage(serverStorageOptions)
-              }
+        this.stores = {
+            cookie: onClient() ? new CookieStorage(options) : new MemoryStorage(options),
+            local: onClient() ? new LocalStorage(options) : new MemoryStorage(options),
+            memory: new MemoryStorage(options)
+        }
 
         this.redirectURI = config.redirectURI
 
@@ -248,7 +246,8 @@ class Auth {
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
             token_type: this.get('token_type'),
             usid: this.get('usid'),
-            customer_type: this.get('customer_type') as CustomerType
+            customer_type: this.get('customer_type') as CustomerType,
+            refresh_token_expires_in: this.get('refresh_token_expires_in')
         }
     }
 
@@ -315,11 +314,15 @@ class Auth {
             ? 'refresh_token_guest_copy'
             : 'refresh_token_registered_copy'
 
+        const refreshTokenExpiry = isGuest
+            ? this.REFRESH_TOKEN_EXPIRATION_DAYS_GUEST
+            : this.REFRESH_TOKEN_EXPIRATION_DAYS_REGISTERED
+
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
+            expires: refreshTokenExpiry
         })
         this.set(refreshTokenCopyKey, res.refresh_token, {
-            expires: this.REFRESH_TOKEN_EXPIRATION_DAYS
+            expires: refreshTokenExpiry
         })
     }
 
@@ -347,7 +350,7 @@ class Auth {
             .finally(() => {
                 this.pendingToken = undefined
             })
-        return this.pendingToken
+        return await this.pendingToken
     }
 
     /**
@@ -371,7 +374,7 @@ class Auth {
             return this.data
         }
         if (this.pendingToken) {
-            return this.pendingToken
+            return await this.pendingToken
         }
         const accessToken = this.get('access_token')
 
@@ -401,7 +404,7 @@ class Auth {
                 }
             }
         }
-        return this.queueRequest(
+        return await this.queueRequest(
             () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
             true
         )
@@ -429,7 +432,7 @@ class Auth {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const isGuest = true
-        return this.queueRequest(
+        return await this.queueRequest(
             () =>
                 helpers.loginGuestUser(this.client, {
                     redirectURI,
@@ -445,15 +448,15 @@ class Auth {
      */
     async register(body: ShopperCustomersTypes.CustomerRegistration) {
         const {
-            customer: {email},
+            customer: {login},
             password
         } = body
 
-        // email is optional field from isomorphic library
+        // login is optional field from isomorphic library
         // type CustomerRegistration
         // here we had to guard it to avoid ts error
-        if (!email) {
-            throw new Error('Customer registration is missing email address.')
+        if (!login) {
+            throw new Error('Customer registration is missing login field.')
         }
 
         const res = await this.shopperCustomersClient.registerCustomer({
@@ -462,7 +465,7 @@ class Auth {
             },
             body
         })
-        await this.loginRegisteredUserB2C({username: email, password})
+        await this.loginRegisteredUserB2C({username: login, password})
         return res
     }
 
@@ -496,7 +499,7 @@ class Auth {
             refreshToken: this.get('refresh_token_registered')
         })
         this.clearStorage()
-        return this.loginGuestUser()
+        return await this.loginGuestUser()
     }
 
     /**

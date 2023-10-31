@@ -137,12 +137,30 @@ describe('DevServer loading page', () => {
         const options = opts()
         const app = NoWebpackDevServerFactory._createApp(options)
         app.use('/', DevServerFactory._redirectToLoadingScreen)
+        const expectedPath = '/__mrt/loading-screen/index.html?loading=1&path=%2F'
 
         return request(app)
             .get('/')
             .expect(302) // Expecting the 302 temporary redirect (not 301)
             .then((response) => {
-                expect(response.headers.location).toBe('/__mrt/loading-screen/index.html?loading=1')
+                expect(response.headers.location).toBe(expectedPath)
+            })
+    })
+
+    test('should contain path query parameter with encoded original url', async () => {
+        const options = opts()
+        const app = NoWebpackDevServerFactory._createApp(options)
+        app.use('/', DevServerFactory._redirectToLoadingScreen)
+        const originalUrl =
+            '/global/en-GB/product/25519318M?color=JJ8UTXX&size=9MD&pid=701642923497M'
+        const expectedPath = `/__mrt/loading-screen/index.html?loading=1&path=${encodeURIComponent(
+            originalUrl
+        )}`
+
+        return request(app)
+            .get(originalUrl)
+            .then((response) => {
+                expect(response.headers.location).toBe(expectedPath)
             })
     })
 })
@@ -249,16 +267,14 @@ describe('DevServer request processor support', () => {
 
 describe('DevServer listening on http/https protocol', () => {
     let server
-    let originalEnv
+    let originalEnv = process.env
 
     beforeEach(() => {
-        originalEnv = Object.assign({}, process.env)
+        process.env = {...originalEnv}
     })
 
     afterEach(() => {
-        if (server) {
-            server.close()
-        }
+        server?.close()
         process.env = originalEnv
     })
 
@@ -275,7 +291,7 @@ describe('DevServer listening on http/https protocol', () => {
 
     cases.forEach(({options, env, name}) => {
         const protocol = options.protocol || env.DEV_SERVER_PROTOCOL
-        test(`${name}`, () => {
+        test(`${name}`, async () => {
             process.env = {...process.env, ...env}
             const {server: _server} = NoWebpackDevServerFactory.createHandler(
                 opts(options),
@@ -286,10 +302,8 @@ describe('DevServer listening on http/https protocol', () => {
                 }
             )
             server = _server
-            return insecureFetch(`${protocol}://localhost:${TEST_PORT}`).then((response) => {
-                expect(response.ok).toBe(true)
-                return Promise.resolve()
-            })
+            const response = await insecureFetch(`${protocol}://localhost:${TEST_PORT}`)
+            expect(response.ok).toBe(true)
         })
     })
 })
@@ -641,7 +655,8 @@ describe('DevServer rendering', () => {
         const req = {
             app: {
                 __webpackReady: jest.fn().mockReturnValue(true),
-                __hotServerMiddleware: jest.fn()
+                __hotServerMiddleware: jest.fn(),
+                __devMiddleware: {waitUntilValid: (callback) => callback()}
             }
         }
         const res = {}
@@ -652,13 +667,15 @@ describe('DevServer rendering', () => {
         expect(req.app.__hotServerMiddleware).toHaveBeenCalledWith(req, res, next)
     })
 
-    test('redirects to loading screen when not ready', () => {
+    test('redirects to loading screen during the inital build', () => {
         const TestFactory = {
             ...NoWebpackDevServerFactory,
             _redirectToLoadingScreen: jest.fn()
         }
         const req = {
-            app: {__webpackReady: jest.fn().mockReturnValue(false)}
+            app: {
+                __isInitialBuild: true
+            }
         }
         const res = {}
         const next = jest.fn()

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -20,7 +20,7 @@ import {
     Container,
     Stack,
     Text
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
@@ -95,6 +95,12 @@ const ContactInfo = () => {
     const onForgotPasswordClick = () => {
         authModal.onOpen()
     }
+
+    useEffect(() => {
+        if (!showPasswordField) {
+            form.unregister('password')
+        }
+    }, [showPasswordField])
 
     return (
         <ToggleCard

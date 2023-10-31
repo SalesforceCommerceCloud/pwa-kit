@@ -18,7 +18,7 @@ import {
     PopoverTrigger,
     Portal,
     Text
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {InfoIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {FormattedMessage} from 'react-intl'
 

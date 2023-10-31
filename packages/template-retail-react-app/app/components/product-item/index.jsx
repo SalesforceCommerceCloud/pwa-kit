@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 
 // Chakra Components
-import {Box, Fade, Flex, Stack, Text} from '@chakra-ui/react'
+import {Box, Fade, Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'

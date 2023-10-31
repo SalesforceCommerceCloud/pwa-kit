@@ -47,6 +47,15 @@ export const DevServerMixin = {
     /**
      * @private
      */
+    _getAllowCookies(options) {
+        return 'MRT_ALLOW_COOKIES' in process.env
+            ? process.env.MRT_ALLOW_COOKIES === 'true'
+            : options.localAllowCookies
+    },
+
+    /**
+     * @private
+     */
     _getProtocol(options) {
         return process.env.DEV_SERVER_PROTOCOL || options.protocol
     },
@@ -133,8 +142,10 @@ export const DevServerMixin = {
         }
         app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
+        app.__isInitialBuild = true
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
         app.__devMiddleware.waitUntilValid(() => {
+            app.__isInitialBuild = false
             // Be just a little more generous before letting eg. Lighthouse hit it!
             setTimeout(() => {
                 console.log(chalk.cyan('First build complete'))
@@ -269,20 +280,27 @@ export const DevServerMixin = {
 
     render(req, res, next) {
         const app = req.app
-        if (app.__webpackReady()) {
-            app.__hotServerMiddleware(req, res, next)
-        } else {
+
+        if (app?.__isInitialBuild) {
             this._redirectToLoadingScreen(req, res, next)
+        } else {
+            // Ensure that we do not try to render anything until the webpack bundle is valid.
+            // There was a bug previously where developers would refresh the page while webpack was building,
+            // causing them to get redirected to the loading page and sometimes getting stuck,
+            // requiring them to restart their dev server
+            app.__devMiddleware.waitUntilValid(() => {
+                app.__hotServerMiddleware(req, res, next)
+            })
         }
     },
 
     /**
      * @private
      */
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _redirectToLoadingScreen(req, res, next) {
-        res.redirect('/__mrt/loading-screen/index.html?loading=1')
+        const path = encodeURIComponent(req.originalUrl)
+        res.redirect(`/__mrt/loading-screen/index.html?loading=1&path=${path}`)
     },
 
     /**
@@ -371,7 +389,12 @@ export const DevServerMixin = {
     _getWebpackAsset(req, compilerName, fileName) {
         if (req.app.__webpackReady()) {
             const outputFileSystem = req.app.__devMiddleware.context.outputFileSystem
-            const jsonWebpackStats = req.app.__devMiddleware.context.stats.toJson()
+            // Projects may have a large amount of stats data to process that can lead to performance issues
+            // we pass in options that help prevent that - preset: 'none' processes no data (TODO: make configurable)
+            const jsonWebpackStats = req.app.__devMiddleware.context.stats.toJson({
+                preset: 'none',
+                outputPath: true
+            })
 
             try {
                 const rp = jsonWebpackStats.children.find((child) => child.name === compilerName)

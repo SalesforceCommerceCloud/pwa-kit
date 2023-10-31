@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {Button} from '@chakra-ui/react'
+import {Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'

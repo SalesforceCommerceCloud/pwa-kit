@@ -21,7 +21,7 @@ import {
     Stack,
     Container,
     Link
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
 import Hero from '@salesforce/retail-react-app/app/components/hero'

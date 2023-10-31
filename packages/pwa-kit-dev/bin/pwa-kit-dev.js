@@ -13,7 +13,6 @@ const WebSocket = require('ws')
 const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
-const projectPkg = require(process.cwd() + '/package.json')
 const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
 
 // Scripts in ./bin have never gone through babel, so we
@@ -58,6 +57,19 @@ const getProjectName = async () => {
         throw new Error(`Missing "name" field in "package.json"`)
     }
     return projectPkg.name
+}
+
+const getAppEntrypoint = async () => {
+    const defaultPath = p.join(process.cwd(), 'app', 'ssr.js')
+    if (await fse.pathExists(defaultPath)) return defaultPath
+
+    const projectPkg = await scriptUtils.getProjectPkg()
+    const {overridesDir} = projectPkg?.ccExtensibility ?? {}
+    if (!overridesDir || typeof overridesDir !== 'string') return null
+
+    const overridePath = p.join(process.cwd(), p.sep + overridesDir, 'app', 'ssr.js')
+    if (await fse.pathExists(overridePath)) return overridePath
+    return null
 }
 
 const main = async () => {
@@ -178,22 +190,6 @@ const main = async () => {
             }
         })
 
-    const appSSRpath = p.join(process.cwd(), 'app', 'ssr.js')
-    const appSSRjs = fse.pathExistsSync(appSSRpath)
-    const overrideSSRpath = p.join(
-        process.cwd(),
-        typeof projectPkg?.ccExtensibility?.overridesDir === 'string' &&
-            !projectPkg?.ccExtensibility?.overridesDir?.startsWith(p.sep)
-            ? p.sep + projectPkg?.ccExtensibility?.overridesDir
-            : projectPkg?.ccExtensibility?.overridesDir
-            ? projectPkg?.ccExtensibility?.overridesDir
-            : '',
-        'app',
-        'ssr.js'
-    )
-    const overrideSSRjs = fse.pathExistsSync(overrideSSRpath)
-    const resolvedSSRPath = appSSRjs ? appSSRpath : overrideSSRjs ? overrideSSRpath : null
-
     program
         .command('start')
         .description(`develop your app locally`)
@@ -202,7 +198,23 @@ const main = async () => {
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
         .action(async ({inspect, noHMR}) => {
-            execSync(`node${inspect ? ' --inspect' : ''} ${resolvedSSRPath}`, {
+            // We use @babel/node instead of node because we want to support ES6 import syntax
+            const babelNode = p.join(
+                require.resolve('webpack'),
+                '..',
+                '..',
+                '..',
+                '.bin',
+                'babel-node'
+            )
+
+            const entrypoint = await getAppEntrypoint()
+            if (!entrypoint) {
+                error('Could not determine app entrypoint.')
+                process.exit(1)
+            }
+
+            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {})
@@ -290,6 +302,9 @@ const main = async () => {
                 'immediately deploy the bundle to this target once it is pushed'
             )
         )
+        .addOption(
+            new program.Option('-w, --wait', 'wait for the deployment to complete before exiting')
+        )
         .action(
             async ({
                 buildDirectory,
@@ -297,7 +312,8 @@ const main = async () => {
                 projectSlug,
                 target,
                 cloudOrigin,
-                credentialsFile
+                credentialsFile,
+                wait
             }) => {
                 // Set the deployment target env var, this is required to ensure we
                 // get the correct configuration object. Do not assign the variable it if
@@ -305,6 +321,10 @@ const main = async () => {
                 // string value.
                 if (target) {
                     process.env.DEPLOY_TARGET = target
+                } else if (wait) {
+                    throw new Error(
+                        'You must provide a target to deploy to when using --wait to wait for deployment to finish.'
+                    )
                 }
 
                 const credentials = await scriptUtils.readCredentials(credentialsFile)
@@ -336,7 +356,12 @@ const main = async () => {
                 const data = await client.push(bundle, projectSlug, target)
                 const warnings = data.warnings || []
                 warnings.forEach(warn)
-                success('Bundle Uploaded')
+                if (wait) {
+                    success('Bundle Uploaded - waiting for deployment to complete')
+                    await client.waitForDeploy(projectSlug, target)
+                } else {
+                    success('Bundle Uploaded')
+                }
             }
         )
 

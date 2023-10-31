@@ -40,14 +40,12 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
-    "commerce-sdk-isomorphic": "^1.10.1",
+    "commerce-sdk-isomorphic": "^1.10.4",
     "js-cookie": "^3.0.1",
-    "jwt-decode": "^3.1.2",
-    "typedoc": "^0.24.7",
-    "typedoc-plugin-missing-exports": "^2.0.0"
+    "jwt-decode": "^3.1.2"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.1.0-dev",
+    "@salesforce/pwa-kit-dev": "3.2.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
@@ -59,17 +57,18 @@
     "@types/react-dom": "^18.2.1",
     "@types/react-helmet": "^6.1.6",
     "cross-env": "^5.2.1",
-    "internal-lib-build": "3.1.0-dev",
+    "internal-lib-build": "3.2.0-dev",
     "jsonwebtoken": "^9.0.0",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
-    "semver": "^7.3.8",
+    "semver": "^7.5.2",
     "shelljs": "^0.8.5",
     "typedoc": "^0.24.7",
-    "typescript": "^4.8.3"
+    "typedoc-plugin-missing-exports": "^2.0.0",
+    "typescript": "4.9.5"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^4.28.0",

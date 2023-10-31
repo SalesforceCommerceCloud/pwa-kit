@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -15,8 +15,12 @@ import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {basketWithProductSet} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
+import {
+    basketWithProductSet,
+    einsteinRecommendation
+} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+import userEvent from '@testing-library/user-event'
 import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
 
 jest.setTimeout(60000)
@@ -27,7 +31,7 @@ const MockedComponent = () => {
     return (
         <Switch>
             <Route
-                path="/en-GB/product/:productId"
+                path="/uk/en-GB/product/:productId"
                 render={(props) => <ProductDetail {...props} />}
             />
         </Switch>
@@ -52,7 +56,7 @@ beforeEach(() => {
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'ProductDetail', '/en-GB/product/test-product')
+    window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/test-product')
 })
 
 afterEach(() => {
@@ -98,8 +102,13 @@ describe('product set', () => {
     })
 
     test('add the set to cart successfully', async () => {
-        const urlPathAfterSelectingAllVariants =
-            '/en-GB/product/winter-lookM?25518447M=color%3DJJ5FUXX%26size%3D9MD&25518704M=color%3DJJ2XNXX%26size%3D9MD&25772717M=color%3DTAUPETX%26size%3D070%26width%3DM'
+        const urlPathAfterSelectingAllVariants = `/uk/en-GB/product/winter-lookM?${new URLSearchParams(
+            {
+                '25518447M': 'color=JJ5FUXX&size=9MD',
+                '25518704M': 'color=JJ2XNXX&size=9MD',
+                '25772717M': 'color=TAUPETX&size=070&width=M'
+            }
+        )}`
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
 
         // Initial basket is necessary to add items to it
@@ -150,6 +159,60 @@ describe('product set', () => {
             const heroImage = within(child).getAllByRole('img')[0]
             expect(heroImage.getAttribute('loading')).toBe('lazy')
         })
+    })
+})
+
+describe('Recommended Products', () => {
+    let fetchMock
+    beforeAll(() => {
+        // This is probably more complex than it needs to be? I tried using jest-fetch-mock and msw,
+        // but I couldn't get those working...
+        fetchMock = jest.spyOn(global, 'fetch').mockImplementation(async (url) => {
+            const json = url.endsWith('viewed-recently-einstein') ? einsteinRecommendation : {}
+            return new Response(JSON.stringify(json))
+        })
+    })
+    beforeEach(() => {
+        fetchMock.mockClear()
+    })
+    afterAll(() => {
+        fetchMock.mockRestore()
+    })
+    test('Recently Viewed gets updated when navigating between products', async () => {
+        global.server.use(
+            // Use a single product (and not a product set)
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(productsResponse.data[0]))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.json({}))
+            })
+        )
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+        renderWithProviders(<MockedComponent />)
+
+        // If we poll for updates immediately, the test output is flooded with errors:
+        // "Warning: An update to WrappedComponent inside a test was not wrapped in act(...)."
+        // If we wait to poll until the component is updated, then the errors disappear. Using a
+        // timeout is clearly a suboptimal solution, but I don't know the "correct" way to fix it.
+        let done = false
+        setTimeout(() => (done = true), 200)
+        await waitFor(() => expect(done).toBeTruthy())
+
+        expect(await screen.findAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+        expect(await screen.findByText(/Summer Bomber Jacket/)).toBeInTheDocument()
+
+        // We requested Recently Viewed products on the first page load, but we
+        // only want to check against the second page load
+        fetchMock.mockClear()
+        await user.click(screen.getByText(/Summer Bomber Jacket/))
+
+        // The scope of this test means we just care about the Recently Viewed component being
+        // updated - we don't need to wait for the rest of the page loading
+        expect(fetchMock).toHaveBeenCalledWith(
+            expect.stringMatching(/viewed-recently-einstein$/),
+            expect.any(Object)
+        )
     })
 })
 

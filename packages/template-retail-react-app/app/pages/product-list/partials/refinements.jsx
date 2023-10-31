@@ -15,7 +15,7 @@ import {
     AccordionButton,
     AccordionPanel,
     AccordionIcon
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 import ColorRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/color-refinements'
 import SizeRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/size-refinements'
@@ -38,9 +38,10 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
 
     // Use saved state for accordions
     if (!isServer) {
+        // TODO: Change this to `useLocalStorage` hook when localStorage detection is more robust
+        const filterAccordionState = window.localStorage.getItem(FILTER_ACCORDION_SATE)
         const savedExpandedAccordionIndexes =
-            window.localStorage.getItem(FILTER_ACCORDION_SATE) &&
-            JSON.parse(window.localStorage.getItem(FILTER_ACCORDION_SATE))
+            filterAccordionState && JSON.parse(filterAccordionState)
 
         if (savedExpandedAccordionIndexes) {
             filtersIndexes = filters
@@ -58,6 +59,8 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
         const filterState = filters
             ?.filter((filter, index) => expandedIndex.includes(index))
             .map((filter) => filter.attributeId)
+
+        // TODO: Update when localStorage detection is more robust? useLocalStorage is only a getter
         window.localStorage.setItem(FILTER_ACCORDION_SATE, JSON.stringify(filterState))
     }
 

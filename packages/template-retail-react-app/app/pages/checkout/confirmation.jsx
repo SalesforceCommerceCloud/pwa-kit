@@ -19,7 +19,7 @@ import {
     Alert,
     AlertIcon,
     Divider
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
 import {useOrder, useProducts, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'

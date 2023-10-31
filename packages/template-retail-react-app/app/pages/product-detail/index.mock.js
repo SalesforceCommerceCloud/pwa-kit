@@ -195,3 +195,17 @@ export const basketWithProductSet = {
     taxation: 'gross',
     tax_total: null
 }
+
+export const einsteinRecommendation = {
+    recs: [
+        {
+            id: '11736753M',
+            product_name: 'Summer Bomber Jacket',
+            image_url:
+                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZCU_007/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5e894c3a/images/large/B0574182_001_L1.jpg',
+            product_url:
+                'https://zzcu-007.sandbox.us01.dx.commercecloud.salesforce.com/mens-summer-bomber-jacket/11736753M.html?lang=en_US'
+        }
+    ],
+    recoUUID: '79e9f44e-c4d3-405a-ae4c-eba7b4bfdd4a'
+}

@@ -21,7 +21,7 @@ import {
     Skeleton,
     Stack,
     Text
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
 import {useForm} from 'react-hook-form'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'

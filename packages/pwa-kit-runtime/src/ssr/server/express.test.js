@@ -293,7 +293,7 @@ describe('SSRServer operation', () => {
             })
     })
 
-    test('SSRServer rendering gets and sends no cookies', () => {
+    test('SSRServer rendering blocks cookie setting by default', () => {
         const route = (req, res) => {
             res.setHeader('set-cookie', 'blah123')
             res.sendStatus(200)
@@ -309,6 +309,25 @@ describe('SSRServer operation', () => {
                 expect(console.warn.mock.calls[0][0]).toContain(`Discarding "Set-Cookie: blah123"`)
                 expect(res.headers['Set-Cookie']).toBeUndefined()
                 expect(res.headers['set-cookie']).toBeUndefined()
+            })
+    })
+
+    test('SSRServer rendering allows setting cookies with MRT_ALLOW_COOKIES env', () => {
+        process.env = {
+            MRT_ALLOW_COOKIES: 'true'
+        }
+        const route = (req, res) => {
+            res.setHeader('set-cookie', 'blah123')
+            res.sendStatus(200)
+        }
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', route)
+
+        return request(app)
+            .get('/')
+            .expect(200)
+            .then((res) => {
+                expect(res.headers['set-cookie']).toEqual(['blah123'])
             })
     })
 
@@ -494,10 +513,27 @@ describe('SSRServer operation', () => {
             })
     })
 
-    test('should strip cookies before passing the request to the handler', () => {
+    test('should strip cookies before passing the request to the handler by default', () => {
         const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             expect(req.headers.cookie).toBeUndefined()
+            res.sendStatus(200)
+        }
+        app.get('/*', route)
+        return request(app)
+            .get('/')
+            .set('cookie', 'xyz=456')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.headers['set-cookie']).toBeUndefined()
+            })
+    })
+
+    test('should allow cookies in the request with MRT_ALLOW_COOKIES env', () => {
+        process.env = {MRT_ALLOW_COOKIES: 'true'}
+        const app = RemoteServerFactory._createApp(opts())
+        const route = (req, res) => {
+            expect(req.headers.cookie).toBe('xyz=456')
             res.sendStatus(200)
         }
         app.get('/*', route)

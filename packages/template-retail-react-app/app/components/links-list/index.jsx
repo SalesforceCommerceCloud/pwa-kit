@@ -6,7 +6,14 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, List, ListItem, Heading, HStack, useMultiStyleConfig} from '@chakra-ui/react'
+import {
+    Box,
+    List,
+    ListItem,
+    Heading,
+    HStack,
+    useMultiStyleConfig
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
 const LinksList = ({

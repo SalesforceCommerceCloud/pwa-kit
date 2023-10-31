@@ -7,7 +7,7 @@
 import React, {useEffect, useRef} from 'react'
 import {render} from '@testing-library/react'
 import {BrowserRouter as Router} from 'react-router-dom'
-import {ChakraProvider} from '@chakra-ui/react'
+import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 
 import theme from '@salesforce/retail-react-app/app/theme'

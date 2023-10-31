@@ -19,7 +19,7 @@ import {
     Text,
     useDisclosure,
     useToast
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     AuthHelpers,
     useAuthHelper,

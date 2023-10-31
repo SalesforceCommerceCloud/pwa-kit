@@ -1,0 +1,16 @@
+name: e2e_validate_generated_app
+inputs:
+  PROJECT_KEY:
+    description: Project key to specify project to validate ("retail-app-demo", "retail-app-ext" or "retail-app-no-ext")
+    required: true
+    type: string
+  cwd:
+    required: false
+    default: ${PWD}
+runs:
+  using: composite
+  steps:
+  - name: Validate generated project based on project-key
+    working-directory: ${{ inputs.cwd }}
+    run: node e2e/scripts/validate-generated-project.js ${{ inputs.PROJECT_KEY }}
+    shell: bash

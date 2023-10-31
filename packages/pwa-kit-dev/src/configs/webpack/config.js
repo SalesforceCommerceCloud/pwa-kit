@@ -320,6 +320,18 @@ const withChunking = (config) => {
     }
 }
 
+const staticFolderCopyPlugin = new CopyPlugin({
+    patterns: [
+        {
+            from: path
+                .resolve(`${EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''}app/static`)
+                .replace(/\\/g, '/'),
+            to: `static/`,
+            noErrorOnMissing: true
+        }
+    ]
+})
+
 const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
@@ -391,6 +403,7 @@ const enableReactRefresh = (config) => {
         }
     }
 }
+
 const client =
     entryPointExists(['app', 'main']) &&
     baseConfig('web')
@@ -466,26 +479,7 @@ const renderer =
                 },
                 plugins: [
                     ...config.plugins,
-
-                    // This must only appear on one config – this one is the only mandatory one.
-                    new CopyPlugin({
-                        patterns: [
-                            {
-                                from: path
-                                    .resolve(
-                                        `${
-                                            EXT_OVERRIDES_DIR
-                                                ? EXT_OVERRIDES_DIR_NO_SLASH + '/'
-                                                : ''
-                                        }app/static`
-                                    )
-                                    .replace(/\\/g, '/'),
-                                to: `static/`,
-                                noErrorOnMissing: true
-                            }
-                        ]
-                    }),
-
+                    staticFolderCopyPlugin,
                     // Keep this on the slowest-to-build item - the server-side bundle.
                     new WebpackNotifierPlugin({
                         title: `PWA Kit Project: ${pkg.name}`,
@@ -516,6 +510,7 @@ const ssr = (() => {
                     },
                     plugins: [
                         ...config.plugins,
+                        staticFolderCopyPlugin,
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
                     ].filter(Boolean)
                 }

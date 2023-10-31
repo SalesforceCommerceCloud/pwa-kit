@@ -1,6 +1,6 @@
 {
   "name": "test-commerce-sdk-react",
-  "version": "3.1.0-dev",
+  "version": "3.2.0-dev",
   "private": true,
   "scripts": {
     "build": "pwa-kit-dev build",
@@ -19,20 +19,20 @@
   "devDependencies": {
     "@loadable/component": "^5.15.3",
     "@salesforce/commerce-sdk-react": "1.1.0-dev",
-    "@salesforce/pwa-kit-dev": "3.1.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.1.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.1.0-dev",
+    "@salesforce/pwa-kit-dev": "3.2.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "3.2.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.2.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "@types/loadable__component": "^5.13.4",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.1",
     "@types/react-router-dom": "^5.3.3",
-    "internal-lib-build": "3.1.0-dev",
+    "internal-lib-build": "3.2.0-dev",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.3.4",
-    "typescript": "^4.8.3"
+    "typescript": "4.9.5"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",
@@ -53,7 +53,7 @@
       "**/*.json"
     ],
     "ssrParameters": {
-      "ssrFunctionNodeVersion": "16.x",
+      "ssrFunctionNodeVersion": "18.x",
       "proxyConfigs": [
         {
           "host": "kv7kzm78.api.commercecloud.salesforce.com",

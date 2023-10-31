@@ -12,7 +12,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {normalizeSetBundleProduct} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
-import {Box, Button, Stack} from '@chakra-ui/react'
+import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     useProduct,
     useCategory,
@@ -31,6 +31,8 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
+
+import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 
 // constant
 import {
@@ -66,11 +68,17 @@ const ProductDetail = () => {
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
     }
+    const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
-    const {data: product, isLoading: isProductLoading} = useProduct(
+    const {
+        data: product,
+        isLoading: isProductLoading,
+        isError: isProductError,
+        error: productError
+    } = useProduct(
         {
             parameters: {
                 id: urlParams.get('pid') || productId,
@@ -89,12 +97,38 @@ const ProductDetail = () => {
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
-    const {data: category} = useCategory({
+    const {
+        data: category,
+        isError: isCategoryError,
+        error: categoryError
+    } = useCategory({
         parameters: {
             id: product?.primaryCategoryId,
             level: 1
         }
     })
+
+    /**************** Error Handling ****************/
+
+    if (isProductError) {
+        const errorStatus = productError?.response?.status
+        switch (errorStatus) {
+            case 404:
+                throw new HTTPNotFound('Product Not Found.')
+            default:
+                throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
+        }
+    }
+    if (isCategoryError) {
+        const errorStatus = categoryError?.response?.status
+        switch (errorStatus) {
+            case 404:
+                throw new HTTPNotFound('Category Not Found.')
+            default:
+                throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
+        }
+    }
+
     const [primaryCategory, setPrimaryCategory] = useState(category)
     const variant = useVariant(product)
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
@@ -310,6 +344,7 @@ const ProductDetail = () => {
                             }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
+                            isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
                             validateOrderability={handleChildProductValidation}
                             childProductOrderability={childProductOrderability}
@@ -371,6 +406,7 @@ const ProductDetail = () => {
                                                 }
                                             }}
                                             isProductLoading={isProductLoading}
+                                            isBasketLoading={isBasketLoading}
                                             isWishlistLoading={isWishlistLoading}
                                             setChildProductOrderability={
                                                 setChildProductOrderability
@@ -396,6 +432,7 @@ const ProductDetail = () => {
                             }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
+                            isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
                         />
                         <InformationAccordion product={product} />
@@ -432,6 +469,9 @@ const ProductDetail = () => {
                     />
 
                     <RecommendedProducts
+                        // The Recently Viewed recommender doesn't use `products`, so instead we
+                        // provide a key to update the recommendations on navigation.
+                        key={location.key}
                         title={
                             <FormattedMessage
                                 defaultMessage="Recently Viewed"

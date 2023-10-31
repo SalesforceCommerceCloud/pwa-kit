@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {SimpleGrid} from '@chakra-ui/react'
+import {SimpleGrid} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Region, regionPropType} from '@salesforce/commerce-sdk-react/components'
 
 /**

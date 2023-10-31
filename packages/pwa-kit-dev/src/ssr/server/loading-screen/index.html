@@ -21,10 +21,8 @@
                 <h1 class="loading-text">Building your app</h1>
                 <div class="fun-facts">
                     <p class="fun-fact">Tip: <code>AppConfig</code> is one of four special components in PWA Kit for adding functionality across multiple pages. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/special-components.html">Learn more</a>.</p>
-                    <p class="fun-fact">Tip: You can use the <code>getProps</code> method to inject data from API requests into your pages. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html">Learn more</a>.</p>
                     <p class="fun-fact">Tip: Maximizing your cache hit ratio can drastically improve storefront performance. <a target="_blank" href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/maximizing-your-cache-hit-ratio.html">Learn more</a>.</p>
                     <p class="fun-fact">Pop quiz: What does SLAS stand for? See the <a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references?meta=shopper-login:Summary">SLAS docs</a> for the answer!</p>
-                    <p class="fun-fact">Fun fact: In PWA Kit 1.4, we now support React 17. <a target="_blank" href="https://github.com/SalesforceCommerceCloud/pwa-kit/releases">Learn more</a>.</p>
                     <p class="fun-fact">Want to write in TypeScript? You can start now!</p>
                     <p class="fun-fact">Have you seen the new <a target="_blank" href="https://developer.salesforce.com/developer-centers/commerce-cloud">Commerce Cloud</a> page on the Salesforce Developers portal?</p>
                     <p class="fun-fact">Want to learn more about composable commerce? Hang out with us at <a target="_blank" href="https://www.salesforce.com/trailblazerdx/">TrailblazerDX 2022</a>!</p>
@@ -86,8 +84,9 @@
                 }
 
                 waitForReady().then(() => {
-                    // Redirect to homepage
-                    window.location = url.origin
+                    // Redirect to homepage if path is not defined
+                    const path = url.searchParams.get('path') ?? ''
+                    window.location = new URL(path, url.origin)
                 })
             }
 

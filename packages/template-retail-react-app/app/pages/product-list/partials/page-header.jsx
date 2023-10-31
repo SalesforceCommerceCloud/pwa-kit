@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 // Components
-import {Box, Heading, Flex, Text, Fade} from '@chakra-ui/react'
+import {Box, Heading, Flex, Text, Fade} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
 import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'

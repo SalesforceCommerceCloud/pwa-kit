@@ -74,6 +74,7 @@ const ENVS_TO_EXPOSE = [
     'deploy_target',
     'external_domain_name',
     'mobify_property_id',
+    'mrt_allow_cookies',
     'node_env',
     'tz'
 ]
@@ -177,6 +178,20 @@ const cacheTest = async (req, res) => {
 }
 
 /**
+ * Express handler that sets a simple cookie and returns a JSON response with
+ * diagnostic values. This set cache control to private to prevent CloudFront
+ * caching as we expect customers to do for personalized responses. Use
+ * ?name=test-name&value=test-value to set a cookie.
+ */
+const cookieTest = async (req, res) => {
+    if (Object.hasOwn(req.query, 'name')) {
+        res.cookie(req.query.name, req.query?.value)
+    }
+    res.set('Cache-Control', 'private, max-age=60')
+    res.json(jsonFromRequest(req))
+}
+
+/**
  * Logging middleware; logs request and response headers (and response status).
  */
 const loggingMiddleware = (req, res, next) => {
@@ -207,7 +222,8 @@ const options = {
     port: 3000,
 
     // The protocol on which the development Express app listens.
-    // Note that http://localhost is treated as a secure context for development.
+    // Note that http://localhost is treated as a secure context for development,
+    // except by Safari.
     protocol: 'http',
 
     mobify: pkg.mobify
@@ -232,6 +248,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
     app.get('/cache', cacheTest)
+    app.get('/cookie', cookieTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)

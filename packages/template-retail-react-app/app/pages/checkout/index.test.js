@@ -299,6 +299,16 @@ test('Can proceed through checkout steps as guest', async () => {
     await user.click(screen.getByText(/2 items in cart/i))
     expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument()
 
+    // Verify password field is reset if customer toggles login form
+    const loginToggleButton = screen.getByText(/Already have an account\? Log in/i)
+    await user.click(loginToggleButton)
+    // Provide customer email and submit
+    const passwordInput = document.querySelector('input[type="password"]')
+    await user.type(passwordInput, 'Password1!')
+
+    const checkoutAsGuestButton = screen.getByText(/Checkout as guest/i)
+    await user.click(checkoutAsGuestButton)
+
     // Provide customer email and submit
     const emailInput = screen.getByLabelText(/email/i)
     const submitBtn = screen.getByText(/checkout as guest/i)

@@ -8,6 +8,7 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
+import StorefrontPreview from '@salesforce/pwa-kit-react-sdk/storefront-preview'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -22,7 +23,11 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import * as queryKeyHelpers from '@salesforce/commerce-sdk-react/hooks/ShopperProducts/queryKeyHelpers'
 // Chakra
-import {Box, useDisclosure, useStyleConfig} from '@chakra-ui/react'
+import {
+    Box,
+    useDisclosure,
+    useStyleConfig
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
@@ -46,6 +51,7 @@ import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/us
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -71,7 +77,7 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 
 const onClient = typeof window !== 'undefined'
 
-/* 
+/*
 The categories tree can be really large! For performance reasons,
 we only load the level 0 categories on server side, and load the rest
 on client side to reduce SSR page size.
@@ -83,7 +89,7 @@ const useLazyLoadCategories = () => {
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
 
-    const ids = levelZeroCategoriesQuery.data?.[itemsKey].map((category) => category.id)
+    const ids = levelZeroCategoriesQuery.data?.[itemsKey]?.map((category) => category.id)
     const queries = useCategoryBulk(ids, {
         enabled: onClient && ids?.length > 0
     })
@@ -107,7 +113,7 @@ const App = (props) => {
     const {children} = props
     const {data: categoriesTree} = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')
-
+    const {getTokenWhenReady} = useAccessToken()
     const appOrigin = getAppOrigin()
 
     const history = useHistory()
@@ -139,10 +145,23 @@ const App = (props) => {
         l10nConfig: site.l10n
     })
 
+    // If the translation file exists, it'll be served directly from static folder (and won't reach this code here).
+    // However, if the file is missing, the App would render a 404 page.
+    const is404ForMissingTranslationFile = /\/static\/translations\/compiled\/[^.]+\.json$/.test(
+        location?.pathname
+    )
+
     // Fetch the translation message data using the target locale.
     const {data: messages} = useQuery({
-        queryKey: ['app', 'translationas', 'messages', targetLocale],
-        queryFn: () => fetchTranslations(targetLocale),
+        queryKey: ['app', 'translations', 'messages', targetLocale],
+        queryFn: () => {
+            if (is404ForMissingTranslationFile) {
+                // Return early to prevent an infinite loop
+                // Otherwise, it'll continue to fetch the missing translation file again
+                return {}
+            }
+            return fetchTranslations(targetLocale)
+        },
         enabled: isServer
     })
 
@@ -160,8 +179,11 @@ const App = (props) => {
         {parameters: {customerId: customer.customerId}},
         {enabled: !!customer.customerId && !isServer}
     )
+    const {data: basket} = useCurrentBasket()
+
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
+    const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
 
     useEffect(() => {
         // Create a new basket if the current customer doesn't have one.
@@ -170,14 +192,34 @@ const App = (props) => {
                 body: {}
             })
         }
+    }, [baskets])
+
+    useEffect(() => {
         // update the basket currency if it doesn't match the current locale currency
-        if (baskets?.baskets?.[0]?.currency && baskets.baskets[0].currency !== currency) {
+        if (basket?.currency && basket?.currency !== currency) {
             updateBasket.mutate({
-                parameters: {basketId: baskets.baskets[0].basketId},
+                parameters: {basketId: basket.basketId},
                 body: {currency}
             })
         }
-    }, [baskets])
+    }, [basket?.currency])
+
+    useEffect(() => {
+        // update the basket customer email
+        if (
+            basket &&
+            customer?.isRegistered &&
+            customer?.email &&
+            customer?.email !== basket?.customerInfo?.email
+        ) {
+            updateCustomerForBasket.mutate({
+                parameters: {basketId: basket.basketId},
+                body: {
+                    email: customer.email
+                }
+            })
+        }
+    }, [customer?.isRegistered, customer?.email, basket?.customerInfo?.email])
 
     useEffect(() => {
         // Listen for online status changes.
@@ -226,7 +268,6 @@ const App = (props) => {
         const path = buildUrl('/account/wishlist')
         history.push(path)
     }
-
     return (
         <Box className="sf-app" {...styles.container}>
             <IntlProvider
@@ -253,6 +294,7 @@ const App = (props) => {
                 defaultLocale={DEFAULT_LOCALE}
             >
                 <CurrencyProvider currency={currency}>
+                    <StorefrontPreview getToken={getTokenWhenReady} />
                     <Seo>
                         <meta name="theme-color" content={THEME_COLOR} />
                         <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />

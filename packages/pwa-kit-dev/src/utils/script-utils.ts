@@ -9,12 +9,23 @@ import path from 'path'
 import archiver, {EntryData} from 'archiver'
 import {default as _fetch, Response} from 'node-fetch'
 import {URL} from 'url'
-import {readFile, stat, mkdtemp, rm} from 'fs/promises'
-import {createWriteStream, Stats} from 'fs'
-import {readJson} from 'fs-extra'
+import {
+    createWriteStream,
+    existsSync,
+    readFile,
+    readJson,
+    stat,
+    mkdtemp,
+    rm,
+    readdir,
+    Stats,
+    Dirent
+} from 'fs-extra'
 import {Minimatch} from 'minimatch'
 import git from 'git-rev-sync'
 import validator from 'validator'
+import {execSync} from 'child_process'
+import semver from 'semver'
 
 export const DEFAULT_CLOUD_ORIGIN = 'https://cloud.mobify.com'
 export const DEFAULT_DOCS_URL =
@@ -48,6 +59,9 @@ interface Bundle {
 interface Pkg {
     name: string
     version: string
+    ccExtensibility?: {extends: string; overridesDir: string}
+    dependencies?: {[key: string]: string}
+    devDependencies?: {[key: string]: string}
 }
 
 /**
@@ -80,6 +94,122 @@ export const getProjectPkg = async (): Promise<Pkg> => {
     } catch {
         throw new Error(`Could not read project package at "${p}"`)
     }
+}
+
+/**
+ * Get the set of file paths within a specific directory
+ * @param dir Directory to walk
+ * @returns Set of file paths within the directory
+ */
+export const walkDir = async (
+    dir: string,
+    baseDir: string,
+    fileSet?: Set<string>
+): Promise<Set<string>> => {
+    fileSet = fileSet || new Set<string>()
+    const entries: Dirent[] = await readdir(dir, {withFileTypes: true})
+
+    await Promise.all(
+        entries.map(async (entry) => {
+            const entryPath = path.join(dir, entry.name)
+            if (entry.isDirectory()) {
+                await walkDir(entryPath, baseDir, fileSet)
+            } else {
+                fileSet?.add(entryPath.replace(baseDir + path.sep, ''))
+            }
+        })
+    )
+
+    return fileSet
+}
+
+interface DependencyTree {
+    version: string
+    name?: string
+    dependencies?: Record<string, DependencyTree>
+    resolved?: string
+    overridden?: boolean
+}
+
+/**
+ * Returns a DependencyTree that includes the versions of all packages
+ * including their dependencies within the project.
+ *
+ * @returns A DependencyTree with the versions of all dependencies
+ */
+export const getProjectDependencyTree = async (): Promise<DependencyTree | null> => {
+    // When executing this inside template-retail-react-app, the output of `npm ls` exceeds the
+    // max buffer size that child_process can handle, so we can't use that directly. The max string
+    // size is much larger, so writing/reading a temp file is a functional workaround.
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
+    const destination = path.join(tmpDir, 'npm-ls.json')
+    try {
+        execSync(`npm ls --all --json > ${destination}`)
+        return await readJson(destination, 'utf8')
+    } catch (_) {
+        // Don't prevent bundles from being pushed if this step fails
+        return null
+    } finally {
+        // Remove temp file asynchronously after returning; ignore failures
+        void rm(destination).catch(() => {})
+    }
+}
+
+/**
+ * Returns the lowest version of a package installed.
+ *
+ * @param packageName - The name of the package to get the lowest version for
+ * @param dependencyTree - The dependency tree including all package versions
+ * @returns The lowest version of the given package that is installed
+ */
+export const getLowestPackageVersion = (
+    packageName: string,
+    dependencyTree: DependencyTree
+): string => {
+    let lowestVersion: string | null = null
+
+    function search(tree: DependencyTree) {
+        for (const key in tree.dependencies) {
+            const dependency = tree.dependencies[key]
+            if (key === packageName) {
+                const version = dependency.version
+                if (!lowestVersion || semver.lt(version, lowestVersion)) {
+                    lowestVersion = version
+                }
+            }
+
+            if (dependency.dependencies) {
+                search(dependency)
+            }
+        }
+    }
+
+    search(dependencyTree)
+    return lowestVersion ?? 'unknown'
+}
+
+/**
+ * Returns the versions of all PWA Kit dependencies of a project.
+ * This will search the dependency tree for the lowest version of each PWA Kit package.
+ *
+ * @param dependencyTree - The dependency tree including all package versions
+ * @returns The versions of all dependencies of the project.
+ */
+export const getPwaKitDependencies = (dependencyTree: DependencyTree): {[key: string]: string} => {
+    const pwaKitDependencies = [
+        '@salesforce/pwa-kit-react-sdk',
+        '@salesforce/pwa-kit-runtime',
+        '@salesforce/pwa-kit-dev'
+    ]
+
+    // pwa-kit package versions are not always listed as direct dependencies
+    // in the package.json such as when a bundle is using template extensibility
+    const nestedPwaKitDependencies: {[key: string]: string} = {}
+    pwaKitDependencies.forEach((packageName) => {
+        nestedPwaKitDependencies[packageName] = getLowestPackageVersion(packageName, dependencyTree)
+    })
+
+    return nestedPwaKitDependencies
 }
 
 export class CloudAPIClient {
@@ -172,6 +302,61 @@ export class CloudAPIClient {
         const data = await res.json()
         return data['token']
     }
+
+    /** Polls MRT for deployment status every 30 seconds. */
+    async waitForDeploy(project: string, environment: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            /** Milliseconds to wait between checks. */
+            const delay = 30_000
+            /** Check the deployment status to see whether it has finished. */
+            const check = async (): Promise<void> => {
+                const url = new URL(
+                    `/api/projects/${project}/target/${environment}`,
+                    this.opts.origin
+                )
+                const res = await this.opts.fetch(url, {headers: await this.getHeaders()})
+
+                if (!res.ok) {
+                    const text = await res.text()
+                    let json
+                    try {
+                        if (text) json = JSON.parse(text)
+                    } catch (_) {} // eslint-disable-line no-empty
+                    const message = json?.detail ?? text
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                    const detail = message ? `: ${message}` : ''
+                    throw new Error(`${res.status} ${res.statusText}${detail}`)
+                }
+
+                const data: {state: string} = await res.json()
+                if (typeof data.state !== 'string') {
+                    return reject(
+                        new Error('An unknown state occurred when polling the deployment.')
+                    )
+                }
+                switch (data.state) {
+                    case 'CREATE_IN_PROGRESS':
+                    case 'PUBLISH_IN_PROGRESS':
+                        // In progress - check again after the next delay
+                        // `check` is async, so we need to use .catch to properly handle errors
+                        setTimeout(() => void check().catch(reject), delay)
+                        return
+                    case 'CREATE_FAILED':
+                    case 'PUBLISH_FAILED':
+                        // Failed - reject with failure
+                        return reject(new Error('Deployment failed.'))
+                    case 'ACTIVE':
+                        // Success!
+                        return resolve()
+                    default:
+                        // Unknown - reject with confusion
+                        return reject(new Error(`Unknown deployment state "${data.state}".`))
+                }
+            }
+            // Start checking after the first delay!
+            setTimeout(() => void check().catch(reject), delay)
+        })
+    }
 }
 
 export const defaultMessage = (gitInstance: typeof git = git): string => {
@@ -209,6 +394,7 @@ export const createBundle = async ({
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
     const destination = path.join(tmpDir, 'build.tar')
     const filesInArchive: string[] = []
+    let bundle_metadata: {[key: string]: any} = {}
 
     if (ssr_only.length === 0 || ssr_shared.length === 0) {
         throw new Error('no ssrOnly or ssrShared files are defined')
@@ -251,6 +437,38 @@ export const createBundle = async ({
                         archive.finalize()
                     })
             )
+            .then(async () => {
+                const {
+                    dependencies = {},
+                    devDependencies = {},
+                    ccExtensibility = {extends: '', overridesDir: ''}
+                } = await getProjectPkg()
+                const extendsTemplate = 'node_modules/' + ccExtensibility.extends
+
+                let cc_overrides: string[] = []
+                if (ccExtensibility.overridesDir) {
+                    const overrides_files = await walkDir(
+                        ccExtensibility.overridesDir,
+                        ccExtensibility.overridesDir
+                    )
+                    cc_overrides = Array.from(overrides_files).filter((item) =>
+                        existsSync(path.join(extendsTemplate, item))
+                    )
+                }
+                const dependencyTree = await getProjectDependencyTree()
+                // If we can't load the dependency tree, pretend that it's empty.
+                // TODO: Should we report an error?
+                const pwaKitDeps = dependencyTree ? getPwaKitDependencies(dependencyTree) : {}
+
+                bundle_metadata = {
+                    dependencies: {
+                        ...dependencies,
+                        ...devDependencies,
+                        ...(pwaKitDeps ?? {})
+                    },
+                    cc_overrides: cc_overrides
+                }
+            })
             .then(() => readFile(destination))
             .then((data) => {
                 const encoding = 'base64'
@@ -260,7 +478,8 @@ export const createBundle = async ({
                     data: data.toString(encoding),
                     ssr_parameters,
                     ssr_only: filesInArchive.filter(glob(ssr_only)),
-                    ssr_shared: filesInArchive.filter(glob(ssr_shared))
+                    ssr_shared: filesInArchive.filter(glob(ssr_shared)),
+                    bundle_metadata
                 }
             })
             // This is a false positive. The promise returned by `.finally()` won't resolve until

@@ -6,7 +6,12 @@
  */
 
 import React from 'react'
-import {SimpleGrid, Button, Center, useMultiStyleConfig} from '@chakra-ui/react'
+import {
+    SimpleGrid,
+    Button,
+    Center,
+    useMultiStyleConfig
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 
 const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {

@@ -6,7 +6,7 @@
  */
 import React, {Fragment} from 'react'
 import {FormattedMessage} from 'react-intl'
-import {Flex, Button} from '@chakra-ui/react'
+import {Flex, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     AmexIcon,
     DiscoverIcon,

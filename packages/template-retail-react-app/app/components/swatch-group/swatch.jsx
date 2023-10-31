@@ -7,7 +7,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button, Box, Center, useMultiStyleConfig} from '@chakra-ui/react'
+import {
+    Button,
+    Box,
+    Center,
+    useMultiStyleConfig
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Link as RouteLink} from 'react-router-dom'
 
 /**

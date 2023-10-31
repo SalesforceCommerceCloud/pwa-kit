@@ -17,8 +17,10 @@ import {rest} from 'msw'
 import {registerUserToken} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 describe('AppConfig', () => {
+    let originalFetch
     beforeAll(() => {
         jest.spyOn(window.localStorage, 'setItem')
+        originalFetch = global.fetch
         global.fetch = jest.fn().mockImplementation(() => mockConfig.mockFetchOCAPISessions)
     })
 
@@ -45,7 +47,7 @@ describe('AppConfig', () => {
     afterAll(() => {
         window.localStorage.setItem.mockRestore()
         global.fetch.mockClear()
-        delete global.fetch
+        global.fetch = originalFetch
     })
 
     test('renders', async () => {

@@ -18,7 +18,7 @@ import {
     Stack,
     useMultiStyleConfig,
     IconButton
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 
 // Hooks

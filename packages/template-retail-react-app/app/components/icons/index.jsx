@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {forwardRef} from 'react'
-import {Icon, useTheme} from '@chakra-ui/react'
+import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
 // svg-sprite-loader webpack plugin at build time and injected in the <body> tag
@@ -84,7 +84,7 @@ VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
  * @param {string} name - the filename of the imported svg (does not include extension)
  */
 /* istanbul ignore next */
-const icon = (name, passProps) => {
+export const icon = (name, passProps) => {
     const displayName = name
         .toLowerCase()
         .replace(/(?:^|[\s-/])\w/g, (match) => match.toUpperCase())

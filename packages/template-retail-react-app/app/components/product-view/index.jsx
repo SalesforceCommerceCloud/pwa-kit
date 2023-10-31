@@ -10,7 +10,17 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
+import {
+    Flex,
+    Heading,
+    Button,
+    Skeleton,
+    Box,
+    Text,
+    VStack,
+    Fade,
+    useTheme
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
@@ -21,23 +31,15 @@ import ImageGallery from '@salesforce/retail-react-app/app/components/image-gall
 import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {Skeleton as ImageGallerySkeleton} from '@salesforce/retail-react-app/app/components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
-const ProductViewHeader = ({
-    name,
-    price,
-    currency,
-    category,
-    productType,
-    isProductPartOfBundle
-}) => {
-    const intl = useIntl()
-    const {currency: activeCurrency} = useCurrency()
+const ProductViewHeader = ({name, basePrice, discountPrice, isProductPartOfBundle, currency, category, productType}) => {
     const isProductASet = productType?.set
 
     return (
@@ -53,21 +55,13 @@ const ProductViewHeader = ({
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            {/* Price */}
             {!isProductPartOfBundle && (
-                <Skeleton isLoaded={price} minWidth={32}>
-                    <Text fontWeight="bold" fontSize="md" aria-label="price">
-                        {isProductASet &&
-                            `${intl.formatMessage({
-                                id: 'product_view.label.starting_at_price',
-                                defaultMessage: 'Starting at'
-                            })} `}
-                        {intl.formatNumber(price, {
-                            style: 'currency',
-                            currency: currency || activeCurrency
-                        })}
-                    </Text>
-                </Skeleton>
+                <DisplayPrice
+                    basePrice={basePrice}
+                    discountPrice={discountPrice}
+                    currency={currency}
+                    isProductASet={isProductASet}
+                />
             )}
         </VStack>
     )
@@ -75,7 +69,8 @@ const ProductViewHeader = ({
 
 ProductViewHeader.propTypes = {
     name: PropTypes.string,
-    price: PropTypes.number,
+    basePrice: PropTypes.number,
+    discountPrice: PropTypes.number,
     currency: PropTypes.string,
     category: PropTypes.array,
     productType: PropTypes.object,
@@ -107,6 +102,7 @@ const ProductView = forwardRef(
             childOfBundleQuantity = 0,
             childProductOrderability,
             setChildProductOrderability,
+            isBasketLoading = false,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
@@ -138,6 +134,7 @@ const ProductView = forwardRef(
             stockLevel,
             stepQuantity
         } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
+        const {basePrice, discountPrice} = getDisplayPrice(product)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const isProductABundle = product?.type.bundle
@@ -255,6 +252,7 @@ const ProductView = forwardRef(
                         key="cart-button"
                         onClick={handleCartItem}
                         isDisabled={disableButton}
+                        isLoading={isBasketLoading}
                         width="100%"
                         variant="solid"
                         marginBottom={4}
@@ -340,7 +338,8 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
-                        price={product?.pricePerUnit || product?.price}
+                        basePrice={basePrice}
+                        discountPrice={discountPrice}
                         productType={product?.type}
                         currency={product?.currency}
                         category={category}
@@ -382,7 +381,8 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
-                                price={product?.pricePerUnit || product?.price}
+                                basePrice={basePrice}
+                                discountPrice={discountPrice}
                                 productType={product?.type}
                                 currency={product?.currency}
                                 category={category}
@@ -599,6 +599,7 @@ ProductView.propTypes = {
     childOfBundleQuantity: PropTypes.number,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
+    isBasketLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,
     addToCart: PropTypes.func,
     addToWishlist: PropTypes.func,

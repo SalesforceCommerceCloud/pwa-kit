@@ -6,7 +6,7 @@
  */
 import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {Img, Box, useTheme} from '@chakra-ui/react'
+import {Img, Box, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getResponsiveImageAttributes} from '@salesforce/retail-react-app/app/utils/responsive-image'
 
 /**

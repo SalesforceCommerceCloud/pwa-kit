@@ -43,11 +43,13 @@ const main = (program) => {
         sh.exec(`node ${script1} ${targetVersion} ${opts.package}`)
 
         const script2 = path.join(__dirname, 'pwa-kit-deps-version.js')
-        const updateDepsBehaviour = /-dev\b/.test(targetVersion) ? 'sync' : 'latest'
+        const updateDepsBehaviour = opts.pwaKitDeps
         sh.exec(`node ${script2} ${updateDepsBehaviour} ${opts.package}`)
 
         // After updating the dependencies, let's update the package lock files
         sh.exec('npm install')
+
+        listAllVersions()
 
         process.exit(0)
     }
@@ -64,13 +66,9 @@ const main = (program) => {
 
     independentPackages.forEach((pkg) => {
         const {location, version: oldVersion} = pkg
-        // Restore and then increment to the next pre-release version
-        // TODO: is it possible to _not_ trigger the lifecycle scripts? See CHANGELOG.md
+        // Restore to the original version
+        // TODO: is it possible to _not_ trigger the lifecycle scripts? See commerce-sdk-react/CHANGELOG.md
         setPackageVersion(oldVersion, {cwd: location})
-        setPackageVersion('prerelease', {cwd: location})
-
-        const newVersion = JSON.parse(sh.exec('npm pkg get version', {cwd: location, silent: true}))
-        pkg.version = newVersion
     })
 
     // Now that all of the package version updates are done,
@@ -88,8 +86,7 @@ const main = (program) => {
     // After updating the dependencies, let's update the package lock files
     sh.exec('npm install')
 
-    sh.echo('\nVersions of packages in the monorepo:\n')
-    sh.exec('lerna list --all --long')
+    listAllVersions()
 }
 
 const updatePeerDeps = (pkgJson, newMonorepoVersion) => {
@@ -116,14 +113,28 @@ const updateDeps = (pkgJson) => {
     })
 }
 
+const listAllVersions = () => {
+    sh.echo('\nVersions of packages in the monorepo:\n')
+    sh.exec('lerna list --all --long')
+}
+
 program.description('Bump the version of a package in our monorepo')
 program.arguments('<target-version>')
 
-program.option(
-    '-p, --package <package-name>',
-    'the package name or an alias to a group of packages',
-    'sdk'
-)
+program
+    .option(
+        '-p, --package <package-name>',
+        'the package name or an alias to a group of packages',
+        'sdk'
+    )
+    .addOption(
+        new program.Option(
+            '-d, --pwa-kit-deps <update-behavior>',
+            'for non-sdk packages, choose how to update their pwa-kit dependencies: either sync with repo or grab @latest from npm'
+        )
+            .choices(['sync', 'latest'])
+            .default('sync')
+    )
 
 program.parse(process.argv)
 main(program)

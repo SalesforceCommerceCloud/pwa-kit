@@ -7,7 +7,16 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
+import {
+    Box,
+    Button,
+    Checkbox,
+    Container,
+    Heading,
+    Stack,
+    Text,
+    Divider
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
@@ -15,6 +24,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
+    getMaskCreditCardNumber,
     getCreditCardIcon
 } from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {
@@ -75,7 +85,7 @@ const Payment = () => {
             paymentMethodId: 'CREDIT_CARD',
             paymentCard: {
                 holder: formValue.holder,
-                issueNumber: formValue.number.replace(/ /g, ''),
+                maskedNumber: getMaskCreditCardNumber(formValue.number),
                 cardType: getPaymentInstrumentCardType(formValue.cardType),
                 expirationMonth: parseInt(expirationMonth),
                 expirationYear: parseInt(`20${expirationYear}`)

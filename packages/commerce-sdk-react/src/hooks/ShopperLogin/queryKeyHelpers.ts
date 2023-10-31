@@ -12,13 +12,6 @@ import {pick} from '../utils'
 type Client = ShopperLogin<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    retrieveCredQualityUserInfo: [
-        '/commerce-sdk-react',
-        '/organizations/',
-        string | undefined,
-        '/cred-qual/user',
-        Params<'retrieveCredQualityUserInfo'>
-    ]
     getUserInfo: [
         '/commerce-sdk-react',
         '/organizations/',
@@ -54,20 +47,6 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
     path: (params: Params<T>) => ExcludeTail<QueryKeys[T]>
     /** Generates the full query key for an endpoint. */
     queryKey: (params: Params<T>) => QueryKeys[T]
-}
-
-export const retrieveCredQualityUserInfo: QueryKeyHelper<'retrieveCredQualityUserInfo'> = {
-    parameters: (params) => pick(params, ['organizationId', 'username']),
-    path: (params) => [
-        '/commerce-sdk-react',
-        '/organizations/',
-        params.organizationId,
-        '/cred-qual/user'
-    ],
-    queryKey: (params: Params<'retrieveCredQualityUserInfo'>) => [
-        ...retrieveCredQualityUserInfo.path(params),
-        retrieveCredQualityUserInfo.parameters(params)
-    ]
 }
 
 export const getUserInfo: QueryKeyHelper<'getUserInfo'> = {

@@ -20,7 +20,7 @@ import {
     createStylesContext,
     Button,
     FormControl
-} from '@chakra-ui/react'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl} from 'react-intl'
 
 import LinksList from '@salesforce/retail-react-app/app/components/links-list'
@@ -211,7 +211,7 @@ const Subscribe = ({...otherProps}) => {
 
             <Box>
                 <InputGroup>
-                    {/* Had to swap the following InputRightElement and Input 
+                    {/* Had to swap the following InputRightElement and Input
                         to avoid the hydration error due to mismatched html between server and client side.
                         This is a workaround for Lastpass plugin that automatically injects its icon for input fields.
                     */}

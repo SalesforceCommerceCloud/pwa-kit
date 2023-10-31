@@ -6,11 +6,12 @@
  */
 
 import {
+    getDisplayPrice,
     getDisplayVariationValues,
     normalizeSetBundleProduct
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
-import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import {mockedCustomerProductListsDetails} from '@salesforce/retail-react-app/app/mocks/mock-data'
 
 const variationAttributes = [
     {
@@ -82,5 +83,27 @@ describe('normalizeSetBundleProduct', () => {
     test('passing in product bundle normalizes data', () => {
         const normalizedProduct = normalizeSetBundleProduct(mockProductBundle)
         expect(normalizedProduct.childProducts).toStrictEqual(mockProductBundle.bundledProducts)
+    })
+})
+
+describe('getDisplayPrice', function () {
+    test('returns basePrice and discountPrice', () => {
+        const {basePrice, discountPrice} = getDisplayPrice(
+            mockedCustomerProductListsDetails.data[0]
+        )
+
+        expect(basePrice).toBe(199.0)
+        expect(discountPrice).toBe(189.0)
+    })
+
+    test('returns null if there is not discount promotion', () => {
+        const data = {
+            ...mockedCustomerProductListsDetails.data[0],
+            productPromotions: []
+        }
+        const {basePrice, discountPrice} = getDisplayPrice(data)
+
+        expect(basePrice).toBe(199.0)
+        expect(discountPrice).toBeNull()
     })
 })
