@@ -42,19 +42,27 @@ export class LocalStorage extends BaseStorage {
         return window.localStorage.getItem(suffixedKey) || ''
     }
     delete(key: string) {
-        const suffixedKey = this.getSuffixedKey(key)
-        const oldValue = this.get(suffixedKey)
-        window.localStorage.removeItem(suffixedKey)
-        // Changes to localStorage automatically dispatch a storage event in every tab where a site
-        // is loaded, *except* the original tab that made the change. To allow our `useLocalStorage`
-        // hook to work in the originating tab, we must dispatch a copy of the event. This event is
-        // only seen by the originating tab. A key difference with this event is that `isTrusted` is
-        // false, but that should not impact our use case.
-        const event = new StorageEvent('storage', {
-            key: suffixedKey,
-            oldValue: oldValue,
-            newValue: null
-        })
-        window.dispatchEvent(event)
+        try {
+            const suffixedKey = this.getSuffixedKey(key)
+            const oldValue = window.localStorage.getItem(suffixedKey)
+
+            window.localStorage.removeItem(suffixedKey) // Attempt to remove the item
+
+            // Changes to localStorage automatically dispatch a storage event in every tab where a site
+            // is loaded, *except* the original tab that made the change. To allow our `useLocalStorage`
+            // hook to work in the originating tab, we must dispatch a copy of the event. This event is
+            // only seen by the originating tab. A key difference with this event is that `isTrusted` is
+            // false, but that should not impact our use case.
+            const event = new StorageEvent('storage', {
+                key: suffixedKey,
+                oldValue: oldValue,
+                newValue: null
+            })
+            window.dispatchEvent(event)
+
+            console.log(`Successfully removed the localStorage item: ${suffixedKey}`)
+        } catch (error) {
+            console.error(`Failed to remove the localStorage item: ${error}`)
+        }
     }
 }
