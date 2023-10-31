@@ -29,6 +29,19 @@ describe('Storefront Preview Component', function () {
         // eslint-disable-next-line
         window = oldWindow
     })
+    
+    test('Renders children when enabled', async () => {
+        const MockComponent = () => <div data-testid="mockComponent">Mock Component</div>
+        const wrapper = render(<StorefrontPreview enabled={true} getToken={() => 'my-token'}><MockComponent /></StorefrontPreview>)
+        expect(wrapper.getByTestId('mockComponent')).toBeDefined()
+    })
+
+    test('Renders children when disabled', async () => {
+        const MockComponent = () => <div data-testid="mockComponent">Mock Component</div>
+        const wrapper = render(<StorefrontPreview enabled={false}><MockComponent /></StorefrontPreview>)
+        expect(wrapper.getByTestId('mockComponent')).toBeDefined()
+    })
+
     test('not renders nothing when enabled is off', async () => {
         render(<StorefrontPreview enabled={false} />)
         const helmet = Helmet.peek()

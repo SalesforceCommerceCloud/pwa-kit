@@ -17,9 +17,10 @@ import {useHistory} from 'react-router-dom'
  * This flag only applies if storefront is ran in Runtime Admin iframe.
  * @param {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  */
-export const StorefrontPreview = ({enabled = true, getToken}) => {
+export const StorefrontPreview = ({children, enabled = true, getToken}) => {
     const history = useHistory()
     let isHostTrusted
+
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
@@ -31,21 +32,25 @@ export const StorefrontPreview = ({enabled = true, getToken}) => {
             }
         }
     }, [enabled, getToken])
-    if (!enabled) {
-        return null
-    }
+
     // We only want to run this function when enabled is on
     isHostTrusted = detectStorefrontPreview()
-    return isHostTrusted ? (
-        <Helmet>
-            <script
-                id="storefront_preview"
-                src={getClientScript()}
-                async
-                type="text/javascript"
-            ></script>
-        </Helmet>
-    ) : null
+
+    return (
+        <>
+            {enabled && isHostTrusted && (
+                <Helmet>
+                    <script
+                        id="storefront_preview"
+                        src={getClientScript()}
+                        async
+                        type="text/javascript"
+                    ></script>
+                </Helmet>
+            )}
+            {children}
+        </>
+    )
 }
 
 StorefrontPreview.defaultProps = {
@@ -53,6 +58,7 @@ StorefrontPreview.defaultProps = {
 }
 
 StorefrontPreview.propTypes = {
+    children: PropTypes.node,
     enabled: PropTypes.bool,
     // a custom prop type function to only require this prop if enabled is true.
     getToken: function (props, propName, componentName) {
