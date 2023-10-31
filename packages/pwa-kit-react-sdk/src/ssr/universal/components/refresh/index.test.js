@@ -68,25 +68,25 @@ test('navigate to homepage if `referrer` search param cannot be found in the pag
 test('hard refresh to the referrer should occur', async () => {
     // Delete the real properties from window, so we can mock them
     delete window.location
-    window.location = { assign: jest.fn() };
+    window.location = {assign: jest.fn()}
 
     jest.spyOn(console, 'warn')
 
     useLocation.mockImplementationOnce(() => ({
-        search: `?referrer=${referrerURL}&reloadServerSide=true`
+        search: `?referrer=${referrerURL}&experimentalUnsafeReloadServerSide=true`
     }))
     mount(<Refresh />)
     jest.runAllTimers()
     await runAllPromises()
 
     expect(console.warn).toHaveBeenCalled()
-    expect(window.location.assign).toHaveBeenCalled();
+    expect(window.location.assign).toHaveBeenCalled()
 })
 
 test('hard refresh to the referrer should not occur', async () => {
     // Delete the real properties from window, so we can mock them
     delete window.location
-    window.location = { assign: jest.fn() };
+    window.location = {assign: jest.fn()}
 
     jest.spyOn(console, 'warn')
 

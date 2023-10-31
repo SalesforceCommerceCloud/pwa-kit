@@ -15,14 +15,14 @@ import {useHistory} from 'react-router-dom'
  *
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
  * @param  {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
- * @param  {Array} additionalSearchParams - An array of key/value search params to add when context changes
- * @param  {boolean} reloadServerSide - if true, will reload the page on server side when context changes
+ * @param  {Array} experimentalUnsafeAdditionalSearchParams - An array of key/value search params to add when context changes
+ * @param  {boolean} experimentalUnsafeReloadServerSide - if true, will reload the page on server side when context changes
  */
 export const StorefrontPreview = ({
     enabled = true,
     getToken,
-    additionalSearchParams = [],
-    reloadServerSide = false
+    experimentalUnsafeAdditionalSearchParams = [],
+    experimentalUnsafeReloadServerSide = false
 }) => {
     const history = useHistory()
     let isHostTrusted
@@ -31,14 +31,19 @@ export const StorefrontPreview = ({
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
-                navigate: (path, action = 'push', ...args) => {
+                experimentalUnsafeNavigate: (path, action = 'push', ...args) => {
                     history[action](path, ...args)
                 },
-                additionalSearchParams,
-                reloadServerSide
+                experimentalUnsafeAdditionalSearchParams,
+                experimentalUnsafeReloadServerSide
             }
         }
-    }, [enabled, getToken, additionalSearchParams, reloadServerSide])
+    }, [
+        enabled,
+        getToken,
+        experimentalUnsafeAdditionalSearchParams,
+        experimentalUnsafeReloadServerSide
+    ])
     if (!enabled) {
         return null
     }
@@ -58,7 +63,7 @@ export const StorefrontPreview = ({
 
 StorefrontPreview.defaultProps = {
     enabled: true,
-    reloadServerSide: false
+    experimentalUnsafeReloadServerSide: false
 }
 
 StorefrontPreview.propTypes = {
@@ -74,6 +79,6 @@ StorefrontPreview.propTypes = {
             )
         }
     },
-    additionalSearchParams: PropTypes.array,
-    reloadServerSide: PropTypes.bool
+    experimentalUnsafeAdditionalSearchParams: PropTypes.array,
+    experimentalUnsafeReloadServerSide: PropTypes.bool
 }

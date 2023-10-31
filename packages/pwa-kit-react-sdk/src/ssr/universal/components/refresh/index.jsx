@@ -40,10 +40,14 @@ const Refresh = () => {
                 referrer = '/'
             }
 
-            // if reloadServerSide is true, reload the page on server side
-            const reloadServerSide = new URLSearchParams(location.search).get('reloadServerSide')
-            if (reloadServerSide === 'true') {
-                console.warn('"reloadServerSide" was set to true - reloading page on server side')
+            // if experimentalUnsafeReloadServerSide is true, reload the page on server side
+            const experimentalUnsafeReloadServerSide = new URLSearchParams(location.search).get(
+                'experimentalUnsafeReloadServerSide'
+            )
+            if (experimentalUnsafeReloadServerSide === 'true') {
+                console.warn(
+                    '"experimentalUnsafeReloadServerSide" was set to true - reloading page on server side'
+                )
                 window.location.assign(referrer)
                 return
             }
