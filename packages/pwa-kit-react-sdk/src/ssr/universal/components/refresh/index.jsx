@@ -48,7 +48,7 @@ const Refresh = () => {
                 console.warn(
                     '"experimentalUnsafeReloadServerSide" was set to true - reloading page on server side'
                 )
-                window.location.assign(referrer)
+                window.location.replace(referrer)
                 return
             }
 

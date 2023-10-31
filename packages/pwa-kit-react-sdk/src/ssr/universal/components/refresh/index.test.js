@@ -68,7 +68,7 @@ test('navigate to homepage if `referrer` search param cannot be found in the pag
 test('hard refresh to the referrer should occur', async () => {
     // Delete the real properties from window, so we can mock them
     delete window.location
-    window.location = {assign: jest.fn()}
+    window.location = {replace: jest.fn()}
 
     jest.spyOn(console, 'warn')
 
@@ -80,13 +80,13 @@ test('hard refresh to the referrer should occur', async () => {
     await runAllPromises()
 
     expect(console.warn).toHaveBeenCalled()
-    expect(window.location.assign).toHaveBeenCalled()
+    expect(window.location.replace).toHaveBeenCalled()
 })
 
 test('hard refresh to the referrer should not occur', async () => {
     // Delete the real properties from window, so we can mock them
     delete window.location
-    window.location = {assign: jest.fn()}
+    window.location = {replace: jest.fn()}
 
     jest.spyOn(console, 'warn')
 
@@ -98,5 +98,5 @@ test('hard refresh to the referrer should not occur', async () => {
     await runAllPromises()
 
     expect(console.warn).not.toHaveBeenCalled()
-    expect(window.location.assign).not.toHaveBeenCalled()
+    expect(window.location.replace).not.toHaveBeenCalled()
 })
