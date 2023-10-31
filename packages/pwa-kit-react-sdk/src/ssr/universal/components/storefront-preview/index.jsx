@@ -19,10 +19,10 @@ import {useHistory} from 'react-router-dom'
  * @param  {boolean} experimentalUnsafeReloadServerSide - if true, will reload the page on server side when context changes
  */
 export const StorefrontPreview = ({
-    enabled = true,
+    enabled,
     getToken,
     experimentalUnsafeAdditionalSearchParams = [],
-    experimentalUnsafeReloadServerSide = false
+    experimentalUnsafeReloadServerSide
 }) => {
     const history = useHistory()
     let isHostTrusted
