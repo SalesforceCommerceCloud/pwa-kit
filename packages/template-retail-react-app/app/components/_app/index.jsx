@@ -176,7 +176,10 @@ const App = (props) => {
                         <CurrencyProvider currency={currency}>
                             <Seo>
                                 <meta name="theme-color" content={THEME_COLOR} />
-                                <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
+                                <meta
+                                    name="apple-mobile-web-app-title"
+                                    content={DEFAULT_SITE_TITLE}
+                                />
                                 <link
                                     rel="apple-touch-icon"
                                     href={getAssetUrl('static/img/global/apple-touch-icon.png')}
