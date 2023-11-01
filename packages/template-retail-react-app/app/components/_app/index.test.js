@@ -16,7 +16,7 @@ import messages from '../../translations/compiled/en-GB.json'
 import mockConfig from '../../../config/mocks/default'
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 jest.mock('pwa-kit-react-sdk/storefront-preview', () => {
-    return () => null
+    return ({children}) => children
 })
 let windowSpy
 beforeAll(() => {
