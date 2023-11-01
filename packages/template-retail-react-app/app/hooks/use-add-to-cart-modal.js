@@ -173,8 +173,9 @@ export const AddToCartModal = () => {
                                                 discountPriceProps={{as: 'p'}}
                                                 basePrice={lineItemBasePrice * quantity}
                                                 discountPrice={
-                                                    typeof lineItemDiscountPrice === 'number' &&
-                                                    lineItemDiscountPrice * quantity
+                                                    typeof lineItemDiscountPrice === 'number'
+                                                        ? lineItemDiscountPrice * quantity
+                                                        : null
                                                 }
                                                 currency={currency}
                                             />
