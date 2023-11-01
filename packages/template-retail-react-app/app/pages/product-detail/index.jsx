@@ -64,7 +64,7 @@ const ProductDetail = () => {
     /****************************** Basket *********************************/
     const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
-    const updateBundleItemsInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
+    const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
@@ -313,7 +313,7 @@ const ProductDetail = () => {
                     if (!bundleChild) return
                     const variantId = bundleChild.variant.productId
 
-                    updateBundleItemsInBasketMutation.mutate({
+                    updateItemInBasketMutation.mutate({
                         method: 'PATCH',
                         parameters: {
                             basketId: basket.basketId,
