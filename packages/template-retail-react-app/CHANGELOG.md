@@ -2,6 +2,7 @@
 - Support Storefront Preview 
   - [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
   - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
+- Product bundles [#1511](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1511)
   
 ## v2.0.0 (Sep 21, 2023)
 
