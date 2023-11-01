@@ -13,6 +13,7 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {getTenantId, isError} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
+import OcapiShopperCustomerGroups from './ocapi-shopper-customer-groups'
 
 /**
  * The configuration details for the connecting to the API.
@@ -97,7 +98,8 @@ class CommerceAPI {
             shopperSearch: {
                 api: sdk.ShopperSearch,
                 sendCurrency: ['productSearch', 'getSearchSuggestions']
-            }
+            },
+            shopperCustomerGroups: {api: OcapiShopperCustomerGroups}
         }
 
         // Instantiate the SDK class proxies and create getters from our api mapping.

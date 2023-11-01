@@ -114,6 +114,31 @@ export default function useStorefrontPreview(opts = {}) {
     }
 
     const updatePreviewContext = async () => {
+        // optionally, call OCAPI custom hook to see if the change in shopper context (custom qualifiers/ session attributes)
+        // triggered any customer groups
+        // This class connects to a custom hook endpoint implemented by
+        // https://github.com/SalesforceCommerceCloud/sfcc-hooks-collection
+        // and can be used to retrieve customer groups for a given customer, based on the current auth access token
+        // ** This is not automatically configured by this project. **
+
+        const customerGroups = []
+
+        try {
+            const result = await api.shopperCustomerGroups.getCustomerGroups({})
+            if (result && result?.c_result && result?.c_result.length) {
+                result.c_result.map((customerGroup) => customerGroups.push(customerGroup.id))
+            }
+        } catch (e) {
+            console.error('Error retrieving customer groups')
+        }
+
+        // set new customer groups to context
+        if (customerGroups.length) {
+            ampProps.groups = customerGroups
+            api.auth._storage.set('customerGroups', JSON.stringify(customerGroups))
+            document.cookie = `customerGroups=${JSON.stringify(customerGroups)};`
+        }
+
         // in order for the personalized preview pricing and context to be updated
         // we need to trigger a re-render of the client side app
         // remove the context changed param from the url
