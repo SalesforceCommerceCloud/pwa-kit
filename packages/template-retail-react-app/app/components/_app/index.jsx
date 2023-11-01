@@ -270,31 +270,31 @@ const App = (props) => {
     }
     return (
         <Box className="sf-app" {...styles.container}>
-            <IntlProvider
-                onError={(err) => {
-                    if (!messages) {
-                        // During the ssr prepass phase the messages object has not loaded, so we can suppress
-                        // errors during this time.
-                        return
-                    }
-                    if (err.code === 'MISSING_TRANSLATION') {
-                        // NOTE: Remove the console error for missing translations during development,
-                        // as we knew translations would be added later.
-                        console.warn('Missing translation', err.message)
-                        return
-                    }
-                    throw err
-                }}
-                locale={targetLocale}
-                messages={messages}
-                // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
-                // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
-                // - "extract-default-translations"
-                // - "compile-translations:pseudo"
-                defaultLocale={DEFAULT_LOCALE}
-            >
-                <CurrencyProvider currency={currency}>
-                    <StorefrontPreview getToken={getTokenWhenReady}>
+            <StorefrontPreview getToken={getTokenWhenReady}>
+                <IntlProvider
+                    onError={(err) => {
+                        if (!messages) {
+                            // During the ssr prepass phase the messages object has not loaded, so we can suppress
+                            // errors during this time.
+                            return
+                        }
+                        if (err.code === 'MISSING_TRANSLATION') {
+                            // NOTE: Remove the console error for missing translations during development,
+                            // as we knew translations would be added later.
+                            console.warn('Missing translation', err.message)
+                            return
+                        }
+                        throw err
+                    }}
+                    locale={targetLocale}
+                    messages={messages}
+                    // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
+                    // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
+                    // - "extract-default-translations"
+                    // - "compile-translations:pseudo"
+                    defaultLocale={DEFAULT_LOCALE}
+                >
+                    <CurrencyProvider currency={currency}>
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
                             <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
@@ -387,9 +387,9 @@ const App = (props) => {
                                 <AuthModal {...authModal} />
                             </AddToCartModalProvider>
                         </Box>
-                    </StorefrontPreview>
-                </CurrencyProvider>
-            </IntlProvider>
+                    </CurrencyProvider>
+                </IntlProvider>
+            </StorefrontPreview>
         </Box>
     )
 }
