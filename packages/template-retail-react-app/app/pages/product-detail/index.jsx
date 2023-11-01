@@ -279,14 +279,12 @@ const ProductDetail = () => {
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
-            console.log('childProductSelections', childProductSelections)
             const bundledProductItems = childProductSelections.map((child) => {
                 return {
                     productId: child.variant.productId,
                     quantity: child.quantity
                 }
             })
-            console.log('bundledProductItems', bundledProductItems)
 
             const productItems = [
                 {
