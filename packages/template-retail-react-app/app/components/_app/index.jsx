@@ -345,13 +345,17 @@ const App = (props) => {
                                                     isOpen={isOpen}
                                                     onClose={onClose}
                                                     onLogoClick={onLogoClick}
-                                                    root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                                    root={
+                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                    }
                                                 />
                                             </HideOnDesktop>
 
                                             <HideOnMobile>
                                                 <ListMenu
-                                                    root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                                    root={
+                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                    }
                                                 />
                                             </HideOnMobile>
                                         </Header>
@@ -378,7 +382,9 @@ const App = (props) => {
                                         flexDirection="column"
                                         flex="1"
                                     >
-                                        <OfflineBoundary isOnline={false}>{children}</OfflineBoundary>
+                                        <OfflineBoundary isOnline={false}>
+                                            {children}
+                                        </OfflineBoundary>
                                     </Box>
                                 </SkipNavContent>
 
