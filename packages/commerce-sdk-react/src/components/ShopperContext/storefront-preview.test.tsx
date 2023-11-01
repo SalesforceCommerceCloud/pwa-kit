@@ -1,3 +1,4 @@
+// @ts-nocheck 
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
@@ -6,9 +7,15 @@
  */
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import {StorefrontPreview} from './index'
+import StorefrontPreview from './storefront-preview'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
+
+declare global {
+    interface Window {
+        STOREFRONT_PREVIEW: any
+    }
+}
 
 jest.mock('./utils', () => {
     const origin = jest.requireActual('./utils')
@@ -17,6 +24,7 @@ jest.mock('./utils', () => {
         detectStorefrontPreview: jest.fn()
     }
 })
+
 describe('Storefront Preview Component', function () {
     const oldWindow = window
 
@@ -58,6 +66,7 @@ describe('Storefront Preview Component', function () {
         })
     })
     test('renders script tag when enabled is on but host is not trusted', async () => {
+        // @ts-ignore
         detectStorefrontPreview.mockReturnValue(false)
 
         render(<StorefrontPreview />)
@@ -69,6 +78,7 @@ describe('Storefront Preview Component', function () {
         })
     })
     test('renders script tag when enabled is on', async () => {
+        // @ts-ignore
         detectStorefrontPreview.mockReturnValue(true)
 
         render(<StorefrontPreview enabled={true} />)
@@ -86,6 +96,7 @@ describe('Storefront Preview Component', function () {
 
     test('getToken is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
         window.STOREFRONT_PREVIEW = {}
+        // @ts-ignore
         detectStorefrontPreview.mockReturnValue(true)
 
         render(<StorefrontPreview getToken={() => 'my-token'} />)
