@@ -8,7 +8,7 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
-import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
+import StorefrontPreview from '@salesforce/pwa-kit-react-sdk/storefront-preview'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'

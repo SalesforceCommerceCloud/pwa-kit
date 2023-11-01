@@ -1,4 +1,3 @@
-// @ts-nocheck 
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
@@ -20,7 +19,7 @@ import {useHistory} from 'react-router-dom'
  */
 export const StorefrontPreview = ({children, enabled = true, getToken}) => {
     const history = useHistory()
-    const isHostTrusted = detectStorefrontPreview()
+    let isHostTrusted
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
@@ -33,6 +32,9 @@ export const StorefrontPreview = ({children, enabled = true, getToken}) => {
             }
         }
     }, [enabled, getToken])
+
+    // We only want to run this function when enabled is on
+    isHostTrusted = detectStorefrontPreview()
 
     return (
         <>
@@ -70,5 +72,3 @@ StorefrontPreview.propTypes = {
         }
     }
 }
-
-export default StorefrontPreview

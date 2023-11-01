@@ -64,7 +64,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
-    "react-router-dom": "^5.3.4",
     "semver": "^7.5.2",
     "shelljs": "^0.8.5",
     "typedoc": "^0.24.7",
@@ -77,8 +76,7 @@
     "react-helmet": "^6.1.0"
   },
   "optionalDependencies": {
-    "prop-types": "^15.8.1",
-    "react-router-dom": "^5.3.4"
+    "prop-types": "^15.8.1"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",
