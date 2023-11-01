@@ -5,4 +5,4 @@ generator-assets
 vendor
 temp
 temp_static
-src/components/ShopperContext
+src/components/StorefrontPreview
