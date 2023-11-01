@@ -64,6 +64,7 @@ const ProductDetail = () => {
     /****************************** Basket *********************************/
     const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
+    const updateBundleItemsInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
@@ -278,12 +279,14 @@ const ProductDetail = () => {
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
+            console.log('childProductSelections', childProductSelections)
             const bundledProductItems = childProductSelections.map((child) => {
                 return {
                     productId: child.variant.productId,
                     quantity: child.quantity
                 }
             })
+            console.log('bundledProductItems', bundledProductItems)
 
             const productItems = [
                 {
@@ -294,9 +297,36 @@ const ProductDetail = () => {
                 }
             ]
 
-            await addItemToBasketMutation.mutateAsync({
+            const res = await addItemToBasketMutation.mutateAsync({
                 parameters: {basketId: basket.basketId},
                 body: productItems
+            })
+
+            // the response from addItemToBasketMutation returns an entire basket including newly added bundle product along with other products in the cart
+            // there is no reliable way to filter out the bundle among productItems
+            // Hence, we have to loop over each basket items, and its bundleProductItems to search out the children that still have
+            // masterId and update it with the variantId
+            res.productItems.forEach((productItem) => {
+                productItem.bundledProductItems.forEach((item) => {
+                    // seek out the bundle child that still uses masterId as product id
+                    const bundleChild = childProductSelections.find(
+                        (prod) => prod.product.id === item.productId
+                    )
+                    if (!bundleChild) return
+                    const variantId = bundleChild.variant.productId
+
+                    updateBundleItemsInBasketMutation.mutate({
+                        method: 'PATCH',
+                        parameters: {
+                            basketId: basket.basketId,
+                            itemId: item.itemId
+                        },
+                        body: {
+                            productId: variantId,
+                            quantity: selectedQuantity
+                        }
+                    })
+                })
             })
 
             einstein.sendAddToCart(productItems)
