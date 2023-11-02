@@ -20,7 +20,7 @@ import {useHistory} from 'react-router-dom'
  */
 export const StorefrontPreview = ({
     children,
-    enabled= true,
+    enabled = true,
     getToken,
     experimentalUnsafeAdditionalSearchParams = [],
     experimentalUnsafeReloadServerSide
