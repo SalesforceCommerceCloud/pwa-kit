@@ -34,7 +34,7 @@ export const StorefrontPreview = ({
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
-                navigate: (
+                experimentalUnsafeNavigate: (
                     path: LocationDescriptor<unknown>,
                     action: 'push' | 'replace' = 'push',
                     ...args: unknown[]
