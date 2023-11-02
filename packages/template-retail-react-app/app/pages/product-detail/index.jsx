@@ -305,7 +305,7 @@ const ProductDetail = () => {
             // Hence, we have to loop over each basket items, and its bundleProductItems to search out the children that still have
             // masterId and update it with the variantId
             res.productItems.forEach((productItem) => {
-                productItem.bundledProductItems.forEach((item) => {
+                productItem.bundledProductItems?.forEach((item) => {
                     // seek out the bundle child that still uses masterId as product id
                     const bundleChild = childProductSelections.find(
                         (prod) => prod.product.id === item.productId
