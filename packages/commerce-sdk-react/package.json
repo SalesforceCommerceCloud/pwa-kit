@@ -25,7 +25,7 @@
     "!setup-jest.js"
   ],
   "scripts": {
-    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --noEmit",
+    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc --emitDeclarationOnly",
     "build:docs": "typedoc --plugin typedoc-plugin-missing-exports --hideGenerator",
     "build:watch": "nodemon --watch 'src/**' --ext 'tsx,ts' --exec  'npm run build'",
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\"",
