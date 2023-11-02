@@ -1,6 +1,6 @@
 {
   "name": "test-commerce-sdk-react",
-  "version": "3.2.0-dev",
+  "version": "3.2.0-preview.0",
   "private": true,
   "scripts": {
     "build": "pwa-kit-dev build",
@@ -19,16 +19,16 @@
   "devDependencies": {
     "@loadable/component": "^5.15.3",
     "@salesforce/commerce-sdk-react": "1.1.0-dev",
-    "@salesforce/pwa-kit-dev": "3.2.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.2.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.2.0-dev",
+    "@salesforce/pwa-kit-dev": "3.2.0-preview.0",
+    "@salesforce/pwa-kit-react-sdk": "3.2.0-preview.0",
+    "@salesforce/pwa-kit-runtime": "3.2.0-preview.0",
     "@tanstack/react-query": "^4.28.0",
     "@types/loadable__component": "~5.13.4",
     "@types/node": "~16.0.3",
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.1",
     "@types/react-router-dom": "~5.3.3",
-    "internal-lib-build": "3.2.0-dev",
+    "internal-lib-build": "3.2.0-preview.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
