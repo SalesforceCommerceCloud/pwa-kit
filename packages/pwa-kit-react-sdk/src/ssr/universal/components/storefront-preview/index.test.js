@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {mount} from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import {StorefrontPreview} from './index'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
@@ -42,6 +42,31 @@ describe('Storefront Preview Component', function () {
         // eslint-disable-next-line
         window = oldWindow
     })
+
+    test('Renders children when enabled', async () => {
+        const MockComponent = () => <div data-testid="mockComponent">Mock Component</div>
+        MockComponent.displayName = 'MockComponent'
+
+        const wrapper = shallow(
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'}>
+                <MockComponent />
+            </StorefrontPreview>
+        )
+        expect(wrapper.find('MockComponent')).toBeDefined()
+    })
+
+    test('Renders children when disabled', async () => {
+        const MockComponent = () => <div data-testid="mockComponent">Mock Component</div>
+        MockComponent.displayName = 'MockComponent'
+
+        const wrapper = shallow(
+            <StorefrontPreview enabled={false}>
+                <MockComponent />
+            </StorefrontPreview>
+        )
+        expect(wrapper.find('MockComponent')).toBeDefined()
+    })
+
     test('not renders nothing when enabled is off', async () => {
         mount(<StorefrontPreview enabled={false} />)
         // this will return all the markup assigned to helmet
@@ -49,6 +74,7 @@ describe('Storefront Preview Component', function () {
         const helmet = Helmet.peek()
         expect(helmet).toBeUndefined()
     })
+
     test('renders script tag when enabled is on but host is not trusted', async () => {
         detectStorefrontPreview.mockReturnValue(false)
 

@@ -19,13 +19,15 @@ import {useHistory} from 'react-router-dom'
  * @param  {boolean} experimentalUnsafeReloadServerSide - if true, will reload the page on server side when context changes
  */
 export const StorefrontPreview = ({
-    enabled,
+    children,
+    enabled= true,
     getToken,
     experimentalUnsafeAdditionalSearchParams = [],
     experimentalUnsafeReloadServerSide
 }) => {
     const history = useHistory()
-    let isHostTrusted
+    const isHostTrusted = detectStorefrontPreview()
+
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
@@ -44,21 +46,21 @@ export const StorefrontPreview = ({
         experimentalUnsafeAdditionalSearchParams,
         experimentalUnsafeReloadServerSide
     ])
-    if (!enabled) {
-        return null
-    }
-    // We only want to run this function when enabled is on
-    isHostTrusted = detectStorefrontPreview()
-    return isHostTrusted ? (
-        <Helmet>
-            <script
-                id="storefront_preview"
-                src={getClientScript()}
-                async
-                type="text/javascript"
-            ></script>
-        </Helmet>
-    ) : null
+    return (
+        <>
+            {enabled && isHostTrusted && (
+                <Helmet>
+                    <script
+                        id="storefront_preview"
+                        src={getClientScript()}
+                        async
+                        type="text/javascript"
+                    ></script>
+                </Helmet>
+            )}
+            {children}
+        </>
+    )
 }
 
 StorefrontPreview.defaultProps = {
@@ -67,6 +69,7 @@ StorefrontPreview.defaultProps = {
 }
 
 StorefrontPreview.propTypes = {
+    children: PropTypes.node,
     enabled: PropTypes.bool,
     // a custom prop type function to only require this prop if enabled is true.
     getToken: function (props, propName, componentName) {
@@ -82,3 +85,5 @@ StorefrontPreview.propTypes = {
     experimentalUnsafeAdditionalSearchParams: PropTypes.array,
     experimentalUnsafeReloadServerSide: PropTypes.bool
 }
+
+export default StorefrontPreview
