@@ -96,13 +96,6 @@ jobs:
           CWD: "./packages/template-retail-react-app"
           TARGET: production
 
-      - name: Push Bundle to MRT (Commerce SDK React)
-        if: env.IS_NOT_FORK == 'true' && env.IS_LATEST_NPM == 'true' && env.DEVELOPMENT == 'true'
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "./packages/test-commerce-sdk-react"
-          TARGET: commerce-sdk-react
-
       - name: Check Repository Clean
         if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/check_clean"
