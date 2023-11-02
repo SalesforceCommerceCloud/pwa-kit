@@ -1,4 +1,4 @@
-## v2.1.0-dev (Sep 26, 2023)
+## v2.1.0-preview.0 (Nov 2, 2023)
 - Support Storefront Preview 
   - [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
   - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
