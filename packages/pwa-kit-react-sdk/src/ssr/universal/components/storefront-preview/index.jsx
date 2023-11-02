@@ -18,7 +18,7 @@ import {useHistory} from 'react-router-dom'
  */
 export const StorefrontPreview = ({children, enabled = true, getToken}) => {
     const history = useHistory()
-    let isHostTrusted = detectStorefrontPreview()
+    const isHostTrusted = detectStorefrontPreview()
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
