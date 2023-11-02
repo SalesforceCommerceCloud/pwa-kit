@@ -39,6 +39,19 @@ const Refresh = () => {
                 console.warn('Could not find `referrer` search param - redirecting to home page.')
                 referrer = '/'
             }
+
+            // if experimentalUnsafeReloadServerSide is true, reload the page on server side
+            const experimentalUnsafeReloadServerSide = new URLSearchParams(location.search).get(
+                'experimentalUnsafeReloadServerSide'
+            )
+            if (experimentalUnsafeReloadServerSide === 'true') {
+                console.warn(
+                    '"experimentalUnsafeReloadServerSide" was set to true - reloading page on server side'
+                )
+                window.location.replace(referrer)
+                return
+            }
+
             history.replace(referrer)
         }
         refetchData()

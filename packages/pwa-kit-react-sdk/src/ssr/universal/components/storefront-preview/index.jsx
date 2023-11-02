@@ -15,8 +15,16 @@ import {useHistory} from 'react-router-dom'
  *
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
  * @param  {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
+ * @param  {Array} experimentalUnsafeAdditionalSearchParams - An array of key/value search params to add when context changes
+ * @param  {boolean} experimentalUnsafeReloadServerSide - if true, will reload the page on server side when context changes
  */
-export const StorefrontPreview = ({children, enabled = true, getToken}) => {
+export const StorefrontPreview = ({
+    children,
+    enabled = true,
+    getToken,
+    experimentalUnsafeAdditionalSearchParams = [],
+    experimentalUnsafeReloadServerSide
+}) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
 
@@ -25,13 +33,19 @@ export const StorefrontPreview = ({children, enabled = true, getToken}) => {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
-                navigate: (path, action = 'push', ...args) => {
+                experimentalUnsafeNavigate: (path, action = 'push', ...args) => {
                     history[action](path, ...args)
-                }
+                },
+                experimentalUnsafeAdditionalSearchParams,
+                experimentalUnsafeReloadServerSide
             }
         }
-    }, [enabled, getToken])
-
+    }, [
+        enabled,
+        getToken,
+        experimentalUnsafeAdditionalSearchParams,
+        experimentalUnsafeReloadServerSide
+    ])
     return (
         <>
             {enabled && isHostTrusted && (
@@ -50,7 +64,8 @@ export const StorefrontPreview = ({children, enabled = true, getToken}) => {
 }
 
 StorefrontPreview.defaultProps = {
-    enabled: true
+    enabled: true,
+    experimentalUnsafeReloadServerSide: false
 }
 
 StorefrontPreview.propTypes = {
@@ -66,7 +81,9 @@ StorefrontPreview.propTypes = {
                 `${propName} is a required function for ${componentName} when enabled is true`
             )
         }
-    }
+    },
+    experimentalUnsafeAdditionalSearchParams: PropTypes.array,
+    experimentalUnsafeReloadServerSide: PropTypes.bool
 }
 
 export default StorefrontPreview

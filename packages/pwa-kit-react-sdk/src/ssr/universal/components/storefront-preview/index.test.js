@@ -104,17 +104,68 @@ describe('Storefront Preview Component', function () {
 
         mount(<StorefrontPreview getToken={() => 'my-token'} />)
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
-        expect(window.STOREFRONT_PREVIEW.navigate).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeAdditionalSearchParams).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeReloadServerSide).toBeDefined()
     })
 
-    test('window.STOREFRONT_PREVIEW.navigate', () => {
+    test('window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate', () => {
         detectStorefrontPreview.mockReturnValue(true)
         mount(<StorefrontPreview getToken={() => 'my-token'} />)
 
-        window.STOREFRONT_PREVIEW.navigate('/', 'replace')
+        window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate('/', 'replace')
         expect(useHistory().replace).toHaveBeenCalledWith('/')
 
-        window.STOREFRONT_PREVIEW.navigate('/')
+        window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate('/')
         expect(useHistory().push).toHaveBeenCalledWith('/')
+    })
+
+    test('window.STOREFRONT_PREVIEW.experimentalUnsafeAdditionalSearchParams', async () => {
+        detectStorefrontPreview.mockReturnValue(true)
+
+        const getSearchParamsToAdd = () => {
+            return [
+                {
+                    name: 'vse',
+                    value: 'my-custom-vse-{{effectiveDateTimeUnix}}.staging.content.io'
+                },
+                {
+                    name: 'vse-timestamp',
+                    value: '{{effectiveDateTimeUnix}}'
+                }
+            ]
+        }
+
+        mount(
+            <StorefrontPreview
+                getToken={() => 'my-token'}
+                experimentalUnsafeAdditionalSearchParams={getSearchParamsToAdd()}
+            />
+        )
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeAdditionalSearchParams).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeAdditionalSearchParams.length).toBe(
+            getSearchParamsToAdd().length
+        )
+    })
+
+    test('window.STOREFRONT_PREVIEW.experimentalUnsafeReloadServerSide to be false', async () => {
+        detectStorefrontPreview.mockReturnValue(true)
+
+        mount(<StorefrontPreview getToken={() => 'my-token'} />)
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeReloadServerSide).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeReloadServerSide).toBe(false)
+    })
+
+    test('window.STOREFRONT_PREVIEW.experimentalUnsafeReloadServerSide to be true', async () => {
+        detectStorefrontPreview.mockReturnValue(true)
+
+        mount(
+            <StorefrontPreview
+                getToken={() => 'my-token'}
+                experimentalUnsafeReloadServerSide={true}
+            />
+        )
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeReloadServerSide).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeReloadServerSide).toBe(true)
     })
 })
