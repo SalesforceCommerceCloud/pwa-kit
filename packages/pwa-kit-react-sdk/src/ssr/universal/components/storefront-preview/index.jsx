@@ -16,7 +16,7 @@ import {useHistory} from 'react-router-dom'
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
  * @param  {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  */
-export const StorefrontPreview = ({children, enabled = true, getToken}) => {
+const StorefrontPreview = ({children, enabled = true, getToken}) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
 
