@@ -97,6 +97,9 @@ describe('Storefront Preview Component', function () {
 
         render(<StorefrontPreview getToken={() => 'my-token'} />)
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
-        expect(window.STOREFRONT_PREVIEW.navigate).toBeDefined()
+    })
+
+    test('experimental unsafe props are defined', () => {
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate).toBeDefined()
     })
 })
