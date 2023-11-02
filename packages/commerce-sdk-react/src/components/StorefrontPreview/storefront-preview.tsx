@@ -1,4 +1,3 @@
-// @ts-nocheck 
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
@@ -11,14 +10,22 @@ import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {detectStorefrontPreview, getClientScript} from './utils'
 import {useHistory} from 'react-router-dom'
+import type {LocationDescriptor} from 'history'
 
 /**
  *
- * @param {boolean} enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true.
- * This flag only applies if storefront is ran in Runtime Admin iframe.
- * @param {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
+ * @param enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true.
+ * This flag only applies if storefront is running in a Runtime Admin iframe.
+ * @param getToken - A method that returns the access token for the current user
  */
-export const StorefrontPreview = ({children, enabled = true, getToken}) => {
+export const StorefrontPreview = ({
+    children,
+    enabled = true,
+    getToken
+}: React.PropsWithChildren<{
+    enabled?: boolean
+    getToken: () => string | undefined | Promise<string | undefined>
+}>) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
 
@@ -27,7 +34,11 @@ export const StorefrontPreview = ({children, enabled = true, getToken}) => {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
-                navigate: (path, action = 'push', ...args) => {
+                navigate: (
+                    path: LocationDescriptor<unknown>,
+                    action: 'push' | 'replace' = 'push',
+                    ...args: unknown[]
+                ) => {
                     history[action](path, ...args)
                 }
             }
@@ -59,13 +70,15 @@ StorefrontPreview.propTypes = {
     children: PropTypes.node,
     enabled: PropTypes.bool,
     // a custom prop type function to only require this prop if enabled is true.
-    getToken: function (props, propName, componentName) {
+    getToken: function (props: any, propName: any, componentName: any) {
         if (
             props['enabled'] === true &&
             (props[propName] === undefined || typeof props[propName] !== 'function')
         ) {
             return new Error(
-                `${propName} is a required function for ${componentName} when enabled is true`
+                `${String(propName)} is a required function for ${String(
+                    componentName
+                )} when enabled is true`
             )
         }
     }
