@@ -12,6 +12,8 @@ import {detectStorefrontPreview, getClientScript} from './utils'
 import {useHistory} from 'react-router-dom'
 import type {LocationDescriptor} from 'history'
 
+type GetToken = () => string | undefined | Promise<string | undefined>
+
 /**
  *
  * @param enabled - flag to turn on/off Storefront Preview feature. By default, it is set to true.
@@ -22,10 +24,10 @@ export const StorefrontPreview = ({
     children,
     enabled = true,
     getToken
-}: React.PropsWithChildren<{
-    enabled?: boolean
-    getToken: () => string | undefined | Promise<string | undefined>
-}>) => {
+}: React.PropsWithChildren<
+    // getToken is required unless enabled is false
+    {enabled?: true; getToken: GetToken} | {enabled: false; getToken?: GetToken}
+>) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
 
@@ -60,10 +62,6 @@ export const StorefrontPreview = ({
             {children}
         </>
     )
-}
-
-StorefrontPreview.defaultProps = {
-    enabled: true
 }
 
 StorefrontPreview.propTypes = {
