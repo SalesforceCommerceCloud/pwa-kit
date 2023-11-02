@@ -1,4 +1,3 @@
-// @ts-nocheck 
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
@@ -30,10 +29,13 @@ export const getParentOrigin = () => {
     }
 }
 
-const isParentOriginTrusted = (parentOrigin) => {
-    return window.location.hostname === 'localhost'
-        ? parentOrigin === DEVELOPMENT_ORIGIN // Development
-        : TRUSTED_ORIGINS.includes(parentOrigin) // Production
+const isParentOriginTrusted = (parentOrigin: string | undefined) => {
+    return Boolean(
+        parentOrigin &&
+            (window.location.hostname === 'localhost'
+                ? parentOrigin === DEVELOPMENT_ORIGIN // Development
+                : TRUSTED_ORIGINS.includes(parentOrigin)) // Production
+    )
 }
 
 /** Detects whether the storefront is running in an iframe as part of Storefront Preview.
