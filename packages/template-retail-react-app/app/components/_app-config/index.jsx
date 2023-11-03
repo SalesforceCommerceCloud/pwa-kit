@@ -86,7 +86,8 @@ AppConfig.restore = (locals = {}) => {
     const {app: appConfig} = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
-        einsteinConfig: appConfig.einsteinAPI
+        einsteinConfig: appConfig.einsteinAPI,
+        amplience: appConfig.amplience
     }
 
     apiConfig.parameters.siteId = site.id

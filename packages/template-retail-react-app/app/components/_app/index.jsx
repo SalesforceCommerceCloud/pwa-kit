@@ -43,6 +43,7 @@ import useCustomer from '../../commerce-api/hooks/useCustomer'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import useWishlist from '../../hooks/use-wishlist'
+import useStorefrontPreview from '../../hooks/use-storefront-preview'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -78,7 +79,7 @@ const App = (props) => {
         targetLocale = DEFAULT_LOCALE,
         messages = {},
         categories: allCategories = {},
-        ampProps
+        ampProps = {}
     } = props
 
     const appOrigin = getAppOrigin()
@@ -151,16 +152,25 @@ const App = (props) => {
         connectRealtimeViz()
     }, [])
 
+    // Set up storefront preview
+    const storefrontPreview = useStorefrontPreview({ampProps})
+
     useEffect(() => {
         // Lets automatically close the mobile navigation when the
         // location path is changed.
         onClose()
         const activeParams = new URLSearchParams(location.search || '')
-        const showPreview =
-            activeParams &&
-            ((activeParams.has('vse') && activeParams.get('vse')) ||
-                (activeParams.has('pagevse') && activeParams.get('pagevse')))
-        setShowVse(showPreview)
+
+        // optional, hide the Amplience toolbar to avoid confusion from competing preview toolbars
+        if (storefrontPreview.isEnabled) {
+            setShowVse(false)
+        } else {
+            const showPreview =
+                activeParams &&
+                ((activeParams.has('vse') && activeParams.get('vse')) ||
+                    (activeParams.has('pagevse') && activeParams.get('pagevse')))
+            setShowVse(showPreview)
+        }
     }, [location])
 
     if (typeof window !== 'undefined') {
@@ -211,7 +221,11 @@ const App = (props) => {
         <Box className="sf-app" {...styles.container}>
             {/* For pwa-kit v2, we need to use this getToken prop to make sure it can work properly
                 with Storefront Preview feature*/}
-            <StorefrontPreview getToken={() => window.localStorage.getItem('token')}>
+            <StorefrontPreview
+                getToken={() => window.localStorage.getItem('token')}
+                experimentalUnsafeAdditionalSearchParams={storefrontPreview.getAdditionalSearchParams()}
+                experimentalUnsafeReloadServerSide={true}
+            >
                 <IntlProvider
                     onError={(err) => {
                         if (err.code === 'MISSING_TRANSLATION') {

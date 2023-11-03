@@ -91,3 +91,6 @@ export const TOAST_MESSAGE_REMOVED_FROM_WISHLIST = defineMessage({
     id: 'global.info.removed_from_wishlist',
     defaultMessage: 'Item removed from wishlist'
 })
+
+// Constants for Storefront Preview
+export const PREVIEW_CONTEXT_CHANGED_QS_PARAM = '__preview_context_changed'

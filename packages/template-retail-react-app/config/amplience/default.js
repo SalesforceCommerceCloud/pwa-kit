@@ -9,18 +9,19 @@ module.exports = {
         hub: 'sfcccomposable'
     },
     envs: [
-        /*
         {
-            name: 'Environment 1',
-            hub: 'environment01',
-            vse: '{{Your VSE URL for Environment 1}}'
-        },
+            name: 'production',
+            hub: 'sfcccomposable',
+            vse: '1pqebtas9axy7zeeiy96389op.staging.bigcontent.io',
+            timeMachine: 'gvzrfgnzc'
+        }
+        /*
          {
             name: 'Environment 1',
             hub: 'environment01',
             vse: '{{Your VSE URL for Environment 2}}'
         }
-        */
+         */
     ],
     visualisations: [
         {
