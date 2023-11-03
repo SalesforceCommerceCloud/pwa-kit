@@ -12,7 +12,7 @@ runs:
   steps:
     - name: Push Bundle to MRT
       run: |-
-        cd ${{ inputs.cwd }}
+        cd ${{ inputs.CWD }}
         project="scaffold-pwa"
         build="build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
         if [[ ${{ inputs.TARGET }} ]]; then
