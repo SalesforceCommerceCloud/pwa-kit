@@ -2,6 +2,7 @@ name: push_to_mrt
 inputs:
   CWD:
     description: Project directory
+    default: ${{ github.workspace }}
   TARGET:
     description: MRT target
   FLAGS:
@@ -11,7 +12,7 @@ runs:
   steps:
     - name: Push Bundle to MRT
       run: |-
-        cd ${{ inputs.CWD }}
+        cd ${{ inputs.cwd }}
         project="scaffold-pwa"
         build="build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
         if [[ ${{ inputs.TARGET }} ]]; then
