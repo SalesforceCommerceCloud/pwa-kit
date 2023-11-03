@@ -1,5 +1,4 @@
-## 2.7.5-dev (Aug 29, 2023)
--   Disable hydration in storefront preview 
+## v2.8.0-preview.0 (Nov 02, 2023)
 -   Support Storefront Preview 
     - [#1442](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1442)
     - [#1443](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1443)
