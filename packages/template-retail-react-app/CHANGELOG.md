@@ -1,3 +1,11 @@
+## v2.1.0-preview.0 (Nov 2, 2023)
+
+- Support Storefront Preview 
+  - [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
+  - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
+- Show discounted and strikethrough prices when there is a promotion on product detail page [1455](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1455)
+- Move Content-Security-Policy logic to pwa-kit-runtime [1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
+  
 ## v2.0.0 (Sep 21, 2023)
 
 - V3 Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)

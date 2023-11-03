@@ -267,16 +267,14 @@ describe('DevServer request processor support', () => {
 
 describe('DevServer listening on http/https protocol', () => {
     let server
-    let originalEnv
+    let originalEnv = process.env
 
     beforeEach(() => {
-        originalEnv = Object.assign({}, process.env)
+        process.env = {...originalEnv}
     })
 
     afterEach(() => {
-        if (server) {
-            server.close()
-        }
+        server?.close()
         process.env = originalEnv
     })
 
@@ -293,7 +291,7 @@ describe('DevServer listening on http/https protocol', () => {
 
     cases.forEach(({options, env, name}) => {
         const protocol = options.protocol || env.DEV_SERVER_PROTOCOL
-        test(`${name}`, () => {
+        test(`${name}`, async () => {
             process.env = {...process.env, ...env}
             const {server: _server} = NoWebpackDevServerFactory.createHandler(
                 opts(options),
@@ -304,10 +302,8 @@ describe('DevServer listening on http/https protocol', () => {
                 }
             )
             server = _server
-            return insecureFetch(`${protocol}://localhost:${TEST_PORT}`).then((response) => {
-                expect(response.ok).toBe(true)
-                return Promise.resolve()
-            })
+            const response = await insecureFetch(`${protocol}://localhost:${TEST_PORT}`)
+            expect(response.ok).toBe(true)
         })
     })
 })

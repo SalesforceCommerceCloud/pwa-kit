@@ -4,9 +4,13 @@ inputs:
     description: Project key to specify project to generate ("retail-app-demo", "retail-app-ext" or "retail-app-no-ext")
     required: true
     type: string
+  cwd:
+    required: false
+    default: ${PWD}
 runs:
   using: composite
   steps:
   - name: Generate new project based on project-key
+    working-directory: ${{ inputs.cwd }}
     run: node e2e/scripts/generate-project.js ${{ inputs.PROJECT_KEY }}
     shell: bash

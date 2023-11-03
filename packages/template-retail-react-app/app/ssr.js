@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -9,7 +9,6 @@
 
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
-import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
 
@@ -20,7 +19,7 @@ const options = {
     // The cache time for SSR'd pages (defaults to 600 seconds)
     defaultCacheTimeSeconds: 600,
 
-    // This is the value of the 'mobify' object from package.json
+    // The contents of the config file for the current environment
     mobify: getConfig(),
 
     // The port that the local dev server listens on
@@ -38,18 +37,25 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
     app.use(
         helmet({
+            // pwa-kit-runtime ensures that the Content-Security-Policy header always contains the
+            // directives required for PWA Kit to function. Add custom directives here.
             contentSecurityPolicy: {
                 useDefaults: true,
                 directives: {
-                    'img-src': ["'self'", '*.commercecloud.salesforce.com', 'data:'],
-                    'script-src': ["'self'", "'unsafe-eval'", 'storage.googleapis.com'],
-                    'connect-src': ["'self'", 'api.cquotient.com'],
-
-                    // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null
+                    'img-src': [
+                        // Default source for product images - replace with your CDN
+                        '*.commercecloud.salesforce.com'
+                    ],
+                    'script-src': [
+                        // Used by the service worker in /worker/main.js
+                        'storage.googleapis.com'
+                    ],
+                    'connect-src': [
+                        // Connect to Einstein APIs
+                        'api.cquotient.com'
+                    ]
                 }
-            },
-            hsts: isRemote()
+            }
         })
     )
 

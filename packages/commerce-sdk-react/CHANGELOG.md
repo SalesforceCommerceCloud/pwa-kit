@@ -1,3 +1,9 @@
+## v1.1.0-preview.0 (Nov 02, 2023)
+
+- Add StorefrontPreview component [#1508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1508)
+- Using `login` for authentication instead of `email` in registration process [#1464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1464)
+- Fix bug to remove cookies using the default attributes used when setting cookie [#1505](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1505)
+
 ## v1.0.2 (Sep 21, 2023)
 
 - commerce-sdk-react: have typedoc-related deps as dev dependencies [#1425](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1425)
