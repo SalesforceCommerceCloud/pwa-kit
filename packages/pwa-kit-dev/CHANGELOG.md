@@ -1,3 +1,4 @@
+## v2.8.0 (Nov 02, 2023)
 ## v2.7.4 (Aug 28, 2023)
 - Fix performance issue caused by potentially large amounts of stats data from webpack [#1391](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1391/files)
 

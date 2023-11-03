@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -8,7 +8,6 @@
 
 import path from 'path'
 import {getRuntime} from 'pwa-kit-runtime/ssr/server/express'
-import {isRemote} from 'pwa-kit-runtime/utils/ssr-server'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
 
@@ -19,14 +18,15 @@ const options = {
     // The cache time for SSR'd pages (defaults to 600 seconds)
     defaultCacheTimeSeconds: 600,
 
-    // This is the value of the 'mobify' object from package.json
+    // The contents of the config file for the current environment
     mobify: getConfig(),
 
     // The port that the local dev server listens on
     port: 3000,
 
     // The protocol on which the development Express app listens.
-    // Note that http://localhost is treated as a secure context for development.
+    // Note that http://localhost is treated as a secure context for development,
+    // except by Safari.
     protocol: 'http'
 }
 
@@ -36,13 +36,13 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
     app.use(
         helmet({
+            // pwa-kit-runtime ensures that the Content-Security-Policy header always contains the
+            // directives required for PWA Kit to function. Add custom directives here.
             contentSecurityPolicy: {
                 useDefaults: true,
                 directives: {
                     'img-src': [
-                        "'self'",
                         '*.commercecloud.salesforce.com',
-                        'data:',
                         '*.cdn.content.amplience.net',
                         'cdn.media.amplience.net',
                         '*.staging.bigcontent.io',
@@ -50,8 +50,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.stylitics.com'
                     ],
                     'script-src': [
-                        "'self'",
-                        "'unsafe-eval'",
                         'storage.googleapis.com',
                         '*.cdn.content.amplience.net',
                         'cdn.media.amplience.net',
@@ -61,7 +59,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         "'unsafe-inline'"
                     ],
                     'connect-src': [
-                        "'self'",
                         "'unsafe-eval'",
                         'api.cquotient.com',
                         '*.cdn.content.amplience.net',
@@ -81,12 +78,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.stylitics.com',
                         'data:'
                     ],
-                    'frame-ancestors': ["'self'", '*.amplience.net'],
-                    // Do not upgrade insecure requests for local development
-                    'upgrade-insecure-requests': isRemote() ? [] : null
+                    'frame-ancestors': ["'self'", '*.amplience.net']
                 }
-            },
-            hsts: isRemote()
+            }
         })
     )
 

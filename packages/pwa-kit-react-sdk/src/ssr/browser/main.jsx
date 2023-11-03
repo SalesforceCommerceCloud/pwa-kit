@@ -19,7 +19,7 @@ import {uuidv4} from '../../utils/uuidv4.client'
 import PropTypes from 'prop-types'
 
 /* istanbul ignore next */
-export const registerServiceWorker = (url) => {
+export const registerServiceWorker = async (url) => {
     return Promise.resolve().then(() => {
         if ('serviceWorker' in navigator) {
             return Promise.resolve()
@@ -75,7 +75,7 @@ OuterApp.propTypes = {
     locals: PropTypes.object
 }
 /* istanbul ignore next */
-export const start = () => {
+export const start = async () => {
     const AppConfig = getAppConfig()
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)

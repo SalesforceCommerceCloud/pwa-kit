@@ -50,6 +50,7 @@ import ProductTile from './components/project/product-tile'
 import SocialIcons from './components/project/social-icons'
 import SwatchGroup from './components/project/swatch-group'
 import ImageGallery from './components/project/image-gallery'
+import DisplayPrice from './components/project/display-price'
 
 // Amplience Components
 import PreviewHeader from './components/amplience/preview-header'
@@ -110,6 +111,7 @@ const overrides = {
         ProductTile,
         SwatchGroup,
         ImageGallery,
+        DisplayPrice,
 
         // amplience components
         PreviewHeader,

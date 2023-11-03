@@ -22,8 +22,8 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilderAndQuery} from '../../../utils/url'
 import Link from '../link'
 import withRegistration from '../../../hoc/with-registration'
-import {useCurrency} from '../../../hooks'
 import {useLocation} from 'react-router-dom'
+import DisplayPrice from '../../display-price'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -100,14 +100,13 @@ const AmplienceProductTile = (props) => {
         children,
         ...rest
     } = props
-    const {currency, image, price, productId} = product
+    const {image, productId} = product
     // AmplienceProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
 
-    const {currency: activeCurrency} = useCurrency()
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('AmplienceProductTile')
     const location = useLocation()
@@ -164,12 +163,7 @@ const AmplienceProductTile = (props) => {
                 <Text {...styles.title}>{localizedProductName}</Text>
 
                 {/* Price */}
-                <Text {...styles.price}>
-                    {intl.formatNumber(price, {
-                        style: 'currency',
-                        currency: currency || activeCurrency
-                    })}
-                </Text>
+                <DisplayPrice product={product} scope="tile" />
             </div>
         </Contain>
     )
