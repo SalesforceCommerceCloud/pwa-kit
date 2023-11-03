@@ -65,6 +65,7 @@ const ProductDetail = () => {
     const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
+    const updateBasket = useShopperBasketsMutation('updateBasket')
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
@@ -286,6 +287,10 @@ const ProductDetail = () => {
                 }
             })
 
+            const masterIds = childProductSelections.map((child) => {
+                return child.product.id
+            })
+
             const productItems = [
                 {
                     productId: product.id,
@@ -304,26 +309,30 @@ const ProductDetail = () => {
             // there is no reliable way to filter out the bundle among productItems
             // Hence, we have to loop over each basket items, and its bundleProductItems to search out the children that still have
             // masterId and update it with the variantId
-            res.productItems.forEach((productItem) => {
-                productItem.bundledProductItems?.forEach((item) => {
+            const bundle = res.productItems.find((productItem) => {
+                if (!productItem.bundledProductItems?.length) return
+                const childIds = productItem.bundledProductItems?.map((item) => {
                     // seek out the bundle child that still uses masterId as product id
-                    const bundleChild = childProductSelections.find(
-                        (prod) => prod.product.id === item.productId
-                    )
-                    if (!bundleChild) return
-                    const variantId = bundleChild.variant.productId
+                    return item.productId
+                })
+                return childIds.every((id) => masterIds.includes(id))
+            })
 
-                    updateItemInBasketMutation.mutate({
-                        method: 'PATCH',
-                        parameters: {
-                            basketId: basket.basketId,
-                            itemId: item.itemId
-                        },
-                        body: {
-                            productId: variantId,
-                            quantity: selectedQuantity
-                        }
-                    })
+            bundle.bundledProductItems?.forEach((bundleChild) => {
+                const childSelection = childProductSelections.find(
+                    (childProd) => childProd.product.id === bundleChild.productId
+                )
+                if (!childSelection) return
+                updateItemInBasketMutation.mutate({
+                    method: 'PATCH',
+                    parameters: {
+                        basketId: basket.basketId,
+                        itemId: bundleChild.itemId
+                    },
+                    body: {
+                        productId: childSelection.variant.productId,
+                        quantity: selectedQuantity
+                    }
                 })
             })
 
@@ -331,6 +340,7 @@ const ProductDetail = () => {
 
             return childProductSelections
         } catch (error) {
+            console.log(error)
             showError(error)
         }
     }
