@@ -61,25 +61,25 @@ jobs:
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
 
-      # - name: Run unit tests
-      #   uses: "./.github/actions/unit_tests"
+      - name: Run unit tests
+        uses: "./.github/actions/unit_tests"
 
-      # - name: Run bundlesize test
-      #   uses: "./.github/actions/bundle_size_test"
+      - name: Run bundlesize test
+        uses: "./.github/actions/bundle_size_test"
 
-      # - name: Smoke test scripts
-      #   if: env.IS_DEFAULT_NPM == 'true'
-      #   uses: "./.github/actions/smoke_tests"
+      - name: Smoke test scripts
+        if: env.IS_DEFAULT_NPM == 'true'
+        uses: "./.github/actions/smoke_tests"
 
       - name: Create MRT credentials file
-        # if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' )
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' )
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT (Development)
-        # if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOP == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOP == 'true'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/template-retail-react-app"
