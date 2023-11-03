@@ -65,7 +65,6 @@ const ProductDetail = () => {
     const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
-    const updateBasket = useShopperBasketsMutation('updateBasket')
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
@@ -305,10 +304,9 @@ const ProductDetail = () => {
                 body: productItems
             })
 
-            // the response from addItemToBasketMutation returns an entire basket including newly added bundle product along with other products in the cart
-            // there is no reliable way to filter out the bundle among productItems
-            // Hence, we have to loop over each basket items, and its bundleProductItems to search out the children that still have
-            // masterId and update it with the variantId
+            // since the returned data includes all products in basket
+            // here we compare list of productIds in bundleProductItems of each productItem to filter out the
+            // current bundle that last added into cart
             const bundle = res.productItems.find((productItem) => {
                 if (!productItem.bundledProductItems?.length) return
                 const childIds = productItem.bundledProductItems?.map((item) => {
@@ -318,23 +316,27 @@ const ProductDetail = () => {
                 return childIds.every((id) => masterIds.includes(id))
             })
 
-            bundle.bundledProductItems?.forEach((bundleChild) => {
-                const childSelection = childProductSelections.find(
-                    (childProd) => childProd.product.id === bundleChild.productId
-                )
-                if (!childSelection) return
-                updateItemInBasketMutation.mutate({
-                    method: 'PATCH',
-                    parameters: {
-                        basketId: basket.basketId,
-                        itemId: bundleChild.itemId
-                    },
-                    body: {
-                        productId: childSelection.variant.productId,
-                        quantity: selectedQuantity
-                    }
-                })
-            })
+            // using for loop here to make sure the call is run in sequence, not parallel
+            // parallel calls can cause stale data from basket
+            if (bundle?.bundledProductItems?.length) {
+                for (const bundleChild of bundle.bundledProductItems) {
+                    const childSelection = childProductSelections.find(
+                        (childProd) => childProd.product.id === bundleChild.productId
+                    )
+                    if (!childSelection) return
+                    await updateItemInBasketMutation.mutateAsync({
+                        method: 'PATCH',
+                        parameters: {
+                            basketId: basket.basketId,
+                            itemId: bundleChild.itemId
+                        },
+                        body: {
+                            productId: childSelection.variant.productId,
+                            quantity: selectedQuantity
+                        }
+                    })
+                }
+            }
 
             einstein.sendAddToCart(productItems)
 

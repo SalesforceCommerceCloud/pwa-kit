@@ -188,6 +188,7 @@ const Cart = () => {
 
     /***************************** Update Cart **************************/
     const handleUpdateCart = async (variant, quantity) => {
+        console.log('variant', variant)
         // close the modal before handle the change
         onClose()
         // using try-catch is better than using onError callback since we have many mutation calls logic here
@@ -243,32 +244,46 @@ const Cart = () => {
         // close the modal before handle the change
         onClose()
 
+        console.log('childProducts', childProducts)
+        console.log('bundle', bundle)
         try {
             setCartItemLoading(true)
 
+            // update the quantity for bundle main
             const item = {
                 productId: bundle.productId,
                 quantity: bundleQuantity,
-                price: bundle.price,
-
-                bundledProductItems: bundle.bundledProductItems.map(({itemId}, i) => {
-                    const quantityPerBundle = bundle.bundledProducts[i].quantity
-                    const totalQuantity = bundleQuantity * quantityPerBundle
-
-                    return {
-                        itemId,
-                        productId: childProducts[i].variant.productId,
-                        quantity: totalQuantity
-                    }
-                })
+                price: bundle.price
             }
-            return await updateItemInBasketMutation.mutateAsync({
+
+            await updateItemInBasketMutation.mutateAsync({
                 parameters: {
                     basketId: basket.basketId,
                     itemId: selectedItem.itemId
                 },
                 body: item
             })
+
+            // updating manually individual child item to basket
+            // using for loop here to make sure the call is run in sequence, not parallel
+            // parallel calls can cause stale date from basket
+            for (const bundleChild of bundle.bundledProductItems) {
+                const childSelection = childProducts.find(
+                    (childProd) => childProd.product.id === bundleChild.productId
+                )
+                if (!childSelection) return
+                await updateItemInBasketMutation.mutateAsync({
+                    method: 'PATCH',
+                    parameters: {
+                        basketId: basket.basketId,
+                        itemId: bundleChild.itemId
+                    },
+                    body: {
+                        productId: childSelection.variant.productId,
+                        quantity: bundleQuantity
+                    }
+                })
+            }
         } catch {
             showError()
         } finally {
