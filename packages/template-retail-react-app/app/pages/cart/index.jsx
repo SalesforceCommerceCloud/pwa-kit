@@ -28,6 +28,7 @@ import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empt
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
+import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 
 // Hooks
@@ -79,6 +80,7 @@ const Cart = () => {
             }
         }
     )
+
     const {data: customer} = useCurrentCustomer()
     const {customerId, isRegistered} = customer
 
@@ -236,6 +238,44 @@ const Cart = () => {
             setSelectedItem(undefined)
         }
     }
+
+    const handleUpdateBundle = async (bundle, bundleQuantity, childProducts) => {
+        // close the modal before handle the change
+        onClose()
+
+        try {
+            setCartItemLoading(true)
+
+            const item = {
+                productId: bundle.productId,
+                quantity: bundleQuantity,
+                price: bundle.price,
+
+                bundledProductItems: bundle.bundledProductItems.map(({itemId}, i) => {
+                    const quantityPerBundle = bundle.bundledProducts[i].quantity
+                    const totalQuantity = bundleQuantity * quantityPerBundle
+
+                    return {
+                        itemId,
+                        productId: childProducts[i].variant.productId,
+                        quantity: totalQuantity
+                    }
+                })
+            }
+            return await updateItemInBasketMutation.mutateAsync({
+                parameters: {
+                    basketId: basket.basketId,
+                    itemId: selectedItem.itemId
+                },
+                body: item
+            })
+        } catch {
+            showError()
+        } finally {
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
+        }
+    }
     /***************************** Update Cart **************************/
 
     /***************************** Update quantity **************************/
@@ -362,7 +402,7 @@ const Cart = () => {
                                     {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem
-                                                key={productItem.productId}
+                                                key={productItem.itemId}
                                                 index={idx}
                                                 secondaryActions={
                                                     <CartSecondaryButtonGroup
@@ -397,7 +437,7 @@ const Cart = () => {
                                     })}
                                 </Stack>
                                 <Box>
-                                    {isOpen && (
+                                    {isOpen && !selectedItem.bundledProductItems && (
                                         <ProductViewModal
                                             isOpen={isOpen}
                                             onOpen={onOpen}
@@ -405,6 +445,17 @@ const Cart = () => {
                                             product={selectedItem}
                                             updateCart={(variant, quantity) =>
                                                 handleUpdateCart(variant, quantity)
+                                            }
+                                        />
+                                    )}
+                                    {isOpen && selectedItem.bundledProductItems && (
+                                        <BundleProductViewModal
+                                            isOpen={isOpen}
+                                            onOpen={onOpen}
+                                            onClose={onClose}
+                                            product={selectedItem}
+                                            updateCart={(product, quantity, childProducts) =>
+                                                handleUpdateBundle(product, quantity, childProducts)
                                             }
                                         />
                                     )}

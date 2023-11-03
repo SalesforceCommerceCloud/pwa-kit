@@ -7,8 +7,10 @@
 
 import {
     getDisplayPrice,
-    getDisplayVariationValues
+    getDisplayVariationValues,
+    normalizeSetBundleProduct
 } from '@salesforce/retail-react-app/app/utils/product-utils'
+import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 import {mockedCustomerProductListsDetails} from '@salesforce/retail-react-app/app/mocks/mock-data'
 
 const variationAttributes = [
@@ -51,6 +53,36 @@ test('getDisplayVariationValues', () => {
         Colour: 'Taupe',
         Size: '6.5',
         Width: 'M'
+    })
+})
+
+describe('normalizeSetBundleProduct', () => {
+    test('passing in regular product returns original product', () => {
+        const mockProduct = {
+            name: 'Striped Silk Tie',
+            id: '25752986M',
+            type: {master: true}
+        }
+
+        const normalizedProduct = normalizeSetBundleProduct(mockProduct)
+
+        expect(normalizedProduct).toStrictEqual(mockProduct)
+    })
+
+    test('passing in product set normalizes data', () => {
+        const normalizedProduct = normalizeSetBundleProduct(mockProductSet)
+
+        for (let i = 0; i < mockProductSet.setProducts.length; i++) {
+            expect(normalizedProduct.childProducts[i].quantity).toBeNull()
+            expect(normalizedProduct.childProducts[i].product).toStrictEqual(
+                mockProductSet.setProducts[i]
+            )
+        }
+    })
+
+    test('passing in product bundle normalizes data', () => {
+        const normalizedProduct = normalizeSetBundleProduct(mockProductBundle)
+        expect(normalizedProduct.childProducts).toStrictEqual(mockProductBundle.bundledProducts)
     })
 })
 

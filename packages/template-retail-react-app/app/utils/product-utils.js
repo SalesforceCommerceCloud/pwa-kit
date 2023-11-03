@@ -35,6 +35,25 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
 }
 
 /**
+ * Normalizes data for product sets and product bundles into the same format
+ * Useful for operations that apply to both product sets and product bundles
+ *
+ * @param {Object} product - A product set or product bundle
+ * @returns {Object} - returns normalized product if product is a set/bundle, otherwise returns original product
+ */
+export const normalizeSetBundleProduct = (product) => {
+    if (!product?.type.set && !product?.type.bundle) return product
+    return {
+        ...product,
+        childProducts: product?.type.set
+            ? product.setProducts.map((child) => {
+                  return {product: child, quantity: null}
+              })
+            : product.bundledProducts
+    }
+}
+
+/**
  * This function extract the promotional price from a product. If there are more than one price, the smallest price will be picked
  * @param {object} product - product detail object
  * @returns {{discountPrice: number, basePrice: number | string}}

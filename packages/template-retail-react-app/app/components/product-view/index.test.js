@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
@@ -246,4 +247,54 @@ describe('add to cart button loading tests', () => {
         )
         expect(screen.getByRole('button', {name: /add to cart/i})).toBeEnabled()
     })
+})
+
+test('renders a product bundle properly - parent item', () => {
+    const parent = mockProductBundle
+    renderWithProviders(
+        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
+    )
+
+    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
+    // (they're hidden with display:none style)
+    const addBundleToCartButton = screen.getAllByRole('button', {name: /add bundle to cart/i})[0]
+    const addBundleToWishlistButton = screen.getAllByRole('button', {
+        name: /add bundle to wishlist/i
+    })[0]
+    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
+    const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
+
+    // What should exist:
+    expect(addBundleToCartButton).toBeInTheDocument()
+    expect(addBundleToWishlistButton).toBeInTheDocument()
+    expect(quantityPicker).toBeInTheDocument()
+
+    // What should _not_ exist:
+    expect(variationAttributes).toHaveLength(0)
+})
+
+test('renders a product bundle properly - child item', () => {
+    const child = mockProductBundle.bundledProducts[0].product
+    renderWithProviders(
+        <MockComponent
+            product={child}
+            addToCart={() => {}}
+            addToWishlist={() => {}}
+            isProductPartOfBundle={true}
+            setChildProductOrderability={() => {}}
+        />
+    )
+
+    const addToCartButton = screen.queryByRole('button', {name: /add to cart/i})
+    const addToWishlistButton = screen.queryByRole('button', {name: /add to wishlist/i})
+    const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
+    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
+
+    // What should exist:
+    expect(variationAttributes).toHaveLength(2)
+
+    // What should _not_ exist:
+    expect(addToCartButton).toBeNull()
+    expect(addToWishlistButton).toBeNull()
+    expect(quantityPicker).toBeNull()
 })

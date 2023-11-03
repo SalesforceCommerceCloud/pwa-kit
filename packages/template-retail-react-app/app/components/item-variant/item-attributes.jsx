@@ -7,13 +7,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, FormattedNumber} from 'react-intl'
-import {Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useIntl, FormattedMessage, FormattedNumber} from 'react-intl'
+import {Flex, Stack, Text, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
 import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {usePromotions} from '@salesforce/commerce-sdk-react'
+import {usePromotions, useProducts, useProduct} from '@salesforce/commerce-sdk-react'
+import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 /**
  * In the context of a cart product item variant, this component renders a styled
@@ -24,6 +25,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const {data: basket} = useCurrentBasket()
     const {currency: activeCurrency} = useCurrency()
     const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
+    const intl = useIntl()
 
     // Fetch all the promotions given by price adjustments. We display this info in
     // the promotion info popover when applicable.
@@ -38,25 +40,68 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
         }
     )
     const promos = res?.data || []
-    // Create a mapping of variation values to their associated attributes. This allows us
-    // the render the readable names/labels rather than variation value IDs.
-    const variationValues = Object.keys(variant.variationValues || []).map((key) => {
-        const value = variant.variationValues[key]
-        const attr = variant.variationAttributes?.find((attr) => attr.id === key)
-        return {
-            id: key,
-            name: attr?.name || key,
-            value: attr.values.find((val) => val.value === value)?.name || value
+    const variationValues = getDisplayVariationValues(
+        variant?.variationAttributes,
+        variant?.variationValues
+    )
+
+    // get variant info for bundled products in cart page and order history page
+    const productBundleIds =
+        variant?.bundledProductItems?.map(({productId}) => productId).join(',') ?? ''
+    const {data: productBundleVariantData, isLoading: bundleVariantIsLoading} = useProducts(
+        {
+            parameters: {
+                ids: productBundleIds,
+                allImages: false
+            }
+        },
+        {
+            enabled: Boolean(variant?.type?.bundle && productBundleIds),
+            select: (result) => {
+                // formats response so we can easily display child quantity/variant selection
+                return result?.data?.map((item) => {
+                    const quantity = variant?.bundledProductItems.find(
+                        (childProduct) => childProduct.productId === item.id
+                    )?.quantity
+                    return {
+                        ...item,
+                        quantity,
+                        variationValues: getDisplayVariationValues(
+                            item?.variationAttributes,
+                            item?.variationValues
+                        )
+                    }
+                })
+            }
         }
-    })
+    )
+
+    // get bundle product data for wishlist page
+    const {data: productBundleData, isLoading: productBundleIsLoading} = useProduct(
+        {
+            parameters: {
+                id: variant?.id,
+                allImages: false
+            }
+        },
+        {
+            enabled: Boolean(variant?.type?.bundle && !productBundleIds)
+        }
+    )
 
     return (
         <Stack spacing={1.5} flex={1} {...props}>
-            {variationValues?.map((variationValue) => (
-                <Text lineHeight={1} color="gray.700" fontSize="sm" key={variationValue.id}>
-                    {variationValue.name}: {variationValue.value}
-                </Text>
-            ))}
+            {variationValues &&
+                Object.keys(variationValues).map((key) => (
+                    <Text
+                        lineHeight={1}
+                        color="gray.700"
+                        fontSize="sm"
+                        key={`${key}: ${variationValues[key]}`}
+                    >
+                        {key}: {variationValues[key]}
+                    </Text>
+                ))}
 
             {includeQuantity && (
                 <Text lineHeight={1} color="gray.700" fontSize="sm">
@@ -66,6 +111,67 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                         id="item_attributes.label.quantity"
                     />
                 </Text>
+            )}
+
+            {!productBundleIsLoading && productBundleData && !productBundleVariantData && (
+                <Box>
+                    {productBundleData?.bundledProducts.map(({product, quantity}) => (
+                        <Box marginTop={2} key={product.id}>
+                            <Text fontSize="sm" color="gray.700" as="b">
+                                {product?.name}
+                            </Text>
+                            <Text fontSize="sm" color="gray.700">
+                                {intl.formatMessage({
+                                    defaultMessage: 'Qty',
+                                    id: 'add_to_cart_modal.label.quantity'
+                                })}
+                                : {quantity}
+                            </Text>
+                        </Box>
+                    ))}
+                </Box>
+            )}
+
+            {!bundleVariantIsLoading && productBundleVariantData && (
+                <Box>
+                    <Text fontSize={15} marginTop={3} fontWeight={500}>
+                        {intl.formatMessage({
+                            defaultMessage: 'Selected Options',
+                            id: 'item_attributes.label.selected_options'
+                        })}
+                        :
+                    </Text>
+                    {productBundleVariantData?.map(
+                        ({variationValues, name: productName, quantity, id}) => {
+                            return (
+                                <Box key={id} marginTop={2}>
+                                    <Text fontSize="sm" color="gray.700" as="b">
+                                        {productName}
+                                    </Text>
+                                    <Text fontSize="sm" color="gray.700">
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Qty',
+                                            id: 'add_to_cart_modal.label.quantity'
+                                        })}
+                                        : {quantity}
+                                    </Text>
+                                    {Object.keys(variationValues).map((key) => {
+                                        const selectedVariant = `${key}: ${variationValues[key]}`
+                                        return (
+                                            <Text
+                                                fontSize="sm"
+                                                color="gray.700"
+                                                key={selectedVariant}
+                                            >
+                                                {selectedVariant}
+                                            </Text>
+                                        )
+                                    })}
+                                </Box>
+                            )
+                        }
+                    )}
+                </Box>
             )}
 
             {variant.priceAdjustments?.length > 0 && (
