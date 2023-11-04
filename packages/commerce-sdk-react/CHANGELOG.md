@@ -1,3 +1,4 @@
+## v1.2.0-dev (Nov 03, 2023)
 ## v1.1.0 (Nov 03, 2023)
 
 - Add StorefrontPreview component [#1508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1508)
