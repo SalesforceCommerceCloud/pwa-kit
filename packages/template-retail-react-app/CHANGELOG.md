@@ -1,3 +1,4 @@
+## v2.2.0-dev (Nov 3, 2023)
 ## v2.1.0 (Nov 3, 2023)
 
 - Support Storefront Preview 
