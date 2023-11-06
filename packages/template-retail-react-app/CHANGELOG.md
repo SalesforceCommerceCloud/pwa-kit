@@ -1,7 +1,11 @@
-## v2.1.0-dev (Sep 26, 2023)
+## v2.2.0-dev (Nov 3, 2023)
+## v2.1.0 (Nov 3, 2023)
+
 - Support Storefront Preview 
   - [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
   - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
+- Show discounted and strikethrough prices when there is a promotion on product detail page [1455](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1455)
+- Move Content-Security-Policy logic to pwa-kit-runtime [1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
   
 ## v2.0.0 (Sep 21, 2023)
 
