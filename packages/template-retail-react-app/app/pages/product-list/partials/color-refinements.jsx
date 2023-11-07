@@ -46,6 +46,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     variant="outline"
                                     marginRight={0}
                                     marginBottom="-1px"
+                                    aria-label={`${value.label} (${value.hitCount})`} // @W-12627094@
                                 >
                                     <Center
                                         {...styles.swatchButton}
@@ -78,6 +79,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     alignItems="center"
                                     fontSize="sm"
                                     marginBottom="1px"
+                                    aria-hidden="true" // avoid redundant readout since swatch has aria label
                                 >{`${value.label} (${value.hitCount})`}</Text>
                             </HStack>
                         </Box>
