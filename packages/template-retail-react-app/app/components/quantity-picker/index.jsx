@@ -45,7 +45,9 @@ const QuantityPicker = (props) => {
 
     const inc = getIncrementButtonProps({variant: 'outline'})
     const dec = getDecrementButtonProps({variant: 'outline'})
-    const input = getInputProps({maxWidth: '44px', textAlign: 'center'})
+    // @W-12627099@ 
+    // TODO: potentially reuse quantity localized string
+    const input = getInputProps({maxWidth: '44px', textAlign: 'center', 'aria-label': 'Quantity'})
 
     return (
         <HStack>
