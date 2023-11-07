@@ -125,8 +125,10 @@ export const Component = ({component, code}: ComponentProps) => {
     let instance = <ComponentNotFound {...rest} {...data} />
     if (code) {
         instance = (
+            // @ts-ignore jsx-parser types are using older version of React types
             <JsxParser
-                components={pageContext?.jsxParserComponents}
+                // @ts-ignore
+                components={pageContext.jsxParserComponents}
                 jsx={code}
                 {...rest}
                 {...data}

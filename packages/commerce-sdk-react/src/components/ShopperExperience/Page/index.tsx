@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState, ExoticComponent} from 'react'
 import {Helmet} from 'react-helmet'
 import type {Component as ComponentType, Page as PageType} from '../types'
 import {Region} from '../Region'
@@ -13,17 +13,17 @@ type ComponentMap = {
     [typeId: string]: React.ComponentType<ComponentType & unknown>
 }
 
-type JsxParserComponents = Array<React.Component>
+type JsxParserComponents = Record<string, ComponentType | ExoticComponent<{}>>
 
 interface PageProps extends React.ComponentProps<'div'> {
     page: PageType
     components: ComponentMap
-    jsxParserComponents: JsxParserComponents
+    jsxParserComponents?: JsxParserComponents
 }
 
 type PageContextValue = {
     components: ComponentMap
-    jsxParserComponents: JsxParserComponents
+    jsxParserComponents?: JsxParserComponents
 }
 
 // This context will hold the component map as well as any other future context.
@@ -69,6 +69,9 @@ export const Page = (props: PageProps) => {
     }, [components])
 
     useEffect(() => {
+        if (!jsxParserComponents) {
+            return
+        }
         setContextValue({
             ...contextValue,
             jsxParserComponents
