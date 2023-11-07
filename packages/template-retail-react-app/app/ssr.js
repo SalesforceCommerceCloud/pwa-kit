@@ -9,6 +9,7 @@
 
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
 
@@ -34,7 +35,9 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    // Set HTTP security headers
+    // Use default HTTP security headers required by PWA Kit
+    app.use(defaultPwaKitSecurityHeaders)
+    // Set custom HTTP security headers
     app.use(
         helmet({
             // pwa-kit-runtime ensures that the Content-Security-Policy header always contains the

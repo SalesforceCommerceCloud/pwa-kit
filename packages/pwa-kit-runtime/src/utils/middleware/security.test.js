@@ -8,7 +8,7 @@ import {
     CONTENT_SECURITY_POLICY as CSP,
     STRICT_TRANSPORT_SECURITY as HSTS
 } from '../../ssr/server/constants'
-import {defaultSecurityHeaders} from './security'
+import {defaultPwaKitSecurityHeaders} from './security'
 
 describe('Content-Security-Policy enforcement', () => {
     let res
@@ -39,7 +39,7 @@ describe('Content-Security-Policy enforcement', () => {
     afterEach(() => delete process.env.AWS_LAMBDA_FUNCTION_NAME)
 
     test('adds required directives for development', () => {
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         expectDirectives([
             "connect-src 'self' localhost:*",
@@ -50,7 +50,7 @@ describe('Content-Security-Policy enforcement', () => {
     })
     test('adds required directives for production', () => {
         mockProduction()
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, '')
         expectDirectives([
             "connect-src 'self' https://runtime.commercecloud.com",
@@ -61,7 +61,7 @@ describe('Content-Security-Policy enforcement', () => {
         ])
     })
     test('merges with existing CSP directives', () => {
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, "connect-src test:* ; script-src 'unsafe-eval' test:*")
         expectDirectives([
             "connect-src test:* 'self' localhost:*",
@@ -69,27 +69,27 @@ describe('Content-Security-Policy enforcement', () => {
         ])
     })
     test('allows other CSP directives', () => {
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, 'fake-directive test:*')
         expectDirectives(['fake-directive test:*'])
     })
     test('enforces upgrade-insecure-requests disabled on development', () => {
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, 'upgrade-insecure-requests')
         expect(res.getHeader(CSP)).not.toContain('upgrade-insecure-requests')
     })
     test('enforces upgrade-insecure-requests enabled on production', () => {
         mockProduction()
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, 'connect-src localhost:*')
         expectDirectives(['upgrade-insecure-requests'])
     })
     test('adds directives even if setHeader is never called', () => {
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         expectDirectives(["img-src 'self' data:"])
     })
     test('handles multiple CSP headers', () => {
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(CSP, ['connect-src first.header', 'script-src second.header'])
         const headers = res.getHeader(CSP)
         expect(headers).toHaveLength(2)
@@ -99,24 +99,24 @@ describe('Content-Security-Policy enforcement', () => {
     test('does not modify unrelated headers', () => {
         const header = 'Contentious-Secret-Police'
         const value = 'connect-src unmodified fake directive'
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(header, value)
         expect(res.getHeader(header)).toBe(value)
     })
     test('blocks Strict-Transport-Security header in development', () => {
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(HSTS, 'max-age=12345')
         expect(res.hasHeader(HSTS)).toBe(false)
     })
     test('allows Strict-Transport-Security header in production', () => {
         mockProduction()
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         res.setHeader(HSTS, 'max-age=12345')
         expect(res.getHeader(HSTS)).toBe('max-age=12345')
     })
     test('provides default value for Strict-Transport-Security header in production', () => {
         mockProduction()
-        defaultSecurityHeaders({}, res, () => {})
+        defaultPwaKitSecurityHeaders({}, res, () => {})
         expect(res.getHeader(HSTS)).toBe('max-age=15552000; includeSubDomains')
     })
 })
