@@ -314,6 +314,7 @@ export const DevServerMixin = {
     },
 
     /**
+     * But really, it's just the origin.
      * @private
      */
     _getDevServerURL(options) {
@@ -345,11 +346,27 @@ export const DevServerMixin = {
         server.listen({hostname, port}, () => {
             /* istanbul ignore next */
             if (process.env.NODE_ENV !== 'test') {
-                open(
-                    `${this._getDevServerURL(
-                        app.options
-                    )}/__mrt/loading-screen/index.html?loading=1`
-                )
+                const origin = this._getDevServerURL(app.options)
+                const url = new URL('/__mrt/loading-screen/index.html?loading=1', origin)
+                if (process.env.PWA_KIT_DEV_SERVER_URL) {
+                    // env var could be a full path or relative, so we use `origin` as a safeguard
+                    const redirectUrl = new URL(process.env.PWA_KIT_DEV_SERVER_URL, origin)
+                    if (
+                        // Check host rather than origin to be flexible about http vs https
+                        redirectUrl.host === url.host &&
+                        // But still only allow those two protocols!
+                        (redirectUrl.protocol === 'http:' || redirectUrl.protocol === 'https:')
+                    ) {
+                        // We don't need to include the full href because it's
+                        const redirect = redirectUrl.href.replace(redirectUrl.origin, '')
+                        url.searchParams.set('path', redirect)
+                    } else {
+                        console.warn(
+                            `Refusing to redirect to ${process.env.PWA_KIT_DEV_SERVER_URL} as it is not the same origin as the dev server (${origin}).`
+                        )
+                    }
+                }
+                open(url.href)
             }
         })
 

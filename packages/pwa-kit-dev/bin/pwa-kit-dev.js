@@ -197,7 +197,12 @@ const main = async () => {
             new program.Option('--inspect', 'enable debugging with --inspect on the node process')
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
-        .action(async ({inspect, noHMR}) => {
+        .addOption(
+            new program.Option('--url <url>', 'initial URL to load after the server starts').env(
+                'PWA_KIT_DEV_SERVER_URL'
+            )
+        )
+        .action(async ({inspect, noHMR, url}) => {
             // We use @babel/node instead of node because we want to support ES6 import syntax
             const babelNode = p.join(
                 require.resolve('webpack'),
@@ -217,7 +222,8 @@ const main = async () => {
             execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
                 env: {
                     ...process.env,
-                    ...(noHMR ? {HMR: 'false'} : {})
+                    ...(url && {PWA_KIT_DEV_SERVER_URL: url}),
+                    ...(noHMR && {HMR: 'false'})
                 }
             })
         })

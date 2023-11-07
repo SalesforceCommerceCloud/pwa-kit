@@ -83,10 +83,23 @@
                     })
                 }
 
+                const getRedirectUrl = (path) => {
+                    if (!path) return
+                    const redirect = new URL(path, window.location.origin)
+                    // Don't allow weird protocols
+                    if (redirect.protocol !== 'http:' && redirect.protocol !== 'https:') return
+                    // Don't allow different origin, unless it's just http vs https
+                    if (redirect.host !== window.location.host) return
+                    return redirect.href
+                }
+
                 waitForReady().then(() => {
-                    // Redirect to homepage if path is not defined
-                    const path = url.searchParams.get('path') ?? ''
-                    window.location = new URL(path, url.origin)
+                    const path = url.searchParams.get('path')
+                    const redirect = getRedirectUrl(path)
+                    if (path && !redirect) {
+                        console.warn(`Refusing to redirect to invalid URL: ${path}`)
+                    }
+                    window.location = redirect || location.origin
                 })
             }
 
