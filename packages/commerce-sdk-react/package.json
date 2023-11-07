@@ -42,7 +42,8 @@
   "dependencies": {
     "commerce-sdk-isomorphic": "^1.10.4",
     "js-cookie": "^3.0.1",
-    "jwt-decode": "^3.1.2"
+    "jwt-decode": "^3.1.2",
+    "react-jsx-parser": "^1.29.0"
   },
   "devDependencies": {
     "@salesforce/pwa-kit-dev": "3.2.0-dev",
