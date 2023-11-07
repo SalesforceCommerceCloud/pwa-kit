@@ -4,7 +4,7 @@
 
 ```js
 // your-project/app/ssr.js
-import {getRuntime, defaultSecurityHeaders} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import {defaultSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 const {handler} = runtime.createHandler(options, (app) => {
     // Use default HTTP security headers required by PWA Kit
     app.use(defaultSecurityHeaders)
