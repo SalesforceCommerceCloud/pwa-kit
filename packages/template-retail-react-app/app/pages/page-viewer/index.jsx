@@ -1,8 +1,10 @@
 import React from 'react'
 import {useParams} from 'react-router-dom'
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import * as Components from '@salesforce/retail-react-app/app/components/shared/ui'
 import {usePage} from '@salesforce/commerce-sdk-react'
 import {Page} from '@salesforce/commerce-sdk-react/components'
+import JsxParser from 'react-jsx-parser'
 import {ImageTile, ImageWithText} from '../../page-designer/assets'
 import {
     Carousel,
@@ -25,7 +27,10 @@ const PAGEDESIGNER_TO_COMPONENT = {
     'commerce_layouts.mobileGrid2r2c': MobileGrid2r2c,
     'commerce_layouts.mobileGrid2r3c': MobileGrid2r3c,
     'commerce_layouts.mobileGrid3r1c': MobileGrid3r1c,
-    'commerce_layouts.mobileGrid3r2c': MobileGrid3r2c
+    'commerce_layouts.mobileGrid3r2c': MobileGrid3r2c,
+    'headless.einstein': (props) => {
+        return <JsxParser jsx={props.code.code} components={Components} />
+    }
 }
 
 const PageViewer = () => {

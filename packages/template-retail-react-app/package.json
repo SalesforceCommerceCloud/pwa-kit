@@ -81,6 +81,7 @@
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.43.9",
     "react-intl": "^5.25.1",
+    "react-jsx-parser": "^1.29.0",
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
