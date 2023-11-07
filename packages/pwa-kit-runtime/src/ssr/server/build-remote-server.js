@@ -36,15 +36,13 @@ import assert from 'assert'
 import semver from 'semver'
 import pkg from '../../../package.json'
 import fs from 'fs'
+import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import {morganStream} from '../../utils/morgan-stream'
-
-/** A promise that has resolved to `undefined`. */
-export const RESOLVED_PROMISE = Promise.resolve()
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
