@@ -9,14 +9,14 @@ import {isRemote} from '../ssr-server'
 
 /**
  * This express middleware sets the Content-Security-Policy and Strict-Transport-Security headers to
- * values that are required for PWA Kit to work. It also patches `res.setHeader` allow additional
- * CSP directives to be added, without removing the required directives, and it prevents the
- * Strict-Transport-Security header from being set on the local dev server.
+ * default values that are required for PWA Kit to work. It also patches `res.setHeader` to allow
+ * additional CSP directives to be added without removing the required directives, and it prevents
+ * the Strict-Transport-Security header from being set on the local dev server.
  * @param {express.Request} req Express request object
  * @param {express.Response} res Express response object
  * @param {express.NextFunction} next Express next callback
  */
-export const defaultSecurityHeaders = (req, res, next) => {
+export const defaultPwaKitSecurityHeaders = (req, res, next) => {
     /** CSP-compatible origin for Runtime Admin. */
     // localhost doesn't include a protocol because different browsers behave differently :\
     const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'

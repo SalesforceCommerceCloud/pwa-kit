@@ -8,7 +8,7 @@ import {
     CONTENT_SECURITY_POLICY as CSP,
     STRICT_TRANSPORT_SECURITY as HSTS
 } from '../../ssr/server/constants'
-import {defaultSecurityHeaders} from './defaultSecurityHeaders'
+import {defaultSecurityHeaders} from './security'
 
 describe('Content-Security-Policy enforcement', () => {
     let res
