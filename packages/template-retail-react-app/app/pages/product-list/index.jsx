@@ -702,7 +702,9 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const history = useHistory()
 
     return (
-        <FormControl data-testid="sf-product-list-sort" id="page_sort" width="auto" {...otherProps}>
+        // TODO: potentially pull out aria label for localization
+        // @W-12627093@
+        <FormControl aria-label="Sort Products by" data-testid="sf-product-list-sort" id="page_sort" width="auto" {...otherProps}>
             <Select
                 value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
                 onChange={({target}) => {
@@ -713,6 +715,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
             >
                 {sortUrls.map((href, index) => (
                     <option key={href} value={href}>
+                        {/* TODO: use this as reference on how to do localization for @W-12627140@ */}
                         {intl.formatMessage(
                             {
                                 id: 'product_list.select.sort_by',
