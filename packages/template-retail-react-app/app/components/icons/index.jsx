@@ -92,8 +92,9 @@ export const icon = (name, passProps) => {
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
         const baseStyle = theme?.components?.Icon?.baseStyle
+        // @W-12627109@, @W-12627100@
         return (
-            <Icon ref={ref} {...baseStyle} {...passProps} {...props}>
+            <Icon ref={ref} role="img" aria-label={name} {...baseStyle} {...passProps} {...props}>
                 <use role="presentation" xlinkHref={`#${name}`} />
             </Icon>
         )
