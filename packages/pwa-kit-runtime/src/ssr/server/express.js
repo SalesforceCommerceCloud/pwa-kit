@@ -23,8 +23,6 @@ import {CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import {RemoteServerFactory} from './build-remote-server'
 
-export const RESOLVED_PROMISE = Promise.resolve()
-
 /**
  * Use properties of the request, such as URL and querystring, to generate
  * a cache key string suitable for passing to sendResponseFromCache or

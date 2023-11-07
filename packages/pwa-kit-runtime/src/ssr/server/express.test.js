@@ -22,7 +22,6 @@ import * as ssrServerUtils from '../../utils/ssr-server/utils'
 import {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} from './build-remote-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
 import {
-    RESOLVED_PROMISE,
     generateCacheKey,
     getResponseFromCache,
     sendCachedResponse,
