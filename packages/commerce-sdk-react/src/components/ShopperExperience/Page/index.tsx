@@ -13,13 +13,17 @@ type ComponentMap = {
     [typeId: string]: React.ComponentType<ComponentType & unknown>
 }
 
+type JsxParserComponents = Array<React.Component>
+
 interface PageProps extends React.ComponentProps<'div'> {
     page: PageType
     components: ComponentMap
+    jsxParserComponents: JsxParserComponents
 }
 
 type PageContextValue = {
     components: ComponentMap
+    jsxParserComponents: JsxParserComponents
 }
 
 // This context will hold the component map as well as any other future context.
@@ -44,11 +48,15 @@ export const usePageContext = () => {
  * @param {PageProps} props
  * @param {Page} props.region - The page designer page data representation.
  * @param {ComponentMap} props.components - A mapping of typeId's to react components representing the type.
+ * @param {JsxParserComponents} [props.jsxParserComponents] - An array of react components that the jsx parser can use, optional.
  * @returns {React.ReactElement} - Page component.
  */
 export const Page = (props: PageProps) => {
-    const {page, components, className = '', ...rest} = props
-    const [contextValue, setContextValue] = useState({components} as PageContextValue)
+    const {page, components, jsxParserComponents, className = '', ...rest} = props
+    const [contextValue, setContextValue] = useState({
+        components,
+        jsxParserComponents
+    } as PageContextValue)
     const {id, regions, pageDescription, pageKeywords, pageTitle} = page || {}
 
     // NOTE: This probably is not required as the list of components is known at compile time,
@@ -59,6 +67,13 @@ export const Page = (props: PageProps) => {
             components
         })
     }, [components])
+
+    useEffect(() => {
+        setContextValue({
+            ...contextValue,
+            jsxParserComponents
+        })
+    }, [jsxParserComponents])
 
     return (
         <PageContext.Provider value={contextValue}>

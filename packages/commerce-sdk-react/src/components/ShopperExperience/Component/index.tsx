@@ -7,9 +7,11 @@
 import React from 'react'
 import {Component as ComponentType} from '../types'
 import {usePageContext} from '../Page'
+import JsxParser from 'react-jsx-parser'
 
 type ComponentProps = {
     component: ComponentType
+    code?: string
 }
 
 const ComponentNotFound = ({typeId}: ComponentType) => (
@@ -20,17 +22,23 @@ const ComponentNotFound = ({typeId}: ComponentType) => (
  *
  * @param {PageProps} props
  * @param {Component} props.component - The page designer component data representation.
+ * @param {string} [props.code] - The raw JSW code for the component.
  * @returns {React.ReactElement} - Experience component.
  */
-export const Component = ({component}: ComponentProps) => {
+export const Component = ({component, code}: ComponentProps) => {
     const pageContext = usePageContext()
-    const ComponentClass = pageContext?.components[component.typeId] || ComponentNotFound
     const {data, ...rest} = component
+    let instance = <ComponentNotFound {...rest} {...data} />
+    if (code) {
+        instance = <JsxParser components={pageContext?.jsxParserComponents} jsx={code} />
+    } else if (pageContext?.components[component.typeId]) {
+        const ComponentClass = pageContext?.components[component.typeId]
+        instance = <ComponentClass {...rest} {...data} />
+    }
+
     return (
         <div id={component.id} className="component">
-            <div className="container">
-                <ComponentClass {...rest} {...data} />
-            </div>
+            <div className="container">{instance}</div>
         </div>
     )
 }
