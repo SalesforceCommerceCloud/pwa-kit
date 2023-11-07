@@ -37,14 +37,14 @@ export const Region = (props: RegionProps) => {
         <div id={id} className={`region ${className}`} {...rest}>
             <div className="container">
                 {components?.map((component) => (
-                    <Component key={component.id} component={component} code={component.code} />
+                    <Component key={component.id} component={component} />
                 ))}
             </div>
         </div>
     )
 }
 
-Region.displayName = 'Region'
+Region.displayName = '[Page Designer] Region'
 
 Region.propTypes = {
     region: propType.isRequired,
