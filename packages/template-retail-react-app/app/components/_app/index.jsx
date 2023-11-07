@@ -268,9 +268,23 @@ const App = (props) => {
         const path = buildUrl('/account/wishlist')
         history.push(path)
     }
+
+    // START - Demo "onContextChange" handler.
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+    const contextChangeHandler = async (context) => {
+        const waitFor = 7500 // ms
+        console.log(
+            `STOREFRONT: Handling context change. Synthetic ${waitFor / 1000}s wait.`,
+            context
+        )
+        await sleep(waitFor)
+        console.log('STOREFRONT: Finished custom context handler.')
+    }
+    // END
+
     return (
         <Box className="sf-app" {...styles.container}>
-            <StorefrontPreview getToken={getTokenWhenReady}>
+            <StorefrontPreview getToken={getTokenWhenReady} onContextChange={contextChangeHandler}>
                 <IntlProvider
                     onError={(err) => {
                         if (!messages) {

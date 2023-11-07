@@ -8,11 +8,12 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
-import {detectStorefrontPreview, getClientScript} from './utils'
+import {CustomPropTypes, detectStorefrontPreview, getClientScript, noop} from './utils'
 import {useHistory} from 'react-router-dom'
 import type {LocationDescriptor} from 'history'
 
 type GetToken = () => string | undefined | Promise<string | undefined>
+type ContextChangeHandler = () => undefined | Promise<undefined>
 
 /**
  *
@@ -23,14 +24,15 @@ type GetToken = () => string | undefined | Promise<string | undefined>
 export const StorefrontPreview = ({
     children,
     enabled = true,
-    getToken
+    getToken,
+    onContextChange
 }: React.PropsWithChildren<
-    // getToken is required unless enabled is false
-    {enabled?: true; getToken: GetToken} | {enabled: false; getToken?: GetToken}
+    // getToken and onContextChange are only required when enabled = true.
+    {enabled?: true; getToken: GetToken; onContextChange: ContextChangeHandler} | {enabled: false; getToken?: GetToken; onContextChange?: ContextChangeHandler}
 >) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
-
+ 
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
@@ -44,8 +46,10 @@ export const StorefrontPreview = ({
                     history[action](path, ...args)
                 }
             }
+
+            window.STOREFRONT_PREVIEW.onContextChange = onContextChange ?? noop
         }
-    }, [enabled, getToken])
+    }, [enabled, getToken, onContextChange])
 
     return (
         <>
@@ -67,19 +71,11 @@ export const StorefrontPreview = ({
 StorefrontPreview.propTypes = {
     children: PropTypes.node,
     enabled: PropTypes.bool,
-    // a custom prop type function to only require this prop if enabled is true.
-    getToken: function (props: any, propName: any, componentName: any) {
-        if (
-            props['enabled'] === true &&
-            (props[propName] === undefined || typeof props[propName] !== 'function')
-        ) {
-            return new Error(
-                `${String(propName)} is a required function for ${String(
-                    componentName
-                )} when enabled is true`
-            )
-        }
-    }
+    // A custom prop type function to only require this prop if enabled is true. Ultimately we would like
+    // to get to a place where both these props are simply optional and we will provide default implementations.
+    // This would make the API simpler to use.
+    getToken: CustomPropTypes.requiredFunctionWhenEnabled,
+    onContextChange: CustomPropTypes.requiredFunctionWhenEnabled
 }
 
 export default StorefrontPreview
