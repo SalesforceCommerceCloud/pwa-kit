@@ -49,6 +49,7 @@ const PromoPopover = ({header, children, ...props}) => {
                         minWidth="auto"
                         position="relative"
                         variant="unstyled"
+                        aria-label="Info" // TODO: pull out for localization | @W-12627098@
                     />
                 </PopoverTrigger>
                 <Portal>
