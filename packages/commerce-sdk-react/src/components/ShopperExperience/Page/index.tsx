@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useEffect, useState, ExoticComponent} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {Helmet} from 'react-helmet'
 import type {Component as ComponentType, Page as PageType} from '../types'
 import {Region} from '../Region'
@@ -13,7 +13,7 @@ type ComponentMap = {
     [typeId: string]: React.ComponentType<ComponentType & unknown>
 }
 
-type JsxParserComponents = Record<string, ComponentType | ExoticComponent<{}>>
+type JsxParserComponents = Record<string, ComponentType>
 
 interface PageProps extends React.ComponentProps<'div'> {
     page: PageType
@@ -96,6 +96,6 @@ export const Page = (props: PageProps) => {
     )
 }
 
-Page.displayName = 'Page'
+Page.displayName = '[Page Designer] Page'
 
 export default Page

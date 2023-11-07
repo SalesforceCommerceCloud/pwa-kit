@@ -164,6 +164,6 @@ export const Component = ({component}: ComponentProps) => {
     )
 }
 
-Component.displayName = 'Page Designer Component'
+Component.displayName = '[Page Designer] Component'
 
 export default Component
