@@ -28,7 +28,7 @@ export const StorefrontPreview = ({
     onContextChange
 }: React.PropsWithChildren<
     // getToken and onContextChange are only required when enabled = true.
-    {enabled?: true; getToken: GetToken; onContextChange: ContextChangeHandler} | {enabled: false; getToken?: GetToken; onContextChange?: ContextChangeHandler}
+    {enabled?: true; getToken: GetToken; onContextChange?: ContextChangeHandler;} | {enabled: false; getToken?: GetToken; onContextChange?: ContextChangeHandler;}
 >) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
@@ -44,10 +44,9 @@ export const StorefrontPreview = ({
                     ...args: unknown[]
                 ) => {
                     history[action](path, ...args)
-                }
+                },
+                onContextChange: onContextChange || noop
             }
-
-            window.STOREFRONT_PREVIEW.onContextChange = onContextChange ?? noop
         }
     }, [enabled, getToken, onContextChange])
 
