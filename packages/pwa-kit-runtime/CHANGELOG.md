@@ -1,7 +1,23 @@
+## v3.2.1 (Nov 07, 2023)
+
+- Revert mandatory enforcement of Content-Security-Policy headers. Provide middleware as an opt-in replacement. [#1528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1528)
+
+```js
+// your-project/app/ssr.js
+import {getRuntime, defaultSecurityHeaders} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+const {handler} = runtime.createHandler(options, (app) => {
+    // Use default HTTP security headers required by PWA Kit
+    app.use(defaultSecurityHeaders)
+    // ...
+}
+```
+
 ## v3.2.0 (Nov 03, 2023)
-- Move Content-Security-Policy logic to pwa-kit-runtime [1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
+
+- Move Content-Security-Policy logic to pwa-kit-runtime [#1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
 
 ## v3.1.1 (Sep 21, 2023)
+
 ## v3.1.0 (Jul 26, 2023)
 
 - Allow setting cookies using the `MRT_ALLOW_COOKIES` environment variable [#1318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1318)
