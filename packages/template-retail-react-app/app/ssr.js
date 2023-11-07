@@ -35,13 +35,11 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    // Use default HTTP security headers required by PWA Kit
+    // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)
     // Set custom HTTP security headers
     app.use(
         helmet({
-            // pwa-kit-runtime ensures that the Content-Security-Policy header always contains the
-            // directives required for PWA Kit to function. Add custom directives here.
             contentSecurityPolicy: {
                 useDefaults: true,
                 directives: {
