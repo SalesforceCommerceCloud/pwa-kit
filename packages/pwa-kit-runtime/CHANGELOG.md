@@ -1,3 +1,4 @@
+## v3.3.0-nightly-20231107080143 (Nov 07, 2023)
 ## v3.3.0-dev (Nov 03, 2023)
 ## v3.2.0 (Nov 03, 2023)
 - Move Content-Security-Policy logic to pwa-kit-runtime [1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
