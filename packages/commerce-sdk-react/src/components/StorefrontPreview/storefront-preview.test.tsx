@@ -6,9 +6,15 @@
  */
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import {StorefrontPreview} from './index'
+import StorefrontPreview from './storefront-preview'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
+
+declare global {
+    interface Window {
+        STOREFRONT_PREVIEW: Record<string, unknown>
+    }
+}
 
 jest.mock('./utils', () => {
     const origin = jest.requireActual('./utils')
@@ -17,6 +23,7 @@ jest.mock('./utils', () => {
         detectStorefrontPreview: jest.fn()
     }
 })
+
 describe('Storefront Preview Component', function () {
     const oldWindow = window
 
@@ -29,6 +36,27 @@ describe('Storefront Preview Component', function () {
         // eslint-disable-next-line
         window = oldWindow
     })
+
+    test('Renders children when enabled', () => {
+        const MockComponent = () => <div data-testid="mockComponent">Mock Component</div>
+        const wrapper = render(
+            <StorefrontPreview enabled={true} getToken={() => 'my-token'}>
+                <MockComponent />
+            </StorefrontPreview>
+        )
+        expect(wrapper.getByTestId('mockComponent')).toBeDefined()
+    })
+
+    test('Renders children when disabled', () => {
+        const MockComponent = () => <div data-testid="mockComponent">Mock Component</div>
+        const wrapper = render(
+            <StorefrontPreview enabled={false}>
+                <MockComponent />
+            </StorefrontPreview>
+        )
+        expect(wrapper.getByTestId('mockComponent')).toBeDefined()
+    })
+
     test('not renders nothing when enabled is off', async () => {
         render(<StorefrontPreview enabled={false} />)
         const helmet = Helmet.peek()
@@ -37,9 +65,9 @@ describe('Storefront Preview Component', function () {
         })
     })
     test('renders script tag when enabled is on but host is not trusted', async () => {
-        detectStorefrontPreview.mockReturnValue(false)
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(false)
 
-        render(<StorefrontPreview />)
+        render(<StorefrontPreview getToken={() => undefined} />)
         // this will return all the markup assigned to helmet
         // which will get rendered inside head.
         const helmet = Helmet.peek()
@@ -48,9 +76,9 @@ describe('Storefront Preview Component', function () {
         })
     })
     test('renders script tag when enabled is on', async () => {
-        detectStorefrontPreview.mockReturnValue(true)
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
-        render(<StorefrontPreview enabled={true} />)
+        render(<StorefrontPreview enabled={true} getToken={() => undefined} />)
         // this will return all the markup assigned to helmet
         // which will get rendered inside head.
         const helmet = Helmet.peek()
@@ -63,12 +91,15 @@ describe('Storefront Preview Component', function () {
         })
     })
 
-    test('getToken is defined in window.STOREFRONT_PREVIEW when it is defined', async () => {
+    test('getToken is defined in window.STOREFRONT_PREVIEW when it is defined', () => {
         window.STOREFRONT_PREVIEW = {}
-        detectStorefrontPreview.mockReturnValue(true)
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
         render(<StorefrontPreview getToken={() => 'my-token'} />)
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
-        expect(window.STOREFRONT_PREVIEW.navigate).toBeDefined()
+    })
+
+    test('experimental unsafe props are defined', () => {
+        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate).toBeDefined()
     })
 })
