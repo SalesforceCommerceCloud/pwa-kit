@@ -1,6 +1,6 @@
 ## v2.8.1 (Nov 8, 2023)
 
-- Use the new opt-in mechanism for enforcing the default security headers required by PWA Kit projects. [#1528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1528)
+- Use the new opt-in mechanism for enforcing the default security headers required by PWA Kit projects. [#1530](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1530)
 
 ## 2.8.0 (Nov 3, 2023)
 
