@@ -704,7 +704,13 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     return (
         // TODO: potentially pull out aria label for localization
         // @W-12627093@
-        <FormControl aria-label="Sort Products by" data-testid="sf-product-list-sort" id="page_sort" width="auto" {...otherProps}>
+        <FormControl
+            aria-label="Sort Products by"
+            data-testid="sf-product-list-sort"
+            id="page_sort"
+            width="auto"
+            {...otherProps}
+        >
             <Select
                 value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
                 onChange={({target}) => {
