@@ -44,7 +44,7 @@ export const Region = (props: RegionProps) => {
     )
 }
 
-Region.displayName = 'Region'
+Region.displayName = '[Page Designer] Region'
 
 Region.propTypes = {
     region: propType.isRequired,
