@@ -94,7 +94,7 @@ export const icon = (name, passProps) => {
         const baseStyle = theme?.components?.Icon?.baseStyle
         // @W-12627109@, @W-12627100@
         return (
-            <Icon ref={ref} role="img" aria-label={name} {...baseStyle} {...passProps} {...props}>
+            <Icon ref={ref} role="img" aria-label={name} {...baseStyle} {...props} {...passProps}>
                 <use role="presentation" xlinkHref={`#${name}`} />
             </Icon>
         )
@@ -134,7 +134,13 @@ export const GithubLogo = icon('github-logo')
 export const HamburgerIcon = icon('hamburger')
 export const InfoIcon = icon('info')
 export const LikeIcon = icon('like')
-export const LockIcon = icon('lock')
+// @W-12627172@
+// TODO: potentially pull out aria-label for localization
+export const LockIcon = icon('lock', {
+    'aria-label': 'Secure',
+    'aria-hidden': false,
+    focusable: true
+})
 export const LocationIcon = icon('location')
 export const PaypalIcon = icon('paypal', {viewBox: PaypalSymbol.viewBox})
 export const PlugIcon = icon('plug')
