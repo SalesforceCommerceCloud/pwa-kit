@@ -357,8 +357,8 @@ export const DevServerMixin = {
                         // But still only allow those two protocols!
                         (redirectUrl.protocol === 'http:' || redirectUrl.protocol === 'https:')
                     ) {
-                        // We don't need to include the full href because it's
-                        const redirect = redirectUrl.href.replace(redirectUrl.origin, '')
+                        // We can omit the origin because it's just the dev server origin
+                        const redirect = redirectUrl.href.slice(redirectUrl.origin.length)
                         url.searchParams.set('path', redirect)
                     } else {
                         console.warn(
