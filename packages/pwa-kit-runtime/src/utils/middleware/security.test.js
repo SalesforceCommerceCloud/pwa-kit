@@ -10,6 +10,9 @@ import {
 } from '../../ssr/server/constants'
 import {defaultPwaKitSecurityHeaders} from './security'
 
+// no `Object.hasOwn` in node 14 :(
+const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key)
+
 describe('Content-Security-Policy enforcement', () => {
     let res
 
@@ -30,7 +33,7 @@ describe('Content-Security-Policy enforcement', () => {
     beforeEach(() => {
         const headers = {}
         res = {
-            hasHeader: (key) => Object.hasOwn(headers, key),
+            hasHeader: (key) => hasOwn(headers, key),
             getHeader: (key) => headers[key],
             setHeader: (key, val) => (headers[key] = val)
         }
