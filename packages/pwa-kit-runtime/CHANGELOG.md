@@ -1,5 +1,4 @@
 ## v2.8.1 (Nov 08, 2023)
-## v2.8.1 (Nov 08, 2023)
 
 - Revert mandatory enforcement of Content-Security-Policy headers. Provide middleware as an opt-in replacement. [#1530](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1530)
 
