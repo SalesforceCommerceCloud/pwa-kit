@@ -1,7 +1,8 @@
-## 2.8.0 (Oct 23, 2023)
+## 2.8.0 (Nov 3, 2023)
 -   Support Storefront Preview
     - [#1468](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1468)
     - [#1426](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1426)
+-   Move Content-Security-Policy logic into pwa-kit-runtime [#1491](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1491)
 
 ## 2.7.4 (Aug 28, 2023)
 -   Support Node 18 and NPM 9 in PWA Kit v2.x [#1265](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1265)
