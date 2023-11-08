@@ -2,6 +2,7 @@ name: push_to_mrt
 inputs:
   CWD:
     description: Project directory
+    default: ${{ github.workspace }}
   TARGET:
     description: MRT target
   FLAGS:
