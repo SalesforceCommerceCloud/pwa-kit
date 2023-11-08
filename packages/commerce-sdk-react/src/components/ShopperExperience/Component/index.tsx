@@ -140,10 +140,12 @@ export const Component = ({component}: ComponentProps) => {
     }, [code?.code])
 
     if (isEinsteinAssistedComponent) {
+        // TODO: this is a workaround for the fact that
+        // 'react-jsx-parser' still uses React@16 typings
+        // we need to cast it to the newer React typings
+        const JsxParserComponent = JsxParser as unknown as React.ElementType
         instance = (
-            // @ts-ignore jsx-parser types are using older version of React types
-            <JsxParser
-                // @ts-ignore
+            <JsxParserComponent
                 components={pageContext.jsxParserComponents}
                 // TODO: make component data structure more clear
                 // from the PD custom editor, let's not have "code.code"
