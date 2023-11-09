@@ -12,6 +12,7 @@ import {
     Input,
     useNumberInput
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useIntl} from 'react-intl'
 
 /**
  * This is the mobile implementation of the Chakra NumberInput. This simple component essentially
@@ -25,6 +26,7 @@ import {
  * @returns
  */
 const QuantityPicker = (props) => {
+    const intl = useIntl()
     const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
         ...props,
         // Defaults
@@ -46,8 +48,14 @@ const QuantityPicker = (props) => {
     const inc = getIncrementButtonProps({variant: 'outline'})
     const dec = getDecrementButtonProps({variant: 'outline'})
     // @W-12627099@
-    // TODO: potentially reuse quantity localized string
-    const input = getInputProps({maxWidth: '44px', textAlign: 'center', 'aria-label': 'Quantity'})
+    const input = getInputProps({
+        maxWidth: '44px', 
+        textAlign: 'center', 
+        'aria-label': intl.formatMessage({
+            defaultMessage: 'Quantity',
+            id: 'product_view.label.quantity'
+        })
+    })
 
     return (
         <HStack>

@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {forwardRef} from 'react'
+import {defineMessage} from 'react-intl'
 import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
@@ -135,9 +136,11 @@ export const HamburgerIcon = icon('hamburger')
 export const InfoIcon = icon('info')
 export const LikeIcon = icon('like')
 // @W-12627172@
-// TODO: potentially pull out aria-label for localization
 export const LockIcon = icon('lock', {
-    'aria-label': 'Secure',
+    'aria-label': defineMessage({
+        id: 'icons.assistive_msg.lock',
+        defaultMessage: 'Secure'
+    }),
     'aria-hidden': false,
     focusable: true
 })
