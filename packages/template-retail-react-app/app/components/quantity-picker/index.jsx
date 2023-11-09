@@ -49,8 +49,8 @@ const QuantityPicker = (props) => {
     const dec = getDecrementButtonProps({variant: 'outline'})
     // @W-12627099@
     const input = getInputProps({
-        maxWidth: '44px', 
-        textAlign: 'center', 
+        maxWidth: '44px',
+        textAlign: 'center',
         'aria-label': intl.formatMessage({
             defaultMessage: 'Quantity',
             id: 'product_view.label.quantity'
