@@ -288,6 +288,7 @@ const App = (props) => {
                     {ACTIVE_DATA_ENABLE && (
                         <script
                             src={getAssetUrl('static/head-active_data.js')}
+                            id="headActiveData"
                             type="text/javascript"
                         ></script>
                     )}
@@ -420,6 +421,7 @@ const App = (props) => {
                     <script
                         type="text/javascript"
                         src={getAssetUrl('static/dwanalytics-22.2.js')}
+                        id="dwanalytics"
                         async="async"
                         onLoad={trackPage}
                     ></script>
@@ -428,6 +430,7 @@ const App = (props) => {
                     <script
                         src={getAssetUrl('static/dwac-21.7.js')}
                         type="text/javascript"
+                        id="dwac"
                         async="async"
                     ></script>
                 )}
