@@ -21,11 +21,17 @@ export default {
         }
     },
     variants: {
+        outline: {
+            field: {
+                borderColor: 'gray.500'
+            }
+        },
         filled: {
             // we use filled variant for
             // search input
             field: {
-                backgroundColor: 'gray.50',
+                borderColor: 'gray.500',
+                backgroundColor: 'gray.100',
                 _focus: {
                     backgroundColor: 'white'
                 },
