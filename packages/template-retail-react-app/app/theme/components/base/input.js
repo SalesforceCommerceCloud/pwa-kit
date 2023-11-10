@@ -30,7 +30,7 @@ export default {
             // we use filled variant for
             // search input
             field: {
-                borderColor: 'gray.500',
+                borderColor: 'gray.600',
                 backgroundColor: 'gray.100',
                 _focus: {
                     backgroundColor: 'white'
