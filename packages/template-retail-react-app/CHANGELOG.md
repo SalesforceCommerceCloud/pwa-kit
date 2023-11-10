@@ -1,4 +1,6 @@
 ## v2.2.0-dev (Nov 3, 2023)
+- (A11y) Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
+
 ## v2.1.0 (Nov 3, 2023)
 
 - Support Storefront Preview 

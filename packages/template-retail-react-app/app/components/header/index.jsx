@@ -252,7 +252,6 @@ const Header = ({
                         onClick={onWishlistClick}
                     />
                     <IconButton
-                        // TODO: pull out for localization
                         // @W-12627140@
                         aria-label={intl.formatMessage(
                             {
