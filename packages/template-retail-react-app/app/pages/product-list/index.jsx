@@ -702,7 +702,6 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const history = useHistory()
 
     return (
-        // @W-12627093@
         <FormControl
             aria-label={intl.formatMessage({
                 id: 'product_list.drawer.title.sort_by',

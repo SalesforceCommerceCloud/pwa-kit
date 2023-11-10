@@ -47,7 +47,6 @@ const QuantityPicker = (props) => {
 
     const inc = getIncrementButtonProps({variant: 'outline'})
     const dec = getDecrementButtonProps({variant: 'outline'})
-    // @W-12627099@
     const input = getInputProps({
         maxWidth: '44px',
         textAlign: 'center',

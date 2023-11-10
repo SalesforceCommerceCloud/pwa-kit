@@ -93,7 +93,6 @@ export const icon = (name, passProps) => {
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
         const baseStyle = theme?.components?.Icon?.baseStyle
-        // @W-12627109@, @W-12627100@
         return (
             <Icon ref={ref} role="img" aria-label={name} {...baseStyle} {...props} {...passProps}>
                 <use role="presentation" xlinkHref={`#${name}`} />
@@ -108,9 +107,12 @@ export const icon = (name, passProps) => {
 const cache = createIntlCache()
 
 // Use createIntl to utilize localization out of react component
-const intl = createIntl({
-    locale: 'en', // TODO: figure out what values are valid and where we can grab locale
-}, cache)
+const intl = createIntl(
+    {
+        locale: 'en' // TODO: figure out what values are valid and where we can grab locale
+    },
+    cache
+)
 
 // Export Chakra icon components that use our SVG sprite symbol internally
 // For non-square SVGs, we can use the symbol data from the import to set the

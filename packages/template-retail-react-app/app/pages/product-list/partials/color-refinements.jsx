@@ -46,7 +46,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     variant="outline"
                                     marginRight={0}
                                     marginBottom="-1px"
-                                    aria-label={`${value.label} (${value.hitCount})`} // @W-12627094@
+                                    aria-label={`${value.label} (${value.hitCount})`}
                                 >
                                     <Center
                                         {...styles.swatchButton}

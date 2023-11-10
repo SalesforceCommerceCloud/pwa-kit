@@ -252,7 +252,6 @@ const Header = ({
                         onClick={onWishlistClick}
                     />
                     <IconButton
-                        // @W-12627140@
                         aria-label={intl.formatMessage(
                             {
                                 id: 'header.button.assistive_msg.my_cart_with_num_items',

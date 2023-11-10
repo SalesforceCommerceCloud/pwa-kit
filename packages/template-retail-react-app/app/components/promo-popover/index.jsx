@@ -50,7 +50,6 @@ const PromoPopover = ({header, children, ...props}) => {
                         minWidth="auto"
                         position="relative"
                         variant="unstyled"
-                        // @W-12627098@
                         aria-label={intl.formatMessage({
                             id: 'promo_popover.assistive_msg.info',
                             defaultMessage: 'Info'
