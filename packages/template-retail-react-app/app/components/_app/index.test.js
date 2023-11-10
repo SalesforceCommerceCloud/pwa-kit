@@ -17,6 +17,15 @@ import messages from '@salesforce/retail-react-app/app/static/translations/compi
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
+let mockActiveDataEnable = false
+jest.mock('@salesforce/retail-react-app/app/constants', () => {
+    const mockConstants = jest.requireActual('@salesforce/retail-react-app/app/constants')
+    return {
+        __esModule: true,
+        ...mockConstants,
+        ACTIVE_DATA_ENABLE: mockActiveDataEnable
+    }
+})
 
 let windowSpy
 beforeAll(() => {
@@ -65,6 +74,32 @@ describe('App', () => {
         )
         expect(screen.getByRole('main')).toBeInTheDocument()
         expect(screen.getByText('Any children here')).toBeInTheDocument()
+    })
+
+    test('Active Data component is not rendered', () => {
+        mockActiveDataEnable = false
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        renderWithProviders(
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                <p>Any children here</p>
+            </App>
+        )
+        waitFor(() => expect(document.getElementById('#headActiveData')).not.toBeInTheDocument())
+        waitFor(() => expect(document.getElementById('#dwanalytics')).not.toBeInTheDocument())
+        waitFor(() => expect(document.getElementById('#dwac')).not.toBeInTheDocument())
+    })
+
+    test('Active Data component is rendered appropriately', () => {
+        mockActiveDataEnable = true
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        renderWithProviders(
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                <p>Any children here</p>
+            </App>
+        )
+        waitFor(() => expect(document.getElementById('#headActiveData')).toBeInTheDocument())
+        waitFor(() => expect(document.getElementById('#dwanalytics')).toBeInTheDocument())
+        waitFor(() => expect(document.getElementById('#dwac')).toBeInTheDocument())
     })
 
     test('The localized hreflang links exist in the html head', () => {

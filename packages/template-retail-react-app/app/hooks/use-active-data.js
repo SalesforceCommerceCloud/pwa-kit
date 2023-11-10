@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/*global dw*/
 import {ACTIVE_DATA_ENABLE} from '@salesforce/retail-react-app/app/constants'
 
 const useActiveData = () => {
@@ -13,7 +14,7 @@ const useActiveData = () => {
                 return
             }
             try {
-                if (dw.ac) {
+                if (dw?.ac) {
                     if (category && category.id) {
                         console.log('Applying category context')
                         dw.ac.applyContext({category: category.id})
@@ -22,9 +23,9 @@ const useActiveData = () => {
                         console.log('Capturing product')
                         dw.ac._capture({id: product.id, type: type})
                     }
-                }
-                if (typeof dw.ac._scheduleDataSubmission === 'function') {
-                    dw.ac._scheduleDataSubmission()
+                    if (dw.ac?._scheduleDataSubmission) {
+                        dw.ac._scheduleDataSubmission()
+                    }
                 }
             } catch (err) {
                 console.error(err)
@@ -36,10 +37,10 @@ const useActiveData = () => {
             }
             try {
                 console.log('Setting DW Search Context')
-                if (dw.ac) {
+                if (dw?.ac) {
                     console.log('Applying search context')
                     dw.ac.applyContext({searchData: searchParams})
-                    if (typeof dw.ac._scheduleDataSubmission === 'function') {
+                    if (dw.ac?._scheduleDataSubmission) {
                         dw.ac._scheduleDataSubmission()
                     }
                     productSearchResult.hits.map((productSearchItem) => {
@@ -56,12 +57,12 @@ const useActiveData = () => {
             }
             try {
                 console.log('Set DW Category Context')
-                if (dw.ac) {
+                if (dw?.ac) {
                     if (category && category.id) {
                         console.log('Applying category context')
                         dw.ac.applyContext({category: category.id, searchData: searchParams})
                     }
-                    if (typeof dw.ac._scheduleDataSubmission === 'function') {
+                    if (dw.ac?._scheduleDataSubmission) {
                         dw.ac._scheduleDataSubmission()
                     }
                     productSearchResult.hits.map((productSearchItem) => {
