@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {forwardRef} from 'react'
-import {defineMessage} from 'react-intl'
+import {createIntl, createIntlCache} from 'react-intl'
 import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
@@ -104,6 +104,14 @@ export const icon = (name, passProps) => {
     return component
 }
 
+// Cache is optional but highly recommended as it prevents memory leak
+const cache = createIntlCache()
+
+// Use createIntl to utilize localization out of react component
+const intl = createIntl({
+    locale: 'en', // TODO: figure out what values are valid and where we can grab locale
+}, cache)
+
 // Export Chakra icon components that use our SVG sprite symbol internally
 // For non-square SVGs, we can use the symbol data from the import to set the
 // proper viewBox attribute on the Icon wrapper.
@@ -135,9 +143,8 @@ export const GithubLogo = icon('github-logo')
 export const HamburgerIcon = icon('hamburger')
 export const InfoIcon = icon('info')
 export const LikeIcon = icon('like')
-// @W-12627172@
 export const LockIcon = icon('lock', {
-    'aria-label': defineMessage({
+    'aria-label': intl.formatMessage({
         id: 'icons.assistive_msg.lock',
         defaultMessage: 'Secure'
     }),
