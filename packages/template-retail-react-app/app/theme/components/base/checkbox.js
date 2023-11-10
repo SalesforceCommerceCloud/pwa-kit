@@ -12,7 +12,7 @@ export default {
         },
         control: {
             marginTop: '2px',
-            borderColor: 'gray.600',
+            borderColor: 'gray.500',
             _checked: {
                 backgroundColor: 'blue.600',
                 borderColor: 'blue.600',
