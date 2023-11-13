@@ -50,10 +50,10 @@ const AppConfig = ({children, locals = {}}) => {
             shortCode={commerceApiConfig.parameters.shortCode}
             clientId={commerceApiConfig.parameters.clientId}
             organizationId={commerceApiConfig.parameters.organizationId}
-            siteId={appOrigin?.includes('bathandbodyworks.ca') ? 'RefArchFrench' : locals.site?.id}
+            siteId={appOrigin?.includes('mysite.ca') ? 'RefArchFrench' : locals.site?.id}
             locale={
                 // TODO: Do NOT use this in production, fetch locale from a dictionary of locales
-                true ? 'fr-FR' : locals.locale?.id
+                appOrigin?.includes('mysite.ca') ? 'fr-FR' : locals.locale?.id
             }
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
@@ -63,7 +63,7 @@ const AppConfig = ({children, locals = {}}) => {
         >
             <MultiSiteProvider
                 site={locals.site}
-                locale={true ? 'fr-FR' : locals.locale?.id}
+                locale={appOrigin?.includes('mysite.ca') ? 'fr-FR' : locals.locale?.id}
                 buildUrl={locals.buildUrl}
             >
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
