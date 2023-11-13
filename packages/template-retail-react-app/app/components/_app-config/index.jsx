@@ -43,21 +43,29 @@ const AppConfig = ({children, locals = {}}) => {
     const commerceApiConfig = locals.appConfig.commerceAPI
 
     const appOrigin = getAppOrigin()
-
+    console.log('~appOrigin', appOrigin)
+    console.log('~locals.locale?.id', locals.locale?.id)
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
             clientId={commerceApiConfig.parameters.clientId}
             organizationId={commerceApiConfig.parameters.organizationId}
-            siteId={locals.site?.id}
-            locale={locals.locale?.id}
+            siteId={appOrigin?.includes('bathandbodyworks.ca') ? 'RefArchFrench' : locals.site?.id}
+            locale={
+                // TODO: Do NOT use this in production, fetch locale from a dictionary of locales
+                true ? 'fr-FR' : locals.locale?.id
+            }
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
             OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
         >
-            <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
+            <MultiSiteProvider
+                site={locals.site}
+                locale={true ? 'fr-FR' : locals.locale?.id}
+                buildUrl={locals.buildUrl}
+            >
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
             </MultiSiteProvider>
             <ReactQueryDevtools />
