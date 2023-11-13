@@ -1,4 +1,5 @@
 ## v2.2.0-dev (Nov 3, 2023)
+- (A11y) Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
 - (A11y) Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
 
 ## v2.1.0 (Nov 3, 2023)

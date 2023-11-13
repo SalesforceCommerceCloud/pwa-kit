@@ -51,10 +51,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     <Center
                                         {...styles.swatchButton}
                                         marginRight={0}
-                                        border={
-                                            value.label.toLowerCase() === 'white' &&
-                                            '1px solid black'
-                                        }
+                                        border="1px solid black"
                                     >
                                         <Box
                                             marginRight={0}
