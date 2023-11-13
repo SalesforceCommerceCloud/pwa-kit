@@ -84,7 +84,7 @@ VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
  * A helper for creating a Chakra-wrapped icon from our own SVG imports via sprite sheet.
  * @param {string} name - the filename of the imported svg (does not include extension)
  * @param {Object} passProps - props that will be passed onto the underlying Icon component
- * @param {Object} localizationAttributes - attributes with localized values that will be passed 
+ * @param {Object} localizationAttributes - attributes with localized values that will be passed
  *      onto the underlying Icon component, use `defineMessage` to create localized string
  */
 /* istanbul ignore next */
