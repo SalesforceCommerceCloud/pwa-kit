@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {forwardRef} from 'react'
-import {createIntl, createIntlCache} from 'react-intl'
+import {useIntl, defineMessage} from 'react-intl'
 import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
@@ -83,15 +83,24 @@ VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
 /**
  * A helper for creating a Chakra-wrapped icon from our own SVG imports via sprite sheet.
  * @param {string} name - the filename of the imported svg (does not include extension)
+ * @param {Object} passProps - props that will be passed onto the underlying Icon component
+ * @param {Object} localizationAttributes - attributes with localized values that will be passed 
+ *      onto the underlying Icon component, use `defineMessage` to create localized string
  */
 /* istanbul ignore next */
-export const icon = (name, passProps) => {
+export const icon = (name, passProps, localizationAttributes) => {
     const displayName = name
         .toLowerCase()
         .replace(/(?:^|[\s-/])\w/g, (match) => match.toUpperCase())
         .replace(/-/g, '')
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
+        const intl = useIntl()
+        if (localizationAttributes) {
+            Object.keys(localizationAttributes).forEach((key) => {
+                passProps[key] = intl.formatMessage(localizationAttributes[key])
+            })
+        }
         const baseStyle = theme?.components?.Icon?.baseStyle
         return (
             <Icon ref={ref} role="img" aria-label={name} {...baseStyle} {...props} {...passProps}>
@@ -102,17 +111,6 @@ export const icon = (name, passProps) => {
     component.displayName = `${displayName}Icon`
     return component
 }
-
-// Cache is optional but highly recommended as it prevents memory leak
-const cache = createIntlCache()
-
-// Use createIntl to utilize localization out of react component
-const intl = createIntl(
-    {
-        locale: 'en' // TODO: figure out what values are valid and where we can grab locale
-    },
-    cache
-)
 
 // Export Chakra icon components that use our SVG sprite symbol internally
 // For non-square SVGs, we can use the symbol data from the import to set the
@@ -145,14 +143,19 @@ export const GithubLogo = icon('github-logo')
 export const HamburgerIcon = icon('hamburger')
 export const InfoIcon = icon('info')
 export const LikeIcon = icon('like')
-export const LockIcon = icon('lock', {
-    'aria-label': intl.formatMessage({
-        id: 'icons.assistive_msg.lock',
-        defaultMessage: 'Secure'
-    }),
-    'aria-hidden': false,
-    focusable: true
-})
+export const LockIcon = icon(
+    'lock',
+    {
+        'aria-hidden': false,
+        focusable: true
+    },
+    {
+        'aria-label': defineMessage({
+            id: 'icons.assistive_msg.lock',
+            defaultMessage: 'Secure'
+        })
+    }
+)
 export const LocationIcon = icon('location')
 export const PaypalIcon = icon('paypal', {viewBox: PaypalSymbol.viewBox})
 export const PlugIcon = icon('plug')
