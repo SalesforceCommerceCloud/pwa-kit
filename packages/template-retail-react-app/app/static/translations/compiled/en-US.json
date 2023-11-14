@@ -809,6 +809,20 @@
       "value": "Payment"
     }
   ],
+  "colorRefinements.label.hitCount": [
+    {
+      "type": 1,
+      "value": "colorLabel"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "colorHitCount"
+    }
+  ],
   "confirmation_modal.default.action.no": [
     {
       "type": 0,

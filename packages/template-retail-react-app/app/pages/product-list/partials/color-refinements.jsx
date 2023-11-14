@@ -17,8 +17,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
 import {cssColorGroups} from '@salesforce/retail-react-app/app/constants'
+import {useIntl} from 'react-intl'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
+    const intl = useIntl()
     const styles = useMultiStyleConfig('SwatchGroup', {
         variant: 'circle',
         disabled: false
@@ -46,7 +48,13 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     variant="outline"
                                     marginRight={0}
                                     marginBottom="-1px"
-                                    aria-label={`${value.label} (${value.hitCount})`}
+                                    aria-label={intl.formatMessage(
+                                        {
+                                            id: 'colorRefinements.label.hitCount',
+                                            defaultMessage: '{colorLabel} {colorHitCount}'
+                                        },
+                                        {colorLabel: value.label, colorHitCount: value.hitCount}
+                                    )}
                                 >
                                     <Center
                                         {...styles.swatchButton}
@@ -77,7 +85,15 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     fontSize="sm"
                                     marginBottom="1px"
                                     aria-hidden="true" // avoid redundant readout since swatch has aria label
-                                >{`${value.label} (${value.hitCount})`}</Text>
+                                >
+                                    {intl.formatMessage(
+                                        {
+                                            id: 'colorRefinements.label.hitCount',
+                                            defaultMessage: '{colorLabel} {colorHitCount}'
+                                        },
+                                        {colorLabel: value.label, colorHitCount: value.hitCount}
+                                    )}
+                                </Text>
                             </HStack>
                         </Box>
                     )
