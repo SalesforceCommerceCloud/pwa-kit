@@ -75,7 +75,7 @@ StorefrontPreview.propTypes = {
     // to get to a place where both these props are simply optional and we will provide default implementations.
     // This would make the API simpler to use.
     getToken: CustomPropTypes.requiredFunctionWhenEnabled,
-    onContextChange: CustomPropTypes.requiredFunctionWhenEnabled
+    onContextChange: PropTypes.func
 }
 
 export default StorefrontPreview
