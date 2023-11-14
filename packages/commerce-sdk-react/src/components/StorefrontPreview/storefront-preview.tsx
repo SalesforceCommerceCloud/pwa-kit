@@ -14,6 +14,7 @@ import type {LocationDescriptor} from 'history'
 
 type GetToken = () => string | undefined | Promise<string | undefined>
 type ContextChangeHandler = () => void | Promise<void>
+type OptionalWhenDisabled<T> = ({enabled?: true} & T) | ({enabled: false} & Partial<T>)
 
 /**
  *
@@ -27,8 +28,8 @@ export const StorefrontPreview = ({
     getToken,
     onContextChange
 }: React.PropsWithChildren<
-    // getToken and onContextChange are only required when enabled = true.
-    {enabled?: true; getToken: GetToken; onContextChange?: ContextChangeHandler;} | {enabled: false; getToken?: GetToken; onContextChange?: ContextChangeHandler;}
+    // Props are only required when Storefront Preview is enabled
+    OptionalWhenDisabled<{getToken: GetToken; onContextChange?: ContextChangeHandler}>
 >) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
