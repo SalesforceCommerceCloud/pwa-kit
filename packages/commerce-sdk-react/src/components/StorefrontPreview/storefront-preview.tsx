@@ -13,7 +13,7 @@ import {useHistory} from 'react-router-dom'
 import type {LocationDescriptor} from 'history'
 
 type GetToken = () => string | undefined | Promise<string | undefined>
-type ContextChangeHandler = () => undefined | Promise<undefined>
+type ContextChangeHandler = () => void | Promise<void>
 
 /**
  *
