@@ -270,14 +270,28 @@ const App = (props) => {
     }
 
     // START - Demo "onContextChange" handler.
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-    const contextChangeHandler = async (context) => {
-        const waitFor = 7500 // ms
-        console.log(
-            `STOREFRONT: Handling context change. Synthetic ${waitFor / 1000}s wait.`,
-            context
+    // TODO: Remove before merging PR
+    const fakeRequest = (options = {}) => {
+        const failurePercentage = options?.failurePercentage || 0 // 0 --> 1
+        const maxDuration = options?.maxDuration || 15000
+        const duration = Math.floor(Math.random() * maxDuration)
+
+        return new Promise((resolve, reject) =>
+            setTimeout(() => {
+                if (Math.random() < failurePercentage) {
+                    reject(new Error('A random network error occured!'))
+                } else {
+                    resolve()
+                }
+            }, duration)
         )
-        await sleep(waitFor)
+    }
+
+    const contextChangeHandler = async (context) => {
+        // NOTE: We know that the timeout error will occur after 10 seconds, so having a max wait
+        // of 15 seconds means there is a random chance we will wait longer than the 10 second timeout.
+        console.log(`STOREFRONT: Simulating network request on questionable network.`, context)
+        await fakeRequest({maxDuration: 15000, failurePercentage: 0.4}) // 40% of the time we will fail!
         console.log('STOREFRONT: Finished custom context handler.')
     }
     // END
