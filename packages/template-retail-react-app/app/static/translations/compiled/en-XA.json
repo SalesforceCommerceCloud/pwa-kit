@@ -1660,11 +1660,15 @@
     },
     {
       "type": 0,
-      "value": " "
+      "value": " ("
     },
     {
       "type": 1,
       "value": "colorHitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
     },
     {
       "type": 0,

@@ -51,7 +51,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     aria-label={intl.formatMessage(
                                         {
                                             id: 'colorRefinements.label.hitCount',
-                                            defaultMessage: '{colorLabel} {colorHitCount}'
+                                            defaultMessage: '{colorLabel} ({colorHitCount})'
                                         },
                                         {colorLabel: value.label, colorHitCount: value.hitCount}
                                     )}
@@ -89,7 +89,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     {intl.formatMessage(
                                         {
                                             id: 'colorRefinements.label.hitCount',
-                                            defaultMessage: '{colorLabel} {colorHitCount}'
+                                            defaultMessage: '{colorLabel} ({colorHitCount})'
                                         },
                                         {colorLabel: value.label, colorHitCount: value.hitCount}
                                     )}

@@ -816,11 +816,15 @@
     },
     {
       "type": 0,
-      "value": " "
+      "value": " ("
     },
     {
       "type": 1,
       "value": "colorHitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
     }
   ],
   "confirmation_modal.default.action.no": [
