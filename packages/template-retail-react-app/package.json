@@ -99,8 +99,5 @@
       "path": "build/vendor.js",
       "maxSize": "320 kB"
     }
-  ],
-  "overrides": {
-    "nwsapi": "2.2.2"
-  }
+  ]
 }

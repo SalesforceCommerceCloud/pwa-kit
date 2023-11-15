@@ -94,7 +94,7 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
                             <Stack spacing={6}>
                                 {form.formState.errors?.global && (
                                     <Alert status="error">
-                                        <AlertIcon color="red.500" boxSize={4} />
+                                        <AlertIcon color="red.600" boxSize={4} />
                                         <Text fontSize="sm" ml={3}>
                                             {form.formState.errors.global.message}
                                         </Text>
