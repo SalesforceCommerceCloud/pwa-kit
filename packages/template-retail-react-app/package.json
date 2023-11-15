@@ -11,7 +11,7 @@
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "npm run build-translations && pwa-kit-dev build",
-    "build-translations": "npm run extract-default-translations && npm run compile-translations",
+    "build-translations": "npm run extract-default-translations && npm run compile-translations && npm run compile-translations:pseudo",
     "compile-translations": "node ./scripts/translations/compile-folder.js translations",
     "compile-translations:pseudo": "node ./scripts/translations/compile-pseudo.js translations/en-US.json",
     "extract-default-translations": "node ./scripts/translations/extract-default-messages.js en-US",
