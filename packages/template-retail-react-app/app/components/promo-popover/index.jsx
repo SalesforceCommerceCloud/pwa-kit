@@ -20,7 +20,7 @@ import {
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {InfoIcon} from '@salesforce/retail-react-app/app/components/icons'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 
 /**
  * This component renders a small info icon and displays a popover when hovered. It could be adapted
@@ -28,6 +28,7 @@ import {FormattedMessage} from 'react-intl'
  * promotions applied to products and/or orders on cart, checkout, order confirmation and order history.
  */
 const PromoPopover = ({header, children, ...props}) => {
+    const intl = useIntl()
     return (
         <Box position="relative" {...props}>
             <Popover isLazy placement="top" boundary="scrollParent" trigger="hover" variant="small">
@@ -49,6 +50,10 @@ const PromoPopover = ({header, children, ...props}) => {
                         minWidth="auto"
                         position="relative"
                         variant="unstyled"
+                        aria-label={intl.formatMessage({
+                            id: 'promo_popover.assistive_msg.info',
+                            defaultMessage: 'Info'
+                        })}
                     />
                 </PopoverTrigger>
                 <Portal>
