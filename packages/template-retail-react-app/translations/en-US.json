@@ -316,6 +316,9 @@
   "checkout_payment.title.payment": {
     "defaultMessage": "Payment"
   },
+  "colorRefinements.label.hitCount": {
+    "defaultMessage": "{colorLabel} ({colorHitCount})"
+  },
   "confirmation_modal.default.action.no": {
     "defaultMessage": "No"
   },
@@ -552,8 +555,8 @@
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "My account"
   },
-  "header.button.assistive_msg.my_cart": {
-    "defaultMessage": "My cart"
+  "header.button.assistive_msg.my_cart_with_num_items": {
+    "defaultMessage": "My cart, number of items: {numItems}"
   },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "Wishlist"
@@ -645,6 +648,9 @@
   },
   "home.title.react_starter_store": {
     "defaultMessage": "The React PWA Starter Store for Retail"
+  },
+  "icons.assistive_msg.lock": {
+    "defaultMessage": "Secure"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"
@@ -1037,6 +1043,9 @@
   },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Apply"
+  },
+  "promo_popover.assistive_msg.info": {
+    "defaultMessage": "Info"
   },
   "promo_popover.heading.promo_applied": {
     "defaultMessage": "Promotions Applied"
