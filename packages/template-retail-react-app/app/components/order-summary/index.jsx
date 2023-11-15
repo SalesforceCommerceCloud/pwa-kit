@@ -61,6 +61,7 @@ const CartItems = ({basket}) => {
             <Box>
                 <Button
                     variant="link"
+                    color="blue.700"
                     leftIcon={<BasketIcon boxSize="22px" />}
                     rightIcon={cartItemsExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                     onClick={() => setCartItemsExpanded(!cartItemsExpanded)}
@@ -100,7 +101,7 @@ const CartItems = ({basket}) => {
                         )
                     })}
 
-                    <Button as={Link} to="/cart" variant="link" width="full">
+                    <Button as={Link} to="/cart" variant="link" width="full" color="blue.700">
                         <FormattedMessage
                             defaultMessage="Edit cart"
                             id="order_summary.cart_items.link.edit_cart"
@@ -163,7 +164,7 @@ const OrderSummary = ({
                     {basket.orderPriceAdjustments?.map((adjustment) => (
                         <Flex justify="space-between" key={adjustment.priceAdjustmentId}>
                             <Text fontSize={fontSize}>{adjustment.itemText}</Text>
-                            <Text color="green.500" fontSize={fontSize}>
+                            <Text color="green.600" fontSize={fontSize}>
                                 <FormattedNumber
                                     style="currency"
                                     currency={basket?.currency}
@@ -209,7 +210,7 @@ const OrderSummary = ({
                         ) ? (
                             <Text
                                 as="span"
-                                color="green.500"
+                                color="green.700"
                                 textTransform="uppercase"
                                 fontSize={fontSize}
                             >
