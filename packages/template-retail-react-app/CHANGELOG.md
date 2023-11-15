@@ -1,4 +1,6 @@
 ## v2.2.0-dev (Nov 3, 2023)
+- (A11y) Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
+
 ## v2.1.0 (Nov 3, 2023)
 
 - Support Storefront Preview 
