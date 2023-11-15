@@ -252,10 +252,13 @@ const Header = ({
                         onClick={onWishlistClick}
                     />
                     <IconButton
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.my_cart',
-                            defaultMessage: 'My cart'
-                        })}
+                        aria-label={intl.formatMessage(
+                            {
+                                id: 'header.button.assistive_msg.my_cart_with_num_items',
+                                defaultMessage: 'My cart, number of items: {numItems}'
+                            },
+                            {numItems: totalItems}
+                        )}
                         icon={
                             <>
                                 <BasketIcon />
