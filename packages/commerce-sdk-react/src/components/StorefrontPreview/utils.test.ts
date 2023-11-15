@@ -4,13 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {DOMWindow} from 'jsdom'
+import type {DOMWindow, JSDOM} from 'jsdom'
 import {getParentOrigin} from '../../utils'
 import {getClientScript, detectStorefrontPreview} from './utils'
 
 const LOCALHOST_ORIGIN = 'http://localhost:4000'
 const RUNTIME_ADMIN_ORIGIN = 'https://runtime.commercecloud.com'
 const OTHER_ORIGIN = 'https://website.about.bagels'
+
+declare global {
+    const jsdom: JSDOM
+}
 
 /** Empty `window.top` that throws if you try to do anything with it. */
 const mockTop = new Proxy({} as DOMWindow, {
