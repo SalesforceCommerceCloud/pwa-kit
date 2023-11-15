@@ -151,7 +151,7 @@ export default function ShippingOptions() {
                                                                 <Text
                                                                     key={promo.promotionId}
                                                                     fontSize="sm"
-                                                                    color="green.500"
+                                                                    color="green.600"
                                                                 >
                                                                     {promo.calloutMsg}
                                                                 </Text>
@@ -208,7 +208,7 @@ export default function ShippingOptions() {
                                 <Text
                                     fontWeight="normal"
                                     textDecoration="line-through"
-                                    color="gray.500"
+                                    color="gray.600"
                                     marginLeft={1}
                                 >
                                     <FormattedNumber
@@ -228,7 +228,7 @@ export default function ShippingOptions() {
                             <Text
                                 key={adjustment.priceAdjustmentId}
                                 fontSize="sm"
-                                color="green.500"
+                                color="green.600"
                             >
                                 {adjustment.itemText}
                             </Text>
