@@ -79,8 +79,7 @@ const ProductTile = (props) => {
     const styles = useMultiStyleConfig('ProductTile')
 
     return (
-        // TODO: pull out for localization
-        <Box aria-label="product tile" {...styles.container}>
+        <Box {...styles.container}>
             <Link
                 data-testid="product-tile"
                 to={productUrlBuilder({id: productId}, intl.local)}
