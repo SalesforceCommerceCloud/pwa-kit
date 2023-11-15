@@ -1649,6 +1649,32 @@
       "value": "]"
     }
   ],
+  "colorRefinements.label.hitCount": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 1,
+      "value": "colorLabel"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "colorHitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "confirmation_modal.default.action.no": [
     {
       "type": 0,
@@ -2805,14 +2831,18 @@
       "value": "]"
     }
   ],
-  "header.button.assistive_msg.my_cart": [
+  "header.button.assistive_msg.my_cart_with_num_items": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ḿẏ ƈȧȧřŧ"
+      "value": "Ḿẏ ƈȧȧřŧ, ƞŭŭḿƀḗḗř ǿǿƒ īŧḗḗḿş: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
     },
     {
       "type": 0,
@@ -3241,6 +3271,20 @@
     {
       "type": 0,
       "value": "Ŧħḗḗ Řḗḗȧȧƈŧ ƤẆȦ Şŧȧȧřŧḗḗř Şŧǿǿřḗḗ ƒǿǿř Řḗḗŧȧȧīŀ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "icons.assistive_msg.lock": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƈŭŭřḗḗ"
     },
     {
       "type": 0,
@@ -5095,6 +5139,20 @@
     {
       "type": 0,
       "value": "Ȧƥƥŀẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "promo_popover.assistive_msg.info": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Īƞƒǿǿ"
     },
     {
       "type": 0,
