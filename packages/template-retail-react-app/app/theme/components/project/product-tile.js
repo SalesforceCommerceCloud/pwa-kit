@@ -6,7 +6,9 @@
  */
 export default {
     baseStyle: () => ({
-        container: {},
+        container: {
+            position: 'relative'
+        },
         favIcon: {
             position: 'absolute',
             variant: 'unstyled',
