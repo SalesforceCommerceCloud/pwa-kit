@@ -48,7 +48,13 @@ const ActionCard = ({children, onEdit, onRemove, ...props}) => {
                         </Button>
                     )}
                     {onRemove && (
-                        <Button variant="link" size="sm" colorScheme="red" onClick={handleRemove}>
+                        <Button
+                            variant="link"
+                            size="sm"
+                            colorScheme="red"
+                            onClick={handleRemove}
+                            color="red.600"
+                        >
                             <FormattedMessage
                                 defaultMessage="Remove"
                                 id="action_card.action.remove"
