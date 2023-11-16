@@ -41,7 +41,7 @@ const QuantityPicker = (props) => {
 
             // If there is a `onFocus` property define, call it with the event captured.
             // eslint-disable-next-line react/prop-types
-            onFocus && onFocus.call(this, e)
+            onFocus?.call(this, e)
         }
     })
 
