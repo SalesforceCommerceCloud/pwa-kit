@@ -72,7 +72,7 @@ import {
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE,
-    ACTIVE_DATA_ENABLE
+    ACTIVE_DATA_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -285,7 +285,7 @@ const App = (props) => {
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
                 <Helmet>
-                    {ACTIVE_DATA_ENABLE && (
+                    {ACTIVE_DATA_ENABLED && (
                         <script
                             src={getAssetUrl('static/head-active_data.js')}
                             id="headActiveData"
@@ -417,7 +417,7 @@ const App = (props) => {
                         </Box>
                     </CurrencyProvider>
                 </IntlProvider>
-                {ACTIVE_DATA_ENABLE && (
+                {ACTIVE_DATA_ENABLED && (
                     <script
                         type="text/javascript"
                         src={getAssetUrl('static/dwanalytics-22.2.js')}
@@ -426,7 +426,7 @@ const App = (props) => {
                         onLoad={trackPage}
                     ></script>
                 )}
-                {ACTIVE_DATA_ENABLE && (
+                {ACTIVE_DATA_ENABLED && (
                     <script
                         src={getAssetUrl('static/dwac-21.7.js')}
                         type="text/javascript"

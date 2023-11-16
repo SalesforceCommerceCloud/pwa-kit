@@ -5,12 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /*global dw*/
-import {ACTIVE_DATA_ENABLE} from '@salesforce/retail-react-app/app/constants'
+import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const useActiveData = () => {
     return {
         async sendViewProduct(category, product, type) {
-            if (!ACTIVE_DATA_ENABLE) {
+            if (!ACTIVE_DATA_ENABLED) {
                 return
             }
             try {
@@ -32,7 +32,7 @@ const useActiveData = () => {
             }
         },
         async sendViewSearch(searchParams, productSearchResult) {
-            if (!ACTIVE_DATA_ENABLE) {
+            if (!ACTIVE_DATA_ENABLED) {
                 return
             }
             try {
@@ -52,7 +52,7 @@ const useActiveData = () => {
             }
         },
         async sendViewCategory(searchParams, category, productSearchResult) {
-            if (!ACTIVE_DATA_ENABLE) {
+            if (!ACTIVE_DATA_ENABLED) {
                 return
             }
             try {
@@ -74,7 +74,10 @@ const useActiveData = () => {
             }
         },
         async trackPage(siteId, localeId, currency) {
-            if (!ACTIVE_DATA_ENABLE) {
+            if (!ACTIVE_DATA_ENABLED) {
+                return
+            }
+            if (typeof dw === 'undefined') {
                 return
             }
             try {
