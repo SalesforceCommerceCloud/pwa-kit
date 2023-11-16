@@ -552,8 +552,8 @@
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "My account"
   },
-  "header.button.assistive_msg.my_cart": {
-    "defaultMessage": "My cart"
+  "header.button.assistive_msg.my_cart_with_num_items": {
+    "defaultMessage": "My cart, number of items: {numItems}"
   },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "Wishlist"

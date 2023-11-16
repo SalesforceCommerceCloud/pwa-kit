@@ -1341,10 +1341,14 @@
       "value": "My account"
     }
   ],
-  "header.button.assistive_msg.my_cart": [
+  "header.button.assistive_msg.my_cart_with_num_items": [
     {
       "type": 0,
-      "value": "My cart"
+      "value": "My cart, number of items: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
     }
   ],
   "header.button.assistive_msg.wishlist": [
