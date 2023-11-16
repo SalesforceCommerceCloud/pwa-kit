@@ -269,36 +269,9 @@ const App = (props) => {
         history.push(path)
     }
 
-    // START - Demo "onContextChange" handler.
-    // TODO: Remove before merging PR
-    const fakeRequest = (options = {}) => {
-        const failurePercentage = options?.failurePercentage || 0 // 0 --> 1
-        const maxDuration = options?.maxDuration || 15000
-        const duration = Math.floor(Math.random() * maxDuration)
-
-        return new Promise((resolve, reject) =>
-            setTimeout(() => {
-                if (Math.random() < failurePercentage) {
-                    reject(new Error('A random network error occured!'))
-                } else {
-                    resolve()
-                }
-            }, duration)
-        )
-    }
-
-    const contextChangeHandler = async (context) => {
-        // NOTE: We know that the timeout error will occur after 10 seconds, so having a max wait
-        // of 15 seconds means there is a random chance we will wait longer than the 10 second timeout.
-        console.log(`STOREFRONT: Simulating network request on questionable network.`, context)
-        await fakeRequest({maxDuration: 15000, failurePercentage: 0.4}) // 40% of the time we will fail!
-        console.log('STOREFRONT: Finished custom context handler.')
-    }
-    // END
-
     return (
         <Box className="sf-app" {...styles.container}>
-            <StorefrontPreview getToken={getTokenWhenReady} onContextChange={contextChangeHandler}>
+            <StorefrontPreview getToken={getTokenWhenReady}>
                 <IntlProvider
                     onError={(err) => {
                         if (!messages) {
