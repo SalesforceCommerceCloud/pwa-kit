@@ -361,7 +361,7 @@ const main = async () => {
                 }
 
                 /** @type {Credentials} */
-                var credentials
+                let credentials
                 if (user && key) {
                     credentials = {
                         username: user,
