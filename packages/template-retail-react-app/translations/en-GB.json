@@ -316,6 +316,9 @@
   "checkout_payment.title.payment": {
     "defaultMessage": "Payment"
   },
+  "colorRefinements.label.hitCount": {
+    "defaultMessage": "{colorLabel} ({colorHitCount})"
+  },
   "confirmation_modal.default.action.no": {
     "defaultMessage": "No"
   },
