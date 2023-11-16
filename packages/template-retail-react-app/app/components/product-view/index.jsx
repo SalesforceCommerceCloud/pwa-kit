@@ -8,7 +8,7 @@
 import React, {forwardRef, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
-import {useIntl} from 'react-intl'
+import {useIntl, FormattedMessage} from 'react-intl'
 
 import {
     Flex,
@@ -311,13 +311,14 @@ const ProductView = forwardRef(
                                 />
                                 <HideOnMobile>
                                     {showFullLink && product && (
-                                        <Link to={`/product/${product.master.masterId}`}>
-                                            <Text color="blue.600">
-                                                {intl.formatMessage({
-                                                    defaultMessage: 'See full details',
-                                                    id: 'product_view.link.full_details'
-                                                })}
-                                            </Text>
+                                        <Link
+                                            to={`/product/${product.master.masterId}`}
+                                            color="blue.600"
+                                        >
+                                            <FormattedMessage
+                                                id="product_view.link.full_details"
+                                                defaultMessage="See full details"
+                                            />
                                         </Link>
                                     )}
                                 </HideOnMobile>
@@ -473,13 +474,14 @@ const ProductView = forwardRef(
                             </Box>
                             <HideOnDesktop>
                                 {showFullLink && product && (
-                                    <Link to={`/product/${product.master.masterId}`}>
-                                        <Text color="blue.600">
-                                            {intl.formatMessage({
-                                                defaultMessage: 'See full details',
-                                                id: 'product_view.link.full_details'
-                                            })}
-                                        </Text>
+                                    <Link
+                                        to={`/product/${product.master.masterId}`}
+                                        color="blue.600"
+                                    >
+                                        <FormattedMessage
+                                            id="product_view.link.full_details"
+                                            defaultMessage="See full details"
+                                        />
                                     </Link>
                                 )}
                             </HideOnDesktop>
