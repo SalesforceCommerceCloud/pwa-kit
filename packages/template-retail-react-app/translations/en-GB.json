@@ -649,6 +649,9 @@
   "home.title.react_starter_store": {
     "defaultMessage": "The React PWA Starter Store for Retail"
   },
+  "icons.assistive_msg.lock": {
+    "defaultMessage": "Secure"
+  },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"
   },
@@ -1040,6 +1043,9 @@
   },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Apply"
+  },
+  "promo_popover.assistive_msg.info": {
+    "defaultMessage": "Info"
   },
   "promo_popover.heading.promo_applied": {
     "defaultMessage": "Promotions Applied"

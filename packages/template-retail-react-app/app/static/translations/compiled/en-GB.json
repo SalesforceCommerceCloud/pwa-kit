@@ -1557,6 +1557,12 @@
       "value": "The React PWA Starter Store for Retail"
     }
   ],
+  "icons.assistive_msg.lock": [
+    {
+      "type": 0,
+      "value": "Secure"
+    }
+  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,
@@ -2385,6 +2391,12 @@
     {
       "type": 0,
       "value": "Apply"
+    }
+  ],
+  "promo_popover.assistive_msg.info": [
+    {
+      "type": 0,
+      "value": "Info"
     }
   ],
   "promo_popover.heading.promo_applied": [
