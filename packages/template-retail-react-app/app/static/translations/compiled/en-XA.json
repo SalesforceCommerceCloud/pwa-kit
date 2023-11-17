@@ -5037,6 +5037,20 @@
       "value": "]"
     }
   ],
+  "product_view.label.variant_type": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 1,
+      "value": "variantType"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "product_view.link.full_details": [
     {
       "type": 0,

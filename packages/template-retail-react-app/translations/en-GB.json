@@ -1020,6 +1020,9 @@
   "product_view.label.starting_at_price": {
     "defaultMessage": "Starting at"
   },
+  "product_view.label.variant_type": {
+    "defaultMessage": "{variantType}"
+  },
   "product_view.link.full_details": {
     "defaultMessage": "See full details"
   },
