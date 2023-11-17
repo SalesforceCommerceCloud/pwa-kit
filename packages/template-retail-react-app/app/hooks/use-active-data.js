@@ -16,11 +16,9 @@ const useActiveData = () => {
             try {
                 if (dw?.ac) {
                     if (category && category.id) {
-                        console.log('Applying category context')
                         dw.ac.applyContext({category: category.id})
                     }
                     if (product && product.id) {
-                        console.log('Capturing product')
                         dw.ac._capture({id: product.id, type: type})
                     }
                     if (dw.ac?._scheduleDataSubmission) {
@@ -36,9 +34,7 @@ const useActiveData = () => {
                 return
             }
             try {
-                console.log('Setting DW Search Context')
                 if (dw?.ac) {
-                    console.log('Applying search context')
                     dw.ac.applyContext({searchData: searchParams})
                     if (dw.ac?._scheduleDataSubmission) {
                         dw.ac._scheduleDataSubmission()
@@ -56,10 +52,8 @@ const useActiveData = () => {
                 return
             }
             try {
-                console.log('Set DW Category Context')
                 if (dw?.ac) {
                     if (category && category.id) {
-                        console.log('Applying category context')
                         dw.ac.applyContext({category: category.id, searchData: searchParams})
                     }
                     if (dw.ac?._scheduleDataSubmission) {
@@ -87,10 +81,8 @@ const useActiveData = () => {
                     '-Site/' +
                     localeId +
                     '/__Analytics-Start'
-                console.log('Tracking enabled for ' + activeDataUrl)
                 var dwAnalytics = dw.__dwAnalytics.getTracker(activeDataUrl)
                 if (typeof dw.ac == 'undefined') {
-                    console.log('Tracking page view')
                     dwAnalytics.trackPageView()
                 } else {
                     try {
@@ -100,7 +92,6 @@ const useActiveData = () => {
                     } catch (err) {
                         console.error(err)
                     }
-                    console.log('Setting DW Analytics')
                     dw.ac.setDWAnalytics(dwAnalytics)
                 }
             } catch (err) {
