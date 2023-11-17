@@ -60,7 +60,7 @@ const PromoPopover = ({header, children, ...props}) => {
                     <Box boxShadow="lg">
                         <PopoverArrow />
                         <PopoverCloseButton />
-                        <PopoverHeader borderBottom="none" tabindex="0">
+                        <PopoverHeader borderBottom="none">
                             {header || (
                                 <Text fontWeight="bold" fontSize="md">
                                     <FormattedMessage
@@ -70,9 +70,7 @@ const PromoPopover = ({header, children, ...props}) => {
                                 </Text>
                             )}
                         </PopoverHeader>
-                        <PopoverBody pt={0} tabindex="0">
-                            {children}
-                        </PopoverBody>
+                        <PopoverBody pt={0}>{children}</PopoverBody>
                     </Box>
                 </PopoverContent>
             </Popover>
