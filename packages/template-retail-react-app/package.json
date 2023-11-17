@@ -14,7 +14,7 @@
     "build-translations": "npm run extract-default-translations && npm run compile-translations && npm run compile-translations:pseudo",
     "compile-translations": "node ./scripts/translations/compile-folder.js translations",
     "compile-translations:pseudo": "node ./scripts/translations/compile-pseudo.js translations/en-US.json",
-    "extract-default-translations": "node ./scripts/translations/extract-default-messages.js en-US && node ./scripts/translations/extract-default-messages.js en-GB",
+    "extract-default-translations": "node ./scripts/translations/extract-default-messages.js en-US",
     "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
     "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
     "lint:fix": "npm run lint -- --fix",
