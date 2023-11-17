@@ -371,8 +371,8 @@ const ProductList = (props) => {
             {...rest}
         >
             <Helmet>
-                <title>{category?.pageTitle}</title>
-                <meta name="description" content={category?.pageDescription} />
+                <title>{category?.pageTitle ?? searchQuery}</title>
+                <meta name="description" content={category?.pageDescription ?? searchQuery} />
                 <meta name="keywords" content={category?.pageKeywords} />
             </Helmet>
             {showNoResults ? (

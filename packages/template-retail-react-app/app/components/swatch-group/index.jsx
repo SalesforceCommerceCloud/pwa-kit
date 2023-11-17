@@ -30,7 +30,7 @@ const SwatchGroup = (props) => {
     } = props
     const styles = useStyleConfig('SwatchGroup')
     return (
-        <Flex {...styles.swatchGroup} role="radiogroup">
+        <Flex {...styles.swatchGroup} role="radiogroup" aria-label={label}>
             <HStack {...styles.swatchLabel}>
                 <Box fontWeight="semibold">{`${label}:`}</Box>
                 <Box>{displayName}</Box>
