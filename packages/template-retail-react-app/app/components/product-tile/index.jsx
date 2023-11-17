@@ -105,15 +105,23 @@ const ProductTile = (props) => {
 
                 {/* Price */}
                 <Text {...styles.price} data-testid="product-tile-price">
-                    {hitType === 'set' &&
-                        intl.formatMessage({
-                            id: 'product_tile.label.starting_at_price',
-                            defaultMessage: 'Starting at'
-                        })}{' '}
-                    {intl.formatNumber(price, {
-                        style: 'currency',
-                        currency: currency || activeCurrency
-                    })}
+                    {hitType === 'set'
+                        ? intl.formatMessage(
+                              {
+                                  id: 'product_tile.label.starting_at_price',
+                                  defaultMessage: 'Starting at {price}'
+                              },
+                              {
+                                  price: intl.formatNumber(price, {
+                                      style: 'currency',
+                                      currency: currency || activeCurrency
+                                  })
+                              }
+                          )
+                        : intl.formatNumber(price, {
+                              style: 'currency',
+                              currency: currency || activeCurrency
+                          })}
                 </Text>
             </Link>
             {enableFavourite && (
