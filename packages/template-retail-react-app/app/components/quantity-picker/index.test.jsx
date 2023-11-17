@@ -44,7 +44,7 @@ describe('QuantityPicker', () => {
         await user.type(button, '{space}')
         expect(input.value).toBe('7')
     })
-    test('hitting space on minus decrements value', async () => {
+    test('hitting enter/space on minus decrements value', async () => {
         const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
