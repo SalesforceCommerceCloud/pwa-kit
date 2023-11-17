@@ -24,3 +24,28 @@ export const getClientScript = () => {
         ? `${parentOrigin}/mobify/bundle/development/static/storefront-preview.js`
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }
+
+// Custom Prop Types.
+export const CustomPropTypes = {
+    /**
+     * This custom PropType ensures that the prop is only required when the known prop
+     * "enabled" is set to "true".
+     * 
+     * @param props 
+     * @param propName 
+     * @param componentName 
+     * @returns
+     */
+    requiredFunctionWhenEnabled: (props: any, propName: any, componentName: any) => {
+        if (
+            props['enabled'] === true &&
+            (props[propName] === undefined || typeof props[propName] !== 'function')
+        ) {
+            return new Error(
+                `${String(propName)} is a required function for ${String(
+                    componentName
+                )} when enabled is true`
+            )
+        }
+    }
+}
