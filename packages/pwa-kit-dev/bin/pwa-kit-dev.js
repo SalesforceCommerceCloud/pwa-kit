@@ -181,6 +181,7 @@ const main = async () => {
 
                 // support older PWA_KIT_CREDENTIALS_FILE env var for credentialsFile
                 if (!credentialsFile && process.env.PWA_KIT_CREDENTIALS_FILE) {
+                    console.warn('Using PWA_KIT_CREDENTIALS_FILE is deprecated. Please use MRT_CREDENTIALS_FILE instead.')
                     credentialsFile = process.env.PWA_KIT_CREDENTIALS_FILE
                 }
 
