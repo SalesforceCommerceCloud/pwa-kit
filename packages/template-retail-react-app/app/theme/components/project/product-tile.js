@@ -23,6 +23,9 @@ export default {
             ratio: 1,
             paddingBottom: 2
         },
+        link: {
+            display: 'block'
+        },
         price: {},
         title: {
             fontWeight: 600
