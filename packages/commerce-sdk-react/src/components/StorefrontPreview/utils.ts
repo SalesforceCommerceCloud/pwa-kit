@@ -56,14 +56,6 @@ export const getClientScript = () => {
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }
 
-/**
- * Do nothing!
- * 
- * @returns undefined
- */
-export const noop = () => undefined
-
-
 // Custom Prop Types.
 export const CustomPropTypes = {
     /**

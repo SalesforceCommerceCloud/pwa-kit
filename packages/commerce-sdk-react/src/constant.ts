@@ -8,8 +8,8 @@
 /**
  * This list contains domains that can host code in iframe
  */
-export const IFRAME_HOST_ALLOW_LIST = [
-    'runtime.commercecloud.com',
-    'runtime-admin-staging.mobify-storefront.com',
-    'runtime-admin-preview.mobify-storefront.com'
-]
+export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
+    'https://runtime.commercecloud.com',
+    'https://runtime-admin-staging.mobify-storefront.com',
+    'https://runtime-admin-preview.mobify-storefront.com'
+])

@@ -8,7 +8,7 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
-import {CustomPropTypes, detectStorefrontPreview, getClientScript, noop} from './utils'
+import {CustomPropTypes, detectStorefrontPreview, getClientScript} from './utils'
 import {useHistory} from 'react-router-dom'
 import type {LocationDescriptor} from 'history'
 
@@ -39,14 +39,14 @@ export const StorefrontPreview = ({
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
+                onContextChange,
                 experimentalUnsafeNavigate: (
                     path: LocationDescriptor<unknown>,
                     action: 'push' | 'replace' = 'push',
                     ...args: unknown[]
                 ) => {
                     history[action](path, ...args)
-                },
-                onContextChange: onContextChange || noop
+                }
             }
         }
     }, [enabled, getToken, onContextChange])
