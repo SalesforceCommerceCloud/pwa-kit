@@ -16,15 +16,13 @@ const useActiveData = () => {
             if (!canTrack()) return
             try {
                 if (dw.ac) {
-                    if (category && category.id) {
+                    if (category?.id) {
                         dw.ac.applyContext({category: category.id})
                     }
-                    if (product && product.id) {
+                    if (product?.id) {
                         dw.ac._capture({id: product.id, type: type})
                     }
-                    if (dw.ac?._scheduleDataSubmission) {
-                        dw.ac._scheduleDataSubmission()
-                    }
+                    dw.ac._scheduleDataSubmission?.()
                 }
             } catch (err) {
                 console.error(err)
@@ -35,9 +33,7 @@ const useActiveData = () => {
             try {
                 if (dw.ac) {
                     dw.ac.applyContext({searchData: searchParams})
-                    if (dw.ac?._scheduleDataSubmission) {
-                        dw.ac._scheduleDataSubmission()
-                    }
+                    dw.ac._scheduleDataSubmission?.()
                     productSearchResult.hits.map((productSearchItem) => {
                         dw.ac._capture({id: productSearchItem.productId, type: 'searchhit'})
                     })
@@ -50,12 +46,10 @@ const useActiveData = () => {
             if (!canTrack()) return
             try {
                 if (dw.ac) {
-                    if (category && category.id) {
+                    if (category?.id) {
                         dw.ac.applyContext({category: category.id, searchData: searchParams})
                     }
-                    if (dw.ac?._scheduleDataSubmission) {
-                        dw.ac._scheduleDataSubmission()
-                    }
+                    dw.ac._scheduleDataSubmission?.()
                     productSearchResult.hits.map((productSearchItem) => {
                         dw.ac._capture({id: productSearchItem.productId, type: 'searchhit'})
                     })
@@ -73,14 +67,12 @@ const useActiveData = () => {
                     '-Site/' +
                     localeId +
                     '/__Analytics-Start'
-                var dwAnalytics = dw.__dwAnalytics.getTracker(activeDataUrl)
-                if (typeof dw.ac == 'undefined') {
-                    dwAnalytics.trackPageView()
+                var dwAnalytics = dw.__dwAnalytics?.getTracker(activeDataUrl)
+                if (typeof dw.ac === 'undefined') {
+                    dwAnalytics?.trackPageView()
                 } else {
                     try {
-                        if (typeof dw.ac._setSiteCurrency === 'function') {
-                            dw.ac._setSiteCurrency(currency)
-                        }
+                        dw.ac._setSiteCurrency?.(currency)
                     } catch (err) {
                         console.error(err)
                     }
