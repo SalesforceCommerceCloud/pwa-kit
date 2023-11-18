@@ -25,7 +25,7 @@ const useActiveData = () => {
                     dw.ac._scheduleDataSubmission?.()
                 }
             } catch (err) {
-                console.error(err)
+                console.warn('Active Data request failed')
             }
         },
         async sendViewSearch(searchParams, productSearchResult) {
@@ -39,7 +39,7 @@ const useActiveData = () => {
                     })
                 }
             } catch (err) {
-                console.error(err)
+                console.warn('Active Data request failed')
             }
         },
         async sendViewCategory(searchParams, category, productSearchResult) {
@@ -55,7 +55,7 @@ const useActiveData = () => {
                     })
                 }
             } catch (err) {
-                console.error(err)
+                console.warn('Active Data request failed')
             }
         },
         async trackPage(siteId, localeId, currency) {
@@ -74,12 +74,12 @@ const useActiveData = () => {
                     try {
                         dw.ac._setSiteCurrency?.(currency)
                     } catch (err) {
-                        console.error(err)
+                        console.warn('Active Data request failed')
                     }
                     dw.ac.setDWAnalytics(dwAnalytics)
                 }
             } catch (err) {
-                console.error(err)
+                console.warn('Active Data request failed')
             }
         }
     }
