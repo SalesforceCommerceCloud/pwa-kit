@@ -8,13 +8,14 @@
 import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const useActiveData = () => {
+    // Returns true when the feature flag is enabled and the tracking scripts have been executed
+    // This MUST be called before using the `dw` variable, otherwise a ReferenceError will be thrown
+    const canTrack = () => ACTIVE_DATA_ENABLED && typeof dw !== 'undefined'
     return {
         async sendViewProduct(category, product, type) {
-            if (!ACTIVE_DATA_ENABLED) {
-                return
-            }
+            if (!canTrack()) return
             try {
-                if (dw?.ac) {
+                if (dw.ac) {
                     if (category && category.id) {
                         dw.ac.applyContext({category: category.id})
                     }
@@ -30,11 +31,9 @@ const useActiveData = () => {
             }
         },
         async sendViewSearch(searchParams, productSearchResult) {
-            if (!ACTIVE_DATA_ENABLED) {
-                return
-            }
+            if (!canTrack()) return
             try {
-                if (dw?.ac) {
+                if (dw.ac) {
                     dw.ac.applyContext({searchData: searchParams})
                     if (dw.ac?._scheduleDataSubmission) {
                         dw.ac._scheduleDataSubmission()
@@ -48,11 +47,9 @@ const useActiveData = () => {
             }
         },
         async sendViewCategory(searchParams, category, productSearchResult) {
-            if (!ACTIVE_DATA_ENABLED) {
-                return
-            }
+            if (!canTrack()) return
             try {
-                if (dw?.ac) {
+                if (dw.ac) {
                     if (category && category.id) {
                         dw.ac.applyContext({category: category.id, searchData: searchParams})
                     }
@@ -68,12 +65,7 @@ const useActiveData = () => {
             }
         },
         async trackPage(siteId, localeId, currency) {
-            if (!ACTIVE_DATA_ENABLED) {
-                return
-            }
-            if (typeof dw === 'undefined') {
-                return
-            }
+            if (!canTrack()) return
             try {
                 var activeDataUrl =
                     '/mobify/proxy/ocapi/on/demandware.store/Sites-' +
