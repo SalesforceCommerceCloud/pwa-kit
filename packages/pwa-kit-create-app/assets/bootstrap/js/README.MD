@@ -1,4 +1,4 @@
-<h1>PWA Kit Generated App</h1>
+# PWA Kit Generated App
 
 Welcome to the PWA Kit!
 
@@ -22,6 +22,8 @@ This will open a browser and your storefront will be running on http://localhost
 ```
 npm run push -- -m "Message to help you recognize this bundle"
 ```
+
+**Note**: This command will push to the MRT project that matches the name field in `package.json`. To push to a different project, include the `-s` argument.
 
 **Important**: Access to the [Runtime Admin](https://runtime.commercecloud.com/) application is required to deploy bundles. To learn more, read our guide to [Push and Deploy Bundles](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html).
 
