@@ -376,7 +376,13 @@ const ProductView = forwardRef(
                                                 variant={id === 'color' ? 'circle' : 'square'}
                                                 value={selectedValue?.value}
                                                 displayName={selectedValue?.name || ''}
-                                                label={name}
+                                                label={intl.formatMessage(
+                                                    {
+                                                        defaultMessage: '{variantType}',
+                                                        id: 'product_view.label.variant_type'
+                                                    },
+                                                    {variantType: name}
+                                                )}
                                             >
                                                 {values.map(
                                                     ({href, name, image, value, orderable}) => (
