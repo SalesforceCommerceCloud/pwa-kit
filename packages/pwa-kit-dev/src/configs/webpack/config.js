@@ -158,7 +158,11 @@ const baseConfig = (target) => {
                               // bundle size is not super critical. Express generates this warning,
                               // because it uses dynamic require() calls, which cause Webpack to
                               // bundle the whole library.
-                              /Critical dependency: the request of a dependency is an expression/
+                              /Critical dependency: the request of a dependency is an expression/,
+                              // These can be ignored as we do typically want source maps to be loaded
+                              // for libraries being loaded, if they don't exist we don't want to see
+                              // the mess in the console.
+                              /Failed to parse source map/
                           ]
                       }
                     : {}),
