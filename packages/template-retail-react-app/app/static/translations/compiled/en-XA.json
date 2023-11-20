@@ -4907,14 +4907,44 @@
       "value": "]"
     }
   ],
-  "product_tile.assistive_msg.wishlist": [
+  "product_tile.assistive_msg.add_to_wishlist": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ẇīşħŀīşŧ"
+      "value": "Ȧḓḓ "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " ŧǿǿ ẇīşħŀīşŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_tile.assistive_msg.remove_from wishlist": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗḿǿǿṽḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " ƒřǿǿḿ ẇīşħŀīşŧ"
     },
     {
       "type": 0,

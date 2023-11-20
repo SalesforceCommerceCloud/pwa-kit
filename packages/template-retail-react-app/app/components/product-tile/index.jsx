@@ -135,10 +135,23 @@ const ProductTile = (props) => {
                     }}
                 >
                     <IconButtonWithRegistration
-                        aria-label={intl.formatMessage({
-                            id: 'product_tile.assistive_msg.wishlist',
-                            defaultMessage: 'Wishlist'
-                        })}
+                        aria-label={
+                            intl.isFavourite
+                                ? intl.formatMessage(
+                                      {
+                                          id: 'product_tile.assistive_msg.add_to_wishlist',
+                                          defaultMessage: 'Add {product} to wishlist'
+                                      },
+                                      {product: localizedProductName}
+                                  )
+                                : intl.formatMessage(
+                                      {
+                                          id: 'product_tile.assistive_msg.remove_from wishlist',
+                                          defaultMessage: 'Remove {product} from wishlist'
+                                      },
+                                      {product: localizedProductName}
+                                  )
+                        }
                         icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
                         {...styles.favIcon}
                         disabled={isFavouriteLoading}
@@ -190,7 +203,7 @@ ProductTile.propTypes = {
      */
     enableFavourite: PropTypes.bool,
     /**
-     * Display the product as a faviourite.
+     * Display the product as a favourite.
      */
     isFavourite: PropTypes.bool,
     /**

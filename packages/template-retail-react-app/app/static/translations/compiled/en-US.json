@@ -2291,10 +2291,32 @@
       "value": "sortOption"
     }
   ],
-  "product_tile.assistive_msg.wishlist": [
+  "product_tile.assistive_msg.add_to_wishlist": [
     {
       "type": 0,
-      "value": "Wishlist"
+      "value": "Add "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " to wishlist"
+    }
+  ],
+  "product_tile.assistive_msg.remove_from wishlist": [
+    {
+      "type": 0,
+      "value": "Remove "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " from wishlist"
     }
   ],
   "product_tile.label.starting_at_price": [

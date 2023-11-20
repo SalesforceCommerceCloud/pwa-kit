@@ -993,8 +993,11 @@
   "product_list.select.sort_by": {
     "defaultMessage": "Sort By: {sortOption}"
   },
-  "product_tile.assistive_msg.wishlist": {
-    "defaultMessage": "Wishlist"
+  "product_tile.assistive_msg.add_to_wishlist": {
+    "defaultMessage": "Add {product} to wishlist"
+  },
+  "product_tile.assistive_msg.remove_from wishlist": {
+    "defaultMessage": "Remove {product} from wishlist"
   },
   "product_tile.label.starting_at_price": {
     "defaultMessage": "Starting at {price}"
