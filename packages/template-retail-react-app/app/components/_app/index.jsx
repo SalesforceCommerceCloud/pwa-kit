@@ -268,6 +268,7 @@ const App = (props) => {
         const path = buildUrl('/account/wishlist')
         history.push(path)
     }
+
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
