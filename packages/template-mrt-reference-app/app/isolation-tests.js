@@ -6,16 +6,16 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const { LambdaClient, InvokeCommand } = require("@aws-sdk/client-lambda")
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3")
-const { CloudWatchLogsClient, PutLogEventsCommand } = require("@aws-sdk/client-cloudwatch-logs")
+const {LambdaClient, InvokeCommand} = require('@aws-sdk/client-lambda')
+const {S3Client, GetObjectCommand} = require('@aws-sdk/client-s3')
+const {CloudWatchLogsClient, PutLogEventsCommand} = require('@aws-sdk/client-cloudwatch-logs')
 
 export const isolationOriginLambdaTest = async (input) => {
     const client = new LambdaClient()
     try {
         await client.send(new InvokeCommand(input))
     } catch (e) {
-        if (e.name === "AccessDeniedException") {
+        if (e.name === 'AccessDeniedException') {
             return true
         }
         console.error(e)
@@ -24,12 +24,12 @@ export const isolationOriginLambdaTest = async (input) => {
     return false
 }
 
-const isolationS3Test = async (input) => {
-    const client = new S3Client({region: "us-east-1"})
+export const isolationS3Test = async (input) => {
+    const client = new S3Client({region: 'us-east-1'})
     try {
         await client.send(new GetObjectCommand(input))
     } catch (e) {
-        if (e.name === "AccessDenied") {
+        if (e.name === 'AccessDenied') {
             return true
         }
         console.error(e)
@@ -38,7 +38,7 @@ const isolationS3Test = async (input) => {
     return false
 }
 
-const isolationLogsTest = async (input) => {
+export const isolationLogsTest = async (input) => {
     const client = new CloudWatchLogsClient()
     try {
         const inputValues = {
@@ -46,13 +46,13 @@ const isolationLogsTest = async (input) => {
             logEvents: [
                 {
                     timestamp: Date.now(),
-                    message: "This is plastic"
+                    message: 'This is plastic'
                 }
             ]
         }
         await client.send(new PutLogEventsCommand(inputValues))
     } catch (e) {
-        if (e.name === "AccessDeniedException") {
+        if (e.name === 'AccessDeniedException') {
             return true
         }
         console.error(e)
@@ -63,17 +63,19 @@ const isolationLogsTest = async (input) => {
 
 export const executeIsolationTests = async (params) => {
     const tests = [
-        {name: "origin", keys: ["FunctionName"], fn: isolationOriginLambdaTest},
-        {name: "storage", keys: ["Bucket", "Key"], fn: isolationS3Test},
-        {name: "logs", keys: ["logGroupName", "logStreamName"], fn: isolationLogsTest},
+        {name: 'origin', keys: ['FunctionName'], fn: isolationOriginLambdaTest},
+        {name: 'storage', keys: ['Bucket', 'Key'], fn: isolationS3Test},
+        {name: 'logs', keys: ['logGroupName', 'logStreamName'], fn: isolationLogsTest}
     ]
     let results = {}
     for (const test of tests) {
         const {keys, fn, name} = test
-        const input = Object.keys(params).filter(key => keys.includes(key)).reduce((obj, key) => {
-            obj[key] = params[key]
-            return obj
-        }, {})
+        const input = Object.keys(params)
+            .filter((key) => keys.includes(key))
+            .reduce((obj, key) => {
+                obj[key] = params[key]
+                return obj
+            }, {})
         results[name] = await fn(input)
     }
     return results
