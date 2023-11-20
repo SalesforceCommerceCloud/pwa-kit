@@ -218,7 +218,7 @@ const main = async () => {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {}),
-                    ...({WEBPACK_INSPECT: inspect})
+                    ...{WEBPACK_INSPECT: inspect}
                 }
             })
         })
