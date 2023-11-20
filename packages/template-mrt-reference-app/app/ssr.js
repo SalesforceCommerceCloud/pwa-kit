@@ -46,6 +46,7 @@ const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
 const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
+const {isolationTests} = require('./isolation-tests')
 
 /**
  * Custom error class
@@ -249,6 +250,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/tls', tlsVersionTest)
     app.get('/cache', cacheTest)
     app.get('/cookie', cookieTest)
+    app.get('/isolation', isolationTests)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
