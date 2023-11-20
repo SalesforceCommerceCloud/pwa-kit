@@ -80,39 +80,48 @@ const ProductScroller = forwardRef(
                             ...scrollProps?.sx
                         }}
                     >
-                        {(isLoading ? [0, 1, 2, 4] : products).map((product, idx) => {
-                            return (
-                                <Box
-                                    key={product?.id || idx}
-                                    flex="0 0 auto"
-                                    width={itemWidth}
-                                    style={{scrollSnapAlign: 'start'}}
-                                >
-                                    {isLoading ? (
-                                        <Stack data-testid="product-scroller-item-skeleton">
-                                            <AspectRatio ratio={1}>
-                                                <Skeleton />
-                                            </AspectRatio>
-                                            <Stack spacing={2}>
-                                                <Skeleton width="150px" height={5} />
-                                                <Skeleton width="75px" height={5} />
-                                            </Stack>
-                                        </Stack>
-                                    ) : (
-                                        <ProductTile
-                                            data-testid="product-scroller-item"
-                                            product={product}
-                                            {...(typeof productTileProps === 'function'
-                                                ? {...productTileProps(product)}
-                                                : {...productTileProps})}
-                                            dynamicImageProps={{
-                                                widths: ['70vw', '70vw', '40vw', '30vw']
-                                            }}
-                                        />
-                                    )}
-                                </Box>
-                            )
-                        })}
+                        {isLoading
+                            ? [0, 1, 2, 4].map((key) => {
+                                  return (
+                                      <Box
+                                          key={key}
+                                          flex="0 0 auto"
+                                          width={itemWidth}
+                                          style={{scrollSnapAlign: 'start'}}
+                                      >
+                                          <Stack data-testid="product-scroller-item-skeleton">
+                                              <AspectRatio ratio={1}>
+                                                  <Skeleton />
+                                              </AspectRatio>
+                                              <Stack spacing={2}>
+                                                  <Skeleton width="150px" height={5} />
+                                                  <Skeleton width="75px" height={5} />
+                                              </Stack>
+                                          </Stack>
+                                      </Box>
+                                  )
+                              })
+                            : products.map((product, idx) => {
+                                  return (
+                                      <Box
+                                          key={product?.id || idx}
+                                          flex="0 0 auto"
+                                          width={itemWidth}
+                                          style={{scrollSnapAlign: 'start'}}
+                                      >
+                                          <ProductTile
+                                              data-testid="product-scroller-item"
+                                              product={product}
+                                              {...(typeof productTileProps === 'function'
+                                                  ? {...productTileProps(product)}
+                                                  : {...productTileProps})}
+                                              dynamicImageProps={{
+                                                  widths: ['70vw', '70vw', '40vw', '30vw']
+                                              }}
+                                          />
+                                      </Box>
+                                  )
+                              })}
                     </Stack>
                 </Stack>
 
