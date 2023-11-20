@@ -116,7 +116,7 @@ const ProductScroller = forwardRef(
                     </Stack>
                 </Stack>
 
-                {products?.length > 3 && (
+                {!isLoading && products?.length > 3 && (
                     <>
                         <Box
                             display={{
