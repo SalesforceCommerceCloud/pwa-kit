@@ -4942,7 +4942,11 @@
     },
     {
       "type": 0,
-      "value": "Şŧȧȧřŧīƞɠ ȧȧŧ"
+      "value": "Şŧȧȧřŧīƞɠ ȧȧŧ "
+    },
+    {
+      "type": 1,
+      "value": "price"
     },
     {
       "type": 0,
@@ -5041,6 +5045,20 @@
     {
       "type": 0,
       "value": "Şŧȧȧřŧīƞɠ ȧȧŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.label.variant_type": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 1,
+      "value": "variantType"
     },
     {
       "type": 0,

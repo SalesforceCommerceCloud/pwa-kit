@@ -2306,7 +2306,11 @@
   "product_tile.label.starting_at_price": [
     {
       "type": 0,
-      "value": "Starting at"
+      "value": "Starting at "
+    },
+    {
+      "type": 1,
+      "value": "price"
     }
   ],
   "product_view.button.add_set_to_cart": [
@@ -2349,6 +2353,12 @@
     {
       "type": 0,
       "value": "Starting at"
+    }
+  ],
+  "product_view.label.variant_type": [
+    {
+      "type": 1,
+      "value": "variantType"
     }
   ],
   "product_view.link.full_details": [
