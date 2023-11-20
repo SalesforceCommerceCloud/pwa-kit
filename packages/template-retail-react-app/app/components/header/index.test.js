@@ -65,7 +65,7 @@ test('renders Header', async () => {
         const menu = document.querySelector('button[aria-label="Menu"]')
         const logo = document.querySelector('button[aria-label="Logo"]')
         const account = document.querySelector('svg[aria-label="My account"]')
-        const cart = document.querySelector('button[aria-label="My cart"]')
+        const cart = document.querySelector('button[aria-label="My cart, number of items: 0"]')
         const wishlist = document.querySelector('button[aria-label="Wishlist"]')
         const searchInput = document.querySelector('input[type="search"]')
         expect(menu).toBeInTheDocument()
@@ -94,7 +94,7 @@ test('renders Header with event handlers', async () => {
         const menu = document.querySelector('button[aria-label="Menu"]')
         const logo = document.querySelector('button[aria-label="Logo"]')
         const account = document.querySelector('svg[aria-label="My account"]')
-        const cart = document.querySelector('button[aria-label="My cart"]')
+        const cart = document.querySelector('button[aria-label="My cart, number of items: 0"]')
         expect(menu).toBeInTheDocument()
         fireEvent.click(menu)
         expect(onMenuClick).toHaveBeenCalledTimes(1)
@@ -124,8 +124,13 @@ test.each(testBaskets)(
         renderWithProviders(<Header />)
 
         await waitFor(() => {
-            // Look for badge.
-            const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
+            const cart = document.querySelector('button[aria-label="My cart, number of items: 0"]')
+            const badge = document.querySelector(
+                'button[aria-label="My cart, number of items: 0"] .chakra-badge'
+            )
+
+            // Cart icon should exist but with no badge
+            expect(cart).toBeInTheDocument()
             expect(badge).not.toBeInTheDocument()
         })
     }
@@ -136,7 +141,9 @@ test('renders cart badge when basket is loaded', async () => {
 
     await waitFor(() => {
         // Look for badge.
-        const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
+        const badge = document.querySelector(
+            'button[aria-label="My cart, number of items: 2"] .chakra-badge'
+        )
         expect(badge).toBeInTheDocument()
     })
 })

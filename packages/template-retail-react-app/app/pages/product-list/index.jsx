@@ -371,8 +371,8 @@ const ProductList = (props) => {
             {...rest}
         >
             <Helmet>
-                <title>{category?.pageTitle}</title>
-                <meta name="description" content={category?.pageDescription} />
+                <title>{category?.pageTitle ?? searchQuery}</title>
+                <meta name="description" content={category?.pageDescription ?? searchQuery} />
                 <meta name="keywords" content={category?.pageKeywords} />
             </Helmet>
             {showNoResults ? (
@@ -702,7 +702,16 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const history = useHistory()
 
     return (
-        <FormControl data-testid="sf-product-list-sort" id="page_sort" width="auto" {...otherProps}>
+        <FormControl
+            aria-label={intl.formatMessage({
+                id: 'product_list.drawer.title.sort_by',
+                defaultMessage: 'Sort By'
+            })}
+            data-testid="sf-product-list-sort"
+            id="page_sort"
+            width="auto"
+            {...otherProps}
+        >
             <Select
                 value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
                 onChange={({target}) => {
