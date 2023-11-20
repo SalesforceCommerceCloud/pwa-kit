@@ -32,5 +32,25 @@ module.exports = {
                 ]
             }
         ]
-    }
+    },
+    // For an import in a file to be replaced via template extensibility, the import must use the
+    // full package name, rather than relative imports, i.e. all retail react app imports must use
+    // "@salesforce/retail-react-app/" rather than relative imports.
+    overrides: [
+        {
+            files: ['packages/template-retail-react-app/**'],
+            plugins: ['no-relative-import-paths'],
+            rules: {
+                // https://github.com/MelvinVermeer/eslint-plugin-no-relative-import-paths
+                'no-relative-import-paths/no-relative-import-paths': [
+                    'error',
+                    {
+                        allowSameFolder: false,
+                        rootDir: 'packages/template-retail-react-app',
+                        prefix: '@salesforce/retail-react-app'
+                    }
+                ]
+            }
+        }
+    ]
 }
