@@ -114,6 +114,12 @@ const Header = ({
             if (!hasEnterPopoverContent.current) onClose()
         }, 100)
     }
+
+    const placeholder = intl.formatMessage({
+        id: 'header.field.placeholder.search_for_products',
+        defaultMessage: 'Search for products...'
+    })
+
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
@@ -143,10 +149,8 @@ const Header = ({
                     <Box {...styles.bodyContainer}>{children}</Box>
                     <Box {...styles.searchContainer}>
                         <Search
-                            placeholder={intl.formatMessage({
-                                id: 'header.field.placeholder.search_for_products',
-                                defaultMessage: 'Search for products...'
-                            })}
+                            aria-label={placeholder}
+                            placeholder={placeholder}
                             {...styles.search}
                         />
                     </Box>

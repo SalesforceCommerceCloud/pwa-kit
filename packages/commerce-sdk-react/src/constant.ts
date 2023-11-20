@@ -9,7 +9,7 @@
  * This list contains domains that can host code in iframe
  */
 export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
-    'runtime.commercecloud.com',
-    'runtime-admin-staging.mobify-storefront.com',
-    'runtime-admin-preview.mobify-storefront.com'
+    'https://runtime.commercecloud.com',
+    'https://runtime-admin-staging.mobify-storefront.com',
+    'https://runtime-admin-preview.mobify-storefront.com'
 ])
