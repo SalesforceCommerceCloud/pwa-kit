@@ -25,8 +25,6 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     const anotherSite = siteId === defaultSiteId ? 'RefArch' : defaultSiteId
     const anotherLocale = locale === defaultLocale ? 'en-CA' : defaultLocale
     return (
-        // @ts-expect-error: Types of property 'key' are incompatible.
-        // Possible conflicting types due to duplicate @types/react installs
         <CommerceApiProvider
             siteId={siteId}
             shortCode="8o7m175y"
