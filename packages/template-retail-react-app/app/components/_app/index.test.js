@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable no-import-assign */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
@@ -15,18 +16,22 @@ import {DEFAULT_LOCALE} from '@salesforce/retail-react-app/app/utils/test-utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import * as constants from '@salesforce/retail-react-app/app/constants'
 
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 
 let windowSpy
+let originalValue
 beforeAll(() => {
     jest.spyOn(console, 'log').mockImplementation(jest.fn())
     jest.spyOn(console, 'groupCollapsed').mockImplementation(jest.fn())
+    originalValue = constants.ACTIVE_DATA_ENABLED
 })
 
 afterAll(() => {
     console.log.mockRestore()
     console.groupCollapsed.mockRestore()
+    constants.ACTIVE_DATA_ENABLED = originalValue
 })
 beforeEach(() => {
     windowSpy = jest.spyOn(window, 'window', 'get')
@@ -64,6 +69,36 @@ describe('App', () => {
             </App>
         )
         expect(screen.getByRole('main')).toBeInTheDocument()
+        expect(screen.getByText('Any children here')).toBeInTheDocument()
+    })
+
+    test('Active Data component is not rendered', async () => {
+        constants.ACTIVE_DATA_ENABLED = false
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        renderWithProviders(
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                <p>Any children here</p>
+            </App>
+        )
+        await waitFor(() =>
+            expect(document.getElementById('headActiveData')).not.toBeInTheDocument()
+        )
+        await waitFor(() => expect(document.getElementById('dwanalytics')).not.toBeInTheDocument())
+        await waitFor(() => expect(document.getElementById('dwac')).not.toBeInTheDocument())
+        expect(screen.getByText('Any children here')).toBeInTheDocument()
+    })
+
+    test('Active Data component is rendered appropriately', async () => {
+        constants.ACTIVE_DATA_ENABLED = true
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        renderWithProviders(
+            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                <p>Any children here</p>
+            </App>
+        )
+        await waitFor(() => expect(document.getElementById('headActiveData')).toBeInTheDocument())
+        await waitFor(() => expect(document.getElementById('dwanalytics')).toBeInTheDocument())
+        await waitFor(() => expect(document.getElementById('dwac')).toBeInTheDocument())
         expect(screen.getByText('Any children here')).toBeInTheDocument()
     })
 
