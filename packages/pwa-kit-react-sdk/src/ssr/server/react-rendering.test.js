@@ -18,9 +18,28 @@ import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
+import {getLocationSearch} from './react-rendering'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {getAppConfig} from '../universal/compatibility'
 
+const mockConfig = {
+    externals: [],
+    pageNotFoundURL: '/page-not-found',
+    ssrEnabled: true,
+    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+    ssrShared: [
+        'static/ico/favicon.ico',
+        'static/robots.txt',
+        '**/*.js',
+        '**/*.js.map',
+        '**/*.json'
+    ],
+    ssrParameters: {
+        ssrFunctionNodeVersion: '18.x',
+        proxyConfigs: [[Object], [Object]]
+    }
+}
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
     const defaults = {
@@ -38,6 +57,15 @@ const opts = (overrides = {}) => {
         ...overrides
     }
 }
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+
+    return {
+        ...actual,
+        getConfig: jest.fn(() => mockConfig)
+    }
+})
 
 jest.mock('../universal/compatibility', () => {
     const AppConfig = jest.requireActual('../universal/components/_app-config').default
@@ -733,5 +761,47 @@ describe('The Node SSR Environment', () => {
                 expectations(res)
             })
         })
+    })
+})
+
+describe.only('getLocationSearch', function () {
+    test('interprets + sign as space when interpretsPlusSignAsSpace is set to true in config', () => {
+        getConfig.mockImplementation(() => ({
+            app: {
+                url: {
+                    interpretPlusSignAsSpace: true
+                }
+            },
+            ...mockConfig
+        }))
+        const req = {
+            originalUrl: '/hello-word?q=mens+shirt%20dresses',
+            query: {
+                q: 'mens+shirt%20dresses'
+            }
+        }
+
+        const output = getLocationSearch(req)
+        // we called URLSearchParam.toString for the output, any encoded/not encoded space will replace + with interpretsPlusSignAsSpace is true
+        expect(output).toEqual('?q=mens+shirt+dresses')
+    })
+    test('not interpret + sign as space when interpretsPlusSignAsSpace is set to false in config', () => {
+        getConfig.mockImplementation(() => ({
+            app: {
+                url: {
+                    interpretPlusSignAsSpace: false
+                }
+            },
+            ...mockConfig
+        }))
+        const req = {
+            originalUrl: '/hello-word?q=mens+shirt',
+            query: {
+                q: 'mens+shirt'
+            }
+        }
+        // we called URLSearchParam.toString for the output, with interpretsPlusSignAsSpace is false, it will encode literally + to %2B
+        const output = getLocationSearch(req)
+        expect(output).toEqual('?q=mens%2Bshirt')
     })
 })
