@@ -102,7 +102,7 @@ const getLocationSearch = (req) => {
         })
     })
 
-    const searchString = new URLSearchParams(newParams).toString()
+    const searchString = newParams.toString()
     // Update the location objects reference.
     return searchString ? `?${searchString}` : ''
 }
