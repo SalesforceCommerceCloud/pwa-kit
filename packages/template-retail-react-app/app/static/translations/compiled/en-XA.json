@@ -1551,6 +1551,24 @@
       "value": "]"
     }
   ],
+  "checkout_header.link.assistive_msg.cart": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɓȧȧƈķ ŧǿǿ ƈȧȧřŧ, ƞŭŭḿƀḗḗř ǿǿƒ īŧḗḗḿş: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "checkout_header.link.cart": [
     {
       "type": 0,
