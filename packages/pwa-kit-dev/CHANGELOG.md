@@ -1,7 +1,7 @@
 ## v3.3.0-dev (Nov 03, 2023)
 
 - Add `source-map-loader` plugin to webpack configuration. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
-- Only use source maps in server when `inpect` flag is being used. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
+- Only use source maps in server when `inspect` flag is being used. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
 
 ## v3.2.0 (Nov 03, 2023)
 ## v3.1.1 (Sep 21, 2023)
