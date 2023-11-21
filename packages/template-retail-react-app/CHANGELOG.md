@@ -2,6 +2,7 @@
 - (A11y) Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
 - (A11y) Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
 - (A11y) Fix improper nesting of elements in product tile [#1541](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1541)
+- Fix the issue with + character in search query [#1557](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1557)
 
 ## v2.1.0 (Nov 3, 2023)
 

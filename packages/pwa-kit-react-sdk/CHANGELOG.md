@@ -1,4 +1,7 @@
 ## v3.3.0-dev (Nov 03, 2023)
+
+- Fix the issue with + character in search query [#1557](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1557)
+
 ## v3.2.0 (Nov 03, 2023)
 
 ## v3.1.1 (Sep 21, 2023)
