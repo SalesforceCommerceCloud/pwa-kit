@@ -76,9 +76,7 @@ const logAndFormatError = (err) => {
 // search string using the `query` property. We pay special attention to the order the params
 // as best as we can.
 const getLocationSearch = (req) => {
-    const {
-        app: {preservePlusSignAsSpace}
-    } = getConfig()
+    const {app} = getConfig()
     const [_, search] = req.originalUrl.split('?')
     const params = new URLSearchParams(search)
 
@@ -97,7 +95,7 @@ const getLocationSearch = (req) => {
             // Therefore, we create a flag for it via the app configuration
             newParams.append(
                 key,
-                preservePlusSignAsSpace ? decodeURIComponent(v).replace(/\+/, ' ') : v
+                app.url.interpretPlusSignAsSpace ? decodeURIComponent(v).replace(/\+/, ' ') : v
             )
         })
     })

@@ -12,7 +12,8 @@ module.exports = {
         url: {
             site: 'path',
             locale: 'path',
-            showDefaults: true
+            showDefaults: true,
+            interpretPlusSignAsSpace: false
         },
         defaultSite: 'RefArchGlobal',
         siteAliases: {
@@ -35,8 +36,7 @@ module.exports = {
             // This differs from the siteId in commerceAPIConfig for testing purposes
             siteId: 'aaij-MobileFirst',
             isProduction: false
-        },
-        preservePlusSignAsSpace: false
+        }
     },
     externals: [],
     pageNotFoundURL: '/page-not-found',
