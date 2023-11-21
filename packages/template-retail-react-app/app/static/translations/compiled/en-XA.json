@@ -1973,6 +1973,20 @@
       "value": "]"
     }
   ],
+  "credit_card_fields.tool_tip.security_code_aria_label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗƈŭŭřīŧẏ ƈǿǿḓḗḗ īƞƒǿǿ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
