@@ -76,6 +76,9 @@ const logAndFormatError = (err) => {
 // search string using the `query` property. We pay special attention to the order the params
 // as best as we can.
 const getLocationSearch = (req) => {
+    const {
+        app: {preservePlusSignAsSpace}
+    } = getConfig()
     const [_, search] = req.originalUrl.split('?')
     const params = new URLSearchParams(search)
 
@@ -89,11 +92,13 @@ const getLocationSearch = (req) => {
         const values = Array.isArray(value) ? value : [value]
 
         values.forEach((v) => {
-            // Because URLSearchParams constructor perceives + as space, but append does not
-            // we want to make sure we run the key-value through new URLSearchParams constructor to parse + as space
-            // before we append it to newParams
-            const temp = new URLSearchParams(`${key}=${v}`)
-            newParams.append(key, temp.get(key))
+            // To have feature parity to SFRA, the + sign can be treated as space
+            // However, this could potential a breaking change since not all users want to treat it as such
+            // Therefore, we create a flag for it via the app configuration
+            newParams.append(
+                key,
+                preservePlusSignAsSpace ? decodeURIComponent(v).replace(/\+/, ' ') : v
+            )
         })
     })
 
