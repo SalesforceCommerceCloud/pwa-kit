@@ -7,6 +7,7 @@
 import React from 'react'
 import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components/product-tile/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {fireEvent} from '@testing-library/react'
 
 const mockProductSearchItem = {
     currency: 'USD',
@@ -93,4 +94,15 @@ test('Product set - renders the appropriate price label', async () => {
 
     const container = getByTestId('product-tile-price')
     expect(container).toHaveTextContent(/starting at/i)
+})
+
+test('Remove from wishlist cannot be muti-clicked', () => {
+    const onClick = jest.fn()
+
+    const {getByTestId} = renderWithProviders(<ProductTile product={mockProductSet} enableFavourite={true} onFavouriteToggle={onClick} />)
+    const wishlistButton = getByTestId('wishlist-button')
+
+    fireEvent.click(wishlistButton)
+    fireEvent.click(wishlistButton)
+    expect(onClick).toHaveBeenCalledTimes(1)
 })
