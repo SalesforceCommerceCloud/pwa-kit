@@ -25,6 +25,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useVariant} from '@salesforce/retail-react-app/app/hooks'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
@@ -51,6 +52,7 @@ const ProductDetail = () => {
     const history = useHistory()
     const location = useLocation()
     const einstein = useEinstein()
+    const activeData = useActiveData()
     const toast = useToast()
     const navigate = useNavigation()
     const [productSetSelection, setProductSetSelection] = useState({})
@@ -272,10 +274,20 @@ const ProductDetail = () => {
             einstein.sendViewProduct(product)
             const childrenProducts = product.setProducts
             childrenProducts.map((child) => {
-                einstein.sendViewProduct(child)
+                try {
+                    einstein.sendViewProduct(child)
+                } catch (err) {
+                    console.error(err)
+                }
+                activeData.sendViewProduct(category, child, 'detail')
             })
         } else if (product) {
-            einstein.sendViewProduct(product)
+            try {
+                einstein.sendViewProduct(product)
+            } catch (err) {
+                console.error(err)
+            }
+            activeData.sendViewProduct(category, product, 'detail')
         }
     }, [product])
 
