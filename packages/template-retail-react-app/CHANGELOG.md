@@ -1,14 +1,19 @@
 ## v2.2.0-dev (Nov 3, 2023)
 
-- (A11y) Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
-- (A11y) Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
-- Implement gift option for basket [#1546]https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546
-- (A11y) Ensure all interactive functionality is operable with the keyboard [#1546]https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546
-- (A11y) Fix improper nesting of elements in product tile [#1541](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1541)
+### Accessibility improvements
+
+<!-- Order by Pull Request ID! -->
+- Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
+- Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
+- Fix outline on keyboard focus [#1536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1536/files)
+- Fix improper nesting of elements in product tile [#1541](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1541)
+- Implement gift option for basket [#1546]<https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546>
+- Ensure all interactive functionality is operable with the keyboard [#1546]<https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546>
+- Improve accessibility of quantity picker [#1552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1552)
 
 ## v2.1.0 (Nov 3, 2023)
 
-- Support Storefront Preview 
+- Support Storefront Preview
   - [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
   - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
 - Show discounted and strikethrough prices when there is a promotion on product detail page [1455](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1455)
