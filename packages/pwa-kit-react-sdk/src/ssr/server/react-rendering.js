@@ -78,6 +78,7 @@ const logAndFormatError = (err) => {
 const getLocationSearch = (req) => {
     const [_, search] = req.originalUrl.split('?')
     const params = new URLSearchParams(search)
+
     const newParams = new URLSearchParams()
     const orderedKeys = [...new Set(params.keys())]
 
@@ -88,11 +89,15 @@ const getLocationSearch = (req) => {
         const values = Array.isArray(value) ? value : [value]
 
         values.forEach((v) => {
-            newParams.append(key, v)
+            // Because URLSearchParams constructor perceives + as space, but append does not
+            // we want to make sure we run the key-value through new URLSearchParams constructor to parse + as space
+            // before we append it to newParams
+            const temp = new URLSearchParams(`${key}=${v}`)
+            newParams.append(key, temp.get(key))
         })
     })
-    const searchString = newParams.toString()
 
+    const searchString = new URLSearchParams(newParams).toString()
     // Update the location objects reference.
     return searchString ? `?${searchString}` : ''
 }
@@ -118,6 +123,7 @@ export const render = async (req, res, next) => {
     const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname] = req.originalUrl.split('?')
+
     const location = {
         pathname,
         search: getLocationSearch(req)

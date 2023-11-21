@@ -68,7 +68,6 @@ import {
     useSearchParams
 } from '@salesforce/retail-react-app/app/hooks'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-// import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 
 // Others
@@ -504,7 +503,7 @@ const ProductList = (props) => {
                                           .map((value, index) => (
                                               <ProductTileSkeleton key={index} />
                                           ))
-                                    : productSearchResult.hits.map((productSearchItem) => {
+                                    : productSearchResult?.hits.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
                                           const isInWishlist =
                                               !!wishlist?.customerProductListItems?.find(
