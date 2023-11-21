@@ -74,6 +74,7 @@ const ProductScroller = forwardRef(
                         wrap="nowrap"
                         overflowX="scroll"
                         px={{base: 4, md: 8, lg: 0}}
+                        py={1}
                         {...scrollProps}
                         sx={{
                             scrollPadding: {base: 16, md: 32, lg: 0},
