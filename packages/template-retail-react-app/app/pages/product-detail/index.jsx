@@ -190,7 +190,10 @@ const ProductDetail = () => {
                                 // with Chakra Toast, since the ToastManager is rendered via portal
                                 // and the toast doesn't have access to intl provider, which is a
                                 // requirement of the Link component.
-                                <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                                <Button
+                                    variant="link"
+                                    onClick={() => navigate('/account/wishlist')}
+                                >
                                     {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
                                 </Button>
                             )

@@ -99,7 +99,9 @@ test('Product set - renders the appropriate price label', async () => {
 test('Remove from wishlist cannot be muti-clicked', () => {
     const onClick = jest.fn()
 
-    const {getByTestId} = renderWithProviders(<ProductTile product={mockProductSet} enableFavourite={true} onFavouriteToggle={onClick} />)
+    const {getByTestId} = renderWithProviders(
+        <ProductTile product={mockProductSet} enableFavourite={true} onFavouriteToggle={onClick} />
+    )
     const wishlistButton = getByTestId('wishlist-button')
 
     fireEvent.click(wishlistButton)
