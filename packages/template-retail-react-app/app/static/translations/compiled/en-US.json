@@ -761,6 +761,16 @@
       "value": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
     }
   ],
+  "checkout_header.link.assistive_msg.cart": [
+    {
+      "type": 0,
+      "value": "Back to cart, number of items: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
+    }
+  ],
   "checkout_header.link.cart": [
     {
       "type": 0,

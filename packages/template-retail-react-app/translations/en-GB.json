@@ -292,6 +292,9 @@
   "checkout_footer.message.copyright": {
     "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
   },
+  "checkout_header.link.assistive_msg.cart": {
+    "defaultMessage": "Back to cart, number of items: {numItems}"
+  },
   "checkout_header.link.cart": {
     "defaultMessage": "Back to cart"
   },
