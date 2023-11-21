@@ -461,12 +461,6 @@
       "value": "This is a gift."
     }
   ],
-  "cart_secondary_button_group.link_learn_more": [
-    {
-      "type": 0,
-      "value": "Learn More"
-    }
-  ],
   "cart_skeleton.heading.order_summary": [
     {
       "type": 0,
@@ -765,6 +759,16 @@
     {
       "type": 0,
       "value": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+    }
+  ],
+  "checkout_header.link.assistive_msg.cart": [
+    {
+      "type": 0,
+      "value": "Back to cart, number of items: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
     }
   ],
   "checkout_header.link.cart": [

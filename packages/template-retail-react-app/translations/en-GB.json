@@ -186,9 +186,6 @@
   "cart_secondary_button_group.label.this_is_gift": {
     "defaultMessage": "This is a gift."
   },
-  "cart_secondary_button_group.link_learn_more": {
-    "defaultMessage": "Learn More"
-  },
   "cart_skeleton.heading.order_summary": {
     "defaultMessage": "Order Summary"
   },
@@ -294,6 +291,9 @@
   },
   "checkout_footer.message.copyright": {
     "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+  },
+  "checkout_header.link.assistive_msg.cart": {
+    "defaultMessage": "Back to cart, number of items: {numItems}"
   },
   "checkout_header.link.cart": {
     "defaultMessage": "Back to cart"

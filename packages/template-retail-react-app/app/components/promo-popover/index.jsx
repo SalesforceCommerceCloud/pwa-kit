@@ -56,25 +56,23 @@ const PromoPopover = ({header, children, ...props}) => {
                         })}
                     />
                 </PopoverTrigger>
-                <Portal>
-                    <PopoverContent border="none" borderRadius="base">
-                        <Box boxShadow="lg" zIndex="-1">
-                            <PopoverArrow />
-                            <PopoverCloseButton />
-                            <PopoverHeader borderBottom="none">
-                                {header || (
-                                    <Text fontWeight="bold" fontSize="md">
-                                        <FormattedMessage
-                                            defaultMessage="Promotions Applied"
-                                            id="promo_popover.heading.promo_applied"
-                                        />
-                                    </Text>
-                                )}
-                            </PopoverHeader>
-                            <PopoverBody pt={0}>{children}</PopoverBody>
-                        </Box>
-                    </PopoverContent>
-                </Portal>
+                <PopoverContent border="none" borderRadius="base">
+                    <Box boxShadow="lg">
+                        <PopoverArrow />
+                        <PopoverCloseButton />
+                        <PopoverHeader borderBottom="none">
+                            {header || (
+                                <Text fontWeight="bold" fontSize="md">
+                                    <FormattedMessage
+                                        defaultMessage="Promotions Applied"
+                                        id="promo_popover.heading.promo_applied"
+                                    />
+                                </Text>
+                            )}
+                        </PopoverHeader>
+                        <PopoverBody pt={0}>{children}</PopoverBody>
+                    </Box>
+                </PopoverContent>
             </Popover>
         </Box>
     )
