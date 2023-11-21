@@ -2,6 +2,7 @@
 
 - (A11y) Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
 - (A11y) Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
+- Implement gif option for basket [#1546]https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546
 - (A11y) Ensure all interactive functionality is operable with the keyboard [#1546]https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546
 - (A11y) Fix improper nesting of elements in product tile [#1541](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1541)
 
