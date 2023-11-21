@@ -4995,7 +4995,7 @@
       "value": "]"
     }
   ],
-  "product_view.label.aria.quantity_decrement": [
+  "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,
       "value": "["
@@ -5009,7 +5009,7 @@
       "value": "]"
     }
   ],
-  "product_view.label.aria.quantity_increment": [
+  "product_view.label.assistive_msg.quantity_increment": [
     {
       "type": 0,
       "value": "["

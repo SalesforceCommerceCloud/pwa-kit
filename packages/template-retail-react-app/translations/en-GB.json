@@ -1011,10 +1011,10 @@
   "product_view.button.update": {
     "defaultMessage": "Update"
   },
-  "product_view.label.aria.quantity_decrement": {
+  "product_view.label.assistive_msg.quantity_decrement": {
     "defaultMessage": "Decrement Quantity"
   },
-  "product_view.label.aria.quantity_increment": {
+  "product_view.label.assistive_msg.quantity_increment": {
     "defaultMessage": "Increment Quantity"
   },
   "product_view.label.quantity": {

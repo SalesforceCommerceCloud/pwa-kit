@@ -49,14 +49,14 @@ const QuantityPicker = (props) => {
         variant: 'outline',
         'aria-label': intl.formatMessage({
             defaultMessage: 'Increment Quantity',
-            id: 'product_view.label.aria.quantity_increment'
+            id: 'product_view.label.assistive_msg.quantity_increment'
         })
     })
     const dec = getDecrementButtonProps({
         variant: 'outline',
         'aria-label': intl.formatMessage({
             defaultMessage: 'Decrement Quantity',
-            id: 'product_view.label.aria.quantity_decrement'
+            id: 'product_view.label.assistive_msg.quantity_decrement'
         })
     })
     const input = getInputProps({
