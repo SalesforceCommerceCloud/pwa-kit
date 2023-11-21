@@ -33,7 +33,7 @@ const production = 'production'
 const development = 'development'
 const analyzeBundle = process.env.MOBIFY_ANALYZE === 'true'
 const mode = process.env.NODE_ENV === production ? production : development
-const INSPECT = process.execArgv.some(arg => /^--inspect(?:-brk)?(?:$|=)/.test(arg))
+const INSPECT = process.execArgv.some((arg) => /^--inspect(?:-brk)?(?:$|=)/.test(arg))
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
