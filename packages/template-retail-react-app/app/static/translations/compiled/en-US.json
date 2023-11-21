@@ -461,12 +461,6 @@
       "value": "This is a gift."
     }
   ],
-  "cart_secondary_button_group.link_learn_more": [
-    {
-      "type": 0,
-      "value": "Learn More"
-    }
-  ],
   "cart_skeleton.heading.order_summary": [
     {
       "type": 0,
