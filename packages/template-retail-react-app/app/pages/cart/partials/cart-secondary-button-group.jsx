@@ -116,7 +116,7 @@ const CartSecondaryButtonGroup = ({
                             id="cart_secondary_button_group.label.this_is_gift"
                         />
                     </Checkbox>
-                    {/* Uncomment if you want to provide a link to your gift site*/}
+                    {/* if you want to provide a link to your gift site, uncomment this section and re-build your translation*/}
                     {/*<Box marginLeft={1}>*/}
                     {/*    <Button marginLeft={1} variant="link" size="sm" href="#">*/}
                     {/*        <FormattedMessage*/}
