@@ -95,7 +95,7 @@ const getLocationSearch = (req) => {
             // Therefore, we create a flag for it via the app configuration
             newParams.append(
                 key,
-                app.url.interpretPlusSignAsSpace ? decodeURIComponent(v).replace(/\+/, ' ') : v
+                app?.url?.interpretPlusSignAsSpace ? decodeURIComponent(v).replace(/\+/, ' ') : v
             )
         })
     })
@@ -119,6 +119,7 @@ export const render = async (req, res, next) => {
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
+    console.log('config', config)
 
     AppConfig.restore(res.locals)
 
