@@ -186,9 +186,6 @@
   "cart_secondary_button_group.label.this_is_gift": {
     "defaultMessage": "This is a gift."
   },
-  "cart_secondary_button_group.link_learn_more": {
-    "defaultMessage": "Learn More"
-  },
   "cart_skeleton.heading.order_summary": {
     "defaultMessage": "Order Summary"
   },
