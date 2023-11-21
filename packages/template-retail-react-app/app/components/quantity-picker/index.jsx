@@ -92,10 +92,9 @@ const QuantityPicker = (props) => {
     return (
         <HStack>
             <Button data-testid="quantity-decrement" {...dec}>
-                {/* "-" is "hyphen", but we want "minus" */}
                 <FormattedMessage
                     id="product_view.label.quantity_decrement"
-                    defaultMessage="&minus;"
+                    defaultMessage={'\u2212'} // HTML &minus;
                 />
             </Button>
             <Input {...input} />

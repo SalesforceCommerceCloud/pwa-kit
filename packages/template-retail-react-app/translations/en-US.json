@@ -1024,7 +1024,7 @@
     "defaultMessage": "Quantity"
   },
   "product_view.label.quantity_decrement": {
-    "defaultMessage": "&minus;"
+    "defaultMessage": "−"
   },
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"

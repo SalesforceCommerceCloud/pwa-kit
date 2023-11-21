@@ -2362,7 +2362,7 @@
   "product_view.label.quantity_decrement": [
     {
       "type": 0,
-      "value": "&minus;"
+      "value": "−"
     }
   ],
   "product_view.label.quantity_increment": [
