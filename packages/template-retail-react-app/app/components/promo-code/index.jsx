@@ -118,6 +118,7 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
                             justifyContent="flex-start"
                             variant="link"
                             fontSize="sm"
+                            color="blue.700"
                             rightIcon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                             onClick={() => form.reset()}
                         >
