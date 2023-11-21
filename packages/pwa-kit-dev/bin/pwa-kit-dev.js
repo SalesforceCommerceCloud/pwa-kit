@@ -251,8 +251,7 @@ const main = async () => {
             execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
                 env: {
                     ...process.env,
-                    ...(noHMR ? {HMR: 'false'} : {}),
-                    ...{WEBPACK_INSPECT: inspect}
+                    ...(noHMR ? {HMR: 'false'} : {})
                 }
             })
         })
