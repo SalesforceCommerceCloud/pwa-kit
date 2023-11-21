@@ -15,6 +15,10 @@
 
 - Implement gift option for basket [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
 
+### Bug Fixes
+
+- Remove internal linter rule that is missing in generated projects [#1554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1554)
+
 ## v2.1.0 (Nov 3, 2023)
 
 - Support Storefront Preview
