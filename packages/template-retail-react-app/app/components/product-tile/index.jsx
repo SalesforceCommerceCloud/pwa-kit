@@ -136,7 +136,7 @@ const ProductTile = (props) => {
                 >
                     <IconButtonWithRegistration
                         aria-label={
-                            intl.isFavourite
+                            isFavourite
                                 ? intl.formatMessage(
                                       {
                                           id: 'product_tile.assistive_msg.add_to_wishlist',

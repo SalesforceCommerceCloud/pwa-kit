@@ -84,7 +84,7 @@ const ProductScroller = forwardRef(
                         }}
                     >
                         {isLoading
-                            ? [0, 1, 2, 4].map((key) => {
+                            ? [0, 1, 2, 3].map((key) => {
                                   return (
                                       <Box
                                           key={key}
