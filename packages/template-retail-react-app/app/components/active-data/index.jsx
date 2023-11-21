@@ -9,10 +9,6 @@ import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
 
-const DWAC = getAssetUrl('static/dwac-21.7.js')
-const DWANALYTICS = getAssetUrl('static/dwanalytics-22.2.js')
-const HEAD_ACTIVE_DATA = getAssetUrl('static/head-active_data.js')
-
 /**
  * Wrapper for the scripts required to use Active Data analytics
  * @param {Object.<string, string>} props
@@ -21,10 +17,10 @@ const HEAD_ACTIVE_DATA = getAssetUrl('static/head-active_data.js')
  * @param {string} [props.headActiveData='static/head-active_data.js'] - Path to the head-active_data script file
  */
 const ActiveData = ({
-    dwac = DWAC,
-    dwanalytics = DWANALYTICS,
-    headActiveData = HEAD_ACTIVE_DATA
-}) => {
+    dwac = getAssetUrl('static/dwac-21.7.js'),
+    dwanalytics = getAssetUrl('static/dwanalytics-22.2.js'),
+    headActiveData = getAssetUrl('static/head-active_data.js')
+} = {}) => {
     return (
         <>
             <Helmet>
