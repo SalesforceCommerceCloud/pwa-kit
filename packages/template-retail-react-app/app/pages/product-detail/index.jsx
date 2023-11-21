@@ -159,7 +159,7 @@ const ProductDetail = () => {
     )
 
     const handleAddToWishlist = (product, variant, quantity) => {
-        const isItemInWishlist = wishlist.customerProductListItems.find(
+        const isItemInWishlist = wishlist?.customerProductListItems?.find(
             (i) => i.productId === variant?.productId || i.productId === product?.id
         )
 

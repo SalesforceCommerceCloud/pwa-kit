@@ -151,7 +151,8 @@ const Cart = () => {
             if (!customerId || !wishlist) {
                 return
             }
-            const isItemInWishlist = wishlist.customerProductListItems.find(
+
+            const isItemInWishlist = wishlist?.customerProductListItems?.find(
                 (i) => i.productId === product?.id
             )
 
