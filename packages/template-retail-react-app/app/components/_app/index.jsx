@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useQuery, useQueries} from '@tanstack/react-query'
@@ -70,10 +71,12 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE
+    DEFAULT_LOCALE,
+    ACTIVE_DATA_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
+import {Helmet} from 'react-helmet'
 
 const onClient = typeof window !== 'undefined'
 
@@ -115,6 +118,7 @@ const App = (props) => {
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = getAppOrigin()
+    const activeData = useActiveData()
 
     const history = useHistory()
     const location = useLocation()
@@ -269,9 +273,26 @@ const App = (props) => {
         history.push(path)
     }
 
+    const trackPage = () => {
+        activeData.trackPage(site.id, locale.id, currency)
+    }
+
+    useEffect(() => {
+        trackPage()
+    }, [location])
+
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
+                <Helmet>
+                    {ACTIVE_DATA_ENABLED && (
+                        <script
+                            src={getAssetUrl('static/head-active_data.js')}
+                            id="headActiveData"
+                            type="text/javascript"
+                        ></script>
+                    )}
+                </Helmet>
                 <IntlProvider
                     onError={(err) => {
                         if (!messages) {
@@ -396,6 +417,23 @@ const App = (props) => {
                         </Box>
                     </CurrencyProvider>
                 </IntlProvider>
+                {ACTIVE_DATA_ENABLED && (
+                    <script
+                        type="text/javascript"
+                        src={getAssetUrl('static/dwanalytics-22.2.js')}
+                        id="dwanalytics"
+                        async="async"
+                        onLoad={trackPage}
+                    ></script>
+                )}
+                {ACTIVE_DATA_ENABLED && (
+                    <script
+                        src={getAssetUrl('static/dwac-21.7.js')}
+                        type="text/javascript"
+                        id="dwac"
+                        async="async"
+                    ></script>
+                )}
             </StorefrontPreview>
         </Box>
     )
