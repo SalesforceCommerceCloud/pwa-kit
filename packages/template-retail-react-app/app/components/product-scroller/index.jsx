@@ -16,6 +16,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'
 import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {useIntl} from 'react-intl'
 
 /**
  * Renders a scrollable, horizontal container of products with native scroll
@@ -35,6 +36,7 @@ const ProductScroller = forwardRef(
         },
         ref
     ) => {
+        const intl = useIntl()
         const scrollRef = useRef()
 
         // Renders nothing if we aren't loading and have no products.
@@ -139,7 +141,10 @@ const ProductScroller = forwardRef(
                         >
                             <IconButton
                                 data-testid="product-scroller-nav-left"
-                                aria-label="Scroll products left"
+                                aria-label={intl.formatMessage({
+                                    id: 'product_scroller.assistive_msg.scroll_left',
+                                    defaultMessage: 'Scroll products left'
+                                })}
                                 icon={<ChevronLeftIcon color="black" />}
                                 borderRadius="full"
                                 colorScheme="whiteAlpha"
@@ -159,7 +164,10 @@ const ProductScroller = forwardRef(
                         >
                             <IconButton
                                 data-testid="product-scroller-nav-right"
-                                aria-label="Scroll products right"
+                                aria-label={intl.formatMessage({
+                                    id: 'product_scroller.assistive_msg.scroll_right',
+                                    defaultMessage: 'Scroll products right'
+                                })}
                                 icon={<ChevronRightIcon color="black" />}
                                 borderRadius="full"
                                 colorScheme="whiteAlpha"

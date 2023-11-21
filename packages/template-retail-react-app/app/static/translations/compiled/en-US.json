@@ -2291,6 +2291,18 @@
       "value": "sortOption"
     }
   ],
+  "product_scroller.assistive_msg.scroll_left": [
+    {
+      "type": 0,
+      "value": "Scroll products left"
+    }
+  ],
+  "product_scroller.assistive_msg.scroll_right": [
+    {
+      "type": 0,
+      "value": "Scroll products right"
+    }
+  ],
   "product_tile.assistive_msg.add_to_wishlist": [
     {
       "type": 0,
