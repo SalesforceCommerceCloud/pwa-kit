@@ -957,6 +957,12 @@
       "value": "This 4-digit code can be found on the front of your card."
     }
   ],
+  "credit_card_fields.tool_tip.security_code_aria_label": [
+    {
+      "type": 0,
+      "value": "Security code info"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,

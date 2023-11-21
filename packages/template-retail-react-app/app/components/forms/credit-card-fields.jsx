@@ -131,12 +131,26 @@ const CreditCardFields = ({form, prefix = ''}) => {
                     <Field
                         {...fields.securityCode}
                         formLabel={
-                            <FormLabel>
-                                {fields.securityCode.label}{' '}
-                                <Tooltip hasArrow placement="top" label={securityCodeTooltipLabel}>
-                                    <InfoIcon boxSize={5} color="gray.700" ml={1} />
+                            <>
+                                <FormLabel display="inline" mr={1}>
+                                    {fields.securityCode.label}
+                                </FormLabel>
+                                <Tooltip
+                                    hasArrow
+                                    placement="top"
+                                    label={securityCodeTooltipLabel}
+                                    shouldWrapChildren={true}
+                                >
+                                    <InfoIcon
+                                        boxSize={5}
+                                        color="gray.700"
+                                        aria-label={formatMessage({
+                                            id: 'credit_card_fields.tool_tip.security_code_aria_label',
+                                            defaultMessage: 'Security code info'
+                                        })}
+                                    />
                                 </Tooltip>
-                            </FormLabel>
+                            </>
                         }
                     />
                 </SimpleGrid>
