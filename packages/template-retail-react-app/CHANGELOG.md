@@ -1,4 +1,5 @@
 ## v2.2.0-dev (Nov 3, 2023)
+- Add [Active Data](https://help.salesforce.com/s/articleView?id=cc.b2c_active_data_attributes.htm&type=5) files, update pages (app index.jsx, product list and product details pages) to trigger events on product category and product detail views [#1555](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1555)
 - (A11y) Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
 - (A11y) Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
 - (A11y) Fix improper nesting of elements in product tile [#1541](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1541)
