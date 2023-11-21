@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {screen} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker/index'
@@ -14,6 +14,8 @@ const MockComponent = () => {
     const [quantity, setQuantity] = useState(5)
     return <QuantityPicker value={quantity} onChange={(str, num) => setQuantity(num)} />
 }
+
+const MINUS = '\u2212' // HTML `&minus;`, not the same as '-' (\u002d)
 
 describe('QuantityPicker', () => {
     test('clicking plus increments value', async () => {
@@ -28,7 +30,7 @@ describe('QuantityPicker', () => {
         const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
-        const button = screen.getByText('&minus;')
+        const button = screen.getByText(MINUS)
         await user.click(button)
         expect(input.value).toBe('4')
     })
@@ -46,7 +48,7 @@ describe('QuantityPicker', () => {
         const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
-        const button = screen.getByText('&minus;')
+        const button = screen.getByText(MINUS)
         await user.type(button, '{enter}')
         expect(input.value).toBe('4')
         await user.type(button, '{space}')
@@ -65,7 +67,7 @@ describe('QuantityPicker', () => {
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         await user.type(input, '{shift>}{tab}') // > modifier in {shift>} means "keep key pressed"
-        const button = screen.getByText('&minus;')
+        const button = screen.getByText(MINUS)
         expect(button).toHaveFocus()
     })
 })
