@@ -121,7 +121,6 @@
     "@types/node": "~16.0.3",
     "@types/node-fetch": "~2.6.3",
     "@types/validator": "~13.7.14",
-    "eslint-plugin-no-relative-import-paths": "^1.5.2",
     "internal-lib-build": "3.3.0-dev",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
