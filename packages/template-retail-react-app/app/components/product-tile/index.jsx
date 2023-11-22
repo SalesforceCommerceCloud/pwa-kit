@@ -139,15 +139,15 @@ const ProductTile = (props) => {
                             isFavourite
                                 ? intl.formatMessage(
                                       {
-                                          id: 'product_tile.assistive_msg.add_to_wishlist',
-                                          defaultMessage: 'Add {product} to wishlist'
+                                          id: 'product_tile.assistive_msg.remove_from wishlist',
+                                          defaultMessage: 'Remove {product} from wishlist'
                                       },
                                       {product: localizedProductName}
                                   )
                                 : intl.formatMessage(
                                       {
-                                          id: 'product_tile.assistive_msg.remove_from wishlist',
-                                          defaultMessage: 'Remove {product} from wishlist'
+                                          id: 'product_tile.assistive_msg.add_to_wishlist',
+                                          defaultMessage: 'Add {product} to wishlist'
                                       },
                                       {product: localizedProductName}
                                   )
