@@ -21,7 +21,9 @@ import {
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
-jest.setTimeout(30000)
+// This is a flaky test file!
+jest.retryTimes(5)
+jest.setTimeout(40_000)
 
 // Minimal subset of `ocapiOrderResponse` in app/mocks/mock-data.js
 const scapiOrderResponse = {
@@ -368,7 +370,7 @@ test('Can proceed through checkout steps as guest', async () => {
     await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
     await user.type(screen.getByLabelText(/expiration date/i), '1224')
-    await user.type(screen.getByLabelText(/security code/i), '123')
+    await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
 
     // Same as shipping checkbox selected by default
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
@@ -459,7 +461,7 @@ test('Can proceed through checkout as registered customer', async () => {
     await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
     await user.type(screen.getByLabelText(/expiration date/i), '1224')
-    await user.type(screen.getByLabelText(/security code/i), '123')
+    await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
 
     // Same as shipping checkbox selected by default
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()

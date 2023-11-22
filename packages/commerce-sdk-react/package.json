@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/commerce-sdk-react",
-  "version": "1.1.0-dev",
+  "version": "1.2.0-dev",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/ecom-react-hooks#readme",
   "bugs": {
@@ -29,8 +29,8 @@
     "build:docs": "typedoc --plugin typedoc-plugin-missing-exports --hideGenerator",
     "build:watch": "nodemon --watch 'src/**' --ext 'tsx,ts' --exec  'npm run build'",
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\"",
-    "lint": "npm run lint:js && tsc --noEmit",
-    "lint:fix": "npm run lint:js -- --fix",
+    "lint": "npm run lint:js && npm run typecheck",
+    "lint:fix": "npm run lint:js -- --fix && npm run typecheck",
     "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
     "prepare": "npm run build",
     "test": "internal-lib-build test",
@@ -46,11 +46,12 @@
     "react-jsx-parser": "^1.29.0"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.2.0-dev",
+    "@salesforce/pwa-kit-dev": "3.3.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/js-cookie": "~3.0.3",
+    "@types/jsdom": "^16.2.15",
     "@types/jsonwebtoken": "~9.0.0",
     "@types/jwt-decode": "~3.1.0",
     "@types/node": "~16.0.3",
@@ -60,7 +61,7 @@
     "@types/react-helmet": "~6.1.6",
     "@types/react-router-dom": "~5.3.3",
     "cross-env": "^5.2.1",
-    "internal-lib-build": "3.2.0-dev",
+    "internal-lib-build": "3.3.0-dev",
     "jsonwebtoken": "^9.0.0",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",

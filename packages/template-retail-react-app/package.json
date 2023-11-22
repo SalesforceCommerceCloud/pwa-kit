@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/retail-react-app",
-  "version": "2.1.0-dev",
+  "version": "2.2.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
@@ -11,7 +11,7 @@
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "npm run build-translations && pwa-kit-dev build",
-    "build-translations": "npm run extract-default-translations && npm run compile-translations",
+    "build-translations": "npm run extract-default-translations && npm run compile-translations && npm run compile-translations:pseudo",
     "compile-translations": "node ./scripts/translations/compile-folder.js translations",
     "compile-translations:pseudo": "node ./scripts/translations/compile-pseudo.js translations/en-US.json",
     "extract-default-translations": "node ./scripts/translations/extract-default-messages.js en-US",
@@ -45,10 +45,10 @@
     "@lhci/cli": "^0.11.0",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
-    "@salesforce/commerce-sdk-react": "1.1.0-dev",
-    "@salesforce/pwa-kit-dev": "3.2.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.2.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.2.0-dev",
+    "@salesforce/commerce-sdk-react": "1.2.0-dev",
+    "@salesforce/pwa-kit-dev": "3.3.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "3.3.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.3.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",
@@ -100,8 +100,5 @@
       "path": "build/vendor.js",
       "maxSize": "320 kB"
     }
-  ],
-  "overrides": {
-    "nwsapi": "2.2.2"
-  }
+  ]
 }

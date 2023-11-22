@@ -16,7 +16,7 @@ export default {
             height: 5,
             color: 'white',
             fontSize: 'xs',
-            backgroundColor: 'blue.500',
+            backgroundColor: 'blue.600',
             border: '1px solid',
             borderColor: 'white',
             borderRadius: 'full'
