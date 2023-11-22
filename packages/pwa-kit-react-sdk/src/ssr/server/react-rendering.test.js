@@ -783,7 +783,7 @@ describe('getLocationSearch', function () {
 
         const output = getLocationSearch(req)
         // we called URLSearchParam.toString for the output, any encoded/not encoded space will replace + with interpretsPlusSignAsSpace is true
-        expect(output).toEqual('?q=mens+shirt+dresses')
+        expect(output).toBe('?q=mens+shirt+dresses')
     })
     test('not interpret + sign as space when interpretsPlusSignAsSpace is set to false in config', () => {
         getConfig.mockImplementation(() => ({
@@ -802,6 +802,6 @@ describe('getLocationSearch', function () {
         }
         // we called URLSearchParam.toString for the output, with interpretsPlusSignAsSpace is false, it will encode literally + to %2B
         const output = getLocationSearch(req)
-        expect(output).toEqual('?q=mens%2Bshirt')
+        expect(output).toBe('?q=mens%2Bshirt')
     })
 })
