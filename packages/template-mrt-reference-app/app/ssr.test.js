@@ -50,6 +50,7 @@ describe('server', () => {
     afterEach(() => {
         process.env = originalEnv
         server.close()
+        jest.restoreAllMocks()
     })
     test.each([
         ['/', 200, 'application/json; charset=utf-8'],
@@ -76,6 +77,7 @@ describe('server', () => {
     })
 
     test('Path "/isolation" succeeds', async () => {
+        jest.spyOn(console, 'error')
         lambdaMock.on(InvokeCommand).rejects(new AccessDeniedException())
         s3Mock.on(GetObjectCommand).rejects(new AccessDenied())
         logsMock.on(PutLogEventsCommand).rejects(new AccessDeniedException())
@@ -87,6 +89,7 @@ describe('server', () => {
     })
 
     test('Path "/isolation" fails', async () => {
+        jest.spyOn(console, 'error')
         lambdaMock.on(InvokeCommand).resolves()
         s3Mock.on(GetObjectCommand).resolves()
         logsMock.on(PutLogEventsCommand).resolves()
@@ -95,5 +98,12 @@ describe('server', () => {
         expect(response.body.origin).toBe(false)
         expect(response.body.storage).toBe(false)
         expect(response.body.logs).toBe(false)
+        const errors = [
+            'Lambda isolation test failed!',
+            'S3 isolation test failed!',
+            'Log group isolation test failed!'
+        ]
+        const calls = console.error.mock.calls.map((call) => call[0])
+        expect(errors.some((error) => calls.includes(error))).toBe(true)
     })
 })
