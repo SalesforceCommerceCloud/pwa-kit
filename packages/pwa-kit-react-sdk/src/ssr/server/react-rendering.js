@@ -129,7 +129,9 @@ export const render = async (req, res, next) => {
 
     const location = {
         pathname,
-        search: getLocationSearch(req, config?.app?.url?.interpretPlusSignAsSpace)
+        search: getLocationSearch(req, {
+            interpretPlusSignAsSpace: config?.app?.url?.interpretPlusSignAsSpace
+        })
     }
 
     // Step 1 - Find the match.
