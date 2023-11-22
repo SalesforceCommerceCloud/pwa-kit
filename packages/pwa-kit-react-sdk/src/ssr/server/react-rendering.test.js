@@ -22,23 +22,6 @@ import {getLocationSearch} from './react-rendering'
 
 import {getAppConfig} from '../universal/compatibility'
 
-const mockConfig = {
-    externals: [],
-    pageNotFoundURL: '/page-not-found',
-    ssrEnabled: true,
-    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-    ssrShared: [
-        'static/ico/favicon.ico',
-        'static/robots.txt',
-        '**/*.js',
-        '**/*.js.map',
-        '**/*.json'
-    ],
-    ssrParameters: {
-        ssrFunctionNodeVersion: '18.x',
-        proxyConfigs: [[Object], [Object]]
-    }
-}
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
     const defaults = {
