@@ -764,7 +764,7 @@ describe('The Node SSR Environment', () => {
     })
 })
 
-describe.only('getLocationSearch', function () {
+describe('getLocationSearch', function () {
     test('interprets + sign as space when interpretsPlusSignAsSpace is set to true in config', () => {
         getConfig.mockImplementation(() => ({
             app: {
