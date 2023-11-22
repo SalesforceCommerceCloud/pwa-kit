@@ -46,7 +46,7 @@ const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
 const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
-const {isolationTests} = require('./isolation-tests')
+const {isolationTests} = require('./isolation-actions')
 
 /**
  * Custom error class
