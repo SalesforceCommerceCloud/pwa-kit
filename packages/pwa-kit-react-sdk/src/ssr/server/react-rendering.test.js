@@ -19,7 +19,6 @@ import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {getLocationSearch} from './react-rendering'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {getAppConfig} from '../universal/compatibility'
 
@@ -57,15 +56,6 @@ const opts = (overrides = {}) => {
         ...overrides
     }
 }
-
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const actual = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
-
-    return {
-        ...actual,
-        getConfig: jest.fn(() => mockConfig)
-    }
-})
 
 jest.mock('../universal/compatibility', () => {
     const AppConfig = jest.requireActual('../universal/components/_app-config').default
@@ -766,34 +756,17 @@ describe('The Node SSR Environment', () => {
 
 describe('getLocationSearch', function () {
     test('interprets + sign as space when interpretsPlusSignAsSpace is set to true in config', () => {
-        getConfig.mockImplementation(() => ({
-            app: {
-                url: {
-                    interpretPlusSignAsSpace: true
-                }
-            },
-            ...mockConfig
-        }))
         const req = {
             originalUrl: '/hello-word?q=mens+shirt%20dresses',
             query: {
                 q: 'mens+shirt%20dresses'
             }
         }
-
-        const output = getLocationSearch(req)
+        const output = getLocationSearch(req, {interpretPlusSignAsSpace: true})
         // we called URLSearchParam.toString for the output, any encoded/not encoded space will replace + with interpretsPlusSignAsSpace is true
         expect(output).toBe('?q=mens+shirt+dresses')
     })
     test('not interpret + sign as space when interpretsPlusSignAsSpace is set to false in config', () => {
-        getConfig.mockImplementation(() => ({
-            app: {
-                url: {
-                    interpretPlusSignAsSpace: false
-                }
-            },
-            ...mockConfig
-        }))
         const req = {
             originalUrl: '/hello-word?q=mens+shirt',
             query: {

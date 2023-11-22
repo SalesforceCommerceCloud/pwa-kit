@@ -75,8 +75,8 @@ const logAndFormatError = (err) => {
 // Because multi-value params are not supported in `aws-serverless-express` create a proper
 // search string using the `query` property. We pay special attention to the order the params
 // as best as we can.
-export const getLocationSearch = (req) => {
-    const {app} = getConfig()
+export const getLocationSearch = (req, opts = {}) => {
+    const {interpretPlusSignAsSpace = false} = opts
     const [_, search] = req.originalUrl.split('?')
     const params = new URLSearchParams(search)
 
@@ -95,7 +95,7 @@ export const getLocationSearch = (req) => {
             // Therefore, we create a flag for it via the app configuration
             newParams.append(
                 key,
-                app?.url?.interpretPlusSignAsSpace ? decodeURIComponent(v).replace(/\+/, ' ') : v
+                interpretPlusSignAsSpace ? decodeURIComponent(v).replace(/\+/, ' ') : v
             )
         })
     })
@@ -129,7 +129,7 @@ export const render = async (req, res, next) => {
 
     const location = {
         pathname,
-        search: getLocationSearch(req)
+        search: getLocationSearch(req, config?.app?.url?.interpretPlusSignAsSpace)
     }
 
     // Step 1 - Find the match.
