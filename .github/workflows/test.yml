@@ -93,7 +93,7 @@ jobs:
           TARGET: production
 
       - name: Push Bundle to MRT (Commerce SDK React)
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOPMENT == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOP == 'true'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/test-commerce-sdk-react"
