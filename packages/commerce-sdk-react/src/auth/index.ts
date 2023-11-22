@@ -11,7 +11,7 @@ import {
     ShopperLoginTypes,
     ShopperCustomersTypes
 } from 'commerce-sdk-isomorphic'
-import jwtDecode, {JwtPayload} from 'jwt-decode'
+import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
