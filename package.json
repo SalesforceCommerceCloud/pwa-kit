@@ -22,6 +22,7 @@
     "@playwright/test": "^1.36.0",
     "commander": "^9.5.0",
     "eslint-plugin-header": "^3.1.1",
+    "eslint-plugin-no-relative-import-paths": "^1.5.3",
     "jsdom": "^22.1.0",
     "lerna": "^6.6.1",
     "semver": "^7.5.2",
