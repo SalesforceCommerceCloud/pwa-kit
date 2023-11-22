@@ -139,7 +139,7 @@ const ProductTile = (props) => {
                             isFavourite
                                 ? intl.formatMessage(
                                       {
-                                          id: 'product_tile.assistive_msg.remove_from wishlist',
+                                          id: 'product_tile.assistive_msg.remove_from_wishlist',
                                           defaultMessage: 'Remove {product} from wishlist'
                                       },
                                       {product: localizedProductName}

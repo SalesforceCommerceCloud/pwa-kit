@@ -2327,7 +2327,7 @@
       "value": " to wishlist"
     }
   ],
-  "product_tile.assistive_msg.remove_from wishlist": [
+  "product_tile.assistive_msg.remove_from_wishlist": [
     {
       "type": 0,
       "value": "Remove "
