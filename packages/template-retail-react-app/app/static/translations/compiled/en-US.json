@@ -2381,10 +2381,34 @@
       "value": "Update"
     }
   ],
+  "product_view.label.assistive_msg.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "Decrement Quantity"
+    }
+  ],
+  "product_view.label.assistive_msg.quantity_increment": [
+    {
+      "type": 0,
+      "value": "Increment Quantity"
+    }
+  ],
   "product_view.label.quantity": [
     {
       "type": 0,
       "value": "Quantity"
+    }
+  ],
+  "product_view.label.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "−"
+    }
+  ],
+  "product_view.label.quantity_increment": [
+    {
+      "type": 0,
+      "value": "+"
     }
   ],
   "product_view.label.starting_at_price": [

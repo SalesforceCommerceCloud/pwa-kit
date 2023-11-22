@@ -1026,8 +1026,20 @@
   "product_view.button.update": {
     "defaultMessage": "Update"
   },
+  "product_view.label.assistive_msg.quantity_decrement": {
+    "defaultMessage": "Decrement Quantity"
+  },
+  "product_view.label.assistive_msg.quantity_increment": {
+    "defaultMessage": "Increment Quantity"
+  },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"
+  },
+  "product_view.label.quantity_decrement": {
+    "defaultMessage": "−"
+  },
+  "product_view.label.quantity_increment": {
+    "defaultMessage": "+"
   },
   "product_view.label.starting_at_price": {
     "defaultMessage": "Starting at"
