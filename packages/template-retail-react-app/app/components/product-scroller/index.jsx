@@ -16,6 +16,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'
 import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {useIntl} from 'react-intl'
 
 /**
  * Renders a scrollable, horizontal container of products with native scroll
@@ -35,6 +36,7 @@ const ProductScroller = forwardRef(
         },
         ref
     ) => {
+        const intl = useIntl()
         const scrollRef = useRef()
 
         // Renders nothing if we aren't loading and have no products.
@@ -72,6 +74,7 @@ const ProductScroller = forwardRef(
                         wrap="nowrap"
                         overflowX="scroll"
                         px={{base: 4, md: 8, lg: 0}}
+                        py={1}
                         {...scrollProps}
                         sx={{
                             scrollPadding: {base: 16, md: 32, lg: 0},
@@ -80,43 +83,52 @@ const ProductScroller = forwardRef(
                             ...scrollProps?.sx
                         }}
                     >
-                        {(isLoading ? [0, 1, 2, 4] : products).map((product, idx) => {
-                            return (
-                                <Box
-                                    key={product?.id || idx}
-                                    flex="0 0 auto"
-                                    width={itemWidth}
-                                    style={{scrollSnapAlign: 'start'}}
-                                >
-                                    {isLoading ? (
-                                        <Stack data-testid="product-scroller-item-skeleton">
-                                            <AspectRatio ratio={1}>
-                                                <Skeleton />
-                                            </AspectRatio>
-                                            <Stack spacing={2}>
-                                                <Skeleton width="150px" height={5} />
-                                                <Skeleton width="75px" height={5} />
-                                            </Stack>
-                                        </Stack>
-                                    ) : (
-                                        <ProductTile
-                                            data-testid="product-scroller-item"
-                                            product={product}
-                                            {...(typeof productTileProps === 'function'
-                                                ? {...productTileProps(product)}
-                                                : {...productTileProps})}
-                                            dynamicImageProps={{
-                                                widths: ['70vw', '70vw', '40vw', '30vw']
-                                            }}
-                                        />
-                                    )}
-                                </Box>
-                            )
-                        })}
+                        {isLoading
+                            ? [0, 1, 2, 3].map((key) => {
+                                  return (
+                                      <Box
+                                          key={key}
+                                          flex="0 0 auto"
+                                          width={itemWidth}
+                                          style={{scrollSnapAlign: 'start'}}
+                                      >
+                                          <Stack data-testid="product-scroller-item-skeleton">
+                                              <AspectRatio ratio={1}>
+                                                  <Skeleton />
+                                              </AspectRatio>
+                                              <Stack spacing={2}>
+                                                  <Skeleton width="150px" height={5} />
+                                                  <Skeleton width="75px" height={5} />
+                                              </Stack>
+                                          </Stack>
+                                      </Box>
+                                  )
+                              })
+                            : products.map((product, idx) => {
+                                  return (
+                                      <Box
+                                          key={product?.id || idx}
+                                          flex="0 0 auto"
+                                          width={itemWidth}
+                                          style={{scrollSnapAlign: 'start'}}
+                                      >
+                                          <ProductTile
+                                              data-testid="product-scroller-item"
+                                              product={product}
+                                              {...(typeof productTileProps === 'function'
+                                                  ? {...productTileProps(product)}
+                                                  : {...productTileProps})}
+                                              dynamicImageProps={{
+                                                  widths: ['70vw', '70vw', '40vw', '30vw']
+                                              }}
+                                          />
+                                      </Box>
+                                  )
+                              })}
                     </Stack>
                 </Stack>
 
-                {products?.length > 3 && (
+                {!isLoading && products?.length > 3 && (
                     <>
                         <Box
                             display={{
@@ -130,7 +142,10 @@ const ProductScroller = forwardRef(
                         >
                             <IconButton
                                 data-testid="product-scroller-nav-left"
-                                aria-label="Scroll products left"
+                                aria-label={intl.formatMessage({
+                                    id: 'product_scroller.assistive_msg.scroll_left',
+                                    defaultMessage: 'Scroll products left'
+                                })}
                                 icon={<ChevronLeftIcon color="black" />}
                                 borderRadius="full"
                                 colorScheme="whiteAlpha"
@@ -150,7 +165,10 @@ const ProductScroller = forwardRef(
                         >
                             <IconButton
                                 data-testid="product-scroller-nav-right"
-                                aria-label="Scroll products right"
+                                aria-label={intl.formatMessage({
+                                    id: 'product_scroller.assistive_msg.scroll_right',
+                                    defaultMessage: 'Scroll products right'
+                                })}
                                 icon={<ChevronRightIcon color="black" />}
                                 borderRadius="full"
                                 colorScheme="whiteAlpha"
