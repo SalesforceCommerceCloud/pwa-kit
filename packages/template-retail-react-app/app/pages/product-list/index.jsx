@@ -517,7 +517,7 @@ const ProductList = (props) => {
                                           .map((value, index) => (
                                               <ProductTileSkeleton key={index} />
                                           ))
-                                    : productSearchResult?.hits.map((productSearchItem) => {
+                                    : productSearchResult?.hits?.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
                                           const isInWishlist =
                                               !!wishlist?.customerProductListItems?.find(
