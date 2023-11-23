@@ -57,6 +57,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
+const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
@@ -93,6 +94,7 @@ const Cart = () => {
 
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
+    const [localIsGiftItems, setLocalIsGiftItems] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -254,6 +256,48 @@ const Cart = () => {
             setSelectedItem(undefined)
         }
     }
+
+    const handleIsAGiftChange = async (product, checked) => {
+        try {
+            const previousVal = localIsGiftItems[product.itemId]
+            setLocalIsGiftItems({
+                ...localIsGiftItems,
+                [product.itemId]: checked
+            })
+            setCartItemLoading(true)
+            setSelectedItem(product)
+            await updateItemInBasketMutation.mutateAsync(
+                {
+                    parameters: {basketId: basket?.basketId, itemId: product.itemId},
+                    body: {
+                        productId: product.id,
+                        quantity: parseInt(product.quantity),
+                        gift: checked
+                    }
+                },
+                {
+                    onSettled: () => {
+                        // reset the state
+                        setCartItemLoading(false)
+                        setSelectedItem(undefined)
+                    },
+                    onSuccess: () => {
+                        setLocalIsGiftItems({...localIsGiftItems, [product.itemId]: undefined})
+                    },
+                    onError: () => {
+                        // reset the quantity to the previous value
+                        setLocalIsGiftItems({...localIsGiftItems, [product.itemId]: previousVal})
+                        showError()
+                    }
+                }
+            )
+        } catch (e) {
+            showError()
+        } finally {
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
+        }
+    }
     /***************************** Update Cart **************************/
 
     /***************************** Update quantity **************************/
@@ -289,7 +333,7 @@ const Cart = () => {
                 }
             }
         )
-    }, 750)
+    }, DEBOUNCE_WAIT)
 
     const handleChangeItemQuantity = async (product, value) => {
         const {stockLevel} = products[product.productId].inventory
@@ -384,6 +428,14 @@ const Cart = () => {
                                                 index={idx}
                                                 secondaryActions={
                                                     <CartSecondaryButtonGroup
+                                                        isAGift={
+                                                            localIsGiftItems[productItem.itemId]
+                                                                ? localIsGiftItems[
+                                                                      productItem.itemId
+                                                                  ]
+                                                                : productItem.gift
+                                                        }
+                                                        onIsAGiftChange={handleIsAGiftChange}
                                                         onAddToWishlistClick={handleAddToWishlist}
                                                         onEditClick={(product) => {
                                                             setSelectedItem(product)

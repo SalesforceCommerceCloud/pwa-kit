@@ -428,10 +428,9 @@ const ProductView = forwardRef(
                                     <Box fontWeight="bold">
                                         <label htmlFor="quantity">
                                             {intl.formatMessage({
-                                                defaultMessage: 'Quantity',
+                                                defaultMessage: 'Quantity:',
                                                 id: 'product_view.label.quantity'
                                             })}
-                                            :
                                         </label>
                                     </Box>
 
