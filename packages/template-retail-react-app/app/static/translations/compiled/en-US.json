@@ -1339,6 +1339,12 @@
       "value": " added to wishlist"
     }
   ],
+  "global.info.already_in_wishlist": [
+    {
+      "type": 0,
+      "value": "Item is already in wishlist"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
