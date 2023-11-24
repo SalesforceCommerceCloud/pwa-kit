@@ -19,6 +19,7 @@
 ### Bug Fixes
 
 - Remove internal linter rule that is missing in generated projects [#1554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1554)
+- Fix bug where you can add duplicates of the same item to the wishlist. Also fixes bug where skeleton appears when removing last item from the wishlist. [#1560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1560)
 
 ## v2.1.0 (Nov 3, 2023)
 
@@ -27,7 +28,7 @@
   - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
 - Show discounted and strikethrough prices when there is a promotion on product detail page [1455](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1455)
 - Move Content-Security-Policy logic to pwa-kit-runtime [1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
-  
+
 ## v2.0.0 (Sep 21, 2023)
 
 - V3 Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)
