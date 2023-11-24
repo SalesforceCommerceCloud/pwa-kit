@@ -1,4 +1,5 @@
 ## v2.2.0-dev (Nov 3, 2023)
+- Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
 
 ### Accessibility Improvements
 
