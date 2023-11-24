@@ -1,3 +1,6 @@
+## v1.2.0-nightly-20231124080148 (Nov 24, 2023)
+## v1.2.0-dev (Nov 24, 2023)
+## v3.3.0-nightly-20231124080148 (Nov 24, 2023)
 ## v1.2.0-dev (Nov 03, 2023)
 - Add StorefrontPreview component 'onContextChange' property.  [#1527](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1527)
 
