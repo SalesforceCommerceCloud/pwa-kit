@@ -64,7 +64,7 @@ const ProductDetail = () => {
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const {res} = useServerContext()
     if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
     const isBasketLoading = !basket?.basketId
 
