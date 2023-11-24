@@ -12,7 +12,8 @@ module.exports = {
         url: {
             site: 'path',
             locale: 'path',
-            showDefaults: true
+            showDefaults: true,
+            interpretPlusSignAsSpace: false
         },
         defaultSite: 'RefArchGlobal',
         siteAliases: {

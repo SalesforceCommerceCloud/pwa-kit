@@ -10,6 +10,7 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
 import {
+    mockedNullWishList,
     mockedEmptyWishList,
     mockedProductLists,
     mockedWishListProducts
@@ -36,7 +37,21 @@ test('Renders wishlist page', async () => {
     })
 })
 
-test('renders no wishlist items for empty wishlist', async () => {
+test('renders no wishlist items for null data in wishlist', async () => {
+    global.server.use(
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedNullWishList))
+        })
+    )
+
+    renderWithProviders(<AccountWishlist />)
+    await waitFor(() => {
+        expect(screen.getByText(/no wishlist items/i)).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /continue shopping/i})).toBeInTheDocument()
+    })
+})
+
+test('renders no wishlist items for empty data in wishlist', async () => {
     global.server.use(
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedEmptyWishList))

@@ -48,7 +48,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                                     'We couldn’t find anything for {category}. Try searching for a product or {link}.'
                             },
                             {
-                                category: category.name,
+                                category: category?.name,
                                 link: (
                                     <Link as={RouteLink} to={'/'}>
                                         {intl.formatMessage(contactUsMessage)}
