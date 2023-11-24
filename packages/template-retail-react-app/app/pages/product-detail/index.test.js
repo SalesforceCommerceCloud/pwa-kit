@@ -34,7 +34,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     return {
         ...originalModule,
         useShopperCustomersMutation: (mutation) => {
-            if ( mutation === 'createCustomerProductListItem') {
+            if (mutation === 'createCustomerProductListItem') {
                 return {mutate: mockAddToWishlist}
             } else {
                 return originalModule.useShopperCustomersMutation(mutation)
@@ -109,14 +109,13 @@ test('should add to wishlist', async () => {
     )
 
     renderWithProviders(<MockedComponent />)
-    const wishlistButton = await screen.findByRole('button', { name: 'Add to Wishlist'})
+    const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
 
     fireEvent.click(wishlistButton)
     await waitFor(() => {
         expect(mockAddToWishlist).toHaveBeenCalledTimes(1)
     })
 })
-
 
 test('should not add to wishlist if item is already in wishlist', async () => {
     global.server.use(
@@ -132,14 +131,13 @@ test('should not add to wishlist if item is already in wishlist', async () => {
     renderWithProviders(<MockedComponent />)
 
     // const wishlistButton = await screen.findAllByText(/Add to Wishlist/i)
-    const wishlistButton = await screen.findByRole('button', { name: 'Add to Wishlist'})
+    const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
 
     fireEvent.click(wishlistButton)
     await waitFor(() => {
         expect(mockAddToWishlist).toHaveBeenCalledTimes(0)
     })
 })
-
 
 describe('product set', () => {
     beforeEach(() => {
