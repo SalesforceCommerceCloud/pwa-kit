@@ -512,7 +512,8 @@ const ssr = (() => {
                         ...config.plugins,
                         staticFolderCopyPlugin,
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
-                    ].filter(Boolean)
+                    ].filter(Boolean),
+                    devtool: 'source-map'
                 }
             })
             .build()
