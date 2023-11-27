@@ -615,7 +615,7 @@ const ProductList = (props) => {
                         <Refinements
                             toggleFilter={toggleFilter}
                             filters={productSearchResult?.refinements}
-                            selectedFilters={productSearchResult?.selectedRefinements}
+                            selectedFilters={searchParams.refine}
                         />
                     </ModalBody>
 
