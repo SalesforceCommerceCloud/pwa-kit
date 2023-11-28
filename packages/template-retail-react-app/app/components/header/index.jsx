@@ -49,8 +49,6 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 
-const ENTER_KEY = 'Enter'
-
 const IconButtonWithRegistration = withRegistration(IconButton)
 /**
  * The header is the main source for accessing
@@ -154,18 +152,15 @@ const Header = ({
                             {...styles.search}
                         />
                     </Box>
-                    <AccountIcon
-                        {...styles.accountIcon}
-                        tabIndex={0}
-                        onMouseOver={isDesktop ? onOpen : noop}
-                        onKeyDown={(e) => {
-                            e.key === ENTER_KEY ? onMyAccountClick() : noop
-                        }}
-                        onClick={onMyAccountClick}
+                    <IconButtonWithRegistration
+                        icon={<AccountIcon {...styles.accountIcon} />}
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.my_account',
                             defaultMessage: 'My account'
                         })}
+                        variant="unstyled"
+                        onClick={onMyAccountClick}
+                        onMouseOver={isDesktop ? onOpen : noop}
                     />
 
                     {isRegistered && isHydrated() && (
