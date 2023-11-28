@@ -148,6 +148,8 @@ test('clicking a filter on mobile or desktop applies changes to both', async () 
     await waitFor(() => !!screen.getByText(/Beige/i))
 
     // Only desktop filters should be present
+    // Test using two buttons since there was a bug where using only one filter would properly
+    // apply changes to both desktop and mobile, but 2 or more would cause it to fail
     let beigeBtns = screen.getAllByLabelText('Beige (6)')
     let blueBtns = screen.getAllByLabelText('Blue (27)')
     expect(beigeBtns).toHaveLength(1)
@@ -160,9 +162,9 @@ test('clicking a filter on mobile or desktop applies changes to both', async () 
 
     // click filter button for mobile that is hidden on desktop but present in DOM
     // this opens the filter modal on mobile
-    await user.click(screen.getByRole('button', { name: /filter/i }))
+    await user.click(screen.getByRole('button', {name: /filter/i}))
 
-    // re-query for desktop and mobile filters 
+    // re-query for desktop and mobile filters
     beigeBtns = screen.getAllByLabelText('Beige (6)')
     blueBtns = screen.getAllByLabelText('Blue (27)')
 
