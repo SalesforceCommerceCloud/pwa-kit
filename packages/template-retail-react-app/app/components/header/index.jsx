@@ -107,6 +107,7 @@ const Header = ({
 
     const accountMenuKeyDownMap = {
         Escape: () => onAccountMenuClose(),
+        ' ': () => onAccountMenuOpen(),
         Enter: () => onAccountMenuOpen()
     }
 
