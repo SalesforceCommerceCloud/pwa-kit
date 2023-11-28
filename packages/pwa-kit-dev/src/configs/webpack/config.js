@@ -498,8 +498,13 @@ const ssr = (() => {
     if (mode === production) {
         return baseConfig('node')
             .extend((config) => {
+                let additionalConfig = {}
+                if (process.env.SSR_SOURCE_MAP === 'true') {
+                    additionalConfig = {devtool: 'source-map'}
+                }
                 return {
                     ...config,
+                    ...additionalConfig,
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
                     entry: `.${EXT_OVERRIDES_DIR}/app/ssr.js`,
@@ -512,8 +517,7 @@ const ssr = (() => {
                         ...config.plugins,
                         staticFolderCopyPlugin,
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
-                    ].filter(Boolean),
-                    devtool: 'source-map'
+                    ].filter(Boolean)
                 }
             })
             .build()
