@@ -413,6 +413,18 @@
       "value": "Password Reset"
     }
   ],
+  "carousel.button.scroll_left.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Scroll carousel left"
+    }
+  ],
+  "carousel.button.scroll_right.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Scroll carousel right"
+    }
+  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -1163,6 +1175,18 @@
       "value": "Top Sellers"
     }
   ],
+  "field.password.assistive_msg.hide_password": [
+    {
+      "type": 0,
+      "value": "Hide password"
+    }
+  ],
+  "field.password.assistive_msg.show_password": [
+    {
+      "type": 0,
+      "value": "Show password"
+    }
+  ],
   "footer.column.account": [
     {
       "type": 0,
@@ -1339,6 +1363,12 @@
       "value": " added to wishlist"
     }
   ],
+  "global.info.already_in_wishlist": [
+    {
+      "type": 0,
+      "value": "Item is already in wishlist"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
@@ -1367,6 +1397,12 @@
     {
       "type": 0,
       "value": "My account"
+    }
+  ],
+  "header.button.assistive_msg.my_account_menu": [
+    {
+      "type": 0,
+      "value": "Open account menu"
     }
   ],
   "header.button.assistive_msg.my_cart_with_num_items": [
@@ -1605,6 +1641,12 @@
     {
       "type": 0,
       "value": "Please select all your options above"
+    }
+  ],
+  "list_menu.nav.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Main navigation"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2117,10 +2159,22 @@
       "value": "Next"
     }
   ],
+  "pagination.link.next.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Next Page"
+    }
+  ],
   "pagination.link.prev": [
     {
       "type": 0,
       "value": "Prev"
+    }
+  ],
+  "pagination.link.prev.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Previous Page"
     }
   ],
   "password_card.info.password_updated": [
@@ -2327,7 +2381,7 @@
       "value": " to wishlist"
     }
   ],
-  "product_tile.assistive_msg.remove_from wishlist": [
+  "product_tile.assistive_msg.remove_from_wishlist": [
     {
       "type": 0,
       "value": "Remove "

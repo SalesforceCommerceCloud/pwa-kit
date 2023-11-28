@@ -162,6 +162,12 @@
   "auth_modal.password_reset_success.title.password_reset": {
     "defaultMessage": "Password Reset"
   },
+  "carousel.button.scroll_left.assistive_msg": {
+    "defaultMessage": "Scroll carousel left"
+  },
+  "carousel.button.scroll_right.assistive_msg": {
+    "defaultMessage": "Scroll carousel right"
+  },
   "cart.info.removed_from_cart": {
     "defaultMessage": "Item removed from cart"
   },
@@ -471,6 +477,12 @@
   "empty_search_results.recommended_products.title.top_sellers": {
     "defaultMessage": "Top Sellers"
   },
+  "field.password.assistive_msg.hide_password": {
+    "defaultMessage": "Hide password"
+  },
+  "field.password.assistive_msg.show_password": {
+    "defaultMessage": "Show password"
+  },
   "footer.column.account": {
     "defaultMessage": "Account"
   },
@@ -543,6 +555,9 @@
   "global.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
+  "global.info.already_in_wishlist": {
+    "defaultMessage": "Item is already in wishlist"
+  },
   "global.info.removed_from_wishlist": {
     "defaultMessage": "Item removed from wishlist"
   },
@@ -557,6 +572,9 @@
   },
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "My account"
+  },
+  "header.button.assistive_msg.my_account_menu": {
+    "defaultMessage": "Open account menu"
   },
   "header.button.assistive_msg.my_cart_with_num_items": {
     "defaultMessage": "My cart, number of items: {numItems}"
@@ -670,6 +688,9 @@
   },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
+  },
+  "list_menu.nav.assistive_msg": {
+    "defaultMessage": "Main navigation"
   },
   "locale_text.message.ar-SA": {
     "defaultMessage": "Arabic (Saudi Arabia)"
@@ -906,8 +927,14 @@
   "pagination.link.next": {
     "defaultMessage": "Next"
   },
+  "pagination.link.next.assistive_msg": {
+    "defaultMessage": "Next Page"
+  },
   "pagination.link.prev": {
     "defaultMessage": "Prev"
+  },
+  "pagination.link.prev.assistive_msg": {
+    "defaultMessage": "Previous Page"
   },
   "password_card.info.password_updated": {
     "defaultMessage": "Password updated"
@@ -1005,7 +1032,7 @@
   "product_tile.assistive_msg.add_to_wishlist": {
     "defaultMessage": "Add {product} to wishlist"
   },
-  "product_tile.assistive_msg.remove_from wishlist": {
+  "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
   },
   "product_tile.label.starting_at_price": {
