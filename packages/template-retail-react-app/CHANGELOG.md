@@ -1,4 +1,5 @@
 ## v2.2.0-dev (Nov 3, 2023)
+
 - Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
 
 ### Accessibility Improvements
@@ -12,6 +13,7 @@
 - Make security code tooltip receive keyboard focus [#1551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1551)
 - Improve accessibility of quantity picker [#1552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1552)
 - Improve keyboard accessibility of product scroller [#1559](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1559)
+- Improve keyboard accessibility of account menu and nav bar [#1572](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1572)
 
 ### Other Features
 
