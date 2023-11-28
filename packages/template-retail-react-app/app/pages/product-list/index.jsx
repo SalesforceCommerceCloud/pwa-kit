@@ -592,6 +592,7 @@ const ProductList = (props) => {
                     </Grid>
                 </>
             )}
+            {/* Modal for filter options on mobile */}
             <Modal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -615,7 +616,7 @@ const ProductList = (props) => {
                         <Refinements
                             toggleFilter={toggleFilter}
                             filters={productSearchResult?.refinements}
-                            selectedFilters={productSearchResult?.selectedRefinements}
+                            selectedFilters={searchParams.refine}
                         />
                     </ModalBody>
 
