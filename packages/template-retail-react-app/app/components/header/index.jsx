@@ -174,7 +174,10 @@ const Header = ({
                         >
                             <PopoverTrigger>
                                 <ChevronDownIcon
-                                    aria-label="My account trigger"
+                                    aria-label={intl.formatMessage({
+                                        id: 'header.button.assistive_msg.my_account_menu',
+                                        defaultMessage: 'Open account menu'
+                                    })}
                                     onMouseLeave={handleIconsMouseLeave}
                                     onKeyDown={(e) => {
                                         keyMap[e.key]?.(e)
