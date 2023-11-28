@@ -238,7 +238,7 @@ const main = async () => {
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
             const webpackConf = fse.pathExistsSync(projectWebpack)
                 ? projectWebpack
-                : p.join(__dirname, '..', 'dist', 'configs', 'webpack', 'config.js')
+                : p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
             fse.emptyDirSync(buildDirectory)
             execSync(`${webpack} --config ${webpackConf}`, {
                 env: {

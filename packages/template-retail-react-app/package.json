@@ -20,6 +20,7 @@
     "lint:fix": "npm run lint -- --fix",
     "postinstall": "npm run compile-translations && npm run compile-translations:pseudo",
     "push": "npm run build && pwa-kit-dev push",
+    "push:source-map": "cross-env SSR_SOURCE_MAP=true npm run build && pwa-kit-dev push",
     "save-credentials": "pwa-kit-dev save-credentials",
     "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
     "start:inspect": "npm run start -- --inspect",
