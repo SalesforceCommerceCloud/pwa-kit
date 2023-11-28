@@ -85,6 +85,8 @@ const Header = ({
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
     const {
+        getButtonProps: getAccountMenuButtonProps,
+        getDisclosureProps: getAccountMenuDisclosureProps,
         isOpen: isAccountMenuOpen,
         onClose: onAccountMenuClose,
         onOpen: onAccountMenuOpen
@@ -103,12 +105,6 @@ const Header = ({
         await logout.mutateAsync()
         navigate('/login')
         setShowLoading(false)
-    }
-
-    const accountMenuKeyDownMap = {
-        Escape: () => onAccountMenuClose(),
-        ' ': () => onAccountMenuOpen(),
-        Enter: () => onAccountMenuOpen()
     }
 
     const handleIconsMouseLeave = () => {
@@ -178,18 +174,17 @@ const Header = ({
                             onOpen={onAccountMenuOpen}
                         >
                             <PopoverTrigger>
-                                <ChevronDownIcon
+                                <IconButton
                                     aria-label={intl.formatMessage({
                                         id: 'header.button.assistive_msg.my_account_menu',
                                         defaultMessage: 'Open account menu'
                                     })}
-                                    onMouseLeave={handleIconsMouseLeave}
-                                    onKeyDown={(e) => {
-                                        accountMenuKeyDownMap[e.key]?.(e)
-                                    }}
-                                    {...styles.arrowDown}
+                                    icon={<ChevronDownIcon {...styles.arrowDown} />}
+                                    variant="unstyled"
+                                    {...getAccountMenuButtonProps()}
                                     onMouseOver={onAccountMenuOpen}
-                                    tabIndex={0}
+                                    onMouseLeave={handleIconsMouseLeave}
+                                    onClick={(e) => console.log('click', e.target)}
                                 />
                             </PopoverTrigger>
 
@@ -202,6 +197,7 @@ const Header = ({
                                 onMouseOver={() => {
                                     hasEnterPopoverContent.current = true
                                 }}
+                                {...getAccountMenuDisclosureProps()}
                             >
                                 <PopoverArrow />
                                 <PopoverHeader>
