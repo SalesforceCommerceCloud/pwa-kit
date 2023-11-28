@@ -12,6 +12,7 @@
 - Make security code tooltip receive keyboard focus [#1551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1551)
 - Improve accessibility of quantity picker [#1552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1552)
 - Improve keyboard accessibility of product scroller [#1559](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1559)
+- Ensure color is not the sole means of communicating information [#1570](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1570)
 
 ### Other Features
 
