@@ -84,7 +84,11 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-    const {isOpen, onClose, onOpen} = useDisclosure()
+    const {
+        isOpen: isAccountMenuOpen,
+        onClose: onAccountMenuClose,
+        onOpen: onAccountMenuOpen
+    } = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
 
     const [showLoading, setShowLoading] = useState(false)
@@ -101,15 +105,15 @@ const Header = ({
         setShowLoading(false)
     }
 
-    const keyMap = {
-        Escape: () => onClose(),
-        Enter: () => onOpen()
+    const accountMenuKeyDownMap = {
+        Escape: () => onAccountMenuClose(),
+        Enter: () => onAccountMenuOpen()
     }
 
     const handleIconsMouseLeave = () => {
         // don't close the menu if users enter the popover content
         setTimeout(() => {
-            if (!hasEnterPopoverContent.current) onClose()
+            if (!hasEnterPopoverContent.current) onAccountMenuClose()
         }, 100)
     }
 
@@ -160,17 +164,17 @@ const Header = ({
                         })}
                         variant="unstyled"
                         onClick={onMyAccountClick}
-                        onMouseOver={isDesktop ? onOpen : noop}
+                        onMouseOver={isDesktop ? onAccountMenuOpen : noop}
                     />
 
                     {isRegistered && isHydrated() && (
                         <Popover
                             isLazy
                             arrowSize={15}
-                            isOpen={isOpen}
+                            isOpen={isAccountMenuOpen}
                             placement="bottom-end"
-                            onClose={onClose}
-                            onOpen={onOpen}
+                            onClose={onAccountMenuClose}
+                            onOpen={onAccountMenuOpen}
                         >
                             <PopoverTrigger>
                                 <ChevronDownIcon
@@ -180,10 +184,10 @@ const Header = ({
                                     })}
                                     onMouseLeave={handleIconsMouseLeave}
                                     onKeyDown={(e) => {
-                                        keyMap[e.key]?.(e)
+                                        accountMenuKeyDownMap[e.key]?.(e)
                                     }}
                                     {...styles.arrowDown}
-                                    onMouseOver={onOpen}
+                                    onMouseOver={onAccountMenuOpen}
                                     tabIndex={0}
                                 />
                             </PopoverTrigger>
@@ -192,7 +196,7 @@ const Header = ({
                                 {...styles.popoverContent}
                                 onMouseLeave={() => {
                                     hasEnterPopoverContent.current = false
-                                    onClose()
+                                    onAccountMenuClose()
                                 }}
                                 onMouseOver={() => {
                                     hasEnterPopoverContent.current = true
