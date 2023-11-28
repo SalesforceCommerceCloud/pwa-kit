@@ -54,7 +54,7 @@ const Pagination = (props) => {
                 href={prev || currentURL}
                 to={prev || currentURL}
                 aria-label="Previous Page"
-                isDisabled={!prev}
+                aria-disabled={!prev}
                 variant="link"
             >
                 <ChevronLeftIcon />
@@ -103,7 +103,7 @@ const Pagination = (props) => {
                 href={next || currentURL}
                 to={next || currentURL}
                 aria-label="Next Page"
-                isDisabled={!next}
+                aria-disabled={!next}
                 variant="link"
             >
                 <Text>
