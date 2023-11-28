@@ -41,7 +41,8 @@ import {
     EINSTEIN_RECOMMENDERS,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
+    TOAST_MESSAGE_ALREADY_IN_WISHLIST
 } from '@salesforce/retail-react-app/app/constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
@@ -152,34 +153,51 @@ const Cart = () => {
             if (!customerId || !wishlist) {
                 return
             }
-            await createCustomerProductListItem.mutateAsync({
-                parameters: {
-                    listId: wishlist.id,
-                    customerId
-                },
-                body: {
-                    // NOTE: APi does not respect quantity, it always adds 1
-                    quantity: product.quantity,
-                    productId: product.productId,
-                    public: false,
-                    priority: 1,
-                    type: 'product'
-                }
-            })
-            toast({
-                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                status: 'success',
-                action: (
-                    // it would be better if we could use <Button as={Link}>
-                    // but unfortunately the Link component is not compatible
-                    // with Chakra Toast, since the ToastManager is rendered via portal
-                    // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                    </Button>
-                )
-            })
+
+            const isItemInWishlist = wishlist?.customerProductListItems?.find(
+                (i) => i.productId === product?.id
+            )
+
+            if (!isItemInWishlist) {
+                await createCustomerProductListItem.mutateAsync({
+                    parameters: {
+                        listId: wishlist.id,
+                        customerId
+                    },
+                    body: {
+                        // NOTE: APi does not respect quantity, it always adds 1
+                        quantity: product.quantity,
+                        productId: product.productId,
+                        public: false,
+                        priority: 1,
+                        type: 'product'
+                    }
+                })
+                toast({
+                    title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                    status: 'success',
+                    action: (
+                        // it would be better if we could use <Button as={Link}>
+                        // but unfortunately the Link component is not compatible
+                        // with Chakra Toast, since the ToastManager is rendered via portal
+                        // and the toast doesn't have access to intl provider, which is a
+                        // requirement of the Link component.
+                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                            {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        </Button>
+                    )
+                })
+            } else {
+                toast({
+                    title: formatMessage(TOAST_MESSAGE_ALREADY_IN_WISHLIST),
+                    status: 'info',
+                    action: (
+                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                            {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        </Button>
+                    )
+                })
+            }
         } catch {
             showError()
         }

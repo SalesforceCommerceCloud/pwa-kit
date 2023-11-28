@@ -10,6 +10,7 @@
 - Ensure all interactive functionality is operable with the keyboard [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
 - Make security code tooltip receive keyboard focus [#1551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1551)
 - Improve accessibility of quantity picker [#1552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1552)
+- Improve keyboard accessibility of product scroller [#1559](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1559)
 - Fix focus indicator for hero features links on homepage [#1561](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1561)
 
 ### Other Features
@@ -19,6 +20,8 @@
 ### Bug Fixes
 
 - Remove internal linter rule that is missing in generated projects [#1554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1554)
+- Fix bug where you can add duplicates of the same item to the wishlist. Also fixes bug where skeleton appears when removing last item from the wishlist. [#1560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1560)
+- Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
 
 ## v2.1.0 (Nov 3, 2023)
 
@@ -27,7 +30,7 @@
   - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
 - Show discounted and strikethrough prices when there is a promotion on product detail page [1455](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1455)
 - Move Content-Security-Policy logic to pwa-kit-runtime [1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
-  
+
 ## v2.0.0 (Sep 21, 2023)
 
 - V3 Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)

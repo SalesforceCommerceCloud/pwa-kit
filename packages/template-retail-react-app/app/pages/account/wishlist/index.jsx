@@ -107,7 +107,8 @@ const AccountWishlist = () => {
         return isValidChange
     }
 
-    const isPageLoading = wishListItems ? isProductsLoading : isWishListLoading
+    const hasWishlistItems = wishListItems?.length > 0
+    const isPageLoading = hasWishlistItems ? isProductsLoading : isWishListLoading
 
     return (
         <Stack spacing={4} data-testid="account-wishlist-page">
@@ -140,7 +141,7 @@ const AccountWishlist = () => {
                 </Box>
             )}
 
-            {!isPageLoading && !wishListItems && (
+            {!isPageLoading && !hasWishlistItems && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<HeartIcon boxSize={8} />}

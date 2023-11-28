@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
 
@@ -75,7 +75,7 @@ const ProductTile = (props) => {
     const localizedProductName = product.name ?? product.productName
 
     const {currency: activeCurrency} = useCurrency()
-    const [isFavouriteLoading, setFavouriteLoading] = useState(false)
+    const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
 
     return (
@@ -135,17 +135,32 @@ const ProductTile = (props) => {
                     }}
                 >
                     <IconButtonWithRegistration
-                        aria-label={intl.formatMessage({
-                            id: 'product_tile.assistive_msg.wishlist',
-                            defaultMessage: 'Wishlist'
-                        })}
+                        data-testid="wishlist-button"
+                        aria-label={
+                            isFavourite
+                                ? intl.formatMessage(
+                                      {
+                                          id: 'product_tile.assistive_msg.remove_from_wishlist',
+                                          defaultMessage: 'Remove {product} from wishlist'
+                                      },
+                                      {product: localizedProductName}
+                                  )
+                                : intl.formatMessage(
+                                      {
+                                          id: 'product_tile.assistive_msg.add_to_wishlist',
+                                          defaultMessage: 'Add {product} to wishlist'
+                                      },
+                                      {product: localizedProductName}
+                                  )
+                        }
                         icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
                         {...styles.favIcon}
-                        disabled={isFavouriteLoading}
                         onClick={async () => {
-                            setFavouriteLoading(true)
-                            await onFavouriteToggle(!isFavourite)
-                            setFavouriteLoading(false)
+                            if (!isFavouriteLoading.current) {
+                                isFavouriteLoading.current = true
+                                await onFavouriteToggle(!isFavourite)
+                                isFavouriteLoading.current = false
+                            }
                         }}
                     />
                 </Box>
@@ -190,7 +205,7 @@ ProductTile.propTypes = {
      */
     enableFavourite: PropTypes.bool,
     /**
-     * Display the product as a faviourite.
+     * Display the product as a favourite.
      */
     isFavourite: PropTypes.bool,
     /**

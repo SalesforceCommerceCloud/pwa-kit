@@ -5,12 +5,28 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+export const mockedNullWishList = {
+    limit: 1,
+    data: [
+        {
+            creationDate: '2023-03-07T19:57:28.000Z',
+            event: {},
+            id: 'e41812c0545ec3cafcbae8c6e8',
+            lastModified: '2023-03-07T19:57:28.000Z',
+            public: false,
+            type: 'wish_list'
+        }
+    ],
+    total: 1
+}
+
 export const mockedEmptyWishList = {
     limit: 1,
     data: [
         {
             creationDate: '2023-03-07T19:57:28.000Z',
             event: {},
+            customerProductListItems: [],
             id: 'e41812c0545ec3cafcbae8c6e8',
             lastModified: '2023-03-07T19:57:28.000Z',
             public: false,
