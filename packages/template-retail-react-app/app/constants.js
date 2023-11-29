@@ -81,6 +81,11 @@ export const TOAST_MESSAGE_ADDED_TO_WISHLIST = defineMessage({
     defaultMessage: '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
 })
 
+export const TOAST_MESSAGE_ALREADY_IN_WISHLIST = defineMessage({
+    id: 'global.info.already_in_wishlist',
+    defaultMessage: 'Item is already in wishlist'
+})
+
 export const TOAST_MESSAGE_REMOVED_ITEM_FROM_CART = defineMessage({
     defaultMessage: 'Item removed from cart',
     id: 'cart.info.removed_from_cart'

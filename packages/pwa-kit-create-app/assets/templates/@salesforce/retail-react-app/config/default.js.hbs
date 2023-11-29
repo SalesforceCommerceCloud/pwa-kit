@@ -8,14 +8,16 @@
 const sites = require('./sites.js')
 module.exports = {
     app: {
-        // Customize how your 'site' and 'locale' are displayed in the url.
+        // Customize settings for your url
         url: {
             // Determine where the siteRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
             // site: 'none',
             // Determine where the localeRef is located. Valid values include 'path|query_param|none'. Defaults to: 'none'
-            locale: 'none',
-            // This boolean value dictates whether or not default site or locale values are shown in the url. Defaults to: false
-            // showDefaults: true
+            locale: 'none'
+            // This boolean value dictates whether default site or locale values are shown in the url. Defaults to: false
+            // showDefaults: true,
+            // This boolean value dictates whether the plus sign (+) is interpreted as space for query param string. Defaults to: false
+            interpretPlusSignAsSpace: false
         },
         // The default site for your app. This value will be used when a siteRef could not be determined from the url
         defaultSite: '{{answers.project.commerce.siteId}}',

@@ -68,7 +68,6 @@ import {
     useSearchParams
 } from '@salesforce/retail-react-app/app/hooks'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-// import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 
@@ -186,7 +185,7 @@ const ProductList = (props) => {
 
     /**************** Response Handling ****************/
     if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
 
     // Reset scroll position when `isRefetching` becomes `true`.
@@ -518,7 +517,7 @@ const ProductList = (props) => {
                                           .map((value, index) => (
                                               <ProductTileSkeleton key={index} />
                                           ))
-                                    : productSearchResult.hits.map((productSearchItem) => {
+                                    : productSearchResult?.hits?.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
                                           const isInWishlist =
                                               !!wishlist?.customerProductListItems?.find(
@@ -593,6 +592,7 @@ const ProductList = (props) => {
                     </Grid>
                 </>
             )}
+            {/* Modal for filter options on mobile */}
             <Modal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -616,7 +616,7 @@ const ProductList = (props) => {
                         <Refinements
                             toggleFilter={toggleFilter}
                             filters={productSearchResult?.refinements}
-                            selectedFilters={productSearchResult?.selectedRefinements}
+                            selectedFilters={searchParams.refine}
                         />
                     </ModalBody>
 

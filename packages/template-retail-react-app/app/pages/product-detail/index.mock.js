@@ -196,6 +196,437 @@ export const basketWithProductSet = {
     tax_total: null
 }
 
+export const mockProductInWishlist = {
+    limit: 1,
+    data: [
+        {
+            brand: 'Apple',
+            currency: 'USD',
+            id: 'apple-ipod-nano-green-16gM',
+            imageGroups: [
+                {
+                    images: [
+                        {
+                            alt: 'Apple iPod Nano, Green, large',
+                            disBaseLink:
+                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-electronics-m-catalog/default/dw26470cbd/images/large/ipod-nano-green.jpg',
+                            link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw26470cbd/images/large/ipod-nano-green.jpg',
+                            title: 'Apple iPod Nano, Green'
+                        }
+                    ],
+                    variationAttributes: [
+                        {
+                            id: 'color',
+                            values: [
+                                {
+                                    value: 'Green'
+                                }
+                            ]
+                        }
+                    ],
+                    viewType: 'large'
+                },
+                {
+                    images: [
+                        {
+                            alt: 'Apple iPod Nano, Green, medium',
+                            disBaseLink:
+                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-electronics-m-catalog/default/dw610652b7/images/medium/ipod-nano-green.jpg',
+                            link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw610652b7/images/medium/ipod-nano-green.jpg',
+                            title: 'Apple iPod Nano, Green'
+                        }
+                    ],
+                    variationAttributes: [
+                        {
+                            id: 'color',
+                            values: [
+                                {
+                                    value: 'Green'
+                                }
+                            ]
+                        }
+                    ],
+                    viewType: 'medium'
+                },
+                {
+                    images: [
+                        {
+                            alt: 'Apple iPod Nano, Green, small',
+                            disBaseLink:
+                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-electronics-m-catalog/default/dw09f0fd49/images/small/ipod-nano-green.jpg',
+                            link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw09f0fd49/images/small/ipod-nano-green.jpg',
+                            title: 'Apple iPod Nano, Green'
+                        }
+                    ],
+                    variationAttributes: [
+                        {
+                            id: 'color',
+                            values: [
+                                {
+                                    value: 'Green'
+                                }
+                            ]
+                        }
+                    ],
+                    viewType: 'small'
+                },
+                {
+                    images: [
+                        {
+                            alt: 'Apple iPod Nano, Green, swatch',
+                            disBaseLink:
+                                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-electronics-m-catalog/default/dw849cd37f/images/swatch/green.jpg',
+                            link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-electronics-m-catalog/default/dw849cd37f/images/swatch/green.jpg',
+                            title: 'Apple iPod Nano, Green'
+                        }
+                    ],
+                    variationAttributes: [
+                        {
+                            id: 'color',
+                            values: [
+                                {
+                                    value: 'Green'
+                                }
+                            ]
+                        }
+                    ],
+                    viewType: 'swatch'
+                }
+            ],
+            inventory: {
+                ats: 10,
+                backorderable: true,
+                id: 'inventory_m',
+                inStockDate: '2009-03-31T00:00:00.000Z',
+                orderable: true,
+                preorderable: false,
+                stockLevel: 0
+            },
+            longDescription:
+                'Supports MP3 (up to 320 Kbps), MP3 VBR, AAC (up to 320 Kbps), Protected AAC (iTunes Music Store), Audible (formats 2, 3, 4), AIFF, Apple Lossless and WAV audio formats, plus BMP, JPEG, GIF, TIFF, PNG and PSD (Mac only) image formats; podcasting support',
+            master: {
+                masterId: 'apple-ipod-nanoM',
+                orderable: true,
+                price: 119.0
+            },
+            minOrderQuantity: 1,
+            name: 'Apple iPod Nano',
+            pageDescription:
+                'The all new iPod nano has a curved aluminum and glass design and stunning new features. The Genius music feature helps you find music to fit your mood. With the built-in accelerometer, you can rotate the nano to flip through album art with Cover Flow. Plus, view photos and videos in either portrait or landscape.',
+            pageKeywords: 'Apple, iPod, Nano, MP3, Music Player',
+            pageTitle: 'Apple iPod Nano',
+            price: 199.0,
+            pricePerUnit: 199.0,
+            productPromotions: [
+                {
+                    calloutMsg: '$50offOrderCountAbove5',
+                    promotionId: '$50offOrderCountAbove5'
+                },
+                {
+                    promotionalPrice: 189.0,
+                    promotionId: '10$offIpod'
+                },
+                {
+                    promotionalPrice: 194.0,
+                    promotionId: '5$offIpod'
+                }
+            ],
+            shortDescription:
+                'The all new iPod nano has a curved aluminum and glass design and stunning new features. The Genius music \r\nfeature helps you find music to fit your mood. With the built-in accelerometer, you can rotate the nano to flip through album art with \r\nCover Flow. Plus, view photos and videos in either portrait or landscape.',
+            stepQuantity: 1,
+            type: {
+                variant: true
+            },
+            unitMeasure: '',
+            unitQuantity: 0,
+            variants: [
+                {
+                    orderable: true,
+                    price: 149.0,
+                    productId: 'apple-ipod-nano-silver-8gM',
+                    variationValues: {
+                        color: 'Silver',
+                        memorySize: '8 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 149.0,
+                    productId: 'apple-ipod-nano-black-8gM',
+                    variationValues: {
+                        color: 'Black',
+                        memorySize: '8 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 149.0,
+                    productId: 'apple-ipod-nano-purple-8gM',
+                    variationValues: {
+                        color: 'Purple',
+                        memorySize: '8 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 149.0,
+                    productId: 'apple-ipod-nano-blue-8gM',
+                    variationValues: {
+                        color: 'Blue',
+                        memorySize: '8 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 149.0,
+                    productId: 'apple-ipod-nano-green-8gM',
+                    variationValues: {
+                        color: 'Green',
+                        memorySize: '8 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 119.0,
+                    productId: 'apple-ipod-nano-yellow-8gM',
+                    variationValues: {
+                        color: 'Yellow',
+                        memorySize: '8 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 149.0,
+                    productId: 'apple-ipod-nano-orange-8gM',
+                    variationValues: {
+                        color: 'Orange',
+                        memorySize: '8 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 119.0,
+                    productId: 'apple-ipod-nano-red-8gM',
+                    variationValues: {
+                        color: 'Red',
+                        memorySize: '8 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 149.0,
+                    productId: 'apple-ipod-nano-fuscia-8gM',
+                    variationValues: {
+                        color: 'Fuscia',
+                        memorySize: '8 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 199.0,
+                    productId: 'apple-ipod-nano-silver-16gM',
+                    variationValues: {
+                        color: 'Silver',
+                        memorySize: '16 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 199.0,
+                    productId: 'apple-ipod-nano-black-16gM',
+                    variationValues: {
+                        color: 'Black',
+                        memorySize: '16 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 199.0,
+                    productId: 'apple-ipod-nano-purple-16gM',
+                    variationValues: {
+                        color: 'Purple',
+                        memorySize: '16 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 159.0,
+                    productId: 'apple-ipod-nano-blue-16gM',
+                    variationValues: {
+                        color: 'Blue',
+                        memorySize: '16 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 199.0,
+                    productId: 'apple-ipod-nano-green-16gM',
+                    variationValues: {
+                        color: 'Green',
+                        memorySize: '16 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 199.0,
+                    productId: 'apple-ipod-nano-yellow-16gM',
+                    variationValues: {
+                        color: 'Yellow',
+                        memorySize: '16 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 159.0,
+                    productId: 'apple-ipod-nano-orange-16gM',
+                    variationValues: {
+                        color: 'Orange',
+                        memorySize: '16 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 199.0,
+                    productId: 'apple-ipod-nano-red-16gM',
+                    variationValues: {
+                        color: 'Red',
+                        memorySize: '16 GB'
+                    }
+                },
+                {
+                    orderable: true,
+                    price: 199.0,
+                    productId: 'apple-ipod-nano-fuscia-16gM',
+                    variationValues: {
+                        color: 'Fuscia',
+                        memorySize: '16 GB'
+                    }
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    name: 'Color',
+                    values: [
+                        {
+                            name: 'Silver',
+                            orderable: true,
+                            value: 'Silver'
+                        },
+                        {
+                            name: 'Black',
+                            orderable: true,
+                            value: 'Black'
+                        },
+                        {
+                            name: 'Purple',
+                            orderable: true,
+                            value: 'Purple'
+                        },
+                        {
+                            name: 'Blue',
+                            orderable: true,
+                            value: 'Blue'
+                        },
+                        {
+                            name: 'Green',
+                            orderable: true,
+                            value: 'Green'
+                        },
+                        {
+                            name: 'Yellow',
+                            orderable: true,
+                            value: 'Yellow'
+                        },
+                        {
+                            name: 'Orange',
+                            orderable: true,
+                            value: 'Orange'
+                        },
+                        {
+                            name: 'Red',
+                            orderable: true,
+                            value: 'Red'
+                        },
+                        {
+                            name: 'Fuscia',
+                            orderable: true,
+                            value: 'Fuscia'
+                        }
+                    ]
+                },
+                {
+                    id: 'memorySize',
+                    name: 'Memory Size',
+                    values: [
+                        {
+                            name: '8 GB',
+                            orderable: true,
+                            value: '8 GB'
+                        },
+                        {
+                            name: '16 GB',
+                            orderable: true,
+                            value: '16 GB'
+                        }
+                    ]
+                }
+            ],
+            variationValues: {
+                color: 'Green',
+                memorySize: '16 GB'
+            },
+            c_batteryLife: '24 hours',
+            c_batteryType: 'Lithium Ion',
+            c_color: 'Green',
+            c_dimDepth: '0.24 inches',
+            c_dimHeight: '3.6 inches',
+            c_dimWeight: '1.3 ounces',
+            c_dimWidth: '1.5 inches',
+            c_displaySize: '2 inches',
+            c_mediaFormat: ['0010', '0020', '0030'],
+            c_memorySize: '16 GB',
+            c_musicStorage: '4,000 songs',
+            c_portableAudioType: ['0010', '0020'],
+            c_refinementColor: 'green',
+            c_resolution: '320 x 240',
+            c_tabDescription:
+                'The all new iPod nano has a curved aluminum and glass design and stunning new features. The Genius music feature helps you find music to fit your mood. With the built-in accelerometer, you can rotate the nano to flip through album art with Cover Flow. Plus, view photos and videos in either portrait or landscape.',
+            c_tabDetails:
+                'Supports MP3 (up to 320 Kbps), MP3 VBR, AAC (up to 320 Kbps), Protected AAC (iTunes Music Store), Audible (formats 2, 3, 4), AIFF, Apple Lossless and WAV audio formats, plus BMP, JPEG, GIF, TIFF, PNG and PSD (Mac only) image formats; podcasting support',
+            c_videoStorage: '16 hours'
+        }
+    ],
+    total: 1
+}
+
+export const mockWishlistWithItem = {
+    limit: 1,
+    data: [
+        {
+            creationDate: '2021-06-12T00:09:00.000Z',
+            customerProductListItems: [
+                {
+                    id: 'b41ad6634e83fc9673625bf087',
+                    priority: 1,
+                    productId: 'apple-ipod-nano-green-16gM',
+                    public: false,
+                    purchasedQuantity: 0,
+                    quantity: 1,
+                    type: 'product'
+                }
+            ],
+            event: {},
+            id: 'c1b0edb2ad6fcfb153044ef3b0',
+            lastModified: '2021-06-30T04:11:12.602Z',
+            public: false,
+            name: 'PWA wishlist',
+            type: 'wish_list'
+        }
+    ],
+    total: 1
+}
+
 export const einsteinRecommendation = {
     recs: [
         {
