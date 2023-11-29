@@ -146,3 +146,9 @@ Object.defineProperty(window, 'matchMedia', {
         dispatchEvent: jest.fn()
     }))
 })
+
+// With the upgrade to jest v27, setImmediate was removed from jsdom environment
+// Which results in 'ReferenceError: setImmediate is not defined' with any test using `waitFor`
+// Work around is to replace the global function
+// See https://github.com/jestjs/jest/pull/11222
+global.setImmediate = jest.useRealTimers;

@@ -12,6 +12,6 @@
 
 const babelJest = require('babel-jest')
 
-module.exports = babelJest.createTransformer({
+module.exports = babelJest.default.createTransformer({
     rootMode: 'upward'
 })

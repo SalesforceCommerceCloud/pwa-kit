@@ -12,6 +12,7 @@
 
 const babelJest = require('babel-jest')
 
+// TODO: change to use .default after upgrading jest for internal-lib-build
 module.exports = babelJest.createTransformer({
     rootMode: 'upward'
 })
