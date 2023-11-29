@@ -19,25 +19,18 @@ const pkgJSON = JSON.parse(fs.readFileSync(packagePath))
 const locale = process.argv[2]
 
 const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) => {
-    const files = fs.readdirSync(dirPath)
+    const files = fs.readdirSync(dirPath, {withFileTypes: true})
 
     files.forEach(function (file) {
-        if (fs.statSync(path.join(dirPath, file)).isDirectory()) {
-            arrayOfFiles = getAllFilesByExtensions(
-                path.join(dirPath, file),
-                arrayOfFiles,
-                extensions
-            )
+        const filePath = path.join(dirPath, file.name)
+        if (file.isDirectory()) {
+            arrayOfFiles = getAllFilesByExtensions(filePath, arrayOfFiles, extensions)
         } else {
-            arrayOfFiles.push(path.join(dirPath, file))
+            if (extensions.length && extensions.includes(path.extname(filePath))) {
+                arrayOfFiles.push(filePath)
+            }
         }
     })
-    if (extensions.length) {
-        return arrayOfFiles.filter((filePath) => {
-            const getExtension = path.extname(filePath).replace('.', '')
-            return extensions.includes(getExtension)
-        })
-    }
 
     return arrayOfFiles
 }
@@ -62,7 +55,7 @@ try {
         const files = getAllFilesByExtensions(
             path.join(overridesPath, 'app'),
             [],
-            ['js', 'jsx', 'ts', 'tsx']
+            ['.js', '.jsx', '.ts', '.tsx']
         )
         // get the file names that are overridden in base template
         const overriddenFiles = files
