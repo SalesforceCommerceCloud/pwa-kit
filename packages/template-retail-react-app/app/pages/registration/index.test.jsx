@@ -115,7 +115,10 @@ test('Allows customer to create an account', async () => {
     user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
     user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
     user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
-    user.click(withinForm.getByText(/create account/i))
+
+    await waitFor(() => {
+        user.click(withinForm.getByText(/create account/i))
+    })
 
     // wait for success state to appear
     const myAccount = await screen.findAllByText(/My Account/)

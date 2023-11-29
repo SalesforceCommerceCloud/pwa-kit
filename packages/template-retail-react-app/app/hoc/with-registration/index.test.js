@@ -55,7 +55,9 @@ afterEach(() => {
 
 test('should execute onClick for registered users', async () => {
     const onClick = jest.fn()
-    await renderWithProviders(<MockedComponent onClick={onClick} />)
+    await waitFor(() => {
+        renderWithProviders(<MockedComponent onClick={onClick} />)
+    })
 
     await waitFor(() => {
         // we wait for login to complete and user's firstName to show up on screen.

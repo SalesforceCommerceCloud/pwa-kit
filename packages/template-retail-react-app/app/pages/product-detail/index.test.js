@@ -104,7 +104,10 @@ describe('product set', () => {
         renderWithProviders(<MockedPageWithProductSet />, {wrapperProps: {initialBasket}})
 
         const buttons = await screen.findAllByRole('button', {name: /add set to cart/i})
-        fireEvent.click(buttons[0])
+
+        await waitFor(() => {
+            fireEvent.click(buttons[0])
+        })
 
         await waitFor(
             () => {
