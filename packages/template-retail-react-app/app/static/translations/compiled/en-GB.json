@@ -355,6 +355,12 @@
       "value": "You Might Also Like"
     }
   ],
+  "auth_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Close login form"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,

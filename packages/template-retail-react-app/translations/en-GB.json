@@ -144,6 +144,9 @@
   "add_to_cart_modal.recommended_products.title.might_also_like": {
     "defaultMessage": "You Might Also Like"
   },
+  "auth_modal.button.close.assistive_msg": {
+    "defaultMessage": "Close login form"
+  },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "You're now signed in."
   },
