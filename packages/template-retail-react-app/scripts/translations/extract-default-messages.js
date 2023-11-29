@@ -16,7 +16,6 @@ const fs = require('fs')
 const path = require('path')
 const packagePath = path.join(process.cwd(), 'package.json')
 const pkgJSON = JSON.parse(fs.readFileSync(packagePath))
-const locale = process.argv[2]
 
 const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) => {
     const files = fs.readdirSync(dirPath, {withFileTypes: true})
@@ -35,7 +34,7 @@ const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) =>
     return arrayOfFiles
 }
 
-try {
+function extract(locale) {
     // `extends` is a reserved word (`class A extends B {}`)
     const {extends: extendsPkg, overridesDir} = pkgJSON.ccExtensibility || {}
     if (!overridesDir) {
@@ -76,6 +75,11 @@ try {
             }
         })
     }
+}
+
+try {
+    // example usage: node ./scripts/translations/extract-default-messages en-US en-GB
+    process.argv.slice(2).forEach(extract)
 } catch (error) {
     console.error(error)
 }
