@@ -75,4 +75,9 @@ function extract(locale) {
     }
 }
 
-
+try {
+    // example usage: node ./scripts/translations/extract-default-messages en-US en-GB
+    process.argv.slice(2).forEach(extract)
+} catch (error) {
+    console.error(error)
+}
