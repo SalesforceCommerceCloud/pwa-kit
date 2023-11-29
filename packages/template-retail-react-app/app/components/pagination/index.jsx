@@ -57,7 +57,7 @@ const Pagination = (props) => {
                     id: 'pagination.link.prev.assistive_msg',
                     defaultMessage: 'Previous Page'
                 })}
-                isDisabled={!prev}
+                aria-disabled={!prev}
                 variant="link"
             >
                 <ChevronLeftIcon />
@@ -109,7 +109,7 @@ const Pagination = (props) => {
                     id: 'pagination.link.next.assistive_msg',
                     defaultMessage: 'Next Page'
                 })}
-                isDisabled={!next}
+                aria-disabled={!next}
                 variant="link"
             >
                 <Text>
