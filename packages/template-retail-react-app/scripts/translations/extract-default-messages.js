@@ -46,7 +46,11 @@ try {
     // `extends` is a reserved word (`class A extends B {}`)
     const {extends: extendsPkg, overridesDir} = pkgJSON.ccExtensibility || {}
     if (!overridesDir) {
-        const command = `formatjs extract "app/**/*.{js,jsx,ts,tsx}" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        const command = [
+            'formatjs extract "app/**/*.{js,jsx,ts,tsx}"',
+            `--out-file translations/${locale}.json`,
+            '--id-interpolation-pattern [sha512:contenthash:base64:6]'
+        ].join(' ')
         exec(command, (err) => {
             if (err) {
                 console.error(err)
@@ -62,19 +66,13 @@ try {
         )
         // get the file names that are overridden in base template
         const overriddenFiles = files
-            .map((path) => {
-                const replacedPath = path.replace(overridesDir, `node_modules/${extendsPkg}`)
-                // check if this file does exist in base template
-                const isFileExist = fs.existsSync(replacedPath)
-                return isFileExist ? replacedPath : ''
-            })
-            .filter(Boolean)
-        // rename the files needs to ignore to have .ignore extensions so it won't be recognized by formatjs
-        overriddenFiles.forEach((filePath) => {
-            fs.rename(filePath, `${filePath}.ignore`, (err) => err && console.error(err))
-        })
-
-        const extractCommand = `formatjs extract "./node_modules/${extendsPkg}/app/**/*.{js,jsx,ts,tsx}" "${overridesDir}/app/**/*.{js,jsx,ts,tsx}" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        const extractCommand = [
+            'formatjs extract',
+            '"./node_modules/${extendsPkg}/app/**/*.{js,jsx,ts,tsx}"',
+            '"${overridesDir}/app/**/*.{js,jsx,ts,tsx}"',
+            `--out-file translations/${locale}.json`,
+            '--id-interpolation-pattern [sha512:contenthash:base64:6]'
+        ].join(' ')
         exec(extractCommand, (err) => {
             if (err) {
                 console.error(err)
