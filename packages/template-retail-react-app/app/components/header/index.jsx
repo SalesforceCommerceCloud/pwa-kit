@@ -184,7 +184,6 @@ const Header = ({
                                     {...getAccountMenuButtonProps()}
                                     onMouseOver={onAccountMenuOpen}
                                     onMouseLeave={handleIconsMouseLeave}
-                                    onClick={(e) => console.log('click', e.target)}
                                 />
                             </PopoverTrigger>
 
