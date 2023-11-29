@@ -19,6 +19,7 @@
 ### Other Features
 
 - Implement gift option for basket [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
+- Added option to specify `isLoginPage` function to the `withRegistration` component. The default behavior is "all pages ending in `/login`". [#1572](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1572)
 
 ### Bug Fixes
 
