@@ -66,21 +66,21 @@ try {
         )
         // get the file names that are overridden in base template
         const overriddenFiles = files
+            .map((path) => path.replace(overridesDir, `node_modules/${extendsPkg}`))
+            .filter((file) => fs.existsSync(file))
         const extractCommand = [
             'formatjs extract',
             '"./node_modules/${extendsPkg}/app/**/*.{js,jsx,ts,tsx}"',
             '"${overridesDir}/app/**/*.{js,jsx,ts,tsx}"',
             `--out-file translations/${locale}.json`,
-            '--id-interpolation-pattern [sha512:contenthash:base64:6]'
+            '--id-interpolation-pattern [sha512:contenthash:base64:6]',
+            '--ignore',
+            ...overriddenFiles.map((file) => `'${file}'`)
         ].join(' ')
         exec(extractCommand, (err) => {
             if (err) {
                 console.error(err)
             }
-            // restore file names
-            overriddenFiles.forEach((filePath) => {
-                fs.rename(`${filePath}.ignore`, filePath, (err) => err && console.error(err))
-            })
         })
     }
 } catch (error) {
