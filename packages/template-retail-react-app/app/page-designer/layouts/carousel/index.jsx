@@ -18,7 +18,7 @@ import {
 import {Component, regionPropType} from '@salesforce/commerce-sdk-react/components'
 import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {useEffect} from 'react'
-import {useIntl} from '@salesforce/retail-react-app/node_modules/react-intl/index'
+import {useIntl} from 'react-intl'
 
 /**
  * Display child components in a carousel slider manner. Configurations include the number of

@@ -18,7 +18,6 @@ import {
     useAccessToken,
     useCategory,
     useCommerceApi,
-    useCustomerType,
     useCustomerBaskets,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
@@ -123,7 +122,6 @@ const App = (props) => {
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
-    const {isRegistered} = useCustomerType()
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
