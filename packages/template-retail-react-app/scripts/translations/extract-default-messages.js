@@ -24,10 +24,8 @@ const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) =>
         const filePath = path.join(dirPath, file.name)
         if (file.isDirectory()) {
             arrayOfFiles = getAllFilesByExtensions(filePath, arrayOfFiles, extensions)
-        } else {
-            if (extensions.length && extensions.includes(path.extname(filePath))) {
-                arrayOfFiles.push(filePath)
-            }
+        } else if (extensions.length === 0 || extensions.includes(path.extname(filePath))) {
+            arrayOfFiles.push(filePath)
         }
     })
 
@@ -77,9 +75,4 @@ function extract(locale) {
     }
 }
 
-try {
-    // example usage: node ./scripts/translations/extract-default-messages en-US en-GB
-    process.argv.slice(2).forEach(extract)
-} catch (error) {
-    console.error(error)
-}
+
