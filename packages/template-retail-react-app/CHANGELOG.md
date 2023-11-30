@@ -1,14 +1,38 @@
 ## v2.2.0-dev (Nov 3, 2023)
-- (A11y) Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
+
+### Accessibility Improvements
+
+<!-- Order by Pull Request ID! -->
+- Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
+- Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
+- Fix outline on keyboard focus [#1536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1536/files)
+- Fix improper nesting of elements in product tile [#1541](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1541)
+- Ensure all interactive functionality is operable with the keyboard [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
+- Make security code tooltip receive keyboard focus [#1551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1551)
+- Improve accessibility of quantity picker [#1552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1552)
+- Improve keyboard accessibility of product scroller [#1559](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1559)
+- Ensure color is not the sole means of communicating information [#1570](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1570)
+
+### Other Features
+
+- Add [Active Data](https://help.salesforce.com/s/articleView?id=cc.b2c_active_data_attributes.htm&type=5) files, update pages (app index.jsx, product list and product details pages) to trigger events on product category and product detail views [#1555](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1555)
+- Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
+- Implement gift option for basket [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
+
+### Bug Fixes
+
+- Remove internal linter rule that is missing in generated projects [#1554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1554)
+- Fix bug where you can add duplicates of the same item to the wishlist. Also fixes bug where skeleton appears when removing last item from the wishlist. [#1560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1560)
+- Fix PLP filters for mobile [#1565](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1565)
 
 ## v2.1.0 (Nov 3, 2023)
 
-- Support Storefront Preview 
+- Support Storefront Preview
   - [#1413](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1413)
   - [#1440](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1440)
 - Show discounted and strikethrough prices when there is a promotion on product detail page [1455](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1455)
 - Move Content-Security-Policy logic to pwa-kit-runtime [1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
-  
+
 ## v2.0.0 (Sep 21, 2023)
 
 - V3 Fix checkout card number [#1424](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1424)

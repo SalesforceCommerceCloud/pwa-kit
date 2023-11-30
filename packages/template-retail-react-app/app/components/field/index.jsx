@@ -121,7 +121,7 @@ const Field = ({
                         </InputGroup>
 
                         {error && !type !== 'hidden' && (
-                            <FormErrorMessage>{error.message}</FormErrorMessage>
+                            <FormErrorMessage color="red.600">{error.message}</FormErrorMessage>
                         )}
 
                         {helpText}
