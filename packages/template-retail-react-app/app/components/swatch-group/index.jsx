@@ -14,6 +14,7 @@ import {
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {FormattedMessage} from 'react-intl'
 
 /**
  * SwatchGroup allows you to create a list of swatches
@@ -32,7 +33,13 @@ const SwatchGroup = (props) => {
     return (
         <Flex {...styles.swatchGroup} role="radiogroup" aria-label={label}>
             <HStack {...styles.swatchLabel}>
-                <Box fontWeight="semibold">{`${label}:`}</Box>
+                <Box fontWeight="semibold">
+                    <FormattedMessage
+                        id="swatch_group.selected.label"
+                        defaultMessage="{label}:"
+                        values={{label}}
+                    />
+                </Box>
                 <Box>{displayName}</Box>
             </HStack>
             <Flex {...styles.swatchesWrapper}>

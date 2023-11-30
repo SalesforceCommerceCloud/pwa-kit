@@ -5865,6 +5865,24 @@
       "value": "]"
     }
   ],
+  "swatch_group.selected.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "toggle_card.action.edit": [
     {
       "type": 0,

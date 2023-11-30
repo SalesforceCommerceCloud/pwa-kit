@@ -1339,6 +1339,12 @@
       "value": " added to wishlist"
     }
   ],
+  "global.info.already_in_wishlist": [
+    {
+      "type": 0,
+      "value": "Item is already in wishlist"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
@@ -2327,7 +2333,7 @@
       "value": " to wishlist"
     }
   ],
-  "product_tile.assistive_msg.remove_from wishlist": [
+  "product_tile.assistive_msg.remove_from_wishlist": [
     {
       "type": 0,
       "value": "Remove "
@@ -2729,6 +2735,16 @@
     {
       "type": 0,
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+    }
+  ],
+  "swatch_group.selected.label": [
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": ":"
     }
   ],
   "toggle_card.action.edit": [
