@@ -5,16 +5,45 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {useIntl} from 'react-intl'
+import {useHistory} from 'react-router-dom'
+import PropTypes from 'prop-types'
 
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
-import {Box} from '@salesforce/retail-react-app/app/components/shared/ui/index'
-import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
+import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const VariationAttributeSwatchGroup = ({id, name, selectedValue, values = [], variant}) => {
     const intl = useIntl()
-    const swatches = values.map(({href, name, image, value, orderable}) => {
+    const history = useHistory()
+    const swatches = values.map(({href, name, image, value, orderable}, index) => {
+        const prev = values[(index || values.length) - 1] // modulo but supporting negatives
+        const next = values[(index + 1) % values.length]
+
+        /** Mimic the behavior of native radio inputs by using arrow keys to select prev/next value. */
+        const onKeyDown = (evt) => {
+            let sibling
+            switch (evt.key) {
+                case 'ArrowUp':
+                case 'ArrowLeft':
+                    evt.preventDefault()
+                    sibling =
+                        evt.target.previousElementSibling ||
+                        evt.target.parentElement.lastElementChild
+                    history.replace(prev.href)
+                    break
+                case 'ArrowDown':
+                case 'ArrowRight':
+                    evt.preventDefault()
+                    sibling =
+                        evt.target.nextElementSibling || evt.target.parentElement.firstElementChild
+                    history.replace(next.href)
+                    break
+                default:
+                    break
+            }
+            sibling?.focus()
+        }
         const content = image ? (
             <Box
                 height="100%"
@@ -37,6 +66,7 @@ const VariationAttributeSwatchGroup = ({id, name, selectedValue, values = [], va
                 name={name}
                 variant={variant}
                 selected={selectedValue?.value === value}
+                onKeyDown={onKeyDown}
             >
                 {content}
             </Swatch>

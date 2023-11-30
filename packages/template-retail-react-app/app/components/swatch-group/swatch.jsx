@@ -18,8 +18,16 @@ import {Link as RouteLink} from 'react-router-dom'
 /**
  * The Swatch Component displays item inside `SwatchGroup`
  */
-const Swatch = (props) => {
-    const {disabled, selected, label, children, href, variant = 'square', name} = props
+const Swatch = ({
+    children,
+    disabled,
+    href,
+    label,
+    name,
+    selected,
+    onKeyDown,
+    variant = 'square'
+}) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
     return (
         <Button
@@ -30,6 +38,10 @@ const Swatch = (props) => {
             aria-checked={selected}
             variant="outline"
             role="radio"
+            onKeyDown={onKeyDown}
+            // To mimic the behavior of native radio inputs, only the selected input should be
+            // tabbable. (The rest are selectable via arrow keys.)
+            tabindex={selected ? 0 : -1}
         >
             <Center {...styles.swatchButton}>
                 {children}
@@ -70,7 +82,11 @@ Swatch.propTypes = {
     /**
      * The display value for each swatch
      */
-    name: PropTypes.string
+    name: PropTypes.string,
+    /**
+     * Event handler when a key is pressed while the swatch is focused
+     */
+    onKeyDown: PropTypes.func
 }
 
 export default Swatch
