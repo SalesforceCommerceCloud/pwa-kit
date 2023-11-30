@@ -2,7 +2,7 @@
 
 A package that contains internal tools used by other packages in the `pwa-kit` monorepo. It can't run outside the context of this monorepo.
 
-To see all the available commands:
+To see all the available commands: 
 
 ```bash
 cd packages/internal-lib-build
