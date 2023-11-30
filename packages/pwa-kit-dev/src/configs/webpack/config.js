@@ -504,7 +504,7 @@ const ssr = (() => {
                 }
                 return {
                     ...config,
-                    ...additionalConfig,
+                    ...(process.env.SSR_SOURCE_MAP === 'true' ? {devtool: 'source-map'} : {}),
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
                     entry: `.${EXT_OVERRIDES_DIR}/app/ssr.js`,
