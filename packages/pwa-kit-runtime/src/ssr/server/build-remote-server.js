@@ -607,7 +607,7 @@ export const RemoteServerFactory = {
         })
         //
         app.get('/mobify/maintenance/status', (req, res, next) => {
-            res.json({maintenance_mode: 'yes'})
+            res.json({maintenance_mode: process.env.MRT_MAINTENANCE_MODE})
         })
     },
     /**
