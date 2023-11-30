@@ -586,23 +586,26 @@ export const RemoteServerFactory = {
 
     _maintenanceMiddleware(app, opts) {
         console.log('opts.build', opts.build)
-        process.env.MRT_MAINTENANCE_MODE = 'yes'
+        // process.env.MRT_MAINTENANCE_MODE = 'yes'
         // check maintenance mode
         app.use((req, res, next) => {
-            if (process.env.MRT_MAINTENANCE_MODE === 'yes') {
-                console.log('Maintenance mode is on, returning a static page')
-                this.serveStaticFile('static/maintenance-page.html')
-                // res.statusCode(503)
-                //TODO make this a static file, how to make it controllable by users
-                //TODO Checking here https://expressjs.com/en/starter/static-files.html
-                // res.serveStaticFile('/static/favicon.icon')
+            // NOTE: Run server with params to test.
+            // `MRT_MAINTENANCE_MODE=1 npm run start # Maintenance mode is enabled`
+            // `MRT_MAINTENANCE_MODE=no npm run start # Maintenance mode is disabled`            
+            // npm run start # Maintenance mode is disabled by default`
+            const enabled = ['on', '1', 'yes'].includes(process.env.MRT_MAINTENANCE_MODE)
+            const handler = this.serveStaticFile('static/maintenance-page.html')
+            
+            if (enabled) {
+                handler(req, res)
+            } else {
+                next()
             }
-            next()
         })
-        //
-        app.get('/mobify/maintenance/status', (req, res) => {
-            res.json({maintenance_mode: process.env.MRT_MAINTENANCE_MODE})
-        })
+        // //
+        // app.get('/mobify/maintenance/status', (req, res) => {
+        //     res.json({maintenance_mode: process.env.MRT_MAINTENANCE_MODE})
+        // })
     },
     /**
      * @private
