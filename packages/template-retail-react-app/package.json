@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/retail-react-app",
-  "version": "2.1.1",
+  "version": "2.2.0-preview.0",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
@@ -11,7 +11,7 @@
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "npm run build-translations && pwa-kit-dev build",
-    "build-translations": "npm run extract-default-translations && npm run compile-translations",
+    "build-translations": "npm run extract-default-translations && npm run compile-translations && npm run compile-translations:pseudo",
     "compile-translations": "node ./scripts/translations/compile-folder.js translations",
     "compile-translations:pseudo": "node ./scripts/translations/compile-pseudo.js translations/en-US.json",
     "extract-default-translations": "node ./scripts/translations/extract-default-messages.js en-US",
@@ -45,10 +45,10 @@
     "@lhci/cli": "^0.11.0",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
-    "@salesforce/commerce-sdk-react": "1.1.0",
-    "@salesforce/pwa-kit-dev": "3.2.1",
-    "@salesforce/pwa-kit-react-sdk": "3.2.1",
-    "@salesforce/pwa-kit-runtime": "3.2.1",
+    "@salesforce/commerce-sdk-react": "1.2.0-preview.0",
+    "@salesforce/pwa-kit-dev": "3.3.0-preview.0",
+    "@salesforce/pwa-kit-react-sdk": "3.3.0-preview.0",
+    "@salesforce/pwa-kit-runtime": "3.3.0-preview.0",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",
@@ -67,7 +67,7 @@
     "jest-fetch-mock": "^2.1.2",
     "js-cookie": "^3.0.1",
     "jsonwebtoken": "^9.0.0",
-    "jwt-decode": "^3.1.2",
+    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "msw": "^1.2.1",
     "nanoid": "^3.3.4",
@@ -93,14 +93,11 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "42 kB"
+      "maxSize": "43 kB"
     },
     {
       "path": "build/vendor.js",
       "maxSize": "320 kB"
     }
-  ],
-  "overrides": {
-    "nwsapi": "2.2.2"
-  }
+  ]
 }

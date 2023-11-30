@@ -1,92 +1,95 @@
-// @ts-nocheck 
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import type {DOMWindow, JSDOM} from 'jsdom'
+import {getParentOrigin} from '../../utils'
+import {getClientScript, detectStorefrontPreview} from './utils'
 
-import {getClientScript, getParentOrigin, detectStorefrontPreview} from './utils'
+const LOCALHOST_ORIGIN = 'http://localhost:4000'
+const RUNTIME_ADMIN_ORIGIN = 'https://runtime.commercecloud.com'
+const OTHER_ORIGIN = 'https://website.about.bagels'
 
-describe('getClientScript', function () {
-    const oldWindow = window
+declare global {
+    const jsdom: JSDOM
+}
 
+/** Empty `window.top` that throws if you try to do anything with it. */
+const mockTop = new Proxy({} as DOMWindow, {
+    get: (_, prop) => {
+        throw new Error(`window.top['${String(prop)}'] is not mocked.`)
+    }
+})
+
+describe('Storefront Preview utils', () => {
+    let originalLocation: string
+    let referrerSpy: jest.SpyInstance<string>
+
+    const setAncestorOrigins = (...ancestorOrigins: string[]) => {
+        // This is a hacky workaround to bypass two TS errors:
+        // 1. `ancestorOrigins` is a read-only property, but we must change it.
+        // 2. It's supposed to be a DOMStringList, but we're providing an array. This is fine for
+        // our use case, though, because we're just using numeric indexing (`ancestorOrigins[0]`).
+        Object.assign(location, {ancestorOrigins})
+    }
+
+    beforeAll(() => {
+        originalLocation = window.location.href
+        referrerSpy = jest.spyOn(document, 'referrer', 'get')
+    })
     beforeEach(() => {
-        // eslint-disable-next-line
-        window = {...oldWindow}
+        // Sever `window.top === window.self` to pretend we're in an iframe
+        jsdom.reconfigure({windowTop: mockTop, url: originalLocation})
+        jest.resetAllMocks()
     })
-
     afterEach(() => {
-        // eslint-disable-next-line
-        window = oldWindow
-    })
-    test('returns client script src with prod origin', () => {
-        const src = getClientScript()
-        expect(src).toBe('https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js')
-    })
-
-    test('returns client script src with localhost origin', () => {
-        // Delete the real properties from window so we can mock them
-        delete window.parent
-
-        window.parent = {}
-        window.location.ancestorOrigins = ['http://localhost:4000']
-        const src = getClientScript()
-
-        expect(src).toBe(
-            'http://localhost:4000/mobify/bundle/development/static/storefront-preview.js'
-        )
-    })
-})
-
-describe('getParentOrigin', function () {
-    test('returns origin from ancestorOrigins', () => {
-        // Delete the real properties from window so we can mock them
-        delete window.parent
-
-        window.parent = {}
-        const localHostOrigin = 'http://localhost:4000'
-        window.location.ancestorOrigins = [localHostOrigin]
-        const origin = getParentOrigin()
-
-        expect(origin).toBe(localHostOrigin)
-    })
-    test('returns origin from document.referrer', () => {
-        // Delete the real properties from window so we can mock them
-        delete window.parent
-
-        window.parent = {}
+        // @ts-expect-error because TS DOM lib says it's required, but JSDOM doesn't use it
         delete window.location.ancestorOrigins
-        const localHostOrigin = 'http://localhost:4000'
-        jest.spyOn(document, 'referrer', 'get').mockReturnValue(localHostOrigin)
-        const origin = getParentOrigin()
-
-        expect(origin).toBe(localHostOrigin)
     })
-})
-describe('detectStorefrontPreview', function () {
-    test('returns true for trusted origin', () => {
-        // Delete the real properties from window so we can mock them
-        delete window.parent
-        delete window.location
-
-        window.parent = {}
-        window.location = {}
-        window.location.hostname = 'localhost'
-        const localHostOrigin = 'http://localhost:4000'
-        window.location.ancestorOrigins = [localHostOrigin]
-        expect(detectStorefrontPreview()).toBe(true)
+    afterAll(() => {
+        // This type assertion is safe because it's the window provided by JSDOM;
+        // it is required because the TS DOM lib is older and missing a few things
+        jsdom.reconfigure({windowTop: window as unknown as DOMWindow, url: originalLocation})
+        jest.restoreAllMocks()
     })
-    test('returns false for non-trusted origin', () => {
-        // Delete the real properties from window so we can mock them
-        delete window.parent
-        delete window.location
 
-        window.parent = {}
-        window.location = {}
-        window.location.hostname = 'localhost'
-        const localHostOrigin = 'http://localhost:4000'
-        window.location.ancestorOrigins = [localHostOrigin]
-        expect(detectStorefrontPreview()).toBe(true)
+    describe('getClientScript', function () {
+        test('returns client script src with prod origin', () => {
+            setAncestorOrigins(RUNTIME_ADMIN_ORIGIN)
+            const src = getClientScript()
+            expect(src).toBe('https://runtime.commercecloud.com/cc/b2c/preview/preview.client.js')
+        })
+        test('returns client script src with localhost origin', () => {
+            setAncestorOrigins(LOCALHOST_ORIGIN)
+            const src = getClientScript()
+            expect(src).toBe(
+                'http://localhost:4000/mobify/bundle/development/static/storefront-preview.js'
+            )
+        })
+    })
+
+    describe('getParentOrigin', function () {
+        test('returns origin from ancestorOrigins', () => {
+            setAncestorOrigins(LOCALHOST_ORIGIN)
+            expect(getParentOrigin()).toBe(LOCALHOST_ORIGIN)
+        })
+        test('returns origin from document.referrer', () => {
+            referrerSpy.mockReturnValue(LOCALHOST_ORIGIN)
+            expect(getParentOrigin()).toBe(LOCALHOST_ORIGIN)
+        })
+    })
+
+    describe('detectStorefrontPreview', function () {
+        test('returns true for trusted ancestor origin', () => {
+            jsdom.reconfigure({url: 'http://localhost:3000'})
+            setAncestorOrigins(LOCALHOST_ORIGIN)
+            expect(detectStorefrontPreview()).toBe(true)
+        })
+        test('returns false for non-trusted ancestor origin', () => {
+            setAncestorOrigins(OTHER_ORIGIN)
+            expect(detectStorefrontPreview()).toBe(false)
+        })
     })
 })

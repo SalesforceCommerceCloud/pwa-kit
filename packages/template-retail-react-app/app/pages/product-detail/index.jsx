@@ -25,6 +25,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useVariant} from '@salesforce/retail-react-app/app/hooks'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
@@ -39,7 +40,8 @@ import {
     EINSTEIN_RECOMMENDERS,
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
-    TOAST_MESSAGE_ADDED_TO_WISHLIST
+    TOAST_MESSAGE_ADDED_TO_WISHLIST,
+    TOAST_MESSAGE_ALREADY_IN_WISHLIST
 } from '@salesforce/retail-react-app/app/constants'
 import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
@@ -51,6 +53,7 @@ const ProductDetail = () => {
     const history = useHistory()
     const location = useLocation()
     const einstein = useEinstein()
+    const activeData = useActiveData()
     const toast = useToast()
     const navigate = useNavigation()
     const [productSetSelection, setProductSetSelection] = useState({})
@@ -61,7 +64,7 @@ const ProductDetail = () => {
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const {res} = useServerContext()
     if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
     const isBasketLoading = !basket?.basketId
 
@@ -156,43 +159,62 @@ const ProductDetail = () => {
     )
 
     const handleAddToWishlist = (product, variant, quantity) => {
-        createCustomerProductListItem.mutate(
-            {
-                parameters: {
-                    listId: wishlist.id,
-                    customerId
-                },
-                body: {
-                    // NOTE: APi does not respect quantity, it always adds 1
-                    quantity,
-                    productId: variant?.productId || product?.id,
-                    public: false,
-                    priority: 1,
-                    type: 'product'
-                }
-            },
-            {
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                        status: 'success',
-                        action: (
-                            // it would be better if we could use <Button as={Link}>
-                            // but unfortunately the Link component is not compatible
-                            // with Chakra Toast, since the ToastManager is rendered via portal
-                            // and the toast doesn't have access to intl provider, which is a
-                            // requirement of the Link component.
-                            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                                {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                            </Button>
-                        )
-                    })
-                },
-                onError: () => {
-                    showError()
-                }
-            }
+        const isItemInWishlist = wishlist?.customerProductListItems?.find(
+            (i) => i.productId === variant?.productId || i.productId === product?.id
         )
+
+        if (!isItemInWishlist) {
+            createCustomerProductListItem.mutate(
+                {
+                    parameters: {
+                        listId: wishlist.id,
+                        customerId
+                    },
+                    body: {
+                        // NOTE: APi does not respect quantity, it always adds 1
+                        quantity,
+                        productId: variant?.productId || product?.id,
+                        public: false,
+                        priority: 1,
+                        type: 'product'
+                    }
+                },
+                {
+                    onSuccess: () => {
+                        toast({
+                            title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                            status: 'success',
+                            action: (
+                                // it would be better if we could use <Button as={Link}>
+                                // but unfortunately the Link component is not compatible
+                                // with Chakra Toast, since the ToastManager is rendered via portal
+                                // and the toast doesn't have access to intl provider, which is a
+                                // requirement of the Link component.
+                                <Button
+                                    variant="link"
+                                    onClick={() => navigate('/account/wishlist')}
+                                >
+                                    {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                                </Button>
+                            )
+                        })
+                    },
+                    onError: () => {
+                        showError()
+                    }
+                }
+            )
+        } else {
+            toast({
+                title: formatMessage(TOAST_MESSAGE_ALREADY_IN_WISHLIST),
+                status: 'info',
+                action: (
+                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                    </Button>
+                )
+            })
+        }
     }
 
     /**************** Add To Cart ****************/
@@ -272,10 +294,20 @@ const ProductDetail = () => {
             einstein.sendViewProduct(product)
             const childrenProducts = product.setProducts
             childrenProducts.map((child) => {
-                einstein.sendViewProduct(child)
+                try {
+                    einstein.sendViewProduct(child)
+                } catch (err) {
+                    console.error(err)
+                }
+                activeData.sendViewProduct(category, child, 'detail')
             })
         } else if (product) {
-            einstein.sendViewProduct(product)
+            try {
+                einstein.sendViewProduct(product)
+            } catch (err) {
+                console.error(err)
+            }
+            activeData.sendViewProduct(category, product, 'detail')
         }
     }, [product])
 
