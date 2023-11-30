@@ -365,10 +365,11 @@ const ProductView = forwardRef(
                                             selectedValue,
                                             values = []
                                         } = variationAttribute
+                                        const swatchVariant = id === 'color' ? 'circle' : 'square'
+
                                         return (
                                             <SwatchGroup
                                                 key={id}
-                                                variant={id === 'color' ? 'circle' : 'square'}
                                                 value={selectedValue?.value}
                                                 displayName={selectedValue?.name || ''}
                                                 label={intl.formatMessage(
@@ -387,6 +388,10 @@ const ProductView = forwardRef(
                                                             disabled={!orderable}
                                                             value={value}
                                                             name={name}
+                                                            variant={swatchVariant}
+                                                            selected={
+                                                                selectedValue?.value === value
+                                                            }
                                                         >
                                                             {image ? (
                                                                 <Box

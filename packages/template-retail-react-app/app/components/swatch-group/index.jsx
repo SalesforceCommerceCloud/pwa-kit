@@ -20,7 +20,7 @@ import {FormattedMessage} from 'react-intl'
  * Each Swatch is a link with will direct to a href passed to them
  */
 const SwatchGroup = (props) => {
-    const {displayName, children, value: selectedValue, label = '', variant = 'square'} = props
+    const {displayName, children, label = ''} = props
     const styles = useStyleConfig('SwatchGroup')
     return (
         <Flex {...styles.swatchGroup} role="radiogroup" aria-label={label}>
@@ -34,14 +34,7 @@ const SwatchGroup = (props) => {
                 </Box>
                 <Box>{displayName}</Box>
             </HStack>
-            <Flex {...styles.swatchesWrapper}>
-                {React.Children.map(children, (child) => {
-                    return React.cloneElement(child, {
-                        selected: child.props.value === selectedValue,
-                        variant
-                    })
-                })}
-            </Flex>
+            <Flex {...styles.swatchesWrapper}>{children}</Flex>
         </Flex>
     )
 }
@@ -54,21 +47,13 @@ SwatchGroup.propTypes = {
      */
     label: PropTypes.string,
     /**
-     * The selected Swatch value.
-     */
-    value: PropTypes.string,
-    /**
      * The display value of the selected option
      */
     displayName: PropTypes.string,
     /**
      * The Swatch options to choose between
      */
-    children: PropTypes.array,
-    /**
-     * The shape of the swatches
-     */
-    variant: PropTypes.oneOf(['square', 'circle'])
+    children: PropTypes.array
 }
 
 export default SwatchGroup
