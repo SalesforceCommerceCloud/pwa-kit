@@ -12,6 +12,7 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 import helmet from 'helmet'
+import {secret, clientId, shortCode} from '../env-vars.json';
 
 const options = {
     // The build directory (an absolute path)
@@ -59,10 +60,6 @@ const {handler} = runtime.createHandler(options, (app) => {
             }
         })
     )
-
-    const secret = 'vpD-oUncX6sqjL-9ZBFJxgd2pt9Ub81Cis4UA-oY0nE'
-    const clientId = 'ee8a86c8-cd90-44b8-8bdf-61b096884e0c'
-    const shortCode = 'kv7kzm78'
 
     const createSlasHandler = ({clientId, secret, shortCode}) => {
         const proxy = createProxyMiddleware({
