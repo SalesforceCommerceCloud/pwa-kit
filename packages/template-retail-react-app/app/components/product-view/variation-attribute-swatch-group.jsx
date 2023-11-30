@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {useIntl} from 'react-intl'
-import {useHistory} from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
@@ -15,14 +14,11 @@ import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const VariationAttributeSwatchGroup = ({id, name, selectedValue, values = [], variant}) => {
     const intl = useIntl()
-    const history = useHistory()
-    const swatches = values.map(({href, name, image, value, orderable}, index) => {
-        const prev = values[(index || values.length) - 1] // modulo but supporting negatives
-        const next = values[(index + 1) % values.length]
-
+    const swatches = values.map(({href, name, image, value, orderable}) => {
         /** Mimic the behavior of native radio inputs by using arrow keys to select prev/next value. */
         const onKeyDown = (evt) => {
             let sibling
+            // This is not a very react-y way implementation... ¯\_(ツ)_/¯
             switch (evt.key) {
                 case 'ArrowUp':
                 case 'ArrowLeft':
@@ -30,18 +26,17 @@ const VariationAttributeSwatchGroup = ({id, name, selectedValue, values = [], va
                     sibling =
                         evt.target.previousElementSibling ||
                         evt.target.parentElement.lastElementChild
-                    history.replace(prev.href)
                     break
                 case 'ArrowDown':
                 case 'ArrowRight':
                     evt.preventDefault()
                     sibling =
                         evt.target.nextElementSibling || evt.target.parentElement.firstElementChild
-                    history.replace(next.href)
                     break
                 default:
                     break
             }
+            sibling?.click()
             sibling?.focus()
         }
         const content = image ? (
