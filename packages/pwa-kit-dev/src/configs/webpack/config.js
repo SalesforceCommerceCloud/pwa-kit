@@ -506,10 +506,6 @@ const ssr = (() => {
     if (mode === production) {
         return baseConfig('node')
             .extend((config) => {
-                let additionalConfig = {}
-                if (process.env.SSR_SOURCE_MAP === 'true') {
-                    additionalConfig = {devtool: 'source-map'}
-                }
                 return {
                     ...config,
                     ...(process.env.SSR_SOURCE_MAP === 'true' ? {devtool: 'source-map'} : {}),
