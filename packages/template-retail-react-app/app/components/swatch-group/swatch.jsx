@@ -19,17 +19,7 @@ import {Link as RouteLink} from 'react-router-dom'
  * The Swatch Component displays item inside `SwatchGroup`
  */
 const Swatch = (props) => {
-    const {
-        disabled,
-        selected,
-        label,
-        children,
-        href,
-        variant = 'square',
-        onChange,
-        value,
-        name
-    } = props
+    const {disabled, selected, label, children, href, variant = 'square', name} = props
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
     return (
         <Button
@@ -37,10 +27,6 @@ const Swatch = (props) => {
             as={RouteLink}
             to={href}
             aria-label={name}
-            onClick={(e) => {
-                e.preventDefault()
-                onChange(value, href)
-            }}
             aria-checked={selected}
             variant="outline"
             role="radio"
@@ -81,15 +67,6 @@ Swatch.propTypes = {
      *  The url of this option
      */
     href: PropTypes.string,
-    /**
-     * This function is called whenever the user selects an option.
-     * It is passed the new value.
-     */
-    onChange: PropTypes.func,
-    /**
-     * The value for the option.
-     */
-    value: PropTypes.string,
     /**
      * The display value for each swatch
      */

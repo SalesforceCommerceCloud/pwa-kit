@@ -13,7 +13,6 @@ import {
     HStack,
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {FormattedMessage} from 'react-intl'
 
 /**
@@ -21,14 +20,7 @@ import {FormattedMessage} from 'react-intl'
  * Each Swatch is a link with will direct to a href passed to them
  */
 const SwatchGroup = (props) => {
-    const {
-        displayName,
-        children,
-        value: selectedValue,
-        label = '',
-        variant = 'square',
-        onChange = noop
-    } = props
+    const {displayName, children, value: selectedValue, label = '', variant = 'square'} = props
     const styles = useStyleConfig('SwatchGroup')
     return (
         <Flex {...styles.swatchGroup} role="radiogroup" aria-label={label}>
@@ -44,12 +36,9 @@ const SwatchGroup = (props) => {
             </HStack>
             <Flex {...styles.swatchesWrapper}>
                 {React.Children.map(children, (child) => {
-                    const childValue = child.props.value
-
                     return React.cloneElement(child, {
-                        selected: childValue === selectedValue,
-                        variant,
-                        onChange
+                        selected: child.props.value === selectedValue,
+                        variant
                     })
                 })}
             </Flex>
@@ -79,11 +68,7 @@ SwatchGroup.propTypes = {
     /**
      * The shape of the swatches
      */
-    variant: PropTypes.oneOf(['square', 'circle']),
-    /**
-     * This function is called when a new option is selected
-     */
-    onChange: PropTypes.func
+    variant: PropTypes.oneOf(['square', 'circle'])
 }
 
 export default SwatchGroup

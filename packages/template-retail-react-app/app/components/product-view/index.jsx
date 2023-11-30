@@ -7,7 +7,7 @@
 
 import React, {forwardRef, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useLocation} from 'react-router-dom'
+import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
 
 import {
@@ -104,7 +104,6 @@ const ProductView = forwardRef(
     ) => {
         const showToast = useToast()
         const intl = useIntl()
-        const history = useHistory()
         const location = useLocation()
         const {
             isOpen: isAddToCartModalOpen,
@@ -369,10 +368,6 @@ const ProductView = forwardRef(
                                         return (
                                             <SwatchGroup
                                                 key={id}
-                                                onChange={(_, href) => {
-                                                    if (!href) return
-                                                    history.replace(href)
-                                                }}
                                                 variant={id === 'color' ? 'circle' : 'square'}
                                                 value={selectedValue?.value}
                                                 displayName={selectedValue?.name || ''}
