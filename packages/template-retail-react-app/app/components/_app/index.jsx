@@ -151,12 +151,12 @@ const App = (props) => {
     })
     const status = useMaintenanceMode()
     console.log('status.data', status.data)
-    if (
-        status?.data?.maintenance_mode === 'yes' &&
-        !location.pathname.endsWith('/maintenance-page')
-    ) {
-        history.push(buildUrl('/maintenance-page'))
-    }
+    // if (
+    //     status?.data?.maintenance_mode === 'yes' &&
+    //     !location.pathname.endsWith('/maintenance-page')
+    // ) {
+    //     history.push(buildUrl('/maintenance-page'))
+    // }
 
     // If the translation file exists, it'll be served directly from static folder (and won't reach this code here).
     // However, if the file is missing, the App would render a 404 page.

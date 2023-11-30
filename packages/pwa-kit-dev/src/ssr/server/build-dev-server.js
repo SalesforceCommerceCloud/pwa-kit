@@ -228,6 +228,7 @@ export const DevServerMixin = {
     },
 
     serveStaticFile(filePath, opts = {}) {
+        console.log('test----------------', filePath)
         // Warning: Ugly part of the Bundle spec that we need to maintain.
         //
         // This function assumes that an SDK build step will copy all
@@ -258,6 +259,7 @@ export const DevServerMixin = {
                     : '',
                 'app'
             )
+            console.log('baseDir', baseDir)
             return this._serveStaticFile(req, res, baseDir, filePath, opts)
         }
     },

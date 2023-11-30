@@ -285,7 +285,7 @@ export const RemoteServerFactory = {
         this._configureProxyConfigs(options)
 
         const app = this._createExpressApp(options)
-
+        this._maintenanceMiddleware(app, options)
         // Do this first – we want compression applied to
         // everything when it's enabled at all.
         this._setCompression(app)
@@ -584,29 +584,23 @@ export const RemoteServerFactory = {
         app.use(ssrRequestProcessorMiddleware)
     },
 
-    _maintenanceMiddleware(app) {
-        process.env.MRT_MAINTENANCE_MODE = 'no'
+    _maintenanceMiddleware(app, opts) {
+        console.log('opts.build', opts.build)
+        process.env.MRT_MAINTENANCE_MODE = 'yes'
         // check maintenance mode
         app.use((req, res, next) => {
             if (process.env.MRT_MAINTENANCE_MODE === 'yes') {
                 console.log('Maintenance mode is on, returning a static page')
-                res.statusCode(503)
+                this.serveStaticFile('static/maintenance-page.html')
+                // res.statusCode(503)
                 //TODO make this a static file, how to make it controllable by users
                 //TODO Checking here https://expressjs.com/en/starter/static-files.html
-                res.send(`
-                    <html>
-                        <body>
-                            <h1>
-                               The site is in maintenance 🛠  🛠. Please come back later
-                            </h1>
-                        </body>
-                    </html>
-                `)
+                // res.serveStaticFile('/static/favicon.icon')
             }
             next()
         })
         //
-        app.get('/mobify/maintenance/status', (req, res, next) => {
+        app.get('/mobify/maintenance/status', (req, res) => {
             res.json({maintenance_mode: process.env.MRT_MAINTENANCE_MODE})
         })
     },
@@ -643,7 +637,6 @@ export const RemoteServerFactory = {
         app.use(enforceSecurityHeaders) // Must be AFTER prepNonProxyRequest, as they both modify setHeader.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
-        this._maintenanceMiddleware(app)
 
         applyPatches(options)
     },
@@ -789,6 +782,7 @@ export const RemoteServerFactory = {
      * @param {Object} opts - the options object to pass to the original `sendFile` method
      */
     serveStaticFile(filePath, opts = {}) {
+        console.log('remote serverfilePath', filePath)
         return (req, res) => {
             const baseDir = req.app.options.buildDir
             return this._serveStaticFile(req, res, baseDir, filePath, opts)
@@ -799,8 +793,11 @@ export const RemoteServerFactory = {
      * @private
      */
     _serveStaticFile(req, res, baseDir, filePath, opts = {}) {
+        console.log('_serveStaticFile---------------')
         const options = req.app.options
         const file = path.resolve(baseDir, filePath)
+        console.log('filePath', filePath)
+        console.log('file', file)
         res.sendFile(file, {
             headers: {
                 [CACHE_CONTROL]: options.defaultCacheControl
