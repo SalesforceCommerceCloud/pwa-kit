@@ -10,6 +10,7 @@
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {createProxyMiddleware} from 'http-proxy-middleware'
 import helmet from 'helmet'
 
 const options = {
@@ -57,6 +58,38 @@ const {handler} = runtime.createHandler(options, (app) => {
                 }
             }
         })
+    )
+
+    const secret = 'vpD-oUncX6sqjL-9ZBFJxgd2pt9Ub81Cis4UA-oY0nE'
+    const clientId = 'ee8a86c8-cd90-44b8-8bdf-61b096884e0c'
+    const shortCode = 'kv7kzm78'
+
+    const createSlasHandler = ({clientId, secret, shortCode}) => {
+        const proxy = createProxyMiddleware({
+            target: `https://${shortCode}.api.commercecloud.salesforce.com`,
+            changeOrigin: true,
+            onProxyReq: (outGoingReq, incomingReq) => {
+
+                if (incomingReq.path.includes('/token')) {
+                    const encodedClientCredential = Buffer.from(`${clientId}:${secret}`).toString(
+                        'base64'
+                    )
+
+                    outGoingReq.setHeader('Authorization', `Basic ${encodedClientCredential}`)
+                }
+            }
+        })
+        return (req, res, next) => {
+            if (!req.path.startsWith('/shopper/auth')) {
+                return next()
+            }
+            proxy(req, res, next)
+        }
+    }
+
+    app.use(
+        // bodyParser.urlencoded({extended: true}),
+        createSlasHandler({clientId, secret, shortCode})
     )
 
     // Handle the redirect from SLAS as to avoid error
