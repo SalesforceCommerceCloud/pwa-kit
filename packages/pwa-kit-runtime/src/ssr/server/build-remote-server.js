@@ -584,6 +584,32 @@ export const RemoteServerFactory = {
         app.use(ssrRequestProcessorMiddleware)
     },
 
+    _maintenanceMiddleware(app) {
+        process.env.MRT_MAINTENANCE_MODE = 'no'
+        // check maintenance mode
+        app.use((req, res, next) => {
+            if (process.env.MRT_MAINTENANCE_MODE === 'yes') {
+                console.log('Maintenance mode is on, returning a static page')
+                res.statusCode(503)
+                //TODO make this a static file, how to make it controllable by users
+                //TODO Checking here https://expressjs.com/en/starter/static-files.html
+                res.send(`
+                    <html>
+                        <body>
+                            <h1>
+                               The site is in maintenance 🛠  🛠. Please come back later
+                            </h1>
+                        </body>
+                    </html>
+                `)
+            }
+            next()
+        })
+        //
+        app.get('/mobify/maintenance/status', (req, res, next) => {
+            res.json({maintenance_mode: 'yes'})
+        })
+    },
     /**
      * @private
      */
@@ -617,6 +643,7 @@ export const RemoteServerFactory = {
         app.use(enforceSecurityHeaders) // Must be AFTER prepNonProxyRequest, as they both modify setHeader.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
+        this._maintenanceMiddleware(app)
 
         applyPatches(options)
     },
