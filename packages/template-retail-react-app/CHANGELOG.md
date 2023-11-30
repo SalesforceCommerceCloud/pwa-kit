@@ -25,6 +25,10 @@
 - Fix bug where you can add duplicates of the same item to the wishlist. Also fixes bug where skeleton appears when removing last item from the wishlist. [#1560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1560)
 - Fix PLP filters for mobile [#1565](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1565)
 
+## v2.1.1 (Nov 7, 2023)
+
+- Use the new opt-in mechanism for enforcing the default security headers required by PWA Kit projects. [#1528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1528)
+
 ## v2.1.0 (Nov 3, 2023)
 
 - Support Storefront Preview
