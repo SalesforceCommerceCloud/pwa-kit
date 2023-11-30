@@ -53,7 +53,7 @@ SwatchGroup.propTypes = {
     /**
      * The Swatch options to choose between
      */
-    children: PropTypes.array
+    children: PropTypes.node
 }
 
 export default SwatchGroup
