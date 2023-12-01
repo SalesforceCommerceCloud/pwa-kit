@@ -10,7 +10,7 @@
     "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
     "push": "npm run build && pwa-kit-dev push",
     "save-credentials": "pwa-kit-dev save-credentials",
-    "start": "pwa-kit-dev start",
+    "start": "pwa-kit-dev start --babelArgs=\"--extensions \".ts,.tsx\"\"",
     "start:inspect": "npm run start -- --inspect",
     "tail-logs": "pwa-kit-dev tail-logs",
     "test": "pwa-kit-dev test",
