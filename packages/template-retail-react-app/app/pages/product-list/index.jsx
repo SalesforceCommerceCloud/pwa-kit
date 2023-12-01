@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -26,7 +26,6 @@ import {
     Grid,
     Select,
     Text,
-    FormControl,
     Stack,
     useDisclosure,
     Button,
@@ -87,6 +86,7 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+import Sort from '@salesforce/retail-react-app/app/pages/product-list/partials/sort'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -710,50 +710,3 @@ ProductList.propTypes = {
 }
 
 export default ProductList
-
-const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
-    const intl = useIntl()
-    const history = useHistory()
-
-    return (
-        <FormControl
-            aria-label={intl.formatMessage({
-                id: 'product_list.drawer.title.sort_by',
-                defaultMessage: 'Sort By'
-            })}
-            data-testid="sf-product-list-sort"
-            id="page_sort"
-            width="auto"
-            {...otherProps}
-        >
-            <Select
-                value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
-                onChange={({target}) => {
-                    history.push(target.value)
-                }}
-                height={11}
-                width="240px"
-            >
-                {sortUrls.map((href, index) => (
-                    <option key={href} value={href}>
-                        {intl.formatMessage(
-                            {
-                                id: 'product_list.select.sort_by',
-                                defaultMessage: 'Sort By: {sortOption}'
-                            },
-                            {
-                                sortOption: productSearchResult?.sortingOptions[index]?.label
-                            }
-                        )}
-                    </option>
-                ))}
-            </Select>
-        </FormControl>
-    )
-}
-
-Sort.propTypes = {
-    sortUrls: PropTypes.array,
-    productSearchResult: PropTypes.object,
-    basePath: PropTypes.string
-}
