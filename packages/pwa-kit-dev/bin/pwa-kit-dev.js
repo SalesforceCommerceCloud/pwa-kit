@@ -14,6 +14,7 @@ const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
 const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+const openInBrowser = require('open')
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
@@ -29,6 +30,9 @@ const scriptUtils = (() => {
         return require('../utils/script-utils')
     }
 })()
+
+/** Environment variable used by the start/push command --open flag. */
+const PWA_KIT_OPEN_URL = 'PWA_KIT_OPEN_URL'
 
 const colors = {
     warn: 'yellow',
@@ -200,7 +204,7 @@ const main = async () => {
         .addOption(
             new program.Option('-o, --open <url>', 'initial URL to load after the server starts')
                 .default('/')
-                .env('PWA_KIT_OPEN_URL')
+                .env(PWA_KIT_OPEN_URL)
         )
         .addOption(
             new program.Option('--no-open', 'do not launch a browser when the dev server starts')
@@ -225,7 +229,9 @@ const main = async () => {
             execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
                 env: {
                     ...process.env,
-                    ...(open && {PWA_KIT_OPEN_URL: open}),
+                    // NOTE: The logic in build-dev-server.js enforces that only URLs pointing to
+                    // the dev server are actually opened
+                    ...(open && {[PWA_KIT_OPEN_URL]: open}),
                     ...(noHMR && {HMR: 'false'})
                 }
             })
@@ -314,6 +320,11 @@ const main = async () => {
         .addOption(
             new program.Option('-w, --wait', 'wait for the deployment to complete before exiting')
         )
+        .addOption(
+            new program.Option('-o, --open <url>', 'URL to open after the deployment succeeds')
+                .env(PWA_KIT_OPEN_URL)
+                .implies({wait: true})
+        )
         .action(
             async ({
                 buildDirectory,
@@ -322,7 +333,8 @@ const main = async () => {
                 target,
                 cloudOrigin,
                 credentialsFile,
-                wait
+                wait,
+                open: urlToOpen
             }) => {
                 // Set the deployment target env var, this is required to ensure we
                 // get the correct configuration object. Do not assign the variable it if
@@ -367,7 +379,19 @@ const main = async () => {
                 warnings.forEach(warn)
                 if (wait) {
                     success('Bundle Uploaded - waiting for deployment to complete')
-                    await client.waitForDeploy(projectSlug, target)
+                    const hostname = await client.waitForDeploy(projectSlug, target)
+                    success('Deployment completed')
+                    if (urlToOpen) {
+                        // If given a relative path, assume it's for the deployed site
+                        const url = new URL(urlToOpen, `https://${hostname}`)
+                        // Allow pretty much any URL, because users may want to open a third party
+                        // site for next steps after deploying, but don't allow weird input.
+                        if (!url.protocol !== 'http:' && url.protocol !== 'https:') {
+                            warn(`Refusing to open invalid URL: ${urlToOpen}`)
+                        } else {
+                            openInBrowser(url.href)
+                        }
+                    }
                 } else {
                     success('Bundle Uploaded')
                 }
