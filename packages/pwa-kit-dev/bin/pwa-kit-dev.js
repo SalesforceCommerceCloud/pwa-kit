@@ -135,9 +135,13 @@ const main = async () => {
         return program
             .command(name)
             .addOption(
-                new program.Option('--cloud-origin <origin>', 'the API origin to connect to')
+                new program.Option(
+                    '--cloud-origin <origin>',
+                    '[internal] the API origin to connect to'
+                )
                     .default(scriptUtils.DEFAULT_CLOUD_ORIGIN)
                     .env('CLOUD_API_BASE')
+                    .hideHelp()
             )
             .addOption(
                 new program.Option(
