@@ -198,11 +198,11 @@ const main = async () => {
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
         .addOption(
-            new program.Option('--url <url>', 'initial URL to load after the server starts').env(
-                'PWA_KIT_DEV_SERVER_URL'
-            )
+            new program.Option('--open <url>', 'initial URL to load after the server starts')
+                .default('/')
+                .env('PWA_KIT_OPEN_URL')
         )
-        .action(async ({inspect, noHMR, url}) => {
+        .action(async ({inspect, noHMR, open}) => {
             // We use @babel/node instead of node because we want to support ES6 import syntax
             const babelNode = p.join(
                 require.resolve('webpack'),
@@ -222,7 +222,7 @@ const main = async () => {
             execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
                 env: {
                     ...process.env,
-                    ...(url && {PWA_KIT_DEV_SERVER_URL: url}),
+                    ...(open && {PWA_KIT_OPEN_URL: open}),
                     ...(noHMR && {HMR: 'false'})
                 }
             })
