@@ -12,7 +12,7 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 import helmet from 'helmet'
-import {secret, clientId, shortCode} from '../env-vars.json';
+//import {secret, clientId, shortCode} from '../env-vars.json';
 
 const options = {
     // The build directory (an absolute path)
@@ -34,6 +34,12 @@ const options = {
 }
 
 const runtime = getRuntime()
+
+const slasClientId = getConfig().app.commerceAPI.parameters.clientId
+const slasClientSecret = getConfig().slasClient?.secret
+const slasClientShortCode = getConfig().app.commerceAPI.parameters.shortCode
+
+console.log(slasClientShortCode)
 
 const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
@@ -62,11 +68,16 @@ const {handler} = runtime.createHandler(options, (app) => {
     )
 
     const createSlasHandler = ({clientId, secret, shortCode}) => {
+        console.log(shortCode)
+        const target = `https://${shortCode}.api.commercecloud.salesforce.com`
+
+        console.log(target)
+
         const proxy = createProxyMiddleware({
-            target: `https://${shortCode}.api.commercecloud.salesforce.com`,
+            target: target,
             changeOrigin: true,
             onProxyReq: (outGoingReq, incomingReq) => {
-
+                console.log('In proxy')
                 if (incomingReq.path.includes('/token')) {
                     const encodedClientCredential = Buffer.from(`${clientId}:${secret}`).toString(
                         'base64'
@@ -85,8 +96,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     }
 
     app.use(
-        // bodyParser.urlencoded({extended: true}),
-        createSlasHandler({clientId, secret, shortCode})
+        createSlasHandler({slasClientId, slasClientSecret, slasClientShortCode})
     )
 
     // Handle the redirect from SLAS as to avoid error
