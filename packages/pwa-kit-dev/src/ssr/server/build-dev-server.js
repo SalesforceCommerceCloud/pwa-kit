@@ -365,7 +365,9 @@ export const DevServerMixin = {
                         `Refusing to redirect to ${input} as it is not the same origin as the dev server (${origin}).`
                     )
                 }
-                open(url.href)
+                open(url.href).catch((err) => {
+                    console.error(`Failed to open ${url.href}`, err)
+                })
             }
         })
 
