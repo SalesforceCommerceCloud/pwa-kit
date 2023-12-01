@@ -186,9 +186,6 @@
   "cart_secondary_button_group.label.this_is_gift": {
     "defaultMessage": "This is a gift."
   },
-  "cart_secondary_button_group.link_learn_more": {
-    "defaultMessage": "Learn More"
-  },
   "cart_skeleton.heading.order_summary": {
     "defaultMessage": "Order Summary"
   },
@@ -295,6 +292,9 @@
   "checkout_footer.message.copyright": {
     "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
   },
+  "checkout_header.link.assistive_msg.cart": {
+    "defaultMessage": "Back to cart, number of items: {numItems}"
+  },
   "checkout_header.link.cart": {
     "defaultMessage": "Back to cart"
   },
@@ -315,6 +315,9 @@
   },
   "checkout_payment.title.payment": {
     "defaultMessage": "Payment"
+  },
+  "colorRefinements.label.hitCount": {
+    "defaultMessage": "{colorLabel} ({colorHitCount})"
   },
   "confirmation_modal.default.action.no": {
     "defaultMessage": "No"
@@ -380,6 +383,9 @@
   "credit_card_fields.tool_tip.security_code.american_express": {
     "defaultMessage": "This 4-digit code can be found on the front of your card.",
     "description": "American Express security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code_aria_label": {
+    "defaultMessage": "Security code info"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"
@@ -537,6 +543,9 @@
   "global.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
+  "global.info.already_in_wishlist": {
+    "defaultMessage": "Item is already in wishlist"
+  },
   "global.info.removed_from_wishlist": {
     "defaultMessage": "Item removed from wishlist"
   },
@@ -552,8 +561,8 @@
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "My account"
   },
-  "header.button.assistive_msg.my_cart": {
-    "defaultMessage": "My cart"
+  "header.button.assistive_msg.my_cart_with_num_items": {
+    "defaultMessage": "My cart, number of items: {numItems}"
   },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "Wishlist"
@@ -645,6 +654,9 @@
   },
   "home.title.react_starter_store": {
     "defaultMessage": "The React PWA Starter Store for Retail"
+  },
+  "icons.assistive_msg.lock": {
+    "defaultMessage": "Secure"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"
@@ -987,11 +999,20 @@
   "product_list.select.sort_by": {
     "defaultMessage": "Sort By: {sortOption}"
   },
-  "product_tile.assistive_msg.wishlist": {
-    "defaultMessage": "Wishlist"
+  "product_scroller.assistive_msg.scroll_left": {
+    "defaultMessage": "Scroll products left"
+  },
+  "product_scroller.assistive_msg.scroll_right": {
+    "defaultMessage": "Scroll products right"
+  },
+  "product_tile.assistive_msg.add_to_wishlist": {
+    "defaultMessage": "Add {product} to wishlist"
+  },
+  "product_tile.assistive_msg.remove_from_wishlist": {
+    "defaultMessage": "Remove {product} from wishlist"
   },
   "product_tile.label.starting_at_price": {
-    "defaultMessage": "Starting at"
+    "defaultMessage": "Starting at {price}"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
@@ -1008,11 +1029,26 @@
   "product_view.button.update": {
     "defaultMessage": "Update"
   },
+  "product_view.label.assistive_msg.quantity_decrement": {
+    "defaultMessage": "Decrement Quantity"
+  },
+  "product_view.label.assistive_msg.quantity_increment": {
+    "defaultMessage": "Increment Quantity"
+  },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"
   },
+  "product_view.label.quantity_decrement": {
+    "defaultMessage": "−"
+  },
+  "product_view.label.quantity_increment": {
+    "defaultMessage": "+"
+  },
   "product_view.label.starting_at_price": {
     "defaultMessage": "Starting at"
+  },
+  "product_view.label.variant_type": {
+    "defaultMessage": "{variantType}"
   },
   "product_view.link.full_details": {
     "defaultMessage": "See full details"
@@ -1037,6 +1073,9 @@
   },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Apply"
+  },
+  "promo_popover.assistive_msg.info": {
+    "defaultMessage": "Info"
   },
   "promo_popover.heading.promo_applied": {
     "defaultMessage": "Promotions Applied"

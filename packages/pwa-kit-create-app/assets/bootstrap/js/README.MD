@@ -1,41 +1,47 @@
-:loudspeaker: Hey there, Salesforce Commerce Cloud community!
+# PWA Kit Generated App
 
-We’re excited to hear your thoughts on your developer experience with PWA Kit and the Composable Storefront generally! Your feedback is incredibly valuable in helping us guide our roadmap and improve our offering.
+Welcome to the PWA Kit!
 
-:clipboard: Take our quick survey here: [Survey](https://forms.gle/bUZNxQ3QKUcrjhV18) 
+## Getting Started
 
-Feel free to share this survey link with your colleagues, partners, or anyone who has experience with PWA Kit. Your input will help us shape the future of our development tools.
+### Requirements
 
-Thank you for being a part of our community and for your continuous support! :raised_hands:
+-   Node 18 or later
+-   npm 9 or later
 
-# PWA Kit Create App
-
-A tool for generating PWA Kit projects based on project templates, such as the [Retail React App](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html).
-
-## Requirements
-
--   Node 16.11 or later
--   npm 8 or later
-
-## Quick Start
-
-To get started, open a terminal and run the following:
+### Run the Project Locally
 
 ```bash
-npx @salesforce/pwa-kit-create-app
+npm start
 ```
 
-For help, run:
+This will open a browser and your storefront will be running on http://localhost:3000
 
-```bash
-npx @salesforce/pwa-kit-create-app --help
+### Deploy to Managed Runtime
+
+```
+npm run push -- -m "Message to help you recognize this bundle"
 ```
 
-## Documentation
+**Note**: This command will push to the MRT project that matches the name field in `package.json`. To push to a different project, include the `-s` argument.
+
+**Important**: Access to the [Runtime Admin](https://runtime.commercecloud.com/) application is required to deploy bundles. To learn more, read our guide to [Push and Deploy Bundles](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html).
+
+## Customizing the application
+
+This version of the application uses [Template Extensibility](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/template-extensibility.html) to empower you to more easily customize base templates. Please refer to our documentation for more information.
+
+## 🌍 Localization
+
+See the [Localization README.md](./packages/template-retail-react-app/translations/README.md) for important setup instructions for localization.
+
+## 📖 Documentation
 
 The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
 
-### Useful Links:
+## Further documentation
+
+For more information on working with the PWA Kit, refer to:
 
 -   [Get Started](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html)
 -   [Skills for Success](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/skills-for-success.html)
@@ -48,7 +54,3 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 -   [Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html)
 -   [Phased Headless Rollouts](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/phased-headless-rollouts.html)
 -   [Launch Your Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/launching-your-storefront.html)
-
-
-## Support Policy
-Security patches are provided for 24 months after the general availability of each major version of the SDK (1.0, 2.0, and so on).

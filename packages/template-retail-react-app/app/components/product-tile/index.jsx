@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
 
@@ -75,73 +75,97 @@ const ProductTile = (props) => {
     const localizedProductName = product.name ?? product.productName
 
     const {currency: activeCurrency} = useCurrency()
-    const [isFavouriteLoading, setFavouriteLoading] = useState(false)
+    const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
 
     return (
-        <Link
-            data-testid="product-tile"
-            {...styles.container}
-            to={productUrlBuilder({id: productId}, intl.local)}
-            {...rest}
-        >
-            <Box {...styles.imageWrapper}>
-                {image && (
-                    <AspectRatio {...styles.image}>
-                        <DynamicImage
-                            src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
-                            widths={dynamicImageProps?.widths}
-                            imageProps={{
-                                alt: image.alt,
-                                ...dynamicImageProps?.imageProps
-                            }}
-                        />
-                    </AspectRatio>
-                )}
+        <Box {...styles.container}>
+            <Link
+                data-testid="product-tile"
+                to={productUrlBuilder({id: productId}, intl.local)}
+                {...styles.link}
+                {...rest}
+            >
+                <Box {...styles.imageWrapper}>
+                    {image && (
+                        <AspectRatio {...styles.image}>
+                            <DynamicImage
+                                src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
+                                widths={dynamicImageProps?.widths}
+                                imageProps={{
+                                    alt: image.alt,
+                                    ...dynamicImageProps?.imageProps
+                                }}
+                            />
+                        </AspectRatio>
+                    )}
+                </Box>
 
-                {enableFavourite && (
-                    <Box
-                        onClick={(e) => {
-                            // stop click event from bubbling
-                            // to avoid user from clicking the underlying
-                            // product while the favourite icon is disabled
-                            e.preventDefault()
-                        }}
-                    >
-                        <IconButtonWithRegistration
-                            aria-label={intl.formatMessage({
-                                id: 'product_tile.assistive_msg.wishlist',
-                                defaultMessage: 'Wishlist'
-                            })}
-                            icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
-                            {...styles.favIcon}
-                            disabled={isFavouriteLoading}
-                            onClick={async () => {
-                                setFavouriteLoading(true)
+                {/* Title */}
+                <Text {...styles.title}>{localizedProductName}</Text>
+
+                {/* Price */}
+                <Text {...styles.price} data-testid="product-tile-price">
+                    {hitType === 'set'
+                        ? intl.formatMessage(
+                              {
+                                  id: 'product_tile.label.starting_at_price',
+                                  defaultMessage: 'Starting at {price}'
+                              },
+                              {
+                                  price: intl.formatNumber(price, {
+                                      style: 'currency',
+                                      currency: currency || activeCurrency
+                                  })
+                              }
+                          )
+                        : intl.formatNumber(price, {
+                              style: 'currency',
+                              currency: currency || activeCurrency
+                          })}
+                </Text>
+            </Link>
+            {enableFavourite && (
+                <Box
+                    onClick={(e) => {
+                        // stop click event from bubbling
+                        // to avoid user from clicking the underlying
+                        // product while the favourite icon is disabled
+                        e.preventDefault()
+                    }}
+                >
+                    <IconButtonWithRegistration
+                        data-testid="wishlist-button"
+                        aria-label={
+                            isFavourite
+                                ? intl.formatMessage(
+                                      {
+                                          id: 'product_tile.assistive_msg.remove_from_wishlist',
+                                          defaultMessage: 'Remove {product} from wishlist'
+                                      },
+                                      {product: localizedProductName}
+                                  )
+                                : intl.formatMessage(
+                                      {
+                                          id: 'product_tile.assistive_msg.add_to_wishlist',
+                                          defaultMessage: 'Add {product} to wishlist'
+                                      },
+                                      {product: localizedProductName}
+                                  )
+                        }
+                        icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
+                        {...styles.favIcon}
+                        onClick={async () => {
+                            if (!isFavouriteLoading.current) {
+                                isFavouriteLoading.current = true
                                 await onFavouriteToggle(!isFavourite)
-                                setFavouriteLoading(false)
-                            }}
-                        />
-                    </Box>
-                )}
-            </Box>
-
-            {/* Title */}
-            <Text {...styles.title}>{localizedProductName}</Text>
-
-            {/* Price */}
-            <Text {...styles.price} data-testid="product-tile-price">
-                {hitType === 'set' &&
-                    intl.formatMessage({
-                        id: 'product_tile.label.starting_at_price',
-                        defaultMessage: 'Starting at'
-                    })}{' '}
-                {intl.formatNumber(price, {
-                    style: 'currency',
-                    currency: currency || activeCurrency
-                })}
-            </Text>
-        </Link>
+                                isFavouriteLoading.current = false
+                            }
+                        }}
+                    />
+                </Box>
+            )}
+        </Box>
     )
 }
 
@@ -181,7 +205,7 @@ ProductTile.propTypes = {
      */
     enableFavourite: PropTypes.bool,
     /**
-     * Display the product as a faviourite.
+     * Display the product as a favourite.
      */
     isFavourite: PropTypes.bool,
     /**
