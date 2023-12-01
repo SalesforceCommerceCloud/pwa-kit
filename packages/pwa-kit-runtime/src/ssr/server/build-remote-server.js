@@ -585,24 +585,22 @@ export const RemoteServerFactory = {
     },
 
     _maintenanceMiddleware(app, opts) {
-        console.log('opts.build', opts.build)
-        // process.env.MRT_MAINTENANCE_MODE = 'yes'
         // check maintenance mode
         app.use((req, res, next) => {
             // NOTE: Run server with params to test.
             // `MRT_MAINTENANCE_MODE=1 npm run start # Maintenance mode is enabled`
-            // `MRT_MAINTENANCE_MODE=no npm run start # Maintenance mode is disabled`            
+            // `MRT_MAINTENANCE_MODE=no npm run start # Maintenance mode is disabled`
             // npm run start # Maintenance mode is disabled by default`
             const enabled = ['on', '1', 'yes'].includes(process.env.MRT_MAINTENANCE_MODE)
             const handler = this.serveStaticFile('static/maintenance-page.html')
-            
+
             if (enabled) {
                 handler(req, res)
             } else {
                 next()
             }
         })
-        // //
+        //
         // app.get('/mobify/maintenance/status', (req, res) => {
         //     res.json({maintenance_mode: process.env.MRT_MAINTENANCE_MODE})
         // })
@@ -785,7 +783,6 @@ export const RemoteServerFactory = {
      * @param {Object} opts - the options object to pass to the original `sendFile` method
      */
     serveStaticFile(filePath, opts = {}) {
-        console.log('remote serverfilePath', filePath)
         return (req, res) => {
             const baseDir = req.app.options.buildDir
             return this._serveStaticFile(req, res, baseDir, filePath, opts)
@@ -796,11 +793,8 @@ export const RemoteServerFactory = {
      * @private
      */
     _serveStaticFile(req, res, baseDir, filePath, opts = {}) {
-        console.log('_serveStaticFile---------------')
         const options = req.app.options
         const file = path.resolve(baseDir, filePath)
-        console.log('filePath', filePath)
-        console.log('file', file)
         res.sendFile(file, {
             headers: {
                 [CACHE_CONTROL]: options.defaultCacheControl
