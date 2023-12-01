@@ -543,6 +543,9 @@
   "global.info.added_to_wishlist": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
   },
+  "global.info.already_in_wishlist": {
+    "defaultMessage": "Item is already in wishlist"
+  },
   "global.info.removed_from_wishlist": {
     "defaultMessage": "Item removed from wishlist"
   },
@@ -1005,7 +1008,7 @@
   "product_tile.assistive_msg.add_to_wishlist": {
     "defaultMessage": "Add {product} to wishlist"
   },
-  "product_tile.assistive_msg.remove_from wishlist": {
+  "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
   },
   "product_tile.label.starting_at_price": {
