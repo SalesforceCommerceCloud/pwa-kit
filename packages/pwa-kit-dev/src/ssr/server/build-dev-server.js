@@ -344,27 +344,26 @@ export const DevServerMixin = {
         server.on('close', () => app.applicationCache.close())
 
         server.listen({hostname, port}, () => {
-            /* istanbul ignore next */
-            if (process.env.NODE_ENV !== 'test') {
+            /* istanbul ignore next */ // Can't launch the browser during automated tests
+            if (process.env.PWA_KIT_OPEN_URL) {
+                const input = process.env.PWA_KIT_OPEN_URL
                 const origin = this._getDevServerURL(app.options)
                 const url = new URL('/__mrt/loading-screen/index.html?loading=1', origin)
-                if (process.env.PWA_KIT_OPEN_URL) {
-                    // env var could be a full path or relative, so we use `origin` as a safeguard
-                    const redirectUrl = new URL(process.env.PWA_KIT_OPEN_URL, origin)
-                    if (
-                        // Check host rather than origin to be flexible about http vs https
-                        redirectUrl.host === url.host &&
-                        // But still only allow those two protocols!
-                        (redirectUrl.protocol === 'http:' || redirectUrl.protocol === 'https:')
-                    ) {
-                        // We can omit the origin because it's just the dev server origin
-                        const redirect = redirectUrl.href.slice(redirectUrl.origin.length)
-                        url.searchParams.set('path', redirect)
-                    } else {
-                        console.warn(
-                            `Refusing to redirect to ${process.env.PWA_KIT_OPEN_URL} as it is not the same origin as the dev server (${origin}).`
-                        )
-                    }
+                // input could be a full path or relative, so we use `origin` as a safeguard
+                const redirectUrl = new URL(input, origin)
+                if (
+                    // Check host rather than origin to be flexible about http vs https
+                    redirectUrl.host === url.host &&
+                    // But still only allow those two protocols!
+                    (redirectUrl.protocol === 'http:' || redirectUrl.protocol === 'https:')
+                ) {
+                    // We can omit the origin because it's just the dev server origin
+                    const redirect = redirectUrl.href.slice(redirectUrl.origin.length)
+                    url.searchParams.set('path', redirect)
+                } else {
+                    console.warn(
+                        `Refusing to redirect to ${input} as it is not the same origin as the dev server (${origin}).`
+                    )
                 }
                 open(url.href)
             }

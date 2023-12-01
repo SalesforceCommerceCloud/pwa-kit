@@ -202,6 +202,9 @@ const main = async () => {
                 .default('/')
                 .env('PWA_KIT_OPEN_URL')
         )
+        .addOption(
+            new program.Option('--no-open', 'do not launch a browser when the dev server starts')
+        )
         .action(async ({inspect, noHMR, open}) => {
             // We use @babel/node instead of node because we want to support ES6 import syntax
             const babelNode = p.join(
