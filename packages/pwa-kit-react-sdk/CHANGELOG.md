@@ -1,5 +1,4 @@
-## v3.3.0-preview.0 (Nov 30, 2023)
-## v3.3.0-dev (Nov 03, 2023)
+## v3.3.0 (Dec 01, 2023)
 
 - Create a flag to allow toggling behavior that treats + character between words as space in search query [#1557](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1557)
 
