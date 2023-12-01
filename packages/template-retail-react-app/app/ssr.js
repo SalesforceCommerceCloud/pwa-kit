@@ -35,12 +35,6 @@ const options = {
 
 const runtime = getRuntime()
 
-const slasClientId = getConfig().app.commerceAPI.parameters.clientId
-const slasClientSecret = getConfig().slasClient?.secret
-const slasClientShortCode = getConfig().app.commerceAPI.parameters.shortCode
-
-console.log(slasClientShortCode)
-
 const {handler} = runtime.createHandler(options, (app) => {
     // Set HTTP security headers
     app.use(
@@ -67,22 +61,20 @@ const {handler} = runtime.createHandler(options, (app) => {
         })
     )
 
-    const createSlasHandler = ({clientId, secret, shortCode}) => {
-        console.log(shortCode)
+    const createSlasHandler = () => {
+        const clientId = process?.env?.SLAS_PRIVATE_CLIENT_ID
+        const secret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
+        const shortCode = process?.env?.CC_SHORT_CODE
         const target = `https://${shortCode}.api.commercecloud.salesforce.com`
-
-        console.log(target)
 
         const proxy = createProxyMiddleware({
             target: target,
             changeOrigin: true,
             onProxyReq: (outGoingReq, incomingReq) => {
-                console.log('In proxy')
                 if (incomingReq.path.includes('/token')) {
                     const encodedClientCredential = Buffer.from(`${clientId}:${secret}`).toString(
                         'base64'
                     )
-
                     outGoingReq.setHeader('Authorization', `Basic ${encodedClientCredential}`)
                 }
             }
@@ -96,7 +88,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     }
 
     app.use(
-        createSlasHandler({slasClientId, slasClientSecret, slasClientShortCode})
+        createSlasHandler()
     )
 
     // Handle the redirect from SLAS as to avoid error
