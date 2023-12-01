@@ -8,6 +8,7 @@
 const path = require('path')
 const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
+const message = require('./typescript-file').default
 
 const options = {
     // The build directory (an absolute path)

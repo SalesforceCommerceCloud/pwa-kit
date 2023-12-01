@@ -248,12 +248,15 @@ const main = async () => {
                 process.exit(1)
             }
 
-            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
-                env: {
-                    ...process.env,
-                    ...(noHMR ? {HMR: 'false'} : {})
+            execSync(
+                `${babelNode} ${inspect ? '--inspect ' : '--extensions ".ts"'} ${entrypoint}`,
+                {
+                    env: {
+                        ...process.env,
+                        ...(noHMR ? {HMR: 'false'} : {})
+                    }
                 }
-            })
+            )
         })
 
     program
