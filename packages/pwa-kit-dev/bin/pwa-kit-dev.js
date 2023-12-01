@@ -332,7 +332,7 @@ const main = async () => {
                     process.env.DEPLOY_TARGET = target
                 } else if (wait) {
                     throw new Error(
-                        'You must provide a target to deploy to when using --wait to wait for deployment to finish.'
+                        'You must provide a deployment target when using --wait to wait for deployment to finish.'
                     )
                 }
 
