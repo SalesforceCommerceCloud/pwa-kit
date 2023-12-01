@@ -85,21 +85,5 @@ export const getConfig = (opts = {}) => {
         )
     }
 
-    const {config: envVars} = explorerSync.load(process.cwd() + '/env-vars.json')
-    // console.log(process.cwd() + '/env-vars.json')
-    // console.log(envVars)
-
-    // Get env variables
-    const SLAS_PRIVATE_CLIENT_ID = IS_REMOTE ? process?.env?.SLAS_PRIVATE_CLIENT_ID : envVars?.clientId
-    const SLAS_PRIVATE_CLIENT_SECRET = IS_REMOTE ? process?.env?.SLAS_PRIVATE_CLIENT_SECRET : envVars?.secret
-
-    //console.log(SLAS_PRIVATE_CLIENT_ID)
-    config.slasClient = {
-        clientId: SLAS_PRIVATE_CLIENT_ID,
-        secret: SLAS_PRIVATE_CLIENT_SECRET
-    }
-
-    //console.log(config)
-
     return config
 }
