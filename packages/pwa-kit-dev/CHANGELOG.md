@@ -1,9 +1,17 @@
+## There's gonna be a merge conflict cuz we're mid release
+
+- Add `--open <url>` flag to `pwa-kit-dev` `start` and `push` commands. [#1592](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1592)
+  - `pwa-kit-dev start --open <url>` opens the specified URL when the dev server starts, rather than the homepage.
+  - `pwa-kit-dev start --no-open` prevents any URL from opening when the dev server starts.
+  - `pwa-kit-dev push -s <project> -t <environment> --open <url>` opens the specified URL after the deployment succeeds.
+
 ## v3.3.0-dev (Nov 03, 2023)
 
 - Add `source-map-loader` plugin to webpack configuration. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
 - Only use source maps in server when `inspect` flag is being used. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
 
 ## v3.2.0 (Nov 03, 2023)
+
 ## v3.1.1 (Sep 21, 2023)
 
 - Bugfix: resolve performance issue due to webpack stats [#1418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1418)
