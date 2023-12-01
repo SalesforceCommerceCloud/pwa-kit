@@ -48,6 +48,7 @@ const config = {
     shortCode: 'shortCode',
     siteId: 'siteId',
     proxy: 'proxy',
+    slasProxy: 'slasProxy',
     redirectURI: 'redirectURI'
 }
 

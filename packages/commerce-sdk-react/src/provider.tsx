@@ -24,6 +24,7 @@ import {ApiClientConfigParams, ApiClients} from './hooks/types'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
+    slasProxy: string
     locale: string
     currency: string
     redirectURI: string
@@ -52,7 +53,7 @@ export const AuthContext = React.createContext({} as Auth)
  * Initialize a set of Commerce API clients and make it available to all of descendant components
  *
  * @group Components
- * 
+ *
  * @example
  * ```js
     import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -73,11 +74,11 @@ export const AuthContext = React.createContext({} as Auth)
                     {children}
                 </CommerceApiProvider>
         )
-    } 
+    }
 
     export default App
  * ```
- * 
+ *
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
@@ -87,6 +88,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         headers = {},
         organizationId,
         proxy,
+        slasProxy,
         redirectURI,
         fetchOptions,
         siteId,
@@ -99,6 +101,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
 
     const config = {
         proxy,
+        slasProxy,
         headers,
         parameters: {
             clientId,
@@ -130,6 +133,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shortCode,
         siteId,
         proxy,
+        slasProxy,
         fetchOptions,
         locale,
         currency,
@@ -143,6 +147,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shortCode,
             siteId,
             proxy,
+            slasProxy,
             redirectURI,
             fetchOptions,
             fetchedToken,
@@ -154,6 +159,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         shortCode,
         siteId,
         proxy,
+        slasProxy,
         redirectURI,
         fetchOptions,
         fetchedToken,
@@ -170,6 +176,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 headers,
                 organizationId,
                 proxy,
+                slasProxy,
                 redirectURI,
                 fetchOptions,
                 siteId,
