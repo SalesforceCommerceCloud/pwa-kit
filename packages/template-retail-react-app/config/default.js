@@ -26,8 +26,8 @@ module.exports = {
             parameters: {
                 clientId: 'ee8a86c8-cd90-44b8-8bdf-61b096884e0c',
                 organizationId: 'f_ecom_zzrf_026',
-                shortCode: '8o7m175y',
-                siteId: 'kv7kzm78'
+                shortCode: 'kv7kzm78',
+                siteId: 'RefArch'
             }
         },
         einsteinAPI: {
