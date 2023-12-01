@@ -198,7 +198,7 @@ const main = async () => {
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
         .addOption(
-            new program.Option('--open <url>', 'initial URL to load after the server starts')
+            new program.Option('-o, --open <url>', 'initial URL to load after the server starts')
                 .default('/')
                 .env('PWA_KIT_OPEN_URL')
         )
