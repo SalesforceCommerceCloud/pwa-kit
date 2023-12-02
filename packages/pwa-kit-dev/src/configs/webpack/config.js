@@ -265,6 +265,10 @@ const baseConfig = (target) => {
                             use: {
                                 loader: findDepInStack('source-map-loader')
                             }
+                        },
+                        {
+                            test: /\.css$/i,
+                            use: ['style-loader', 'css-loader', 'postcss-loader']
                         }
                     ].filter(Boolean)
                 }

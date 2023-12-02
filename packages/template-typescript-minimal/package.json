@@ -3,6 +3,7 @@
   "version": "3.3.0-dev",
   "private": true,
   "scripts": {
+    "prepare": "panda codegen",
     "build": "pwa-kit-dev build",
     "format": "pwa-kit-dev format \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "npm run lint:js && npm run typecheck",
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
+    "@pandacss/dev": "^0.19.0",
     "@salesforce/pwa-kit-dev": "3.3.0-dev",
     "@salesforce/pwa-kit-react-sdk": "3.3.0-dev",
     "@salesforce/pwa-kit-runtime": "3.3.0-dev",
@@ -25,6 +27,8 @@
     "@types/loadable__component": "~5.13.4",
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.1",
+    "postcss": "^8.4.31",
+    "postcss-cli": "^10.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
@@ -62,5 +66,13 @@
         }
       ]
     }
+  },
+  "dependencies": {
+    "@ark-ui/react": "^1.1.0",
+    "css-loader": "^6.8.1",
+    "postcss": "^8.4.31",
+    "postcss-loader": "^7.3.3",
+    "postcss-preset-env": "^9.3.0",
+    "style-loader": "^3.3.3"
   }
 }

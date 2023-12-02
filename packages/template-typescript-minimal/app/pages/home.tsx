@@ -9,6 +9,7 @@ import {useQuery} from '@tanstack/react-query'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
+import {css} from '../styled-system/css'
 
 interface Props {
     value: number
@@ -104,6 +105,7 @@ const Home = ({value}: Props) => {
     return (
         <div>
             <style dangerouslySetInnerHTML={{__html: style}} />
+            <div className={css({bg: 'red.400'})}>Test</div>
             <div className="loading-screen">
                 <div className="panel title">
                     <h1>

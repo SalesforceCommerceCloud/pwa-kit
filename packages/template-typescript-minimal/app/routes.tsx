@@ -7,6 +7,7 @@
 import loadable, {LoadableComponent} from '@loadable/component'
 
 const Home = loadable(() => import('./pages/home'))
+const ProductDetail = loadable(() => import('./pages/product-detail/index'))
 
 const routes = [
     {
@@ -15,6 +16,10 @@ const routes = [
         // Type assertion because otherwise we encounter this error:
         // Exported variable 'routes' has or is using name 'Props' from external module "./app/pages/home" but cannot be named.
         component: Home as LoadableComponent<unknown>
+    },
+    {
+        path: '/product-detail',
+        component: ProductDetail as LoadableComponent<unknown>
     }
 ]
 
