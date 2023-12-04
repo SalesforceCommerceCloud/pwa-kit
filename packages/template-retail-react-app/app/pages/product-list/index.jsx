@@ -10,21 +10,13 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
-import {
-    useCategory,
-    useCustomerId,
-    useProductSearch,
-    useShopperCustomersMutation
-} from '@salesforce/commerce-sdk-react'
+import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 // Components
 import {
     Box,
     Flex,
-    SimpleGrid,
-    Grid,
-    Select,
     Text,
     Stack,
     useDisclosure,
@@ -45,10 +37,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
-import Pagination from '@salesforce/retail-react-app/app/components/pagination'
-import ProductTile, {
-    Skeleton as ProductTileSkeleton
-} from '@salesforce/retail-react-app/app/components/product-tile'
 import {HideOnDesktop} from '@salesforce/retail-react-app/app/components/responsive'
 import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
 import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/selected-refinements'
@@ -60,13 +48,7 @@ import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list
 import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 // Hooks
-import {
-    useLimitUrls,
-    usePageUrls,
-    useSortUrls,
-    useSearchParams
-} from '@salesforce/retail-react-app/app/hooks'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useSortUrls, useSearchParams} from '@salesforce/retail-react-app/app/hooks'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 
@@ -74,19 +56,11 @@ import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-dat
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 
 // Constants
-import {
-    DEFAULT_LIMIT_VALUES,
-    API_ERROR_MESSAGE,
-    MAX_CACHE_AGE,
-    TOAST_ACTION_VIEW_WISHLIST,
-    TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
-} from '@salesforce/retail-react-app/app/constants'
+import {MAX_CACHE_AGE} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 import Sort from '@salesforce/retail-react-app/app/pages/product-list/partials/sort'
+import ProductListBody from '@salesforce/retail-react-app/app/pages/product-list/partials/body'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -108,16 +82,13 @@ const ProductList = (props) => {
     const history = useHistory()
     const params = useParams()
     const location = useLocation()
-    const toast = useToast()
     const einstein = useEinstein()
     const activeData = useActiveData()
     const {res} = useServerContext()
-    const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
 
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
-    const [wishlistLoading, setWishlistLoading] = useState([])
     const [sortOpen, setSortOpen] = useState(false)
 
     const urlParams = new URLSearchParams(location.search)
@@ -127,14 +98,6 @@ const ProductList = (props) => {
     if (params.categoryId) {
         searchParams._refine.push(`cgid=${params.categoryId}`)
     }
-
-    /**************** Mutation Actions ****************/
-    const {mutateAsync: createCustomerProductListItem} = useShopperCustomersMutation(
-        'createCustomerProductListItem'
-    )
-    const {mutateAsync: deleteCustomerProductListItem} = useShopperCustomersMutation(
-        'deleteCustomerProductListItem'
-    )
 
     /**************** Query Actions ****************/
     const {
@@ -197,97 +160,14 @@ const ProductList = (props) => {
     /**************** Render Variables ****************/
     const basePath = `${location.pathname}${location.search}`
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
-    const {total, sortingOptions} = productSearchResult || {}
+    const {sortingOptions} = productSearchResult || {}
     const selectedSortingOptionLabel =
         sortingOptions?.find(
             (option) => option.id === productSearchResult?.selectedSortingOption
         ) ?? sortingOptions?.[0]
 
     // Get urls to be used for pagination, page size changes, and sorting.
-    const pageUrls = usePageUrls({total})
     const sortUrls = useSortUrls({options: sortingOptions})
-    const limitUrls = useLimitUrls()
-
-    /**************** Action Handlers ****************/
-    const {data: wishlist} = useWishList()
-    const addItemToWishlist = async (product) => {
-        setWishlistLoading([...wishlistLoading, product.productId])
-
-        // TODO: This wishlist object is from an old API, we need to replace it with the new one.
-        const listId = wishlist.id
-        await createCustomerProductListItem(
-            {
-                parameters: {customerId, listId},
-                body: {
-                    quantity: 1,
-                    public: false,
-                    priority: 1,
-                    type: 'product',
-                    productId: product.productId
-                }
-            },
-            {
-                onError: () => {
-                    toast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
-                    })
-                },
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                        status: 'success',
-                        action: (
-                            // it would be better if we could use <Button as={Link}>
-                            // but unfortunately the Link component is not compatible
-                            // with Chakra Toast, since the ToastManager is rendered via portal
-                            // and the toast doesn't have access to intl provider, which is a
-                            // requirement of the Link component.
-                            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                                {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                            </Button>
-                        )
-                    })
-                },
-                onSettled: () => {
-                    setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-                }
-            }
-        )
-    }
-
-    const removeItemFromWishlist = async (product) => {
-        setWishlistLoading([...wishlistLoading, product.productId])
-
-        const listId = wishlist.id
-        const itemId = wishlist.customerProductListItems.find(
-            (i) => i.productId === product.productId
-        ).id
-
-        await deleteCustomerProductListItem(
-            {
-                body: {},
-                parameters: {customerId, listId, itemId}
-            },
-            {
-                onError: () => {
-                    toast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
-                    })
-                },
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
-                        status: 'success'
-                    })
-                },
-                onSettled: () => {
-                    setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-                }
-            }
-        )
-    }
 
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
@@ -494,102 +374,18 @@ const ProductList = (props) => {
                             />
                         </Box>
                     </HideOnDesktop>
-
-                    {/* Body  */}
-                    <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
-                        <Stack display={{base: 'none', md: 'flex'}}>
-                            <Refinements
-                                isLoading={filtersLoading}
-                                toggleFilter={toggleFilter}
-                                filters={productSearchResult?.refinements}
-                                selectedFilters={searchParams.refine}
-                            />
-                        </Stack>
-                        <Box>
-                            <SimpleGrid
-                                columns={[2, 2, 3, 3]}
-                                spacingX={4}
-                                spacingY={{base: 12, lg: 16}}
-                            >
-                                {isHydrated() && (isRefetching || !productSearchResult)
-                                    ? new Array(searchParams.limit)
-                                          .fill(0)
-                                          .map((value, index) => (
-                                              <ProductTileSkeleton key={index} />
-                                          ))
-                                    : productSearchResult?.hits?.map((productSearchItem) => {
-                                          const productId = productSearchItem.productId
-                                          const isInWishlist =
-                                              !!wishlist?.customerProductListItems?.find(
-                                                  (item) => item.productId === productId
-                                              )
-
-                                          return (
-                                              <ProductTile
-                                                  data-testid={`sf-product-tile-${productSearchItem.productId}`}
-                                                  key={productSearchItem.productId}
-                                                  product={productSearchItem}
-                                                  enableFavourite={true}
-                                                  isFavourite={isInWishlist}
-                                                  onClick={() => {
-                                                      if (searchQuery) {
-                                                          einstein.sendClickSearch(
-                                                              searchQuery,
-                                                              productSearchItem
-                                                          )
-                                                      } else if (category) {
-                                                          einstein.sendClickCategory(
-                                                              category,
-                                                              productSearchItem
-                                                          )
-                                                      }
-                                                  }}
-                                                  onFavouriteToggle={(isFavourite) => {
-                                                      const action = isFavourite
-                                                          ? addItemToWishlist
-                                                          : removeItemFromWishlist
-                                                      return action(productSearchItem)
-                                                  }}
-                                                  dynamicImageProps={{
-                                                      widths: [
-                                                          '50vw',
-                                                          '50vw',
-                                                          '20vw',
-                                                          '20vw',
-                                                          '25vw'
-                                                      ]
-                                                  }}
-                                              />
-                                          )
-                                      })}
-                            </SimpleGrid>
-                            {/* Footer */}
-                            <Flex
-                                justifyContent={['center', 'center', 'flex-start']}
-                                paddingTop={8}
-                            >
-                                <Pagination currentURL={basePath} urls={pageUrls} />
-
-                                {/*
-                            Our design doesn't call for a page size select. Show this element if you want
-                            to add one to your design.
-                        */}
-                                <Select
-                                    display="none"
-                                    value={basePath}
-                                    onChange={({target}) => {
-                                        history.push(target.value)
-                                    }}
-                                >
-                                    {limitUrls.map((href, index) => (
-                                        <option key={href} value={href}>
-                                            {DEFAULT_LIMIT_VALUES[index]}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </Flex>
-                        </Box>
-                    </Grid>
+                    <ProductListBody
+                        {...{
+                            filtersLoading,
+                            toggleFilter,
+                            productSearchResult,
+                            searchParams,
+                            isRefetching,
+                            searchQuery,
+                            category,
+                            basePath
+                        }}
+                    ></ProductListBody>
                 </>
             )}
             {/* Modal for filter options on mobile */}
