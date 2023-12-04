@@ -243,10 +243,8 @@ const main = async () => {
                 }
             })
         )
-        .action(async ({inspect, noHMR, babelArgs}) => {
-            if (babelArgs) {
-                console.log(`starting with babel args "${babelArgs}"`)
-            }
+        .action(async ({inspect, noHMR, babelArgs = '.js,.jsx,.ts,.tsx'}) => {
+            console.log(`starting with babel args "${babelArgs}"`)
             // We use @babel/node instead of node because we want to support ES6 import syntax
             const babelNode = p.join(
                 require.resolve('webpack'),
