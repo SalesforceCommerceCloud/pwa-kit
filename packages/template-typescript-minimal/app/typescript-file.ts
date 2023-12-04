@@ -1,7 +1,10 @@
-// Define a variable of type string
-let message: string = 'Hello, TypeScript!'
+/*
+ * Copyright (c) 2023, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
-// Print the message to the console
-console.log(message)
+let message: string = 'Hello, TypeScript!'
 
 export default message
