@@ -243,34 +243,43 @@ const main = async () => {
                 }
             })
         )
-        .action(async ({inspect, noHMR, babelArgs = '.js,.jsx,.ts,.tsx'}) => {
-            console.log(`starting with babel args "${babelArgs}"`)
-            // We use @babel/node instead of node because we want to support ES6 import syntax
-            const babelNode = p.join(
-                require.resolve('webpack'),
-                '..',
-                '..',
-                '..',
-                '.bin',
-                'babel-node'
-            )
+        .action(
+            async ({
+                inspect,
+                noHMR,
+                // eslint-disable-next-line no-useless-escape
+                babelArgs = `--babelArgs="--extensions \".js,.jsx,.ts,.tsx\""`
+            }) => {
+                console.log(`starting with babel args "${babelArgs}"`)
+                // We use @babel/node instead of node because we want to support ES6 import syntax
+                const babelNode = p.join(
+                    require.resolve('webpack'),
+                    '..',
+                    '..',
+                    '..',
+                    '.bin',
+                    'babel-node'
+                )
 
-            const entrypoint = await getAppEntrypoint()
-            if (!entrypoint) {
-                error('Could not determine app entrypoint.')
-                process.exit(1)
-            }
-
-            execSync(
-                `${babelNode} ${inspect ? `--inspect ${babelArgs}` : `${babelArgs}`} ${entrypoint}`,
-                {
-                    env: {
-                        ...process.env,
-                        ...(noHMR ? {HMR: 'false'} : {})
-                    }
+                const entrypoint = await getAppEntrypoint()
+                if (!entrypoint) {
+                    error('Could not determine app entrypoint.')
+                    process.exit(1)
                 }
-            )
-        })
+
+                execSync(
+                    `${babelNode} ${
+                        inspect ? `--inspect ${babelArgs}` : `${babelArgs}`
+                    } ${entrypoint}`,
+                    {
+                        env: {
+                            ...process.env,
+                            ...(noHMR ? {HMR: 'false'} : {})
+                        }
+                    }
+                )
+            }
+        )
 
     program
         .command('build')
