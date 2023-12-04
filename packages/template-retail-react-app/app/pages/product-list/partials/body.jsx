@@ -26,14 +26,10 @@ import ProductTile, {
 } from '@salesforce/retail-react-app/app/components/product-tile'
 import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
 
-// Icons
-
 // Hooks
 import {useLimitUrls, usePageUrls} from '@salesforce/retail-react-app/app/hooks'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-
-// Others
 
 // Constants
 import {
