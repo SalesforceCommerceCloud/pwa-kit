@@ -88,7 +88,6 @@ const ProductList = (props) => {
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
 
     /**************** Page State ****************/
-    const [filtersLoading, setFiltersLoading] = useState(false)
     const [sortOpen, setSortOpen] = useState(false)
 
     const urlParams = new URLSearchParams(location.search)
@@ -151,10 +150,9 @@ const ProductList = (props) => {
         res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
 
-    // Reset scroll position when `isRefetching` becomes `true`.
+    // Reset scroll position when refetching data
     useEffect(() => {
-        isRefetching && window.scrollTo(0, 0)
-        setFiltersLoading(isRefetching)
+        if (isRefetching) window.scrollTo(0, 0)
     }, [isRefetching])
 
     /**************** Render Variables ****************/
@@ -376,7 +374,6 @@ const ProductList = (props) => {
                     </HideOnDesktop>
                     <ProductListBody
                         {...{
-                            filtersLoading,
                             toggleFilter,
                             productSearchResult,
                             searchParams,
@@ -408,7 +405,7 @@ const ProductList = (props) => {
                     </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody py={4}>
-                        {filtersLoading && <LoadingSpinner />}
+                        {isRefetching && <LoadingSpinner />}
                         <Refinements
                             toggleFilter={toggleFilter}
                             filters={productSearchResult?.refinements}

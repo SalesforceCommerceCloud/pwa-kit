@@ -48,18 +48,15 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 
 /* eslint-disable react/prop-types */
-const ProductListBody = (props) => {
-    const {
-        filtersLoading,
-        toggleFilter,
-        productSearchResult,
-        searchParams,
-        isRefetching,
-        searchQuery,
-        category,
-        basePath
-    } = props
-
+const ProductListBody = ({
+    toggleFilter,
+    productSearchResult,
+    searchParams,
+    isRefetching,
+    searchQuery,
+    category,
+    basePath
+}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const toast = useToast()
@@ -162,7 +159,7 @@ const ProductListBody = (props) => {
         <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
             <Stack display={{base: 'none', md: 'flex'}}>
                 <Refinements
-                    isLoading={filtersLoading}
+                    isLoading={isRefetching}
                     toggleFilter={toggleFilter}
                     filters={productSearchResult?.refinements}
                     selectedFilters={searchParams.refine}
