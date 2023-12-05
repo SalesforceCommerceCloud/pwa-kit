@@ -35,7 +35,6 @@ const ProductListHeader = (props) => {
     return (
         <>
             <AbovePageHeader />
-            {/* Header */}
             <Stack
                 display={{base: 'none', lg: 'flex'}}
                 direction="row"
