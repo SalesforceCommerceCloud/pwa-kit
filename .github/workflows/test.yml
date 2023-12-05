@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         node: [16, 18]
-        npm: [8, 9]
+        npm: [8, 9, 10]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
@@ -125,7 +125,7 @@ jobs:
       fail-fast: false
       matrix:
         node: [16, 18]
-        npm: [8, 9]
+        npm: [8, 9, 10]
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
