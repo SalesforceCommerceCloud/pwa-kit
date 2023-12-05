@@ -1,5 +1,6 @@
 ## v3.3.0-dev (Nov 03, 2023)
 
+- Improve `pwa-kit-dev start` command to accept CLI arguments for babel that get passed as CLI args to `pwa-kit-dev start`, this fixes [#1591](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/1591)
 - Add `source-map-loader` plugin to webpack configuration. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
 - Only use source maps in server when `inspect` flag is being used. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
 
