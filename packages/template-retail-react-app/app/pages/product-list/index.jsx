@@ -16,7 +16,6 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 // Components
 import {
     Box,
-    Flex,
     Text,
     Stack,
     useDisclosure,
@@ -37,30 +36,24 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
-import {HideOnDesktop} from '@salesforce/retail-react-app/app/components/responsive'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
-import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/selected-refinements'
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
-import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/page-header'
-import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/above-page-header'
-
-// Icons
-import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
+import ProductListBody from '@salesforce/retail-react-app/app/pages/product-list/partials/body'
+import ProductListHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/header'
 
 // Hooks
-import {useSortUrls, useSearchParams} from '@salesforce/retail-react-app/app/hooks'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+import {
+    useActiveData,
+    useEinstein,
+    useNavigation,
+    useSortUrls,
+    useSearchParams
+} from '@salesforce/retail-react-app/app/hooks'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
-
-// Constants
 import {MAX_CACHE_AGE} from '@salesforce/retail-react-app/app/constants'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import Sort from '@salesforce/retail-react-app/app/pages/product-list/partials/sort'
-import ProductListBody from '@salesforce/retail-react-app/app/pages/product-list/partials/body'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -270,118 +263,27 @@ const ProductList = (props) => {
                 <EmptySearchResults searchQuery={searchQuery} category={category} />
             ) : (
                 <>
-                    <AbovePageHeader />
-                    {/* Header */}
-                    <Stack
-                        display={{base: 'none', lg: 'flex'}}
-                        direction="row"
-                        justify="flex-start"
-                        align="flex-start"
-                        spacing={4}
-                        marginBottom={6}
-                    >
-                        <Flex align="left" width="287px">
-                            <PageHeader
-                                searchQuery={searchQuery}
-                                category={category}
-                                productSearchResult={productSearchResult}
-                                isLoading={isLoading}
-                            />
-                        </Flex>
-
-                        <Box flex={1} paddingTop={'45px'}>
-                            <SelectedRefinements
-                                filters={productSearchResult?.refinements}
-                                toggleFilter={toggleFilter}
-                                handleReset={resetFilters}
-                                selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />
-                        </Box>
-                        <Box paddingTop={'45px'}>
-                            <Sort
-                                sortUrls={sortUrls}
-                                productSearchResult={productSearchResult}
-                                basePath={basePath}
-                            />
-                        </Box>
-                    </Stack>
-
-                    <HideOnDesktop>
-                        <Stack spacing={6}>
-                            <PageHeader
-                                searchQuery={searchQuery}
-                                category={category}
-                                productSearchResult={productSearchResult}
-                                isLoading={isLoading}
-                            />
-                            <Stack
-                                display={{base: 'flex', md: 'none'}}
-                                direction="row"
-                                justify="flex-start"
-                                align="center"
-                                spacing={1}
-                                height={12}
-                                borderColor="gray.100"
-                            >
-                                <Flex align="center">
-                                    <Button
-                                        fontSize="sm"
-                                        colorScheme="black"
-                                        variant="outline"
-                                        marginRight={2}
-                                        display="inline-flex"
-                                        leftIcon={<FilterIcon boxSize={5} />}
-                                        onClick={onOpen}
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Filter"
-                                            id="product_list.button.filter"
-                                        />
-                                    </Button>
-                                </Flex>
-                                <Flex align="center">
-                                    <Button
-                                        maxWidth="245px"
-                                        fontSize="sm"
-                                        marginRight={2}
-                                        colorScheme="black"
-                                        variant="outline"
-                                        display="inline-flex"
-                                        rightIcon={<ChevronDownIcon boxSize={5} />}
-                                        onClick={() => setSortOpen(true)}
-                                    >
-                                        {formatMessage(
-                                            {
-                                                id: 'product_list.button.sort_by',
-                                                defaultMessage: 'Sort By: {sortOption}'
-                                            },
-                                            {
-                                                sortOption: selectedSortingOptionLabel?.label
-                                            }
-                                        )}
-                                    </Button>
-                                </Flex>
-                            </Stack>
-                        </Stack>
-                        <Box marginBottom={4}>
-                            <SelectedRefinements
-                                filters={productSearchResult?.refinements}
-                                toggleFilter={toggleFilter}
-                                handleReset={resetFilters}
-                                selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />
-                        </Box>
-                    </HideOnDesktop>
+                    <ProductListHeader
+                        searchQuery={searchQuery}
+                        category={category}
+                        productSearchResult={productSearchResult}
+                        isLoading={isLoading}
+                        toggleFilter={toggleFilter}
+                        resetFilters={resetFilters}
+                        sortUrls={sortUrls}
+                        basePath={basePath}
+                        onOpen={onOpen}
+                        setSortOpen={setSortOpen}
+                        selectedSortingOptionLabel={selectedSortingOptionLabel}
+                    ></ProductListHeader>
                     <ProductListBody
-                        {...{
-                            toggleFilter,
-                            productSearchResult,
-                            searchParams,
-                            isRefetching,
-                            searchQuery,
-                            category,
-                            basePath
-                        }}
+                        toggleFilter={toggleFilter}
+                        productSearchResult={productSearchResult}
+                        searchParams={searchParams}
+                        isRefetching={isRefetching}
+                        searchQuery={searchQuery}
+                        category={category}
+                        basePath={basePath}
                     ></ProductListBody>
                 </>
             )}
