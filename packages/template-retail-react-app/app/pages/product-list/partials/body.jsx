@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {useIntl} from 'react-intl'
-import {useCustomerId, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
+import PropTypes from 'prop-types'
 
 // Components
 import {
@@ -27,6 +26,8 @@ import ProductTile, {
 import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
 
 // Hooks
+import {useIntl} from 'react-intl'
+import {useCustomerId, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {useLimitUrls, usePageUrls} from '@salesforce/retail-react-app/app/hooks'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
@@ -43,27 +44,11 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 
-/* eslint-disable react/prop-types */
-const ProductListBody = ({
-    toggleFilter,
-    productSearchResult,
-    searchParams,
-    isRefetching,
-    searchQuery,
-    category,
-    basePath
-}) => {
+const useWishListThing = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const toast = useToast()
-    const einstein = useEinstein()
     const customerId = useCustomerId()
-
-    // Get urls to be used for pagination, page size changes, and sorting.
-    const pageUrls = usePageUrls({total: productSearchResult?.total})
-    const limitUrls = useLimitUrls()
-
-    /**************** Wishlist Management ****************/
     const [wishlistLoading, setWishlistLoading] = useState([])
     const {data: wishlist} = useWishList()
     const {mutateAsync: createCustomerProductListItem} = useShopperCustomersMutation(
@@ -150,6 +135,22 @@ const ProductListBody = ({
             }
         )
     }
+    return {wishlist, addItemToWishlist, removeItemFromWishlist}
+}
+
+const ProductListBody = ({
+    toggleFilter,
+    productSearchResult,
+    searchParams,
+    isRefetching,
+    searchQuery,
+    category,
+    basePath
+}) => {
+    const einstein = useEinstein()
+    const pageUrls = usePageUrls({total: productSearchResult?.total})
+    const limitUrls = useLimitUrls()
+    const {wishlist, addItemToWishlist, removeItemFromWishlist} = useWishListThing()
 
     return (
         <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
@@ -233,6 +234,15 @@ const ProductListBody = ({
     )
 }
 
-ProductListBody.propTypes = {}
+ProductListBody.propTypes = {
+    toggleFilter: PropTypes.func,
+    resetFilters: PropTypes.func,
+    productSearchResult: PropTypes.object,
+    searchParams: PropTypes.object,
+    isRefetching: PropTypes.boolean,
+    category: PropTypes.object,
+    basePath: PropTypes.string,
+    searchQuery: PropTypes.string
+}
 
 export default ProductListBody
