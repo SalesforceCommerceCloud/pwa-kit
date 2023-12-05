@@ -6,7 +6,7 @@
  */
 
 import path from 'path'
-import {getRuntime} from '@salesforce/pwa-kit-runtime/dist/ssr/server/express.js'
+import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import pkg from '../package.json'
 import message from './typescript-file'
 
