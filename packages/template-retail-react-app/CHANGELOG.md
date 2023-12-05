@@ -1,3 +1,7 @@
+## There's gonna be a merge conflict because we're mid release
+
+- Split PLP into multiple files to improve extensibility [#1599](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1599)
+
 ## v2.2.0-dev (Nov 3, 2023)
 
 ### Accessibility Improvements
