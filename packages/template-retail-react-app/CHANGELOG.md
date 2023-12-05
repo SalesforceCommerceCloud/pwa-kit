@@ -11,6 +11,7 @@
 - Make security code tooltip receive keyboard focus [#1551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1551)
 - Improve accessibility of quantity picker [#1552](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1552)
 - Improve keyboard accessibility of product scroller [#1559](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1559)
+- Fix focus indicator for hero features links on homepage [#1561](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1561)
 - Ensure color is not the sole means of communicating information [#1570](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1570)
 
 ### Other Features
@@ -18,11 +19,13 @@
 - Add [Active Data](https://help.salesforce.com/s/articleView?id=cc.b2c_active_data_attributes.htm&type=5) files, update pages (app index.jsx, product list and product details pages) to trigger events on product category and product detail views [#1555](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1555)
 - Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
 - Implement gift option for basket [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
+- Update `extract-default-messages` script to support multiple locales [#1574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1574)
 
 ### Bug Fixes
 
 - Remove internal linter rule that is missing in generated projects [#1554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1554)
 - Fix bug where you can add duplicates of the same item to the wishlist. Also fixes bug where skeleton appears when removing last item from the wishlist. [#1560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1560)
+- Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
 - Fix PLP filters for mobile [#1565](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1565)
 
 ## v2.1.0 (Nov 3, 2023)
