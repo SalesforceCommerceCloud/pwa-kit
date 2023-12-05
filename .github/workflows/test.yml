@@ -35,8 +35,8 @@ jobs:
         node: [16, 18]
         npm: [8, 9, 10]
         exclude: # node 16 is not compatible with npm 10
-          - node: 16
-          - npm: 10
+          - node: [16]
+          - npm: [10]
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
@@ -130,8 +130,8 @@ jobs:
         node: [16, 18]
         npm: [8, 9, 10]
         exclude: # node 16 is not compatible with npm 10
-          - node: 16
-          - npm: 10
+          - node: [16]
+          - npm: [10]
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
