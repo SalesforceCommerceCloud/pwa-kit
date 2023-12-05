@@ -230,7 +230,6 @@ const ProductListBody = ({
 
 ProductListBody.propTypes = {
     toggleFilter: PropTypes.func,
-    resetFilters: PropTypes.func,
     productSearchResult: PropTypes.object,
     searchParams: PropTypes.object,
     isRefetching: PropTypes.bool,
