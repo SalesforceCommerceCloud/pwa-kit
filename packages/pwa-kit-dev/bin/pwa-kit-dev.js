@@ -234,7 +234,7 @@ const main = async () => {
         .addOption(
             new program.Option(
                 '--babelArgs <babel-args>',
-                'args to pass through to babel'
+                'args to pass through to babel-node'
             ).argParser((val) => {
                 if (typeof val !== 'string' || val === '') {
                     throw new program.InvalidArgumentError(`"babel-args" cannot be empty`)
