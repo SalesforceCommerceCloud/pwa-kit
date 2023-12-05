@@ -135,7 +135,11 @@ const useWishListControls = () => {
             }
         )
     }
-    return {wishlist, addItemToWishlist, removeItemFromWishlist}
+
+    const isInWishlist = (productId) => {
+        return !!wishlist?.customerProductListItems?.find((item) => item.productId === productId)
+    }
+    return {isInWishlist, addItemToWishlist, removeItemFromWishlist}
 }
 
 const ProductListBody = ({
@@ -150,7 +154,7 @@ const ProductListBody = ({
     const einstein = useEinstein()
     const pageUrls = usePageUrls({total: productSearchResult?.total})
     const limitUrls = useLimitUrls()
-    const {wishlist, addItemToWishlist, removeItemFromWishlist} = useWishListControls()
+    const {addItemToWishlist, isInWishlist, removeItemFromWishlist} = useWishListControls()
 
     return (
         <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
@@ -168,44 +172,31 @@ const ProductListBody = ({
                         ? new Array(searchParams.limit)
                               .fill(0)
                               .map((value, index) => <ProductTileSkeleton key={index} />)
-                        : productSearchResult?.hits?.map((productSearchItem) => {
-                              const productId = productSearchItem.productId
-                              const isInWishlist = !!wishlist?.customerProductListItems?.find(
-                                  (item) => item.productId === productId
-                              )
-
-                              return (
-                                  <ProductTile
-                                      data-testid={`sf-product-tile-${productSearchItem.productId}`}
-                                      key={productSearchItem.productId}
-                                      product={productSearchItem}
-                                      enableFavourite={true}
-                                      isFavourite={isInWishlist}
-                                      onClick={() => {
-                                          if (searchQuery) {
-                                              einstein.sendClickSearch(
-                                                  searchQuery,
-                                                  productSearchItem
-                                              )
-                                          } else if (category) {
-                                              einstein.sendClickCategory(
-                                                  category,
-                                                  productSearchItem
-                                              )
-                                          }
-                                      }}
-                                      onFavouriteToggle={(isFavourite) => {
-                                          const action = isFavourite
-                                              ? addItemToWishlist
-                                              : removeItemFromWishlist
-                                          return action(productSearchItem)
-                                      }}
-                                      dynamicImageProps={{
-                                          widths: ['50vw', '50vw', '20vw', '20vw', '25vw']
-                                      }}
-                                  />
-                              )
-                          })}
+                        : productSearchResult?.hits?.map((productSearchItem) => (
+                              <ProductTile
+                                  data-testid={`sf-product-tile-${productSearchItem.productId}`}
+                                  key={productSearchItem.productId}
+                                  product={productSearchItem}
+                                  enableFavourite={true}
+                                  isFavourite={isInWishlist(productSearchItem.productId)}
+                                  onClick={() => {
+                                      if (searchQuery) {
+                                          einstein.sendClickSearch(searchQuery, productSearchItem)
+                                      } else if (category) {
+                                          einstein.sendClickCategory(category, productSearchItem)
+                                      }
+                                  }}
+                                  onFavouriteToggle={(isFavourite) => {
+                                      const action = isFavourite
+                                          ? addItemToWishlist
+                                          : removeItemFromWishlist
+                                      return action(productSearchItem)
+                                  }}
+                                  dynamicImageProps={{
+                                      widths: ['50vw', '50vw', '20vw', '20vw', '25vw']
+                                  }}
+                              />
+                          ))}
                 </SimpleGrid>
                 {/* Footer */}
                 <Flex justifyContent={['center', 'center', 'flex-start']} paddingTop={8}>
@@ -239,7 +230,7 @@ ProductListBody.propTypes = {
     resetFilters: PropTypes.func,
     productSearchResult: PropTypes.object,
     searchParams: PropTypes.object,
-    isRefetching: PropTypes.boolean,
+    isRefetching: PropTypes.bool,
     category: PropTypes.object,
     basePath: PropTypes.string,
     searchQuery: PropTypes.string
