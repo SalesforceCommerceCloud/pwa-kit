@@ -235,16 +235,9 @@ const main = async () => {
             new program.Option(
                 '--babelArgs <babel-args>',
                 'args to pass through to babel-node'
-            ).argParser((val) => {
-                if (typeof val !== 'string' || val === '') {
-                    throw new program.InvalidArgumentError(`"babel-args" cannot be empty`)
-                } else {
-                    return val
-                }
-            })
+            ).default('--extensions ".js,.jsx,.ts,.tsx"')
         )
-        .action(async ({inspect, noHMR, babelArgs = `--extensions ".js,.jsx,.ts,.tsx"`}) => {
-            console.log(`starting with babel args "${babelArgs}"`)
+        .action(async ({inspect, noHMR, babelArgs}) => {
             // We use @babel/node instead of node because we want to support ES6 import syntax
             const babelNode = p.join(
                 require.resolve('webpack'),
@@ -261,15 +254,12 @@ const main = async () => {
                 process.exit(1)
             }
 
-            execSync(
-                `${babelNode} ${inspect ? `--inspect ${babelArgs}` : `${babelArgs}`} ${entrypoint}`,
-                {
-                    env: {
-                        ...process.env,
-                        ...(noHMR ? {HMR: 'false'} : {})
-                    }
+            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
+                env: {
+                    ...process.env,
+                    ...(noHMR ? {HMR: 'false'} : {})
                 }
-            )
+            })
         })
 
     program
