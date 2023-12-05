@@ -9,7 +9,9 @@
 // This file should only re-export the hooks themselves. If users want to access providers/helpers,
 // they can do so by importing the specific file.
 export {default as useActiveData} from './use-active-data'
-export {useAddToCartModal, useAddToCartModalContext} from './use-add-to-cart-modal'
+// TODO: This export results in Uncaught ReferenceError: Cannot access 'useAddToCartModal' before initialization
+// Probably caused by circular imports somewhere?
+// export {useAddToCartModal, useAddToCartModalContext} from './use-add-to-cart-modal'
 export {useAuthModal} from './use-auth-modal'
 export {useCurrency} from './use-currency'
 export {useCurrentBasket} from './use-current-basket'
@@ -31,5 +33,3 @@ export {useVariant} from './use-variant'
 export {useVariationAttributes} from './use-variation-attributes'
 export {useVariationParams} from './use-variation-params'
 export {useWishList} from './use-wish-list'
-
-import * as constants from '@salesforce/retail-react-app/app/constants'
