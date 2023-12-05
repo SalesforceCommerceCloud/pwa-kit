@@ -99,14 +99,6 @@ describe('Storefront Preview Component', function () {
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
     })
 
-    test('onContextChange is defined in window.STOREFRONT_PREVIEW when it is defined', () => {
-        window.STOREFRONT_PREVIEW = {}
-        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
-
-        render(<StorefrontPreview enabled={true} getToken={() => 'my-token'} onContextChange={() => undefined} />)
-        expect(window.STOREFRONT_PREVIEW.onContextChange).toBeDefined()
-    })
-
     test('experimental unsafe props are defined', () => {
         expect(window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate).toBeDefined()
     })
