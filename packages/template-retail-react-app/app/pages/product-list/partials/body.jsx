@@ -28,9 +28,12 @@ import Refinements from '@salesforce/retail-react-app/app/pages/product-list/par
 // Hooks
 import {useIntl} from 'react-intl'
 import {useCustomerId, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
-import {useLimitUrls, usePageUrls} from '@salesforce/retail-react-app/app/hooks'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import {
+    useEinstein,
+    useLimitUrls,
+    usePageUrls,
+    useToast
+} from '@salesforce/retail-react-app/app/hooks'
 
 // Constants
 import {
