@@ -44,7 +44,7 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 
-const useWishListThing = () => {
+const useWishListControls = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const toast = useToast()
@@ -150,7 +150,7 @@ const ProductListBody = ({
     const einstein = useEinstein()
     const pageUrls = usePageUrls({total: productSearchResult?.total})
     const limitUrls = useLimitUrls()
-    const {wishlist, addItemToWishlist, removeItemFromWishlist} = useWishListThing()
+    const {wishlist, addItemToWishlist, removeItemFromWishlist} = useWishListControls()
 
     return (
         <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
