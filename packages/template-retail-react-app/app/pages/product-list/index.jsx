@@ -35,9 +35,8 @@ import {MAX_CACHE_AGE} from '@salesforce/retail-react-app/app/constants'
 import MobileSortPicker from '@salesforce/retail-react-app/app/pages/product-list/partials/mobile-sort-picker'
 import MobileRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/mobile-refinements'
 
-// NOTE: You can ignore certain refinements on a template level by updating the below
-// list of ignored refinements.
-const REFINEMENT_DISALLOW_LIST = ['c_isNew']
+/** List of refinements that shoppers should not be able to filter by. */
+export const REFINEMENT_DISALLOW_LIST = ['c_isNew']
 
 /*
  * This is a simple product listing page. It displays a paginated list
