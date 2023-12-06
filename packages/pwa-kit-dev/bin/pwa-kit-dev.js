@@ -240,6 +240,12 @@ const main = async () => {
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
         .addOption(
+            new program.Option(
+                '--babelArgs <babel-args>',
+                'args to pass through to babel-node'
+            ).default('--extensions ".js,.jsx,.ts,.tsx"')
+        )
+        .addOption(
             new program.Option('-o, --open <url>', 'initial URL to load after the server starts')
                 .default('/')
                 .env(PWA_KIT_OPEN_URL)
@@ -247,7 +253,7 @@ const main = async () => {
         .addOption(
             new program.Option('--no-open', 'do not launch a browser when the dev server starts')
         )
-        .action(async ({inspect, noHMR, open}) => {
+        .action(async ({inspect, noHMR, babelArgs, open}) => {
             // We use @babel/node instead of node because we want to support ES6 import syntax
             const babelNode = p.join(
                 require.resolve('webpack'),
@@ -264,7 +270,7 @@ const main = async () => {
                 process.exit(1)
             }
 
-            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
+            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
                 env: {
                     ...process.env,
                     // NOTE: The logic in build-dev-server.js enforces that only URLs pointing to
