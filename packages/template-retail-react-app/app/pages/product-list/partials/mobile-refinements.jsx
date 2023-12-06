@@ -4,18 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/*
- * Copyright (c) 2023, Salesforce, Inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-
-// Components
 import {
     Text,
     Stack,
@@ -28,16 +19,9 @@ import {
     ModalCloseButton,
     ModalOverlay
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-
-// Project Components
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
 
-// Hooks
-
-// Others
-
-/* eslint-disable react/prop-types */
 const MobileRefinements = (props) => {
     const {
         isOpen,
@@ -107,7 +91,13 @@ const MobileRefinements = (props) => {
 }
 
 MobileRefinements.propTypes = {
-    x: PropTypes.bool
+    isOpen: PropTypes.bool,
+    onClose: PropTypes.func,
+    isRefetching: PropTypes.bool,
+    toggleFilter: PropTypes.func,
+    productSearchResult: PropTypes.object,
+    searchParams: PropTypes.object,
+    resetFilters: PropTypes.func
 }
 
 export default MobileRefinements
