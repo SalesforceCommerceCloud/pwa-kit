@@ -8,30 +8,14 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation, useParams} from 'react-router-dom'
-import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
 import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 // Components
-import {
-    Box,
-    Text,
-    Stack,
-    useDisclosure,
-    Button,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    ModalContent,
-    ModalCloseButton,
-    ModalOverlay
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import ProductListBody from '@salesforce/retail-react-app/app/pages/product-list/partials/body'
 import ProductListHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/header'
@@ -49,6 +33,7 @@ import {
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import {MAX_CACHE_AGE} from '@salesforce/retail-react-app/app/constants'
 import MobileSortPicker from '@salesforce/retail-react-app/app/pages/product-list/partials/mobile-sort-picker'
+import MobileRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/mobile-refinements'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -65,7 +50,6 @@ const ProductList = (props) => {
     // eslint-disable-next-line react/prop-types, @typescript-eslint/no-unused-vars
     const {isLoading: _unusedIsLoading, staticContext, ...rest} = props
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const params = useParams()
     const location = useLocation()
@@ -281,64 +265,15 @@ const ProductList = (props) => {
                     ></ProductListBody>
                 </>
             )}
-            {/* Modal for filter options on mobile */}
-            <Modal
+            <MobileRefinements
                 isOpen={isOpen}
                 onClose={onClose}
-                size="full"
-                motionPreset="slideInBottom"
-                scrollBehavior="inside"
-            >
-                <ModalOverlay />
-                <ModalContent top={0} marginTop={0}>
-                    <ModalHeader>
-                        <Text fontWeight="bold" fontSize="2xl">
-                            <FormattedMessage
-                                defaultMessage="Filter"
-                                id="product_list.modal.title.filter"
-                            />
-                        </Text>
-                    </ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody py={4}>
-                        {isRefetching && <LoadingSpinner />}
-                        <Refinements
-                            toggleFilter={toggleFilter}
-                            filters={productSearchResult?.refinements}
-                            selectedFilters={searchParams.refine}
-                        />
-                    </ModalBody>
-
-                    <ModalFooter
-                        // justify="space-between"
-                        display="block"
-                        width="full"
-                        borderTop="1px solid"
-                        borderColor="gray.100"
-                        paddingBottom={10}
-                    >
-                        <Stack>
-                            <Button width="full" onClick={onClose}>
-                                {formatMessage(
-                                    {
-                                        id: 'product_list.modal.button.view_items',
-                                        defaultMessage: 'View {prroductCount} items'
-                                    },
-                                    {
-                                        prroductCount: productSearchResult?.total
-                                    }
-                                )}
-                            </Button>
-                            <Button width="full" variant="outline" onClick={resetFilters}>
-                                <FormattedMessage
-                                    defaultMessage="Clear Filters"
-                                    id="product_list.modal.button.clear_filters"
-                                />
-                            </Button>
-                        </Stack>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+                isRefetching={isRefetching}
+                toggleFilter={toggleFilter}
+                productSearchResult={productSearchResult}
+                searchParams={searchParams}
+                resetFilters={resetFilters}
+            ></MobileRefinements>
             <MobileSortPicker
                 sortOpen={sortOpen}
                 setSortOpen={setSortOpen}
