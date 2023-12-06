@@ -7,7 +7,7 @@
 import {withLegacyGetProps} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-legacy-get-props'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import AppConfig from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/_app-config'
-import '../../styled-system/styles.css'
+import '../../index.css'
 
 const isServerSide = typeof window === 'undefined'
 
