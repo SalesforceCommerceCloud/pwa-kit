@@ -7,7 +7,7 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useLocation, useParams} from 'react-router-dom'
+import {useLocation, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
 import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
@@ -26,13 +26,7 @@ import {
     ModalFooter,
     ModalContent,
     ModalCloseButton,
-    ModalOverlay,
-    Drawer,
-    DrawerBody,
-    DrawerHeader,
-    DrawerOverlay,
-    DrawerContent,
-    DrawerCloseButton
+    ModalOverlay
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
@@ -54,6 +48,7 @@ import {
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import {MAX_CACHE_AGE} from '@salesforce/retail-react-app/app/constants'
+import MobileSortPicker from '@salesforce/retail-react-app/app/pages/product-list/partials/mobile-sort-picker'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -72,7 +67,6 @@ const ProductList = (props) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const history = useHistory()
     const params = useParams()
     const location = useLocation()
     const einstein = useEinstein()
@@ -345,53 +339,13 @@ const ProductList = (props) => {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-            <Drawer
-                placement="bottom"
-                isOpen={sortOpen}
-                onClose={() => setSortOpen(false)}
-                size="sm"
-                motionPreset="slideInBottom"
-                scrollBehavior="inside"
-                isFullHeight={false}
-                height="50%"
-            >
-                <DrawerOverlay />
-                <DrawerContent marginTop={0}>
-                    <DrawerHeader boxShadow="none">
-                        <Text fontWeight="bold" fontSize="2xl">
-                            <FormattedMessage
-                                defaultMessage="Sort By"
-                                id="product_list.drawer.title.sort_by"
-                            />
-                        </Text>
-                    </DrawerHeader>
-                    <DrawerCloseButton />
-                    <DrawerBody>
-                        {sortUrls.map((href, idx) => (
-                            <Button
-                                width="full"
-                                onClick={() => {
-                                    setSortOpen(false)
-                                    history.push(href)
-                                }}
-                                fontSize={'md'}
-                                key={idx}
-                                marginTop={0}
-                                variant="menu-link"
-                            >
-                                <Text
-                                    as={
-                                        selectedSortingOptionLabel?.label ===
-                                            productSearchResult?.sortingOptions[idx]?.label && 'u'
-                                    }
-                                >
-                                    {productSearchResult?.sortingOptions[idx]?.label}
-                                </Text>
-                            </Button>
-                        ))}
-                    </DrawerBody>
-                </DrawerContent>
-            </Drawer>
+            <MobileSortPicker
+                sortOpen={sortOpen}
+                setSortOpen={setSortOpen}
+                sortUrls={sortUrls}
+                selectedSortingOptionLabel={selectedSortingOptionLabel}
+                productSearchResult={productSearchResult}
+            ></MobileSortPicker>
         </Box>
     )
 }
