@@ -1,4 +1,6 @@
 ## v3.3.0-preview.0 (Nov 30, 2023)
+- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
+
 ## v3.3.0-dev (Nov 03, 2023)
 
 - Add `source-map-loader` plugin to webpack configuration. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
