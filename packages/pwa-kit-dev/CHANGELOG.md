@@ -1,3 +1,4 @@
+## v3.3.0-nightly-20231206080144 (Dec 06, 2023)
 ## v3.3.0-dev (Nov 03, 2023)
 
 - Add `source-map-loader` plugin to webpack configuration. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
