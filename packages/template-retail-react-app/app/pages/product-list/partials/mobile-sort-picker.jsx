@@ -23,7 +23,7 @@ import {
 
 const MobileSortPicker = (props) => {
     const history = useHistory()
-    const {sortOpen, setSortOpen, sortUrls, selectedSortingOptionLabel, productSearchResult} = props
+    const {sortOpen, setSortOpen, sortUrls, selectedSort, productSearchResult} = props
     return (
         <Drawer
             placement="bottom"
@@ -61,7 +61,7 @@ const MobileSortPicker = (props) => {
                         >
                             <Text
                                 as={
-                                    selectedSortingOptionLabel?.label ===
+                                    selectedSort?.label ===
                                         productSearchResult?.sortingOptions[idx]?.label && 'u'
                                 }
                             >
@@ -78,7 +78,7 @@ const MobileSortPicker = (props) => {
 MobileSortPicker.propTypes = {
     sortOpen: PropTypes.bool,
     setSortOpen: PropTypes.func,
-    selectedSortingOptionLabel: PropTypes.object,
+    selectedSort: PropTypes.object,
     sortUrls: PropTypes.arrayOf(PropTypes.string),
     productSearchResult: PropTypes.object
 }

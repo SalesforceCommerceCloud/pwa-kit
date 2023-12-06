@@ -130,7 +130,7 @@ const ProductList = (props) => {
     const basePath = `${location.pathname}${location.search}`
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
     const {sortingOptions} = productSearchResult || {}
-    const selectedSortingOptionLabel =
+    const selectedSort =
         sortingOptions?.find(
             (option) => option.id === productSearchResult?.selectedSortingOption
         ) ?? sortingOptions?.[0]
@@ -252,7 +252,7 @@ const ProductList = (props) => {
                         basePath={basePath}
                         onOpen={onOpen}
                         setSortOpen={setSortOpen}
-                        selectedSortingOptionLabel={selectedSortingOptionLabel}
+                        selectedSort={selectedSort}
                     ></ProductListHeader>
                     <ProductListBody
                         toggleFilter={toggleFilter}
@@ -278,7 +278,7 @@ const ProductList = (props) => {
                 sortOpen={sortOpen}
                 setSortOpen={setSortOpen}
                 sortUrls={sortUrls}
-                selectedSortingOptionLabel={selectedSortingOptionLabel}
+                selectedSort={selectedSort}
                 productSearchResult={productSearchResult}
             ></MobileSortPicker>
         </Box>

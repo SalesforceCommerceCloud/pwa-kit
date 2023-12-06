@@ -29,7 +29,7 @@ const ProductListHeader = (props) => {
         basePath,
         onOpen,
         setSortOpen,
-        selectedSortingOptionLabel
+        selectedSort
     } = props
     const {formatMessage} = useIntl()
     return (
@@ -119,7 +119,7 @@ const ProductListHeader = (props) => {
                                         defaultMessage: 'Sort By: {sortOption}'
                                     },
                                     {
-                                        sortOption: selectedSortingOptionLabel?.label
+                                        sortOption: selectedSort?.label
                                     }
                                 )}
                             </Button>
@@ -150,7 +150,7 @@ ProductListHeader.propTypes = {
     basePath: PropTypes.string,
     onOpen: PropTypes.func,
     setSortOpen: PropTypes.func,
-    selectedSortingOptionLabel: PropTypes.object
+    selectedSort: PropTypes.object
 }
 
 export default ProductListHeader
