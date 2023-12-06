@@ -69,21 +69,21 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
                 {name}
             </Link>
 
-            <Link
-                as={RouteLink}
-                to={'#'}
-                onMouseOver={onOpen}
-                onKeyDown={(e) => {
-                    keyMap[e.key]?.(e)
-                }}
-                {...baseStyle.listMenuTriggerLinkIcon}
-            >
-                <PopoverTrigger>
+            <PopoverTrigger>
+                <Link
+                    as={RouteLink}
+                    to={'#'}
+                    onMouseOver={onOpen}
+                    onKeyDown={(e) => {
+                        keyMap[e.key]?.(e)
+                    }}
+                    {...baseStyle.listMenuTriggerLinkIcon}
+                >
                     <Fade in={hasItems}>
                         <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
                     </Fade>
-                </PopoverTrigger>
-            </Link>
+                </Link>
+            </PopoverTrigger>
         </Box>
     )
 }
