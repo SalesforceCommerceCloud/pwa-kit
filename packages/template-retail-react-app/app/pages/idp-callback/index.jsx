@@ -5,20 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import React, {useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Text, VStack, Spinner} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
-import {useIdpCallback} from '@salesforce/retail-react-app/app/hooks/use-idp-callback'
+import useIdpCallback from '@salesforce/retail-react-app/app/hooks/use-idp-callback'
 import {useLocation} from 'react-router-dom'
 
 const IDPCallback = () => {
     const navigate = useNavigation()
     const location = useLocation()
+    const {data: customer} = useCurrentCustomer()
     const {formatMessage} = useIntl()
-    const {customer, error} = useIdpCallback({
+    const {authenticationError} = useIdpCallback({
         labels: {
             missingParameters: formatMessage({
                 defaultMessage: 'Missing parameters',
@@ -42,7 +44,7 @@ const IDPCallback = () => {
             <Seo
                 title={formatMessage({defaultMessage: 'Redirecting...', id: 'idp.redirect.title'})}
             />
-            {error && (
+            {authenticationError && (
                 <VStack>
                     <AlertIcon boxSize={12} color="red.500" />
                     <Text
@@ -55,10 +57,10 @@ const IDPCallback = () => {
                             id="idp.redirect.error"
                         />
                     </Text>
-                    <Text fontSize="x-large">{error}</Text>
+                    <Text fontSize="x-large">{authenticationError}</Text>
                 </VStack>
             )}
-            {!error && (
+            {!authenticationError && (
                 <VStack>
                     <Spinner boxSize={12} />
                     <Text

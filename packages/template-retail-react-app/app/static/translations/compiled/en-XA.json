@@ -3323,6 +3323,62 @@
       "value": "]"
     }
   ],
+  "idp.redirect.error": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗřřǿǿř ŀǿǿɠɠīƞɠ īƞ ẇīŧħ īḓḗḗƞŧīŧẏ ƥřǿǿṽīḓḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "idp.redirect.error.missing_parameters": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿīşşīƞɠ ƥȧȧřȧȧḿḗḗŧḗḗřş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "idp.redirect.message": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥŀḗḗȧȧşḗḗ ħǿǿŀḓ..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "idp.redirect.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧŭŭŧħḗḗƞŧīƈȧȧŧīƞɠ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,
@@ -4147,6 +4203,20 @@
     {
       "type": 0,
       "value": "Ƈřḗḗȧȧŧḗḗ ȧȧƈƈǿǿŭŭƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "login_form.button.continue_with_facebook": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈǿǿƞŧīƞŭŭḗḗ ẇīŧħ Ƒȧȧƈḗḗƀǿǿǿǿķ"
     },
     {
       "type": 0,
@@ -5407,6 +5477,20 @@
       "value": "]"
     }
   ],
+  "register_form.button.sign_up_with_facebook": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şīɠƞ ŭŭƥ ẇīŧħ Ƒȧȧƈḗḗƀǿǿǿǿķ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "register_form.heading.lets_get_started": [
     {
       "type": 0,
@@ -5481,6 +5565,20 @@
     {
       "type": 0,
       "value": "Ƈřḗḗȧȧŧḗḗ ȧȧƞ ȧȧƈƈǿǿŭŭƞŧ ȧȧƞḓ ɠḗḗŧ ƒīřşŧ ȧȧƈƈḗḗşş ŧǿǿ ŧħḗḗ ṽḗḗřẏ ƀḗḗşŧ ƥřǿǿḓŭŭƈŧş, īƞşƥīřȧȧŧīǿǿƞ ȧȧƞḓ ƈǿǿḿḿŭŭƞīŧẏ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "register_form.message.or": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "ǿǿř"
     },
     {
       "type": 0,

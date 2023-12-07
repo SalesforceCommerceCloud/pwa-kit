@@ -7,31 +7,19 @@
 import React from 'react'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import {screen} from '@testing-library/react'
-import Account from '@salesforce/retail-react-app/app/pages/account'
 import {
     renderWithProviders,
     createPathWithDefaults
 } from '@salesforce/retail-react-app/app/utils/test-utils'
 import IDPCallback from '@salesforce/retail-react-app/app/pages/idp-callback'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-
-import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search-params'
-import useIdpAuth from '@salesforce/retail-react-app/app/hooks/use-idp-auth'
+import useIdpCallback from '@salesforce/retail-react-app/app/hooks/use-idp-callback'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 jest.setTimeout(60000)
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-search-params')
-jest.mock('@salesforce/retail-react-app/app/hooks/use-idp-auth')
-jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => {
-    return {
-        useCurrentCustomer: () => ({
-            data: {
-                isRegistered: true,
-                email: 'test@test.com'
-            }
-        })
-    }
-})
+jest.mock('@salesforce/retail-react-app/app/hooks/use-idp-callback')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer')
 
 const MockedComponent = () => {
     const match = {
@@ -41,7 +29,7 @@ const MockedComponent = () => {
         <Router>
             <IDPCallback />
             <Route path={createPathWithDefaults('/account')}>
-                <Account match={match} />
+                <div>test@test.com</div>
             </Route>
         </Router>
     )
@@ -49,20 +37,21 @@ const MockedComponent = () => {
 
 describe('IDP Callback', () => {
     beforeEach(() => {
-        useSearchParams.mockReset()
-        useIdpAuth.mockReset()
+        useIdpCallback.mockReset()
+        useCurrentCustomer.mockReset()
     })
 
     describe.each([
-        [{usid: 'usid', code: 'code'}, 'Authenticating'],
         [{}, 'Missing parameters'],
         [{error_description: 'Random error'}, 'Random error']
     ])('when search params are %p', (searchParams, expectedText) => {
         test(`should show "${expectedText}"`, async () => {
-            useSearchParams.mockReturnValue([searchParams])
-            useIdpAuth.mockImplementation(() => ({
-                processIdpResult: () => new Promise(() => {})
-            }))
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    isRegistered: false
+                }
+            })
+            useIdpCallback.mockReturnValue({authenticationError: expectedText})
 
             renderWithProviders(<MockedComponent />, {
                 wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
@@ -72,28 +61,13 @@ describe('IDP Callback', () => {
         })
     })
 
-    test('should show an error if the hook throws an error', async () => {
-        useSearchParams.mockReturnValue([{usid: 'usid', code: 'code'}])
-
-        useIdpAuth.mockImplementation(() => ({
-            processIdpResult: () => Promise.reject({message: 'Something happened'})
-        }))
-
-        renderWithProviders(<MockedComponent />, {
-            wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
-        })
-
-        expect(
-            await screen.findByText(/Something happened/i, {}, {timeout: 30000})
-        ).toBeInTheDocument()
-    })
-
     test('should navigate to account page when account is logged in', async () => {
-        useSearchParams.mockReturnValue([{usid: 'usid', code: 'code'}])
-
-        useIdpAuth.mockImplementation(() => ({
-            processIdpResult: () => Promise.resolve()
-        }))
+        useCurrentCustomer.mockReturnValue({
+            data: {
+                isRegistered: true
+            }
+        })
+        useIdpCallback.mockReturnValue({authenticationError: null})
 
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}

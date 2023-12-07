@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import {useEffect, useState} from 'react'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import useIDPAuth from '@salesforce/retail-react-app/app/hooks/use-idp-auth'
 import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search-params'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+
+const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
 
 /**
  * A hook that handles the IDP callback
@@ -15,31 +17,34 @@ import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search
  * @param {Object} props
  * @param {{missingParameters: String}} props.labels
  *
- * @returns {{customer: Object, error: String}} The current customer and error
+ * @returns {{authenticationError: String}} - The authentication error
  */
-export const useIdpCallback = ({labels}) => {
-    const idpAuth = useIDPAuth()
-    const {data: customer} = useCurrentCustomer()
+const useIdpCallback = ({labels}) => {
     const [params] = useSearchParams()
-    const [error, setError] = useState(params.error_description)
+    const [authenticationError, setAuthenticationError] = useState(params.error_description)
+    const auth = useAuthContext()
 
     useEffect(() => {
         // If there is an error in the URL, we don't need to do anything else
-        if (error) {
+        if (authenticationError) {
             return
         }
 
         // We need to make sure we have the usid and code in the URL
         if (!params.usid || !params.code) {
-            setError(labels?.missingParameters)
+            setAuthenticationError(labels?.missingParameters)
 
             return
         }
 
-        idpAuth.processIdpResult(params.usid, params.code).catch((error) => {
-            setError(error.message)
+        auth.loginIDPUser({
+            usid: params.usid,
+            code: params.code,
+            redirectURI: `${getAppOrigin()}${SLAS_CALLBACK_ENDPOINT}`
         })
     }, [])
 
-    return {customer, error}
+    return {authenticationError}
 }
+
+export default useIdpCallback

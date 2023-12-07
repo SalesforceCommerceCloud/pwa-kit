@@ -1579,6 +1579,30 @@
       "value": "Secure"
     }
   ],
+  "idp.redirect.error": [
+    {
+      "type": 0,
+      "value": "Error logging in with identity provider"
+    }
+  ],
+  "idp.redirect.error.missing_parameters": [
+    {
+      "type": 0,
+      "value": "Missing parameters"
+    }
+  ],
+  "idp.redirect.message": [
+    {
+      "type": 0,
+      "value": "Please hold..."
+    }
+  ],
+  "idp.redirect.title": [
+    {
+      "type": 0,
+      "value": "Authenticating"
+    }
+  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,
@@ -1935,6 +1959,12 @@
     {
       "type": 0,
       "value": "Create account"
+    }
+  ],
+  "login_form.button.continue_with_facebook": [
+    {
+      "type": 0,
+      "value": "Continue with Facebook"
     }
   ],
   "login_form.button.sign_in": [
@@ -2519,6 +2549,12 @@
       "value": "Create Account"
     }
   ],
+  "register_form.button.sign_up_with_facebook": [
+    {
+      "type": 0,
+      "value": "Sign up with Facebook"
+    }
+  ],
   "register_form.heading.lets_get_started": [
     {
       "type": 0,
@@ -2565,6 +2601,12 @@
     {
       "type": 0,
       "value": "Create an account and get first access to the very best products, inspiration and community."
+    }
+  ],
+  "register_form.message.or": [
+    {
+      "type": 0,
+      "value": "or"
     }
   ],
   "reset_password.button.back_to_sign_in": [

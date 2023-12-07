@@ -443,6 +443,25 @@ class Auth {
     }
 
     /**
+     * A login method to handle the callback from an IDP.
+     */
+    async loginIDPUser(body: {code: string; usid: string; redirectURI: string}) {
+        return await this.queueRequest(() => {
+            const tokenBody = {
+                code: body.code,
+                usid: body.usid,
+                grant_type: 'authorization_code_pkce',
+                redirect_uri: body.redirectURI,
+                code_verifier: localStorage.getItem('codeVerifier') || '',
+                client_id: this.client.clientConfig.parameters.clientId,
+                channel_id: this.client.clientConfig.parameters.siteId
+            }
+
+            return this.client.getAccessToken({body: tokenBody})
+        }, false)
+    }
+
+    /**
      * This is a wrapper method for ShopperCustomer API registerCustomer endpoint.
      *
      */
