@@ -996,6 +996,18 @@
   "product_list.modal.title.filter": {
     "defaultMessage": "Filter"
   },
+  "product_list.refinements.button.assistive_msg.add_filter": {
+    "defaultMessage": "Add filter: {label}"
+  },
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": {
+    "defaultMessage": "Add filter: {label} ({hitCount})"
+  },
+  "product_list.refinements.button.assistive_msg.remove_filter": {
+    "defaultMessage": "Remove filter: {label}"
+  },
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": {
+    "defaultMessage": "Remove filter: {label} ({hitCount})"
+  },
   "product_list.select.sort_by": {
     "defaultMessage": "Sort By: {sortOption}"
   },
@@ -1134,6 +1146,9 @@
   },
   "search.action.cancel": {
     "defaultMessage": "Cancel"
+  },
+  "selected_refinements.action.assistive_msg.clear_all": {
+    "defaultMessage": "Clear all filters"
   },
   "selected_refinements.action.clear_all": {
     "defaultMessage": "Clear All"
