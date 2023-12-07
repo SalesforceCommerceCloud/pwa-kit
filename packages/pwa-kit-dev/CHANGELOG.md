@@ -1,3 +1,4 @@
+## v3.3.0-nightly-20231207080149 (Dec 07, 2023)
 ## v3.3.0-dev (Nov 03, 2023)
 
 - Improve `pwa-kit-dev start` command to accept CLI arguments for babel-node that get passed as CLI args to `pwa-kit-dev start` [#1591](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/1591)
