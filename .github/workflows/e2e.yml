@@ -12,7 +12,10 @@ jobs:
       matrix:
         # Run all matrix env at once because we will not deploy demo app to MRT.
         node: [16, 18]
-        npm: [8, 9]
+        npm: [8, 9, 10]
+        exclude: # node 16 is not compatible with npm 10
+          - node: 16
+            npm: 10
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
@@ -55,7 +58,10 @@ jobs:
       max-parallel: 1
       matrix:
         node: [16, 18]
-        npm: [8, 9]
+        npm: [8, 9, 10]
+        exclude: # node 16 is not compatible with npm 10
+          - node: 16
+            npm: 10
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
@@ -127,7 +133,10 @@ jobs:
       max-parallel: 1
       matrix:
         node: [16, 18]
-        npm: [8, 9]
+        npm: [8, 9, 10]
+        exclude: # node 16 is not compatible with npm 10
+          - node: 16
+            npm: 10
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.

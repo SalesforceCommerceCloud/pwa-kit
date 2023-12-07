@@ -1,3 +1,6 @@
+## v3.3.0-preview.0 (Nov 30, 2023)
+- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
+
 ## v3.3.0-dev (Nov 03, 2023)
 
 - Improve `pwa-kit-dev start` command to accept CLI arguments for babel-node that get passed as CLI args to `pwa-kit-dev start` [#1591](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/1591)
