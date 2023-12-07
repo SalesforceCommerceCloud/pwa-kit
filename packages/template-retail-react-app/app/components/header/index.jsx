@@ -10,10 +10,11 @@ import {useIntl} from 'react-intl'
 import {
     useMultiStyleConfig,
     Box,
-    Flex,
-    IconButton,
     Badge,
     Button,
+    Flex,
+    HStack,
+    IconButton,
     Popover,
     PopoverHeader,
     PopoverTrigger,
@@ -154,42 +155,53 @@ const Header = ({
                             {...styles.search}
                         />
                     </Box>
-                    <AccountIcon
-                        {...styles.accountIcon}
-                        tabIndex={0}
-                        onMouseOver={isDesktop ? onOpen : noop}
-                        onKeyDown={(e) => {
-                            e.key === ENTER_KEY ? onMyAccountClick() : noop
-                        }}
-                        onClick={onMyAccountClick}
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.my_account',
-                            defaultMessage: 'My account'
-                        })}
-                    />
+                    <Popover
+                        isLazy
+                        arrowSize={15}
+                        isOpen={isOpen}
+                        placement="bottom-end"
+                        onClose={onClose}
+                        onOpen={onOpen}
+                    >
+                        <PopoverTrigger>
+                            <IconButton
+                                {...styles.icons}
+                                variant="unstyled"
+                                icon={
+                                    <HStack justify="center" spacing={0}>
+                                        <AccountIcon
+                                            {...styles.accountIcon}
+                                            tabIndex={0}
+                                            onMouseOver={isDesktop ? onOpen : noop}
+                                            onKeyDown={(e) => {
+                                                e.key === ENTER_KEY ? onMyAccountClick() : noop
+                                            }}
+                                            onClick={onMyAccountClick}
+                                            aria-label={intl.formatMessage({
+                                                id: 'header.button.assistive_msg.my_account',
+                                                defaultMessage: 'My account'
+                                            })}
+                                            role="button"
+                                        />
+                                        {isRegistered && isHydrated() && (
+                                            <ChevronDownIcon
+                                                role="button"
+                                                aria-label="My account trigger"
+                                                onMouseLeave={handleIconsMouseLeave}
+                                                onKeyDown={(e) => {
+                                                    keyMap[e.key]?.(e)
+                                                }}
+                                                {...styles.arrowDown}
+                                                onMouseOver={onOpen}
+                                                tabIndex={0}
+                                            />
+                                        )}
+                                    </HStack>
+                                }
+                            />
+                        </PopoverTrigger>
 
-                    {isRegistered && isHydrated() && (
-                        <Popover
-                            isLazy
-                            arrowSize={15}
-                            isOpen={isOpen}
-                            placement="bottom-end"
-                            onClose={onClose}
-                            onOpen={onOpen}
-                        >
-                            <PopoverTrigger>
-                                <ChevronDownIcon
-                                    aria-label="My account trigger"
-                                    onMouseLeave={handleIconsMouseLeave}
-                                    onKeyDown={(e) => {
-                                        keyMap[e.key]?.(e)
-                                    }}
-                                    {...styles.arrowDown}
-                                    onMouseOver={onOpen}
-                                    tabIndex={0}
-                                />
-                            </PopoverTrigger>
-
+                        {isRegistered && isHydrated() && (
                             <PopoverContent
                                 {...styles.popoverContent}
                                 onMouseLeave={() => {
@@ -243,8 +255,9 @@ const Header = ({
                                     </Button>
                                 </PopoverFooter>
                             </PopoverContent>
-                        </Popover>
-                    )}
+                        )}
+                    </Popover>
+
                     <IconButtonWithRegistration
                         aria-label={intl.formatMessage({
                             defaultMessage: 'Wishlist',
