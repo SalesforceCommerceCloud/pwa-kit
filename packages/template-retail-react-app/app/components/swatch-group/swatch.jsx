@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -16,19 +16,35 @@ import {
 import {Link as RouteLink} from 'react-router-dom'
 
 /**
- * The Swatch Component displays item inside `SwatchGroup`
+ * The Swatch Component displays item inside `SwatchGroup`. For proper keyboard accessibility,
+ * ensure that the rendered elements can receive keyboard focus, and are immediate siblings.
  */
-const Swatch = ({
-    children,
-    disabled,
-    href,
-    label,
-    name,
-    selected,
-    onKeyDown,
-    variant = 'square'
-}) => {
+const Swatch = ({children, disabled, href, label, name, selected, variant = 'square'}) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
+    /** Mimic the behavior of native radio inputs by using arrow keys to select prev/next value. */
+    const onKeyDown = (evt) => {
+        let sibling
+        // This is not a very react-y way implementation... ¯\_(ツ)_/¯
+        switch (evt.key) {
+            case 'ArrowUp':
+            case 'ArrowLeft':
+                evt.preventDefault()
+                sibling =
+                    evt.target.previousElementSibling || evt.target.parentElement.lastElementChild
+                break
+            case 'ArrowDown':
+            case 'ArrowRight':
+                evt.preventDefault()
+                sibling =
+                    evt.target.nextElementSibling || evt.target.parentElement.firstElementChild
+                break
+            default:
+                break
+        }
+        sibling?.click()
+        sibling?.focus()
+    }
+
     return (
         <Button
             {...styles.swatch}
@@ -41,7 +57,7 @@ const Swatch = ({
             onKeyDown={onKeyDown}
             // To mimic the behavior of native radio inputs, only the selected input should be
             // tabbable. (The rest are selectable via arrow keys.)
-            tabindex={selected ? 0 : -1}
+            tabIndex={selected ? 0 : -1}
         >
             <Center {...styles.swatchButton}>
                 {children}
@@ -82,11 +98,7 @@ Swatch.propTypes = {
     /**
      * The display value for each swatch
      */
-    name: PropTypes.string,
-    /**
-     * Event handler when a key is pressed while the swatch is focused
-     */
-    onKeyDown: PropTypes.func
+    name: PropTypes.string
 }
 
 export default Swatch

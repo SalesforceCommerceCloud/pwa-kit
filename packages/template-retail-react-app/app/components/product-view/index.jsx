@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
 import React, {forwardRef, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
@@ -34,8 +35,9 @@ import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
+import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
-import VariationAttributeSwatchGroup from '@salesforce/retail-react-app/app/components/product-view/variation-attribute-swatch-group'
 
 const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, productType}) => {
     const isProductASet = productType?.set
@@ -354,14 +356,54 @@ const ProductView = forwardRef(
                                     <Skeleton height={20} width={64} />
                                 </>
                             ) : (
-                                variationAttributes.map((attr) => {
-                                    const variant = attr.id === 'color' ? 'circle' : 'square'
+                                variationAttributes.map(({id, name, selectedValue, values}) => {
+                                    const swatches = values.map(
+                                        ({href, name, image, value, orderable}) => {
+                                            const content = image ? (
+                                                <Box
+                                                    height="100%"
+                                                    width="100%"
+                                                    minWidth="32px"
+                                                    backgroundRepeat="no-repeat"
+                                                    backgroundSize="cover"
+                                                    backgroundColor={name.toLowerCase()}
+                                                    backgroundImage={`url(${
+                                                        image.disBaseLink || image.link
+                                                    })`}
+                                                />
+                                            ) : (
+                                                name
+                                            )
+                                            return (
+                                                <Swatch
+                                                    key={value}
+                                                    href={href}
+                                                    disabled={!orderable}
+                                                    value={value}
+                                                    name={name}
+                                                    variant={id === 'color' ? 'circle' : 'square'}
+                                                    selected={selectedValue?.value === value}
+                                                >
+                                                    {content}
+                                                </Swatch>
+                                            )
+                                        }
+                                    )
                                     return (
-                                        <VariationAttributeSwatchGroup
-                                            key={attr.id}
-                                            {...attr}
-                                            variant={variant}
-                                        />
+                                        <SwatchGroup
+                                            key={id}
+                                            value={selectedValue?.value}
+                                            displayName={selectedValue?.name || ''}
+                                            label={intl.formatMessage(
+                                                {
+                                                    defaultMessage: '{variantType}',
+                                                    id: 'product_view.label.variant_type'
+                                                },
+                                                {variantType: name}
+                                            )}
+                                        >
+                                            {swatches}
+                                        </SwatchGroup>
                                     )
                                 })
                             )}
