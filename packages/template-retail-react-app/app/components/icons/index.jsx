@@ -85,7 +85,9 @@ VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
  * @param {string} name - the filename of the imported svg (does not include extension)
  * @param {Object} passProps - props that will be passed onto the underlying Icon component
  * @param {Object} localizationAttributes - attributes with localized values that will be passed
- *      onto the underlying Icon component, use `defineMessage` to create localized string
+ *      onto the underlying Icon component, use `defineMessage` to create localized string.
+ *      You'll also need to pass an intl object from react-intl as a prop to translate the
+ *      messages. See usages of <LockIcon> in the app as example
  */
 /* istanbul ignore next */
 export const icon = (name, passProps, localizationAttributes) => {
@@ -95,8 +97,9 @@ export const icon = (name, passProps, localizationAttributes) => {
         .replace(/-/g, '')
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
-        const intl = useIntl()
-        if (localizationAttributes) {
+        if (localizationAttributes && props?.intl) {
+            const {intl, ...otherProps} = props
+            props = otherProps
             Object.keys(localizationAttributes).forEach((key) => {
                 passProps[key] = intl.formatMessage(localizationAttributes[key])
             })

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {Fragment} from 'react'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Flex, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     AmexIcon,
@@ -17,6 +17,7 @@ import {
 import Link from '@salesforce/retail-react-app/app/components/link'
 
 const CartCta = () => {
+    const intl = useIntl()
     return (
         <Fragment>
             <Button
@@ -25,7 +26,7 @@ const CartCta = () => {
                 width={['95%', '95%', '95%', '100%']}
                 marginTop={[6, 6, 2, 2]}
                 mb={4}
-                rightIcon={<LockIcon />}
+                rightIcon={<LockIcon intl={intl} />}
                 variant="solid"
             >
                 <FormattedMessage

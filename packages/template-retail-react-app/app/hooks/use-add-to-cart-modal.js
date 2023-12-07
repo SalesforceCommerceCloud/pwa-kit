@@ -222,7 +222,7 @@ export const AddToCartModal = () => {
                                     to="/checkout"
                                     width="100%"
                                     variant="outline"
-                                    rightIcon={<LockIcon />}
+                                    rightIcon={<LockIcon intl={intl} />}
                                 >
                                     {intl.formatMessage({
                                         defaultMessage: 'Proceed to Checkout',
@@ -287,7 +287,7 @@ export const AddToCartModal = () => {
                             to="/checkout"
                             width="100%"
                             variant="outline"
-                            rightIcon={<LockIcon />}
+                            rightIcon={<LockIcon intl={intl} />}
                         >
                             {intl.formatMessage({
                                 defaultMessage: 'Proceed to Checkout',
