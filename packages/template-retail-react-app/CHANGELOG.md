@@ -1,8 +1,15 @@
+## There's gonna be a merge conflict cuz we're mid release
+
+### Accessibility improvements
+
+- Change radio refinements from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
+
 ## v2.2.0-dev (Nov 3, 2023)
 
 ### Accessibility Improvements
 
 <!-- Order by Pull Request ID! -->
+- Ensure the ListMenuTrigger component applies ARIA attributes to the correct element for the trigger icon [#1600](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1600)
 - Ensure form fields and icons have accessible labels [#1526](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1526)
 - Ensure active user interface components have sufficient contrast [#1534](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1534)
 - Fix outline on keyboard focus [#1536](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1536/files)
