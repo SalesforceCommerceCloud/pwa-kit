@@ -10,11 +10,10 @@ import {useIntl} from 'react-intl'
 import {
     useMultiStyleConfig,
     Box,
+    Flex,
+    IconButton,
     Badge,
     Button,
-    Flex,
-    HStack,
-    IconButton,
     Popover,
     PopoverHeader,
     PopoverTrigger,
@@ -49,8 +48,6 @@ import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
-
-const ENTER_KEY = 'Enter'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 /**
@@ -87,7 +84,13 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-    const {isOpen, onClose, onOpen} = useDisclosure()
+    const {
+        getButtonProps: getAccountMenuButtonProps,
+        getDisclosureProps: getAccountMenuDisclosureProps,
+        isOpen: isAccountMenuOpen,
+        onClose: onAccountMenuClose,
+        onOpen: onAccountMenuOpen
+    } = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
 
     const [showLoading, setShowLoading] = useState(false)
@@ -104,15 +107,10 @@ const Header = ({
         setShowLoading(false)
     }
 
-    const keyMap = {
-        Escape: () => onClose(),
-        Enter: () => onOpen()
-    }
-
     const handleIconsMouseLeave = () => {
         // don't close the menu if users enter the popover content
         setTimeout(() => {
-            if (!hasEnterPopoverContent.current) onClose()
+            if (!hasEnterPopoverContent.current) onAccountMenuClose()
         }, 100)
     }
 
@@ -155,62 +153,50 @@ const Header = ({
                             {...styles.search}
                         />
                     </Box>
-                    <Popover
-                        isLazy
-                        arrowSize={15}
-                        isOpen={isOpen}
-                        placement="bottom-end"
-                        onClose={onClose}
-                        onOpen={onOpen}
-                    >
-                        <PopoverTrigger>
-                            <IconButton
-                                {...styles.icons}
-                                variant="unstyled"
-                                icon={
-                                    <HStack justify="center" spacing={0}>
-                                        <AccountIcon
-                                            {...styles.accountIcon}
-                                            tabIndex={0}
-                                            onMouseOver={isDesktop ? onOpen : noop}
-                                            onKeyDown={(e) => {
-                                                e.key === ENTER_KEY ? onMyAccountClick() : noop
-                                            }}
-                                            onClick={onMyAccountClick}
-                                            aria-label={intl.formatMessage({
-                                                id: 'header.button.assistive_msg.my_account',
-                                                defaultMessage: 'My account'
-                                            })}
-                                            role="button"
-                                        />
-                                        {isRegistered && isHydrated() && (
-                                            <ChevronDownIcon
-                                                role="button"
-                                                aria-label="My account trigger"
-                                                onMouseLeave={handleIconsMouseLeave}
-                                                onKeyDown={(e) => {
-                                                    keyMap[e.key]?.(e)
-                                                }}
-                                                {...styles.arrowDown}
-                                                onMouseOver={onOpen}
-                                                tabIndex={0}
-                                            />
-                                        )}
-                                    </HStack>
-                                }
-                            />
-                        </PopoverTrigger>
+                    <IconButtonWithRegistration
+                        icon={<AccountIcon {...styles.accountIcon} />}
+                        aria-label={intl.formatMessage({
+                            id: 'header.button.assistive_msg.my_account',
+                            defaultMessage: 'My account'
+                        })}
+                        variant="unstyled"
+                        onClick={onMyAccountClick}
+                        onMouseOver={isDesktop ? onAccountMenuOpen : noop}
+                    />
 
-                        {isRegistered && isHydrated() && (
+                    {isRegistered && isHydrated() && (
+                        <Popover
+                            isLazy
+                            arrowSize={15}
+                            isOpen={isAccountMenuOpen}
+                            placement="bottom-end"
+                            onClose={onAccountMenuClose}
+                            onOpen={onAccountMenuOpen}
+                        >
+                            <PopoverTrigger>
+                                <IconButton
+                                    aria-label={intl.formatMessage({
+                                        id: 'header.button.assistive_msg.my_account_menu',
+                                        defaultMessage: 'Open account menu'
+                                    })}
+                                    icon={<ChevronDownIcon {...styles.arrowDown} />}
+                                    variant="unstyled"
+                                    {...getAccountMenuButtonProps()}
+                                    onMouseOver={onAccountMenuOpen}
+                                    onMouseLeave={handleIconsMouseLeave}
+                                />
+                            </PopoverTrigger>
+
                             <PopoverContent
                                 {...styles.popoverContent}
                                 onMouseLeave={() => {
                                     hasEnterPopoverContent.current = false
-                                    onClose()
+                                    onAccountMenuClose()
                                 }}
                                 onMouseOver={() => {
                                     hasEnterPopoverContent.current = true
                                 }}
+                                {...getAccountMenuDisclosureProps()}
                             >
                                 <PopoverArrow />
                                 <PopoverHeader>
@@ -255,9 +241,8 @@ const Header = ({
                                     </Button>
                                 </PopoverFooter>
                             </PopoverContent>
-                        )}
-                    </Popover>
-
+                        </Popover>
+                    )}
                     <IconButtonWithRegistration
                         aria-label={intl.formatMessage({
                             defaultMessage: 'Wishlist',
