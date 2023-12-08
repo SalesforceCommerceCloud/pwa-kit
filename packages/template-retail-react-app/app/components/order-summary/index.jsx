@@ -58,8 +58,8 @@ const CartItems = ({basket}) => {
     return (
         <Accordion allowToggle={true} width="100%">
             <AccordionItem style={{border: 0}}>
-                <AccordionButton variant="link">
-                    <BasketIcon />
+                <AccordionButton color="blue.700">
+                    <BasketIcon aria-hidden={true} />
                     <Box px={2}>
                         <FormattedMessage
                             id="order_summary.cart_items.action.num_of_items_in_cart"
@@ -106,12 +106,6 @@ const CartItems = ({basket}) => {
                 </AccordionPanel>
             </AccordionItem>
         </Accordion>
-        // <Stack spacing={5} width="full">
-        //     <Box>
-
-        //     </Box>
-
-        // </Stack>
     )
 }
 
