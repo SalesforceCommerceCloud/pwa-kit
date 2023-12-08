@@ -18,6 +18,7 @@ import {
 import {Component, regionPropType} from '@salesforce/commerce-sdk-react/components'
 import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {useEffect} from 'react'
+import {useIntl} from 'react-intl'
 
 /**
  * Display child components in a carousel slider manner. Configurations include the number of
@@ -37,6 +38,7 @@ import {useEffect} from 'react'
  * @returns {React.ReactElement} - Carousel component.
  */
 export const Carousel = (props = {}) => {
+    const intl = useIntl()
     const scrollRef = useRef()
     const breakpoint = useBreakpoint()
     const [hasOverflow, setHasOverflow] = useState(false)
@@ -172,11 +174,14 @@ export const Carousel = (props = {}) => {
                     {/* boxShadow requires !important --> https://github.com/chakra-ui/chakra-ui/issues/3553 */}
                     <IconButton
                         data-testid="carousel-nav-left"
-                        aria-label="Scroll carousel left"
+                        aria-label={intl.formatMessage({
+                            id: 'carousel.button.scroll_left.assistive_msg',
+                            defaultMessage: 'Scroll carousel left'
+                        })}
                         icon={<ChevronLeftIcon color="black" />}
                         borderRadius="full"
                         colorScheme="whiteAlpha"
-                        boxShadow={'0 3px 10px rgb(0 0 0 / 20%) !important'}
+                        boxShadow="0 3px 10px rgb(0 0 0 / 20%) !important"
                         onClick={() => scroll(-1)}
                     />
                 </Box>
@@ -191,11 +196,14 @@ export const Carousel = (props = {}) => {
                     {/* boxShadow requires !important --> https://github.com/chakra-ui/chakra-ui/issues/3553 */}
                     <IconButton
                         data-testid="carousel-nav-right"
-                        aria-label="Scroll carousel right"
+                        aria-label={intl.formatMessage({
+                            id: 'carousel.button.scroll_right.assistive_msg',
+                            defaultMessage: 'Scroll carousel right'
+                        })}
                         icon={<ChevronRightIcon color="black" />}
                         borderRadius="full"
                         colorScheme="whiteAlpha"
-                        boxShadow={'0 3px 10px rgb(0 0 0 / 20%) !important'}
+                        boxShadow="0 3px 10px rgb(0 0 0 / 20%) !important"
                         onClick={() => scroll(1)}
                     />
                 </Box>

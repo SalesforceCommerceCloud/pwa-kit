@@ -18,7 +18,6 @@ import {
     useAccessToken,
     useCategory,
     useCommerceApi,
-    useCustomerType,
     useCustomerBaskets,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
@@ -123,7 +122,6 @@ const App = (props) => {
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
-    const {isRegistered} = useCustomerType()
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
@@ -257,18 +255,13 @@ const App = (props) => {
     }
 
     const onAccountClick = () => {
-        // Link to account page for registered customer, open auth modal otherwise
-        if (isRegistered) {
-            const path = buildUrl('/account')
-            history.push(path)
-        } else {
-            // if they already are at the login page, do not show login modal
-            if (new RegExp(`^/login$`).test(location.pathname)) return
-            authModal.onOpen()
-        }
+        // Link to account page if registered; Header component will show auth modal for guest users
+        const path = buildUrl('/account')
+        history.push(path)
     }
 
     const onWishlistClick = () => {
+        // Link to wishlist page if registered; Header component will show auth modal for guest users
         const path = buildUrl('/account/wishlist')
         history.push(path)
     }
