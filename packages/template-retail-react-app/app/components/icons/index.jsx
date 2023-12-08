@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {forwardRef} from 'react'
-import {useIntl, defineMessage} from 'react-intl'
+import {defineMessage} from 'react-intl'
+import PropTypes from 'prop-types'
 import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
@@ -87,7 +88,9 @@ VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
  * @param {Object} localizationAttributes - attributes with localized values that will be passed
  *      onto the underlying Icon component, use `defineMessage` to create localized string.
  *      You'll also need to pass an intl object from react-intl as a prop to translate the
- *      messages. See usages of <LockIcon> in the app as example
+ *      messages. See usages of <LockIcon> in the app as example. This is because the icon
+ *      component is sometimes called outside the context of the <IntlProvider> component,
+ *      so we recieve errors when trying to use the useIntl hook
  */
 /* istanbul ignore next */
 export const icon = (name, passProps, localizationAttributes) => {
@@ -111,6 +114,11 @@ export const icon = (name, passProps, localizationAttributes) => {
             </Icon>
         )
     })
+
+    component.propTypes = {
+        intl: PropTypes.object
+    }
+
     component.displayName = `${displayName}Icon`
     return component
 }
