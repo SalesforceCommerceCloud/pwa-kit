@@ -1,13 +1,16 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
-const path = require('path')
-const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
-const pkg = require('../package.json')
+
+import path from 'path'
+import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import pkg from '../package.json'
+import message from './typescript-file'
+
+console.log(message) // print out to validate TS import works
 
 const options = {
     // The build directory (an absolute path)

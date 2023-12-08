@@ -130,13 +130,12 @@ const Home = () => {
                     {heroFeatures.map((feature, index) => {
                         const featureMessage = feature.message
                         return (
-                            <Box
-                                key={index}
-                                background={'white'}
-                                boxShadow={'0px 2px 2px rgba(0, 0, 0, 0.1)'}
-                                borderRadius={'4px'}
-                            >
-                                <Link target="_blank" href={feature.href}>
+                            <Link key={index} target="_blank" href={feature.href}>
+                                <Box
+                                    background={'white'}
+                                    boxShadow="0px 2px 2px rgba(0, 0, 0, 0.1)"
+                                    borderRadius={'4px'}
+                                >
                                     <HStack>
                                         <Flex
                                             paddingLeft={6}
@@ -150,8 +149,8 @@ const Home = () => {
                                             {intl.formatMessage(featureMessage.title)}
                                         </Text>
                                     </HStack>
-                                </Link>
-                            </Box>
+                                </Box>
+                            </Link>
                         )
                     })}
                 </SimpleGrid>

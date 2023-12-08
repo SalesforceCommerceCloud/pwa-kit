@@ -231,7 +231,13 @@ const main = async () => {
             new program.Option('--inspect', 'enable debugging with --inspect on the node process')
         )
         .addOption(new program.Option('--noHMR', 'disable the client-side hot module replacement'))
-        .action(async ({inspect, noHMR}) => {
+        .addOption(
+            new program.Option(
+                '--babelArgs <babel-args>',
+                'args to pass through to babel-node'
+            ).default('--extensions ".js,.jsx,.ts,.tsx"')
+        )
+        .action(async ({inspect, noHMR, babelArgs}) => {
             // We use @babel/node instead of node because we want to support ES6 import syntax
             const babelNode = p.join(
                 require.resolve('webpack'),
@@ -248,7 +254,7 @@ const main = async () => {
                 process.exit(1)
             }
 
-            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${entrypoint}`, {
+            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
                 env: {
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {})
