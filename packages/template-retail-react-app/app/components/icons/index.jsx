@@ -87,10 +87,8 @@ VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
  * @param {Object} passProps - props that will be passed onto the underlying Icon component
  * @param {Object} localizationAttributes - attributes with localized values that will be passed
  *      onto the underlying Icon component, use `defineMessage` to create localized string.
- *      You'll also need to pass an intl object from react-intl as a prop to translate the
- *      messages. See usages of <LockIcon> in the app as example. This is because the icon
- *      component is sometimes called outside the context of the <IntlProvider> component,
- *      so we recieve errors when trying to use the useIntl hook
+ *      Additionally, if the icon is rendered outside the provider tree, you'll also need to
+ *      pass an intl object from react-intl as a prop to translate the messages.
  */
 /* istanbul ignore next */
 export const icon = (name, passProps, localizationAttributes) => {
