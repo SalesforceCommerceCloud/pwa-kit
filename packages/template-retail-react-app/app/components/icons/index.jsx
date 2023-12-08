@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {forwardRef} from 'react'
-import {defineMessage} from 'react-intl'
+import React, {forwardRef, useContext} from 'react'
+import {defineMessage, IntlContext} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
@@ -100,9 +100,21 @@ export const icon = (name, passProps, localizationAttributes) => {
         .replace(/-/g, '')
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
-        if (localizationAttributes && props?.intl) {
-            const {intl, ...otherProps} = props
-            props = otherProps
+        // NOTE: We want to avoid `useIntl` here because that throws when <IntlProvider> is not in
+        // the component ancestry, but we only enforce `intl` if we have `localizationAttributes`.
+        let intl = useContext(IntlContext)
+        if (localizationAttributes) {
+            if (props?.intl) {
+                const {intl: intlProp, ...otherProps} = props
+                // Allow `props.intl` to take precedence over the intl we found
+                intl = intlProp
+                props = otherProps
+            }
+            if (!intl) {
+                throw new Error(
+                    'To localize messages, you must either have <IntlProvider> in the component ancestry or provide `intl` as a prop'
+                )
+            }
             Object.keys(localizationAttributes).forEach((key) => {
                 passProps[key] = intl.formatMessage(localizationAttributes[key])
             })

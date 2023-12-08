@@ -30,10 +30,15 @@ test('renders svg icons with Chakra Icon component', () => {
     expect(use).toHaveAttribute('xlink:href', '#check')
 })
 
+test('uses intl from context when rendered with providers', () => {
+    renderWithProviders(<Icons.LockIcon />)
+    expect(useIntl).toHaveBeenCalled()
+})
+
 // the icon component can exist outside the provider tree via the error component
 // therefore we cannot use the useIntl hook because the <IntlProvider> component
 // will not exist in the component tree, so we pass the intl object as a prop
-test('uses intl object from props and not from useIntl hook', () => {
+test('uses intl from props when rendered outside provider tree', () => {
     const mockIntl = {
         formatMessage: jest.fn()
     }
@@ -43,4 +48,11 @@ test('uses intl object from props and not from useIntl hook', () => {
 
     expect(mockIntl.formatMessage).toHaveBeenCalled()
     expect(useIntl).not.toHaveBeenCalled()
+})
+
+test('throws error when rendered outside provider tree and no intl prop is passed', async () => {
+    const errorMsg =
+        'To localize messages, you must either have <IntlProvider> in the component ancestry or provide `intl` as a prop'
+    // render without providers
+    expect(() => render(<Icons.LockIcon />)).toThrow(errorMsg)
 })
