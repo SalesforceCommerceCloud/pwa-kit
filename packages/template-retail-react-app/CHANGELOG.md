@@ -2,7 +2,7 @@
 
 ### Accessibility improvements
 
-- Change radio refinements from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
+- Change radio refinements (for example, filtering by Price) from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
 
 ## v2.2.0-dev (Nov 3, 2023)
 

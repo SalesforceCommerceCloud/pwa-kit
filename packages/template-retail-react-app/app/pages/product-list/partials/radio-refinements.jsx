@@ -25,7 +25,7 @@ const RadioRefinement = ({filter, value, toggleFilter, selectedFilters}) => {
                 // these workarounds to prevent it from receiving focus.
                 inputProps={{'aria-hidden': true, tabIndex: -1}}
                 onClick={() => buttonRef.current?.click()}
-            ></Radio>
+            />
             <Text
                 ref={buttonRef}
                 ml={2}
