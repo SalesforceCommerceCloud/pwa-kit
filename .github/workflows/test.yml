@@ -50,7 +50,7 @@ jobs:
         }}
       # The current recommended version for Managed Runtime:
       # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
-      IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
+      IS_MRT_NODE: ${{ matrix.node == 18 && matrix.npm == 10 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -149,7 +149,7 @@ jobs:
         }}
       # The current recommended version for Managed Runtime:
       # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
-      IS_MRT_NODE: ${{ matrix.node == 16 && matrix.npm == 8 }}
+      IS_MRT_NODE: ${{ matrix.node == 18 && matrix.npm == 10 }}
     runs-on: windows-latest
     steps:
         - name: Checkout
