@@ -5,8 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+// !!! ----- WARNING ----- WARNING ----- WARNING ----- !!!
 // Tests use render instead of renderWithProviders because
 // error component is rendered outside provider tree
+// !!! ----------------------------------------------- !!!
 import {screen, render} from '@testing-library/react'
 import Error from '@salesforce/retail-react-app/app/components/_error/index'
 
