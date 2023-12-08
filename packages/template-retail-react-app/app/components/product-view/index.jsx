@@ -358,7 +358,7 @@ const ProductView = forwardRef(
                             ) : (
                                 variationAttributes.map(({id, name, selectedValue, values}) => {
                                     const swatches = values.map(
-                                        ({href, name, image, value, orderable}) => {
+                                        ({href, name, image, value, orderable}, index) => {
                                             const content = image ? (
                                                 <Box
                                                     height="100%"
@@ -374,6 +374,19 @@ const ProductView = forwardRef(
                                             ) : (
                                                 name
                                             )
+                                            const hasSelection = Boolean(selectedValue?.value)
+                                            const isSelected = selectedValue?.value === value
+                                            const isFirst = index === 0
+                                            // To mimic the behavior of a native radio input, only
+                                            // one swatch should receive tab focus; the rest can be
+                                            // selected using arrow keys when the swatch group has
+                                            // focus. The focused element is the selected option or
+                                            // the first in the group, if no option is selected.
+                                            // This is a slight difference, for simplicity, from the
+                                            // native element, where the first element is focused on
+                                            // `Tab` and the _last_ element is focused on `Shift+Tab`
+                                            const isFocusable =
+                                                isSelected || (!hasSelection && isFirst)
                                             return (
                                                 <Swatch
                                                     key={value}
@@ -382,7 +395,8 @@ const ProductView = forwardRef(
                                                     value={value}
                                                     name={name}
                                                     variant={id === 'color' ? 'circle' : 'square'}
-                                                    selected={selectedValue?.value === value}
+                                                    selected={isSelected}
+                                                    isFocusable={isFocusable}
                                                 >
                                                     {content}
                                                 </Swatch>

@@ -19,7 +19,16 @@ import {Link as RouteLink} from 'react-router-dom'
  * The Swatch Component displays item inside `SwatchGroup`. For proper keyboard accessibility,
  * ensure that the rendered elements can receive keyboard focus, and are immediate siblings.
  */
-const Swatch = ({children, disabled, href, label, name, selected, variant = 'square'}) => {
+const Swatch = ({
+    children,
+    disabled,
+    href,
+    label,
+    name,
+    selected,
+    isFocusable,
+    variant = 'square'
+}) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
     /** Mimic the behavior of native radio inputs by using arrow keys to select prev/next value. */
     const onKeyDown = (evt) => {
@@ -55,9 +64,9 @@ const Swatch = ({children, disabled, href, label, name, selected, variant = 'squ
             variant="outline"
             role="radio"
             onKeyDown={onKeyDown}
-            // To mimic the behavior of native radio inputs, only the selected input should be
-            // tabbable. (The rest are selectable via arrow keys.)
-            tabIndex={selected ? 0 : -1}
+            // To mimic the behavior of native radio inputs, only one input should be focusable.
+            // (The rest are selectable via arrow keys.)
+            tabIndex={isFocusable ? 0 : -1}
         >
             <Center {...styles.swatchButton}>
                 {children}
@@ -98,7 +107,15 @@ Swatch.propTypes = {
     /**
      * The display value for each swatch
      */
-    name: PropTypes.string
+    name: PropTypes.string,
+    /**
+     * The value for the option.
+     */
+    value: PropTypes.string,
+    /**
+     * Whether the swatch can receive tab focus
+     */
+    isFocusable: PropTypes.bool
 }
 
 export default Swatch
