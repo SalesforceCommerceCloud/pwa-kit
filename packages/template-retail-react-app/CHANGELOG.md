@@ -1,4 +1,4 @@
-## v2.2.0-dev (Nov 3, 2023)
+## v2.2.0-preview.1 (Nov 3, 2023)
 
 ### Accessibility Improvements
 
@@ -22,6 +22,7 @@
 - Implement gift option for basket [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
 - Update `extract-default-messages` script to support multiple locales [#1574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1574)
 - Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
+- Add support for localization in icon component [#1609](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1609)
 
 ### Bug Fixes
 
