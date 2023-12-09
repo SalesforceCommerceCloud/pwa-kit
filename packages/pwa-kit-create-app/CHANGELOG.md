@@ -1,3 +1,5 @@
+## v3.4.0-dev (Dec 08, 2023)
+
 ## v3.3.0 (Nov 8, 2023)
 - Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
 - Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
