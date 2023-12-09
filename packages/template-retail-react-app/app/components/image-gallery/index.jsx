@@ -128,7 +128,6 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                         <ListItem
                             {...styles.thumbnailImageItem}
                             key={index}
-                            data-testid="image-gallery-thumbnails"
                             borderColor={`${selected ? 'black' : ''}`}
                             borderWidth={`${selected ? '1px' : 0}`}
                         >
@@ -142,6 +141,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                                         }
                                     }}
                                     onClick={() => setSelectedIndex(index)}
+                                    data-testid="image-gallery-thumbnails"
                                 >
                                     <Img
                                         alt={image.alt}
