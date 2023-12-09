@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -25,7 +25,8 @@ import LinkRefinements from '@salesforce/retail-react-app/app/pages/product-list
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {FILTER_ACCORDION_SATE} from '@salesforce/retail-react-app/app/constants'
 
-const componentMap = {
+/** Map of refinement attribute IDs to the components used to display values as filter options. */
+export const componentMap = {
     cgid: LinkRefinements,
     c_refinementColor: ColorRefinements,
     c_size: SizeRefinements,
