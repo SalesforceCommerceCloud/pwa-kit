@@ -11,9 +11,7 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE,
-    CONTENT_SECURITY_POLICY,
-    STRICT_TRANSPORT_SECURITY
+    NO_CACHE
 } from './constants'
 import {
     catchAndLog,
@@ -614,7 +612,6 @@ export const RemoteServerFactory = {
 
         // Apply the SSR middleware to any subsequent routes that we expect users
         // to add in their projects, like in any regular Express app.
-        app.use(enforceSecurityHeaders) // Must be AFTER prepNonProxyRequest, as they both modify setHeader.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
 
@@ -936,105 +933,6 @@ export const RemoteServerFactory = {
     _getRequestProcessor(req) {
         return null
     }
-}
-
-/**
- * Patches `res.setHeader` to ensure that the Content-Security-Policy header always includes the
- * directives required for PWA Kit to work.
- * @param {express.Request} req Express request object
- * @param {express.Response} res Express response object
- * @param {express.NextFunction} next Express next callback
- */
-export const enforceSecurityHeaders = (req, res, next) => {
-    /** CSP-compatible origin for Runtime Admin. */
-    // localhost doesn't include a protocol because different browsers behave differently :\
-    const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
-    /**
-     * Map of directive names/values that are required for PWA Kit to work. Array values will be
-     * merged with user-provided values; boolean values will replace user-provided values.
-     * @type Object.<string, string[] | boolean>
-     */
-    const directives = {
-        'connect-src': ["'self'", runtimeAdmin],
-        'frame-ancestors': [runtimeAdmin],
-        'img-src': ["'self'", 'data:'],
-        'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin],
-        // Always upgrade insecure requests when deployed, never upgrade on local dev server
-        'upgrade-insecure-requests': isRemote()
-    }
-
-    const setHeader = res.setHeader
-    res.setHeader = (name, value) => {
-        let modifiedValue = value
-        switch (name?.toLowerCase()) {
-            case CONTENT_SECURITY_POLICY: {
-                // If multiple Content-Security-Policy headers are provided, then the most restrictive
-                // option is chosen for each directive. Therefore, we must modify *all* directives to
-                // ensure that our required directives will work as expected.
-                // Ref: https://w3c.github.io/webappsec-csp/#multiple-policies
-                modifiedValue = Array.isArray(value)
-                    ? value.map((item) => modifyDirectives(item, directives))
-                    : modifyDirectives(value, directives)
-                break
-            }
-            case STRICT_TRANSPORT_SECURITY: {
-                // Block setting this header on local development server - it will break things!
-                if (!isRemote()) return
-                break
-            }
-            default: {
-                break
-            }
-        }
-        return setHeader.call(res, name, modifiedValue)
-    }
-    // Provide an initial CSP (or patch the existing header)
-    res.setHeader(CONTENT_SECURITY_POLICY, res.getHeader(CONTENT_SECURITY_POLICY) ?? '')
-    // Provide an initial value for HSTS, if not already set - use default from `helmet`
-    if (!res.hasHeader(STRICT_TRANSPORT_SECURITY)) {
-        res.setHeader(STRICT_TRANSPORT_SECURITY, 'max-age=15552000; includeSubDomains')
-    }
-    next()
-}
-
-/**
- * Updates the given Content-Security-Policy header to include all directives required by PWA Kit.
- * @param {string} original Original Content-Security-Policy header
- * @returns {string} Modified Content-Security-Policy header
- * @private
- */
-const modifyDirectives = (original, required) => {
-    const directives = original
-        .trim()
-        .split(';')
-        .reduce((acc, directive) => {
-            const text = directive.trim()
-            if (text) {
-                const [name, ...values] = text.split(/ +/)
-                acc[name] = values
-            }
-            return acc
-        }, {})
-
-    // Add missing required CSP directives
-    for (const [name, value] of Object.entries(required)) {
-        if (value === true) {
-            // Boolean directive (required) - overwrite original value
-            directives[name] = []
-        } else if (value === false) {
-            // Boolean directive (disabled) - delete original value
-            delete directives[name]
-        } else {
-            // Regular string[] directive - merge values
-            // Wrapping with `[...new Set(array)]` removes duplicate entries
-            directives[name] = [...new Set([...(directives[name] ?? []), ...value])]
-        }
-    }
-
-    // Re-construct header string
-    return Object.entries(directives)
-        .map(([name, values]) => [name, ...values].join(' '))
-        .join(';')
 }
 
 /**
