@@ -1,12 +1,13 @@
-## There's gonna be a merge conflict cuz we're mid release
+## v3.4.0-dev (Dec 08, 2023)
 
 - Add `--open <url>` flag to `pwa-kit-dev` `start` and `push` commands. [#1592](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1592)
   - `pwa-kit-dev start --open <url>` opens the specified URL when the dev server starts, rather than the homepage.
   - `pwa-kit-dev start --no-open` prevents any URL from opening when the dev server starts.
   - `pwa-kit-dev push -s <project> -t <environment> --open <url>` opens the specified URL after the deployment succeeds.
 
-## v3.3.0-dev (Nov 03, 2023)
+## v3.3.0 (Dec 08, 2023)
 
+- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
 - Improve `pwa-kit-dev start` command to accept CLI arguments for babel-node that get passed as CLI args to `pwa-kit-dev start` [#1591](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/1591)
 - Bugfix for TS not loading in typescript minimal project `ssr.js` [#1591](https://github.com/SalesforceCommerceCloud/pwa-kit/issues/1591)
 - Add `source-map-loader` plugin to webpack configuration. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)

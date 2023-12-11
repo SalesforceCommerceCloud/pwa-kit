@@ -1,4 +1,4 @@
 build
 coverage
 docs
-app/overrides/static
+overrides/app/static

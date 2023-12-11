@@ -1,5 +1,8 @@
-## v1.2.0-dev (Nov 03, 2023)
-- Add StorefrontPreview component 'onContextChange' property.  [#1527](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1527)
+## v1.3.0-dev (Dec 08, 2023)
+
+## v1.2.0 (Dec 08, 2023)
+- Add StorefrontPreview component 'onContextChange' property to prepare for future Storefront Preview release [#1527](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1527)
+- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
 
 ## v1.1.0 (Nov 03, 2023)
 
