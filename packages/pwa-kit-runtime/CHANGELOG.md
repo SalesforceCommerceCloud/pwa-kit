@@ -1,6 +1,10 @@
 ## v3.4.0-dev (Dec 08, 2023)
+<!-- RELEASE TASK: Is node 20 available on MRT? Delete the line saying it isn't! -->
+
+- Add support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
 
 ## v3.3.0 (Dec 08, 2023)
+
 - Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
 
 ## v3.2.1 (Nov 08, 2023)

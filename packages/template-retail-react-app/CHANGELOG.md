@@ -1,7 +1,14 @@
 ## v2.3.0-dev (Nov 8, 2023)
+<!-- RELEASE TASK: Is node 20 available on MRT? Delete the line saying it isn't! -->
+
 ### Accessibility improvements
 
 - Change radio refinements (for example, filtering by Price) from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
+
+### Other features
+
+- Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+  - Support for node 20 is not yet available on Managed Runtime
 
 ## v2.2.0 (Nov 8, 2023)
 
