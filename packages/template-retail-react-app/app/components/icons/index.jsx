@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {forwardRef} from 'react'
-import {useIntl, defineMessage} from 'react-intl'
+import React, {forwardRef, useContext} from 'react'
+import {defineMessage, IntlContext} from 'react-intl'
+import PropTypes from 'prop-types'
 import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
@@ -85,7 +86,9 @@ VisaSymbol.viewBox = VisaSymbol.viewBox || '0 0 38 22'
  * @param {string} name - the filename of the imported svg (does not include extension)
  * @param {Object} passProps - props that will be passed onto the underlying Icon component
  * @param {Object} localizationAttributes - attributes with localized values that will be passed
- *      onto the underlying Icon component, use `defineMessage` to create localized string
+ *      onto the underlying Icon component, use `defineMessage` to create localized string.
+ *      Additionally, if the icon is rendered outside the provider tree, you'll also need to
+ *      pass an intl object from react-intl as a prop to translate the messages.
  */
 /* istanbul ignore next */
 export const icon = (name, passProps, localizationAttributes) => {
@@ -95,8 +98,21 @@ export const icon = (name, passProps, localizationAttributes) => {
         .replace(/-/g, '')
     const component = forwardRef((props, ref) => {
         const theme = useTheme()
-        const intl = useIntl()
+        // NOTE: We want to avoid `useIntl` here because that throws when <IntlProvider> is not in
+        // the component ancestry, but we only enforce `intl` if we have `localizationAttributes`.
+        let intl = useContext(IntlContext)
         if (localizationAttributes) {
+            if (props?.intl) {
+                const {intl: intlProp, ...otherProps} = props
+                // Allow `props.intl` to take precedence over the intl we found
+                intl = intlProp
+                props = otherProps
+            }
+            if (!intl) {
+                throw new Error(
+                    'To localize messages, you must either have <IntlProvider> in the component ancestry or provide `intl` as a prop'
+                )
+            }
             Object.keys(localizationAttributes).forEach((key) => {
                 passProps[key] = intl.formatMessage(localizationAttributes[key])
             })
@@ -108,6 +124,11 @@ export const icon = (name, passProps, localizationAttributes) => {
             </Icon>
         )
     })
+
+    component.propTypes = {
+        intl: PropTypes.object
+    }
+
     component.displayName = `${displayName}Icon`
     return component
 }
