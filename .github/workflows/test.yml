@@ -182,7 +182,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
@@ -279,7 +279,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Setup Windows Machine
         uses: "./.github/actions/setup_windows"
