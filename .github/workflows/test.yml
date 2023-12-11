@@ -321,7 +321,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [16] # Should match node version supported by MRT.
+        node: [18] # Should match node version supported by MRT.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
