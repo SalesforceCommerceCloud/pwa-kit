@@ -16,7 +16,6 @@ import {
     PopoverContent,
     PopoverHeader,
     PopoverTrigger,
-    Portal,
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {InfoIcon} from '@salesforce/retail-react-app/app/components/icons'
