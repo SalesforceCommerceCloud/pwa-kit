@@ -75,9 +75,7 @@ describe('server', () => {
     })
 
     test('Path "/headers" echoes request headers', async () => {
-        const response = await request(app)
-            .get('/headers')
-            .set('Random-Header', 'random')
+        const response = await request(app).get('/headers').set('Random-Header', 'random')
 
         expect(response.body.headers['random-header']).toBe('random')
     })
