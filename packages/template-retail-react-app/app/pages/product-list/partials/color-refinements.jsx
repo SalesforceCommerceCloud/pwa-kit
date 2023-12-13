@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -18,6 +18,10 @@ import {
 import PropTypes from 'prop-types'
 import {cssColorGroups} from '@salesforce/retail-react-app/app/constants'
 import {useIntl} from 'react-intl'
+import {
+    ADD_FILTER_HIT_COUNT,
+    REMOVE_FILTER_HIT_COUNT
+} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const intl = useIntl()
@@ -49,11 +53,8 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                     marginRight={0}
                                     marginBottom="-1px"
                                     aria-label={intl.formatMessage(
-                                        {
-                                            id: 'colorRefinements.label.hitCount',
-                                            defaultMessage: '{colorLabel} ({colorHitCount})'
-                                        },
-                                        {colorLabel: value.label, colorHitCount: value.hitCount}
+                                        isSelected ? REMOVE_FILTER_HIT_COUNT : ADD_FILTER_HIT_COUNT,
+                                        value
                                     )}
                                 >
                                     <Center

@@ -1,15 +1,21 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 import React from 'react'
-import {Box, Checkbox, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import PropTypes from 'prop-types'
+import {useIntl} from 'react-intl'
+import {Box, Checkbox, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    ADD_FILTER,
+    REMOVE_FILTER
+} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
 
 const CheckboxRefinements = ({filter, toggleFilter, selectedFilters}) => {
+    const {formatMessage} = useIntl()
     return (
         <Stack spacing={1}>
             {filter.values
@@ -22,6 +28,10 @@ const CheckboxRefinements = ({filter, toggleFilter, selectedFilters}) => {
                             <Checkbox
                                 isChecked={isChecked}
                                 onChange={() => toggleFilter(value, filter.attributeId, isChecked)}
+                                aria-label={formatMessage(
+                                    isChecked ? REMOVE_FILTER : ADD_FILTER,
+                                    value
+                                )}
                             >
                                 {value.label}
                             </Checkbox>
