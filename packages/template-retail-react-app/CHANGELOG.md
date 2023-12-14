@@ -4,6 +4,7 @@
 ### Accessibility improvements
 
 - Change radio refinements (for example, filtering by Price) from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
+- Update search refinements ARIA labels to include "add/remove filter" [#1607](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1607)
 
 ### Other features
 
