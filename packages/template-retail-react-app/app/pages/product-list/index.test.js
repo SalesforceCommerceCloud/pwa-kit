@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -150,23 +150,23 @@ test('clicking a filter on mobile or desktop applies changes to both', async () 
     // Only desktop filters should be present
     // Test using two buttons since there was a bug where using only one filter would properly
     // apply changes to both desktop and mobile, but 2 or more would cause it to fail
-    let beigeBtns = screen.getAllByLabelText('Beige (6)')
-    let blueBtns = screen.getAllByLabelText('Blue (27)')
+    let beigeBtns = screen.getAllByLabelText('Add filter: Beige (6)')
+    let blueBtns = screen.getAllByLabelText('Add filter: Blue (27)')
     expect(beigeBtns).toHaveLength(1)
     expect(blueBtns).toHaveLength(1)
 
     // click beige filter and ensure that only beige is checked
     await user.click(beigeBtns[0])
     expect(beigeBtns[0]).toHaveAttribute('aria-checked', 'true')
-    expect(screen.getByLabelText('Blue (27)')).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByLabelText('Add filter: Blue (27)')).toHaveAttribute('aria-checked', 'false')
 
     // click filter button for mobile that is hidden on desktop but present in DOM
     // this opens the filter modal on mobile
-    await user.click(screen.getByRole('button', {name: /filter/i}))
+    await user.click(screen.getByText('Filter'))
 
     // re-query for desktop and mobile filters
-    beigeBtns = screen.getAllByLabelText('Beige (6)')
-    blueBtns = screen.getAllByLabelText('Blue (27)')
+    beigeBtns = screen.getAllByLabelText('Remove filter: Beige (6)')
+    blueBtns = screen.getAllByLabelText('Add filter: Blue (27)')
 
     // both mobile and desktop filters are present in DOM
     expect(beigeBtns).toHaveLength(2)
