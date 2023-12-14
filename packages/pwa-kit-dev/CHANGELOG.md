@@ -1,5 +1,7 @@
 ## v3.4.0-dev (Dec 08, 2023)
 
+- Add support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+
 ## v3.3.0 (Dec 08, 2023)
 
 - Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
@@ -9,6 +11,7 @@
 - Only use source maps in server when `inspect` flag is being used. [#1535](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1535)
 
 ## v3.2.0 (Nov 03, 2023)
+
 ## v3.1.1 (Sep 21, 2023)
 
 - Bugfix: resolve performance issue due to webpack stats [#1418](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1418)
