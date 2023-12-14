@@ -14,7 +14,7 @@ module.exports = {
         ...base.moduleNameMapper,
         '^react$': '<rootDir>/node_modules/react/index.js',
         '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js',
-        '^@salesforce\/retail-react-app(.*)$': '<rootDir>$1',
+        '^@salesforce/retail-react-app(.*)$': '<rootDir>$1',
         '^@tanstack/react-query$':
             '<rootDir>/node_modules/@tanstack/react-query/build/lib/index.js',
         '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',

@@ -1,6 +1,11 @@
 ## v3.4.0-dev (Dec 08, 2023)
+<!-- RELEASE TASK: Is node 20 available on MRT? Delete the line saying it isn't! -->
+
+- Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+  - Support for node 20 is not yet available on Managed Runtime
 
 ## v3.3.0 (Nov 8, 2023)
+
 - Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
 - Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
 
