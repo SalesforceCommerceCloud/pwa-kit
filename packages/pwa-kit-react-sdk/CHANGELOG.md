@@ -1,12 +1,16 @@
 ## v3.4.0-dev (Dec 08, 2023)
 
+- Add support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+
 ## v3.3.0 (Dec 08, 2023)
+
 - Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
 - Create a flag to allow toggling behavior that treats + character between words as space in search query [#1557](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1557)
 
 ## v3.2.0 (Nov 03, 2023)
 
 ## v3.1.1 (Sep 21, 2023)
+
 ## v3.1.0 (Jul 26, 2023)
 
 ## v3.0.0 (Jun 15, 2023)
