@@ -10,6 +10,7 @@
 
 - Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
   - Support for node 20 is not yet available on Managed Runtime
+- Display selected refinements on PLP, even if the selected refinement has no hits [#1622](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1622)
 
 ## v2.2.0 (Nov 8, 2023)
 
