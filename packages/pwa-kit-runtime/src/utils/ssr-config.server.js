@@ -10,7 +10,7 @@ const SUPPORTED_FILE_TYPES = ['js', 'yml', 'yaml', 'json']
 
 const IS_REMOTE = Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
 
-const CONFIG_CACHE = new Map();
+const CONFIG_CACHE = new Map()
 
 /**
  * Returns the express app configuration file in object form. The file will be resolved in the
@@ -41,7 +41,7 @@ export const getConfig = (opts = {}) => {
     const {buildDirectory} = opts
 
     if (CONFIG_CACHE.has(buildDirectory)) {
-        return CONFIG_CACHE.get(buildDirectory);
+        return CONFIG_CACHE.get(buildDirectory)
     }
 
     const configDirBase = IS_REMOTE ? 'build' : ''
@@ -92,7 +92,7 @@ export const getConfig = (opts = {}) => {
         )
     }
 
-    CONFIG_CACHE.set(buildDirectory, config);
+    CONFIG_CACHE.set(buildDirectory, config)
 
     return config
 }
