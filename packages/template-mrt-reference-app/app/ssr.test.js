@@ -70,6 +70,16 @@ describe('server', () => {
         return request(app).get('/cache').expect('Cache-Control', 's-maxage=60')
     })
 
+    test('Path "/cache/:duration" has Cache-Control set correctly', () => {
+        return request(app).get('/cache/123').expect('Cache-Control', 's-maxage=123')
+    })
+
+    test('Path "/headers" echoes request headers', async () => {
+        const response = await request(app).get('/headers').set('Random-Header', 'random')
+
+        expect(response.body.headers['random-header']).toBe('random')
+    })
+
     test('Path "/cookie" sets cookie', () => {
         return request(app)
             .get('/cookie?name=test-cookie&value=test-value')

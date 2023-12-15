@@ -19,7 +19,7 @@ describe('ListMenu', () => {
         const categoryTrigger = screen.getByText(/Mens/i)
         await user.hover(categoryTrigger)
         expect(categoryTrigger).toBeInTheDocument()
-        expect(screen.getByRole('navigation', {name: 'main'})).toBeInTheDocument()
+        expect(screen.getByRole('navigation', {name: 'Main navigation'})).toBeInTheDocument()
         const suit = screen.getByText(/suits/i)
         expect(suit).toBeInTheDocument()
     })

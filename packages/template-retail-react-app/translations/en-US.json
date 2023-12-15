@@ -144,6 +144,9 @@
   "add_to_cart_modal.recommended_products.title.might_also_like": {
     "defaultMessage": "You Might Also Like"
   },
+  "auth_modal.button.close.assistive_msg": {
+    "defaultMessage": "Close login form"
+  },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "You're now signed in."
   },
@@ -161,6 +164,12 @@
   },
   "auth_modal.password_reset_success.title.password_reset": {
     "defaultMessage": "Password Reset"
+  },
+  "carousel.button.scroll_left.assistive_msg": {
+    "defaultMessage": "Scroll carousel left"
+  },
+  "carousel.button.scroll_right.assistive_msg": {
+    "defaultMessage": "Scroll carousel right"
   },
   "cart.info.removed_from_cart": {
     "defaultMessage": "Item removed from cart"
@@ -471,6 +480,12 @@
   "empty_search_results.recommended_products.title.top_sellers": {
     "defaultMessage": "Top Sellers"
   },
+  "field.password.assistive_msg.hide_password": {
+    "defaultMessage": "Hide password"
+  },
+  "field.password.assistive_msg.show_password": {
+    "defaultMessage": "Show password"
+  },
   "footer.column.account": {
     "defaultMessage": "Account"
   },
@@ -560,6 +575,9 @@
   },
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "My account"
+  },
+  "header.button.assistive_msg.my_account_menu": {
+    "defaultMessage": "Open account menu"
   },
   "header.button.assistive_msg.my_cart_with_num_items": {
     "defaultMessage": "My cart, number of items: {numItems}"
@@ -673,6 +691,9 @@
   },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
+  },
+  "list_menu.nav.assistive_msg": {
+    "defaultMessage": "Main navigation"
   },
   "locale_text.message.ar-SA": {
     "defaultMessage": "Arabic (Saudi Arabia)"
@@ -909,8 +930,14 @@
   "pagination.link.next": {
     "defaultMessage": "Next"
   },
+  "pagination.link.next.assistive_msg": {
+    "defaultMessage": "Next Page"
+  },
   "pagination.link.prev": {
     "defaultMessage": "Prev"
+  },
+  "pagination.link.prev.assistive_msg": {
+    "defaultMessage": "Previous Page"
   },
   "password_card.info.password_updated": {
     "defaultMessage": "Password updated"
@@ -995,6 +1022,18 @@
   },
   "product_list.modal.title.filter": {
     "defaultMessage": "Filter"
+  },
+  "product_list.refinements.button.assistive_msg.add_filter": {
+    "defaultMessage": "Add filter: {label}"
+  },
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": {
+    "defaultMessage": "Add filter: {label} ({hitCount})"
+  },
+  "product_list.refinements.button.assistive_msg.remove_filter": {
+    "defaultMessage": "Remove filter: {label}"
+  },
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": {
+    "defaultMessage": "Remove filter: {label} ({hitCount})"
   },
   "product_list.select.sort_by": {
     "defaultMessage": "Sort By: {sortOption}"
@@ -1134,6 +1173,9 @@
   },
   "search.action.cancel": {
     "defaultMessage": "Cancel"
+  },
+  "selected_refinements.action.assistive_msg.clear_all": {
+    "defaultMessage": "Clear all filters"
   },
   "selected_refinements.action.clear_all": {
     "defaultMessage": "Clear All"

@@ -1,66 +1,82 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
-import {
-    Box,
-    Text,
-    Radio,
-    RadioGroup,
-    Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
+import {useIntl} from 'react-intl'
+import {Box, Text, Radio, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    ADD_FILTER,
+    REMOVE_FILTER
+} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
+
+const RadioRefinement = ({filter, value, toggleFilter, selectedFilters}) => {
+    const buttonRef = useRef()
+    const {formatMessage} = useIntl()
+    const selected = selectedFilters.includes(value.value)
+    // Because choosing a refinement is equivalent to a form submission, the best semantic choice
+    // for the refinement is a button or a link, rather than a radio input. The radio element here
+    // is purely for visual purposes, and should probably be replaced with a simple icon.
+    return (
+        <Box>
+            <Radio
+                display="inline-flex"
+                height={{base: '44px', lg: '24px'}}
+                isChecked={selected}
+                // Ideally, this "icon" would be part of the button, but doing so with a radio input
+                // triggers `onClick` twice. The radio must be separate, and therefore we must add
+                // these workarounds to prevent it from receiving focus.
+                inputProps={{'aria-hidden': true, tabIndex: -1}}
+                onClick={() => buttonRef.current?.click()}
+            ></Radio>
+            <Text
+                ref={buttonRef}
+                ml={2}
+                as="button"
+                fontSize="sm"
+                onClick={() => toggleFilter(value, filter.attributeId, false, false)}
+                aria-label={formatMessage(selected ? REMOVE_FILTER : ADD_FILTER, value)}
+            >
+                {value.label}
+            </Text>
+        </Box>
+    )
+}
+
+RadioRefinement.propTypes = {
+    filter: PropTypes.object,
+    value: PropTypes.object,
+    toggleFilter: PropTypes.func,
+    selectedFilters: PropTypes.arrayOf(PropTypes.object)
+}
 
 const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
     return (
-        <Box>
-            <RadioGroup
-                // The following `false` fallback is required to avoid the radio group
-                // from switching to "uncontrolled mode" when `selectedFilters` is empty.
-                value={selectedFilters[0] ?? false}
-            >
-                <Stack spacing={1}>
-                    {filter.values
-                        .filter((refinementValue) => refinementValue.hitCount > 0)
-                        .map((value) => {
-                            return (
-                                <Box key={value.value}>
-                                    <Radio
-                                        display="flex"
-                                        alignItems="center"
-                                        height={{base: '44px', lg: '24px'}}
-                                        value={value.value}
-                                        onChange={() =>
-                                            toggleFilter(
-                                                value,
-                                                filter.attributeId,
-                                                selectedFilters.includes(value.value),
-                                                false
-                                            )
-                                        }
-                                        fontSize="sm"
-                                    >
-                                        <Text marginLeft={-1} fontSize="sm">
-                                            {value.label}
-                                        </Text>
-                                    </Radio>
-                                </Box>
-                            )
-                        })}
-                </Stack>
-            </RadioGroup>
-        </Box>
+        <Stack spacing={1}>
+            {filter.values.map(
+                (value) =>
+                    value.hitCount > 0 && (
+                        <RadioRefinement
+                            key={value.value}
+                            value={value}
+                            filter={filter}
+                            toggleFilter={toggleFilter}
+                            selectedFilters={selectedFilters}
+                        />
+                    )
+            )}
+        </Stack>
     )
 }
 
 RadioRefinements.propTypes = {
     filter: PropTypes.object,
     toggleFilter: PropTypes.func,
-    selectedFilters: PropTypes.array
+    selectedFilters: PropTypes.arrayOf(PropTypes.object)
 }
 
 export default RadioRefinements
