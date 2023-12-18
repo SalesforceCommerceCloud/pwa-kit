@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -16,34 +16,57 @@ import {
 import {Link as RouteLink} from 'react-router-dom'
 
 /**
- * The Swatch Component displays item inside `SwatchGroup`
+ * The Swatch Component displays item inside `SwatchGroup`. For proper keyboard accessibility,
+ * ensure that the rendered elements can receive keyboard focus, and are immediate siblings.
  */
-const Swatch = (props) => {
-    const {
-        disabled,
-        selected,
-        label,
-        children,
-        href,
-        variant = 'square',
-        onChange,
-        value,
-        name
-    } = props
+const Swatch = ({
+    children,
+    disabled,
+    href,
+    label,
+    name,
+    selected,
+    isFocusable,
+    variant = 'square'
+}) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
+    /** Mimic the behavior of native radio inputs by using arrow keys to select prev/next value. */
+    const onKeyDown = (evt) => {
+        let sibling
+        // This is not a very react-y way implementation... ¯\_(ツ)_/¯
+        switch (evt.key) {
+            case 'ArrowUp':
+            case 'ArrowLeft':
+                evt.preventDefault()
+                sibling =
+                    evt.target.previousElementSibling || evt.target.parentElement.lastElementChild
+                break
+            case 'ArrowDown':
+            case 'ArrowRight':
+                evt.preventDefault()
+                sibling =
+                    evt.target.nextElementSibling || evt.target.parentElement.firstElementChild
+                break
+            default:
+                break
+        }
+        sibling?.click()
+        sibling?.focus()
+    }
+
     return (
         <Button
             {...styles.swatch}
             as={RouteLink}
             to={href}
             aria-label={name}
-            onClick={(e) => {
-                e.preventDefault()
-                onChange(value, href)
-            }}
             aria-checked={selected}
             variant="outline"
             role="radio"
+            onKeyDown={onKeyDown}
+            // To mimic the behavior of native radio inputs, only one input should be focusable.
+            // (The rest are selectable via arrow keys.)
+            tabIndex={isFocusable ? 0 : -1}
         >
             <Center {...styles.swatchButton}>
                 {children}
@@ -82,18 +105,17 @@ Swatch.propTypes = {
      */
     href: PropTypes.string,
     /**
-     * This function is called whenever the user selects an option.
-     * It is passed the new value.
+     * The display value for each swatch
      */
-    onChange: PropTypes.func,
+    name: PropTypes.string,
     /**
      * The value for the option.
      */
     value: PropTypes.string,
     /**
-     * The display value for each swatch
+     * Whether the swatch can receive tab focus
      */
-    name: PropTypes.string
+    isFocusable: PropTypes.bool
 }
 
 export default Swatch
