@@ -14,10 +14,9 @@ import {
     REMOVE_FILTER
 } from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
 
-const RadioRefinement = ({filter, value, toggleFilter, selectedFilters}) => {
+const RadioRefinement = ({filter, value, toggleFilter, isSelected}) => {
     const buttonRef = useRef()
     const {formatMessage} = useIntl()
-    const selected = selectedFilters.includes(value.value)
     // Because choosing a refinement is equivalent to a form submission, the best semantic choice
     // for the refinement is a button or a link, rather than a radio input. The radio element here
     // is purely for visual purposes, and should probably be replaced with a simple icon.
@@ -26,7 +25,7 @@ const RadioRefinement = ({filter, value, toggleFilter, selectedFilters}) => {
             <Radio
                 display="inline-flex"
                 height={{base: '44px', lg: '24px'}}
-                isChecked={selected}
+                isChecked={isSelected}
                 // Ideally, this "icon" would be part of the button, but doing so with a radio input
                 // triggers `onClick` twice. The radio must be separate, and therefore we must add
                 // these workarounds to prevent it from receiving focus.
@@ -39,7 +38,7 @@ const RadioRefinement = ({filter, value, toggleFilter, selectedFilters}) => {
                 as="button"
                 fontSize="sm"
                 onClick={() => toggleFilter(value, filter.attributeId, false, false)}
-                aria-label={formatMessage(selected ? REMOVE_FILTER : ADD_FILTER, value)}
+                aria-label={formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)}
             >
                 {value.label}
             </Text>
@@ -51,24 +50,27 @@ RadioRefinement.propTypes = {
     filter: PropTypes.object,
     value: PropTypes.object,
     toggleFilter: PropTypes.func,
-    selectedFilters: PropTypes.arrayOf(PropTypes.object)
+    isSelected: PropTypes.bool
 }
 
 const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
     return (
         <Stack spacing={1}>
-            {filter.values.map(
-                (value) =>
-                    value.hitCount > 0 && (
-                        <RadioRefinement
-                            key={value.value}
-                            value={value}
-                            filter={filter}
-                            toggleFilter={toggleFilter}
-                            selectedFilters={selectedFilters}
-                        />
-                    )
-            )}
+            {filter.values.map((value) => {
+                const isSelected = selectedFilters.includes(value.value)
+                // Don't display refinements with no results, unless we got there by selecting too
+                // many refinements
+                if (value.hitCount === 0 && !isSelected) return
+                return (
+                    <RadioRefinement
+                        key={value.value}
+                        value={value}
+                        filter={filter}
+                        toggleFilter={toggleFilter}
+                        isSelected={isSelected}
+                    />
+                )
+            })}
         </Stack>
     )
 }

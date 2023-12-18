@@ -39,6 +39,7 @@ export default {
         },
         accountIcon: {
             height: 11,
+            minWidth: 'auto',
             cursor: 'pointer',
             alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
             _focus: {
@@ -50,6 +51,7 @@ export default {
         },
         arrowDown: {
             height: 11,
+            minWidth: 'auto',
             marginRight: 0,
             alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
             cursor: 'pointer',
@@ -60,6 +62,10 @@ export default {
                 outline: 0
             },
             display: ['none', 'none', 'none', 'block']
+        },
+        wishlistIcon: {
+            // More breathing room between the account and wishlist icons
+            marginLeft: 2
         },
         signout: {
             width: '100%',
