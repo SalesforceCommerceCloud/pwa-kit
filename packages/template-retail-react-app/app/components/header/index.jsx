@@ -177,9 +177,11 @@ const Header = ({
                                 <IconButton
                                     aria-label={intl.formatMessage({
                                         id: 'header.button.assistive_msg.my_account_menu',
-                                        defaultMessage: 'Open account menu'
+                                        defaultMessage: 'My account menu'
                                     })}
-                                    icon={<ChevronDownIcon {...styles.arrowDown} />}
+                                    icon={
+                                        <ChevronDownIcon aria-hidden="true" {...styles.arrowDown} />
+                                    }
                                     variant="unstyled"
                                     {...getAccountMenuButtonProps()}
                                     onMouseOver={onAccountMenuOpen}

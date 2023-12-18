@@ -1408,7 +1408,7 @@
   "header.button.assistive_msg.my_account_menu": [
     {
       "type": 0,
-      "value": "Open account menu"
+      "value": "My account menu"
     }
   ],
   "header.button.assistive_msg.my_cart_with_num_items": [

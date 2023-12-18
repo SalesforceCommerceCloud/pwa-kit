@@ -577,7 +577,7 @@
     "defaultMessage": "My account"
   },
   "header.button.assistive_msg.my_account_menu": {
-    "defaultMessage": "Open account menu"
+    "defaultMessage": "My account menu"
   },
   "header.button.assistive_msg.my_cart_with_num_items": {
     "defaultMessage": "My cart, number of items: {numItems}"
