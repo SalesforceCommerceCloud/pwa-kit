@@ -65,6 +65,7 @@ const CartItems = ({basket}) => {
                     leftIcon={<BasketIcon boxSize="22px" />}
                     rightIcon={cartItemsExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                     onClick={() => setCartItemsExpanded(!cartItemsExpanded)}
+                    aria-expanded={cartItemsExpanded}
                 >
                     <FormattedMessage
                         id="order_summary.cart_items.action.num_of_items_in_cart"
