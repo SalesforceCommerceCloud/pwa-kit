@@ -13,6 +13,7 @@ import {useLocation} from 'react-router-dom'
 import {
     AspectRatio,
     Box,
+    Button,
     Img,
     Flex,
 
@@ -127,7 +128,6 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                     return (
                         <ListItem
                             {...styles.thumbnailImageItem}
-                            tabIndex={0}
                             key={index}
                             data-testid="image-gallery-thumbnails"
                             onKeyDown={(e) => {
@@ -140,11 +140,13 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                             borderWidth={`${selected ? '1px' : 0}`}
                         >
                             <AspectRatio ratio={1}>
-                                <Img
-                                    alt={image.alt}
-                                    src={image.disBaseLink || image.link}
-                                    loading={loadingStrategy}
-                                />
+                                <Button variant="link" borderRadius={0} aria-pressed={selected}>
+                                    <Img
+                                        alt={image.alt}
+                                        src={image.disBaseLink || image.link}
+                                        loading={loadingStrategy}
+                                    />
+                                </Button>
                             </AspectRatio>
                         </ListItem>
                     )
