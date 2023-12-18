@@ -1,10 +1,17 @@
-## There's gonna be a merge conflict cuz we're mid release
+## v2.3.0-dev (Nov 8, 2023)
+<!-- RELEASE TASK: Is node 20 available on MRT? Delete the line saying it isn't! -->
 
 ### Accessibility improvements
 
 - Change radio refinements (for example, filtering by Price) from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
+- Update search refinements ARIA labels to include "add/remove filter" [#1607](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1607)
 
-## v2.2.0-dev (Nov 3, 2023)
+### Other features
+
+- Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+  - Support for node 20 is not yet available on Managed Runtime
+
+## v2.2.0 (Nov 8, 2023)
 
 ### Accessibility Improvements
 
@@ -29,6 +36,8 @@
 - Implement gift option for basket [#1546](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1546)
 - Added option to specify `isLoginPage` function to the `withRegistration` component. The default behavior is "all pages ending in `/login`". [#1572](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1572)
 - Update `extract-default-messages` script to support multiple locales [#1574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1574)
+- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
+- Add support for localization in icon component [#1609](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1609)
 
 ### Bug Fixes
 
@@ -36,6 +45,10 @@
 - Fix bug where you can add duplicates of the same item to the wishlist. Also fixes bug where skeleton appears when removing last item from the wishlist. [#1560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1560)
 - Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
 - Fix PLP filters for mobile [#1565](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1565)
+
+## v2.1.1 (Nov 7, 2023)
+
+- Use the new opt-in mechanism for enforcing the default security headers required by PWA Kit projects. [#1528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1528)
 
 ## v2.1.0 (Nov 3, 2023)
 

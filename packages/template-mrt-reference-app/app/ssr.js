@@ -127,6 +127,7 @@ const filterAndSortObjectKeys = (o, whitelist) =>
  */
 const jsonFromRequest = (req) => {
     return {
+        args: req.query,
         protocol: req.protocol,
         method: req.method,
         path: req.path,
@@ -174,7 +175,8 @@ const tlsVersionTest = async (_, res) => {
  * Express handler that enables the cache and returns a JSON response with diagnostic values.
  */
 const cacheTest = async (req, res) => {
-    res.set('Cache-Control', 's-maxage=60')
+    let duration = req.params.duration || '60'
+    res.set('Cache-Control', `s-maxage=${duration}`)
     res.json(jsonFromRequest(req))
 }
 
@@ -190,6 +192,14 @@ const cookieTest = async (req, res) => {
     }
     res.set('Cache-Control', 'private, max-age=60')
     res.json(jsonFromRequest(req))
+}
+
+/**
+ * Express handler that echos back a JSON response with
+ * headers supplied in the request.
+ */
+const headerTest = async (req, res) => {
+    res.json({headers: redactAndSortObjectKeys(req.headers)})
 }
 
 /**
@@ -249,7 +259,9 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
     app.get('/cache', cacheTest)
+    app.get('/cache/:duration(\\d+)', cacheTest)
     app.get('/cookie', cookieTest)
+    app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing

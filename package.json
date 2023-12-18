@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit",
-  "version": "3.3.0-dev",
+  "version": "3.4.0-dev",
   "scripts": {
     "bump-version": "node ./scripts/bump-version/index.js",
     "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
@@ -30,8 +30,8 @@
     "syncpack": "^10.1.0"
   },
   "engines": {
-    "node": "^16.11.0 || ^18.0.0",
-    "npm": "^8.0.0 || ^9.0.0"
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "dependencies": {
     "node-fetch": "^2.6.9"
