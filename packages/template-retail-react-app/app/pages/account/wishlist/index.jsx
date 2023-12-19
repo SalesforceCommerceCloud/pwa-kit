@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Flex, Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -29,6 +29,12 @@ const AccountWishlist = () => {
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
     const toast = useToast()
+
+    const headingRef = useRef()
+    useEffect(() => {
+        // Focus the 'Wishlist' header when the component mounts for accessibility
+        headingRef.current.focus()
+    }, [])
 
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
@@ -112,7 +118,7 @@ const AccountWishlist = () => {
 
     return (
         <Stack spacing={4} data-testid="account-wishlist-page">
-            <Heading as="h1" fontSize="2xl">
+            <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                 <FormattedMessage defaultMessage="Wishlist" id="account_wishlist.title.wishlist" />
             </Heading>
 
@@ -184,6 +190,8 @@ const AccountWishlist = () => {
                         secondaryActions={
                             <WishlistSecondaryButtonGroup
                                 productListItemId={item.id}
+                                // Focus to 'Wishlist' header after remove for accessibility
+                                focusElementOnRemove={headingRef}
                                 onClick={handleSecondaryAction}
                             />
                         }

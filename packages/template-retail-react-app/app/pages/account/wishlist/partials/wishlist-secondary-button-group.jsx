@@ -47,7 +47,11 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
  * Renders secondary actions on a product-item card in the form of a button group.
  * Represents other actions you want the user to perform with the product-item (eg.: Remove or Edit)
  */
-const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
+const WishlistSecondaryButtonGroup = ({
+    productListItemId,
+    focusElementOnRemove,
+    onClick = noop
+}) => {
     const variant = useItemVariant()
     const {data: customer} = useCurrentCustomer()
     const {data: wishList} = useWishList()
@@ -57,6 +61,9 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
+        // After we remove an item from the wishlist
+        // we need to place focus to the next logical place for accessibility
+        focusElementOnRemove?.current?.focus()
     }
 
     const deleteCustomerProductListItem = useShopperCustomersMutation(
@@ -118,6 +125,7 @@ const WishlistSecondaryButtonGroup = ({productListItemId, onClick = noop}) => {
 
 WishlistSecondaryButtonGroup.propTypes = {
     productListItemId: PropTypes.string,
+    focusElementOnRemove: PropTypes.object,
     onClick: PropTypes.func
 }
 
