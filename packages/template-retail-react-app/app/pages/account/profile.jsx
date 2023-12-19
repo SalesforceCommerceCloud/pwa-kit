@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
@@ -335,9 +335,15 @@ const PasswordCard = () => {
 }
 
 const AccountDetail = () => {
+    const headingRef = useRef()
+    useEffect(() => {
+        // Focus the 'Account Details' header when the component mounts for accessibility
+        headingRef?.current?.focus()
+    }, [])
+
     return (
         <Stack data-testid="account-detail-page" spacing={6}>
-            <Heading as="h1" fontSize="24px">
+            <Heading as="h1" fontSize="24px" tabIndex="0" ref={headingRef}>
                 <FormattedMessage
                     defaultMessage="Account Details"
                     id="account_detail.title.account_details"

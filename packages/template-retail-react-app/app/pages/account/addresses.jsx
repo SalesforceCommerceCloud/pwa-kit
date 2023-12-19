@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -147,6 +147,12 @@ const AccountAddresses = () => {
     const showToast = useToast()
     const form = useForm()
 
+    const headingRef = useRef()
+    useEffect(() => {
+        // Focus the 'Addresses' header when the component mounts for accessibility
+        headingRef?.current?.focus()
+    }, [])
+
     const hasAddresses = addresses?.length > 0
     const showError = () => {
         showToast({
@@ -239,7 +245,7 @@ const AccountAddresses = () => {
 
     return (
         <Stack spacing={4} data-testid="account-addresses-page">
-            <Heading as="h1" fontSize="2xl">
+            <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                 <FormattedMessage
                     defaultMessage="Addresses"
                     id="account_addresses.title.addresses"

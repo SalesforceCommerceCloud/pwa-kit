@@ -33,7 +33,7 @@ const AccountWishlist = () => {
     const headingRef = useRef()
     useEffect(() => {
         // Focus the 'Wishlist' header when the component mounts for accessibility
-        headingRef.current.focus()
+        headingRef?.current?.focus()
     }, [])
 
     const [selectedItem, setSelectedItem] = useState(undefined)
