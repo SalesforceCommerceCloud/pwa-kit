@@ -154,12 +154,14 @@ const Header = ({
                         />
                     </Box>
                     <IconButtonWithRegistration
-                        icon={<AccountIcon {...styles.accountIcon} />}
+                        icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.my_account',
                             defaultMessage: 'My account'
                         })}
                         variant="unstyled"
+                        {...styles.icons}
+                        {...styles.accountIcon}
                         onClick={onMyAccountClick}
                         onMouseOver={isDesktop ? onAccountMenuOpen : noop}
                     />
@@ -179,8 +181,10 @@ const Header = ({
                                         id: 'header.button.assistive_msg.my_account_menu',
                                         defaultMessage: 'Open account menu'
                                     })}
-                                    icon={<ChevronDownIcon {...styles.arrowDown} />}
+                                    icon={<ChevronDownIcon />}
                                     variant="unstyled"
+                                    {...styles.icons}
+                                    {...styles.arrowDown}
                                     {...getAccountMenuButtonProps()}
                                     onMouseOver={onAccountMenuOpen}
                                     onMouseLeave={handleIconsMouseLeave}
@@ -251,6 +255,7 @@ const Header = ({
                         icon={<HeartIcon />}
                         variant="unstyled"
                         {...styles.icons}
+                        {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
                     <IconButton

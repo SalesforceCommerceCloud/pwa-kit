@@ -1228,6 +1228,9 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
   },
+  "swatch_group.selected.label": {
+    "defaultMessage": "{label}:"
+  },
   "toggle_card.action.edit": {
     "defaultMessage": "Edit"
   },
