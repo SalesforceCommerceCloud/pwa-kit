@@ -61,9 +61,6 @@ const WishlistSecondaryButtonGroup = ({
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
-        // After we remove an item from the wishlist
-        // we need to place focus to the next logical place for accessibility
-        focusElementOnRemove?.current?.focus()
     }
 
     const deleteCustomerProductListItem = useShopperCustomersMutation(
@@ -90,6 +87,10 @@ const WishlistSecondaryButtonGroup = ({
                 }),
                 status: 'success'
             })
+
+            // After we remove an item from the wishlist
+            // we need to place focus to the next logical place for accessibility
+            focusElementOnRemove?.current?.focus()
         } catch {
             toast({title: formatMessage(API_ERROR_MESSAGE), status: 'error'})
         }
