@@ -18,26 +18,27 @@ const CheckboxRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const {formatMessage} = useIntl()
     return (
         <Stack spacing={1}>
-            {filter.values
-                ?.filter((refinementValue) => refinementValue.hitCount > 0)
-                .map((value) => {
-                    const isChecked = selectedFilters.includes(value.value)
+            {filter.values?.map((value) => {
+                const isChecked = selectedFilters.includes(value.value)
+                // Don't display refinements with no results, unless we got there by selecting too
+                // many refinements
+                if (value.hitCount === 0 && !isChecked) return
 
-                    return (
-                        <Box key={value.value}>
-                            <Checkbox
-                                isChecked={isChecked}
-                                onChange={() => toggleFilter(value, filter.attributeId, isChecked)}
-                                aria-label={formatMessage(
-                                    isChecked ? REMOVE_FILTER : ADD_FILTER,
-                                    value
-                                )}
-                            >
-                                {value.label}
-                            </Checkbox>
-                        </Box>
-                    )
-                })}
+                return (
+                    <Box key={value.value}>
+                        <Checkbox
+                            isChecked={isChecked}
+                            onChange={() => toggleFilter(value, filter.attributeId, isChecked)}
+                            aria-label={formatMessage(
+                                isChecked ? REMOVE_FILTER : ADD_FILTER,
+                                value
+                            )}
+                        >
+                            {value.label}
+                        </Checkbox>
+                    </Box>
+                )
+            })}
         </Stack>
     )
 }
