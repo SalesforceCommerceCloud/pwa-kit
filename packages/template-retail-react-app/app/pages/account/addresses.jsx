@@ -222,6 +222,8 @@ const AccountAddresses = () => {
                             status: 'success',
                             isClosable: true
                         })
+                        // Move focus to header after we successfully remove address
+                        headingRef?.current?.focus()
                     }
                 }
             )
@@ -240,6 +242,7 @@ const AccountAddresses = () => {
         } else {
             setSelectedAddressId(undefined)
             setIsEditing(!isEditing)
+            headingRef?.current?.focus()
         }
     }
 
