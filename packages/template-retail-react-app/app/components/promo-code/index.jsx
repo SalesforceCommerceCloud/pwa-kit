@@ -32,8 +32,6 @@ export const usePromoCode = () => {
     const applyPromoCodeMutation = useShopperBasketsMutation('addCouponToBasket')
     const removePromoCodeMutation = useShopperBasketsMutation('removeCouponFromBasket')
 
-    // TODO: figure out why promo code error doesn't show up anymore
-    // currently getting 400s when submitting promo code
     const submitPromoCode = async ({code}) => {
         applyPromoCodeMutation.mutate(
             {
