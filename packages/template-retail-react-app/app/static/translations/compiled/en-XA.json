@@ -6317,6 +6317,20 @@
       "value": "]"
     }
   ],
+  "use_address_fields.label.address_form": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓřḗḗşş Ƒǿǿřḿ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "use_address_fields.label.city": [
     {
       "type": 0,

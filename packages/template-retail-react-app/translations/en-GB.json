@@ -1270,6 +1270,9 @@
   "use_address_fields.label.address": {
     "defaultMessage": "Address"
   },
+  "use_address_fields.label.address_form": {
+    "defaultMessage": "Address Form"
+  },
   "use_address_fields.label.city": {
     "defaultMessage": "City"
   },
