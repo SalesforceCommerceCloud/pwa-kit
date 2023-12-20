@@ -50,6 +50,7 @@ export const ToggleCard = ({
                             fontSize="lg"
                             lineHeight="30px"
                             color={disabled && !editing && 'gray.600'}
+                            tabIndex="0"
                         >
                             {title}
                         </Heading>

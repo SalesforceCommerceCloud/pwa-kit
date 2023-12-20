@@ -195,6 +195,14 @@ const ShippingAddressSelection = ({
         form.reset({...address})
     }
 
+    const headingText = formatMessage({
+        defaultMessage: 'Shipping Address',
+        id: 'shipping_address.title.shipping_address'
+    })
+    const shippingAddressHeading = Array.from(document.querySelectorAll('h2')).find(
+        (element) => element.textContent === headingText
+    )
+
     const removeSavedAddress = async (addressId) => {
         if (addressId === selectedAddressId) {
             setSelectedAddressId(undefined)
@@ -202,12 +210,20 @@ const ShippingAddressSelection = ({
             form.reset({addressId: ''})
         }
 
-        await removeCustomerAddress.mutateAsync({
-            parameters: {
-                customerId: customer.customerId,
-                addressName: addressId
+        await removeCustomerAddress.mutateAsync(
+            {
+                parameters: {
+                    customerId: customer.customerId,
+                    addressName: addressId
+                }
+            },
+            {
+                onSuccess: () => {
+                    // Focus on header after successful remove for accessibility
+                    shippingAddressHeading?.focus()
+                }
             }
-        })
+        )
     }
 
     // Opens/closes the 'add address' form. Notice that when toggling either state,
@@ -221,6 +237,8 @@ const ShippingAddressSelection = ({
             setSelectedAddressId(undefined)
             form.reset({addressId: ''})
             setIsEditingAddress(!isEditingAddress)
+            // Set focus to header after canceling out of form
+            shippingAddressHeading?.focus()
         }
 
         form.trigger()
