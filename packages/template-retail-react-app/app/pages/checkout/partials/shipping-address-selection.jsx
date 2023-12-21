@@ -245,7 +245,7 @@ const ShippingAddressSelection = ({
             setIsEditingAddress(true)
         } else {
             // Focus on the edit button that opened the form when the form closes
-            // otherwise the focus on the heading if we can't find the button
+            // otherwise focus on the heading if we can't find the button
             const focusAfterClose =
                 editBtnRefs[selectedAddressId]?.current ?? shippingAddressHeading
             focusAfterClose?.focus()
