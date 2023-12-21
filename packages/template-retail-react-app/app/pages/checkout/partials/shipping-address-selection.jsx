@@ -119,6 +119,23 @@ const ShippingAddressSelection = ({
     const [isEditingAddress, setIsEditingAddress] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(undefined)
 
+    // keep track of the edit buttons so we can focus on them later for accessibility
+    const [editBtns, setEditBtns] = useState({})
+    useEffect(() => {
+        const currentEditBtns = {}
+        customer.addresses?.forEach(({addressId}) => {
+            try {
+                // if addressId starts with a number we need to escape it so we can query properly
+                currentEditBtns[addressId] = document.querySelector(
+                    `button#${CSS.escape(addressId)}`
+                )
+            } catch {
+                currentEditBtns[addressId] = null
+            }
+        })
+        setEditBtns(currentEditBtns)
+    }, [customer.addresses])
+
     const defaultForm = useForm({
         mode: 'onChange',
         shouldUnregister: false,
@@ -234,11 +251,13 @@ const ShippingAddressSelection = ({
             form.reset({...address})
             setIsEditingAddress(true)
         } else {
+            // Focus on the edit button that opened the form when the form closes
+            // otherwise the focus on the heading if we can't find the button
+            const focusAfterClose = editBtns[selectedAddressId] ?? shippingAddressHeading
+            focusAfterClose?.focus()
             setSelectedAddressId(undefined)
             form.reset({addressId: ''})
             setIsEditingAddress(!isEditingAddress)
-            // Set focus to header after canceling out of form
-            shippingAddressHeading?.focus()
         }
 
         form.trigger()
@@ -275,6 +294,7 @@ const ShippingAddressSelection = ({
                                                         removeSavedAddress(address.addressId)
                                                     }
                                                     onEdit={() => toggleAddressEdit(address)}
+                                                    editBtnId={address.addressId}
                                                     data-testid={`sf-checkout-shipping-address-${index}`}
                                                 >
                                                     <AddressDisplay address={address} />
