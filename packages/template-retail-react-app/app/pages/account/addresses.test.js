@@ -138,19 +138,19 @@ test('Handles focus for cancel/save buttons in address form correctly', async ()
     })
 
     // Focus is on heading when component initially renders
-    expect(document.activeElement).toBe(screen.getByRole('heading', { name: /addresses/i }))
+    expect(document.activeElement).toBe(screen.getByRole('heading', {name: /addresses/i}))
 
     await helperAddNewAddress(user)
-    
-    const editBtn = screen.getByRole('button', { name: /edit/i })
-    
+
+    const editBtn = screen.getByRole('button', {name: /edit/i})
+
     // hitting cancel button on edit form brings focus back to edit button
     await user.click(editBtn)
-    await user.click(screen.getByRole('button', { name: /cancel/i }))
+    await user.click(screen.getByRole('button', {name: /cancel/i}))
     expect(document.activeElement).toBe(editBtn)
 
     // hitting save button on edit form brings focus back to edit button
     await user.click(editBtn)
-    await user.click(screen.getByRole('button', { name: /save/i }))
+    await user.click(screen.getByRole('button', {name: /save/i}))
     expect(document.activeElement).toBe(editBtn)
 })
