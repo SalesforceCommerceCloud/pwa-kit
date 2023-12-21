@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router'
 import {
@@ -123,6 +123,12 @@ const AccountOrderDetail = () => {
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
 
+    const headingRef = useRef()
+    useEffect(() => {
+        // Focus the 'Order Details' header when the component mounts for accessibility
+        headingRef?.current?.focus()
+    }, [])
+
     return (
         <Stack spacing={6} data-testid="account-order-details-page">
             <Stack>
@@ -148,7 +154,7 @@ const AccountOrderDetail = () => {
                 </Box>
 
                 <Stack spacing={[1, 2]}>
-                    <Heading as="h1" fontSize={['lg', '2xl']}>
+                    <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
                         <FormattedMessage
                             defaultMessage="Order Details"
                             id="account_order_detail.title.order_details"
