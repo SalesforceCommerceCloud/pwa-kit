@@ -16,7 +16,7 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
  * The provided `onRemove` callback triggers a loading spinner internally
  * if given a promise.
  */
-const ActionCard = ({children, onEdit, onRemove, ...props}) => {
+const ActionCard = ({children, onEdit, onRemove, editBtnId, ...props}) => {
     const [showLoading, setShowLoading] = useState(false)
 
     const handleRemove = async () => {
@@ -43,7 +43,7 @@ const ActionCard = ({children, onEdit, onRemove, ...props}) => {
                 <Box>{children}</Box>
                 <Stack direction="row" spacing={4}>
                     {onEdit && (
-                        <Button onClick={onEdit} variant="link" size="sm">
+                        <Button id={editBtnId} onClick={onEdit} variant="link" size="sm">
                             <FormattedMessage defaultMessage="Edit" id="action_card.action.edit" />
                         </Button>
                     )}
@@ -75,7 +75,10 @@ ActionCard.propTypes = {
     onRemove: PropTypes.func,
 
     /** Content rendered in card */
-    children: PropTypes.node
+    children: PropTypes.node,
+
+    /** ID for the edit button, used to query for the edit button to focus on for accessibility */
+    editBtnId: PropTypes.string
 }
 
 export default ActionCard
