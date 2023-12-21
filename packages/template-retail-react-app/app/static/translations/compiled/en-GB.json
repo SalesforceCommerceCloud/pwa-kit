@@ -2965,6 +2965,12 @@
       "value": "Address"
     }
   ],
+  "use_address_fields.label.address_form": [
+    {
+      "type": 0,
+      "value": "Address Form"
+    }
+  ],
   "use_address_fields.label.city": [
     {
       "type": 0,
