@@ -154,20 +154,13 @@ const AccountAddresses = () => {
     }, [])
 
     // keep track of the edit buttons so we can focus on them later for accessibility
-    const [editBtns, setEditBtns] = useState({})
+    const [editBtnRefs, setEditBtnRefs] = useState({})
     useEffect(() => {
-        const currentEditBtns = {}
+        const currentRefs = {}
         addresses?.forEach(({addressId}) => {
-            try {
-                // if addressId starts with a number we need to escape it so we can query properly
-                currentEditBtns[addressId] = document.querySelector(
-                    `button#${CSS.escape(addressId)}`
-                )
-            } catch {
-                currentEditBtns[addressId] = null
-            }
+            currentRefs[addressId] = React.createRef()
         })
-        setEditBtns(currentEditBtns)
+        setEditBtnRefs(currentRefs)
     }, [addresses])
 
     const hasAddresses = addresses?.length > 0
@@ -259,7 +252,7 @@ const AccountAddresses = () => {
         } else {
             // Focus on the edit button that opened the form when the form closes
             // otherwise the focus on the heading if we can't find the button
-            const focusAfterClose = editBtns[selectedAddressId] ?? headingRef?.current
+            const focusAfterClose = editBtnRefs[selectedAddressId]?.current ?? headingRef?.current
             focusAfterClose?.focus()
             setSelectedAddressId(undefined)
             setIsEditing(!isEditing)
@@ -333,7 +326,7 @@ const AccountAddresses = () => {
                             <ActionCard
                                 borderColor="gray.200"
                                 key={address.addressId}
-                                editBtnId={address.addressId}
+                                editBtnRef={editBtnRefs[address.addressId]}
                                 onRemove={() => removeAddress(address.addressId)}
                                 onEdit={() => toggleEdit(address)}
                             >
