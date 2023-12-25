@@ -1,3 +1,4 @@
+## v3.4.0-nightly-20231225080200 (Dec 25, 2023)
 ## v3.4.0-dev (Dec 08, 2023)
 <!-- RELEASE TASK: Is node 20 available on MRT? Delete the line saying it isn't! -->
 
