@@ -106,14 +106,14 @@ const DATA_MAP: AuthDataMap = {
         key: 'token_type'
     },
     refresh_token_guest: {
-        storageType: 'cookie',
+        storageType: 'local',
         key: 'cc-nx-g',
         callback: (store) => {
             store.delete('cc-nx')
         }
     },
     refresh_token_registered: {
-        storageType: 'cookie',
+        storageType: 'local',
         key: 'cc-nx',
         callback: (store) => {
             store.delete('cc-nx-g')
