@@ -15,7 +15,7 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {onClient} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -106,14 +106,14 @@ const DATA_MAP: AuthDataMap = {
         key: 'token_type'
     },
     refresh_token_guest: {
-        storageType: 'local',
+        storageType: isOriginTrusted(getParentOrigin()) ? 'local' : 'cookie',
         key: 'cc-nx-g',
         callback: (store) => {
             store.delete('cc-nx')
         }
     },
     refresh_token_registered: {
-        storageType: 'local',
+        storageType: isOriginTrusted(getParentOrigin()) ? 'local' : 'cookie',
         key: 'cc-nx',
         callback: (store) => {
             store.delete('cc-nx-g')
