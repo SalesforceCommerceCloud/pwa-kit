@@ -13,9 +13,16 @@ import {
 } from 'commerce-sdk-isomorphic'
 import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
-import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
+import {
+    BaseStorage,
+    LocalStorage,
+    CookieStorage,
+    MemoryStorage,
+    StorageType,
+    LocalAndCookieStorage
+} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
+import {onClient} from '../utils'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -106,14 +113,14 @@ const DATA_MAP: AuthDataMap = {
         key: 'token_type'
     },
     refresh_token_guest: {
-        storageType: isOriginTrusted(getParentOrigin()) ? 'local' : 'cookie',
+        storageType: 'localandcookie',
         key: 'cc-nx-g',
         callback: (store) => {
             store.delete('cc-nx')
         }
     },
     refresh_token_registered: {
-        storageType: isOriginTrusted(getParentOrigin()) ? 'local' : 'cookie',
+        storageType: 'localandcookie',
         key: 'cc-nx',
         callback: (store) => {
             store.delete('cc-nx-g')
@@ -199,6 +206,9 @@ class Auth {
         this.stores = {
             cookie: onClient() ? new CookieStorage(options) : new MemoryStorage(options),
             local: onClient() ? new LocalStorage(options) : new MemoryStorage(options),
+            localandcookie: onClient()
+                ? new LocalAndCookieStorage(options)
+                : new MemoryStorage(options),
             memory: new MemoryStorage(options)
         }
 
