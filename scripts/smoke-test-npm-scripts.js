@@ -35,7 +35,7 @@ const main = () => {
     const exclude = [
         /^lint.*$/,
         /^test.*$/,
-        /^push.*$/,
+        /^push$/,
         /^save-credentials$/,
         /^tail-logs$/,
         /^format$/,
