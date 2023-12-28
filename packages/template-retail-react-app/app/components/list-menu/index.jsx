@@ -69,21 +69,21 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
                 {name}
             </Link>
 
-            <Link
-                as={RouteLink}
-                to={'#'}
-                onMouseOver={onOpen}
-                onKeyDown={(e) => {
-                    keyMap[e.key]?.(e)
-                }}
-                {...baseStyle.listMenuTriggerLinkIcon}
-            >
-                <PopoverTrigger>
+            <PopoverTrigger>
+                <Link
+                    as={RouteLink}
+                    to={'#'}
+                    onMouseOver={onOpen}
+                    onKeyDown={(e) => {
+                        keyMap[e.key]?.(e)
+                    }}
+                    {...baseStyle.listMenuTriggerLinkIcon}
+                >
                     <Fade in={hasItems}>
                         <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
                     </Fade>
-                </PopoverTrigger>
-            </Link>
+                </Link>
+            </PopoverTrigger>
         </Box>
     )
 }
@@ -225,6 +225,7 @@ const ListMenu = ({root, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
     const [ariaBusy, setAriaBusy] = useState(true)
+    const intl = useIntl()
 
     useEffect(() => {
         setAriaBusy(false)
@@ -233,7 +234,10 @@ const ListMenu = ({root, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
     return (
         <nav
             id="list-menu"
-            aria-label="main"
+            aria-label={intl.formatMessage({
+                id: 'list_menu.nav.assistive_msg',
+                defaultMessage: 'Main navigation'
+            })}
             aria-live="polite"
             aria-busy={ariaBusy}
             aria-atomic="true"

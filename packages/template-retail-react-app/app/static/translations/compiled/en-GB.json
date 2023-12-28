@@ -355,6 +355,12 @@
       "value": "You Might Also Like"
     }
   ],
+  "auth_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Close login form"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -411,6 +417,18 @@
     {
       "type": 0,
       "value": "Password Reset"
+    }
+  ],
+  "carousel.button.scroll_left.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Scroll carousel left"
+    }
+  ],
+  "carousel.button.scroll_right.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Scroll carousel right"
     }
   ],
   "cart.info.removed_from_cart": [
@@ -1163,6 +1181,18 @@
       "value": "Top Sellers"
     }
   ],
+  "field.password.assistive_msg.hide_password": [
+    {
+      "type": 0,
+      "value": "Hide password"
+    }
+  ],
+  "field.password.assistive_msg.show_password": [
+    {
+      "type": 0,
+      "value": "Show password"
+    }
+  ],
   "footer.column.account": [
     {
       "type": 0,
@@ -1339,6 +1369,12 @@
       "value": " added to wishlist"
     }
   ],
+  "global.info.already_in_wishlist": [
+    {
+      "type": 0,
+      "value": "Item is already in wishlist"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
@@ -1367,6 +1403,12 @@
     {
       "type": 0,
       "value": "My account"
+    }
+  ],
+  "header.button.assistive_msg.my_account_menu": [
+    {
+      "type": 0,
+      "value": "Open account menu"
     }
   ],
   "header.button.assistive_msg.my_cart_with_num_items": [
@@ -1605,6 +1647,12 @@
     {
       "type": 0,
       "value": "Please select all your options above"
+    }
+  ],
+  "list_menu.nav.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Main navigation"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2117,10 +2165,22 @@
       "value": "Next"
     }
   ],
+  "pagination.link.next.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Next Page"
+    }
+  ],
   "pagination.link.prev": [
     {
       "type": 0,
       "value": "Prev"
+    }
+  ],
+  "pagination.link.prev.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Previous Page"
     }
   ],
   "password_card.info.password_updated": [
@@ -2291,6 +2351,70 @@
       "value": "Filter"
     }
   ],
+  "product_list.refinements.button.assistive_msg.add_filter": [
+    {
+      "type": 0,
+      "value": "Add filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Add filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter": [
+    {
+      "type": 0,
+      "value": "Remove filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Remove filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "product_list.select.sort_by": [
     {
       "type": 0,
@@ -2327,7 +2451,7 @@
       "value": " to wishlist"
     }
   ],
-  "product_tile.assistive_msg.remove_from wishlist": [
+  "product_tile.assistive_msg.remove_from_wishlist": [
     {
       "type": 0,
       "value": "Remove "
@@ -2629,6 +2753,12 @@
       "value": "Cancel"
     }
   ],
+  "selected_refinements.action.assistive_msg.clear_all": [
+    {
+      "type": 0,
+      "value": "Clear all filters"
+    }
+  ],
   "selected_refinements.action.clear_all": [
     {
       "type": 0,
@@ -2729,6 +2859,16 @@
     {
       "type": 0,
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+    }
+  ],
+  "swatch_group.selected.label": [
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": ":"
     }
   ],
   "toggle_card.action.edit": [

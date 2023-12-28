@@ -11,14 +11,18 @@ jobs:
       fail-fast: false
       matrix:
         # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [16, 18]
-        npm: [8, 9]
+        node: [16, 18, 20]
+        npm: [8, 9, 10]
+        exclude: # node 16 is not compatible with npm 10
+          - node: 16
+            npm: 10
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+      # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -54,14 +58,18 @@ jobs:
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
       max-parallel: 1
       matrix:
-        node: [16, 18]
-        npm: [8, 9]
+        node: [16, 18, 20]
+        npm: [8, 9, 10]
+        exclude: # node 16 is not compatible with npm 10
+          - node: 16
+            npm: 10
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+      # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -126,14 +134,18 @@ jobs:
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
       max-parallel: 1
       matrix:
-        node: [16, 18]
-        npm: [8, 9]
+        node: [16, 18, 20]
+        npm: [8, 9, 10]
+        exclude: # node 16 is not compatible with npm 10
+          - node: 16
+            npm: 10
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 9) }}
+      # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
+      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3

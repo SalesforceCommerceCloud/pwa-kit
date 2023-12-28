@@ -739,6 +739,20 @@
       "value": "]"
     }
   ],
+  "auth_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŀǿǿşḗḗ ŀǿǿɠīƞ ƒǿǿřḿ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -839,6 +853,34 @@
     {
       "type": 0,
       "value": "Ƥȧȧşşẇǿǿřḓ Řḗḗşḗḗŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "carousel.button.scroll_left.assistive_msg": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şƈřǿǿŀŀ ƈȧȧřǿǿŭŭşḗḗŀ ŀḗḗƒŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "carousel.button.scroll_right.assistive_msg": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şƈřǿǿŀŀ ƈȧȧřǿǿŭŭşḗḗŀ řīɠħŧ"
     },
     {
       "type": 0,
@@ -2411,6 +2453,34 @@
       "value": "]"
     }
   ],
+  "field.password.assistive_msg.hide_password": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ħīḓḗḗ ƥȧȧşşẇǿǿřḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "field.password.assistive_msg.show_password": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħǿǿẇ ƥȧȧşşẇǿǿřḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "footer.column.account": [
     {
       "type": 0,
@@ -2857,6 +2927,20 @@
     {
       "type": 0,
       "value": "Ḿẏ ȧȧƈƈǿǿŭŭƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "header.button.assistive_msg.my_account_menu": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿƥḗḗƞ ȧȧƈƈǿǿŭŭƞŧ ḿḗḗƞŭŭ"
     },
     {
       "type": 0,
@@ -3391,6 +3475,20 @@
     {
       "type": 0,
       "value": "Ƥŀḗḗȧȧşḗḗ şḗḗŀḗḗƈŧ ȧȧŀŀ ẏǿǿŭŭř ǿǿƥŧīǿǿƞş ȧȧƀǿǿṽḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "list_menu.nav.assistive_msg": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿȧȧīƞ ƞȧȧṽīɠȧȧŧīǿǿƞ"
     },
     {
       "type": 0,
@@ -4531,6 +4629,20 @@
       "value": "]"
     }
   ],
+  "pagination.link.next.assistive_msg": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞḗḗẋŧ Ƥȧȧɠḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "pagination.link.prev": [
     {
       "type": 0,
@@ -4539,6 +4651,20 @@
     {
       "type": 0,
       "value": "Ƥřḗḗṽ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "pagination.link.prev.assistive_msg": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥřḗḗṽīǿǿŭŭş Ƥȧȧɠḗḗ"
     },
     {
       "type": 0,
@@ -4915,6 +5041,102 @@
     {
       "type": 0,
       "value": "Ƒīŀŧḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.add_filter": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ ƒīŀŧḗḗř: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ ƒīŀŧḗḗř: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗḿǿǿṽḗḗ ƒīŀŧḗḗř: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗḿǿǿṽḗḗ ƒīŀŧḗḗř: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
     },
     {
       "type": 0,
@@ -5627,6 +5849,20 @@
       "value": "]"
     }
   ],
+  "selected_refinements.action.assistive_msg.clear_all": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŀḗḗȧȧř ȧȧŀŀ ƒīŀŧḗḗřş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "selected_refinements.action.clear_all": [
     {
       "type": 0,
@@ -5859,6 +6095,24 @@
     {
       "type": 0,
       "value": "Ȧřḗḗ ẏǿǿŭŭ şŭŭřḗḗ ẏǿǿŭŭ ẇȧȧƞŧ ŧǿǿ şīɠƞ ǿǿŭŭŧ? Ẏǿǿŭŭ ẇīŀŀ ƞḗḗḗḗḓ ŧǿǿ şīɠƞ ƀȧȧƈķ īƞ ŧǿǿ ƥřǿǿƈḗḗḗḗḓ ẇīŧħ ẏǿǿŭŭř ƈŭŭřřḗḗƞŧ ǿǿřḓḗḗř."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "swatch_group.selected.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": ":"
     },
     {
       "type": 0,
