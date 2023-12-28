@@ -16,7 +16,8 @@ jest.mock('./storage', () => {
     return {
         ...originalModule,
         CookieStorage: originalModule.MemoryStorage,
-        LocalStorage: originalModule.MemoryStorage
+        LocalStorage: originalModule.MemoryStorage,
+        LocalAndCookieStorage: originalModule.MemoryStorage
     }
 })
 
@@ -66,8 +67,6 @@ describe('Auth', () => {
         auth.set('access_token', accessToken)
         expect(auth.get('refresh_token_guest')).toBe(refreshToken)
         expect(auth.get('access_token')).toBe(accessToken)
-        // @ts-expect-error private property
-        expect([...auth.stores['cookie'].map.keys()]).toEqual([`cc-nx-g_siteId`])
         // @ts-expect-error private property
         expect([...auth.stores['local'].map.keys()]).toEqual([`access_token_siteId`])
     })
