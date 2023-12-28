@@ -17,7 +17,7 @@ const PromoCodeFields = ({form, prefix = '', ...props}) => {
     const code = form.watch('code')
 
     return (
-        <Box {...props}>
+        <Box aria-labelledby="code-feedback" {...props}>
             <Field inputProps={{flex: 1, mr: 2}} {...fields.code}>
                 <Button
                     type="submit"

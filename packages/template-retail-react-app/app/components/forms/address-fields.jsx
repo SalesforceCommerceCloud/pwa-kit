@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
+import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
     Grid,
@@ -19,9 +20,24 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 const AddressFields = ({form, prefix = ''}) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
+    const intl = useIntl()
+
+    const addressFormRef = useRef()
+    useEffect(() => {
+        // Focus on the form when the component mounts for accessibility
+        addressFormRef?.current?.focus()
+    }, [])
 
     return (
-        <Stack spacing={5}>
+        <Stack
+            spacing={5}
+            aria-label={intl.formatMessage({
+                id: 'use_address_fields.label.address_form',
+                defaultMessage: 'Address Form'
+            })}
+            tabIndex="0"
+            ref={addressFormRef}
+        >
             <SimpleGrid columns={[1, 1, 2]} gap={5}>
                 <Field {...fields.firstName} />
                 <Field {...fields.lastName} />

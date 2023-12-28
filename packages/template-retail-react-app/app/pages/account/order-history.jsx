@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {useLocation} from 'react-router'
 import {
@@ -99,6 +99,12 @@ const AccountOrderHistory = () => {
 
     const pageUrls = usePageUrls({total: paging.total, limit})
 
+    const headingRef = useRef()
+    useEffect(() => {
+        // Focus the 'Order History' header when the component mounts for accessibility
+        headingRef?.current?.focus()
+    }, [])
+
     useEffect(() => {
         window.scrollTo(0, 0)
     }, [customer, searchParams.offset])
@@ -106,7 +112,7 @@ const AccountOrderHistory = () => {
     return (
         <Stack spacing={4} data-testid="account-order-history-page">
             <Stack>
-                <Heading as="h1" fontSize="2xl">
+                <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                     <FormattedMessage
                         defaultMessage="Order History"
                         id="account_order_history.title.order_history"

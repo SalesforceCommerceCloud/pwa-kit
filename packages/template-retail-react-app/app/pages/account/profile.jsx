@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
@@ -87,6 +87,14 @@ const ProfileCard = () => {
         })
     }, [customer?.firstName, customer?.lastName, customer?.email, customer?.phoneHome])
 
+    const profileHeadingText = formatMessage({
+        defaultMessage: 'My Profile',
+        id: 'profile_card.title.my_profile'
+    })
+    const profileHeading = Array.from(document.querySelectorAll('h2')).find(
+        (element) => element.textContent === profileHeadingText
+    )
+
     const submit = async (values) => {
         try {
             form.clearErrors()
@@ -118,6 +126,7 @@ const ProfileCard = () => {
                             status: 'success',
                             isClosable: true
                         })
+                        profileHeading?.focus()
                     }
                 }
             )
@@ -131,10 +140,7 @@ const ProfileCard = () => {
             id="my-profile"
             title={
                 <Skeleton height="30px" width="120px">
-                    {formatMessage({
-                        defaultMessage: 'My Profile',
-                        id: 'profile_card.title.my_profile'
-                    })}
+                    {profileHeadingText}
                 </Skeleton>
             }
             editing={isEditing}
@@ -155,7 +161,12 @@ const ProfileCard = () => {
                                 </Alert>
                             )}
                             <ProfileFields form={form} />
-                            <FormActionButtons onCancel={() => setIsEditing(false)} />
+                            <FormActionButtons
+                                onCancel={() => {
+                                    setIsEditing(false)
+                                    profileHeading?.focus()
+                                }}
+                            />
                         </Stack>
                     </form>
                 </Container>
@@ -233,6 +244,14 @@ const PasswordCard = () => {
 
     const form = useForm()
 
+    const passwordHeadingText = formatMessage({
+        defaultMessage: 'Password',
+        id: 'password_card.title.password'
+    })
+    const passwordHeading = Array.from(document.querySelectorAll('h2')).find(
+        (element) => element.textContent === passwordHeadingText
+    )
+
     const submit = async (values) => {
         try {
             form.clearErrors()
@@ -259,6 +278,7 @@ const PasswordCard = () => {
                             email: values.email,
                             password: values.password
                         })
+                        passwordHeading?.focus()
                     }
                 }
             )
@@ -281,10 +301,7 @@ const PasswordCard = () => {
             id="password"
             title={
                 <Skeleton height="30px" width="120px">
-                    {formatMessage({
-                        defaultMessage: 'Password',
-                        id: 'password_card.title.password'
-                    })}
+                    {passwordHeadingText}
                 </Skeleton>
             }
             editing={isEditing}
@@ -305,7 +322,12 @@ const PasswordCard = () => {
                                 </Alert>
                             )}
                             <UpdatePasswordFields form={form} />
-                            <FormActionButtons onCancel={() => setIsEditing(false)} />
+                            <FormActionButtons
+                                onCancel={() => {
+                                    setIsEditing(false)
+                                    passwordHeading?.focus()
+                                }}
+                            />
                         </Stack>
                     </form>
                 </Container>
@@ -335,9 +357,15 @@ const PasswordCard = () => {
 }
 
 const AccountDetail = () => {
+    const headingRef = useRef()
+    useEffect(() => {
+        // Focus the 'Account Details' header when the component mounts for accessibility
+        headingRef?.current?.focus()
+    }, [])
+
     return (
         <Stack data-testid="account-detail-page" spacing={6}>
-            <Heading as="h1" fontSize="24px">
+            <Heading as="h1" fontSize="24px" tabIndex="0" ref={headingRef}>
                 <FormattedMessage
                     defaultMessage="Account Details"
                     id="account_detail.title.account_details"

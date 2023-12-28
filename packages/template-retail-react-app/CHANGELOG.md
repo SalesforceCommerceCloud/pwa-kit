@@ -6,6 +6,7 @@
 - Add correct keyboard interaction behavior for variation attribute radio buttons [#1587](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1587)
 - Change radio refinements (for example, filtering by Price) from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
 - Update search refinements ARIA labels to include "add/remove filter" [#1607](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1607)
+- Improve focus behavior on my account pages, address forms, and promo codes [#1625](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1625)
 
 ### Other features
 
