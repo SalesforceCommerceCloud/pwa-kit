@@ -13,16 +13,9 @@ import {
 } from 'commerce-sdk-isomorphic'
 import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
-import {
-    BaseStorage,
-    LocalStorage,
-    CookieStorage,
-    MemoryStorage,
-    StorageType,
-    LocalAndCookieStorage
-} from './storage'
+import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {onClient} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -74,6 +67,8 @@ type AuthDataMap = Record<
     }
 >
 
+const isStorefrontPreview = isOriginTrusted(getParentOrigin())
+
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
  * the storage type and the key when stored in that storage. You can also pass in a "callback"
@@ -113,17 +108,17 @@ const DATA_MAP: AuthDataMap = {
         key: 'token_type'
     },
     refresh_token_guest: {
-        storageType: 'localandcookie',
-        key: 'cc-nx-g',
+        storageType: 'cookie',
+        key: isStorefrontPreview ? 'cc-nx-g-preview' : 'cc-nx-g',
         callback: (store) => {
-            store.delete('cc-nx')
+            store.delete(isStorefrontPreview ? 'cc-nx-preview' : 'cc-nx')
         }
     },
     refresh_token_registered: {
-        storageType: 'localandcookie',
-        key: 'cc-nx',
+        storageType: 'cookie',
+        key: isStorefrontPreview ? 'cc-nx-preview' : 'cc-nx',
         callback: (store) => {
-            store.delete('cc-nx-g')
+            store.delete(isStorefrontPreview ? 'cc-nx-g-preview' : 'cc-nx-g')
         }
     },
     refresh_token_expires_in: {
@@ -136,16 +131,16 @@ const DATA_MAP: AuthDataMap = {
     // This triggers a new fetch for access_token using the current refresh_token from cookie storage and makes sure customer auth state is always in sync between SFRA and PWA sites in a hybrid setup.
     refresh_token_guest_copy: {
         storageType: 'local',
-        key: 'cc-nx-g',
+        key: isStorefrontPreview ? 'cc-nx-g-preview' : 'cc-nx-g',
         callback: (store) => {
-            store.delete('cc-nx')
+            store.delete(isStorefrontPreview ? 'cc-nx-preview' : 'cc-nx')
         }
     },
     refresh_token_registered_copy: {
         storageType: 'local',
-        key: 'cc-nx',
+        key: isStorefrontPreview ? 'cc-nx-preview' : 'cc-nx',
         callback: (store) => {
-            store.delete('cc-nx-g')
+            store.delete(isStorefrontPreview ? 'cc-nx-g-preview' : 'cc-nx-g')
         }
     },
     customer_type: {
@@ -206,9 +201,6 @@ class Auth {
         this.stores = {
             cookie: onClient() ? new CookieStorage(options) : new MemoryStorage(options),
             local: onClient() ? new LocalStorage(options) : new MemoryStorage(options),
-            localandcookie: onClient()
-                ? new LocalAndCookieStorage(options)
-                : new MemoryStorage(options),
             memory: new MemoryStorage(options)
         }
 

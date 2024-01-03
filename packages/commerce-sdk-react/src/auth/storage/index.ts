@@ -5,9 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export type StorageType = 'cookie' | 'local' | 'localandcookie' | 'memory'
+export type StorageType = 'cookie' | 'local' | 'memory'
 export * from './base'
 export * from './cookie'
 export * from './local'
-export * from './localandcookie'
 export * from './memory'
