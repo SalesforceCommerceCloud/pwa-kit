@@ -67,7 +67,7 @@ type AuthDataMap = Record<
     }
 >
 
-const isStorefrontPreview = isOriginTrusted(getParentOrigin())
+const isParentTrusted = isOriginTrusted(getParentOrigin())
 
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
@@ -109,16 +109,16 @@ const DATA_MAP: AuthDataMap = {
     },
     refresh_token_guest: {
         storageType: 'cookie',
-        key: isStorefrontPreview ? 'cc-nx-g-preview' : 'cc-nx-g',
+        key: isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g',
         callback: (store) => {
-            store.delete(isStorefrontPreview ? 'cc-nx-preview' : 'cc-nx')
+            store.delete(isParentTrusted ? 'cc-nx-iframe' : 'cc-nx')
         }
     },
     refresh_token_registered: {
         storageType: 'cookie',
-        key: isStorefrontPreview ? 'cc-nx-preview' : 'cc-nx',
+        key: isParentTrusted ? 'cc-nx-iframe' : 'cc-nx',
         callback: (store) => {
-            store.delete(isStorefrontPreview ? 'cc-nx-g-preview' : 'cc-nx-g')
+            store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
     },
     refresh_token_expires_in: {
@@ -131,16 +131,16 @@ const DATA_MAP: AuthDataMap = {
     // This triggers a new fetch for access_token using the current refresh_token from cookie storage and makes sure customer auth state is always in sync between SFRA and PWA sites in a hybrid setup.
     refresh_token_guest_copy: {
         storageType: 'local',
-        key: isStorefrontPreview ? 'cc-nx-g-preview' : 'cc-nx-g',
+        key: isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g',
         callback: (store) => {
-            store.delete(isStorefrontPreview ? 'cc-nx-preview' : 'cc-nx')
+            store.delete(isParentTrusted ? 'cc-nx-iframe' : 'cc-nx')
         }
     },
     refresh_token_registered_copy: {
         storageType: 'local',
-        key: isStorefrontPreview ? 'cc-nx-preview' : 'cc-nx',
+        key: isParentTrusted ? 'cc-nx-iframe' : 'cc-nx',
         callback: (store) => {
-            store.delete(isStorefrontPreview ? 'cc-nx-g-preview' : 'cc-nx-g')
+            store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
     },
     customer_type: {
