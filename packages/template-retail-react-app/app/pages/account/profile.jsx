@@ -234,7 +234,7 @@ const PasswordCard = () => {
     const {formatMessage} = useIntl()
 
     const {data: customer} = useCurrentCustomer()
-    const {isRegistered, customerId} = customer
+    const {isRegistered, customerId, email} = customer
 
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
@@ -275,22 +275,17 @@ const PasswordCard = () => {
                             isClosable: true
                         })
                         login.mutate({
-                            email: values.email,
+                            username: email,
                             password: values.password
                         })
                         passwordHeading?.focus()
+                    },
+                    onError: async (err) => {
+                        const resObj = await err.response.json()
+                        form.setError('root.global', {type: 'manual', message: resObj.detail})
                     }
                 }
             )
-            setIsEditing(false)
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Password updated',
-                    id: 'password_card.info.password_updated'
-                }),
-                status: 'success',
-                isClosable: true
-            })
         } catch (error) {
             form.setError('global', {type: 'manual', message: error.message})
         }
@@ -313,11 +308,11 @@ const PasswordCard = () => {
                 <Container variant="form">
                     <form onSubmit={form.handleSubmit(submit)}>
                         <Stack spacing={6}>
-                            {form.formState.errors?.global && (
+                            {form.formState.errors?.root?.global && (
                                 <Alert status="error">
                                     <AlertIcon color="red.500" boxSize={4} />
                                     <Text fontSize="sm" ml={3}>
-                                        {form.formState.errors.global.message}
+                                        {form.formState.errors.root.global.message}
                                     </Text>
                                 </Alert>
                             )}
