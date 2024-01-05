@@ -287,7 +287,7 @@ const PasswordCard = () => {
                 }
             )
         } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
+            form.setError('root.global', {type: 'manual', message: error.message})
         }
     }
 
@@ -309,7 +309,7 @@ const PasswordCard = () => {
                     <form onSubmit={form.handleSubmit(submit)}>
                         <Stack spacing={6}>
                             {form.formState.errors?.root?.global && (
-                                <Alert status="error">
+                                <Alert data-testid="password-update-error" status="error">
                                     <AlertIcon color="red.500" boxSize={4} />
                                     <Text fontSize="sm" ml={3}>
                                         {form.formState.errors.root.global.message}
