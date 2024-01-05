@@ -279,6 +279,7 @@ const PasswordCard = () => {
                             password: values.password
                         })
                         passwordHeading?.focus()
+                        form.reset()
                     },
                     onError: async (err) => {
                         const resObj = await err.response.json()
