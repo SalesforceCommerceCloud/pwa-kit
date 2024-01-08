@@ -5638,3 +5638,10 @@ export const mockCartVariant = {
     c_size: '9MD',
     c_width: 'Z'
 }
+
+export const mockPasswordUpdateFalure = {
+    title: 'Update Password',
+    type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/update-password',
+    detail: 'The update password request is invalid. Customer\u0027s current password is not valid',
+    errorMessage: 'Customer\u0027s current password is not valid'
+}
