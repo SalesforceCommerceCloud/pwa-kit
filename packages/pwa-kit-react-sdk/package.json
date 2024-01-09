@@ -52,7 +52,7 @@
     "pwa-kit-runtime": "^2.8.2",
     "react-ssr-prepass": "^1.5.0",
     "react-uid": "^2.3.2",
-    "serialize-javascript": "^6.0.1",
+    "serialize-javascript": "^6.0.2",
     "svg-sprite-loader": "^6.0.11",
     "watch": "1.0.2"
   },
