@@ -16,7 +16,8 @@ import {
     mockOrderHistory,
     mockedGuestCustomer,
     mockedRegisteredCustomer,
-    mockOrderProducts
+    mockOrderProducts,
+    mockPasswordUpdateFalure
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import Account from '@salesforce/retail-react-app/app/pages/account/index'
 import Login from '@salesforce/retail-react-app/app/pages/login'
@@ -162,27 +163,52 @@ describe('updating profile', function () {
 })
 
 describe('updating password', function () {
-    beforeEach(() => {
-        global.server.use(
-            rest.put('*/password', (req, res, ctx) => {
-                return res(ctx.json())
-            })
-        )
-    })
-    test('Allows customer to update password', async () => {
+    test('Password update form is rendered correctly', async () => {
         const {user} = renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
         const el = within(screen.getByTestId('sf-toggle-card-password'))
         await user.click(el.getByText(/edit/i))
+
+        expect(el.getByLabelText(/current password/i)).toBeInTheDocument()
+        expect(el.getByLabelText(/new password/i)).toBeInTheDocument()
+        expect(el.getByText(/forgot password/i)).toBeInTheDocument()
+    })
+
+    test('Allows customer to update password', async () => {
+        global.server.use(
+            rest.put('*/password', (req, res, ctx) => res(ctx.status(204), ctx.json()))
+        )
+
+        const {user} = renderWithProviders(<MockedComponent />)
+
+        const el = within(screen.getByTestId('sf-toggle-card-password'))
+        await user.click(el.getByText(/edit/i))
         await user.type(el.getByLabelText(/current password/i), 'Password!12345')
         await user.type(el.getByLabelText(/new password/i), 'Password!98765')
         await user.click(el.getByText(/Forgot password/i))
-
-        expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
-
         await user.click(el.getByText(/save/i))
+
         expect(await screen.findByText('••••••••')).toBeInTheDocument()
+    })
+
+    test('Warns customer when updating password with invalid current password', async () => {
+        global.server.use(
+            rest.put('*/password', (req, res, ctx) =>
+                res(ctx.status(401), ctx.json(mockPasswordUpdateFalure))
+            )
+        )
+
+        const {user} = renderWithProviders(<MockedComponent />)
+
+        const el = within(screen.getByTestId('sf-toggle-card-password'))
+        await user.click(el.getByText(/edit/i))
+        await user.type(el.getByLabelText(/current password/i), 'Password!123456')
+        await user.type(el.getByLabelText(/new password/i), 'Password!98765')
+        await user.click(el.getByText(/Forgot password/i))
+        await user.click(el.getByText(/save/i))
+
+        expect(await screen.findByTestId('password-update-error')).toBeInTheDocument()
     })
 })
