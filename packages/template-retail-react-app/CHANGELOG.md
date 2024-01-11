@@ -6,6 +6,7 @@
 - Add correct keyboard interaction behavior for variation attribute radio buttons [#1587](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1587)
 - Change radio refinements (for example, filtering by Price) from radio inputs to styled buttons [#1605](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1605)
 - Update search refinements ARIA labels to include "add/remove filter" [#1607](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1607)
+- Improve focus behavior on my account pages, address forms, and promo codes [#1625](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1625)
 
 ### Other features
 
@@ -43,6 +44,8 @@
 
 ### Bug Fixes
 
+- Fix checkout allowing you to proceed to review with invalid billing address [#1632](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1632)
+- Fix password change functionality [#1634](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1634)
 - Remove internal linter rule that is missing in generated projects [#1554](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1554)
 - Fix bug where you can add duplicates of the same item to the wishlist. Also fixes bug where skeleton appears when removing last item from the wishlist. [#1560](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1560)
 - Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)

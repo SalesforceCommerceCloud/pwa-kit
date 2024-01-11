@@ -131,8 +131,14 @@ const Payment = () => {
         if (!appliedPayment) {
             await onPaymentSubmit(paymentFormValues)
         }
-        await onBillingSubmit()
-        goToNextStep()
+
+        // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
+        // submit, `undefined` is returned.
+        const updatedBasket = await onBillingSubmit()
+
+        if (updatedBasket) {
+            goToNextStep()
+        }
     })
 
     return (
