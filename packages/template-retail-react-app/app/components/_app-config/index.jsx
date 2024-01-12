@@ -26,6 +26,11 @@ import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
+import useBlock from '@salesforce/retail-react-app/app/hooks/use-block'
+
+const wait = async (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
@@ -43,6 +48,28 @@ const AppConfig = ({children, locals = {}}) => {
     const commerceApiConfig = locals.appConfig.commerceAPI
 
     const appOrigin = getAppOrigin()
+
+    const REDIRECTS_ENABLED = true
+    useBlock(async (location) => {
+        // If the redirect feature is not enabled we don't need to circumvent the normal routing flow, so we return
+        // "false" to not block.
+        if (!REDIRECTS_ENABLED) {
+            return false
+        } 
+
+        // If the redirect feature IS enabled there are 2 ways we can solve the problem. 
+        // 1. We can block navigation until we check to see if there is a redirect for the clicked link.
+        // 2. We navigate the an intermediate page that will handle checking for a url mapping and do what is
+        //    needs to do.
+        // There are pros and cons to each, the first option we don't have an intermediate page so it's not as jarring, 
+        // but we will have lag in all links transitioning. The second options doesn't have this lag in transition, but 
+        // it has this secondary page that we must show (loader) that happens on all links. 
+        // 
+        // DEVELOPER NOTE: I think its a really bad idea to implement redirects in a single page app.
+        console.log('location: ', location)
+        // This gets caught by the catch-all route.
+        return `/_seo-url-mapping?locationPathname=${location.pathname}&locationSearch=${location.search}`
+    })
 
     return (
         <CommerceApiProvider
@@ -120,7 +147,83 @@ const options = {
                 retry: false
             }
         }
+    },
+    // NOTE: The API for `dehydratedState` will be an object in the form of a react query client cache state
+    // object, it can also be a function that returns the same object or an asyn function that returns that same 
+    // object type. We are going to use this API to make a pre-fetch to get the mapping information for the given
+    // pathname which is passed in via a context object argument.
+    // DEVELOPER NOTE: We should probably place this function in another file and only apply the enhancement if the feature
+    // is enabled. 
+    // DEVELOPER NOTE: Is it possible through overrides to break this feature? Probably.
+    dehydratedState: async ({location}) => {
+        const {pathname} = location
+        const queries = []
+
+        // NOTE: This function is essentially simulating the getUrlMapping endpoint of the 
+        // Shopper SEO API.
+        await new Promise((resolve) => setTimeout(resolve, 200))
+        
+        if (pathname === '/custom-product-path') {
+            queries.push({
+                // This represents the smallest definition of a query state, you absoloutly need
+                // `dataUpdatedAt` and `status`.
+                state: {
+                    data: {
+                        resourceId: '66936828M',
+                        resourceType: 'PRODUCT'
+                    },
+                    dataUpdatedAt: Date.now(),
+                    status: 'success'
+                },
+                queryKey: [
+                    'url-mappings',
+                    '/custom-product-path'
+                ]
+            })
+        } else if (pathname === '/custom-product-path-bad') {
+            queries.push({
+                state: {
+                    dataUpdatedAt: Date.now(),
+                    error: 'No seo url found!',
+                    errorUpdatedAt: Date.now(),
+                    status: 'error'
+                },
+                queryKey: [
+                    'url-mappings',
+                    '/custom-product-path-bad'
+                ]
+            })
+        } else if (pathname === '/global/en-GB/product/52416781M') {
+            queries.push({
+                state: {
+                    data: {
+                        redirectUrl: {
+                            copySourceParams: false,
+                            destinationId: "42416786M",
+                            destinationType: "product",
+                            statusCode: "301",
+                            destinationUrl: "https://staging-c7testing-cdd.demandware.net/s/SiteGenesis/casual%20to%20dressy%20trousers/?lang=en_US"
+                        },
+                        resourceId: '52416781M',
+                        resourceType: 'product'
+                    },
+                    dataUpdatedAt: Date.now(),
+                    status: 'success'
+                },
+                queryKey: [
+                    'url-mappings',
+                    '/global/en-GB/product/52416781M'
+                ]
+            })
+        }
+
+        return {
+            queries
+        }
     }
 }
 
-export default withReactQuery(AppConfig, options)
+export default withReactQuery(
+    AppConfig, 
+    options
+)

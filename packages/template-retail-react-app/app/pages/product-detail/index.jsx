@@ -48,7 +48,7 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
-const ProductDetail = () => {
+const ProductDetail = (props = {}) => {
     const {formatMessage} = useIntl()
     const history = useHistory()
     const location = useLocation()
@@ -69,7 +69,10 @@ const ProductDetail = () => {
     const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
-    const {productId} = useParams()
+    let {productId} = useParams()
+    if (props.productId) {
+        productId = props.productId
+    }
     const urlParams = new URLSearchParams(location.search)
     const {
         data: product,
@@ -86,7 +89,8 @@ const ProductDetail = () => {
         {
             // When shoppers select a different variant (and the app fetches the new data),
             // the old data is still rendered (and not the skeletons).
-            keepPreviousData: true
+            keepPreviousData: true,
+            cacheTime: Infinity
         }
     )
 
