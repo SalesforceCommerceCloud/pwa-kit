@@ -36,7 +36,9 @@ jest.mock('commerce-sdk-isomorphic', () => {
 
 jest.mock('../utils', () => ({
     __esModule: true,
-    onClient: () => true
+    onClient: () => true,
+    getParentOrigin: jest.fn().mockResolvedValue(''),
+    isOriginTrusted: () => false
 }))
 
 /** The auth data we store has a slightly different shape than what we use. */
