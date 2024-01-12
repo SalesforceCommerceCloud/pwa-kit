@@ -7,6 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useLocation, Redirect} from 'react-router-dom'
 
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
@@ -27,6 +28,7 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 import useBlock from '@salesforce/retail-react-app/app/hooks/use-block'
+import {useUrlMapping} from '@salesforce/retail-react-app/app/pages/seo-url-mapping/use-url-mapping'
 
 const wait = async (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms))
@@ -41,6 +43,7 @@ const wait = async (ms) => {
  */
 const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
+    const {pathname, search} = useLocation()
     const headers = {
         'correlation-id': correlationId
     }
@@ -70,6 +73,17 @@ const AppConfig = ({children, locals = {}}) => {
         // This gets caught by the catch-all route.
         return `/_seo-url-mapping?locationPathname=${location.pathname}&locationSearch=${location.search}`
     })
+    const {data: urlMapping} = useUrlMapping({
+        parameters: {
+            urlSegment: pathname
+        }
+    })
+
+    // DEVELOPER NOTE: Think about when we need to run this code, should we only be doing it when we are
+    // on the server?
+    if (urlMapping) {
+        return <Redirect to={`/global/en-GB/${urlMapping.redirectUrl.destinationType}/${urlMapping.redirectUrl.destinationId}${search}`} />
+    }
 
     return (
         <CommerceApiProvider
