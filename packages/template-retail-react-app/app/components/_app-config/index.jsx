@@ -69,7 +69,6 @@ const AppConfig = ({children, locals = {}}) => {
         // it has this secondary page that we must show (loader) that happens on all links. 
         // 
         // DEVELOPER NOTE: I think its a really bad idea to implement redirects in a single page app.
-        console.log('location: ', location)
         // This gets caught by the catch-all route.
         return `/_seo-url-mapping?locationPathname=${location.pathname}&locationSearch=${location.search}`
     })
@@ -81,7 +80,7 @@ const AppConfig = ({children, locals = {}}) => {
 
     // DEVELOPER NOTE: Think about when we need to run this code, should we only be doing it when we are
     // on the server?
-    if (urlMapping) {
+    if (urlMapping?.redirectUrl) {
         return <Redirect to={`/global/en-GB/${urlMapping.redirectUrl.destinationType}/${urlMapping.redirectUrl.destinationId}${search}`} />
     }
 

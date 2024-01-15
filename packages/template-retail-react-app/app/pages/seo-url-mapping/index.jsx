@@ -34,7 +34,7 @@ const SeoUrlMapping = () => {
     })
     
     const {resourceId, resourceType, refinements, redirectUrl} = data
-    debugger
+
     if (redirectUrl) {
         // This is were we will take the redrect information and generate a PWA link from it and redirect to it.
         // DEVELOPER NOTE: `destinationUrl` is also included in the data, this could be used is the partner has 
@@ -44,7 +44,6 @@ const SeoUrlMapping = () => {
     }
 
     if (error) {
-        debugger
         // DEVELOPER NOTE: This pathname is important!
         if (!!locationPathname) {
             return <Redirect to={locationPathname} />

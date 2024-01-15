@@ -24,7 +24,7 @@ export const useBlock = func => {
     funcRef.current = func
 
     useEffect(() => {
-        if (location === lastLocation.current || lastLocation.current?.pathname === '/_seo-url-mapping' || !funcRef.current){
+        if (location === lastLocation.current || lastLocation.current?.pathname === '/_seo-url-mapping' || !funcRef.current) {
             lastLocation.current = location
             return
         }
