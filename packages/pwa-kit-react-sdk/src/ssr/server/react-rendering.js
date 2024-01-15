@@ -119,10 +119,10 @@ export const render = async (req, res, next) => {
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
-
+    debugger
     AppConfig.restore(res.locals)
 
-    const routes = getRoutes(res.locals)
+    const routes = await getRoutes(res.locals)
     const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname] = req.originalUrl.split('?')
@@ -133,6 +133,12 @@ export const render = async (req, res, next) => {
             interpretPlusSignAsSpace: config?.app?.url?.interpretPlusSignAsSpace
         })
     }
+
+    // Serialize the routes and add them to the config. We'll use this on the client-side later.
+    config.app.routes = routes.map((route) => ({
+        path: route.path,
+        componentName: route.component.displayName.match(/\((\w+)\)/)[1]
+    }))
 
     // Step 1 - Find the match.
     let route
