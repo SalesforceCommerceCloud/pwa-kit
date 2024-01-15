@@ -113,7 +113,9 @@ export const routes = [
 
 export default () => {
     const config = getConfig()
-    return configureRoutes(routes, config, {
+    const configuredRoutes =  configureRoutes(routes, config, {
         ignoredRoutes: ['/callback', '*']
     })
+    console.log('configuredRoutes: ', configuredRoutes)
+    return configuredRoutes
 }
