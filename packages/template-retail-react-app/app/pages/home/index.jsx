@@ -23,9 +23,7 @@ import {
     Link
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-import {useRouteContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/switch'
 import {Link as RouteLink} from 'react-router-dom'
-import {ProductDetail} from '@salesforce/retail-react-app/app/routes'
 
 // Project Components
 import Hero from '@salesforce/retail-react-app/app/components/hero'
@@ -75,25 +73,6 @@ const Home = () => {
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
-    }, [])
-
-    /**************** Testing Dynamic Route Loading ****************/
-    const {routes, updateRoutes} = useRouteContext()
-    useEffect(() => {
-        const hasRoute = routes.some(({path}) => {
-            return path.includes('custom-url')
-        })
-        if (hasRoute) {
-            return
-        }
-        updateRoutes([
-            {
-                path: '/custom-url',
-                // DEVELOPER NOTE: Here we would want to use a Loadable component as to not bloat the home page chunk size.
-                component: () => <ProductDetail productId="25686544M"/>
-            },
-            ...routes
-        ])
     }, [])
 
     return (

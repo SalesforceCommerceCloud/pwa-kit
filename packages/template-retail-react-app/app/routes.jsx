@@ -79,15 +79,15 @@ const componentNameMap = {
 }
 
 const getUrlMapping = async (urlSegment) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     
     // DEVELOPER NOTE: We probably need to account for the site and locale prefixes if there are any.
     const mappings = {
-        "/stripped-silk-tie": {
+        "/custom-url": {
             resourceId: '25752986M',
             resourceType: 'product'
         },
-        "/product/25592770M": {
+        "/product/TG786M": {
             redirectUrl: {
                 destinationId: '52416781M',
                 destinationType: 'product'

@@ -77,6 +77,14 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 
+import {useBlock} from '@salesforce/retail-react-app/app/hooks/use-block'
+import {useRouteContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/switch'
+import {ProductDetail} from '@salesforce/retail-react-app/app/routes'
+import {Redirect} from 'react-router-dom'
+
+const wait = (t) => new Promise((resolve) => setTimeout(resolve, t))
+
+
 const onClient = typeof window !== 'undefined'
 
 /*
@@ -186,6 +194,57 @@ const App = (props) => {
     const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
+
+    const {routes, updateRoutes} = useRouteContext()
+
+    useBlock(async (location) => {
+        const mappings = {
+            "/custom-url": {
+                resourceId: '25752986M',
+                resourceType: 'product'
+            },
+            "/product/TG786M": {
+                redirectUrl: {
+                    destinationId: '52416781M',
+                    destinationType: 'product'
+                },
+                resourceId: 'mens',
+                resourceType: 'category'
+            }
+        }
+
+        // This is where we would be making a request to the SEO API's.
+        await wait(1000)
+        const response = mappings[location.pathname]
+
+        if (response) {
+            const isRedirect = !!response.redirectUrl
+            let Component
+            let props
+            if (isRedirect) {
+                Component = Redirect
+                props = {
+                    to: `/${response.redirectUrl.destinationType}/${response.redirectUrl.destinationId}`
+                }
+            } else {
+                Component = ProductDetail
+                props = {
+                    [`${response.resourceType}Id`]: response.resourceId
+                }
+            }
+
+            updateRoutes([
+                {
+                    path: location.pathname,
+                    // DEVELOPER NOTE: Here we would want to use a Loadable component as to not bloat the home page chunk size.
+                    component: () => <Component {...props}/>
+                },
+                ...routes
+            ])
+        }
+        
+        return false
+    })
 
     useEffect(() => {
         // Create a new basket if the current customer doesn't have one.

@@ -10,7 +10,7 @@ import {Switch as RouterSwitch, Route} from 'react-router-dom'
 import AppErrorBoundary from '../app-error-boundary'
 import {UIDReset, UIDFork} from 'react-uid'
 
-const RoutesContext = React.createContext()
+const RoutesContext = React.createContext({})
 
 // DEVELOPER NTOES: MAKE THIS API FANCIER!
 export const useRouteContext = () => useContext(RoutesContext)
@@ -33,13 +33,14 @@ const Switch = (props) => {
         <UIDReset>
             <AppErrorBoundary error={error}>
                 {!error && (
-                    <App preloadedProps={appState.appProps}>
-                        <RoutesContext.Provider value={{
-                            routes: _routes,
-                            updateRoutes: (routes) => {
-                                setRoutes(routes)
-                            }
-                        }}>
+                    <RoutesContext.Provider value={{
+                        routes: _routes,
+                        updateRoutes: (routes) => {
+                            setRoutes(routes)
+                        }
+                    }}>
+                        <App preloadedProps={appState.appProps}>
+                        
                             <RouterSwitch>
                                 {_routes.map((route, i) => {
                                     const {component: Component, props, ...routeProps} = route
@@ -52,8 +53,8 @@ const Switch = (props) => {
                                     )
                                 })}
                             </RouterSwitch>
-                        </RoutesContext.Provider>
-                    </App>
+                        </App>
+                    </RoutesContext.Provider>
                 )}
             </AppErrorBoundary>
         </UIDReset>
