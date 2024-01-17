@@ -116,10 +116,11 @@ export const getLocationSearch = (req, opts = {}) => {
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
+    debugger
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
-    debugger
+
     AppConfig.restore(res.locals)
 
     const routes = await getRoutes(res.locals)
@@ -137,7 +138,8 @@ export const render = async (req, res, next) => {
     // Serialize the routes and add them to the config. We'll use this on the client-side later.
     config.app.routes = routes.map((route) => ({
         path: route.path,
-        componentName: route.component.displayName.match(/\((\w+)\)/)[1]
+        componentName: route.component.displayName.match(/\((\w+)\)/)[1],
+        componentProps: route.props
     }))
 
     // Step 1 - Find the match.

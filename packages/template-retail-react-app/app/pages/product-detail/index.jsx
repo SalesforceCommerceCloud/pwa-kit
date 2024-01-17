@@ -73,7 +73,7 @@ const ProductDetail = (props) => {
     if (props.productId) {
         productId = props.productId
     }
-    debugger
+
     const urlParams = new URLSearchParams(location.search)
     const {
         data: product,
@@ -93,7 +93,6 @@ const ProductDetail = (props) => {
             keepPreviousData: true
         }
     )
-
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
     const {
