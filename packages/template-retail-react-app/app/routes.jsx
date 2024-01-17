@@ -47,7 +47,7 @@ export const PageNotFound = loadable(() => import('./pages/page-not-found'))
 Home.displayName = 'Home'
 ProductDetail.displayName = 'ProductDetail'
 ProductList.displayName = 'ProductList'
-PageNotFound.displayName = 'PageNameFound'
+PageNotFound.displayName = 'PageNotFound'
 
 const isServerSide = typeof window === 'undefined'
 
@@ -136,6 +136,7 @@ export default async (locals) => {
             ignoredRoutes: ['/callback', '*']
         })
     } else {
+        debugger
         // SERVER!
 
         configuredRoutes = configureRoutes(routes, config, {
@@ -153,7 +154,7 @@ export default async (locals) => {
             if (isRedirect) {
                 Component = Redirect
                 props = {
-                    to: `/us/en-US/${mapping.redirectUrl.destinationType}/${mapping.redirectUrl.destinationId}`
+                    to: `/${mapping.redirectUrl.destinationType}/${mapping.redirectUrl.destinationId}`
                 }
             } else {
                 Component = ProductDetail

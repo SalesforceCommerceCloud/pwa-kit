@@ -10,9 +10,9 @@ const sites = require('./sites.js')
 module.exports = {
     app: {
         url: {
-            site: 'path',
-            locale: 'path',
-            showDefaults: true,
+            site: 'none',
+            locale: 'none',
+            showDefaults: false,
             interpretPlusSignAsSpace: false
         },
         defaultSite: 'RefArch',
