@@ -18,6 +18,7 @@ import {
 import {HTTPError, HTTPNotFound} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 
 const PAGEDESIGNER_TO_COMPONENT = {
+    'headless.einsteinAssisted': Components,
     'commerce_assets.photoTile': ImageTile,
     'commerce_assets.imageAndText': ImageWithText,
     'commerce_layouts.carousel': Carousel,

@@ -32,7 +32,7 @@ interface RegionProps extends React.ComponentProps<'div'> {
 export const Region = (props: RegionProps) => {
     const {region, className = '', ...rest} = props
     const {id, components} = region
-
+    console.log(components)
     return (
         <div id={id} className={`region ${className}`} {...rest}>
             <div className="container">
