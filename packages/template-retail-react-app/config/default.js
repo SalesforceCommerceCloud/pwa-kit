@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sites = require('./sites.js')
 
 module.exports = {
@@ -14,7 +13,7 @@ module.exports = {
             locale: 'path',
             showDefaults: true
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'RefArch',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -23,18 +22,18 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
-                siteId: 'RefArchGlobal'
+                clientId: 'cdbc4a96-8d95-447c-ac1e-226aed007c98',
+                organizationId: 'f_ecom_bjnl_dev',
+                shortCode: 'sandbox-001',
+                siteId: 'RefArch'
             }
         },
         einsteinAPI: {
-            host: 'https://api.cquotient.com',
-            einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            host: 'https://staging.ai.salesforce.com',
+            einsteinId: 'd27fafa6-8622-400d-97a4-ddf0794943a2',
             // This differs from the siteId in commerceAPIConfig for testing purposes
-            siteId: 'aaij-MobileFirst',
-            isProduction: false
+            siteId: 'bjnl-RefArch',
+            isProduction: true
         }
     },
     externals: [],
@@ -49,14 +48,14 @@ module.exports = {
         '**/*.json'
     ],
     ssrParameters: {
-        ssrFunctionNodeVersion: '18.x',
+        ssrFunctionNodeVersion: '16.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'development-functional38-qa222.demandware.net',
                 path: 'ocapi'
             }
         ]
