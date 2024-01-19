@@ -13,7 +13,7 @@ type ComponentProps = {
     component: ComponentType
 }
 
-const ComponentNotFound = ({typeId}: ComponentType) => (
+const ComponentNotFound = ({typeId}: {typeId: string}) => (
     <div>{`Component type '${typeId}' not found!`}</div>
 )
 
@@ -120,11 +120,12 @@ export const REQUIRED_EGPT_JSX_COMPONENTS = [
 export const Component = ({component}: ComponentProps) => {
     const pageContext = usePageContext()
     const {jsxParserComponents} = pageContext
-    const {data, ...rest} = component
+    const {data, typeId, ...rest} = component
     const {code} = data || {}
-    const isEinsteinAssistedComponent = !!code
-    let instance = <ComponentNotFound {...rest} {...data} />
-
+    const isEinsteinAssistedComponent = typeId === 'headless.einsteinAssisted'
+    let instance = <ComponentNotFound typeId={typeId} />
+    console.log('component', component)
+    console.log('code.code', code?.code)
     useEffect(() => {
         if (isEinsteinAssistedComponent) {
             const missingJsxComponents = REQUIRED_EGPT_JSX_COMPONENTS.filter((required) => {
@@ -139,7 +140,11 @@ export const Component = ({component}: ComponentProps) => {
         }
     }, [code?.code])
 
-    if (isEinsteinAssistedComponent) {
+    if (isEinsteinAssistedComponent && !code?.code?.react) {
+        return null
+    }
+
+    if (isEinsteinAssistedComponent && code?.code?.react) {
         // TODO: this is a workaround for the fact that
         // 'react-jsx-parser' still uses React@16 typings
         // we need to cast it to the newer React typings
@@ -149,14 +154,13 @@ export const Component = ({component}: ComponentProps) => {
                 components={pageContext.jsxParserComponents}
                 // TODO: make component data structure more clear
                 // from the PD custom editor, let's not have "code.code"
-                jsx={code.code}
-                {...rest}
-                {...data}
+                jsx={code.code.react}
+                {...component}
             />
         )
     } else if (pageContext?.components[component.typeId]) {
         const ComponentClass = pageContext?.components[component.typeId]
-        instance = <ComponentClass {...rest} {...data} />
+        instance = <ComponentClass {...component} />
     }
 
     return (

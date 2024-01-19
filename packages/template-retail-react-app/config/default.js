@@ -22,9 +22,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'cdbc4a96-8d95-447c-ac1e-226aed007c98',
+                clientId: 'bf7fc8bf-3ca9-45f9-9c73-7dbb5dff08b1',
                 organizationId: 'f_ecom_bjnl_dev',
-                shortCode: 'sandbox-001',
+                shortCode: 'performance-001',
                 siteId: 'RefArch'
             }
         },
@@ -51,7 +51,7 @@ module.exports = {
         ssrFunctionNodeVersion: '16.x',
         proxyConfigs: [
             {
-                host: 'sandbox-001.api.commercecloud.salesforce.com',
+                host: 'performance-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
