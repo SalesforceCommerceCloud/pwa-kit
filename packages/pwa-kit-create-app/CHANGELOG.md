@@ -1,5 +1,4 @@
-## v3.4.0-dev (Dec 08, 2023)
-<!-- RELEASE TASK: Is node 20 available on MRT? Delete the line saying it isn't! -->
+## v3.4.0-preview.0 (Dec 08, 2023)
 
 - Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
   - Support for node 20 is not yet available on Managed Runtime
