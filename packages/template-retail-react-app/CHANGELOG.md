@@ -1,4 +1,4 @@
-## v2.3.0-preview.0 (Nov 8, 2023)
+## v2.3.0 (Jan 19, 2024)
 
 ### Accessibility improvements
 

@@ -1,4 +1,4 @@
-## v1.3.0-preview.0 (Jan 19, 2024)
+## v1.3.0 (Jan 19, 2024)
 
 - Add support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
 - Fix bug when running in an iframe [#1629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1629)
