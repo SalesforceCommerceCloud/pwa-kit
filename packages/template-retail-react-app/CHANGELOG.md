@@ -4,6 +4,8 @@
 
 - Fix `extract-default-translations` script [#1647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1647)
 
+## v2.3.0
+
 ### Accessibility improvements
 
 - Add correct keyboard interaction behavior for variation attribute radio buttons [#1587](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1587)
