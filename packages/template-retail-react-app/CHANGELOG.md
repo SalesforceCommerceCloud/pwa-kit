@@ -4,7 +4,7 @@
 
 - Fix `extract-default-translations` script [#1647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1647)
 
-## v2.3.0
+## v2.3.0 (Jan 19, 2024)
 
 ### Accessibility improvements
 
