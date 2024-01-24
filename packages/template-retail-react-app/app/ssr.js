@@ -35,12 +35,6 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    app.use(req, res, (next) => {
-        if (req.path.startsWith('/shopper/auth')) {
-            console.log('test---------------------------')
-        }
-        next()
-    })
     // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)
     // Set custom HTTP security headers
