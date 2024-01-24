@@ -345,6 +345,47 @@ describe('Auth', () => {
         await auth.ready()
         expect(helpers.refreshAccessToken).toHaveBeenCalled()
     })
+
+    test('ready - use refresh token when access token is expired with slas private client', async () => {
+        const auth = new Auth(configSLASPrivate)
+        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
+        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
+
+        // To simulate real-world scenario, let's first test with a good valid token
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest_copy', 'refresh_token_guest') // Simulates SFRA auth state has NOT changed and token is valid.
+
+        const data: StoredAuthData = {
+            refresh_token_guest: 'refresh_token_guest',
+            access_token: JWTNotExpired,
+            customer_id: 'customer_id',
+            enc_user_id: 'enc_user_id',
+            expires_in: 1800,
+            id_token: 'id_token',
+            idp_access_token: 'idp_access_token',
+            token_type: 'token_type',
+            usid: 'usid',
+            customer_type: 'guest',
+            refresh_token_expires_in: 30 * 24 * 3600
+        }
+
+        Object.keys(data).forEach((key) => {
+            // @ts-expect-error private method
+            auth.set(key, data[key])
+        })
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
+
+        // And then now test with an _expired_ token
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).toHaveBeenCalled()
+        const funcArg = (helpers.refreshAccessToken as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER})
+    })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
 
