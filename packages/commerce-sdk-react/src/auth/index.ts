@@ -501,7 +501,7 @@ class Auth {
         await this.loginRegisteredUserB2C({
             username: login,
             password,
-            clientSecret: this.isSlasPrivate ? SLAS_PRIVATE_SECRET_PLACEHOLDER : ''
+            clientSecret: this.isSlasPrivate ? SLAS_PRIVATE_SECRET_PLACEHOLDER : undefined
         })
         return res
     }
