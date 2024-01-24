@@ -162,8 +162,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         OCAPISessionsURL
     ])
 
-    // console.log('process?.env', process.env.NODE_ENV)
-
     // Initialize the session
     useEffect(() => void auth.ready(), [auth])
 
