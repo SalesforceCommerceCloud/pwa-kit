@@ -13,3 +13,5 @@ export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
     'https://runtime-admin-staging.mobify-storefront.com',
     'https://runtime-admin-preview.mobify-storefront.com'
 ])
+
+export const SLAS_PRIVATE_SECRET_PLACEHOLDER = 'slas-private-secret-placeholder'

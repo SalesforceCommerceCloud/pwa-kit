@@ -16,6 +16,7 @@ import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
 import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
+import {SLAS_PRIVATE_SECRET_PLACEHOLDER} from '../constant'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -25,6 +26,7 @@ interface AuthConfig extends ApiClientConfigParams {
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
     OCAPISessionsURL?: string
+    isSlasPrivate?: boolean
 }
 
 interface JWTHeaders {
@@ -167,6 +169,7 @@ class Auth {
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private OCAPISessionsURL: string
+    private isSlasPrivate: boolean = false
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
@@ -209,6 +212,8 @@ class Auth {
         this.fetchedToken = config.fetchedToken || ''
 
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
+
+        this.isSlasPrivate = config.isSlasPrivate || false
     }
 
     get(name: AuthDataKeys) {
@@ -389,7 +394,16 @@ class Auth {
         if (refreshToken) {
             try {
                 return await this.queueRequest(
-                    () => helpers.refreshAccessToken(this.client, {refreshToken}),
+                    () =>
+                        helpers.refreshAccessToken(
+                            this.client,
+                            {refreshToken},
+                            {
+                                clientSecret: this.isSlasPrivate
+                                    ? SLAS_PRIVATE_SECRET_PLACEHOLDER
+                                    : undefined
+                            }
+                        ),
                     !!refreshTokenGuest
                 )
             } catch (error) {
@@ -406,10 +420,21 @@ class Auth {
                 }
             }
         }
-        return await this.queueRequest(
-            () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
-            true
-        )
+
+        return this.isSlasPrivate
+            ? await this.queueRequest(
+                  () =>
+                      helpers.loginGuestUserPrivate(
+                          this.client,
+                          {redirectURI: this.redirectURI},
+                          {clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER}
+                      ),
+                  true
+              )
+            : await this.queueRequest(
+                  () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
+                  true
+              )
     }
 
     /**
@@ -434,14 +459,20 @@ class Auth {
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const isGuest = true
-        return await this.queueRequest(
-            () =>
-                helpers.loginGuestUser(this.client, {
-                    redirectURI,
-                    ...(usid && {usid})
-                }),
-            isGuest
-        )
+        return this.isSlasPrivate
+            ? await this.queueRequest(
+                  () =>
+                      helpers.loginGuestUserPrivate(
+                          this.client,
+                          {redirectURI: this.redirectURI},
+                          {clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER}
+                      ),
+                  true
+              )
+            : await this.queueRequest(
+                  () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
+                  true
+              )
     }
 
     /**
@@ -467,7 +498,11 @@ class Auth {
             },
             body
         })
-        await this.loginRegisteredUserB2C({username: login, password})
+        await this.loginRegisteredUserB2C({
+            username: login,
+            password,
+            clientSecret: this.isSlasPrivate ? SLAS_PRIVATE_SECRET_PLACEHOLDER : ''
+        })
         return res
     }
 

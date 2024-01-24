@@ -31,6 +31,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     headers?: Record<string, string>
     fetchedToken?: string
     OCAPISessionsURL?: string
+    isSlasPrivate?: boolean
 }
 
 /**
@@ -94,9 +95,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         locale,
         currency,
         fetchedToken,
-        OCAPISessionsURL
+        OCAPISessionsURL,
+        isSlasPrivate = false
     } = props
-
     const config = {
         proxy,
         headers,
@@ -146,7 +147,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             redirectURI,
             fetchOptions,
             fetchedToken,
-            OCAPISessionsURL
+            OCAPISessionsURL,
+            isSlasPrivate
         })
     }, [
         clientId,
@@ -159,6 +161,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchedToken,
         OCAPISessionsURL
     ])
+
+    // console.log('process?.env', process.env.NODE_ENV)
 
     // Initialize the session
     useEffect(() => void auth.ready(), [auth])
