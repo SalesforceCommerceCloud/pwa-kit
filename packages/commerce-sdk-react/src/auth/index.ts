@@ -16,7 +16,6 @@ import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
 import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
-import {SLAS_PRIVATE_SECRET_PLACEHOLDER} from '../constant'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -26,7 +25,7 @@ interface AuthConfig extends ApiClientConfigParams {
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
     OCAPISessionsURL?: string
-    isSlasPrivate?: boolean
+    clientSecret?: string
 }
 
 interface JWTHeaders {
@@ -169,7 +168,7 @@ class Auth {
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private OCAPISessionsURL: string
-    private isSlasPrivate: boolean = false
+    private clientSecret: string
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
@@ -213,7 +212,7 @@ class Auth {
 
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
-        this.isSlasPrivate = config.isSlasPrivate || false
+        this.clientSecret = config.clientSecret || ''
     }
 
     get(name: AuthDataKeys) {
@@ -399,9 +398,7 @@ class Auth {
                             this.client,
                             {refreshToken},
                             {
-                                clientSecret: this.isSlasPrivate
-                                    ? SLAS_PRIVATE_SECRET_PLACEHOLDER
-                                    : undefined
+                                clientSecret: this.clientSecret ? this.clientSecret : undefined
                             }
                         ),
                     !!refreshTokenGuest
@@ -421,13 +418,13 @@ class Auth {
             }
         }
 
-        return this.isSlasPrivate
+        return this.clientSecret
             ? await this.queueRequest(
                   () =>
                       helpers.loginGuestUserPrivate(
                           this.client,
                           {redirectURI: this.redirectURI},
-                          {clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER}
+                          {clientSecret: this.clientSecret}
                       ),
                   true
               )
@@ -456,16 +453,13 @@ class Auth {
      *
      */
     async loginGuestUser() {
-        const redirectURI = this.redirectURI
-        const usid = this.get('usid')
-        const isGuest = true
-        return this.isSlasPrivate
+        return this.clientSecret
             ? await this.queueRequest(
                   () =>
                       helpers.loginGuestUserPrivate(
                           this.client,
                           {redirectURI: this.redirectURI},
-                          {clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER}
+                          {clientSecret: this.clientSecret}
                       ),
                   true
               )
@@ -501,7 +495,7 @@ class Auth {
         await this.loginRegisteredUserB2C({
             username: login,
             password,
-            clientSecret: this.isSlasPrivate ? SLAS_PRIVATE_SECRET_PLACEHOLDER : undefined
+            clientSecret: this.clientSecret ? this.clientSecret : undefined
         })
         return res
     }

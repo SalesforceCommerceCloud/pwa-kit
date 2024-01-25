@@ -62,7 +62,7 @@ const configSLASPrivate = {
     siteId: 'siteId',
     proxy: 'proxy',
     redirectURI: 'redirectURI',
-    isSlasPrivate: true
+    clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
 }
 
 describe('Auth', () => {
