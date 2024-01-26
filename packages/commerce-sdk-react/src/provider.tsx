@@ -32,6 +32,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     fetchedToken?: string
     OCAPISessionsURL?: string
     clientSecret?: string
+    silenceWarnings?: boolean
 }
 
 /**
@@ -96,7 +97,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         currency,
         fetchedToken,
         OCAPISessionsURL,
-        clientSecret
+        clientSecret,
+        silenceWarnings
     } = props
     const config = {
         proxy,
@@ -148,7 +150,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchOptions,
             fetchedToken,
             OCAPISessionsURL,
-            clientSecret
+            clientSecret,
+            silenceWarnings
         })
     }, [
         clientId,
@@ -160,7 +163,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchOptions,
         fetchedToken,
         OCAPISessionsURL,
-        clientSecret
+        clientSecret,
+        silenceWarnings
     ])
 
     // Initialize the session
@@ -178,7 +182,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 siteId,
                 shortCode,
                 locale,
-                currency
+                currency,
+                silenceWarnings
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>

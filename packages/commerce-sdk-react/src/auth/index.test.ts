@@ -8,7 +8,8 @@ import Auth, {AuthData} from './'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
-import {SLAS_PRIVATE_SECRET_PLACEHOLDER} from '../constant'
+
+export const SLAS_PRIVATE_SECRET_PLACEHOLDER = 'slas-private-secret-placeholder'
 
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {

@@ -16,6 +16,7 @@ import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
 import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
+import {slasSecretWarningMsg} from '../constant'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -26,6 +27,7 @@ interface AuthConfig extends ApiClientConfigParams {
     fetchedToken?: string
     OCAPISessionsURL?: string
     clientSecret?: string
+    silenceWarnings?: boolean
 }
 
 interface JWTHeaders {
@@ -169,6 +171,7 @@ class Auth {
     private fetchedToken: string
     private OCAPISessionsURL: string
     private clientSecret: string
+    private silenceWarnings: boolean
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
@@ -213,6 +216,7 @@ class Auth {
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
         this.clientSecret = config.clientSecret || ''
+        this.silenceWarnings = config.silenceWarnings || false
     }
 
     get(name: AuthDataKeys) {
@@ -359,6 +363,12 @@ class Auth {
         return await this.pendingToken
     }
 
+    logWarningOnClient = (silenceWarnings: boolean, msg: string) => {
+        if (onClient() && !silenceWarnings) {
+            console.warn(msg)
+        }
+    }
+
     /**
      * The ready function returns a promise that resolves with valid ShopperLogin
      * token response.
@@ -417,13 +427,13 @@ class Auth {
                 }
             }
         }
-
+        this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
         return this.clientSecret
             ? await this.queueRequest(
                   () =>
                       helpers.loginGuestUserPrivate(
                           this.client,
-                          {redirectURI: this.redirectURI},
+                          {},
                           {clientSecret: this.clientSecret}
                       ),
                   true
@@ -453,12 +463,15 @@ class Auth {
      *
      */
     async loginGuestUser() {
+        if (this.clientSecret) {
+            this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
+        }
         return this.clientSecret
             ? await this.queueRequest(
                   () =>
                       helpers.loginGuestUserPrivate(
                           this.client,
-                          {redirectURI: this.redirectURI},
+                          {},
                           {clientSecret: this.clientSecret}
                       ),
                   true
@@ -505,6 +518,9 @@ class Auth {
      *
      */
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
+        if (this.clientSecret) {
+            this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
+        }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const isGuest = false

@@ -14,4 +14,5 @@ export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
     'https://runtime-admin-preview.mobify-storefront.com'
 ])
 
-export const SLAS_PRIVATE_SECRET_PLACEHOLDER = 'slas-private-secret-placeholder'
+export const slasSecretWarningMsg =
+    'This function can run on client-side. You are potentially exposing SLAS secret on browser. Make sure to keep it safe and secure!'
