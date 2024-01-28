@@ -1,5 +1,5 @@
-## v2.3.0-dev (Nov 8, 2023)
-<!-- RELEASE TASK: Is node 20 available on MRT? Delete the line saying it isn't! -->
+## v2.4.0-dev (Jan 22, 2024)
+## v2.3.0 (Nov 8, 2023)
 
 ### Accessibility improvements
 

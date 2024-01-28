@@ -1,4 +1,5 @@
-## v1.3.0-dev (Dec 08, 2023)
+## v1.4.0-dev (Jan 22, 2024)
+## v1.3.0 (Jan 19, 2024)
 
 - Add support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
 
