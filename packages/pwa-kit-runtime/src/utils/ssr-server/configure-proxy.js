@@ -129,6 +129,25 @@ export const configureProxy = ({
                 ([key, value]) => proxyRequest.setHeader(key, value)
             )
 
+            // Very specific for now
+            // TODO - generalize this
+            // Note - we probably want to exclude /oauth2/login from this since that includes an
+            // authorization header with the user's credentials
+            if (proxyPath.includes('/mobify/proxy/api') && url.includes('/oauth2/token')) {
+                console.log('In special proxy')
+                const authHeader = newHeaders['Authorization']
+                if (authHeader) {
+                    const authHeaderValue = authHeader.replace('Basic ','')
+                    const decodedValue = atob(authHeaderValue)
+                    console.log(`${authHeader} ${decodedValue}`)
+                    const [id, secret] = decodedValue.split(':')
+                    if (secret.includes(PLACEHOLDER)) {
+                        const encodedValue = btoa(`${id}:${process.env.client_secret}`)
+                        proxyRequest.setHeader('Authorization', `Basic ${encodedValue}`)
+                    }
+                }
+            }
+
             // Handle deletion of headers.
             // Iterate over the keys of incomingRequest.headers - for every
             // key, if the value is not present in newHeaders, we remove
