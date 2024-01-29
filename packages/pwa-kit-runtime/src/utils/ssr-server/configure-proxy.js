@@ -12,6 +12,8 @@ import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
+const PLACEHOLDER = '_PLACEHOLERPROXY'
+
 /**
  * This path matching RE matches on /mobify/proxy and then skips one path
  * element. For example, /mobify/proxy/heffalump/woozle would be converted to
@@ -135,7 +137,12 @@ export const configureProxy = ({
             // authorization header with the user's credentials
             if (proxyPath.includes('/mobify/proxy/api') && url.includes('/oauth2/token')) {
                 console.log('In special proxy')
-                const authHeader = newHeaders['Authorization']
+                Object.entries(newHeaders).forEach(
+                    // setHeader always replaces any current value.
+                    ([key, value]) => console.log(`${key} ${value}`)
+                )
+                const authHeader = newHeaders['authorization']
+                console.log(authHeader)
                 if (authHeader) {
                     const authHeaderValue = authHeader.replace('Basic ','')
                     const decodedValue = atob(authHeaderValue)
