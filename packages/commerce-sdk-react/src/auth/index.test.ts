@@ -9,6 +9,8 @@ import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 
+export const SLAS_PRIVATE_SECRET_PLACEHOLDER = 'slas-private-secret-placeholder'
+
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
     const originalModule = jest.requireActual('./storage')
@@ -28,6 +30,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
         helpers: {
             refreshAccessToken: jest.fn().mockResolvedValue(''),
             loginGuestUser: jest.fn().mockResolvedValue(''),
+            loginGuestUserPrivate: jest.fn().mockResolvedValue(''),
             loginRegisteredUserB2C: jest.fn().mockResolvedValue(''),
             logout: jest.fn().mockResolvedValue('')
         }
@@ -51,6 +54,16 @@ const config = {
     siteId: 'siteId',
     proxy: 'proxy',
     redirectURI: 'redirectURI'
+}
+
+const configSLASPrivate = {
+    clientId: 'clientId',
+    organizationId: 'organizationId',
+    shortCode: 'shortCode',
+    siteId: 'siteId',
+    proxy: 'proxy',
+    redirectURI: 'redirectURI',
+    clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
 }
 
 describe('Auth', () => {
@@ -333,21 +346,90 @@ describe('Auth', () => {
         await auth.ready()
         expect(helpers.refreshAccessToken).toHaveBeenCalled()
     })
+
+    test('ready - use refresh token when access token is expired with slas private client', async () => {
+        const auth = new Auth(configSLASPrivate)
+        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
+        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
+
+        // To simulate real-world scenario, let's first test with a good valid token
+        // @ts-expect-error private method
+        auth.set('refresh_token_guest_copy', 'refresh_token_guest') // Simulates SFRA auth state has NOT changed and token is valid.
+
+        const data: StoredAuthData = {
+            refresh_token_guest: 'refresh_token_guest',
+            access_token: JWTNotExpired,
+            customer_id: 'customer_id',
+            enc_user_id: 'enc_user_id',
+            expires_in: 1800,
+            id_token: 'id_token',
+            idp_access_token: 'idp_access_token',
+            token_type: 'token_type',
+            usid: 'usid',
+            customer_type: 'guest',
+            refresh_token_expires_in: 30 * 24 * 3600
+        }
+
+        Object.keys(data).forEach((key) => {
+            // @ts-expect-error private method
+            auth.set(key, data[key])
+        })
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
+
+        // And then now test with an _expired_ token
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).toHaveBeenCalled()
+        const funcArg = (helpers.refreshAccessToken as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER})
+    })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
 
         await auth.ready()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
+
     test('loginGuestUser', async () => {
         const auth = new Auth(config)
         await auth.loginGuestUser()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
+
+    test('loginGuestUser with slas private', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
+        const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER})
+    })
+
     test('loginRegisteredUserB2C', async () => {
         const auth = new Auth(config)
         await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
         expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
+        const functionArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][1]
+        expect(functionArg).toMatchObject({username: 'test', password: 'test'})
+    })
+
+    test('loginRegisteredUserB2C with slas private', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.loginRegisteredUserB2C({
+            username: 'test',
+            password: 'test',
+            clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
+        })
+        expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
+        const functionArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][1]
+        expect(functionArg).toMatchObject({
+            username: 'test',
+            password: 'test',
+            clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
+        })
     })
     test('logout', async () => {
         const auth = new Auth(config)
