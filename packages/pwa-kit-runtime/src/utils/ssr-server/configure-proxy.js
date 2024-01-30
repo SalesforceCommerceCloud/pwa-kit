@@ -28,11 +28,23 @@ const headersToCheck = ['authorization']
  */
 const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
 
-function decodeBase64WithNormalText(inputString) {
-    console.log('Inside decode')
+function replacePlaceHolders2(inputString) {
+    var val = inputString
+    if (val.includes(PLACEHOLDER)){
+        // Get env var name
+        const envVar = val.split(new RegExp(PLACEHOLDER))[1]
+        console.log(`envVar ${envVar}`)
 
-    var segments = inputString.split(" ")
+        val = val.replace(PLACEHOLDER+envVar,process.env[envVar])
+        console.log(`after replace ${val}`)
+    }
+    return val
+}
 
+function replacePlaceholders(headerValue) {
+    console.log('Inside placeholder replacement')
+
+    var segments = headerValue.split(" ")
     console.log(`segments ${segments}`)
 
     var decodedWithNormalText = [];
@@ -41,9 +53,12 @@ function decodeBase64WithNormalText(inputString) {
         var matches = BASE64_PATTERN.test(segment)
         if (matches) {
             var decoded = atob(segment);
-            decodedWithNormalText.push(decoded)
+            var replacementString = replacePlaceHolders2(decoded)
+            var encoded = btoa(replacementString)
+            decodedWithNormalText.push(encoded)
         } else {
-            decodedWithNormalText.push(segment)
+            var replacementString = replacePlaceHolders2(segment)
+            decodedWithNormalText.push(replacementString)
         }
     })
 
@@ -173,19 +188,8 @@ export const configureProxy = ({
                         console.log(`${key} ${value}`)
 
                         if (headersToCheck.includes(key)) {
-                            let val = decodeBase64WithNormalText(value)
-                            console.log(`before replace ${val}`)
-
-                            if (val.includes(PLACEHOLDER)){
-                                // Get env var name
-                                const envVar = val.split(new RegExp(PLACEHOLDER))[1]
-                                console.log(`envVar ${envVar}`)
-
-                                val = val.replace(PLACEHOLDER+envVar,process.env[envVar])
-                                console.log(`after replace ${val}`)
-                                // const encodedValue = btoa(`${id}:${process.env[envVar]}`)
-                                // proxyRequest.setHeader(key, `Basic ${encodedValue}`)
-                            }
+                            let val = replacePlaceholders(value)
+                            proxyRequest.setHeader(key, val)
                         }
                     }
                 )
