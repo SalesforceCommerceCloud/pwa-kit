@@ -363,8 +363,8 @@ class Auth {
         return await this.pendingToken
     }
 
-    logWarningOnClient = (silenceWarnings: boolean, msg: string) => {
-        if (onClient() && !silenceWarnings) {
+    logWarning = (msg: string) => {
+        if (!this.silenceWarnings) {
             console.warn(msg)
         }
     }
@@ -427,23 +427,7 @@ class Auth {
                 }
             }
         }
-        if (this.clientSecret) {
-            this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
-        }
-        return this.clientSecret
-            ? await this.queueRequest(
-                  () =>
-                      helpers.loginGuestUserPrivate(
-                          this.client,
-                          {},
-                          {clientSecret: this.clientSecret}
-                      ),
-                  true
-              )
-            : await this.queueRequest(
-                  () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
-                  true
-              )
+        return this.loginGuestUser()
     }
 
     /**
@@ -465,38 +449,16 @@ class Auth {
      *
      */
     async loginGuestUser() {
-        if (this.clientSecret) {
-            this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
+        if (this.clientSecret && onClient()) {
+            this.logWarning(slasSecretWarningMsg)
         }
-        const loginMethod = this.clientSecret ? 'loginGuestUserPrivate' : 'loginGuestUser'
-        type loginPublicType = [
-            ShopperLogin<ApiClientConfigParams>,
-            {redirectURI: string; usid?: string},
-        ]
-        type loginPrivateType = [
-            ShopperLogin<ApiClientConfigParams>,
-            {usid?: string},
-            {clientSecret: string;}
-        ]
-        const restArgs: loginPrivateType | loginPublicType = this.clientSecret
-            ? [this.client, {}, {clientSecret: this.clientSecret}]
-            : [this.client, {redirectURI: this.redirectURI}]
+        const guestPrivateArgs = [this.client, {}, {clientSecret: this.clientSecret}] as const
+        const guestPublicArgs = [this.client, {redirectURI: this.redirectURI}] as const
+        const callback = this.clientSecret
+            ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
+            : () => helpers.loginGuestUser(...guestPublicArgs)
 
-        return await this.queueRequest(() => helpers[loginMethod](...restArgs), true)
-        // return this.clientSecret
-        //     ? await this.queueRequest(
-        //           () =>
-        //               helpers.loginGuestUserPrivate(
-        //                   this.client,
-        //                   {},
-        //                   {clientSecret: this.clientSecret}
-        //               ),
-        //           true
-        //       )
-        //     : await this.queueRequest(
-        //           () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
-        //           true
-        //       )
+        return await this.queueRequest(callback, true)
     }
 
     /**
@@ -535,8 +497,8 @@ class Auth {
      *
      */
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
-        if (this.clientSecret) {
-            this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
+        if (this.clientSecret && onClient()) {
+            this.logWarning(slasSecretWarningMsg)
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
