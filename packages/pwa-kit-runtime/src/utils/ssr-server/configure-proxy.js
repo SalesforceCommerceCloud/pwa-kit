@@ -12,11 +12,21 @@ import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
-const PLACEHOLDER = '__PLACEHOLDER-PROXY-'
-const BASE64_PATTERN = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
 
-// make this configurable!
+// TODO - make this configurable!
 const headersToCheck = ['authorization']
+
+/**
+ * This placeholder is used to inject secrets to requests without exposing them to the client.
+ *
+ * Placeholders take the form of __PLACEHOLDER-PROXY-A-SERVER-ONLY-PROPERTY
+ *
+ * When a request includes this placeholder in the header, we replace the placeholder
+ * with the value stored in A-SERVER-ONLY-PROPERTY
+ *
+ * See the replacePlaceholders function for more information.
+ */
+const PLACEHOLDER = '__PLACEHOLDER-PROXY-'
 
 /**
  * This path matching RE matches on /mobify/proxy and then skips one path
@@ -28,13 +38,15 @@ const headersToCheck = ['authorization']
  */
 const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
 
-function replacePlaceHolders2(inputString) {
+function replacePlaceHolderWithValue(inputString) {
     var val = inputString
     if (val.includes(PLACEHOLDER)){
         // Get env var name
         const envVar = val.split(new RegExp(PLACEHOLDER))[1]
         console.log(`envVar ${envVar}`)
 
+        // TODO - environment variables are not available on the edge
+        // The actual secret values need to be read from somewhere else
         val = val.replace(PLACEHOLDER+envVar,process.env[envVar])
         console.log(`after replace ${val}`)
     }
@@ -43,26 +55,24 @@ function replacePlaceHolders2(inputString) {
 
 function replacePlaceholders(headerValue) {
     console.log('Inside placeholder replacement')
+    const BASE64_PATTERN = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
 
     var segments = headerValue.split(" ")
     console.log(`segments ${segments}`)
 
     var decodedWithNormalText = [];
-
     segments.map((segment) => {
-        var matches = BASE64_PATTERN.test(segment)
-        if (matches) {
+        var isBase64EncodedString = BASE64_PATTERN.test(segment)
+        if (isBase64EncodedString) {
             var decoded = atob(segment);
-            var replacementString = replacePlaceHolders2(decoded)
+            var replacementString = replacePlaceHolderWithValue(decoded)
             var encoded = btoa(replacementString)
             decodedWithNormalText.push(encoded)
         } else {
-            var replacementString = replacePlaceHolders2(segment)
+            var replacementString = replacePlaceHolderWithValue(segment)
             decodedWithNormalText.push(replacementString)
         }
     })
-
-    console.log(`decoded with text ${decodedWithNormalText}`)
 
     var joinedString = decodedWithNormalText.join(' ');
     console.log(`joined string ${joinedString}`)
