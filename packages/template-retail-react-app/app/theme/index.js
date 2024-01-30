@@ -51,7 +51,6 @@ import SocialIcons from '@salesforce/retail-react-app/app/theme/components/proje
 import SwatchGroup from '@salesforce/retail-react-app/app/theme/components/project/swatch-group'
 import ImageGallery from '@salesforce/retail-react-app/app/theme/components/project/image-gallery'
 
-// import '@fontsource/raleway'
 import '@fontsource/raleway/400-italic.css'
 
 // Please refer to the Chakra-Ui theme customization docs found

@@ -51,7 +51,6 @@ const Document = (props) => {
                     content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
                 />
                 <meta name="format-detection" content="telephone=no" />
-                {/* <link rel="stylesheet" type="text/css" href={getAssetUrl('static/styles.css')} /> */}
                 {head.map((child) => child)}
             </head>
             <body {...bodyAttributes}>

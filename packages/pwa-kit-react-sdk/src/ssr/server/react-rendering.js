@@ -189,6 +189,10 @@ export const render = async (req, res, next) => {
 
     appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
 
+
+    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
+    const inlineStyles = await extractor.getInlineStyleElements()
+    // console.log('inlineStyles: ', inlineStyles)
     // Step 4 - Render the App
     let renderResult
     try {
@@ -201,7 +205,8 @@ export const render = async (req, res, next) => {
             res,
             location,
             config,
-            appJSX
+            appJSX,
+            inlineStyles
         })
     } catch (e) {
         // This is an unrecoverable error.
@@ -258,7 +263,7 @@ const renderToString = (jsx, extractor) =>
     ReactDOMServer.renderToString(extractor.collectChunks(jsx))
 
 const renderApp = (args) => {
-    const {req, res, appStateError, appJSX, appState, config} = args
+    const {req, res, appStateError, appJSX, appState, config, inlineStyles} = args
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
@@ -343,22 +348,11 @@ const renderApp = (args) => {
     const helmetHeadTags = VALID_TAG_NAMES.map(
         (tag) => helmet[tag] && helmet[tag].toComponent()
     ).filter((tag) => tag)
-
-    // NOTE: What happens with large style files, should we be using a file stream instead.
-    const css = fs.readFileSync(`${__dirname}/static/style.css`, 'utf8').replace(/url\((static\/fonts\/)/g, '/mobify/bundle/development/static/fonts')
-    // const css = runtime.getCss()
-    const inlineStyle = React.createElement(
-        'style', 
-        {
-            dangerouslySetInnerHTML: { __html: css },
-            key: 'inline_css'
-        }
-    )
     
+    console.log('inlineStyles: ', inlineStyles)
     const html = ReactDOMServer.renderToString(
         <Document
-            head={[...helmetHeadTags, inlineStyle]}
-            // head={[...helmetHeadTags]}
+            head={[...helmetHeadTags, ...inlineStyles]}
             html={appHtml}
             afterBodyStart={svgs}
             beforeBodyEnd={scripts}

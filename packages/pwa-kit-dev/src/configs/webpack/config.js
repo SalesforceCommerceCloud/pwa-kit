@@ -184,8 +184,6 @@ const baseConfig = (target) => {
                 output: {
                     publicPath: '',
                     path: buildDir
-                    // ,
-                    // assetModuleFilename: 'static/[hash][ext][query]'
                 },
                 resolve: {
                     ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
@@ -274,26 +272,9 @@ const baseConfig = (target) => {
                                 loader: findDepInStack('source-map-loader')
                             }
                         },
-                        // {
-                        //     test: /\.s[ac]ss$/i,
-                        //     use: [
-                        //         {
-                        //             loader: findDepInStack('style-loader')
-                        //         },
-                        //         {
-                        //             loader: findDepInStack('css-loader')
-                        //         },
-                        //         {
-                        //             loader: findDepInStack('sass-loader')
-                        //         }
-                        //     ]
-                        // },
                         {
-                            test: /\.css$/i,
+                            test: /\.(sa|sc|c)ss$/,
                             use: [
-                                // {
-                                //     loader: findDepInStack('style-loader')
-                                // }, 
                                 {
                                     loader: MiniCssExtractPlugin.loader
                                 },
@@ -304,19 +285,9 @@ const baseConfig = (target) => {
                         },
                         {
                           test: /\.(woff|woff2)$/i,
-                          // More information here https://webpack.js.org/guides/asset-modules/
-                          type: "asset/resource",
+                          type: 'asset/resource',
                           generator: {
                             filename: 'static/fonts/[hash][ext][query]'
-                            // filename: (pathData) => {
-                            //     const {module} = pathData
-                            //     console.log('module._sourceTypes: ', module._sourceTypes, !!module._sourceTypes)
-                            //     // const {hash, ext, query} = pathData
-                            //     // return `static/fonts/${hash}${ext}${query}`
-                                
-
-                            //     return !!module._sourceTypes ? 'static/fonts/test.woff' : 'not.woff'
-                            // }
                           }
                         }
                     ].filter(Boolean)
