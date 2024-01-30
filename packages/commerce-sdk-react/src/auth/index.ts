@@ -427,7 +427,9 @@ class Auth {
                 }
             }
         }
-        this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
+        if (this.clientSecret) {
+            this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
+        }
         return this.clientSecret
             ? await this.queueRequest(
                   () =>
@@ -466,20 +468,35 @@ class Auth {
         if (this.clientSecret) {
             this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
         }
-        return this.clientSecret
-            ? await this.queueRequest(
-                  () =>
-                      helpers.loginGuestUserPrivate(
-                          this.client,
-                          {},
-                          {clientSecret: this.clientSecret}
-                      ),
-                  true
-              )
-            : await this.queueRequest(
-                  () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
-                  true
-              )
+        const loginMethod = this.clientSecret ? 'loginGuestUserPrivate' : 'loginGuestUser'
+        type loginPublicType = [
+            ShopperLogin<ApiClientConfigParams>,
+            {redirectURI: string; usid?: string},
+        ]
+        type loginPrivateType = [
+            ShopperLogin<ApiClientConfigParams>,
+            {usid?: string},
+            {clientSecret: string;}
+        ]
+        const restArgs: loginPrivateType | loginPublicType = this.clientSecret
+            ? [this.client, {}, {clientSecret: this.clientSecret}]
+            : [this.client, {redirectURI: this.redirectURI}]
+
+        return await this.queueRequest(() => helpers[loginMethod](...restArgs), true)
+        // return this.clientSecret
+        //     ? await this.queueRequest(
+        //           () =>
+        //               helpers.loginGuestUserPrivate(
+        //                   this.client,
+        //                   {},
+        //                   {clientSecret: this.clientSecret}
+        //               ),
+        //           true
+        //       )
+        //     : await this.queueRequest(
+        //           () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
+        //           true
+        //       )
     }
 
     /**

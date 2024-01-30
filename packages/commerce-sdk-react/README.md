@@ -118,11 +118,8 @@ You can choose to use either public or private slas to login. By default, public
 #### How private SLAS works
 This section assumes you read and understand how private SLAS flow works
 
-To enable private slas flow, you need to pass a PLACEHOLDER value into CommerceApiProvider and keep your **real** value secured and safe.
-Since commerce-sdk-react run isomorphically, you should not pass **real** secret into the provider because it will be exposed on client-side.
-When clientSecret is defined, any login request will include an authorization header that contains a Base64 encoded version of the following string: <clientID>:<clientSecret> for token retrival/refresh.  
-
-In your project, you need to establish a method (e.g proxy handler) to replace the placeholder with your secured value for any login outgoing requests.  
+To enable private slas flow, you need to pass your secret into the CommercerProvider via clientSecret prop.
+**Note** You should only use private slas if you know you can secure your secret since commercer-sdk-react runs isomorphically.
 
 ```js
 // app/components/_app-config/index.jsx
@@ -141,7 +138,7 @@ const AppConfig = ({children}) => {
             shortCode="12345678"
             locale="en-US"
             currency="USD"
-            clientSecret="__PROXY_PLACEHOLDER-SLAS_PRIVATE_SECRET"
+            clientSecret="<your-slas-private-secret>"
         >
             {children}
         </CommerceApiProvider>

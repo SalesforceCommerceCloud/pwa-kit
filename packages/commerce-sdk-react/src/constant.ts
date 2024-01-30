@@ -15,4 +15,4 @@ export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
 ])
 
 export const slasSecretWarningMsg =
-    'This function can run on client-side. You are potentially exposing SLAS secret on browser. Make sure to keep it safe and secure!'
+    'You are potentially exposing SLAS secret on browser. Make sure to keep it safe and secure!'
