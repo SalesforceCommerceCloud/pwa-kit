@@ -13,6 +13,10 @@ import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
 const PLACEHOLDER = '__PLACEHOLDER-PROXY-'
+const BASE64_PATTERN = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+
+// make this configurable!
+const headersToCheck = ['authorization']
 
 /**
  * This path matching RE matches on /mobify/proxy and then skips one path
@@ -23,6 +27,33 @@ const PLACEHOLDER = '__PLACEHOLDER-PROXY-'
  * @type {RegExp}
  */
 const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
+
+function decodeBase64WithNormalText(inputString) {
+    console.log('Inside decode')
+
+    var segments = inputString.split(" ")
+
+    console.log(`segments ${segments}`)
+
+    var decodedWithNormalText = [];
+
+    segments.map((segment) => {
+        var matches = BASE64_PATTERN.test(segment)
+        if (matches) {
+            var decoded = atob(segment);
+            decodedWithNormalText.push(decoded)
+        } else {
+            decodedWithNormalText.push(segment)
+        }
+    })
+
+    console.log(`decoded with text ${decodedWithNormalText}`)
+
+    var joinedString = decodedWithNormalText.join(' ');
+    console.log(`joined string ${joinedString}`)
+
+    return joinedString
+}
 
 /**
  * Configure proxying for a path.
@@ -140,27 +171,21 @@ export const configureProxy = ({
                 Object.entries(newHeaders).forEach(
                     ([key, value]) => {
                         console.log(`${key} ${value}`)
-                        let val = value
 
-                        // Specific to the Authorization header
-                        // Remove 'Basic ' and 'Bearer ' from header.
-                        if (key === 'authorization') {
-                            val = value.replace('Basic ','').replace('Bearer ', '')
-                        }
+                        if (headersToCheck.includes(key)) {
+                            let val = decodeBase64WithNormalText(value)
+                            console.log(`before replace ${val}`)
 
-                        // Check if value is base64 encoded. Decode if necessary
-                        var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-                        if (base64regex.test(val)){
-                            val = atob(val)
-                        }
-                        console.log(`${val}`)
+                            if (val.includes(PLACEHOLDER)){
+                                // Get env var name
+                                const envVar = val.split(new RegExp(PLACEHOLDER))[1]
+                                console.log(`envVar ${envVar}`)
 
-                        if (val.includes(PLACEHOLDER)){
-                            // Logic for handling placeholder. This is specific to the use case
-                            // In this case, SLAS Private Client
-                            const [id, secret] = val.split(':')
-                            const encodedValue = btoa(`${id}:${process.env.client_secret}`)
-                            proxyRequest.setHeader(key, `Basic ${encodedValue}`)
+                                val = val.replace(PLACEHOLDER+envVar,process.env[envVar])
+                                console.log(`after replace ${val}`)
+                                // const encodedValue = btoa(`${id}:${process.env[envVar]}`)
+                                // proxyRequest.setHeader(key, `Basic ${encodedValue}`)
+                            }
                         }
                     }
                 )
