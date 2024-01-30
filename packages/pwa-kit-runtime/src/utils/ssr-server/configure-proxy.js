@@ -12,7 +12,7 @@ import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
-const PLACEHOLDER = '_PLACEHOLERPROXY'
+const PLACEHOLDER = '__PLACEHOLDER-PROXY-'
 
 /**
  * This path matching RE matches on /mobify/proxy and then skips one path
@@ -138,21 +138,32 @@ export const configureProxy = ({
             if (proxyPath.includes('/mobify/proxy/api') && url.includes('/oauth2/token')) {
                 console.log('In special proxy')
                 Object.entries(newHeaders).forEach(
-                    // setHeader always replaces any current value.
-                    ([key, value]) => console.log(`${key} ${value}`)
-                )
-                const authHeader = newHeaders['authorization']
-                console.log(authHeader)
-                if (authHeader) {
-                    const authHeaderValue = authHeader.replace('Basic ','')
-                    const decodedValue = atob(authHeaderValue)
-                    console.log(`${authHeader} ${decodedValue}`)
-                    const [id, secret] = decodedValue.split(':')
-                    if (secret.includes(PLACEHOLDER)) {
-                        const encodedValue = btoa(`${id}:${process.env.client_secret}`)
-                        proxyRequest.setHeader('Authorization', `Basic ${encodedValue}`)
+                    ([key, value]) => {
+                        console.log(`${key} ${value}`)
+                        let val = value
+
+                        // Specific to the Authorization header
+                        // Remove 'Basic ' and 'Bearer ' from header.
+                        if (key === 'authorization') {
+                            val = value.replace('Basic ','').replace('Bearer ', '')
+                        }
+
+                        // Check if value is base64 encoded. Decode if necessary
+                        var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+                        if (base64regex.test(val)){
+                            val = atob(val)
+                        }
+                        console.log(`${val}`)
+
+                        if (val.includes(PLACEHOLDER)){
+                            // Logic for handling placeholder. This is specific to the use case
+                            // In this case, SLAS Private Client
+                            const [id, secret] = val.split(':')
+                            const encodedValue = btoa(`${id}:${process.env.client_secret}`)
+                            proxyRequest.setHeader(key, `Basic ${encodedValue}`)
+                        }
                     }
-                }
+                )
             }
 
             // Handle deletion of headers.
