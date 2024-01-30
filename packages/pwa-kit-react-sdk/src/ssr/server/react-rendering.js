@@ -10,6 +10,7 @@
  */
 
 import path from 'path'
+import fs from 'fs'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import {Helmet} from 'react-helmet'
@@ -343,9 +344,21 @@ const renderApp = (args) => {
         (tag) => helmet[tag] && helmet[tag].toComponent()
     ).filter((tag) => tag)
 
+    // NOTE: What happens with large style files, should we be using a file stream instead.
+    const css = fs.readFileSync(`${__dirname}/static/style.css`, 'utf8').replace(/url\((static\/fonts\/)/g, '/mobify/bundle/development/static/fonts')
+    // const css = runtime.getCss()
+    const inlineStyle = React.createElement(
+        'style', 
+        {
+            dangerouslySetInnerHTML: { __html: css },
+            key: 'inline_css'
+        }
+    )
+    
     const html = ReactDOMServer.renderToString(
         <Document
-            head={[...helmetHeadTags]}
+            head={[...helmetHeadTags, inlineStyle]}
+            // head={[...helmetHeadTags]}
             html={appHtml}
             afterBodyStart={svgs}
             beforeBodyEnd={scripts}

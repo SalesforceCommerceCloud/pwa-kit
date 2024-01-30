@@ -23,6 +23,8 @@ import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
@@ -182,6 +184,8 @@ const baseConfig = (target) => {
                 output: {
                     publicPath: '',
                     path: buildDir
+                    // ,
+                    // assetModuleFilename: 'static/[hash][ext][query]'
                 },
                 resolve: {
                     ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
@@ -238,7 +242,11 @@ const baseConfig = (target) => {
                     sdkReplacementPlugin(),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
-                    target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
+                    target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
+
+                    new MiniCssExtractPlugin({
+                        filename: 'static/style.css'
+                    })
                 ].filter(Boolean),
 
                 module: {
@@ -265,6 +273,51 @@ const baseConfig = (target) => {
                             use: {
                                 loader: findDepInStack('source-map-loader')
                             }
+                        },
+                        // {
+                        //     test: /\.s[ac]ss$/i,
+                        //     use: [
+                        //         {
+                        //             loader: findDepInStack('style-loader')
+                        //         },
+                        //         {
+                        //             loader: findDepInStack('css-loader')
+                        //         },
+                        //         {
+                        //             loader: findDepInStack('sass-loader')
+                        //         }
+                        //     ]
+                        // },
+                        {
+                            test: /\.css$/i,
+                            use: [
+                                // {
+                                //     loader: findDepInStack('style-loader')
+                                // }, 
+                                {
+                                    loader: MiniCssExtractPlugin.loader
+                                },
+                                {
+                                    loader: findDepInStack('css-loader')
+                                }
+                            ],
+                        },
+                        {
+                          test: /\.(woff|woff2)$/i,
+                          // More information here https://webpack.js.org/guides/asset-modules/
+                          type: "asset/resource",
+                          generator: {
+                            filename: 'static/fonts/[hash][ext][query]'
+                            // filename: (pathData) => {
+                            //     const {module} = pathData
+                            //     console.log('module._sourceTypes: ', module._sourceTypes, !!module._sourceTypes)
+                            //     // const {hash, ext, query} = pathData
+                            //     // return `static/fonts/${hash}${ext}${query}`
+                                
+
+                            //     return !!module._sourceTypes ? 'static/fonts/test.woff' : 'not.woff'
+                            // }
+                          }
                         }
                     ].filter(Boolean)
                 }

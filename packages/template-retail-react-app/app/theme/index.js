@@ -51,10 +51,16 @@ import SocialIcons from '@salesforce/retail-react-app/app/theme/components/proje
 import SwatchGroup from '@salesforce/retail-react-app/app/theme/components/project/swatch-group'
 import ImageGallery from '@salesforce/retail-react-app/app/theme/components/project/image-gallery'
 
+// import '@fontsource/raleway'
+import '@fontsource/raleway/400-italic.css'
+
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
 // more about extending and overriding themes for your project.
 export const overrides = {
+    fonts: {
+        body: `'Raleway', sans-serif`,
+    },
     styles,
     layerStyles,
     colors,
