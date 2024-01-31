@@ -16,7 +16,7 @@ import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
 import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
-import {slasSecretWarningMsg} from '../constant'
+import {SLAS_SECRET_WARNING_MSG} from '../constant'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -408,7 +408,7 @@ class Auth {
                             this.client,
                             {refreshToken},
                             {
-                                clientSecret: this.clientSecret ? this.clientSecret : undefined
+                                clientSecret: this.clientSecret
                             }
                         ),
                     !!refreshTokenGuest
@@ -450,7 +450,7 @@ class Auth {
      */
     async loginGuestUser() {
         if (this.clientSecret && onClient()) {
-            this.logWarning(slasSecretWarningMsg)
+            this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
         const isGuest = true
@@ -492,7 +492,7 @@ class Auth {
         await this.loginRegisteredUserB2C({
             username: login,
             password,
-            clientSecret: this.clientSecret ? this.clientSecret : undefined
+            clientSecret: this.clientSecret
         })
         return res
     }
@@ -503,7 +503,7 @@ class Auth {
      */
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
         if (this.clientSecret && onClient()) {
-            this.logWarning(slasSecretWarningMsg)
+            this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
