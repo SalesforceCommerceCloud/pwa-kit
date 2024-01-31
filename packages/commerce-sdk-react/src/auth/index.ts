@@ -452,13 +452,18 @@ class Auth {
         if (this.clientSecret && onClient()) {
             this.logWarning(slasSecretWarningMsg)
         }
+        const usid = this.get('usid')
+        const isGuest = true
         const guestPrivateArgs = [this.client, {}, {clientSecret: this.clientSecret}] as const
-        const guestPublicArgs = [this.client, {redirectURI: this.redirectURI}] as const
+        const guestPublicArgs = [
+            this.client,
+            {redirectURI: this.redirectURI, ...(usid && {usid})}
+        ] as const
         const callback = this.clientSecret
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
             : () => helpers.loginGuestUser(...guestPublicArgs)
 
-        return await this.queueRequest(callback, true)
+        return await this.queueRequest(callback, isGuest)
     }
 
     /**
