@@ -192,7 +192,7 @@ export const render = async (req, res, next) => {
 
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
     const inlineStyles = await extractor.getInlineStyleElements()
-    // console.log('inlineStyles: ', inlineStyles)
+
     // Step 4 - Render the App
     let renderResult
     try {
@@ -349,7 +349,7 @@ const renderApp = (args) => {
         (tag) => helmet[tag] && helmet[tag].toComponent()
     ).filter((tag) => tag)
     
-    console.log('inlineStyles: ', inlineStyles)
+
     const html = ReactDOMServer.renderToString(
         <Document
             head={[...helmetHeadTags, ...inlineStyles]}
