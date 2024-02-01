@@ -116,7 +116,7 @@ Commerce-react-sdk supports both public and private flow of the [Authorization f
 You can choose to use either public or private slas to login. By default, public flow is enabled.
 
 #### How private SLAS works
-This section assumes you read and understand how private SLAS flow works
+This section assumes you read and understand how [private SLAS](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.html) flow works
 
 To enable private slas flow, you need to pass your secret into the CommercerProvider via clientSecret prop.
 **Note** You should only use private slas if you know you can secure your secret since commercer-sdk-react runs isomorphically.
@@ -145,7 +145,33 @@ const AppConfig = ({children}) => {
     )
 }
 ```
+#### Disable slas private warnings 
+By default, a warning as below will be displayed on client side to remind developers to always keep their secret safe and secured.
+```js
+'You are potentially exposing SLAS secret on browser. Make sure to keep it safe and secure!'
+```
+You can disable this warning by using CommerceProvider prop `silenceWarnings`
 
+```js
+const AppConfig = ({children}) => {
+    return (
+        <CommerceApiProvider
+            clientId="12345678-1234-1234-1234-123412341234"
+            organizationId="f_ecom_aaaa_001"
+            proxy="localhost:3000/mobify/proxy/api"
+            redirectURI="localhost:3000/callback"
+            siteId="RefArch"
+            shortCode="12345678"
+            locale="en-US"
+            currency="USD"
+            clientSecret="<your-slas-private-secret>"
+            silenceWarnings={true}
+        >
+            {children}
+        </CommerceApiProvider>
+    )
+}
+```
 
 ### Shopper Session Initialization
 
@@ -177,6 +203,7 @@ const Example = () => {
 ### Externally Managed Shopper Authentication
 
 You have the option of handling shopper authentication externally, by providing a SLAS access token. This is useful if you plan on using this library in an application where the authentication mechanism is different.
+
 
 ```jsx
 const MyComponent = ({children}) => {
