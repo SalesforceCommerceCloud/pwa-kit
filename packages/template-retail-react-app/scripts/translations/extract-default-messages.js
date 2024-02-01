@@ -60,8 +60,8 @@ function extract(locale) {
             .filter((file) => fs.existsSync(file))
         const extractCommand = [
             'formatjs extract',
-            '"./node_modules/${extendsPkg}/app/**/*.{js,jsx,ts,tsx}"',
-            '"${overridesDir}/app/**/*.{js,jsx,ts,tsx}"',
+            `"./node_modules/${extendsPkg}/app/**/*.{js,jsx,ts,tsx}"`,
+            `"${overridesDir}/app/**/*.{js,jsx,ts,tsx}"`,
             `--out-file translations/${locale}.json`,
             '--id-interpolation-pattern [sha512:contenthash:base64:6]',
             '--ignore',
