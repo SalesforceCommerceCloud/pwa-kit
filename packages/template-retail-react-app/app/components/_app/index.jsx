@@ -86,14 +86,22 @@ on client side to reduce SSR page size.
 */
 const useLazyLoadCategories = () => {
     const itemsKey = 'categories'
+    const [ready, setReady] = useState(false)
 
+    useEffect(() => {
+        setTimeout(() => {
+            setReady(true) 
+        }, 15000)
+    }, [])
     const levelZeroCategoriesQuery = useCategory({
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
 
     const ids = levelZeroCategoriesQuery.data?.[itemsKey]?.map((category) => category.id)
     const queries = useCategoryBulk(ids, {
-        enabled: onClient && ids?.length > 0
+        // enabled: onClient && ids?.length > 0
+        // enabled: false
+        enabled: onClient && ids?.length > 0 && ready
     })
     const dataArray = queries.map((query) => query.data).filter(Boolean)
     const isLoading = queries.some((query) => query.isLoading)
