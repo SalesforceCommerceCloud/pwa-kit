@@ -19,6 +19,7 @@ import {
     mockCustomerBaskets,
     mockedRegisteredCustomer
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {full} from '@sa11y/preset-rules'
 
 jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
     const originalModule = jest.requireActual(
@@ -77,12 +78,33 @@ test('renders Header', async () => {
     })
 })
 
+// test('renders Header accessibility', async () => {
+//     const {container} = renderWithProviders(<Header />)
+//
+//     await waitFor(() => {
+//         const menu = screen.getByLabelText('Menu')
+//         const logo = screen.getByLabelText('Logo')
+//         const account = screen.getByLabelText('My account')
+//         const cart = screen.getByLabelText('My cart, number of items: 0')
+//         const wishlist = screen.getByLabelText('Wishlist')
+//         const searchInput = document.querySelector('input[type="search"]')
+//         expect(menu).toBeInTheDocument()
+//         expect(logo).toBeInTheDocument()
+//         expect(account).toBeInTheDocument()
+//         expect(cart).toBeInTheDocument()
+//         expect(wishlist).toBeInTheDocument()
+//         expect(searchInput).toBeInTheDocument()
+//     })
+//     // To test using all rules provided by axe
+//     await expect(container).toBeAccessible(full)
+// })
+
 test('renders Header with event handlers', async () => {
     const onMenuClick = jest.fn()
     const onLogoClick = jest.fn()
     const onMyAccountClick = jest.fn()
     const onMyCartClick = jest.fn()
-    renderWithProviders(
+    const {container} = renderWithProviders(
         <Header
             onMenuClick={onMenuClick}
             onLogoClick={onLogoClick}
@@ -105,6 +127,8 @@ test('renders Header with event handlers', async () => {
         fireEvent.click(cart)
         expect(onMyCartClick).toHaveBeenCalledTimes(1)
     })
+    // To test using all rules provided by axe
+    await expect(container).toBeAccessible(full)
 })
 
 /**

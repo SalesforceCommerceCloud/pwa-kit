@@ -21,6 +21,7 @@ const {
     exampleTokenReponse,
     mockCustomerBaskets
 } = require('./app/mocks/mock-data')
+const {setup: sa1lySetup} = require('@sa11y/jest')
 
 // set jsdom in https context to allow read/write secure cookies
 global.jsdom.reconfigure({url: 'https://www.domain.com'})
@@ -29,7 +30,7 @@ configureTestingLibrary({
     // Increase to: 6 x default timeout of 1 second
     ...(process.env.CI ? {asyncUtilTimeout: 6000} : {})
 })
-
+sa1lySetup()
 /**
  * Set up an API mocking server for testing purposes.
  * This mock server includes the basic oauth flow endpoints.

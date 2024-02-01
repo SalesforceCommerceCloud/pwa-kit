@@ -25,7 +25,7 @@
     "start:inspect": "npm run start -- --inspect",
     "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
     "tail-logs": "pwa-kit-dev tail-logs",
-    "test": "pwa-kit-dev test",
+    "test": "pwa-kit-dev test -- --silent",
     "test:lighthouse": "cross-env NODE_ENV=production lhci autorun --config=tests/lighthouserc.js",
     "test:max-file-size": "npm run build && bundlesize"
   },
@@ -84,6 +84,7 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
+    "@sa11y/jest": "^6.3.1",
     "cross-env": "^5.2.1"
   },
   "engines": {
