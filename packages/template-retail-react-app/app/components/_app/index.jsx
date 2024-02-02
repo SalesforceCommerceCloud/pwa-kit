@@ -12,16 +12,14 @@ import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useQuery, useQueries} from '@tanstack/react-query'
+import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
-    useCommerceApi,
     useCustomerBaskets,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import * as queryKeyHelpers from '@salesforce/commerce-sdk-react/hooks/ShopperProducts/queryKeyHelpers'
+
 // Chakra
 import {
     Box,
@@ -60,7 +58,6 @@ import {IntlProvider} from 'react-intl'
 import {
     watchOnlineStatus,
     flatten,
-    mergeMatchedItems,
     isServer
 } from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
@@ -77,51 +74,11 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 
-const onClient = typeof window !== 'undefined'
-
-/*
-The categories tree can be really large! For performance reasons,
-we only load the level 0 categories on server side, and load the rest
-on client side to reduce SSR page size.
-*/
-const useLazyLoadCategories = () => {
-    const itemsKey = 'categories'
-    const [ready, setReady] = useState(false)
-
-    useEffect(() => {
-        setTimeout(() => {
-            setReady(true) 
-        }, 15000)
-    }, [])
-    const levelZeroCategoriesQuery = useCategory({
-        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
-    })
-
-    const ids = levelZeroCategoriesQuery.data?.[itemsKey]?.map((category) => category.id)
-    const queries = useCategoryBulk(ids, {
-        // enabled: onClient && ids?.length > 0
-        // enabled: false
-        enabled: onClient && ids?.length > 0 && ready
-    })
-    const dataArray = queries.map((query) => query.data).filter(Boolean)
-    const isLoading = queries.some((query) => query.isLoading)
-    const isError = queries.some((query) => query.isError)
-    return {
-        isLoading,
-        isError,
-        data: {
-            ...levelZeroCategoriesQuery.data,
-            [itemsKey]: mergeMatchedItems(
-                levelZeroCategoriesQuery.data?.categories || [],
-                dataArray
-            )
-        }
-    }
-}
-
 const App = (props) => {
     const {children} = props
-    const {data: categoriesTree} = useLazyLoadCategories()
+    const {data: categoriesTree} = useCategory({
+        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
+    })
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = getAppOrigin()
@@ -376,9 +333,30 @@ const App = (props) => {
 
                                             <HideOnMobile>
                                                 <ListMenu
-                                                    root={
-                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                    items={
+                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]?.categories
                                                     }
+                                                    itemComponent={(props) => {
+                                                        const {defaultItemComponent: ItemComponent, item} = props
+                                                        const [enabled, setEnabled] = useState(false)
+                                                        const {data: category} = useCategory({
+                                                            parameters: {
+                                                                id: item?.id, 
+                                                                levels: 2
+                                                            },
+                                                        }, {enabled}) 
+
+                                                        return (
+                                                            <ItemComponent 
+                                                                {...props} 
+                                                                item={category} 
+                                                                items={category?.categories} 
+                                                                onOpen={() => {
+                                                                    setEnabled(true)
+                                                                }}
+                                                            />
+                                                        )
+                                                    }}  
                                                 />
                                             </HideOnMobile>
                                         </Header>
@@ -442,49 +420,6 @@ const App = (props) => {
 
 App.propTypes = {
     children: PropTypes.node
-}
-
-/**
- * a hook that parallelly and individually fetches category based on the given ids
- * @param ids - list of categories ids to fetch
- * @param queryOptions -  react query options
- * @return list of react query results
- */
-export const useCategoryBulk = (ids = [], queryOptions) => {
-    const api = useCommerceApi()
-    const {getTokenWhenReady} = useAccessToken()
-    const {
-        app: {commerceAPI}
-    } = getConfig()
-    const {
-        parameters: {organizationId}
-    } = commerceAPI
-    const {site} = useMultiSite()
-
-    const queries = ids.map((id) => {
-        return {
-            queryKey: queryKeyHelpers.getCategory.queryKey({
-                id,
-                levels: 2,
-                organizationId,
-                siteId: site.id
-            }),
-            queryFn: async () => {
-                const token = await getTokenWhenReady()
-                const res = await api.shopperProducts.getCategory({
-                    parameters: {id, levels: 2},
-                    headers: {
-                        authorization: `Bearer ${token}`
-                    }
-                })
-                return res
-            },
-            ...queryOptions,
-            enabled: queryOptions.enabled !== false && Boolean(id)
-        }
-    })
-    const res = useQueries({queries})
-    return res
 }
 
 export default App

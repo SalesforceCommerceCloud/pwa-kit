@@ -12,7 +12,6 @@ import {Link as RouteLink} from 'react-router-dom'
 // Components
 import {
     Box,
-    Fade,
     PopoverTrigger,
 
     // Hooks
@@ -51,7 +50,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
         <Box {...baseStyle.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
-                to={categoryUrlBuilder(item)}
+                to={item && categoryUrlBuilder(item)}
                 onMouseOver={onOpen}
                 {...baseStyle.listMenuTriggerLink}
                 {...(hasItems ? {name: name + ' __'} : {name: name})}
@@ -70,9 +69,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose, hasItems}) => {
                     }}
                     {...baseStyle.listMenuTriggerLinkIcon}
                 >
-                    <Fade in={hasItems}>
-                        <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
-                    </Fade>
+                    <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
                 </Link>
             </PopoverTrigger>
         </Box>

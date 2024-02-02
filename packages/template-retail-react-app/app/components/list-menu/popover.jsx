@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useRef} from 'react'
+import React, {Fragment, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
 
 // Project Components
 import ListMenuTrigger from '@salesforce/retail-react-app/app/components/list-menu/trigger'
+import ListMenuContent from '@salesforce/retail-react-app/app/components/list-menu/content'
 
 // Components
 import {
@@ -20,22 +21,41 @@ import {
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
+
 /**
  * 
  * @param {*} param0 
  * @returns 
  */
-const ListMenuPopover = ({items, item, name, itemsKey, maxColumns}) => {
+const ListMenuPopover = (props) => {
+    const {items, item, name, itemsKey, maxColumns} = props
     const initialFocusRef = useRef()
     const {isOpen, onClose, onOpen} = useDisclosure()
+
+    const handleOnOpen = useCallback(() => {
+        props?.onOpen({
+            item,
+            name
+        })
+        onOpen()
+    }, [])
+
+    const handleOnClose = useCallback(() => {
+        props?.onClose({
+            item,
+            name
+        })
+        onClose()
+    }, [])
+
     return (
         <Box onMouseLeave={onClose}>
             <Popover
                 isLazy
                 placement={'bottom-start'}
                 initialFocusRef={initialFocusRef}
-                onOpen={onOpen}
-                onClose={onClose}
+                onOpen={handleOnOpen}
+                onClose={handleOnClose}
                 isOpen={isOpen}
                 variant="fullWidth"
             >
@@ -44,19 +64,18 @@ const ListMenuPopover = ({items, item, name, itemsKey, maxColumns}) => {
                         item={item}
                         name={name}
                         isOpen={isOpen}
-                        onOpen={onOpen}
+                        onOpen={handleOnOpen}
                         onClose={onClose}
                         hasItems={!!items}
                     />
-                    {items && (
-                        <ListMenuContent
-                            items={items}
-                            itemsKey={itemsKey}
-                            initialFocusRef={initialFocusRef}
-                            onClose={onClose}
-                            maxColumns={maxColumns}
-                        />
-                    )}
+                    
+                    <ListMenuContent
+                        items={items}
+                        itemsKey={itemsKey}
+                        initialFocusRef={initialFocusRef}
+                        onClose={onClose}
+                        maxColumns={maxColumns}
+                    />
                 </Fragment>
             </Popover>
         </Box>
@@ -68,7 +87,9 @@ ListMenuPopover.propTypes = {
     item: PropTypes.object,
     name: PropTypes.string,
     maxColumns: PropTypes.number,
-    itemsKey: PropTypes.string
+    itemsKey: PropTypes.string,
+    onOpen: PropTypes.func,
+    onClose: PropTypes.func
 }
 
 export default ListMenuPopover
