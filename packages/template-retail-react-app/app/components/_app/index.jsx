@@ -23,6 +23,9 @@ import {
 // Chakra
 import {
     Box,
+    Center,
+    Spinner,
+
     useDisclosure,
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -73,6 +76,27 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
+
+const MyItemComponent = (props) => {
+    const {defaultItemComponent: ItemComponent, item} = props
+    const {data: category} = useCategory({
+        parameters: {
+            id: item?.id
+        },
+    }, {enabled: props.isExpanded}) 
+    
+    return (category ? 
+            <ItemComponent 
+                {...props} 
+                item={category} 
+                items={category?.categories} 
+                itemComponent={MyItemComponent}
+            /> : 
+            <Center p="2">
+                <Spinner size="lg" />
+            </Center>
+    )
+}
 
 const App = (props) => {
     const {children} = props
@@ -328,6 +352,8 @@ const App = (props) => {
                                                     root={
                                                         categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
                                                     }
+                                                    // items={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]?.categories}
+                                                    itemComponent={MyItemComponent}
                                                 />
                                             </HideOnDesktop>
 

@@ -14,6 +14,8 @@ import {
     AccordionItem,
     AccordionButton,
     AccordionPanel,
+    Center,
+    Spinner,
     Text,
 
     // Hooks
@@ -50,6 +52,9 @@ const NestedAccordion = (props) => {
     const filter = (item) =>
         typeof itemsFilter === 'function' ? itemsFilter(item) : !!item[itemsFilter]
 
+    console.log('ItemComponent: ', props?.itemComponent)
+    const ItemComponent = props?.itemComponent || NestedAccordion
+    
     return (
         <Accordion className="sf-nested-accordion" {...rest}>
             {/* Optional accordion items before others in items list.  */}
@@ -65,50 +70,35 @@ const NestedAccordion = (props) => {
                             <>
                                 {/* Heading */}
                                 <h2>
-                                    {/* Show item as a leaf node if it has no visible child items. */}
-                                    {items && items.filter(filter).length > 0 ? (
-                                        <AccordionButton {...styles.internalButton}>
-                                            {/* Replace default expanded/collapsed icons. */}
-                                            {isExpanded ? (
-                                                <ChevronDownIcon {...styles.internalButtonIcon} />
-                                            ) : (
-                                                <ChevronRightIcon {...styles.internalButtonIcon} />
-                                            )}
+                                    <AccordionButton {...styles.internalButton}>
+                                        {/* Replace default expanded/collapsed icons. */}
+                                        {isExpanded ? (
+                                            <ChevronDownIcon {...styles.internalButtonIcon} />
+                                        ) : (
+                                            <ChevronRightIcon {...styles.internalButtonIcon} />
+                                        )}
 
-                                            <Text
-                                                fontSize={fontSizes[depth]}
-                                                fontWeight={fontWeights[depth]}
-                                            >
-                                                {name}
-                                            </Text>
-                                        </AccordionButton>
-                                    ) : (
-                                        <AccordionButton
-                                            {...styles.leafButton}
-                                            as={Link}
-                                            to={urlBuilder(item)}
+                                        <Text
+                                            fontSize={fontSizes[depth]}
+                                            fontWeight={fontWeights[depth]}
                                         >
-                                            <Text
-                                                fontSize={fontSizes[depth]}
-                                                fontWeight={fontWeights[depth]}
-                                            >
-                                                {name}
-                                            </Text>
-                                        </AccordionButton>
-                                    )}
+                                            {name}
+                                        </Text>
+                                    </AccordionButton>
                                 </h2>
 
                                 {/* Child Items */}
-                                {items && (
-                                    <AccordionPanel {...styles.panel}>
-                                        <NestedAccordion
-                                            {...styles.nestedAccordion}
-                                            {...props}
-                                            item={item}
-                                            initialDepth={depth + 1}
-                                        />
-                                    </AccordionPanel>
-                                )}
+                                <AccordionPanel {...styles.panel}>
+                                    <ItemComponent
+                                        {...styles.nestedAccordion}
+                                        {...props}
+                                        item={item}
+                                        initialDepth={depth + 1}
+                                        defaultItemComponent={NestedAccordion}
+                                        isExpanded={isExpanded}
+                                    />
+                                </AccordionPanel>
+                                
                             </>
                         )}
                     </AccordionItem>
