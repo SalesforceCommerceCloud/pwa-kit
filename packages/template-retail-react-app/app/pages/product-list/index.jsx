@@ -137,6 +137,10 @@ const ProductList = (props) => {
     )
 
     /**************** Query Actions ****************/
+    // make sure that there is no invalid params sent to SCAPI
+    const searchParamsCopied = {...searchParams}
+    delete searchParamsCopied._refine
+
     const {
         isLoading,
         isRefetching,
@@ -144,7 +148,7 @@ const ProductList = (props) => {
     } = useProductSearch(
         {
             parameters: {
-                ...searchParams,
+                ...searchParamsCopied,
                 refine: searchParams._refine
             }
         },

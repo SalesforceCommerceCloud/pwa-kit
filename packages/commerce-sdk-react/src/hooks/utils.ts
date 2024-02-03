@@ -82,6 +82,7 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
             ...options.headers
         }
     }
+
     return merged
 }
 

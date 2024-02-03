@@ -8,7 +8,7 @@ import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions, omitNullableParameters} from '../utils'
+import {clone, mergeOptions, omitNullableParameters} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 
 type Client = ApiClients['shopperProducts']
@@ -73,6 +73,7 @@ export const useProduct = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
