@@ -82,8 +82,14 @@ const STORE_LOCATOR_HREF = '/store-locator'
  * main usage is to navigate from one category to the next, but also homes links to
  * support, log in and out actions, as support links.
  */
-const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop, itemComponent}) => {
-    const itemsKey = 'categories'
+const DrawerMenu = ({
+    root,
+    itemsKey,
+    isOpen,
+    onClose = noop,
+    onLogoClick = noop,
+    itemComponent
+}) => {
     const intl = useIntl()
     const {isRegistered} = useCustomerType()
     const navigate = useNavigation()

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
@@ -24,8 +24,8 @@ import {
 import {
     Box,
     Center,
+    Fade,
     Spinner,
-
     useDisclosure,
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -43,7 +43,7 @@ import Footer from '@salesforce/retail-react-app/app/components/footer'
 import CheckoutHeader from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-header'
 import CheckoutFooter from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-footer'
 import DrawerMenu from '@salesforce/retail-react-app/app/components/drawer-menu'
-import ListMenu from '@salesforce/retail-react-app/app/components/list-menu'
+import {ListMenu} from '@salesforce/retail-react-app/app/components/list-menu/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
 
@@ -58,11 +58,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {
-    watchOnlineStatus,
-    flatten,
-    isServer
-} from '@salesforce/retail-react-app/app/utils/utils'
+import {watchOnlineStatus, flatten, isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -77,24 +73,57 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 
-const MyItemComponent = (props) => {
-    const {defaultItemComponent: ItemComponent, item} = props
-    const {data: category} = useCategory({
-        parameters: {
-            id: item?.id
+const DrawerMenuItem = (props) => {
+    const {defaultItemComponent: ItemComponent, item, isExpanded} = props
+    const {data: category} = useCategory(
+        {
+            parameters: {
+                id: item?.id
+            }
         },
-    }, {enabled: props.isExpanded}) 
-    
-    return (category ? 
-            <ItemComponent 
-                {...props} 
-                item={category} 
-                items={category?.categories} 
-                itemComponent={MyItemComponent}
-            /> : 
-            <Center p="2">
-                <Spinner size="lg" />
-            </Center>
+        {enabled: isExpanded}
+    )
+
+    return category ? (
+        <Fade in={true}>
+            <ItemComponent
+                {...props}
+                item={category}
+                items={category?.categories}
+                itemComponent={DrawerMenuItem}
+            />
+        </Fade>
+    ) : (
+        <Center p="2">
+            <Spinner size="lg" />
+        </Center>
+    )
+}
+
+const ListMenuItem = (props) => {
+    // TODO:
+    // 1. Thing about this defaultItemComponent prop.
+    // 2. Can we make a hoc to simplify this?
+    // 3. Is there a better way to do the isOpen thing?
+    const {defaultItemComponent: ItemComponent, item, isOpen} = props
+    const {data: category} = useCategory(
+        {
+            parameters: {
+                id: item?.id,
+                levels: 2
+            }
+        },
+        {enabled: isOpen}
+    )
+
+    return category ? (
+        <Fade in={true}>
+            <ItemComponent {...props} item={category} items={category?.categories} />
+        </Fade>
+    ) : (
+        <Center p="2">
+            <Spinner size="lg" />
+        </Center>
     )
 }
 
@@ -107,7 +136,6 @@ const App = (props) => {
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = getAppOrigin()
     const activeData = useActiveData()
-
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
@@ -352,37 +380,18 @@ const App = (props) => {
                                                     root={
                                                         categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
                                                     }
-                                                    // items={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]?.categories}
-                                                    itemComponent={MyItemComponent}
+                                                    itemsKey="categories"
+                                                    itemComponent={DrawerMenuItem}
                                                 />
                                             </HideOnDesktop>
 
                                             <HideOnMobile>
                                                 <ListMenu
-                                                    items={
-                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]?.categories
+                                                    root={
+                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
                                                     }
-                                                    itemComponent={(props) => {
-                                                        const {defaultItemComponent: ItemComponent, item} = props
-                                                        const [enabled, setEnabled] = useState(false)
-                                                        const {data: category} = useCategory({
-                                                            parameters: {
-                                                                id: item?.id, 
-                                                                levels: 2
-                                                            },
-                                                        }, {enabled}) 
-
-                                                        return (
-                                                            <ItemComponent 
-                                                                {...props} 
-                                                                item={category} 
-                                                                items={category?.categories} 
-                                                                onOpen={() => {
-                                                                    setEnabled(true)
-                                                                }}
-                                                            />
-                                                        )
-                                                    }}  
+                                                    itemsKey="categories"
+                                                    itemComponent={ListMenuItem}
                                                 />
                                             </HideOnMobile>
                                         </Header>

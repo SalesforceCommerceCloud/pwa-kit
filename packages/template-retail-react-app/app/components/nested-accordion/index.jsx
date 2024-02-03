@@ -52,9 +52,8 @@ const NestedAccordion = (props) => {
     const filter = (item) =>
         typeof itemsFilter === 'function' ? itemsFilter(item) : !!item[itemsFilter]
 
-    console.log('ItemComponent: ', props?.itemComponent)
     const ItemComponent = props?.itemComponent || NestedAccordion
-    
+
     return (
         <Accordion className="sf-nested-accordion" {...rest}>
             {/* Optional accordion items before others in items list.  */}
@@ -98,7 +97,6 @@ const NestedAccordion = (props) => {
                                         isExpanded={isExpanded}
                                     />
                                 </AccordionPanel>
-                                
                             </>
                         )}
                     </AccordionItem>
@@ -169,7 +167,11 @@ NestedAccordion.propTypes = {
      * This function builds the urls for leaf items. It accepts
      * the current item, and returns a string.
      */
-    urlBuilder: PropTypes.func
+    urlBuilder: PropTypes.func,
+    /**
+     * TODO: Descript the itemComponent prop and order it alphabetically.
+     */
+    itemComponent: PropTypes.func
 }
 
 export default NestedAccordion
