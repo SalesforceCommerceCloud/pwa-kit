@@ -6,7 +6,7 @@
  */
 import type {ShopperExperience} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pick} from '../utils'
+import {getCustomKeys, pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperExperience<{shortCode: string}>
@@ -53,7 +53,8 @@ export const getPages: QueryKeyHelper<'getPages'> = {
             'aspectAttributes',
             'parameters',
             'siteId',
-            'locale'
+            'locale',
+            ...getCustomKeys(params)
         ]),
     path: (params) => ['/commerce-sdk-react', '/organizations/', params.organizationId, '/pages'],
     queryKey: (params: Params<'getPages'>) => [
@@ -70,7 +71,8 @@ export const getPage: QueryKeyHelper<'getPage'> = {
             'aspectAttributes',
             'parameters',
             'siteId',
-            'locale'
+            'locale',
+            ...getCustomKeys(params)
         ]),
     path: (params) => [
         '/commerce-sdk-react',

@@ -6,7 +6,7 @@
  */
 import type {ShopperLogin} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pick} from '../utils'
+import {getCustomKeys, pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperLogin<{shortCode: string}>
@@ -50,7 +50,8 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 }
 
 export const getUserInfo: QueryKeyHelper<'getUserInfo'> = {
-    parameters: (params) => pick(params, ['organizationId', 'channel_id']),
+    parameters: (params) =>
+        pick(params, ['organizationId', 'channel_id', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -64,7 +65,7 @@ export const getUserInfo: QueryKeyHelper<'getUserInfo'> = {
 }
 
 export const getWellknownOpenidConfiguration: QueryKeyHelper<'getWellknownOpenidConfiguration'> = {
-    parameters: (params) => pick(params, ['organizationId']),
+    parameters: (params) => pick(params, ['organizationId', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -78,7 +79,7 @@ export const getWellknownOpenidConfiguration: QueryKeyHelper<'getWellknownOpenid
 }
 
 export const getJwksUri: QueryKeyHelper<'getJwksUri'> = {
-    parameters: (params) => pick(params, ['organizationId']),
+    parameters: (params) => pick(params, ['organizationId', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',

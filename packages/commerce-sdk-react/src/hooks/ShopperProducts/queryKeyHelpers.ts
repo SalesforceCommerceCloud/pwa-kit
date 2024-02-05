@@ -6,7 +6,7 @@
  */
 import type {ShopperProducts} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pick} from '../utils'
+import {getCustomKeys, pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperProducts<{shortCode: string}>
@@ -69,7 +69,8 @@ export const getProducts: QueryKeyHelper<'getProducts'> = {
             'locale',
             'allImages',
             'perPricebook',
-            'siteId'
+            'siteId',
+            ...getCustomKeys(params)
         ]),
     path: (params) => [
         '/commerce-sdk-react',
@@ -94,7 +95,8 @@ export const getProduct: QueryKeyHelper<'getProduct'> = {
             'locale',
             'allImages',
             'perPricebook',
-            'siteId'
+            'siteId',
+            ...getCustomKeys(params)
         ]),
     path: (params) => [
         '/commerce-sdk-react',
@@ -110,7 +112,15 @@ export const getProduct: QueryKeyHelper<'getProduct'> = {
 }
 
 export const getCategories: QueryKeyHelper<'getCategories'> = {
-    parameters: (params) => pick(params, ['organizationId', 'ids', 'levels', 'locale', 'siteId']),
+    parameters: (params) =>
+        pick(params, [
+            'organizationId',
+            'ids',
+            'levels',
+            'locale',
+            'siteId',
+            ...getCustomKeys(params)
+        ]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -124,7 +134,15 @@ export const getCategories: QueryKeyHelper<'getCategories'> = {
 }
 
 export const getCategory: QueryKeyHelper<'getCategory'> = {
-    parameters: (params) => pick(params, ['organizationId', 'id', 'levels', 'locale', 'siteId']),
+    parameters: (params) =>
+        pick(params, [
+            'organizationId',
+            'id',
+            'levels',
+            'locale',
+            'siteId',
+            ...getCustomKeys(params)
+        ]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',

@@ -6,7 +6,7 @@
  */
 import type {ShopperOrders} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pick} from '../utils'
+import {getCustomKeys, pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperOrders<{shortCode: string}>
@@ -55,7 +55,8 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 }
 
 export const getOrder: QueryKeyHelper<'getOrder'> = {
-    parameters: (params) => pick(params, ['organizationId', 'orderNo', 'siteId', 'locale']),
+    parameters: (params) =>
+        pick(params, ['organizationId', 'orderNo', 'siteId', 'locale', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -70,7 +71,8 @@ export const getOrder: QueryKeyHelper<'getOrder'> = {
 }
 
 export const getPaymentMethodsForOrder: QueryKeyHelper<'getPaymentMethodsForOrder'> = {
-    parameters: (params) => pick(params, ['organizationId', 'orderNo', 'siteId', 'locale']),
+    parameters: (params) =>
+        pick(params, ['organizationId', 'orderNo', 'siteId', 'locale', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -86,7 +88,8 @@ export const getPaymentMethodsForOrder: QueryKeyHelper<'getPaymentMethodsForOrde
 }
 
 export const getTaxesFromOrder: QueryKeyHelper<'getTaxesFromOrder'> = {
-    parameters: (params) => pick(params, ['organizationId', 'orderNo', 'siteId']),
+    parameters: (params) =>
+        pick(params, ['organizationId', 'orderNo', 'siteId', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',

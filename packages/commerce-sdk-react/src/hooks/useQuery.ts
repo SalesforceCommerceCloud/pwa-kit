@@ -39,10 +39,12 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     }
 ) => {
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
-    const copied = clone(apiOptions)
-    delete copied.parameters.clientId
-    delete copied.parameters.currency
-    delete copied.parameters.locale
+    const copiedOpts = clone(apiOptions)
+    // remove invalid params so they don't get passed into wrapped method
+    // which will result in  "invalid params" warnings from isomorphic library
+    delete copiedOpts.parameters.clientId
+    delete copiedOpts.parameters.currency
+    delete copiedOpts.parameters.locale
     // This type assertion is NOT safe in all cases. However, we know that `requiredParameters` is
     // the list of parameters required by `Options`, and we know that in the default case (when
     // `queryOptions.enabled` is not set), we only execute the hook when `apiOptions` has all
@@ -52,14 +54,14 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     // missing parameters. This will result in a runtime error. I think that this is an acceptable
     // trade-off, as the behavior is opt-in by the end user, and it feels like adding type safety
     // for this case would add significantly more complexity.
-    const wrappedMethod = async () => await authenticatedMethod(copied as Options)
+    const wrappedMethod = async () => await authenticatedMethod(copiedOpts as Options)
     return useReactQuery(hookConfig.queryKey, wrappedMethod, {
         enabled:
             // Individual hooks can provide `enabled` checks that are done in ADDITION to
             // the required parameter check
             hookConfig.enabled !== false &&
             // The default `enabled` is "has all required parameters"
-            hasAllKeys(copied.parameters, hookConfig.requiredParameters),
+            hasAllKeys(copiedOpts.parameters, hookConfig.requiredParameters),
         // End users can always completely OVERRIDE the default `enabled` check
 
         ...queryOptions,

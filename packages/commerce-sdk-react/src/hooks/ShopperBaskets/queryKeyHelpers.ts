@@ -6,7 +6,7 @@
  */
 import type {ShopperBaskets} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pick} from '../utils'
+import {getCustomKeys, pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperBaskets<{shortCode: string}>
@@ -75,7 +75,8 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 }
 
 export const getBasket: QueryKeyHelper<'getBasket'> = {
-    parameters: (params) => pick(params, ['organizationId', 'basketId', 'siteId', 'locale']),
+    parameters: (params) =>
+        pick(params, ['organizationId', 'basketId', 'siteId', 'locale', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -90,7 +91,8 @@ export const getBasket: QueryKeyHelper<'getBasket'> = {
 }
 
 export const getPaymentMethodsForBasket: QueryKeyHelper<'getPaymentMethodsForBasket'> = {
-    parameters: (params) => pick(params, ['organizationId', 'basketId', 'siteId', 'locale']),
+    parameters: (params) =>
+        pick(params, ['organizationId', 'basketId', 'siteId', 'locale', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -106,7 +108,8 @@ export const getPaymentMethodsForBasket: QueryKeyHelper<'getPaymentMethodsForBas
 }
 
 export const getPriceBooksForBasket: QueryKeyHelper<'getPriceBooksForBasket'> = {
-    parameters: (params) => pick(params, ['organizationId', 'basketId', 'siteId']),
+    parameters: (params) =>
+        pick(params, ['organizationId', 'basketId', 'siteId', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -123,7 +126,14 @@ export const getPriceBooksForBasket: QueryKeyHelper<'getPriceBooksForBasket'> = 
 
 export const getShippingMethodsForShipment: QueryKeyHelper<'getShippingMethodsForShipment'> = {
     parameters: (params) =>
-        pick(params, ['organizationId', 'basketId', 'shipmentId', 'siteId', 'locale']),
+        pick(params, [
+            'organizationId',
+            'basketId',
+            'shipmentId',
+            'siteId',
+            'locale',
+            ...getCustomKeys(params)
+        ]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -141,7 +151,8 @@ export const getShippingMethodsForShipment: QueryKeyHelper<'getShippingMethodsFo
 }
 
 export const getTaxesFromBasket: QueryKeyHelper<'getTaxesFromBasket'> = {
-    parameters: (params) => pick(params, ['organizationId', 'basketId', 'siteId']),
+    parameters: (params) =>
+        pick(params, ['organizationId', 'basketId', 'siteId', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',

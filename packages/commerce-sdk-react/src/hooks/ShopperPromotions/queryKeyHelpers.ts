@@ -6,7 +6,7 @@
  */
 import type {ShopperPromotions} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pick} from '../utils'
+import {getCustomKeys, pick} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperPromotions<{shortCode: string}>
@@ -44,7 +44,8 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 }
 
 export const getPromotions: QueryKeyHelper<'getPromotions'> = {
-    parameters: (params) => pick(params, ['organizationId', 'siteId', 'ids', 'locale']),
+    parameters: (params) =>
+        pick(params, ['organizationId', 'siteId', 'ids', 'locale', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -65,7 +66,8 @@ export const getPromotionsForCampaign: QueryKeyHelper<'getPromotionsForCampaign'
             'siteId',
             'startDate',
             'endDate',
-            'currency'
+            'currency',
+            ...getCustomKeys(params)
         ]),
     path: (params) => [
         '/commerce-sdk-react',

@@ -8,7 +8,7 @@ import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {clone, mergeOptions, omitNullableParameters} from '../utils'
+import {mergeOptions, omitNullableParameters} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 
 type Client = ApiClients['shopperProducts']
