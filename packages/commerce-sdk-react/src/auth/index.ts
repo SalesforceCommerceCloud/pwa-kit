@@ -16,7 +16,7 @@ import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
 import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
-import {slasSecretWarningMsg} from '../constant'
+import {SLAS_SECRET_WARNING_MSG} from '../constant'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -363,8 +363,8 @@ class Auth {
         return await this.pendingToken
     }
 
-    logWarningOnClient = (silenceWarnings: boolean, msg: string) => {
-        if (onClient() && !silenceWarnings) {
+    logWarning = (msg: string) => {
+        if (!this.silenceWarnings) {
             console.warn(msg)
         }
     }
@@ -408,7 +408,7 @@ class Auth {
                             this.client,
                             {refreshToken},
                             {
-                                clientSecret: this.clientSecret ? this.clientSecret : undefined
+                                clientSecret: this.clientSecret
                             }
                         ),
                     !!refreshTokenGuest
@@ -427,21 +427,7 @@ class Auth {
                 }
             }
         }
-        this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
-        return this.clientSecret
-            ? await this.queueRequest(
-                  () =>
-                      helpers.loginGuestUserPrivate(
-                          this.client,
-                          {},
-                          {clientSecret: this.clientSecret}
-                      ),
-                  true
-              )
-            : await this.queueRequest(
-                  () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
-                  true
-              )
+        return this.loginGuestUser()
     }
 
     /**
@@ -463,23 +449,21 @@ class Auth {
      *
      */
     async loginGuestUser() {
-        if (this.clientSecret) {
-            this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
+        if (this.clientSecret && onClient()) {
+            this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
-        return this.clientSecret
-            ? await this.queueRequest(
-                  () =>
-                      helpers.loginGuestUserPrivate(
-                          this.client,
-                          {},
-                          {clientSecret: this.clientSecret}
-                      ),
-                  true
-              )
-            : await this.queueRequest(
-                  () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
-                  true
-              )
+        const usid = this.get('usid')
+        const isGuest = true
+        const guestPrivateArgs = [this.client, {}, {clientSecret: this.clientSecret}] as const
+        const guestPublicArgs = [
+            this.client,
+            {redirectURI: this.redirectURI, ...(usid && {usid})}
+        ] as const
+        const callback = this.clientSecret
+            ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
+            : () => helpers.loginGuestUser(...guestPublicArgs)
+
+        return await this.queueRequest(callback, isGuest)
     }
 
     /**
@@ -508,7 +492,7 @@ class Auth {
         await this.loginRegisteredUserB2C({
             username: login,
             password,
-            clientSecret: this.clientSecret ? this.clientSecret : undefined
+            clientSecret: this.clientSecret
         })
         return res
     }
@@ -518,8 +502,8 @@ class Auth {
      *
      */
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
-        if (this.clientSecret) {
-            this.logWarningOnClient(this.silenceWarnings, slasSecretWarningMsg)
+        if (this.clientSecret && onClient()) {
+            this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')

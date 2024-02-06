@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 
-export const SLAS_PRIVATE_SECRET_PLACEHOLDER = 'slas-private-secret-placeholder'
+const SLAS_PRIVATE_SECRET_PLACEHOLDER = 'slas-private-secret-placeholder'
 
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {

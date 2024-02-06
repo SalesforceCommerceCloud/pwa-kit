@@ -116,13 +116,10 @@ Commerce-react-sdk supports both public and private flow of the [Authorization f
 You can choose to use either public or private slas to login. By default, public flow is enabled.
 
 #### How private SLAS works
-This section assumes you read and understand how private SLAS flow works
+This section assumes you read and understand how [private SLAS](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.html) flow works
 
-To enable private slas flow, you need to pass a PLACEHOLDER value into CommerceApiProvider and keep your **real** value secured and safe.
-Since commerce-sdk-react run isomorphically, you should not pass **real** secret into the provider because it will be exposed on client-side.
-When clientSecret is defined, any login request will include an authorization header that contains a Base64 encoded version of the following string: <clientID>:<clientSecret> for token retrival/refresh.  
-
-In your project, you need to establish a method (e.g proxy handler) to replace the placeholder with your secured value for any login outgoing requests.  
+To enable private slas flow, you need to pass your secret into the CommercerProvider via clientSecret prop.
+**Note** You should only use private slas if you know you can secure your secret since commercer-sdk-react runs isomorphically.
 
 ```js
 // app/components/_app-config/index.jsx
@@ -141,14 +138,40 @@ const AppConfig = ({children}) => {
             shortCode="12345678"
             locale="en-US"
             currency="USD"
-            clientSecret="__PROXY_PLACEHOLDER-SLAS_PRIVATE_SECRET"
+            clientSecret="<your-slas-private-secret>"
         >
             {children}
         </CommerceApiProvider>
     )
 }
 ```
+#### Disable slas private warnings 
+By default, a warning as below will be displayed on client side to remind developers to always keep their secret safe and secured.
+```js
+'You are potentially exposing SLAS secret on browser. Make sure to keep it safe and secure!'
+```
+You can disable this warning by using CommerceProvider prop `silenceWarnings`
 
+```js
+const AppConfig = ({children}) => {
+    return (
+        <CommerceApiProvider
+            clientId="12345678-1234-1234-1234-123412341234"
+            organizationId="f_ecom_aaaa_001"
+            proxy="localhost:3000/mobify/proxy/api"
+            redirectURI="localhost:3000/callback"
+            siteId="RefArch"
+            shortCode="12345678"
+            locale="en-US"
+            currency="USD"
+            clientSecret="<your-slas-private-secret>"
+            silenceWarnings={true}
+        >
+            {children}
+        </CommerceApiProvider>
+    )
+}
+```
 
 ### Shopper Session Initialization
 
@@ -180,6 +203,7 @@ const Example = () => {
 ### Externally Managed Shopper Authentication
 
 You have the option of handling shopper authentication externally, by providing a SLAS access token. This is useful if you plan on using this library in an application where the authentication mechanism is different.
+
 
 ```jsx
 const MyComponent = ({children}) => {
