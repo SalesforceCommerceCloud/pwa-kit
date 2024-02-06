@@ -5,5 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export {ListMenu} from './list-menu'
-export {ListMenuItem} from './list-menu-item'
+export {ListMenu} from '@salesforce/retail-react-app/app/components/list-menu/list-menu'
+export {ListMenuTrigger} from '@salesforce/retail-react-app/app/components/list-menu/list-menu-trigger'
+export {ListMenuPopover} from '@salesforce/retail-react-app/app/components/list-menu/list-menu-popover'
+export {ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu/list-menu-content'

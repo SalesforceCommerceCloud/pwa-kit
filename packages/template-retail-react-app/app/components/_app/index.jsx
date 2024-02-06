@@ -42,8 +42,8 @@ import ScrollToTop from '@salesforce/retail-react-app/app/components/scroll-to-t
 import Footer from '@salesforce/retail-react-app/app/components/footer'
 import CheckoutHeader from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-header'
 import CheckoutFooter from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-footer'
-import DrawerMenu from '@salesforce/retail-react-app/app/components/drawer-menu'
-import {ListMenu} from '@salesforce/retail-react-app/app/components/list-menu/list-menu'
+import {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-menu'
+import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
 
@@ -76,7 +76,7 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 
-const ComponentPlaceholder = () => (
+const componentPlaceholder = (
     <Center p="2">
         <Spinner size="lg" />
     </Center>
@@ -100,14 +100,14 @@ const DrawerMenuItem = withCommerceData(
                 id: item.id
             }
         }),
-        ComponentPlaceholder
+        placeholderContent: componentPlaceholder
     }
 )
 
-const ListMenuItem = withCommerceData(
-    ({defaultItemComponent: ItemComponent, data, ...restProps}) => (
+const ListMenuContentWithData = withCommerceData(
+    ({data, ...restProps}) => (
         <Fade in={true}>
-            <ItemComponent {...restProps} item={data} itemsKey="categories" />
+            <ListMenuContent {...restProps} item={data} />
         </Fade>
     ),
     {
@@ -118,7 +118,7 @@ const ListMenuItem = withCommerceData(
                 levels: 2
             }
         }),
-        ComponentPlaceholder
+        placeholderContent: componentPlaceholder
     }
 )
 
@@ -386,7 +386,7 @@ const App = (props) => {
                                                         categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
                                                     }
                                                     itemsKey="categories"
-                                                    itemComponent={ListMenuItem}
+                                                    contentComponent={ListMenuContentWithData}
                                                 />
                                             </HideOnMobile>
                                         </Header>

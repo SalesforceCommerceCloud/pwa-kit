@@ -5,43 +5,25 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Link as RouteLink} from 'react-router-dom'
 
 // Components
 import {
     Box,
     Flex,
-    Popover,
-    PopoverContent,
-    PopoverBody,
-    PopoverTrigger,
     Stack,
 
     // Hooks
-    useDisclosure,
     useTheme
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
-import Link from '@salesforce/retail-react-app/app/components/link'
-import {ListMenuItem} from '@salesforce/retail-react-app/app/components/list-menu/list-menu-item'
+import {ListMenuPopover} from '@salesforce/retail-react-app/app/components/list-menu/list-menu-popover'
 
-// Others
-import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
-import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
-
+// Constants
 const MAXIMUM_NUMBER_COLUMNS = 5
-
-const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
-    return (
-        <Box {...props} ref={ref}>
-            <ChevronDownIcon />
-        </Box>
-    )
-})
 
 /**
  * This is the navigation component used for desktop devices. Holds the site navigation,
@@ -52,16 +34,13 @@ const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
  * @param maxColumns The maximum number of columns that we want to use per row inside the ListMenu.
  * @param root
  */
-const ListMenu = ({root, itemComponent, itemsKey, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
+const ListMenu = ({root, contentComponent, itemsKey, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
     const theme = useTheme()
     const [ariaBusy, setAriaBusy] = useState(true)
     const intl = useIntl()
-    const initialFocusRef = useRef()
 
-    const ItemComponent = itemComponent || ListMenuItem
-    const items = root?.[itemsKey]
-    const hasItems = !!items
     const {baseStyle} = theme.components.ListMenu
+    const items = root?.[itemsKey]
 
     useEffect(() => {
         setAriaBusy(false)
@@ -83,76 +62,18 @@ const ListMenu = ({root, itemComponent, itemsKey, maxColumns = MAXIMUM_NUMBER_CO
                     <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>
                         {items?.map?.((item) => {
                             const {id, name} = item
-                            // TODO: Figure out how to use a single disclousure for multiple popovers,
-                            // might have to make my own.
-                            const {isOpen, onClose, onOpen} = useDisclosure()
-                            const keyMap = {
-                                Escape: () => onClose(),
-                                Enter: () => onOpen()
-                            }
 
                             return (
-                                <Box key={id} onMouseLeave={onClose}>
-                                    <Popover
-                                        isLazy
-                                        placement={'bottom-start'}
-                                        initialFocusRef={initialFocusRef}
-                                        onOpen={onOpen}
-                                        onClose={onClose}
-                                        isOpen={isOpen}
-                                        variant="fullWidth"
-                                    >
-                                        <Box {...baseStyle.listMenuTriggerContainer}>
-                                            <Link
-                                                as={RouteLink}
-                                                to={item && categoryUrlBuilder(item)}
-                                                onMouseOver={onOpen}
-                                                {...baseStyle.listMenuTriggerLink}
-                                                {...(hasItems
-                                                    ? {name: name + ' __'}
-                                                    : {name: name})}
-                                                {...(isOpen
-                                                    ? baseStyle.listMenuTriggerLinkActive
-                                                    : {})}
-                                            >
-                                                {name}
-                                            </Link>
-
-                                            <PopoverTrigger>
-                                                <Link
-                                                    as={RouteLink}
-                                                    to={'#'}
-                                                    onMouseOver={onOpen}
-                                                    onKeyDown={(e) => {
-                                                        keyMap[e.key]?.(e)
-                                                    }}
-                                                    {...baseStyle.listMenuTriggerLinkIcon}
-                                                >
-                                                    <ChevronIconTrigger
-                                                        {...baseStyle.selectedButtonIcon}
-                                                    />
-                                                </Link>
-                                            </PopoverTrigger>
-                                        </Box>
-
-                                        <PopoverContent
-                                            data-testid="popover-menu"
-                                            {...baseStyle.popoverContent}
-                                        >
-                                            <PopoverBody>
-                                                <ItemComponent
-                                                    key={id}
-                                                    maxColumns={maxColumns}
-                                                    item={item}
-                                                    name={name}
-                                                    items={item?.[itemsKey]}
-                                                    itemsKey={itemsKey}
-                                                    defaultItemComponent={ListMenuItem}
-                                                    isOpen={isOpen}
-                                                />
-                                            </PopoverBody>
-                                        </PopoverContent>
-                                    </Popover>
+                                <Box key={id}>
+                                    <ListMenuPopover
+                                        key={id}
+                                        maxColumns={maxColumns}
+                                        item={item}
+                                        name={name}
+                                        items={item?.[itemsKey]}
+                                        itemsKey={itemsKey}
+                                        contentComponent={contentComponent}
+                                    />
                                 </Box>
                             )
                         })}
@@ -178,7 +99,7 @@ ListMenu.propTypes = {
     /**
      * Customize the component used to render the list menu item
      */
-    itemComponent: PropTypes.func
+    contentComponent: PropTypes.func
 }
 
 export {ListMenu}

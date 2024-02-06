@@ -29,7 +29,7 @@ export default {
             paddingBottom: 4,
             paddingLeft: 4,
             minWidth: '100%',
-            borderRadius: 0,
+            borderRadius: 10,
             position: 'absolute'
         },
         popoverContainer: {

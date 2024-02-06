@@ -418,4 +418,4 @@ DrawerMenu.propTypes = {
     itemComponent: PropTypes.func
 }
 
-export default DrawerMenu
+export {DrawerMenu}
