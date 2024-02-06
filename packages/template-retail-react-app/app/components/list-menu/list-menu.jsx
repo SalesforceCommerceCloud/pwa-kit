@@ -52,7 +52,7 @@ const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
  * @param maxColumns The maximum number of columns that we want to use per row inside the ListMenu.
  * @param root
  */
-const ListMenu = ({root, itemsKey, maxColumns = MAXIMUM_NUMBER_COLUMNS, itemComponent}) => {
+const ListMenu = ({root, itemComponent, itemsKey, maxColumns = MAXIMUM_NUMBER_COLUMNS}) => {
     const theme = useTheme()
     const [ariaBusy, setAriaBusy] = useState(true)
     const intl = useIntl()
@@ -66,11 +66,6 @@ const ListMenu = ({root, itemsKey, maxColumns = MAXIMUM_NUMBER_COLUMNS, itemComp
     useEffect(() => {
         setAriaBusy(false)
     }, [])
-
-    const keyMap = {
-        Escape: () => onClose(),
-        Enter: () => onOpen()
-    }
 
     return (
         <nav
@@ -91,6 +86,10 @@ const ListMenu = ({root, itemsKey, maxColumns = MAXIMUM_NUMBER_COLUMNS, itemComp
                             // TODO: Figure out how to use a single disclousure for multiple popovers,
                             // might have to make my own.
                             const {isOpen, onClose, onOpen} = useDisclosure()
+                            const keyMap = {
+                                Escape: () => onClose(),
+                                Enter: () => onOpen()
+                            }
 
                             return (
                                 <Box key={id} onMouseLeave={onClose}>
@@ -173,13 +172,9 @@ ListMenu.propTypes = {
      */
     maxColumns: PropTypes.number,
     /**
-     * Is called when a sub-menu is opened.
+     * .
      */
-    onMenuOpen: PropTypes.func,
-    /**
-     * Is called when a sub-menu is closed.
-     */
-    onMenuClose: PropTypes.func,
+    itemsKey: PropTypes.string,
     /**
      * Customize the component used to render the list menu item
      */

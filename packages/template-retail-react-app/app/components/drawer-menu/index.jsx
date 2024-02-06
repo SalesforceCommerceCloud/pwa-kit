@@ -407,7 +407,15 @@ DrawerMenu.propTypes = {
     /**
      * Function called when the drawer logo is clicked.
      */
-    onLogoClick: PropTypes.func
+    onLogoClick: PropTypes.func,
+    /**
+     * .
+     */
+    itemsKey: PropTypes.string,
+    /**
+     * Component to be rendered for each individual menu item.
+     */
+    itemComponent: PropTypes.func
 }
 
 export default DrawerMenu

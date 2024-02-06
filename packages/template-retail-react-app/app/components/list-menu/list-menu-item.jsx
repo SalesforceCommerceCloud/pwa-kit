@@ -33,10 +33,11 @@ import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
  * @param {*} param0
  * @returns
  */
-const ListMenuItem = ({maxColumns, items, itemsKey, onClose, initialFocusRef}) => {
+const ListMenuItem = ({maxColumns, item, itemsKey, onClose, initialFocusRef}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
     const {locale} = useIntl()
+    const items = item?.[itemsKey]
 
     return (
         <Container as={Stack} {...baseStyle.popoverContainer}>
@@ -100,11 +101,26 @@ const ListMenuItem = ({maxColumns, items, itemsKey, onClose, initialFocusRef}) =
 }
 
 ListMenuItem.propTypes = {
-    items: PropTypes.array,
+    /**
+     *
+     */
+    item: PropTypes.object,
+    /**
+     *
+     */
+    itemsKey: PropTypes.string,
+    /**
+     *
+     */
     maxColumns: PropTypes.number,
+    /**
+     *
+     */
     onClose: PropTypes.func,
-    initialFocusRef: PropTypes.object,
-    itemsKey: PropTypes.string
+    /**
+     *
+     */
+    initialFocusRef: PropTypes.object
 }
 
 export {ListMenuItem}

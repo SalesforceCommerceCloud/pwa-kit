@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect, Fragment} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
@@ -54,6 +54,9 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
+// HoCs
+import withCommerceData from '@salesforce/retail-react-app/app/components/with-commerce-hook/index'
+
 // Localization
 import {IntlProvider} from 'react-intl'
 
@@ -73,59 +76,51 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 
-const DrawerMenuItem = (props) => {
-    const {defaultItemComponent: ItemComponent, item, isExpanded} = props
-    const {data: category} = useCategory(
-        {
-            parameters: {
-                id: item?.id
-            }
-        },
-        {enabled: isExpanded}
-    )
+const ComponentPlaceholder = () => (
+    <Center p="2">
+        <Spinner size="lg" />
+    </Center>
+)
 
-    return category ? (
+const DrawerMenuItem = withCommerceData(
+    ({defaultItemComponent: ItemComponent, data, ...restProps}) => (
         <Fade in={true}>
             <ItemComponent
-                {...props}
-                item={category}
-                items={category?.categories}
+                {...restProps}
+                item={data}
+                itemsKey="categories"
                 itemComponent={DrawerMenuItem}
             />
         </Fade>
-    ) : (
-        <Center p="2">
-            <Spinner size="lg" />
-        </Center>
-    )
-}
-
-const ListMenuItem = (props) => {
-    // TODO:
-    // 1. Thing about this defaultItemComponent prop.
-    // 2. Can we make a hoc to simplify this?
-    // 3. Is there a better way to do the isOpen thing?
-    const {defaultItemComponent: ItemComponent, item, isOpen} = props
-    const {data: category} = useCategory(
-        {
+    ),
+    {
+        hook: useCategory,
+        queryOption: ({item}) => ({
             parameters: {
-                id: item?.id,
+                id: item.id
+            }
+        }),
+        ComponentPlaceholder
+    }
+)
+
+const ListMenuItem = withCommerceData(
+    ({defaultItemComponent: ItemComponent, data, ...restProps}) => (
+        <Fade in={true}>
+            <ItemComponent {...restProps} item={data} itemsKey="categories" />
+        </Fade>
+    ),
+    {
+        hook: useCategory,
+        queryOption: ({item}) => ({
+            parameters: {
+                id: item.id,
                 levels: 2
             }
-        },
-        {enabled: isOpen}
-    )
-
-    return category ? (
-        <Fade in={true}>
-            <ItemComponent {...props} item={category} items={category?.categories} />
-        </Fade>
-    ) : (
-        <Center p="2">
-            <Spinner size="lg" />
-        </Center>
-    )
-}
+        }),
+        ComponentPlaceholder
+    }
+)
 
 const App = (props) => {
     const {children} = props

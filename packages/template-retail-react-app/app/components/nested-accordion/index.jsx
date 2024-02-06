@@ -14,14 +14,12 @@ import {
     AccordionItem,
     AccordionButton,
     AccordionPanel,
-    Center,
-    Spinner,
     Text,
 
     // Hooks
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import Link from '@salesforce/retail-react-app/app/components/link'
+
 // Icons
 import {ChevronDownIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 
@@ -61,7 +59,6 @@ const NestedAccordion = (props) => {
 
             {items.filter(filter).map((item) => {
                 const {id, name} = item
-                const items = item[itemsKey]
 
                 return (
                     <AccordionItem key={id} border="none">
@@ -87,16 +84,19 @@ const NestedAccordion = (props) => {
                                 </h2>
 
                                 {/* Child Items */}
-                                <AccordionPanel {...styles.panel}>
-                                    <ItemComponent
-                                        {...styles.nestedAccordion}
-                                        {...props}
-                                        item={item}
-                                        initialDepth={depth + 1}
-                                        defaultItemComponent={NestedAccordion}
-                                        isExpanded={isExpanded}
-                                    />
-                                </AccordionPanel>
+                                {isExpanded && (
+                                    <AccordionPanel {...styles.panel}>
+                                        <ItemComponent
+                                            {...styles.nestedAccordion}
+                                            {...props}
+                                            item={item}
+                                            itemsKey={'categories'}
+                                            initialDepth={depth + 1}
+                                            defaultItemComponent={NestedAccordion}
+                                            isExpanded={isExpanded}
+                                        />
+                                    </AccordionPanel>
+                                )}
                             </>
                         )}
                     </AccordionItem>
