@@ -8,8 +8,8 @@
 import React, {Fragment} from 'react'
 
 /**
- * Higher-order component used to conditionally render a provided placeholder component, while data is fetched using
- * the provided hook
+ * Higher-order component used to conditionally render a provided component, while data is fetched using
+ * a `commerce-sdk-react` hook
  *
  * @param {Component} Component - the component you want to be conditionally rendered and provided data to.
  * @param {Object} opts.hook - a commercerce react sdk hook used to fetch data with.
@@ -18,7 +18,7 @@ import React, {Fragment} from 'react'
  * @param {Object} opts.placeholderContent - the component you want be rendered while data is being fetched
  * @returns {Component} - the enhanced component.
  */
-const withCommerceData = (Component, opts = {}) => {
+const withCommerceSdkReact = (Component, opts = {}) => {
     const WrappedComponent = (props) => {
         const {hook, queryOption, placeholderContent} = opts
         const {data, isLoading} = hook(
@@ -37,4 +37,4 @@ const withCommerceData = (Component, opts = {}) => {
     return WrappedComponent
 }
 
-export default withCommerceData
+export {withCommerceSdkReact}

@@ -54,8 +54,8 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
-// HoCs
-import withCommerceData from '@salesforce/retail-react-app/app/components/with-commerce-hook/index'
+// HOCs
+import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
 
 // Localization
 import {IntlProvider} from 'react-intl'
@@ -82,13 +82,12 @@ const componentPlaceholder = (
     </Center>
 )
 
-const DrawerMenuItem = withCommerceData(
-    ({itemComponent: ItemComponent, data, ...restProps}) => (
+const DrawerMenuItem = withCommerceSdkReact(
+    ({itemComponent: ItemComponent, data, ...rest}) => (
         <Fade in={true}>
             <ItemComponent
-                {...restProps}
+                {...rest}
                 item={data}
-                itemsKey="categories"
                 itemComponent={DrawerMenuItem}
             />
         </Fade>
@@ -104,10 +103,10 @@ const DrawerMenuItem = withCommerceData(
     }
 )
 
-const ListMenuContentWithData = withCommerceData(
-    ({data, ...restProps}) => (
+const ListMenuContentWithData = withCommerceSdkReact(
+    ({data, ...rest}) => (
         <Fade in={true}>
-            <ListMenuContent {...restProps} item={data} />
+            <ListMenuContent {...rest} item={data} />
         </Fade>
     ),
     {
