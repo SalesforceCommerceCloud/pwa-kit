@@ -1,4 +1,9 @@
-## v2.4.0-dev (Jan 22, 2024)
+## v3.0.0-dev (Jan 22, 2024)
+
+### Performance improvements
+
+- Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656)
+
 ## v2.3.0 (Nov 8, 2023)
 
 ### Accessibility improvements
