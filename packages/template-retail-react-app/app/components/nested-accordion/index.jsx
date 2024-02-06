@@ -66,24 +66,42 @@ const NestedAccordion = (props) => {
                             <>
                                 {/* Heading */}
                                 <h2>
-                                    <AccordionButton {...styles.internalButton}>
-                                        {/* Replace default expanded/collapsed icons. */}
-                                        {isExpanded ? (
-                                            <ChevronDownIcon {...styles.internalButtonIcon} />
-                                        ) : (
-                                            <ChevronRightIcon {...styles.internalButtonIcon} />
-                                        )}
+                                    {/* Show item as a leaf node if it has no visible child items. */}
+                                    {items && items.filter(filter).length > 0 ? (
+                                        <AccordionButton {...styles.internalButton}>
+                                            {/* Replace default expanded/collapsed icons. */}
+                                            {isExpanded ? (
+                                                <ChevronDownIcon {...styles.internalButtonIcon} />
+                                            ) : (
+                                                <ChevronRightIcon {...styles.internalButtonIcon} />
+                                            )}
 
-                                        <Text
-                                            fontSize={fontSizes[depth]}
-                                            fontWeight={fontWeights[depth]}
+                                            <Text
+                                                fontSize={fontSizes[depth]}
+                                                fontWeight={fontWeights[depth]}
+                                            >
+                                                {name}
+                                            </Text>
+                                        </AccordionButton>
+                                    ) : (
+                                        <AccordionButton
+                                            {...styles.leafButton}
+                                            as={Link}
+                                            to={urlBuilder(item)}
                                         >
-                                            {name}
-                                        </Text>
-                                    </AccordionButton>
+                                            <Text
+                                                fontSize={fontSizes[depth]}
+                                                fontWeight={fontWeights[depth]}
+                                            >
+                                                {name}
+                                            </Text>
+                                        </AccordionButton>
+                                    )}
                                 </h2>
 
                                 {/* Child Items */}
+                                {/* NOTE: Once the API is updated we'll modify this condition to only show if expanded and 
+                                the item has children */}
                                 {isExpanded && (
                                     <AccordionPanel {...styles.panel}>
                                         <ItemComponent
@@ -92,7 +110,7 @@ const NestedAccordion = (props) => {
                                             item={item}
                                             itemsKey={'categories'}
                                             initialDepth={depth + 1}
-                                            defaultItemComponent={NestedAccordion}
+                                            itemComponent={NestedAccordion}
                                             isExpanded={isExpanded}
                                         />
                                     </AccordionPanel>

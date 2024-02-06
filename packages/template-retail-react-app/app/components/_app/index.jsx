@@ -83,7 +83,7 @@ const componentPlaceholder = (
 )
 
 const DrawerMenuItem = withCommerceData(
-    ({defaultItemComponent: ItemComponent, data, ...restProps}) => (
+    ({itemComponent: ItemComponent, data, ...restProps}) => (
         <Fade in={true}>
             <ItemComponent
                 {...restProps}
