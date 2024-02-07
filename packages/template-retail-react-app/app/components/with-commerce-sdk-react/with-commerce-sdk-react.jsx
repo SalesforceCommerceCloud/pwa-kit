@@ -22,7 +22,7 @@ const withCommerceSdkReact = (Component, opts = {}) => {
     const WrappedComponent = (props) => {
         const {hook, queryOptions, placeholderContent} = opts
         const {data, isLoading} = hook(
-            typeof queryOptions === 'function' ? queryOptions(props) : queryOptions
+            typeof queryOptions === 'function' ? queryOptions(props) : queryOptions || {}
         )
 
         return isLoading ? (

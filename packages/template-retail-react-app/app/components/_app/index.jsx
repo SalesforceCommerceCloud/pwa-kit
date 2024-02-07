@@ -90,7 +90,7 @@ const DrawerMenuItem = withCommerceSdkReact(
     ),
     {
         hook: useCategory,
-        queryOption: ({item}) => ({
+        queryOptions: ({item}) => ({
             parameters: {
                 id: item.id
             }
@@ -107,7 +107,7 @@ const ListMenuContentWithData = withCommerceSdkReact(
     ),
     {
         hook: useCategory,
-        queryOption: ({item}) => ({
+        queryOptions: ({item}) => ({
             parameters: {
                 id: item.id,
                 levels: 2
