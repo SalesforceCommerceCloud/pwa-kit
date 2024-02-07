@@ -264,6 +264,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
 
+    // Ensure response headers can contain commas
     app.get('/redirect-with-commas', (req, res) => {
         res.redirect('/22,testing,cc.html')
     })
