@@ -264,6 +264,10 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
 
+    app.get('/redirect-with-commas', (req, res) => {
+        res.redirect('/22,testing,cc.html')
+    })
+
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
     app.all('/auth/logout', (req, res) => res.status(401).send('Logged out'))
