@@ -13,16 +13,16 @@ import React, {Fragment} from 'react'
  *
  * @param {Component} Component - the component you want to be conditionally rendered and provided data to.
  * @param {Object} opts.hook - a commercerce react sdk hook used to fetch data with.
- * @param {Object} opts.queryOption - query parameters passed to the hook, optionally can be a function that returns
+ * @param {Object} opts.queryOptions - query parameters passed to the hook, optionally can be a function that returns
  * a query parameter object.
  * @param {Object} opts.placeholderContent - the component you want be rendered while data is being fetched
  * @returns {Component} - the enhanced component.
  */
 const withCommerceSdkReact = (Component, opts = {}) => {
     const WrappedComponent = (props) => {
-        const {hook, queryOption, placeholderContent} = opts
+        const {hook, queryOptions, placeholderContent} = opts
         const {data, isLoading} = hook(
-            typeof queryOption === 'function' ? queryOption(props) : queryOption
+            typeof queryOptions === 'function' ? queryOptions(props) : queryOptions
         )
 
         return isLoading ? (
