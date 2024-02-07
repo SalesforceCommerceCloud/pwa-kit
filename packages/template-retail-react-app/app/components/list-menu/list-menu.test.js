@@ -14,7 +14,7 @@ import userEvent from '@testing-library/user-event'
 describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {
         const user = userEvent.setup()
-        renderWithProviders(<ListMenu root={mockCategories.root} />)
+        renderWithProviders(<ListMenu root={mockCategories.root} itemsKey="categories" />)
 
         const categoryTrigger = screen.getByText(/Mens/i)
         await user.hover(categoryTrigger)

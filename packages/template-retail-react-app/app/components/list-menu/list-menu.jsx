@@ -12,7 +12,9 @@ import {useIntl} from 'react-intl'
 // Components
 import {
     Box,
+    Center,
     Flex,
+    Spinner,
     Stack,
 
     // Hooks
@@ -58,7 +60,7 @@ const ListMenu = ({root, contentComponent, itemsKey, maxColumns = MAXIMUM_NUMBER
             aria-atomic="true"
         >
             <Flex {...baseStyle.container}>
-                {items && (
+                {items ? (
                     <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>
                         {items?.map?.((item) => {
                             const {id, name} = item
@@ -78,6 +80,10 @@ const ListMenu = ({root, contentComponent, itemsKey, maxColumns = MAXIMUM_NUMBER
                             )
                         })}
                     </Stack>
+                ) : (
+                    <Center p="2">
+                        <Spinner size="lg" />
+                    </Center>
                 )}
             </Flex>
         </nav>

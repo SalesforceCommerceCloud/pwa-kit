@@ -8,6 +8,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+// Project Components
+import Link from '@salesforce/retail-react-app/app/components/link'
+
 // Components
 import {
     Accordion,

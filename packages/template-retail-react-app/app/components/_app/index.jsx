@@ -85,11 +85,7 @@ const componentPlaceholder = (
 const DrawerMenuItem = withCommerceSdkReact(
     ({itemComponent: ItemComponent, data, ...rest}) => (
         <Fade in={true}>
-            <ItemComponent
-                {...rest}
-                item={data}
-                itemComponent={DrawerMenuItem}
-            />
+            <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItem} />
         </Fade>
     ),
     {
