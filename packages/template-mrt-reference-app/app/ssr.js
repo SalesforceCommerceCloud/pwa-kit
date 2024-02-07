@@ -198,7 +198,7 @@ const cookieTest = async (req, res) => {
  * Express handler that sets a response header and returns a JSON response with
  * diagnostic values.  Use ?name=test-name&value=test-value to set a response header.
  */
-const responseHeader = async (req, res) => {
+const responseHeaderTest = async (req, res) => {
     if (Object.hasOwn(req.query, 'name') && Object.hasOwn(req.query, 'value')) {
         res.set(req.query.name, req.query.value)
     }
@@ -274,7 +274,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/cookie', cookieTest)
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
-    app.get('/response-header', responseHeader)
+    app.get('/set-response-header', responseHeaderTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
