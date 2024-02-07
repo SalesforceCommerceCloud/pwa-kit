@@ -88,8 +88,9 @@ describe('server', () => {
     })
 
     test('Path "/set-response-header" sets response header', () => {
-        request(app).get('/set-response-header?name=test-header&value=test-value')
-        .expect('test-header', 'test-value')
+        return request(app)
+            .get('/set-response-header?name=test-header&value=test-value')
+            .expect('test-header', 'test-value')
     })
 
     test('Path "/isolation" succeeds', async () => {
