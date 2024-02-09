@@ -48,7 +48,7 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-demo"
 
-      - name: Validated Generated Retail App Demo
+      - name: Validate Generated Retail App Demo
         uses: ./.github/actions/e2e_validate_generated_app
         with:
           PROJECT_KEY: "retail-app-demo"
@@ -95,7 +95,7 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-no-ext"
 
-      - name: Validated Generated Retail App Demo
+      - name: Validate Retail App Without Extensibility
         uses: ./.github/actions/e2e_validate_generated_app
         with:
           PROJECT_KEY: "retail-app-no-ext"
