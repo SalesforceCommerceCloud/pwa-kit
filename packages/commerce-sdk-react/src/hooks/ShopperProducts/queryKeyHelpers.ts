@@ -64,12 +64,14 @@ export const getProducts: QueryKeyHelper<'getProducts'> = {
             'organizationId',
             'ids',
             'inventoryIds',
+            'select',
             'currency',
             'expand',
             'locale',
             'allImages',
             'perPricebook',
             'siteId',
+            'perPricebook',
             ...getCustomKeys(params)
         ]),
     path: (params) => [

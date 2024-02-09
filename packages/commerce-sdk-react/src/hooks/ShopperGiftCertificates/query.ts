@@ -37,6 +37,8 @@ export const useGiftCertificate = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -44,7 +46,7 @@ export const useGiftCertificate = (
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>(
-        netOptions,
+        {...netOptions, parameters},
         {
             // !!! This is a violation of our design goal of minimal logic in the indivudal endpoint
             // endpoint hooks. This is because this method is a post method, rather than GET,

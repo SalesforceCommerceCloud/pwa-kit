@@ -79,13 +79,15 @@ export const useCustomer = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -151,13 +153,14 @@ export const useCustomerBaskets = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -189,13 +192,15 @@ export const useCustomerOrders = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
-    // We don't use `netOptions` here because we manipulate the options in `useQuery`.
+    // We don't use `netOptions` here because we manipulate the option in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -230,13 +235,15 @@ export const useCustomerPaymentInstrument = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -266,13 +273,15 @@ export const useCustomerProductLists = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -302,13 +311,15 @@ export const useCustomerProductList = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -344,13 +355,15 @@ export const useCustomerProductListItem = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -380,13 +393,15 @@ export const usePublicProductListsBySearchTerm = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -416,13 +431,15 @@ export const usePublicProductList = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -452,13 +469,15 @@ export const useProductListItem = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters

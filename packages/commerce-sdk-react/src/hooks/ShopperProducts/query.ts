@@ -37,13 +37,15 @@ export const useProducts = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -73,14 +75,15 @@ export const useProduct = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -110,13 +113,15 @@ export const useCategories = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -148,13 +153,15 @@ export const useCategory = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    // get valid params for the api from netOptions
+    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
