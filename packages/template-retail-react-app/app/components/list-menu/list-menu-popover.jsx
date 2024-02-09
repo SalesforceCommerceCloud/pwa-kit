@@ -53,7 +53,7 @@ const ListMenuPopover = ({contentComponent, items, item, name, itemsKey, maxColu
                     />
                     {isOpen && (
                         <PopoverContent data-testid="popover-menu" {...baseStyle.popoverContent}>
-                            <PopoverBody>
+                            <PopoverBody {...baseStyle.popoverBody}>
                                 <ContentComponent
                                     item={item}
                                     itemsKey={itemsKey}
