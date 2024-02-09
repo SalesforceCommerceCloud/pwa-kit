@@ -7,7 +7,10 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { generateUserCredentials, getCreditCardExpiry } = require("../../scripts/utils.js");
+const {
+  generateUserCredentials,
+  getCreditCardExpiry,
+} = require("../../scripts/utils.js");
 
 const REGISTERED_USER_CREDENTIALS = generateUserCredentials();
 
@@ -59,7 +62,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
 
   await page.getByRole("radio", { name: "L", exact: true }).click();
 
-  await page.getByRole("button", { name: "+" }).click();
+  await page.locator("button[data-testid='quantity-increment']").click();
 
   // Selected Size and Color texts are broken into multiple elements on the page.
   // So we need to look at the page URL to verify selected variants
@@ -78,28 +81,40 @@ test("Registered shopper can checkout items", async ({ page }) => {
 
   await page.getByLabel(/My cart/i).click();
 
-  await expect(
-    page.getByRole("link", { name: /Stripe Shell/i })
-  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
 
   // Confirm the email input toggles to show sign out button on clicking "Checkout as guest"
   const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']");
 
-  await expect(step0Card.getByRole("button", { name: /Sign Out/i })).toBeVisible();
+  await expect(
+    step0Card.getByRole("button", { name: /Sign Out/i })
+  ).toBeVisible();
 
   await expect(
     page.getByRole("heading", { name: /Shipping Address/i })
   ).toBeVisible();
 
-  await page.locator("input#firstName").fill(REGISTERED_USER_CREDENTIALS.firstName);
-  await page.locator("input#lastName").fill(REGISTERED_USER_CREDENTIALS.lastName);
+  await page
+    .locator("input#firstName")
+    .fill(REGISTERED_USER_CREDENTIALS.firstName);
+  await page
+    .locator("input#lastName")
+    .fill(REGISTERED_USER_CREDENTIALS.lastName);
   await page.locator("input#phone").fill(REGISTERED_USER_CREDENTIALS.phone);
-  await page.locator("input#address1").fill("5 Wall St.");
-  await page.locator("input#city").fill("Burlington");
-  await page.locator("select#stateCode").selectOption("MA");
-  await page.locator("input#postalCode").fill("01803");
+  await page
+    .locator("input#address1")
+    .fill(REGISTERED_USER_CREDENTIALS.address.street);
+  await page
+    .locator("input#city")
+    .fill(REGISTERED_USER_CREDENTIALS.address.city);
+  await page
+    .locator("select#stateCode")
+    .selectOption(REGISTERED_USER_CREDENTIALS.address.state);
+  await page
+    .locator("input#postalCode")
+    .fill(REGISTERED_USER_CREDENTIALS.address.zipcode);
 
   await page
     .getByRole("button", { name: /Continue to Shipping Method/i })
@@ -114,7 +129,12 @@ test("Registered shopper can checkout items", async ({ page }) => {
     page.getByRole("heading", { name: /Shipping & Gift Options/i })
   ).toBeVisible();
 
-  await page.getByRole("button", { name: /Continue to Payment/i }).click();
+  const continueToPayment = page.getByRole("button", {
+    name: /Continue to Payment/i,
+  });
+  if (continueToPayment.isVisible()) {
+    await continueToPayment.click();
+  }
 
   // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
   const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']");
