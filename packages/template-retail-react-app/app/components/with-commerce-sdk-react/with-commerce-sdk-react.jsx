@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment} from 'react'
+import React from 'react'
 
 /**
  * Higher-order component used to conditionally render a provided component, while data is fetched using
@@ -20,16 +20,12 @@ import React, {Fragment} from 'react'
  */
 const withCommerceSdkReact = (Component, opts = {}) => {
     const WrappedComponent = (props) => {
-        const {hook, queryOptions, placeholderContent} = opts
+        const {hook, queryOptions, placeholder: Placeholder} = opts
         const {data, isLoading} = hook(
             typeof queryOptions === 'function' ? queryOptions(props) : queryOptions || {}
         )
 
-        return isLoading ? (
-            <Fragment>{placeholderContent}</Fragment>
-        ) : (
-            <Component {...props} data={data} />
-        )
+        return isLoading ? <Placeholder {...props} /> : <Component {...props} data={data} />
     }
 
     WrappedComponent.propTypes = {}

@@ -76,7 +76,7 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 
-const componentPlaceholder = (
+const PlaceholderComponent = () => (
     <Center p="2">
         <Spinner size="lg" />
     </Center>
@@ -95,7 +95,7 @@ const DrawerMenuItem = withCommerceSdkReact(
                 id: item.id
             }
         }),
-        placeholderContent: componentPlaceholder
+        placeholder: PlaceholderComponent
     }
 )
 
@@ -113,7 +113,7 @@ const ListMenuContentWithData = withCommerceSdkReact(
                 levels: 2
             }
         }),
-        placeholderContent: componentPlaceholder
+        placeholder: PlaceholderComponent
     }
 )
 
