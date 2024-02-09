@@ -139,10 +139,11 @@ test("Registered shopper can checkout items", async ({ page }) => {
     page.getByRole("heading", { name: /Shipping & Gift Options/i })
   ).toBeVisible();
 
+  await page.waitForTimeout(2000);
   const continueToPayment = page.getByRole("button", {
     name: /Continue to Payment/i,
   });
-  if (continueToPayment.isVisible()) {
+  if (continueToPayment.isEnabled()) {
     await continueToPayment.click();
   }
 
