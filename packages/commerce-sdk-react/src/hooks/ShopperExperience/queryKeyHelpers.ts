@@ -7,6 +7,7 @@
 import type {ShopperExperience} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
 import {getCustomKeys, pick} from '../utils'
+import paramKeysMap from './paramKeys'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperExperience<{shortCode: string}>
@@ -32,11 +33,6 @@ export type QueryKeys = {
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
 // and making those generic would add too much complexity.
 type QueryKeyHelper<T extends keyof QueryKeys> = {
-    /**
-     * Reduces the given parameters (which may have additional, unknown properties) to an object
-     * containing *only* the properties required for an endpoint.
-     */
-    parameters: (params: Params<T>) => Params<T>
     /** Generates the path component of the query key for an endpoint. */
     path: (params: Params<T>) => ExcludeTail<QueryKeys[T]>
     /** Generates the full query key for an endpoint. */
@@ -44,36 +40,14 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 }
 
 export const getPages: QueryKeyHelper<'getPages'> = {
-    parameters: (params) =>
-        pick(params, [
-            'organizationId',
-            'categoryId',
-            'productId',
-            'aspectTypeId',
-            'aspectAttributes',
-            'parameters',
-            'siteId',
-            'locale',
-            ...getCustomKeys(params)
-        ]),
     path: (params) => ['/commerce-sdk-react', '/organizations/', params.organizationId, '/pages'],
-    queryKey: (params: Params<'getPages'>) => [
-        ...getPages.path(params),
-        getPages.parameters(params)
-    ]
+    queryKey: (params: Params<'getPages'>) => {
+        const paramKeys = [...paramKeysMap['getPages'], ...getCustomKeys(params)]
+        return [...getPages.path(params), pick(params, paramKeys)]
+    }
 }
 
 export const getPage: QueryKeyHelper<'getPage'> = {
-    parameters: (params) =>
-        pick(params, [
-            'organizationId',
-            'pageId',
-            'aspectAttributes',
-            'parameters',
-            'siteId',
-            'locale',
-            ...getCustomKeys(params)
-        ]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -81,5 +55,8 @@ export const getPage: QueryKeyHelper<'getPage'> = {
         '/pages/',
         params.pageId
     ],
-    queryKey: (params: Params<'getPage'>) => [...getPage.path(params), getPage.parameters(params)]
+    queryKey: (params: Params<'getPage'>) => {
+        const paramKeys = [...paramKeysMap['getPage'], ...getCustomKeys(params)]
+        return [...getPage.path(params), pick(params, paramKeys)]
+    }
 }

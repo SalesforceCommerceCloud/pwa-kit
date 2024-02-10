@@ -7,6 +7,7 @@
 import type {ShopperOrders} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
 import {getCustomKeys, pick} from '../utils'
+import paramKeysMap from './paramKeys'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperOrders<{shortCode: string}>
@@ -43,11 +44,6 @@ export type QueryKeys = {
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
 // and making those generic would add too much complexity.
 type QueryKeyHelper<T extends keyof QueryKeys> = {
-    /**
-     * Reduces the given parameters (which may have additional, unknown properties) to an object
-     * containing *only* the properties required for an endpoint.
-     */
-    parameters: (params: Params<T>) => Params<T>
     /** Generates the path component of the query key for an endpoint. */
     path: (params: Params<T>) => ExcludeTail<QueryKeys[T]>
     /** Generates the full query key for an endpoint. */
@@ -55,8 +51,6 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 }
 
 export const getOrder: QueryKeyHelper<'getOrder'> = {
-    parameters: (params) =>
-        pick(params, ['organizationId', 'orderNo', 'siteId', 'locale', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -64,15 +58,14 @@ export const getOrder: QueryKeyHelper<'getOrder'> = {
         '/orders/',
         params.orderNo
     ],
-    queryKey: (params: Params<'getOrder'>) => [
-        ...getOrder.path(params),
-        getOrder.parameters(params)
-    ]
+    queryKey: (params: Params<'getOrder'>) => {
+        const paramKeys = [...paramKeysMap['getOrder'], ...getCustomKeys(params)]
+
+        return [...getOrder.path(params), pick(params, paramKeys)]
+    }
 }
 
 export const getPaymentMethodsForOrder: QueryKeyHelper<'getPaymentMethodsForOrder'> = {
-    parameters: (params) =>
-        pick(params, ['organizationId', 'orderNo', 'siteId', 'locale', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -81,15 +74,14 @@ export const getPaymentMethodsForOrder: QueryKeyHelper<'getPaymentMethodsForOrde
         params.orderNo,
         '/payment-methods'
     ],
-    queryKey: (params: Params<'getPaymentMethodsForOrder'>) => [
-        ...getPaymentMethodsForOrder.path(params),
-        getPaymentMethodsForOrder.parameters(params)
-    ]
+    queryKey: (params: Params<'getPaymentMethodsForOrder'>) => {
+        const paramKeys = [...paramKeysMap['getPaymentMethodsForOrder'], ...getCustomKeys(params)]
+
+        return [...getPaymentMethodsForOrder.path(params), pick(params, paramKeys)]
+    }
 }
 
 export const getTaxesFromOrder: QueryKeyHelper<'getTaxesFromOrder'> = {
-    parameters: (params) =>
-        pick(params, ['organizationId', 'orderNo', 'siteId', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -98,8 +90,9 @@ export const getTaxesFromOrder: QueryKeyHelper<'getTaxesFromOrder'> = {
         params.orderNo,
         '/taxes'
     ],
-    queryKey: (params: Params<'getTaxesFromOrder'>) => [
-        ...getTaxesFromOrder.path(params),
-        getTaxesFromOrder.parameters(params)
-    ]
+    queryKey: (params: Params<'getTaxesFromOrder'>) => {
+        const paramKeys = [...paramKeysMap['getTaxesFromOrder'], ...getCustomKeys(params)]
+
+        return [...getTaxesFromOrder.path(params), pick(params, paramKeys)]
+    }
 }

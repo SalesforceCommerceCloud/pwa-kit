@@ -7,6 +7,7 @@
 import type {ShopperLogin} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
 import {getCustomKeys, pick} from '../utils'
+import paramKeysMap from './paramKeys'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperLogin<{shortCode: string}>
@@ -38,11 +39,6 @@ export type QueryKeys = {
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
 // and making those generic would add too much complexity.
 type QueryKeyHelper<T extends keyof QueryKeys> = {
-    /**
-     * Reduces the given parameters (which may have additional, unknown properties) to an object
-     * containing *only* the properties required for an endpoint.
-     */
-    parameters: (params: Params<T>) => Params<T>
     /** Generates the path component of the query key for an endpoint. */
     path: (params: Params<T>) => ExcludeTail<QueryKeys[T]>
     /** Generates the full query key for an endpoint. */
@@ -50,44 +46,44 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 }
 
 export const getUserInfo: QueryKeyHelper<'getUserInfo'> = {
-    parameters: (params) =>
-        pick(params, ['organizationId', 'channel_id', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/oauth2/userinfo'
     ],
-    queryKey: (params: Params<'getUserInfo'>) => [
-        ...getUserInfo.path(params),
-        getUserInfo.parameters(params)
-    ]
+    queryKey: (params: Params<'getUserInfo'>) => {
+        const paramKeys = [...paramKeysMap['getUserInfo'], ...getCustomKeys(params)]
+        return [...getUserInfo.path(params), pick(params, paramKeys)]
+    }
 }
 
 export const getWellknownOpenidConfiguration: QueryKeyHelper<'getWellknownOpenidConfiguration'> = {
-    parameters: (params) => pick(params, ['organizationId', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/oauth2/.well-known/openid-configuration'
     ],
-    queryKey: (params: Params<'getWellknownOpenidConfiguration'>) => [
-        ...getWellknownOpenidConfiguration.path(params),
-        getWellknownOpenidConfiguration.parameters(params)
-    ]
+    queryKey: (params: Params<'getWellknownOpenidConfiguration'>) => {
+        const paramKeys = [
+            ...paramKeysMap['getWellknownOpenidConfiguration'],
+            ...getCustomKeys(params)
+        ]
+
+        return [...getWellknownOpenidConfiguration.path(params), pick(params, paramKeys)]
+    }
 }
 
 export const getJwksUri: QueryKeyHelper<'getJwksUri'> = {
-    parameters: (params) => pick(params, ['organizationId', ...getCustomKeys(params)]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
         '/oauth2/jwks'
     ],
-    queryKey: (params: Params<'getJwksUri'>) => [
-        ...getJwksUri.path(params),
-        getJwksUri.parameters(params)
-    ]
+    queryKey: (params: Params<'getJwksUri'>) => {
+        const paramKeys = [...paramKeysMap['getJwksUri'], ...getCustomKeys(params)]
+        return [...getJwksUri.path(params), pick(params, paramKeys)]
+    }
 }

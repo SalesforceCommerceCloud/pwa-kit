@@ -137,9 +137,8 @@ const ProductList = (props) => {
     )
 
     /**************** Query Actions ****************/
-    // make sure that there is no invalid params sent to SCAPI
-    const searchParamsCopied = {...searchParams}
-    delete searchParamsCopied._refine
+    // _refine is an invalid param for useProductSearch, we don't want to pass it to API call
+    const {_refine, ...restOfParams} = searchParams
 
     const {
         isLoading,
@@ -148,7 +147,7 @@ const ProductList = (props) => {
     } = useProductSearch(
         {
             parameters: {
-                ...searchParamsCopied,
+                ...restOfParams,
                 refine: searchParams._refine
             }
         },

@@ -8,8 +8,9 @@ import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions, omitNullableParameters} from '../utils'
+import {getCustomKeys, mergeOptions, omitNullableParameters, pick} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
+import paramKeysMap from './paramKeys'
 
 type Client = ApiClients['shopperPromotions']
 
@@ -37,8 +38,12 @@ export const usePromotions = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    // get valid params for the api from netOptions
-    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
+    // get param keys for the api from netOptions
+    const paramKeys = [
+        ...paramKeysMap[methodName],
+        ...getCustomKeys(netOptions.parameters)
+    ] as const
+    const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -79,8 +84,9 @@ export const usePromotionsForCampaign = (
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    // get valid params for the api from netOptions
-    const parameters = queryKeyHelpers[methodName].parameters(netOptions.parameters)
+    // get param keys for the api from netOptions
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const parameters = pick(netOptions.parameters, paramKeys)
 
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
