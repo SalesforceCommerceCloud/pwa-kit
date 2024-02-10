@@ -105,7 +105,7 @@ ListMenu.propTypes = {
     /**
      * Customize the component used to render the list menu item
      */
-    contentComponent: PropTypes.func
+    contentComponent: PropTypes.elementType
 }
 
 export {ListMenu}

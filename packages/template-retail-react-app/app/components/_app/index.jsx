@@ -82,10 +82,10 @@ const PlaceholderComponent = () => (
     </Center>
 )
 
-const DrawerMenuItem = withCommerceSdkReact(
+const DrawerMenuItemWithData = withCommerceSdkReact(
     ({itemComponent: ItemComponent, data, ...rest}) => (
         <Fade in={true}>
-            <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItem} />
+            <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
         </Fade>
     ),
     {
@@ -371,7 +371,7 @@ const App = (props) => {
                                                         categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
                                                     }
                                                     itemsKey="categories"
-                                                    itemComponent={DrawerMenuItem}
+                                                    itemComponent={DrawerMenuItemWithData}
                                                 />
                                             </HideOnDesktop>
 

@@ -415,7 +415,7 @@ DrawerMenu.propTypes = {
     /**
      * Component to be rendered for each individual menu item.
      */
-    itemComponent: PropTypes.func
+    itemComponent: PropTypes.elementType
 }
 
 export {DrawerMenu}

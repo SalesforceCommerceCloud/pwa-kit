@@ -71,7 +71,7 @@ const ListMenuPopover = ({contentComponent, items, item, name, itemsKey, maxColu
 }
 
 ListMenuPopover.propTypes = {
-    contentComponent: PropTypes.func,
+    contentComponent: PropTypes.elementType,
     items: PropTypes.array,
     item: PropTypes.object,
     name: PropTypes.string,

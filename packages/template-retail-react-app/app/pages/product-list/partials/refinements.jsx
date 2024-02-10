@@ -157,7 +157,7 @@ const Refinements = ({
 }
 
 Refinements.propTypes = {
-    itemsBefore: PropTypes.arrayOf(PropTypes.elementType),
+    itemsBefore: PropTypes.arrayOf(PropTypes.element),
     filters: PropTypes.array,
     excludedFilters: PropTypes.arrayOf(PropTypes.string),
     toggleFilter: PropTypes.func,

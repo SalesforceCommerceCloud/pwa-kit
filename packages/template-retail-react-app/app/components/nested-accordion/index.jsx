@@ -159,6 +159,10 @@ NestedAccordion.propTypes = {
      */
     initialDepth: PropTypes.number,
     /**
+     * Component to be rendered in place of the inner nested accordion.
+     */
+    itemComponent: PropTypes.elementType,
+    /**
      * By default child items are keyed at `items` but if your data differs you
      * can specify a custom key name for chile items. (e.g. children)
      */
@@ -188,11 +192,7 @@ NestedAccordion.propTypes = {
      * This function builds the urls for leaf items. It accepts
      * the current item, and returns a string.
      */
-    urlBuilder: PropTypes.func,
-    /**
-     * TODO: Descript the itemComponent prop and order it alphabetically.
-     */
-    itemComponent: PropTypes.func
+    urlBuilder: PropTypes.func
 }
 
 export default NestedAccordion
