@@ -39,10 +39,7 @@ export const useBasket = (
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [
-        ...paramKeysMap[methodName],
-        ...getCustomKeys(netOptions.parameters)
-    ] as const
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
@@ -81,10 +78,7 @@ export const usePaymentMethodsForBasket = (
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [
-        ...paramKeysMap[methodName],
-        ...getCustomKeys(netOptions.parameters)
-    ] as const
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
@@ -123,10 +117,7 @@ export const usePriceBooksForBasket = (
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [
-        ...paramKeysMap[methodName],
-        ...getCustomKeys(netOptions.parameters)
-    ] as const
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
@@ -165,10 +156,7 @@ export const useShippingMethodsForShipment = (
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [
-        ...paramKeysMap[methodName],
-        ...getCustomKeys(netOptions.parameters)
-    ] as const
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
@@ -202,16 +190,12 @@ export const useTaxesFromBasket = (
     const {shopperBaskets: client} = useCommerceApi()
     const methodName = 'getTaxesFromBasket'
     const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
-    type Params = Partial<Argument<Client['getTaxesFromBasket']>['parameters']>
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [
-        ...paramKeysMap[methodName],
-        ...getCustomKeys(netOptions.parameters)
-    ] as const
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.

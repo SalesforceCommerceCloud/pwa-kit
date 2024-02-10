@@ -40,10 +40,7 @@ export const useShopperContext = (
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
 
     // get param keys for the api from netOptions
-    const paramKeys = [
-        ...paramKeysMap[methodName],
-        ...getCustomKeys(netOptions.parameters)
-    ] as const
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
