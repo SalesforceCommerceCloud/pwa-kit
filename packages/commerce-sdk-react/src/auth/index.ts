@@ -22,6 +22,7 @@ type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
+    slasProxy: string
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
     OCAPISessionsURL?: string
@@ -168,7 +169,7 @@ class Auth {
 
     constructor(config: AuthConfig) {
         this.client = new ShopperLogin({
-            proxy: config.proxy,
+            proxy: config.slasProxy,
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -401,7 +402,8 @@ class Auth {
             }
         }
         return await this.queueRequest(
-            () => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
+            //() => helpers.loginGuestUser(this.client, {redirectURI: this.redirectURI}),
+            () => helpers.loginGuestUserPrivateClient(this.client,{redirectURI: this.redirectURI}),
             true
         )
     }

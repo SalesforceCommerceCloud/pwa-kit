@@ -54,6 +54,7 @@ const AppConfig = ({children, locals = {}}) => {
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            slasProxy={`${appOrigin}`}
             headers={headers}
             OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
         >
