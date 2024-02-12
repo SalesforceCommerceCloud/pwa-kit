@@ -20,7 +20,8 @@
     "@salesforce/pwa-kit-runtime": "3.2.0-dev",
     "cross-fetch": "^3.1.4",
     "express-basic-auth": "^1.2.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "winston": "^3.11.0"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0",

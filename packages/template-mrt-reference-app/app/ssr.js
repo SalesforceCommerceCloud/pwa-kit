@@ -46,6 +46,25 @@ const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
 const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
+const winston = require('winston');
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  defaultMeta: { service: 'user-service' },
+  transports: [
+    //
+    // - Write all logs with importance level of `error` or less to `error.log`
+    // - Write all logs with importance level of `info` or less to `combined.log`
+    //
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+  ],
+});
+
+logger.add(new winston.transports.Console({
+    format: winston.format.json(),
+}));
 
 /**
  * Custom error class
@@ -195,10 +214,14 @@ const cookieTest = async (req, res) => {
  * Logging middleware; logs request and response headers (and response status).
  */
 const loggingMiddleware = (req, res, next) => {
-    // Log request headers
-    console.log({"jinsu-test": "this is a json log using console.log"})
-    // console.log(JSON.stringify(req.headers, null, 2))
+    // Log using winston
+    logger.log('info', 'json log using winston');
+    
+    // Log using process.stdout.write
     process.stdout.write(JSON.stringify({"jinsu-test": "this is a json log using process.stdout.write"}))
+    
+    // Log at each log level
+    console.log({"jinsu-test": "this is a json log using console.log"})
     console.warn({"jinsu-test": "this is a json log using console.warn"})
     console.debug({"jinsu-test": "this is a json log using console.debug"})
     console.info({"jinsu-test": "this is a json log using console.info"})
