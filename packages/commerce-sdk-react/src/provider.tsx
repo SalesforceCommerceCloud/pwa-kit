@@ -21,9 +21,39 @@ import {
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 
+const Shopper_APIs = [
+    'shopperBaskets',
+    'shopperContexts',
+    'shopperCustomers',
+    'shopperExperience',
+    'shopperLogin',
+    'shopperOrders',
+    'shopperProducts',
+    'shopperPromotions',
+    'shopperGiftCertificates',
+    'shopperSearch',
+] as const
+
+interface CommerceApiProxyPaths {
+    shopperBaskets?: string
+    shopperContexts?: string
+    shopperCustomers?: string
+    shopperExperience?: string
+    shopperLogin?: string
+    shopperOrders?: string
+    shopperProducts?: string
+    shopperPromotions?: string
+    shopperGiftCertificates?: string
+    shopperSearch?: string
+    defaultPath: string
+    host: string
+}
+
+type CommerceApiProxyConfigEntry = [string, ApiClientConfigParams]
+
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
-    proxy: string
+    proxy: string | CommerceApiProxyPaths
     locale: string
     currency: string
     redirectURI: string
@@ -54,7 +84,7 @@ export const AuthContext = React.createContext({} as Auth)
  * Initialize a set of Commerce API clients and make it available to all of descendant components
  *
  * @group Components
- * 
+ *
  * @example
  * ```js
     import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -75,11 +105,11 @@ export const AuthContext = React.createContext({} as Auth)
                     {children}
                 </CommerceApiProvider>
         )
-    } 
+    }
 
     export default App
  * ```
- * 
+ *
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
@@ -100,8 +130,16 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings
     } = props
+
+    let workingProxy = '';
+    if (typeof proxy === 'string') {
+        workingProxy = proxy
+    } else {
+        workingProxy = `${proxy.host}${proxy.defaultPath}`
+    }
+
     const config = {
-        proxy,
+        proxy: workingProxy,
         headers,
         parameters: {
             clientId,
@@ -114,6 +152,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
         fetchOptions
     }
+
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -139,13 +178,24 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         headers?.['correlation-id']
     ])
 
+    let authProxy = '';
+    if (typeof proxy === 'string') {
+        authProxy = proxy
+    } else {
+        if (proxy.shopperLogin) {
+            authProxy = `${proxy.host}${proxy.shopperLogin}`
+        } else {
+            authProxy = `${proxy.host}${proxy.defaultPath}`
+        }
+    }
+
     const auth = useMemo(() => {
         return new Auth({
             clientId,
             organizationId,
             shortCode,
             siteId,
-            proxy,
+            proxy: authProxy,
             redirectURI,
             fetchOptions,
             fetchedToken,
