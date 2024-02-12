@@ -4,11 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {Argument, NullableParameters} from '../types'
-import {ShopperCustomers} from 'commerce-sdk-isomorphic'
-type Client = ShopperCustomers<{shortCode: string}>
-type Params = NullableParameters<Argument<Client['getCustomerBaskets']>>['parameters']
-type test = keyof Params
 export const getCustomer = ['organizationId', 'customerId', 'siteId'] as const
 export const getCustomerAddress = ['organizationId', 'customerId', 'addressName', 'siteId'] as const
 export const getCustomerBaskets = ['organizationId', 'customerId', 'siteId'] as const
