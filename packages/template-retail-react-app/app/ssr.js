@@ -9,7 +9,7 @@
 
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
-import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
+import {defaultPwaKitSecurityHeaders, injectSlasPrivateClientSecret} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
 
@@ -60,6 +60,9 @@ const {handler} = runtime.createHandler(options, (app) => {
         })
     )
 
+    // TODO: Should this path be configurable?
+    app.use('/ssr/auth', injectSlasPrivateClientSecret)
+
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
         // This endpoint does nothing and is not expected to change
@@ -67,6 +70,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.set('Cache-Control', `max-age=31536000`)
         res.send()
     })
+
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
