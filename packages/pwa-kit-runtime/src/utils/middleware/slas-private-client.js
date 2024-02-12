@@ -58,7 +58,10 @@ export const injectSlasPrivateClientSecret = (req, res, next) => {
             // the authorization header for a different purpose
             if (!path.includes('/login') && headers.includes('authorization')) {
                 console.log('In replacement')
-                const encodedClientCredential = Buffer.from(`${clientId}:${secret}`).toString(
+                const clientId = process?.env?.SLAS_PRIVATE_CLIENT_ID
+                const clientSecret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
+                console.log(`${clientId} ${clientSecret}`)
+                const encodedClientCredential = Buffer.from(`${clientId}:${clientSecret}`).toString(
                     'base64'
                 )
                 slasRequest.setHeader('Authorization', `Basic ${encodedClientCredential}`)
