@@ -185,7 +185,6 @@ export const getCustomerAddress: QueryKeyHelper<'getCustomerAddress'> = {
         return [...getCustomerAddress.path(params), pick(params, paramKeys)]
     }
 }
-//@ts-ignore
 export const getCustomerBaskets: QueryKeyHelper<'getCustomerBaskets'> = {
     path: (params) => [
         '/commerce-sdk-react',

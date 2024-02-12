@@ -145,7 +145,6 @@ export const getTaxesFromBasket: QueryKeyHelper<'getTaxesFromBasket'> = {
         params.basketId,
         '/taxes'
     ],
-    //@ts-ignore
     queryKey: (params: Params<'getTaxesFromBasket'>) => {
         const paramKeys = [...paramKeysMap['getTaxesFromBasket'], ...getCustomKeys(params)]
         return [...getTaxesFromBasket.path(params), pick(params, paramKeys)]
