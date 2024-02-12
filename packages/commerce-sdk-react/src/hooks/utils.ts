@@ -133,6 +133,8 @@ export const clone = <T>(val: T): T => {
 
 /** get a list of custom key starting with c_**/
 export const getCustomKeys = <T extends object>(obj: T) => {
-    if (typeof obj !== 'object' || obj === null) return []
+    if (typeof obj !== 'object' || obj === null) {
+        throw new Error('Invalid input. Expecting an object as an input.')
+    }
     return Object.keys(obj).filter((key: string): key is `c_${string}` => key.startsWith('c_'))
 }
