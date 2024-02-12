@@ -49,7 +49,6 @@ describe('Hook utils', () => {
 
 describe('getCustomKey', function () {
     test('throw error for invalid input', () => {
-        const res = getCustomKeys([])
         //@ts-expect-error
         expect(() => getCustomKeys(null)).toThrow()
     })
