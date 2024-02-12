@@ -196,6 +196,14 @@ const cookieTest = async (req, res) => {
  */
 const loggingMiddleware = (req, res, next) => {
     // Log request headers
+    console.log({"jinsu-test": "this is a json log using console.log"})
+    // console.log(JSON.stringify(req.headers, null, 2))
+    process.stdout.write(JSON.stringify({"jinsu-test": "this is a json log using process.stdout.write"}))
+    console.warn({"jinsu-test": "this is a json log using console.warn"})
+    console.debug({"jinsu-test": "this is a json log using console.debug"})
+    console.info({"jinsu-test": "this is a json log using console.info"})
+    console.error({"jinsu-test": "this is a json log using console.error"})
+
     console.log(`Request: ${req.method} ${req.originalUrl}`)
     console.log(`Request headers: ${JSON.stringify(req.headers, null, 2)}`)
     // Arrange to log response status and headers
