@@ -1,3 +1,6 @@
+## v3.4.1 (Feb 12, 2024)
+- Fix configuration file to support node 20 [#1663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1663/files)
+
 ## v3.4.0 (Jan 19, 2024)
 
 - Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
