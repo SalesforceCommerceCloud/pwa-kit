@@ -47,10 +47,11 @@ describe('Hook utils', () => {
     })
 })
 
-describe('getCustomerKey', function () {
-    test('returns empty array when input is not an object', () => {
+describe('getCustomKey', function () {
+    test('throw error for invalid input', () => {
         const res = getCustomKeys([])
-        expect(res).toEqual([])
+        //@ts-expect-error
+        expect(() => getCustomKeys(null)).toThrow()
     })
 
     test('returns custom key c_ as output', () => {
