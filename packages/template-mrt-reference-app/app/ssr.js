@@ -216,7 +216,7 @@ const cookieTest = async (req, res) => {
 const loggingMiddleware = (req, res, next) => {
     // Log using winston 
     logger.log('info', 'json log using winston that triggers KeyError');
-    logger.log({'level':'info', 'log':'json log using winston that triggers TypeError', 'telemetryEvent': 'telemetryEvent field defined by customer'});
+    logger.log({'metadata': 'defined by cust', 'level':'info', 'log':'json log using winston', 'telemetryEvent': 'telemetryEvent field defined by customer'});
     
     // Log using process.stdout.write
     // process.stdout.write(JSON.stringify({"jinsu-test": "this is a json log using process.stdout.write"}))
