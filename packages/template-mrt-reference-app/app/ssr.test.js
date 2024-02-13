@@ -96,17 +96,20 @@ describe('server', () => {
 
     test('Path "/set-response-headers" sets response headers', () => {
         return request(app)
-            .get('/set-response-headers?name1=test-header&value1=test-value&name2=test-header2&value2=test-value2')
+            .get(
+                '/set-response-headers?name1=test-header&value1=test-value&name2=test-header2&value2=test-value2'
+            )
             .expect('test-header', 'test-value')
             .expect('test-header2', 'test-value2')
     })
 
     test('Path "/set-multi-value-response-header" sets mult value response header', () => {
         return request(app)
-            .get('/set-multi-value-response-header?name=test-header&value1=test-value&value2=test-value2')
+            .get(
+                '/set-multi-value-response-header?name=test-header&value1=test-value&value2=test-value2'
+            )
             .expect('test-header', 'test-value, test-value2')
     })
-
 
     test('Path "/isolation" succeeds', async () => {
         jest.spyOn(console, 'error')

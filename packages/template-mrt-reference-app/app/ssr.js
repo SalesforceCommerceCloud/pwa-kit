@@ -196,14 +196,14 @@ const cookieTest = async (req, res) => {
 
 /**
  * Express handler that sets response headers and returns a JSON response with
- * diagnostic values.  
- * Use ?name1=test-name&value1=test-value&name2=test-name2&value2=test-value2 
+ * diagnostic values.
+ * Use ?name1=test-name&value1=test-value&name2=test-name2&value2=test-value2
  * to set two response headers.
  */
 const responseHeadersTest = async (req, res) => {
-    let i = 0;
+    let i = 0
     let queryIdFound = true
-    
+
     do {
         i = i + 1
 
@@ -221,25 +221,25 @@ const responseHeadersTest = async (req, res) => {
 
 /**
  * Express handler that sets a multi value response headers and returns a JSON response with
- * diagnostic values.  Use ?name=test-name&value1=test-value&value2=test-value2 to 
+ * diagnostic values.  Use ?name=test-name&value1=test-value&value2=test-value2 to
  * set a response header with multiple values.
  */
 const responseMultiValueHeaderTest = async (req, res) => {
-    let i = 0;
+    let i = 0
     let queryIdFound = true
     let multiHeaderValues = []
 
-    if (!Object.hasOwn(req.query, "name")) {
+    if (!Object.hasOwn(req.query, 'name')) {
         res.json(jsonFromRequest(req))
         return
     }
-    
+
     do {
         i = i + 1
 
         const headerValue = `value${i}`
 
-        //Find all the values and then set as an array 
+        //Find all the values and then set as an array
         if (Object.hasOwn(req.query, headerValue)) {
             multiHeaderValues.push(req.query[headerValue])
         } else {
@@ -249,7 +249,7 @@ const responseMultiValueHeaderTest = async (req, res) => {
 
     if (multiHeaderValues.length > 0) {
         res.set(req.query.name, multiHeaderValues)
-    } 
+    }
     res.json(jsonFromRequest(req))
 }
 
