@@ -127,11 +127,6 @@ export type QueryKeys = {
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
 // and making those generic would add too much complexity.
 type QueryKeyHelper<T extends keyof QueryKeys> = {
-    // /**
-    //  * Reduces the given parameters (which may have additional, unknown properties) to an object
-    //  * containing *only* the properties required for an endpoint.
-    //  */
-    // parameters: (params: Params<T>) => Params<T>
     /** Generates the path component of the query key for an endpoint. */
     path: (params: Params<T>) => ExcludeTail<QueryKeys[T]>
     /** Generates the full query key for an endpoint. */
@@ -140,12 +135,6 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 
 // TODO: Re-implement (and update description from RAML spec) when the endpoint exits closed beta.
 // export const getExternalProfile: QueryKeyHelper<'getExternalProfile'> = {
-//     path: (params) => [
-//         '/commerce-sdk-react',
-//         '/organizations/',
-//         params.organizationId,
-//         '/customers/external-profile'
-//     ],
 //     queryKey: (params: Params<'getExternalProfile'>) => {
 //         const paramKeys = [
 //             ...paramKeysMap['getExternalProfile'],

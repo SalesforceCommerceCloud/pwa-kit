@@ -41,8 +41,8 @@ export const getPublicProductListsBySearchTerm = [
     'siteId'
 ] as const
 export const getPublicProductList = ['organizationId', 'listId', 'siteId'] as const
-// TODO: Re-implement (and update description from RAML spec) when the endpoint exits closed beta.
 export const getProductListItem = ['organizationId', 'listId', 'itemId', 'siteId'] as const
+// TODO: Re-implement (and update description from RAML spec) when the endpoint exits closed beta.
 // export const getExternalProfile = [
 //     'organizationId',
 //     'externalId',

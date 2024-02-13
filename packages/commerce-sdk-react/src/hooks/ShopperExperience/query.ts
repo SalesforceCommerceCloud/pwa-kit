@@ -41,10 +41,7 @@ export const usePages = (
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [
-        ...paramKeysMap[methodName],
-        ...getCustomKeys(netOptions.parameters)
-    ] as const
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
@@ -86,10 +83,7 @@ export const usePage = (
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [
-        ...paramKeysMap[methodName],
-        ...getCustomKeys(netOptions.parameters)
-    ] as const
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
