@@ -49,7 +49,7 @@ describe('Hook utils', () => {
 
 describe('getCustomKey', function () {
     test('throw error for invalid input', () => {
-        //@ts-expect-error
+        //@ts-expect-error wrong typed arg is passed intentional to test error
         expect(() => getCustomKeys(null)).toThrow()
     })
 
