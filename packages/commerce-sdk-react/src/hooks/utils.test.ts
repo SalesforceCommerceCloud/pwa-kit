@@ -6,7 +6,7 @@
  */
 
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import {mergeOptions} from './utils'
+import {mergeOptions, getCustomKeys} from './utils'
 
 describe('Hook utils', () => {
     test('mergeOptions merges body, header, and options', () => {
@@ -44,5 +44,28 @@ describe('Hook utils', () => {
                 optionsHeader: 'optionsHeader'
             }
         })
+    })
+})
+
+describe('getCustomKey', function () {
+    test('throw error for invalid input', () => {
+        //@ts-expect-error wrong typed arg is passed intentional to test error
+        expect(() => getCustomKeys(null)).toThrow()
+    })
+
+    test('returns custom key c_ as output', () => {
+        const res = getCustomKeys({
+            some_key: 'hello',
+            c_key: 'custom key value',
+            c_custom: 'another value'
+        })
+        expect(res).toEqual(['c_key', 'c_custom'])
+    })
+
+    test('returns empty when there is no custom key in the input', () => {
+        const res = getCustomKeys({
+            some_key: 'hello'
+        })
+        expect(res).toEqual([])
     })
 })
