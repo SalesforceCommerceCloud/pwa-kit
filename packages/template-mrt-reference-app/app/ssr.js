@@ -195,13 +195,61 @@ const cookieTest = async (req, res) => {
 }
 
 /**
- * Express handler that sets a response header and returns a JSON response with
- * diagnostic values.  Use ?name=test-name&value=test-value to set a response header.
+ * Express handler that sets response headers and returns a JSON response with
+ * diagnostic values.  
+ * Use ?name1=test-name&value1=test-value&name2=test-name2&value2=test-value2 
+ * to set two response headers.
  */
-const responseHeaderTest = async (req, res) => {
-    if (Object.hasOwn(req.query, 'name') && Object.hasOwn(req.query, 'value')) {
-        res.set(req.query.name, req.query.value)
+const responseHeadersTest = async (req, res) => {
+    let i = 0;
+    let queryIdFound = true
+    
+    do {
+        i = i + 1
+
+        const headerName = `name${i}`
+        const headerValue = `value${i}`
+        if (Object.hasOwn(req.query, headerName) && Object.hasOwn(req.query, headerValue)) {
+            res.set(req.query[headerName], req.query[headerValue])
+        } else {
+            queryIdFound = false
+        }
+    } while (queryIdFound)
+
+    res.json(jsonFromRequest(req))
+}
+
+/**
+ * Express handler that sets a multi value response headers and returns a JSON response with
+ * diagnostic values.  Use ?name=test-name&value1=test-value&value2=test-value2 to 
+ * set a response header with multiple values.
+ */
+const responseMultiValueHeaderTest = async (req, res) => {
+    let i = 0;
+    let queryIdFound = true
+    let multiHeaderValues = []
+
+    if (!Object.hasOwn(req.query, "name")) {
+        res.json(jsonFromRequest(req))
+        return
     }
+    
+    do {
+        i = i + 1
+
+        const headerValue = `value${i}`
+
+        //Find all the values and then set as an array 
+        if (Object.hasOwn(req.query, headerValue)) {
+            multiHeaderValues.push(req.query[headerValue])
+        } else {
+            queryIdFound = false
+        }
+    } while (queryIdFound)
+
+    if (multiHeaderValues.length > 0) {
+        res.set(req.query.name, multiHeaderValues)
+    } 
     res.json(jsonFromRequest(req))
 }
 
@@ -274,7 +322,8 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/cookie', cookieTest)
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
-    app.get('/set-response-header', responseHeaderTest)
+    app.get('/set-response-headers', responseHeadersTest)
+    app.get('/set-multi-value-response-header', responseMultiValueHeaderTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
