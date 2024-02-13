@@ -188,6 +188,21 @@ const RETAIL_REACT_APP_QUESTIONS = [
         validate: validClientId
     },
     {
+        name: 'project.commerce.isSlasClientPrivate',
+        message: 'Is your SLAS client private?',
+        type: 'list',
+        choices: [
+            {
+                name: 'No',
+                value: false
+            },
+            {
+                name: 'Yes',
+                value: true
+            }
+        ]
+    },
+    {
         name: 'project.commerce.siteId',
         message: 'What is your Site ID in Business Manager?',
         validate: validSiteId
