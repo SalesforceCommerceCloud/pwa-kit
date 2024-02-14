@@ -118,10 +118,14 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
-
+  notify-slack-pwa-no-ext:
+    needs: [run-generator-retail-app-no-ext]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-success
-        if: ${{ github.event_name == 'schedule' }}
+        if: ${{ needs.run-generator-retail-app-no-ext.result == 'success' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -133,12 +137,12 @@ jobs:
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-failure
-        if: ${{ failure() && github.event_name == 'schedule' }}
+        if: ${{ needs.run-generator-retail-app-no-ext.result != 'success'  }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {
-              "message": "❌ One or more PWA Kit no-ext E2E tests failed!"
+              "message": "❌ One or more PWA Kit no-ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -212,9 +216,14 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
 
+  notify-slack-pwa-ext:
+    needs: [run-generator-retail-app-ext]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-success
-        if: ${{ github.event_name == 'schedule' }}
+        if: ${{ needs.run-generator-retail-app-ext.result == 'success' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -226,12 +235,12 @@ jobs:
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-failure
-        if: ${{ failure() && github.event_name == 'schedule' }}
+        if: ${{ needs.run-generator-retail-app-ext.result != 'success'  }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {
-              "message": "❌ One or more PWA Kit ext E2E tests failed!"
+              "message": "❌ One or more PWA Kit ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
