@@ -125,7 +125,7 @@ jobs:
     steps:
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-success
-        if: ${{ needs.run-generator-retail-app-no-ext.result == 'success' }}
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result == 'success' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -137,7 +137,7 @@ jobs:
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-failure
-        if: ${{ needs.run-generator-retail-app-no-ext.result != 'success'  }}
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result != 'success'  }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -223,7 +223,7 @@ jobs:
     steps:
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-success
-        if: ${{ needs.run-generator-retail-app-ext.result == 'success' }}
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result == 'success' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -235,7 +235,7 @@ jobs:
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-failure
-        if: ${{ needs.run-generator-retail-app-ext.result != 'success'  }}
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result != 'success'  }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
