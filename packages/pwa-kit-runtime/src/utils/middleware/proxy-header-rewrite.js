@@ -30,10 +30,11 @@ export const proxyHeaderRewrite = (options) => {
                 console.log(`Incoming request: ${incomingRequest.path}`)
                 console.log(`Outgoing request: ${outgoingRequest.path}`)
 
-                Object.entries(headers).forEach(([key, value]) => {
-                    console.log(`${key} ${value}`)
-                    outgoingRequest.setHeader(key, value)
-                })
+                if (!incomingRequest.path.match(config.exclusions))
+                    Object.entries(headers).forEach(([key, value]) => {
+                        console.log(`${key} ${value}`)
+                        outgoingRequest.setHeader(key, value)
+                    })
             }
         })
 

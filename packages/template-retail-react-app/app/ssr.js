@@ -35,7 +35,8 @@ const options = {
 
 const runtime = getRuntime()
 
-const clientId = process?.env?.SLAS_PRIVATE_CLIENT_ID
+// const clientId = process?.env?.SLAS_PRIVATE_CLIENT_ID
+const clientId = getConfig().app.commerceAPI.parameters.clientId
 const secret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
 const encodedSlasCredentials = Buffer.from(`${clientId}:${secret}`).toString(
     'base64'
@@ -71,9 +72,12 @@ const {handler} = runtime.createHandler(options, (app) => {
     // app.use('/ssr/auth', injectSlasPrivateClientSecret)
 
     // TODO - Handle replacing the client secret placeholder with the actual secret
+    // Exclude SLAS authenticate and new customer registration as they use the
+    // authorization header for a different purpose
     app.use(proxyHeaderRewrite({
         rewrite: [{
             path: '/ssr/auth',
+            exclusions: new RegExp('/oauth2/login|/shopper-customers'),
             target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
             headers: {
                  Authorization: `Basic ${encodedSlasCredentials}`
