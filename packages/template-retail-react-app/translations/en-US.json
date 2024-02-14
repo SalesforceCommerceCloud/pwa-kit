@@ -204,6 +204,9 @@
   "cart_title.title.cart_num_of_items": {
     "defaultMessage": "Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
   },
+  "category_links.button_text": {
+    "defaultMessage": "Categories"
+  },
   "cc_radio_group.action.remove": {
     "defaultMessage": "Remove"
   },

@@ -539,6 +539,12 @@
       "value": ")"
     }
   ],
+  "category_links.button_text": [
+    {
+      "type": 0,
+      "value": "Categories"
+    }
+  ],
   "cc_radio_group.action.remove": [
     {
       "type": 0,

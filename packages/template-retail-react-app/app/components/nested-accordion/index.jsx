@@ -8,6 +8,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+// Project Components
+import Link from '@salesforce/retail-react-app/app/components/link'
+
 // Components
 import {
     Accordion,
@@ -19,7 +22,7 @@ import {
     // Hooks
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import Link from '@salesforce/retail-react-app/app/components/link'
+
 // Icons
 import {ChevronDownIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 
@@ -50,6 +53,8 @@ const NestedAccordion = (props) => {
     const filter = (item) =>
         typeof itemsFilter === 'function' ? itemsFilter(item) : !!item[itemsFilter]
 
+    const ItemComponent = props?.itemComponent || NestedAccordion
+
     return (
         <Accordion className="sf-nested-accordion" {...rest}>
             {/* Optional accordion items before others in items list.  */}
@@ -57,7 +62,6 @@ const NestedAccordion = (props) => {
 
             {items.filter(filter).map((item) => {
                 const {id, name} = item
-                const items = item[itemsKey]
 
                 return (
                     <AccordionItem key={id} border="none">
@@ -99,13 +103,18 @@ const NestedAccordion = (props) => {
                                 </h2>
 
                                 {/* Child Items */}
-                                {items && (
+                                {/* NOTE: Once the API is updated we'll modify this condition to only show if expanded and 
+                                the item has children */}
+                                {isExpanded && (
                                     <AccordionPanel {...styles.panel}>
-                                        <NestedAccordion
+                                        <ItemComponent
                                             {...styles.nestedAccordion}
                                             {...props}
                                             item={item}
+                                            itemsKey={'categories'}
                                             initialDepth={depth + 1}
+                                            itemComponent={NestedAccordion}
+                                            isExpanded={isExpanded}
                                         />
                                     </AccordionPanel>
                                 )}
@@ -149,6 +158,10 @@ NestedAccordion.propTypes = {
      * based on their depth.
      */
     initialDepth: PropTypes.number,
+    /**
+     * Component to be rendered in place of the inner nested accordion.
+     */
+    itemComponent: PropTypes.elementType,
     /**
      * By default child items are keyed at `items` but if your data differs you
      * can specify a custom key name for chile items. (e.g. children)

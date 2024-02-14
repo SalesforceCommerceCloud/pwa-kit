@@ -13,6 +13,7 @@ import {useIntl} from 'react-intl'
 import LocaleSelector from '@salesforce/retail-react-app/app/components/locale-selector'
 import NestedAccordion from '@salesforce/retail-react-app/app/components/nested-accordion'
 import SocialIcons from '@salesforce/retail-react-app/app/components/social-icons'
+
 // Components
 import {
     Box,
@@ -81,8 +82,14 @@ const STORE_LOCATOR_HREF = '/store-locator'
  * main usage is to navigate from one category to the next, but also homes links to
  * support, log in and out actions, as support links.
  */
-const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop}) => {
-    const itemsKey = 'categories'
+const DrawerMenu = ({
+    root,
+    itemsKey,
+    isOpen,
+    onClose = noop,
+    onLogoClick = noop,
+    itemComponent
+}) => {
     const intl = useIntl()
     const {isRegistered} = useCustomerType()
     const navigate = useNavigation()
@@ -167,6 +174,7 @@ const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop}) => {
                                             )
                                         }
                                         urlBuilder={categoryUrlBuilder}
+                                        itemComponent={itemComponent}
                                     />
                                 </Fade>
                             ) : (
@@ -399,7 +407,15 @@ DrawerMenu.propTypes = {
     /**
      * Function called when the drawer logo is clicked.
      */
-    onLogoClick: PropTypes.func
+    onLogoClick: PropTypes.func,
+    /**
+     * .
+     */
+    itemsKey: PropTypes.string,
+    /**
+     * Component to be rendered for each individual menu item.
+     */
+    itemComponent: PropTypes.elementType
 }
 
-export default DrawerMenu
+export {DrawerMenu}
