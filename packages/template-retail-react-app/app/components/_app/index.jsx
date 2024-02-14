@@ -76,6 +76,7 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
+import {useMaintenanceMode} from '@salesforce/retail-react-app/app/hooks/use-maintenance-mode'
 
 const onClient = typeof window !== 'undefined'
 
@@ -146,6 +147,14 @@ const App = (props) => {
         },
         l10nConfig: site.l10n
     })
+    const status = useMaintenanceMode()
+    console.log('status.data', status.data)
+    // if (
+    //     status?.data?.maintenance_mode === 'yes' &&
+    //     !location.pathname.endsWith('/maintenance-page')
+    // ) {
+    //     history.push(buildUrl('/maintenance-page'))
+    // }
 
     // If the translation file exists, it'll be served directly from static folder (and won't reach this code here).
     // However, if the file is missing, the App would render a 404 page.

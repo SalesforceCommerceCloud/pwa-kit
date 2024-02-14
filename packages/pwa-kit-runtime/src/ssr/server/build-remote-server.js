@@ -283,7 +283,7 @@ export const RemoteServerFactory = {
         this._configureProxyConfigs(options)
 
         const app = this._createExpressApp(options)
-
+        this._maintenanceMiddleware(app, options)
         // Do this first – we want compression applied to
         // everything when it's enabled at all.
         this._setCompression(app)
@@ -582,6 +582,27 @@ export const RemoteServerFactory = {
         app.use(ssrRequestProcessorMiddleware)
     },
 
+    _maintenanceMiddleware(app, opts) {
+        // check maintenance mode
+        app.use((req, res, next) => {
+            // NOTE: Run server with params to test.
+            // `MRT_MAINTENANCE_MODE=1 npm run start # Maintenance mode is enabled`
+            // `MRT_MAINTENANCE_MODE=no npm run start # Maintenance mode is disabled`
+            // npm run start # Maintenance mode is disabled by default`
+            const enabled = ['on', '1', 'yes'].includes(process.env.MRT_MAINTENANCE_MODE)
+            const handler = this.serveStaticFile('static/maintenance-page.html')
+
+            if (enabled) {
+                handler(req, res)
+            } else {
+                next()
+            }
+        })
+        //
+        // app.get('/mobify/maintenance/status', (req, res) => {
+        //     res.json({maintenance_mode: process.env.MRT_MAINTENANCE_MODE})
+        // })
+    },
     /**
      * @private
      */
