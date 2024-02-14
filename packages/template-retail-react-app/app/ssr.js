@@ -9,9 +9,10 @@
 
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
-import {defaultPwaKitSecurityHeaders, injectSlasPrivateClientSecret} from '@salesforce/pwa-kit-runtime/utils/middleware'
+import {defaultPwaKitSecurityHeaders, injectSlasPrivateClientSecret, proxyHeaderRewrite} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 
 const options = {
     // The build directory (an absolute path)
@@ -60,8 +61,20 @@ const {handler} = runtime.createHandler(options, (app) => {
         })
     )
 
-    // TODO: Should this path be configurable?
-    app.use('/ssr/auth', injectSlasPrivateClientSecret)
+    // // TODO: Should this path be configurable?
+    // app.use('/ssr/auth', injectSlasPrivateClientSecret)
+
+    // TODO - Handle replacing the client secret placeholder with the actual secret
+    app.use(proxyHeaderRewrite({
+        rewrite: [{
+            path: '/ssr/auth',
+            target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
+            headers: {
+                 Authorization: 'Basic base64encoded-clientId:clientSecret'
+            }
+        }],
+        origin: getAppOrigin()
+    }))
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {

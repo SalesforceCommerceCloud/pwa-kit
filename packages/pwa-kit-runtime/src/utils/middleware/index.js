@@ -6,3 +6,4 @@
  */
 export * from './security'
 export * from './slas-private-client'
+export * from './proxy-header-rewrite'

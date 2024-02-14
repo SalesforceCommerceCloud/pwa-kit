@@ -131,15 +131,57 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         silenceWarnings
     } = props
 
-    let workingProxy = '';
+    let defaultProxy = '';
     if (typeof proxy === 'string') {
-        workingProxy = proxy
+        defaultProxy = proxy
     } else {
-        workingProxy = `${proxy.host}${proxy.defaultPath}`
+        defaultProxy = `${proxy.host}${proxy.defaultPath}`
+    }
+    let configs = {'default': {
+            proxy: defaultProxy,
+            headers,
+            parameters: {
+                clientId,
+                organizationId,
+                shortCode,
+                siteId,
+                locale,
+                currency
+            },
+            throwOnBadResponse: true,
+            fetchOptions
+        }
     }
 
+    Shopper_APIs.map( (api) => {
+        let endpoint = defaultProxy;
+
+        if (typeof proxy != 'string') {
+            endpoint = `${proxy.host}${proxy[api]}`
+        }
+
+        let config = {
+            proxy: endpoint,
+            headers,
+            parameters: {
+                clientId,
+                organizationId,
+                shortCode,
+                siteId,
+                locale,
+                currency
+            },
+            throwOnBadResponse: true,
+            fetchOptions
+        }
+
+        configs = Object.assign(configs, {
+            [api]: config
+        })
+    })
+
     const config = {
-        proxy: workingProxy,
+        proxy: defaultProxy,
         headers,
         parameters: {
             clientId,
