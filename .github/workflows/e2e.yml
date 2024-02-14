@@ -48,7 +48,7 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-demo"
 
-      - name: Validated Generated Retail App Demo
+      - name: Validate Generated Retail App Demo
         uses: ./.github/actions/e2e_validate_generated_app
         with:
           PROJECT_KEY: "retail-app-demo"
@@ -95,7 +95,7 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-no-ext"
 
-      - name: Validated Generated Retail App Demo
+      - name: Validate Retail App Without Extensibility
         uses: ./.github/actions/e2e_validate_generated_app
         with:
           PROJECT_KEY: "retail-app-no-ext"
@@ -119,12 +119,29 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
 
-      - uses: actions/upload-artifact@v3
-        if: always()
+      - name: Send GitHub Action data to Slack workflow (Generated)
+        id: slack-success
+        if: ${{ github.event_name == 'schedule' }}
+        uses: slackapi/slack-github-action@v1.23.0
         with:
-          name: playwright-report-retail-app-no-ext
-          path: playwright-report/
-          retention-days: 30
+          payload: |
+            {
+              "message": "✅ All PWA Kit no-ext E2E tests passed!"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send GitHub Action data to Slack workflow (Generated)
+        id: slack-failure
+        if: ${{ failure() && github.event_name == 'schedule' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "message": "❌ One or more PWA Kit no-ext E2E tests failed!"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   run-generator-retail-app-ext:
     # Run after the previous job completes irrespective of its result
     if: ${{ always() }}
@@ -195,9 +212,26 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
 
-      - uses: actions/upload-artifact@v3
-        if: always()
+      - name: Send GitHub Action data to Slack workflow (Generated)
+        id: slack-success
+        if: ${{ github.event_name == 'schedule' }}
+        uses: slackapi/slack-github-action@v1.23.0
         with:
-          name: playwright-report-retail-app-ext
-          path: playwright-report/
-          retention-days: 30
+          payload: |
+            {
+              "message": "✅ All PWA Kit ext E2E tests passed!"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send GitHub Action data to Slack workflow (Generated)
+        id: slack-failure
+        if: ${{ failure() && github.event_name == 'schedule' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "message": "❌ One or more PWA Kit ext E2E tests failed!"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

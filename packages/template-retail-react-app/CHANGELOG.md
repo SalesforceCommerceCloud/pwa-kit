@@ -1,5 +1,16 @@
 ## v2.4.0-dev (Jan 22, 2024)
-## v2.3.0 (Nov 8, 2023)
+
+### Bug Fixes
+
+- Fix invalid query params warnings [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
+
+## v2.3.1 (Jan 23, 2024)
+
+### Bug Fixes
+
+- Fix `extract-default-translations` script [#1647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1647)
+
+## v2.3.0 (Jan 19, 2024)
 
 ### Accessibility improvements
 

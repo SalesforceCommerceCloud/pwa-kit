@@ -109,9 +109,9 @@ const Payment = () => {
         // Using destructuring to remove properties from the object...
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
-        return updateBillingAddressForBasket({
+        return await updateBillingAddressForBasket({
             body: address,
-            parameters: {basketId: basket.basketId, shipmentId: 'me'}
+            parameters: {basketId: basket.basketId}
         })
     }
     const onPaymentRemoval = async () => {
