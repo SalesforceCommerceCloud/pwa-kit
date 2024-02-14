@@ -114,7 +114,7 @@ describe('Auth', () => {
             token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest',
-            refresh_token_expires_in: 30 * 24 * 3600
+            refresh_token_expires_in: 'refresh_token_expires_in'
         }
         // Convert stored format to exposed format
         const result = {...sample, refresh_token: 'refresh_token_guest'}
@@ -241,7 +241,7 @@ describe('Auth', () => {
             token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest',
-            refresh_token_expires_in: 30 * 24 * 3600
+            refresh_token_expires_in: 'refresh_token_expires_in'
         }
         // Convert stored format to exposed format
         const result = {...data, refresh_token: 'refresh_token_guest'}
@@ -328,7 +328,7 @@ describe('Auth', () => {
             token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest',
-            refresh_token_expires_in: 30 * 24 * 3600
+            refresh_token_expires_in: 'refresh_token_expires_in'
         }
 
         Object.keys(data).forEach((key) => {
