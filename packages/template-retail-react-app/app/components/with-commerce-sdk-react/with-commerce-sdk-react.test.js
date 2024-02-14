@@ -41,7 +41,7 @@ describe('withCommerceSdkReact enhanced component', function () {
         const hookThatNeverLoads = createMockHook({data: undefined, isLoading: true})
         const EnhancedComponent = withCommerceSdkReact(MockedComponent, {
             hook: hookThatNeverLoads,
-            placeholderContent: <MockedPlaceholder />
+            placeholder: MockedPlaceholder
         })
 
         render(<EnhancedComponent />)
@@ -56,7 +56,7 @@ describe('withCommerceSdkReact enhanced component', function () {
 
         const EnhandedComponent = withCommerceSdkReact(MockedComponent, {
             hook: hookThatIsLoaded,
-            placeholderContent: <MockedPlaceholder />
+            placeholder: MockedPlaceholder
         })
 
         render(<EnhandedComponent />)
@@ -72,7 +72,7 @@ describe('withCommerceSdkReact enhanced component', function () {
 
         const EnhandedComponent = withCommerceSdkReact(MockedComponent, {
             hook: hookThatIsLoaded,
-            placeholderContent: <MockedPlaceholder />,
+            placeholder: MockedPlaceholder,
             queryOptions: MockQueryParams
         })
 
@@ -88,7 +88,7 @@ describe('withCommerceSdkReact enhanced component', function () {
         const queryOptionsFn = () => MockQueryParams
         const EnhandedComponent = withCommerceSdkReact(MockedComponent, {
             hook: hookThatIsLoaded,
-            placeholderContent: <MockedPlaceholder />,
+            placeholder: MockedPlaceholder,
             queryOptions: queryOptionsFn
         })
 
