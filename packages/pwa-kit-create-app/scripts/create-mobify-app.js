@@ -263,6 +263,7 @@ const PRESETS = [
             ['project.commerce.siteId']: 'RefArch',
             ['project.commerce.organizationId']: 'f_ecom_zzte_053',
             ['project.commerce.shortCode']: 'kv7kzm78',
+            ['project.commerce.isSlasPrivate']: true,
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             ['project.einstein.siteId']: 'aaij-MobileFirst'
         },
