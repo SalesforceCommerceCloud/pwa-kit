@@ -35,6 +35,12 @@ const options = {
 
 const runtime = getRuntime()
 
+const clientId = process?.env?.SLAS_PRIVATE_CLIENT_ID
+const secret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
+const encodedSlasCredentials = Buffer.from(`${clientId}:${secret}`).toString(
+    'base64'
+)
+
 const {handler} = runtime.createHandler(options, (app) => {
     // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)
@@ -70,7 +76,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             path: '/ssr/auth',
             target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
             headers: {
-                 Authorization: 'Basic base64encoded-clientId:clientSecret'
+                 Authorization: `Basic ${encodedSlasCredentials}`
             }
         }],
         origin: getAppOrigin()
