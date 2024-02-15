@@ -14,6 +14,8 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 
+import {createProxyMiddleware} from 'http-proxy-middleware'
+
 const options = {
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
@@ -41,6 +43,14 @@ const secret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
 const encodedSlasCredentials = Buffer.from(`${clientId}:${secret}`).toString(
     'base64'
 )
+
+let slasTarget
+getConfig().ssrParameters.proxyConfigs.forEach((config) => {
+    if (config.path == 'api') {
+        slasTarget = config.host
+    }
+})
+console.log(`Target: ${slasTarget}`)
 
 const {handler} = runtime.createHandler(options, (app) => {
     // Set default HTTP security headers required by PWA Kit
@@ -74,17 +84,34 @@ const {handler} = runtime.createHandler(options, (app) => {
     // TODO - Handle replacing the client secret placeholder with the actual secret
     // Exclude SLAS authenticate and new customer registration as they use the
     // authorization header for a different purpose
-    app.use(proxyHeaderRewrite({
-        rewrite: [{
-            path: '/ssr/auth',
-            exclusions: new RegExp('/oauth2/login|/shopper-customers'),
-            target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
-            headers: {
-                 Authorization: `Basic ${encodedSlasCredentials}`
+    // app.use(proxyHeaderRewrite({
+    //     rewrite: [{
+    //         path: '/ssr/auth',
+    //         exclusions: new RegExp('/oauth2/login|/shopper-customers'),
+    //         target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
+    //         headers: {
+    //              Authorization: `Basic ${encodedSlasCredentials}`
+    //         }
+    //     }],
+    //     origin: getAppOrigin()
+    // }))
+
+    app.use('/ssr/auth', createProxyMiddleware(
+        {
+            target: `https://${slasTarget}`,
+            changeOrigin: true,
+            followRedirects: false,
+            cookiePathRewrite: false,
+            pathRewrite: {'/ssr/auth' : ''},
+            onProxyReq: (outGoingReq, incomingReq) => {
+                console.log('In proxy')
+                if (incomingReq.path.match(/\/oauth2\/token/)) {
+                    outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                }
             }
-        }],
-        origin: getAppOrigin()
-    }))
+        })
+    )
+
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
