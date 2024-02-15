@@ -99,7 +99,7 @@ const ProductDetail = () => {
     } = useCategory({
         parameters: {
             id: product?.primaryCategoryId,
-            level: 1
+            levels: 1
         }
     })
 

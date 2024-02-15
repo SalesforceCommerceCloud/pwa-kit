@@ -138,6 +138,9 @@ const ProductList = (props) => {
     )
 
     /**************** Query Actions ****************/
+    // _refine is an invalid param for useProductSearch, we don't want to pass it to API call
+    const {_refine, ...restOfParams} = searchParams
+
     const {
         isLoading,
         isRefetching,
@@ -145,7 +148,7 @@ const ProductList = (props) => {
     } = useProductSearch(
         {
             parameters: {
-                ...searchParams,
+                ...restOfParams,
                 refine: searchParams._refine
             }
         },

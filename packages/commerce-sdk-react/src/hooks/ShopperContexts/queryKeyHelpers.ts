@@ -6,8 +6,8 @@
  */
 import type {ShopperContexts} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pick} from '../utils'
-
+import {getCustomKeys, pick} from '../utils'
+import paramKeysMap from './paramKeys'
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperContexts<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
@@ -25,11 +25,6 @@ export type QueryKeys = {
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
 // and making those generic would add too much complexity.
 type QueryKeyHelper<T extends keyof QueryKeys> = {
-    /**
-     * Reduces the given parameters (which may have additional, unknown properties) to an object
-     * containing *only* the properties required for an endpoint.
-     */
-    parameters: (params: Params<T>) => Params<T>
     /** Generates the path component of the query key for an endpoint. */
     path: (params: Params<T>) => ExcludeTail<QueryKeys[T]>
     /** Generates the full query key for an endpoint. */
@@ -37,7 +32,6 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 }
 
 export const getShopperContext: QueryKeyHelper<'getShopperContext'> = {
-    parameters: (params) => pick(params, ['organizationId', 'usid']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -45,8 +39,8 @@ export const getShopperContext: QueryKeyHelper<'getShopperContext'> = {
         '/shopper-context/',
         params.usid
     ],
-    queryKey: (params: Params<'getShopperContext'>) => [
-        ...getShopperContext.path(params),
-        getShopperContext.parameters(params)
-    ]
+    queryKey: (params: Params<'getShopperContext'>) => {
+        const paramKeys = [...paramKeysMap['getShopperContext'], ...getCustomKeys(params)]
+        return [...getShopperContext.path(params), pick(params, paramKeys)]
+    }
 }
