@@ -598,7 +598,10 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    const {extend = false} = answers.project
+    const {
+        extend = false,
+        commerce: {isSlasPrivate = false}
+    } = answers.project
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
