@@ -195,6 +195,20 @@ const cookieTest = async (req, res) => {
 }
 
 /**
+ * Express handler that sets single and multi-value response headers
+ * and returns a JSON response with diagnostic values.
+ * Use ?header1=value1&header2=value2 to set two response headers.
+ * Use ?header3=value4&header3=value5 to set multi value headers
+ */
+const responseHeadersTest = async (req, res) => {
+    for (const [key, value] of Object.entries(req.query)) {
+        // If value is an array then a multi-value header will be created
+        res.set(key, value)
+    }
+    res.json(jsonFromRequest(req))
+}
+
+/**
  * Express handler that echos back a JSON response with
  * headers supplied in the request.
  */
@@ -263,6 +277,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/cookie', cookieTest)
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
+    app.get('/set-response-headers', responseHeadersTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)

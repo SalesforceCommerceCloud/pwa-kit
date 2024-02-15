@@ -162,8 +162,6 @@ class Auth {
     private shopperCustomersClient: ShopperCustomers<ApiClientConfigParams>
     private redirectURI: string
     private pendingToken: Promise<TokenResponse> | undefined
-    private REFRESH_TOKEN_EXPIRATION_DAYS_REGISTERED = 90
-    private REFRESH_TOKEN_EXPIRATION_DAYS_GUEST = 30
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private OCAPISessionsURL: string
@@ -316,15 +314,11 @@ class Auth {
             ? 'refresh_token_guest_copy'
             : 'refresh_token_registered_copy'
 
-        const refreshTokenExpiry = isGuest
-            ? this.REFRESH_TOKEN_EXPIRATION_DAYS_GUEST
-            : this.REFRESH_TOKEN_EXPIRATION_DAYS_REGISTERED
-
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: refreshTokenExpiry
+            expires: res.refresh_token_expires_in
         })
         this.set(refreshTokenCopyKey, res.refresh_token, {
-            expires: refreshTokenExpiry
+            expires: res.refresh_token_expires_in
         })
     }
 
