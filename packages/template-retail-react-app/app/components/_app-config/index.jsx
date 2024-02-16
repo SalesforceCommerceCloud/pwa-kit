@@ -44,18 +44,6 @@ const AppConfig = ({children, locals = {}}) => {
 
     const appOrigin = getAppOrigin()
 
-    const proxyPaths = commerceApiConfig.proxyPath
-
-    let proxy
-    if (typeof proxyPaths === 'string') {
-        proxy = `${appOrigin}${commerceApiConfig.proxyPath}`
-    } else {
-        proxy = {
-            ...proxyPaths,
-            host: appOrigin
-        }
-    }
-
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -65,7 +53,7 @@ const AppConfig = ({children, locals = {}}) => {
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
-            proxy={proxy}
+            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
             // clientSecret='enable-client_secret'
             OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
