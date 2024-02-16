@@ -58,7 +58,7 @@ describe('server', () => {
         ['/exception', 500, 'text/html; charset=utf-8'],
         ['/cache', 200, 'application/json; charset=utf-8'],
         ['/cookie', 200, 'application/json; charset=utf-8'],
-        ['/set-response-header', 200, 'application/json; charset=utf-8'],
+        ['/set-response-headers', 200, 'application/json; charset=utf-8'],
         ['/isolation', 200, 'application/json; charset=utf-8']
     ])('Path %p should render correctly', (path, expectedStatus, expectedContentType) => {
         return request(app)
@@ -87,10 +87,11 @@ describe('server', () => {
             .expect('set-cookie', 'test-cookie=test-value; Path=/')
     })
 
-    test('Path "/set-response-header" sets response header', () => {
+    test('Path "/set-response-headers" sets response header', () => {
         return request(app)
-            .get('/set-response-header?name=test-header&value=test-value')
-            .expect('test-header', 'test-value')
+            .get('/set-response-headers?header1=value1&header2=test-value')
+            .expect('header1', 'value1')
+            .expect('header2', 'test-value')
     })
 
     test('Path "/isolation" succeeds', async () => {
