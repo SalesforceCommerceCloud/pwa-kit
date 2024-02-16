@@ -26,7 +26,7 @@ import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
+import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 
