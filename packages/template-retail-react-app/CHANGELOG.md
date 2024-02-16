@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 - Fix invalid query params warnings [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
+- Fix `product-item` component imports to ensure that it is overideable. [#1672](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1672)
 
 ## v2.3.1 (Jan 23, 2024)
 
