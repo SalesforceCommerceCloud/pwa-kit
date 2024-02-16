@@ -36,7 +36,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
 }
 
 /**
- * This function is a wrapper hook for all basket mutations. It will make sure basket has been created before a mutation is performed to the API
+ * This function is will defer basket actions until basket has been created/defined
  * @param mutations {array} - list of baskets actions to be performed at once
  * @param basket - includes hasBasket and basketId (if applicable)
  * @param createBasket {object} - create basket mutation
