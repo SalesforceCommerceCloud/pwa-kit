@@ -34,7 +34,7 @@ const options = {
     // Option for whether to set up a special endpoint for handling
     // private SLAS clients
     // Set this to false if using a SLAS public client
-    useSlasPrivateClient: true
+    useSlasPrivateClient: false
 }
 
 const runtime = getRuntime()
