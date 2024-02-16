@@ -41,6 +41,7 @@ import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import {morganStream} from '../../utils/morgan-stream'
+import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -298,6 +299,8 @@ export const RemoteServerFactory = {
         this._setupMetricsFlushing(app)
         this._setupHealthcheck(app)
         this._setupProxying(app, options)
+
+        this._setupSlasPrivateClientProxy(app, options)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
@@ -593,6 +596,46 @@ export const RemoteServerFactory = {
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
             })
         })
+    },
+
+    /**
+     * @private
+     */
+    _setupSlasPrivateClientProxy(app, options) {
+        if (options.useSlasPrivateClient) {
+            const clientSecret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
+            if (!clientSecret) {
+                app.use('/ssr/auth', (_, res) => {
+                    console.log('Should be 501')
+                    return res.status(501).json({
+                        message:
+                            'Environment variable SLAS_PRIVATE_CLIENT_ID not set: LINK_TO_DOC HERE'
+                    })
+                })
+            } else {
+                const clientId = options.mobify.app.commerceAPI.parameters.clientId
+                const shortCode = options.mobify.app.commerceAPI.parameters.shortCode
+
+                const slasTarget = `https://${shortCode}.api.commercecloud.salesforce.com`
+
+                app.use('/ssr/auth', createProxyMiddleware(
+                    {
+                        target: slasTarget,
+                        changeOrigin: true,
+                        pathRewrite: {'/ssr/auth' : ''},
+                        onProxyReq: (outGoingReq, incomingReq) => {
+                            if (incomingReq.path.match(/\/oauth2\/token/)) {
+                                const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
+                                    'base64'
+                                )
+                                console.log(`In ${outGoingReq.path} ${clientId} ${shortCode} ${clientSecret}`)
+                                outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                            }
+                        }
+                    })
+                )
+            }
+        }
     },
 
     /**

@@ -9,12 +9,9 @@
 
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
-import {defaultPwaKitSecurityHeaders, injectSlasPrivateClientSecret, proxyHeaderRewrite} from '@salesforce/pwa-kit-runtime/utils/middleware'
+import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-
-import {createProxyMiddleware} from 'http-proxy-middleware'
 
 const options = {
     // The build directory (an absolute path)
@@ -32,25 +29,25 @@ const options = {
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
     // except by Safari.
-    protocol: 'http'
+    protocol: 'http',
+
+    // Option for whether to set up a special endpoint for handling
+    // private SLAS clients
+    // Set this to false if using a SLAS public client
+    useSlasPrivateClient: true
 }
 
 const runtime = getRuntime()
 
 // const clientId = process?.env?.SLAS_PRIVATE_CLIENT_ID
-const clientId = getConfig().app.commerceAPI.parameters.clientId
-const secret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
-const encodedSlasCredentials = Buffer.from(`${clientId}:${secret}`).toString(
-    'base64'
-)
 
-let slasTarget
-getConfig().ssrParameters.proxyConfigs.forEach((config) => {
-    if (config.path == 'api') {
-        slasTarget = config.host
-    }
-})
-console.log(`Target: ${slasTarget}`)
+// let slasTarget
+// getConfig().ssrParameters.proxyConfigs.forEach((config) => {
+//     if (config.path == 'api') {
+//         slasTarget = config.host
+//     }
+// })
+// console.log(`Target: ${slasTarget}`)
 
 const {handler} = runtime.createHandler(options, (app) => {
     // Set default HTTP security headers required by PWA Kit
@@ -96,22 +93,27 @@ const {handler} = runtime.createHandler(options, (app) => {
     //     origin: getAppOrigin()
     // }))
 
-    app.use('/ssr/auth', createProxyMiddleware(
-        {
-            target: `https://${slasTarget}`,
-            changeOrigin: true,
-            followRedirects: false,
-            cookiePathRewrite: false,
-            pathRewrite: {'/ssr/auth' : ''},
-            onProxyReq: (outGoingReq, incomingReq) => {
-                console.log('In proxy')
-                if (incomingReq.path.match(/\/oauth2\/token/)) {
-                    outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-                }
-            }
-        })
-    )
+    // app.use('/ssr/auth', createProxyMiddleware(
+    //     {
+    //         //target: `https://${slasTarget}`,
+    //         target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
+    //         changeOrigin: true,
+    //         pathRewrite: {'/ssr/auth' : ''},
+    //         onProxyReq: (outGoingReq, incomingReq) => {
+    //             if (incomingReq.path.match(/\/oauth2\/token/)) {
+    //                 const clientId = getConfig().app.commerceAPI.parameters.clientId
+    //                 const secret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
+    //                 if (!secret) console.warn('Missing client secret environment variable')
+    //                 const encodedSlasCredentials = Buffer.from(`${clientId}:${secret}`).toString(
+    //                     'base64'
+    //                 )
+    //                 outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+    //             }
+    //         }
+    //     })
+    // )
 
+    // app.use(useSlasPrivateClient)
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
