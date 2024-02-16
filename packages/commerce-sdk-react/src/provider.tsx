@@ -21,39 +21,9 @@ import {
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 
-const Shopper_APIs = [
-    'shopperBaskets',
-    'shopperContexts',
-    'shopperCustomers',
-    'shopperExperience',
-    'shopperLogin',
-    'shopperOrders',
-    'shopperProducts',
-    'shopperPromotions',
-    'shopperGiftCertificates',
-    'shopperSearch',
-] as const
-
-interface CommerceApiProxyPaths {
-    shopperBaskets?: string
-    shopperContexts?: string
-    shopperCustomers?: string
-    shopperExperience?: string
-    shopperLogin?: string
-    shopperOrders?: string
-    shopperProducts?: string
-    shopperPromotions?: string
-    shopperGiftCertificates?: string
-    shopperSearch?: string
-    defaultPath: string
-    host: string
-}
-
-type CommerceApiProxyConfigEntry = [string, ApiClientConfigParams]
-
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
-    proxy: string | CommerceApiProxyPaths
+    proxy: string
     locale: string
     currency: string
     redirectURI: string
@@ -130,58 +100,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings
     } = props
-
-    let defaultProxy = '';
-    if (typeof proxy === 'string') {
-        defaultProxy = proxy
-    } else {
-        defaultProxy = `${proxy.host}${proxy.defaultPath}`
-    }
-    let configs = {'default': {
-            proxy: defaultProxy,
-            headers,
-            parameters: {
-                clientId,
-                organizationId,
-                shortCode,
-                siteId,
-                locale,
-                currency
-            },
-            throwOnBadResponse: true,
-            fetchOptions
-        }
-    }
-
-    Shopper_APIs.map( (api) => {
-        let endpoint = defaultProxy;
-
-        if (typeof proxy != 'string') {
-            endpoint = `${proxy.host}${proxy[api]}`
-        }
-
-        let config = {
-            proxy: endpoint,
-            headers,
-            parameters: {
-                clientId,
-                organizationId,
-                shortCode,
-                siteId,
-                locale,
-                currency
-            },
-            throwOnBadResponse: true,
-            fetchOptions
-        }
-
-        configs = Object.assign(configs, {
-            [api]: config
-        })
-    })
-
     const config = {
-        proxy: defaultProxy,
+        proxy,
         headers,
         parameters: {
             clientId,
@@ -194,7 +114,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
         fetchOptions
     }
-
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -220,24 +139,13 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         headers?.['correlation-id']
     ])
 
-    let authProxy = '';
-    if (typeof proxy === 'string') {
-        authProxy = proxy
-    } else {
-        if (proxy.shopperLogin) {
-            authProxy = `${proxy.host}${proxy.shopperLogin}`
-        } else {
-            authProxy = `${proxy.host}${proxy.defaultPath}`
-        }
-    }
-
     const auth = useMemo(() => {
         return new Auth({
             clientId,
             organizationId,
             shortCode,
             siteId,
-            proxy: authProxy,
+            proxy,
             redirectURI,
             fetchOptions,
             fetchedToken,
