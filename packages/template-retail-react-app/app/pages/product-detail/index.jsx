@@ -66,6 +66,7 @@ const ProductDetail = () => {
     /****************************** Basket *********************************/
     const {
         data: basket,
+        isLoading: isBasketLoading,
         derivedData: {hasBasket}
     } = useCurrentBasket()
     console.log('basket', basket)
@@ -76,8 +77,6 @@ const ProductDetail = () => {
     if (res) {
         res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
-    const isBasketLoading = false
-
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
@@ -247,7 +246,7 @@ const ProductDetail = () => {
                 [
                     {
                         mutation: addItemToBasketMutation,
-                        opts: {
+                        args: {
                             body: productItems
                         }
                     }
