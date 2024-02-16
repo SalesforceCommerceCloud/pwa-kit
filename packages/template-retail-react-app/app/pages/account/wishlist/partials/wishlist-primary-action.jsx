@@ -12,7 +12,10 @@ import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-v
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {
+    performBasketAction,
+    useCurrentBasket
+} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
 /**
@@ -22,7 +25,10 @@ import Link from '@salesforce/retail-react-app/app/components/link'
  */
 const WishlistPrimaryAction = () => {
     const variant = useItemVariant()
-    const {data: basket} = useCurrentBasket()
+    const {
+        data: basket,
+        derivedData: {hasBasket}
+    } = useCurrentBasket()
     const {formatMessage} = useIntl()
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
@@ -31,7 +37,7 @@ const WishlistPrimaryAction = () => {
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
-
+    const createBasket = useShopperBasketsMutation('createBasket')
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
 
@@ -50,33 +56,49 @@ const WishlistPrimaryAction = () => {
                   }
               ]
 
-        addItemToBasket.mutate(
-            {body: productItems, parameters: {basketId: basket?.basketId}},
-            {
-                onSuccess: () => {
-                    showToast({
-                        title: formatMessage(
-                            {
-                                defaultMessage:
-                                    '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                                id: 'wishlist_primary_action.info.added_to_cart'
-                            },
-                            {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
-                        ),
-                        status: 'success'
-                    })
-                    onClose()
-                },
-                onError: () => {
-                    showToast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
-                    })
-                },
-                onSettled: () => {
-                    setIsLoading(false)
+        await performBasketAction(
+            [
+                {
+                    mutation: addItemToBasket,
+                    args: {
+                        body: productItems
+                    },
+                    opts: {
+                        onSuccess: () => {
+                            showToast({
+                                title: formatMessage(
+                                    {
+                                        defaultMessage:
+                                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                                        id: 'wishlist_primary_action.info.added_to_cart'
+                                    },
+                                    {
+                                        quantity: isAddingASet
+                                            ? quantity * item.setProducts.length
+                                            : quantity
+                                    }
+                                ),
+                                status: 'success'
+                            })
+                            onClose()
+                        },
+                        onError: () => {
+                            showToast({
+                                title: formatMessage(API_ERROR_MESSAGE),
+                                status: 'error'
+                            })
+                        },
+                        onSettled: () => {
+                            setIsLoading(false)
+                        }
+                    }
                 }
-            }
+            ],
+            {
+                hasBasket,
+                basketId: basket?.basketId
+            },
+            createBasket
         )
     }
 

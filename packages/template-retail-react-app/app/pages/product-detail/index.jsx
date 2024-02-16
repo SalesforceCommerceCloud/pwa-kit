@@ -21,7 +21,11 @@ import {
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {
+    performBasketAction,
+    useCurrentBasket,
+    useShopperBasketsActions
+} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useVariant} from '@salesforce/retail-react-app/app/hooks'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
@@ -60,13 +64,19 @@ const ProductDetail = () => {
     const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {data: basket} = useCurrentBasket()
+    const {
+        data: basket,
+        derivedData: {hasBasket}
+    } = useCurrentBasket()
+    console.log('basket', basket)
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
+    const createBasket = useShopperBasketsMutation('createBasket')
+
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
-    const isBasketLoading = !basket?.basketId
+    const isBasketLoading = false
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -233,11 +243,36 @@ const ProductDetail = () => {
                 price: variant.price,
                 quantity
             }))
-
-            await addItemToBasketMutation.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: productItems
-            })
+            await performBasketAction(
+                [
+                    {
+                        mutation: addItemToBasketMutation,
+                        opts: {
+                            body: productItems
+                        }
+                    }
+                ],
+                {
+                    hasBasket,
+                    basketId: basket?.basketId
+                },
+                createBasket
+            )
+            // if (!hasBasket) {
+            //
+            //     const data = await createBasket.mutateAsync({
+            //         body: {}
+            //     })
+            //     await addItemToBasketMutation.mutateAsync({
+            //         parameters: {basketId: data.basketId},
+            //         body: productItems
+            //     })
+            // } else {
+            //     await addItemToBasketMutation.mutateAsync({
+            //         parameters: {basketId: basket.basketId},
+            //         body: productItems
+            //     })
+            // }
 
             einstein.sendAddToCart(productItems)
 

@@ -34,3 +34,55 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         }
     }
 }
+
+/**
+ * This function is a wrapper hook for all basket mutations. It will make sure basket has been created before a mutation is performed to the API
+ * @param mutations {array} - list of baskets actions to be performed at once
+ * @param basket - includes hasBasket and basketId (if applicable)
+ * @param createBasket {object} - create basket mutation
+ */
+export const performBasketAction = async (mutations, basket, createBasket) => {
+    const {hasBasket = true, basketId} = basket
+    if (hasBasket && !basketId) {
+        throw new Error('Basket Id is undefined. Please try again.')
+    }
+    // You can't initialize mutation in this function since it violates the princile or hook.
+    // You need to initialize in the component level and pass it into this function
+    if (
+        typeof createBasket.mutate !== 'function' ||
+        typeof createBasket.mutateAsync !== 'function'
+    ) {
+        throw new Error('createBasket needs to be an instance of Mutation.')
+    }
+    if (!hasBasket) {
+        const data = await createBasket.mutateAsync({
+            body: {}
+        })
+        // after basket has successfully created, performance list of mutation
+        for (let item of mutations) {
+            const {mutation, opts, args} = item
+            await mutation.mutateAsync(
+                {
+                    parameters: {
+                        basketId: data.basketId
+                    },
+                    ...args
+                },
+                opts
+            )
+        }
+    } else {
+        for (let item of mutations) {
+            const {mutation, opts, args} = item
+            await mutation.mutateAsync(
+                {
+                    parameters: {
+                        basketId
+                    },
+                    ...args
+                },
+                opts
+            )
+        }
+    }
+}

@@ -188,24 +188,18 @@ const App = (props) => {
         {parameters: {customerId: customer.customerId}},
         {enabled: !!customer.customerId && !isServer}
     )
-    const {data: basket} = useCurrentBasket()
+    const {
+        data: basket,
+        derivedData: {hasBasket}
+    } = useCurrentBasket()
 
-    const createBasket = useShopperBasketsMutation('createBasket')
+    // const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
 
     useEffect(() => {
-        // Create a new basket if the current customer doesn't have one.
-        if (baskets?.total === 0) {
-            createBasket.mutate({
-                body: {}
-            })
-        }
-    }, [baskets])
-
-    useEffect(() => {
         // update the basket currency if it doesn't match the current locale currency
-        if (basket?.currency && basket?.currency !== currency) {
+        if (hasBasket && basket?.currency && basket?.currency !== currency) {
             updateBasket.mutate({
                 parameters: {basketId: basket.basketId},
                 body: {currency}
