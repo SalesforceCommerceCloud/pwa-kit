@@ -172,7 +172,6 @@ class Auth {
     private silenceWarnings: boolean
 
     constructor(config: AuthConfig) {
-
         // Special endpoint for injecting SLAS private client secret
         const baseUrl = config.proxy.split(`/mobify/proxy/api`)[0]
         const privateClientEndpoint = `${baseUrl}/ssr/auth`

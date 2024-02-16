@@ -606,7 +606,6 @@ export const RemoteServerFactory = {
             const clientSecret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
             if (!clientSecret) {
                 app.use('/ssr/auth', (_, res) => {
-                    console.log('Should be 501')
                     return res.status(501).json({
                         message:
                             'Environment variable SLAS_PRIVATE_CLIENT_ID not set: LINK_TO_DOC HERE'
@@ -618,18 +617,21 @@ export const RemoteServerFactory = {
 
                 const slasTarget = `https://${shortCode}.api.commercecloud.salesforce.com`
 
-                app.use('/ssr/auth', createProxyMiddleware(
-                    {
+                app.use(
+                    '/ssr/auth',
+                    createProxyMiddleware({
                         target: slasTarget,
                         changeOrigin: true,
-                        pathRewrite: {'/ssr/auth' : ''},
+                        pathRewrite: {'/ssr/auth': ''},
                         onProxyReq: (outGoingReq, incomingReq) => {
                             if (incomingReq.path.match(/\/oauth2\/token/)) {
-                                const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
-                                    'base64'
+                                const encodedSlasCredentials = Buffer.from(
+                                    `${clientId}:${clientSecret}`
+                                ).toString('base64')
+                                outGoingReq.setHeader(
+                                    'Authorization',
+                                    `Basic ${encodedSlasCredentials}`
                                 )
-                                console.log(`In ${outGoingReq.path} ${clientId} ${shortCode} ${clientSecret}`)
-                                outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                             }
                         }
                     })

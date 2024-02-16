@@ -39,16 +39,6 @@ const options = {
 
 const runtime = getRuntime()
 
-// const clientId = process?.env?.SLAS_PRIVATE_CLIENT_ID
-
-// let slasTarget
-// getConfig().ssrParameters.proxyConfigs.forEach((config) => {
-//     if (config.path == 'api') {
-//         slasTarget = config.host
-//     }
-// })
-// console.log(`Target: ${slasTarget}`)
-
 const {handler} = runtime.createHandler(options, (app) => {
     // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)
@@ -74,46 +64,6 @@ const {handler} = runtime.createHandler(options, (app) => {
             }
         })
     )
-
-    // // TODO: Should this path be configurable?
-    // app.use('/ssr/auth', injectSlasPrivateClientSecret)
-
-    // TODO - Handle replacing the client secret placeholder with the actual secret
-    // Exclude SLAS authenticate and new customer registration as they use the
-    // authorization header for a different purpose
-    // app.use(proxyHeaderRewrite({
-    //     rewrite: [{
-    //         path: '/ssr/auth',
-    //         exclusions: new RegExp('/oauth2/login|/shopper-customers'),
-    //         target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
-    //         headers: {
-    //              Authorization: `Basic ${encodedSlasCredentials}`
-    //         }
-    //     }],
-    //     origin: getAppOrigin()
-    // }))
-
-    // app.use('/ssr/auth', createProxyMiddleware(
-    //     {
-    //         //target: `https://${slasTarget}`,
-    //         target: 'https://kv7kzm78.api.commercecloud.salesforce.com',
-    //         changeOrigin: true,
-    //         pathRewrite: {'/ssr/auth' : ''},
-    //         onProxyReq: (outGoingReq, incomingReq) => {
-    //             if (incomingReq.path.match(/\/oauth2\/token/)) {
-    //                 const clientId = getConfig().app.commerceAPI.parameters.clientId
-    //                 const secret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
-    //                 if (!secret) console.warn('Missing client secret environment variable')
-    //                 const encodedSlasCredentials = Buffer.from(`${clientId}:${secret}`).toString(
-    //                     'base64'
-    //                 )
-    //                 outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-    //             }
-    //         }
-    //     })
-    // )
-
-    // app.use(useSlasPrivateClient)
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
