@@ -130,6 +130,7 @@ export const TestProviders = ({
                         organizationId={commerceApiConfig.parameters.organizationId}
                         siteId={site?.id}
                         locale={locale.id}
+                        proxy={`${window.location.origin}/${commerceApiConfig.proxyPath}`}
                         redirectURI={`${window.location.origin}/testcallback`}
                         fetchedToken={bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''}
                     >
