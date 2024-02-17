@@ -84,7 +84,8 @@ const opts = (overrides = {}) => {
             https: httpsAgent
         },
         defaultCacheTimeSeconds: 123,
-        enableLegacyRemoteProxying: false
+        enableLegacyRemoteProxying: false,
+        useSlasPrivateClient: false
     }
     return {
         ...defaults,
@@ -1033,5 +1034,58 @@ describe('DevServer middleware', () => {
         expect(warn.mock.calls).toEqual([
             ['The SSR Server has _strictSSL turned off for https requests']
         ])
+    })
+})
+
+describe('SLAS private client proxy', () => {
+    const savedEnvironment = Object.assign({}, process.env)
+
+    afterEach(() => {
+        process.env = savedEnvironment
+    })
+
+    test('should not create proxy by default', () => {
+        const app = RemoteServerFactory._createApp(opts())
+        return request(app).get('/ssr/auth').expect(404)
+    })
+
+    test('should return 501 if SLAS_PRIVATE_CLIENT_SECRET env var not set', () => {
+        const app = RemoteServerFactory._createApp(opts({useSlasPrivateClient: true}))
+        return request(app).get('/ssr/auth').expect(501)
+    })
+
+    test('does not insert client secret if request not for /oauth2/token', () => {
+        process.env.SLAS_PRIVATE_CLIENT_SECRET = 'a secret'
+        const app = RemoteServerFactory._createApp(opts({
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            clientId: 'clientId',
+                            shortCode: 'shortCode',
+                        }
+                    },
+                }
+            },
+            useSlasPrivateClient: true
+        }))
+        return request(app).get('/ssr/auth').expect(200)
+    })
+
+    test('inserts client secret if request is for /oauth2/token', () => {
+        process.env.SLAS_PRIVATE_CLIENT_SECRET = 'a secret'
+        const app = RemoteServerFactory._createApp(opts({
+            mobify: {
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            clientId: 'clientId',
+                            shortCode: 'shortCode',
+                        }
+                    },
+                }
+            },
+            useSlasPrivateClient: true}))
+        return request(app).get('/ssr/auth/oauth2/token').expect(200)
     })
 })

@@ -624,7 +624,7 @@ export const RemoteServerFactory = {
                         changeOrigin: true,
                         pathRewrite: {'/ssr/auth': ''},
                         onProxyReq: (outGoingReq, incomingReq) => {
-                            if (incomingReq.path.match(/\/oauth2\/token/)) {
+                            if (incomingReq.path?.match(/\/oauth2\/token/)) {
                                 const encodedSlasCredentials = Buffer.from(
                                     `${clientId}:${clientSecret}`
                                 ).toString('base64')
