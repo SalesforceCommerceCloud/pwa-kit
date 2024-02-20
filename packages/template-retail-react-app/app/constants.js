@@ -121,7 +121,7 @@ export const SHIPPING_COUNTRY_CODES = [
 // Use this boolean to determine how a basket is created if there is none
 // true = defer it until an item is added to cart
 // false = create a basket on app's first load
-export const LAZY_BASKET_INITIALIZATION = false
+export const LAZY_BASKET_CREATION = false
 
 // Constant to Enable Active Data
 export const ACTIVE_DATA_ENABLED = false
