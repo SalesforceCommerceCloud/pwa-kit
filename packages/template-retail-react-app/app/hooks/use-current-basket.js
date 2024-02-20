@@ -37,7 +37,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         data: currentBasket,
         mutations: {
             addItemToBasket: async (body) => {
-                if (basketsData?.total > 0 || !LAZY_BASKET_INITIALIZATION) {
+                if (basketsData?.total > 0) {
                     return await addItemToBasketMutation.mutateAsync({
                         parameters: {basketId: currentBasket.basketId},
                         body
