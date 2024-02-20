@@ -602,43 +602,49 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupSlasPrivateClientProxy(app, options) {
-        if (options.useSlasPrivateClient) {
-            const clientSecret = process?.env?.SLAS_PRIVATE_CLIENT_SECRET
-            if (!clientSecret) {
-                app.use('/ssr/auth', (_, res) => {
-                    return res.status(501).json({
-                        message:
-                            'Environment variable SLAS_PRIVATE_CLIENT_ID not set: LINK_TO_DOC HERE'
-                    })
+        if (!options.useSLASPrivateClient) {
+            return
+        }
+        const clientSecret = process.env.SLAS_PRIVATE_CLIENT_SECRET
+        if (!clientSecret) {
+            app.use('/ssr/auth', (_, res) => {
+                return res.status(501).json({
+                    message:
+                        'Environment variable SLAS_PRIVATE_CLIENT_ID not set: LINK_TO_DOC HERE'
                 })
-            } else {
-                const clientId = options.mobify.app.commerceAPI.parameters.clientId
-                const shortCode = options.mobify.app.commerceAPI.parameters.shortCode
+            })
+        } else {
+            const clientId = options.mobify.app.commerceAPI.parameters.clientId
+            const shortCode = options.mobify.app.commerceAPI.parameters.shortCode
 
-                const slasTarget = `https://${shortCode}.api.commercecloud.salesforce.com`
+            const slasTarget = `https://${shortCode}.api.commercecloud.salesforce.com`
+            const encodedSlasCredentials = Buffer.from(
+                `${clientId}:${clientSecret}`
+            ).toString('base64')
 
-                app.use(
-                    '/ssr/auth',
-                    createProxyMiddleware({
-                        target: slasTarget,
-                        changeOrigin: true,
-                        pathRewrite: {'/ssr/auth': ''},
-                        onProxyReq: (outGoingReq, incomingReq) => {
-                            console.log("IN")
-                            if (incomingReq.path?.match(/\/oauth2\/token/)) {
-                                const encodedSlasCredentials = Buffer.from(
-                                    `${clientId}:${clientSecret}`
-                                ).toString('base64')
-                                console.log("REPLACE")
-                                outGoingReq.setHeader(
-                                    'Authorization',
-                                    `Basic ${encodedSlasCredentials}`
-                                )
-                            }
+            app.use(
+                '/ssr/auth',
+                createProxyMiddleware({
+                    target: slasTarget,
+                    changeOrigin: true,
+                    pathRewrite: {'/ssr/auth': ''},
+                    onProxyReq: (outGoingReq, incomingReq) => {
+                        console.log("IN")
+
+                        // We pattern match and add client secrets only to SLAS /token calls for now.
+                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login), use
+                        // the Authorization for a different purpose so we don't want to overwrite
+                        // the header for those calls.
+                        if (incomingReq.path?.match(/\/oauth2\/token/)) {
+                            console.log("REPLACE")
+                            outGoingReq.setHeader(
+                                'Authorization',
+                                `Basic ${encodedSlasCredentials}`
+                            )
                         }
-                    })
-                )
-            }
+                    }
+                })
+            )
         }
     },
 
