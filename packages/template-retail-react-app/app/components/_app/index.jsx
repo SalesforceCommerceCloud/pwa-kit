@@ -71,7 +71,8 @@ import {
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE,
-    ACTIVE_DATA_ENABLED
+    ACTIVE_DATA_ENABLED,
+    LAZY_BASKET_INITIALIZATION
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -188,8 +189,8 @@ const App = (props) => {
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
 
     useEffect(() => {
-        // Create a new basket if the current customer doesn't have one.
-        if (baskets?.total === 0) {
+        // Create a new basket if the current customer doesn't have one in a non-lazy basket initialization mode
+        if (baskets?.total === 0 && !LAZY_BASKET_INITIALIZATION) {
             createBasket.mutate({
                 body: {}
             })

@@ -60,13 +60,14 @@ const ProductDetail = () => {
     const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {data: basket} = useCurrentBasket()
-    const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
+    const {isLoading: isBasketLoading, mutations} = useCurrentBasket()
+    // const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
+    const {addItemToBasket} = mutations
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
-    const isBasketLoading = !basket?.basketId
+    // const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -234,10 +235,7 @@ const ProductDetail = () => {
                 quantity
             }))
 
-            await addItemToBasketMutation.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: productItems
-            })
+            await addItemToBasket(productItems)
 
             einstein.sendAddToCart(productItems)
 

@@ -22,7 +22,7 @@ import Link from '@salesforce/retail-react-app/app/components/link'
  */
 const WishlistPrimaryAction = () => {
     const variant = useItemVariant()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, mutations} = useCurrentBasket()
     const {formatMessage} = useIntl()
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
@@ -30,8 +30,8 @@ const WishlistPrimaryAction = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
 
-    const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
-
+    // const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
+    const {addItemToBasket} = mutations
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
 
@@ -50,34 +50,57 @@ const WishlistPrimaryAction = () => {
                   }
               ]
 
-        addItemToBasket.mutate(
-            {body: productItems, parameters: {basketId: basket?.basketId}},
-            {
-                onSuccess: () => {
-                    showToast({
-                        title: formatMessage(
-                            {
-                                defaultMessage:
-                                    '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                                id: 'wishlist_primary_action.info.added_to_cart'
-                            },
-                            {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
-                        ),
-                        status: 'success'
-                    })
-                    onClose()
-                },
-                onError: () => {
-                    showToast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
-                    })
-                },
-                onSettled: () => {
-                    setIsLoading(false)
-                }
-            }
-        )
+        try {
+            await addItemToBasket(productItems)
+            showToast({
+                title: formatMessage(
+                    {
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                        id: 'wishlist_primary_action.info.added_to_cart'
+                    },
+                    {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
+                ),
+                status: 'success'
+            })
+            onClose()
+        } catch (e) {
+            showToast({
+                title: formatMessage(API_ERROR_MESSAGE),
+                status: 'error'
+            })
+        } finally {
+            setIsLoading(false)
+        }
+
+        // addItemToBasket.mutate(
+        //     {body: productItems, parameters: {basketId: basket?.basketId}},
+        //     {
+        //         onSuccess: () => {
+        //             showToast({
+        //                 title: formatMessage(
+        //                     {
+        //                         defaultMessage:
+        //                             '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+        //                         id: 'wishlist_primary_action.info.added_to_cart'
+        //                     },
+        //                     {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
+        //                 ),
+        //                 status: 'success'
+        //             })
+        //             onClose()
+        //         },
+        //         onError: () => {
+        //             showToast({
+        //                 title: formatMessage(API_ERROR_MESSAGE),
+        //                 status: 'error'
+        //             })
+        //         },
+        //         onSettled: () => {
+        //             setIsLoading(false)
+        //         }
+        //     }
+        // )
     }
 
     const buttonText = {
