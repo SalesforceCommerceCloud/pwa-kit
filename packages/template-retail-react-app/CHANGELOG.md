@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 - Fix invalid query params warnings [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
+- Fix internal server error on account pages [#1675](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1675)
 
 ## v2.3.1 (Jan 23, 2024)
 
