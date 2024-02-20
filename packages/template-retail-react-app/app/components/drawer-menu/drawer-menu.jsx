@@ -85,6 +85,7 @@ const STORE_LOCATOR_HREF = '/store-locator'
 const DrawerMenu = ({
     root,
     itemsKey,
+    itemsCountKey,
     isOpen,
     onClose = noop,
     onLogoClick = noop,
@@ -146,6 +147,7 @@ const DrawerMenu = ({
                                     <NestedAccordion
                                         allowMultiple={true}
                                         item={root}
+                                        itemsCountKey={itemsCountKey}
                                         itemsKey={itemsKey}
                                         itemsFilter="c_showInMenu"
                                         fontSizes={FONT_SIZES}
@@ -409,9 +411,13 @@ DrawerMenu.propTypes = {
      */
     onLogoClick: PropTypes.func,
     /**
-     * .
+     * Customize the property representing the items.
      */
     itemsKey: PropTypes.string,
+    /**
+     * Cusomtize the property representing the items count.
+     */
+    itemsCountKey: PropTypes.string,
     /**
      * Component to be rendered for each individual menu item.
      */
