@@ -624,10 +624,12 @@ export const RemoteServerFactory = {
                         changeOrigin: true,
                         pathRewrite: {'/ssr/auth': ''},
                         onProxyReq: (outGoingReq, incomingReq) => {
+                            console.log("IN")
                             if (incomingReq.path?.match(/\/oauth2\/token/)) {
                                 const encodedSlasCredentials = Buffer.from(
                                     `${clientId}:${clientSecret}`
                                 ).toString('base64')
+                                console.log("REPLACE")
                                 outGoingReq.setHeader(
                                     'Authorization',
                                     `Basic ${encodedSlasCredentials}`

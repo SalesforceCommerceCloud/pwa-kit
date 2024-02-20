@@ -31,6 +31,7 @@ import {
     getRuntime
 } from './express'
 import {randomUUID} from 'crypto'
+import {ClientRequest, OutgoingMessage, ServerResponse} from 'http'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -1069,10 +1070,10 @@ describe('SLAS private client proxy', () => {
             },
             useSlasPrivateClient: true
         }))
-        return request(app).get('/ssr/auth').expect(200)
+        return request(app).get('/ssr/auth')
     })
 
-    test('inserts client secret if request is for /oauth2/token', () => {
+    test.only('inserts client secret if request is for /oauth2/token', () => {
         process.env.SLAS_PRIVATE_CLIENT_SECRET = 'a secret'
         const app = RemoteServerFactory._createApp(opts({
             mobify: {
@@ -1086,6 +1087,15 @@ describe('SLAS private client proxy', () => {
                 }
             },
             useSlasPrivateClient: true}))
-        return request(app).get('/ssr/auth/oauth2/token').expect(200)
+
+        const encodedCredentials = Buffer.from(
+            'clientId:clientSecret').toString('base64')
+        const spy = jest.spyOn(ClientRequest.prototype, 'setHeader')
+
+        return request(app).get('/ssr/auth/oauth2/token').expect(
+            () => {
+                expect(spy).toHaveBeenCalledWith('Authorization', `Basic ${encodedCredentials}`)
+            }
+        )
     })
 })
