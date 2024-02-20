@@ -10,7 +10,6 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
-import {LAZY_BASKET_INITIALIZATION} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * This hook combine some commerce-react-sdk hooks to provide more derived data for Retail App baskets

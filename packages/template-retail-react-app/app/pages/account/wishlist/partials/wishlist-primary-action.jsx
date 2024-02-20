@@ -30,7 +30,6 @@ const WishlistPrimaryAction = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
 
-    // const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
     const {addItemToBasket} = mutations
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
@@ -72,35 +71,6 @@ const WishlistPrimaryAction = () => {
         } finally {
             setIsLoading(false)
         }
-
-        // addItemToBasket.mutate(
-        //     {body: productItems, parameters: {basketId: basket?.basketId}},
-        //     {
-        //         onSuccess: () => {
-        //             showToast({
-        //                 title: formatMessage(
-        //                     {
-        //                         defaultMessage:
-        //                             '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-        //                         id: 'wishlist_primary_action.info.added_to_cart'
-        //                     },
-        //                     {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
-        //                 ),
-        //                 status: 'success'
-        //             })
-        //             onClose()
-        //         },
-        //         onError: () => {
-        //             showToast({
-        //                 title: formatMessage(API_ERROR_MESSAGE),
-        //                 status: 'error'
-        //             })
-        //         },
-        //         onSettled: () => {
-        //             setIsLoading(false)
-        //         }
-        //     }
-        // )
     }
 
     const buttonText = {
