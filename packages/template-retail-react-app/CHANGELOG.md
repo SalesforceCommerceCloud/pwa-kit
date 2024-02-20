@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 - Fix invalid query params warnings [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
+- Fix locale selector navigating back to default locale [#1662](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1662)
 
 ## v2.3.1 (Jan 23, 2024)
 
@@ -141,7 +142,7 @@ The versions published below were not published on npm, and the versioning match
 
 - Dynamic footer Copyright date [#741](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/741)
 - Footer copyright: remove the remaining hardcoded year [#760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/760)
-- ImageGallery uses image.link when DIS is not set [#786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/786)
+- ImageGallery uses image.link when DIS is not set [#786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/786)
 - Use default locale as target if none is specified [#788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/788)
 - Password change bug fix [#803](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/803)
 - pwa-kit-dev command for tailing logs [#789](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/789)
