@@ -60,7 +60,7 @@ const Skeleton = ({children, height, width, ...rest}) => {
 
 const ProfileCard = () => {
     const {formatMessage} = useIntl()
-
+    const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
 
@@ -86,14 +86,6 @@ const ProfileCard = () => {
             phone: customer.phoneHome
         })
     }, [customer?.firstName, customer?.lastName, customer?.email, customer?.phoneHome])
-
-    const profileHeadingText = formatMessage({
-        defaultMessage: 'My Profile',
-        id: 'profile_card.title.my_profile'
-    })
-    const profileHeading = Array.from(document.querySelectorAll('h2')).find(
-        (element) => element.textContent === profileHeadingText
-    )
 
     const submit = async (values) => {
         try {
@@ -126,7 +118,7 @@ const ProfileCard = () => {
                             status: 'success',
                             isClosable: true
                         })
-                        profileHeading?.focus()
+                        headingRef.current.focus()
                     }
                 }
             )
@@ -139,8 +131,11 @@ const ProfileCard = () => {
         <ToggleCard
             id="my-profile"
             title={
-                <Skeleton height="30px" width="120px">
-                    {profileHeadingText}
+                <Skeleton ref={headingRef} height="30px" width="120px">
+                    <FormattedMessage
+                        defaultMessage="My Profile"
+                        id="profile_card.title.my_profile"
+                    />
                 </Skeleton>
             }
             editing={isEditing}
@@ -164,7 +159,7 @@ const ProfileCard = () => {
                             <FormActionButtons
                                 onCancel={() => {
                                     setIsEditing(false)
-                                    profileHeading?.focus()
+                                    headingRef.current.focus()
                                 }}
                             />
                         </Stack>
@@ -232,7 +227,7 @@ const ProfileCard = () => {
 
 const PasswordCard = () => {
     const {formatMessage} = useIntl()
-
+    const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId, email} = customer
 
@@ -243,14 +238,6 @@ const PasswordCard = () => {
     const [isEditing, setIsEditing] = useState(false)
 
     const form = useForm()
-
-    const passwordHeadingText = formatMessage({
-        defaultMessage: 'Password',
-        id: 'password_card.title.password'
-    })
-    const passwordHeading = Array.from(document.querySelectorAll('h2')).find(
-        (element) => element.textContent === passwordHeadingText
-    )
 
     const submit = async (values) => {
         try {
@@ -278,7 +265,7 @@ const PasswordCard = () => {
                             username: email,
                             password: values.password
                         })
-                        passwordHeading?.focus()
+                        headingRef.current.focus()
                         form.reset()
                     },
                     onError: async (err) => {
@@ -296,8 +283,8 @@ const PasswordCard = () => {
         <ToggleCard
             id="password"
             title={
-                <Skeleton height="30px" width="120px">
-                    {passwordHeadingText}
+                <Skeleton ref={headingRef} height="30px" width="120px">
+                    <FormattedMessage defaultMessage="Password" id="password_card.title.password" />
                 </Skeleton>
             }
             editing={isEditing}
@@ -321,7 +308,7 @@ const PasswordCard = () => {
                             <FormActionButtons
                                 onCancel={() => {
                                     setIsEditing(false)
-                                    passwordHeading?.focus()
+                                    headingRef.current.focus()
                                 }}
                             />
                         </Stack>
