@@ -58,6 +58,7 @@ const Skeleton = forwardRef(({children, height, width, ...rest}, ref) => {
     )
 })
 
+Skeleton.displayName = 'Skeleton'
 
 const ProfileCard = () => {
     const {formatMessage} = useIntl()
