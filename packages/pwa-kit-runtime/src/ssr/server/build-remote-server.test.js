@@ -20,7 +20,6 @@ describe('the once function', () => {
 })
 
 describe('remote server factory test coverage', () => {
-
     test('getSlasEndpoint returns undefined if useSLASPrivateClient is false', () => {
         const endpoint = RemoteServerFactory._getSlasEndpoint({})
         expect(endpoint).toBeUndefined()
@@ -30,7 +29,4 @@ describe('remote server factory test coverage', () => {
         const endpoint = RemoteServerFactory._getSlasEndpoint({useSLASPrivateClient: true})
         expect(endpoint).toBeDefined()
     })
-
 })
-
-
