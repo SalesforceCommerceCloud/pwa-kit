@@ -42,6 +42,7 @@ export const useCurrentBasket = ({id = ''} = {}) => {
                         body
                     })
                 } else {
+                    console.log('createbasket')
                     const data = await createBasket.mutateAsync({
                         body: {}
                     })
