@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {once} from './build-remote-server'
+import {once, RemoteServerFactory} from './build-remote-server'
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
@@ -18,3 +18,19 @@ describe('the once function', () => {
         expect(v1).toBe(v2) // The exact same instance
     })
 })
+
+describe('remote server factory test coverage', () => {
+
+    test('getSlasEndpoint returns undefined if useSLASPrivateClient is false', () => {
+        const endpoint = RemoteServerFactory._getSlasEndpoint({})
+        expect(endpoint).toBeUndefined()
+    })
+
+    test('getSlasEndpoint returns endpoint if useSLASPrivateClient is true', () => {
+        const endpoint = RemoteServerFactory._getSlasEndpoint({useSLASPrivateClient: true})
+        expect(endpoint).toBeDefined()
+    })
+
+})
+
+
