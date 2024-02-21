@@ -118,7 +118,7 @@ const ProfileCard = () => {
                             status: 'success',
                             isClosable: true
                         })
-                        headingRef.current.focus()
+                        headingRef?.current?.focus()
                     }
                 }
             )
@@ -159,7 +159,7 @@ const ProfileCard = () => {
                             <FormActionButtons
                                 onCancel={() => {
                                     setIsEditing(false)
-                                    headingRef.current.focus()
+                                    headingRef?.current?.focus()
                                 }}
                             />
                         </Stack>
@@ -265,7 +265,7 @@ const PasswordCard = () => {
                             username: email,
                             password: values.password
                         })
-                        headingRef.current.focus()
+                        headingRef?.current?.focus()
                         form.reset()
                     },
                     onError: async (err) => {
@@ -308,7 +308,7 @@ const PasswordCard = () => {
                             <FormActionButtons
                                 onCancel={() => {
                                     setIsEditing(false)
-                                    headingRef.current.focus()
+                                    headingRef?.current?.focus()
                                 }}
                             />
                         </Stack>
