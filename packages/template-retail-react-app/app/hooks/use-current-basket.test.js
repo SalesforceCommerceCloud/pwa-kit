@@ -14,6 +14,7 @@ import {
     mockCustomerBaskets,
     mockEmptyBasket
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
+import emptyBasket from '@salesforce/retail-react-app/app/mocks/empty-basket'
 
 const MOCK_USE_QUERY_RESULT = {
     data: undefined,
@@ -38,36 +39,46 @@ const MOCK_USE_QUERY_RESULT = {
     refetch: jest.fn(),
     remove: jest.fn()
 }
+let mockFnc
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    mockFnc = jest.fn(() => {
+        return {
+            mutateAsync: jest.fn()
+        }
+    })
     return {
         ...originalModule,
         useCustomerId: jest.fn(() => 'customer-id'),
-        useCustomerBaskets: jest.fn()
+        useCustomerBaskets: jest.fn(),
+        useShopperBasketsMutation: mockFnc
     }
 })
-const MockComponent = ({isLazyBasketCreation = false}) => {
+const MockComponent = () => {
     const {
         data: currentBasket,
-        derivedData: {hasBasket}
+        derivedData: {hasBasket, totalItems},
+        mutations: {addItemToBasket}
     } = useCurrentBasket()
-    console.log('currentBasket', currentBasket?.basketId)
-    const createBasket = useShopperBasketsMutation('createBasket')
-
-    // useEffect(() => {
-    //     console.log('!hasBasket && !isLazyBasketCreation', hasBasket, isLazyBasketCreation)
-    //     if (!hasBasket && !isLazyBasketCreation) {
-    //         console.log('test------------------')
-    //         const rest = createBasket.mutate({
-    //             body: {}
-    //         })
-    //     }
-    // }, [hasBasket])
 
     return (
         <div>
             <div data-testid="basket-id">{currentBasket?.basketId}</div>
-            <button>Add To Cart</button>
+            <div data-testid="total-items">{totalItems}</div>
+            <div data-testid="has-basket">{hasBasket}</div>
+            <button
+                onClick={async () => {
+                    await addItemToBasket([
+                        {
+                            productId: 'product-123',
+                            price: 100,
+                            quantity: 1
+                        }
+                    ])
+                }}
+            >
+                Add To Cart
+            </button>
         </div>
     )
 }
@@ -83,9 +94,11 @@ describe('useCurrentBasket', function () {
         const expectedBasketId = mockCustomerBaskets.baskets[0].basketId
         renderWithProviders(<MockComponent />)
         expect(screen.getByTestId('basket-id').innerHTML).toEqual(expectedBasketId)
+        expect(screen.getByTestId('total-items').innerHTML).toEqual(2)
+        expect(screen.getByTestId('has-basket').innerHTML).toBeTruthy()
     })
 
-    test('returns data with no baskets when customerId is defined but customer has no basket created', () => {
+    test.only('creates basket before add an item to cart when a user has no basket', async () => {
         useCustomerBaskets.mockImplementation(() => {
             return {
                 data: {total: 0},
@@ -93,7 +106,20 @@ describe('useCurrentBasket', function () {
                 ...MOCK_USE_QUERY_RESULT
             }
         })
-        renderWithProviders(<MockComponent />)
+        const {user} = renderWithProviders(<MockComponent />)
         expect(screen.getByTestId('basket-id').innerHTML).toEqual('')
+        console.log('mockFnc', mockFnc)
+        const addToCarBtn = screen.getByText(/add to cart/i)
+        await user.click(addToCarBtn)
+        screen.logTestingPlaygroundURL()
+        // useCustomerBaskets.mockImplementation(() => {
+        //     return {
+        //         data: {total: 1, baskets: mockEmptyBasket},
+        //         isLoading: false,
+        //         ...MOCK_USE_QUERY_RESULT
+        //     }
+        // })
+        const expectedBasketId = mockEmptyBasket.baskets[0].basketId
+        expect(screen.getByTestId('basket-id').innerHTML).toEqual(expectedBasketId)
     })
 })
