@@ -13,9 +13,10 @@ import path from 'path'
 import sinon from 'sinon'
 import superagent from 'superagent'
 import request from 'supertest'
+import express from 'express'
 
 import {PersistentCache} from '../../utils/ssr-cache'
-import {CachedResponse, getHashForString} from '../../utils/ssr-server'
+import {CachedResponse} from '../../utils/ssr-server'
 // We need to mock isRemote in some tests, so we need to import it directly from
 // the file it was defined in, because of the way jest works.
 import * as ssrServerUtils from '../../utils/ssr-server/utils'
@@ -31,7 +32,6 @@ import {
     getRuntime
 } from './express'
 import {randomUUID} from 'crypto'
-import {ClientRequest, OutgoingMessage, ServerResponse} from 'http'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -86,7 +86,7 @@ const opts = (overrides = {}) => {
         },
         defaultCacheTimeSeconds: 123,
         enableLegacyRemoteProxying: false,
-        useSlasPrivateClient: false
+        useSLASPrivateClient: false
     }
     return {
         ...defaults,
@@ -1041,6 +1041,19 @@ describe('DevServer middleware', () => {
 describe('SLAS private client proxy', () => {
     const savedEnvironment = Object.assign({}, process.env)
 
+    let proxyApp
+    const proxyPort = 12345
+    const proxyPath = '/responseHeaders'
+    const slasTarget = `http://localhost:${proxyPort}${proxyPath}`
+
+    beforeAll(() => {
+        proxyApp = express()
+        proxyApp.use(proxyPath, (req, res) => {
+            res.send(req.headers)
+        })
+        proxyApp.listen(proxyPort)
+    })
+
     afterEach(() => {
         process.env = savedEnvironment
     })
@@ -1051,51 +1064,63 @@ describe('SLAS private client proxy', () => {
     })
 
     test('should return 501 if SLAS_PRIVATE_CLIENT_SECRET env var not set', () => {
-        const app = RemoteServerFactory._createApp(opts({useSlasPrivateClient: true}))
+        const app = RemoteServerFactory._createApp(opts({useSLASPrivateClient: true}))
         return request(app).get('/ssr/auth').expect(501)
     })
 
     test('does not insert client secret if request not for /oauth2/token', () => {
         process.env.SLAS_PRIVATE_CLIENT_SECRET = 'a secret'
-        const app = RemoteServerFactory._createApp(opts({
-            mobify: {
-                app: {
-                    commerceAPI: {
-                        parameters: {
-                            clientId: 'clientId',
-                            shortCode: 'shortCode',
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'clientId',
+                                shortCode: 'shortCode'
+                            }
                         }
-                    },
-                }
-            },
-            useSlasPrivateClient: true
-        }))
-        return request(app).get('/ssr/auth')
+                    }
+                },
+                useSLASPrivateClient: true,
+                slasTarget: slasTarget
+            })
+        )
+
+        return request(app)
+            .get('/ssr/auth/')
+            .then((response) => {
+                expect(response.body.authorization).toBeUndefined()
+            })
     })
 
-    test.only('inserts client secret if request is for /oauth2/token', () => {
+    test('inserts client secret if request is for /oauth2/token', () => {
         process.env.SLAS_PRIVATE_CLIENT_SECRET = 'a secret'
-        const app = RemoteServerFactory._createApp(opts({
-            mobify: {
-                app: {
-                    commerceAPI: {
-                        parameters: {
-                            clientId: 'clientId',
-                            shortCode: 'shortCode',
+
+        const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'clientId',
+                                shortCode: 'shortCode'
+                            }
                         }
-                    },
-                }
-            },
-            useSlasPrivateClient: true}))
-
-        const encodedCredentials = Buffer.from(
-            'clientId:clientSecret').toString('base64')
-        const spy = jest.spyOn(ClientRequest.prototype, 'setHeader')
-
-        return request(app).get('/ssr/auth/oauth2/token').expect(
-            () => {
-                expect(spy).toHaveBeenCalledWith('Authorization', `Basic ${encodedCredentials}`)
-            }
+                    }
+                },
+                useSLASPrivateClient: true,
+                slasTarget: slasTarget
+            })
         )
+
+        return request(app)
+            .get('/ssr/auth/oauth2/token')
+            .then((response) => {
+                expect(response.body.authorization).toBe(`Basic ${encodedCredentials}`)
+            })
     })
 })

@@ -116,7 +116,10 @@ export const RemoteServerFactory = {
             mobify: undefined,
 
             // Toggle cookies being passed and set
-            localAllowCookies: false
+            localAllowCookies: false,
+
+            // Toggle for setting up the custom SLAS private client secret handler
+            useSLASPrivateClient: false
         }
 
         options = Object.assign({}, defaults, options)
@@ -146,6 +149,9 @@ export const RemoteServerFactory = {
         // Toggle cookies being passed and set. Can be overridden locally,
         // always uses MRT_ALLOW_COOKIES env remotely
         options.allowCookies = this._getAllowCookies(options)
+
+        // For test only – configure the SLAS private client secret proxy endpoint
+        options.slasTarget = `${options.slasTarget}` || this._getSlasEndpoint(options)
 
         return options
     },
@@ -187,6 +193,15 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _strictSSL(options) {
         return true
+    },
+
+    /**
+     * @private
+     */
+    _getSlasEndpoint(options) {
+        if (!options.useSLASPrivateClient) return undefined
+        const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
+        return `https://${shortCode}.api.commercecloud.salesforce.com`
     },
 
     /**
@@ -605,41 +620,32 @@ export const RemoteServerFactory = {
         if (!options.useSLASPrivateClient) {
             return
         }
+        const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.SLAS_PRIVATE_CLIENT_SECRET
         let handler
         if (!clientSecret) {
             handler = (_, res) => {
                 return res.status(501).json({
-                    message:
-                        'Environment variable SLAS_PRIVATE_CLIENT_ID not set: LINK_TO_DOC HERE'
+                    message: 'Environment variable SLAS_PRIVATE_CLIENT_ID not set: LINK_TO_DOC HERE'
                 })
             }
         } else {
-            const clientId = options.mobify.app.commerceAPI.parameters.clientId
-            const shortCode = options.mobify.app.commerceAPI.parameters.shortCode
+            const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
+                'base64'
+            )
 
-            const slasTarget = `https://${shortCode}.api.commercecloud.salesforce.com`
-            const encodedSlasCredentials = Buffer.from(
-                `${clientId}:${clientSecret}`
-            ).toString('base64')
-
+            console.log(options.slasTarget)
             handler = createProxyMiddleware({
-                target: slasTarget,
+                target: options.slasTarget,
                 changeOrigin: true,
                 pathRewrite: {'/ssr/auth': ''},
                 onProxyReq: (outGoingReq, incomingReq) => {
-                    console.log("IN")
-
                     // We pattern match and add client secrets only to SLAS /token calls for now.
                     // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login), use
                     // the Authorization for a different purpose so we don't want to overwrite
                     // the header for those calls.
                     if (incomingReq.path?.match(/\/oauth2\/token/)) {
-                        console.log("REPLACE")
-                        outGoingReq.setHeader(
-                            'Authorization',
-                            `Basic ${encodedSlasCredentials}`
-                        )
+                        outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
                 }
             })
