@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {forwardRef, useEffect, useRef, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
@@ -42,7 +42,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
  * the bounding element will affect the contents size.
  */
 // eslint-disable-next-line react/prop-types
-const Skeleton = ({children, height, width, ...rest}) => {
+const Skeleton = forwardRef(({children, height, width, ...rest}, ref) => {
     const {data: customer} = useCurrentCustomer()
     const {isRegistered} = customer
     const size = !isRegistered
@@ -52,11 +52,12 @@ const Skeleton = ({children, height, width, ...rest}) => {
           }
         : {}
     return (
-        <ChakraSkeleton isLoaded={!customer.isLoading} {...rest} {...size}>
+        <ChakraSkeleton ref={ref} isLoaded={!customer.isLoading} {...rest} {...size}>
             {children}
         </ChakraSkeleton>
     )
-}
+})
+
 
 const ProfileCard = () => {
     const {formatMessage} = useIntl()
