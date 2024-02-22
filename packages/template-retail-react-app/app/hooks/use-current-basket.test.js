@@ -127,7 +127,7 @@ describe('useCurrentBasket', function () {
         )
     })
 
-    test('returns baskets when customerId is defined assuming basket has been created', async () => {
+    test('returns current basket and derivedData when both customerId and basket are defined', async () => {
         useCustomerBaskets.mockImplementation(() => {
             return {
                 ...MOCK_USE_QUERY_RESULT,
