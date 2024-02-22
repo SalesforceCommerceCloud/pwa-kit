@@ -626,34 +626,36 @@ export const RemoteServerFactory = {
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.SLAS_PRIVATE_CLIENT_SECRET
-        let handler
         if (!clientSecret) {
-            handler = (_, res) => {
-                return res.status(501).json({
-                    message: 'Environment variable SLAS_PRIVATE_CLIENT_ID not set: LINK_TO_DOC HERE'
-                })
-            }
+            throw new Error(
+                `SSR server cannot initialize: missing environment variable SLAS_PRIVATE_CLIENT_ID`
+            )
         } else {
             const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
                 'base64'
             )
 
-            handler = createProxyMiddleware({
-                target: options.slasTarget,
-                changeOrigin: true,
-                pathRewrite: {[endpointPath]: ''},
-                onProxyReq: (outGoingReq, incomingReq) => {
-                    // We pattern match and add client secrets only to SLAS /token calls for now.
-                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login), use
-                    // the Authorization for a different purpose so we don't want to overwrite
-                    // the header for those calls.
-                    if (incomingReq.path?.match(/\/oauth2\/token/)) {
-                        outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+            app.use(
+                [endpointPath],
+                createProxyMiddleware({
+                    target: options.slasTarget,
+                    changeOrigin: true,
+                    pathRewrite: {[endpointPath]: ''},
+                    onProxyReq: (outGoingReq, incomingReq) => {
+                        // We pattern match and add client secrets only to SLAS /token calls for now.
+                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login), use
+                        // the Authorization for a different purpose so we don't want to overwrite
+                        // the header for those calls.
+                        if (incomingReq.path?.match(/\/oauth2\/token/)) {
+                            outGoingReq.setHeader(
+                                'Authorization',
+                                `Basic ${encodedSlasCredentials}`
+                            )
+                        }
                     }
-                }
-            })
+                })
+            )
         }
-        app.use([endpointPath], handler)
     },
 
     /**
