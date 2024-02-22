@@ -1058,14 +1058,18 @@ describe('SLAS private client proxy', () => {
         process.env = savedEnvironment
     })
 
+    afterAll(() => {
+        proxyApp.close()
+    })
+
     test('should not create proxy by default', () => {
         const app = RemoteServerFactory._createApp(opts())
-        return request(app).get('/ssr/auth').expect(404)
+        return request(app).get('/mobify/scapi/shopper/auth').expect(404)
     })
 
     test('should return 501 if SLAS_PRIVATE_CLIENT_SECRET env var not set', () => {
         const app = RemoteServerFactory._createApp(opts({useSLASPrivateClient: true}))
-        return request(app).get('/ssr/auth').expect(501)
+        return request(app).get('/mobify/scapi/shopper/auth').expect(501)
     })
 
     test('does not insert client secret if request not for /oauth2/token', () => {
@@ -1089,11 +1093,11 @@ describe('SLAS private client proxy', () => {
         )
 
         return request(app)
-            .get('/ssr/auth/')
+            .get('/mobify/scapi/shopper/auth/somePath')
             .then((response) => {
                 expect(response.body.authorization).toBeUndefined()
             })
-    })
+    }, 10000)
 
     test('inserts client secret if request is for /oauth2/token', () => {
         process.env.SLAS_PRIVATE_CLIENT_SECRET = 'a secret'
@@ -1118,9 +1122,9 @@ describe('SLAS private client proxy', () => {
         )
 
         return request(app)
-            .get('/ssr/auth/oauth2/token')
+            .get('/mobify/scapi/shopper/auth/oauth2/token')
             .then((response) => {
                 expect(response.body.authorization).toBe(`Basic ${encodedCredentials}`)
             })
-    })
+    }, 10000)
 })

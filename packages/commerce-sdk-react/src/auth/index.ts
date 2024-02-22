@@ -174,7 +174,7 @@ class Auth {
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret
         const baseUrl = config.proxy.split(`/mobify/proxy/api`)[0]
-        const privateClientEndpoint = `${baseUrl}/ssr/auth`
+        const privateClientEndpoint = `${baseUrl}/mobify/scapi/shopper/auth`
 
         this.client = new ShopperLogin({
             proxy: config.clientSecret ? privateClientEndpoint : config.proxy,

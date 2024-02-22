@@ -22,7 +22,8 @@ import {
     processLambdaResponse,
     responseSend,
     configureProxyConfigs,
-    setQuiet
+    setQuiet,
+    localDevLog
 } from '../../utils/ssr-server'
 import dns from 'dns'
 import express from 'express'
@@ -151,7 +152,7 @@ export const RemoteServerFactory = {
         options.allowCookies = this._getAllowCookies(options)
 
         // For test only – configure the SLAS private client secret proxy endpoint
-        options.slasTarget = `${options.slasTarget}` || this._getSlasEndpoint(options)
+        options.slasTarget = options.slasTarget || this._getSlasEndpoint(options)
 
         return options
     },
@@ -620,6 +621,9 @@ export const RemoteServerFactory = {
         if (!options.useSLASPrivateClient) {
             return
         }
+        const endpointPath = '/mobify/scapi/shopper/auth'
+        localDevLog(`Proxying ${endpointPath} to ${options.slasTarget}`)
+
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.SLAS_PRIVATE_CLIENT_SECRET
         let handler
@@ -634,11 +638,10 @@ export const RemoteServerFactory = {
                 'base64'
             )
 
-            console.log(options.slasTarget)
             handler = createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {'/ssr/auth': ''},
+                pathRewrite: {[endpointPath]: ''},
                 onProxyReq: (outGoingReq, incomingReq) => {
                     // We pattern match and add client secrets only to SLAS /token calls for now.
                     // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login), use
@@ -650,7 +653,7 @@ export const RemoteServerFactory = {
                 }
             })
         }
-        app.use('/ssr/auth', handler)
+        app.use([endpointPath], handler)
     },
 
     /**
