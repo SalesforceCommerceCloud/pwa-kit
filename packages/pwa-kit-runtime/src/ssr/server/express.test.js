@@ -1067,14 +1067,14 @@ describe('SLAS private client proxy', () => {
         return request(app).get('/mobify/scapi/shopper/auth').expect(404)
     })
 
-    test('should throw error if SLAS_PRIVATE_CLIENT_SECRET env var not set', () => {
+    test('should throw error if PWA_KIT_SLAS_CLIENT_SECRET env var not set', () => {
         expect(() => {
             RemoteServerFactory._createApp(opts({useSLASPrivateClient: true}))
         }).toThrow()
     })
 
     test('does not insert client secret if request not for /oauth2/token', async () => {
-        process.env.SLAS_PRIVATE_CLIENT_SECRET = 'a secret'
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
         const app = RemoteServerFactory._createApp(
             opts({
@@ -1101,7 +1101,7 @@ describe('SLAS private client proxy', () => {
     })
 
     test('inserts client secret if request is for /oauth2/token', async () => {
-        process.env.SLAS_PRIVATE_CLIENT_SECRET = 'a secret'
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
         const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
 

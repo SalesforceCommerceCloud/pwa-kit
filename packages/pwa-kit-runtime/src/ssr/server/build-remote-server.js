@@ -631,10 +631,10 @@ export const RemoteServerFactory = {
         localDevLog(`Proxying ${endpointPath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
-        const clientSecret = process.env.SLAS_PRIVATE_CLIENT_SECRET
+        const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
         if (!clientSecret) {
             throw new Error(
-                `SSR server cannot initialize: missing environment variable SLAS_PRIVATE_CLIENT_ID`
+                `SSR server cannot initialize: missing environment variable PWA_KIT_SLAS_CLIENT_SECRET`
             )
         } else {
             const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
