@@ -50,6 +50,7 @@ const ListMenu = ({
 }) => {
     const theme = useTheme()
     const [ariaBusy, setAriaBusy] = useState(true)
+    const [activeLink, setActiveLink] = useState()
     const intl = useIntl()
 
     const {baseStyle} = theme.components.ListMenu
@@ -93,7 +94,13 @@ const ListMenu = ({
                                         <Link
                                             as={RouteLink}
                                             to={categoryUrlBuilder(item)}
+                                            onMouseOver={setActiveLink.bind(this, id)}
+                                            onMouseOut={setActiveLink.bind(this)}
                                             {...baseStyle.listMenuTriggerLink}
+                                            {...{name: name + ' __'}}
+                                            {...(activeLink === id
+                                                ? baseStyle.listMenuTriggerLinkActive
+                                                : {})}
                                         >
                                             {name}
                                         </Link>
