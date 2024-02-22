@@ -99,7 +99,7 @@ const ListMenu = ({
                                             {...baseStyle.listMenuTriggerLink}
                                             {...{name: name + ' __'}}
                                             {...(activeLink === id
-                                                ? baseStyle.listMenuTriggerLinkActive
+                                                ? baseStyle.listMenuTriggerlessLinkActive
                                                 : {})}
                                         >
                                             {name}
