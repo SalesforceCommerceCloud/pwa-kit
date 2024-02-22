@@ -131,7 +131,8 @@ describe('useCurrentBasket', function () {
         useCustomerBaskets.mockImplementation(() => {
             return {
                 data: mockCustomerBaskets,
-                isLoading: false
+                isLoading: false,
+                ...MOCK_USE_QUERY_RESULT
             }
         })
         const expectedBasketId = mockCustomerBaskets.baskets[0].basketId
