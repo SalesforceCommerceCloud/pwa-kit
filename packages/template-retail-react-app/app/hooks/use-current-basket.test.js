@@ -98,9 +98,9 @@ describe('useCurrentBasket', function () {
     test('creates basket before add an item to cart when a user has no basket', async () => {
         useCustomerBaskets.mockImplementation(() => {
             return {
+                ...MOCK_USE_QUERY_RESULT,
                 data: {total: 0},
-                isLoading: false,
-                ...MOCK_USE_QUERY_RESULT
+                isLoading: false
             }
         })
         const {user} = await renderWithProviders(<MockComponent />)
@@ -130,9 +130,9 @@ describe('useCurrentBasket', function () {
     test('returns baskets when customerId is defined assuming basket has been created', async () => {
         useCustomerBaskets.mockImplementation(() => {
             return {
+                ...MOCK_USE_QUERY_RESULT,
                 data: mockCustomerBaskets,
-                isLoading: false,
-                ...MOCK_USE_QUERY_RESULT
+                isLoading: false
             }
         })
         const expectedBasketId = mockCustomerBaskets.baskets[0].basketId
