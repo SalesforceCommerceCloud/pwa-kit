@@ -120,7 +120,13 @@ export const RemoteServerFactory = {
             localAllowCookies: false,
 
             // Toggle for setting up the custom SLAS private client secret handler
-            useSLASPrivateClient: false
+            useSLASPrivateClient: false,
+
+            // A regex for identifying which SLAS endpoints the custom SLAS private
+            // client secret handler will inject an Authorization header.
+            // Do not modify unless a project wants to customize additional SLAS
+            // endpoints that we currently do not support (ie. /oauth2/passwordless/token)
+            applySLASPrivateClientToEndpoints: /\/oauth2\/token/
         }
 
         options = Object.assign({}, defaults, options)
@@ -642,11 +648,14 @@ export const RemoteServerFactory = {
                     changeOrigin: true,
                     pathRewrite: {[endpointPath]: ''},
                     onProxyReq: (outGoingReq, incomingReq) => {
-                        // We pattern match and add client secrets only to SLAS /token calls for now.
-                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login), use
-                        // the Authorization for a different purpose so we don't want to overwrite
-                        // the header for those calls.
-                        if (incomingReq.path?.match(/\/oauth2\/token/)) {
+                        // We pattern match and add client secrets only to endpoints that
+                        // match the regex specified by options.applySLASPrivateClientToEndpoints.
+                        // By default, this regex matches only calls to SLAS /oauth2/token
+                        // (see option defaults at the top of this file).
+                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                        // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                        // purpose so we don't want to overwrite the header for those calls.
+                        if (incomingReq.path?.match(options.applySLASPrivateClientToEndpoints)) {
                             outGoingReq.setHeader(
                                 'Authorization',
                                 `Basic ${encodedSlasCredentials}`
