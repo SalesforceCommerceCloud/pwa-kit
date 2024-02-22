@@ -289,7 +289,6 @@ const PasswordCard = () => {
                 <Skeleton ref={headingRef} tabindex="-1" height="30px" width="120px">
                     <FormattedMessage defaultMessage="Password" id="password_card.title.password" />
                 </Skeleton>
-                
             }
             editing={isEditing}
             isLoading={form.formState.isSubmitting}
