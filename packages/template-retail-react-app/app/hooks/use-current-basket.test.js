@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
-import {screen, renderHook, waitFor} from '@testing-library/react'
+import React from 'react'
+import {screen, waitFor} from '@testing-library/react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useCustomerBaskets} from '@salesforce/commerce-sdk-react'
@@ -68,12 +68,11 @@ const MockComponent = () => {
         derivedData: {hasBasket, totalItems},
         mutations: {addItemToBasket}
     } = useCurrentBasket()
-    console.log('currentBasket', currentBasket)
     return (
         <div>
             <div data-testid="basket-id">{currentBasket?.basketId}</div>
             <div data-testid="total-items">{totalItems}</div>
-            <div data-testid="has-basket">{hasBasket}</div>
+            <div data-testid="has-basket">{hasBasket.toString()}</div>
             <button
                 onClick={async () => {
                     const res = await addItemToBasket([
@@ -93,7 +92,6 @@ const MockComponent = () => {
 
 describe('useCurrentBasket', function () {
     beforeEach(() => {
-        jest.resetAllMocks()
         jest.resetModules()
     })
 
@@ -106,7 +104,7 @@ describe('useCurrentBasket', function () {
             }
         })
         const {user} = await renderWithProviders(<MockComponent />)
-        expect(screen.getByTestId('basket-id').innerHTML).toEqual('')
+        expect(screen.getByTestId('basket-id').innerHTML).toBe('')
         const addToCarBtn = screen.getByText(/add to cart/i)
         await user.click(addToCarBtn)
 
@@ -130,19 +128,6 @@ describe('useCurrentBasket', function () {
     })
 
     test('returns baskets when customerId is defined assuming basket has been created', async () => {
-        const MockComponent = () => {
-            const {
-                data: currentBasket,
-                derivedData: {hasBasket, totalItems}
-            } = useCurrentBasket()
-            return (
-                <div>
-                    <div data-testid="basket-id">{currentBasket?.basketId}</div>
-                    <div data-testid="total-items">{totalItems}</div>
-                    <div data-testid="has-basket">{hasBasket}</div>
-                </div>
-            )
-        }
         useCustomerBaskets.mockImplementation(() => {
             return {
                 data: mockCustomerBaskets,
@@ -152,7 +137,7 @@ describe('useCurrentBasket', function () {
         const expectedBasketId = mockCustomerBaskets.baskets[0].basketId
         await renderWithProviders(<MockComponent />)
         expect(screen.getByTestId('basket-id').innerHTML).toEqual(expectedBasketId)
-        expect(screen.getByTestId('total-items').innerHTML).toEqual('2')
+        expect(screen.getByTestId('total-items').innerHTML).toBe('2')
         expect(screen.getByTestId('has-basket').innerHTML).toBeTruthy()
     })
 })

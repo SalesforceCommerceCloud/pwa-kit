@@ -15,7 +15,6 @@ import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/sh
 import {
     useProduct,
     useCategory,
-    useShopperBasketsMutation,
     useShopperCustomersMutation,
     useCustomerId
 } from '@salesforce/commerce-sdk-react'
