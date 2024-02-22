@@ -60,7 +60,6 @@ const ProductDetail = () => {
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading, mutations} = useCurrentBasket()
-    // const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const {addItemToBasket} = mutations
     const {res} = useServerContext()
     if (res) {
