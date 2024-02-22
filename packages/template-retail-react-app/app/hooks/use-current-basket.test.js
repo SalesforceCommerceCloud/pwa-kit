@@ -9,12 +9,11 @@ import React, {useEffect} from 'react'
 import {screen, renderHook, waitFor} from '@testing-library/react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {useCustomerBaskets, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useCustomerBaskets} from '@salesforce/commerce-sdk-react'
 import {
     mockCustomerBaskets,
     mockEmptyBasket
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
-import emptyBasket from '@salesforce/retail-react-app/app/mocks/empty-basket'
 
 const MOCK_USE_QUERY_RESULT = {
     data: undefined,
@@ -39,28 +38,37 @@ const MOCK_USE_QUERY_RESULT = {
     refetch: jest.fn(),
     remove: jest.fn()
 }
-let mockFnc
+
+const basketId = '10cf6aa40edba4fcfcc6915594'
+const mockAsyncMutate = jest
+    .fn()
+    .mockImplementationOnce(() => ({
+        ...mockEmptyBasket.baskets[0],
+        basketId
+    }))
+    .mockImplementationOnce(() => ({
+        ...mockCustomerBaskets.baskets[0],
+        basketId
+    }))
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    mockFnc = jest.fn(() => {
-        return {
-            mutateAsync: jest.fn()
-        }
-    })
     return {
         ...originalModule,
-        useCustomerId: jest.fn(() => 'customer-id'),
+        useCustomerId: jest.fn(() => 'abmuc2wupJxeoRxuo3wqYYmbhI'),
         useCustomerBaskets: jest.fn(),
-        useShopperBasketsMutation: mockFnc
+        useShopperBasketsMutation: () => ({
+            mutateAsync: mockAsyncMutate
+        })
     }
 })
+
 const MockComponent = () => {
     const {
         data: currentBasket,
         derivedData: {hasBasket, totalItems},
         mutations: {addItemToBasket}
     } = useCurrentBasket()
-
+    console.log('currentBasket', currentBasket)
     return (
         <div>
             <div data-testid="basket-id">{currentBasket?.basketId}</div>
@@ -68,7 +76,7 @@ const MockComponent = () => {
             <div data-testid="has-basket">{hasBasket}</div>
             <button
                 onClick={async () => {
-                    await addItemToBasket([
+                    const res = await addItemToBasket([
                         {
                             productId: 'product-123',
                             price: 100,
@@ -84,21 +92,12 @@ const MockComponent = () => {
 }
 
 describe('useCurrentBasket', function () {
-    test('returns baskets when customerId is defined assuming basket has been created', () => {
-        useCustomerBaskets.mockImplementation(() => {
-            return {
-                data: mockCustomerBaskets,
-                isLoading: false
-            }
-        })
-        const expectedBasketId = mockCustomerBaskets.baskets[0].basketId
-        renderWithProviders(<MockComponent />)
-        expect(screen.getByTestId('basket-id').innerHTML).toEqual(expectedBasketId)
-        expect(screen.getByTestId('total-items').innerHTML).toEqual(2)
-        expect(screen.getByTestId('has-basket').innerHTML).toBeTruthy()
+    beforeEach(() => {
+        jest.resetAllMocks()
+        jest.resetModules()
     })
 
-    test.only('creates basket before add an item to cart when a user has no basket', async () => {
+    test('creates basket before add an item to cart when a user has no basket', async () => {
         useCustomerBaskets.mockImplementation(() => {
             return {
                 data: {total: 0},
@@ -106,20 +105,54 @@ describe('useCurrentBasket', function () {
                 ...MOCK_USE_QUERY_RESULT
             }
         })
-        const {user} = renderWithProviders(<MockComponent />)
+        const {user} = await renderWithProviders(<MockComponent />)
         expect(screen.getByTestId('basket-id').innerHTML).toEqual('')
-        console.log('mockFnc', mockFnc)
         const addToCarBtn = screen.getByText(/add to cart/i)
         await user.click(addToCarBtn)
-        screen.logTestingPlaygroundURL()
-        // useCustomerBaskets.mockImplementation(() => {
-        //     return {
-        //         data: {total: 1, baskets: mockEmptyBasket},
-        //         isLoading: false,
-        //         ...MOCK_USE_QUERY_RESULT
-        //     }
-        // })
+
         const expectedBasketId = mockEmptyBasket.baskets[0].basketId
+
+        expect(mockAsyncMutate).toHaveBeenCalledTimes(2)
+        await waitFor(() => expect(mockAsyncMutate.mock.calls[0][0]).toEqual({body: {}}))
+
+        await waitFor(() =>
+            expect(mockAsyncMutate.mock.calls[1][0]).toEqual({
+                parameters: {basketId: expectedBasketId},
+                body: [
+                    {
+                        productId: 'product-123',
+                        price: 100,
+                        quantity: 1
+                    }
+                ]
+            })
+        )
+    })
+
+    test('returns baskets when customerId is defined assuming basket has been created', async () => {
+        const MockComponent = () => {
+            const {
+                data: currentBasket,
+                derivedData: {hasBasket, totalItems}
+            } = useCurrentBasket()
+            return (
+                <div>
+                    <div data-testid="basket-id">{currentBasket?.basketId}</div>
+                    <div data-testid="total-items">{totalItems}</div>
+                    <div data-testid="has-basket">{hasBasket}</div>
+                </div>
+            )
+        }
+        useCustomerBaskets.mockImplementation(() => {
+            return {
+                data: mockCustomerBaskets,
+                isLoading: false
+            }
+        })
+        const expectedBasketId = mockCustomerBaskets.baskets[0].basketId
+        await renderWithProviders(<MockComponent />)
         expect(screen.getByTestId('basket-id').innerHTML).toEqual(expectedBasketId)
+        expect(screen.getByTestId('total-items').innerHTML).toEqual('2')
+        expect(screen.getByTestId('has-basket').innerHTML).toBeTruthy()
     })
 })

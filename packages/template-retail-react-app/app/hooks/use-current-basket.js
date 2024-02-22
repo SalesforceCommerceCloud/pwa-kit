@@ -27,7 +27,6 @@ export const useCurrentBasket = ({id = ''} = {}) => {
 
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const createBasket = useShopperBasketsMutation('createBasket')
-
     const currentBasket =
         basketsData?.baskets?.find((basket) => basket?.basketId === id) || basketsData?.baskets?.[0]
 
@@ -42,14 +41,14 @@ export const useCurrentBasket = ({id = ''} = {}) => {
                         body
                     })
                 } else {
-                    console.log('createbasket')
                     const data = await createBasket.mutateAsync({
                         body: {}
                     })
-                    return await addItemToBasketMutation.mutateAsync({
+                    const rest = await addItemToBasketMutation.mutateAsync({
                         parameters: {basketId: data.basketId},
                         body
                     })
+                    return rest
                 }
             }
         },
