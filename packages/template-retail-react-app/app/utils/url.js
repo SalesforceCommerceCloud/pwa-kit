@@ -147,8 +147,6 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     // remove ending any &
     search = search.replace(/&$/, '')
 
-    const defaultSite = getDefaultSite()
-
     // Remove query parameters
     const {disallowParams = []} = opts
 
@@ -161,7 +159,6 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     }
 
     const site = getSiteByReference(siteRef)
-
     const locale = getLocaleByReference(site, shortCode)
 
     // rebuild the url with new locale,
@@ -169,7 +166,7 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,
         // they will be not shown in the url just
-        defaultSite.alias || defaultSite.id,
+        site.alias || site.id,
         locale?.alias || locale?.id
     )
     return newUrl
