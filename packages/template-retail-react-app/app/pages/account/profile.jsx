@@ -133,7 +133,7 @@ const ProfileCard = () => {
         <ToggleCard
             id="my-profile"
             title={
-                <Skeleton ref={headingRef} tabindex="-1" height="30px" width="120px">
+                <Skeleton ref={headingRef} tabIndex="-1" height="30px" width="120px">
                     <FormattedMessage
                         defaultMessage="My Profile"
                         id="profile_card.title.my_profile"
