@@ -107,10 +107,10 @@ const Account = () => {
         navigate('/login')
     }
 
-    // Do not render anything in the account page on the server!
-    if (!onClient) {
-        return null
-    }
+    // // Do not render anything in the account page on the server!
+    // if (!onClient) {
+    //     return null
+    // }
 
     // If we have customer data and they are not registered, push to login page
     // Using Redirect allows us to store the directed page to location
