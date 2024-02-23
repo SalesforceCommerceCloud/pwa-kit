@@ -35,6 +35,9 @@ export const useMutation = <
             const netOptions = mergeOptions(hookConfig.client, options)
             const cacheUpdates = hookConfig.getCacheUpdates(customerId, netOptions, data)
             updateCache(queryClient, cacheUpdates, data)
+        },
+        onError: (e) => {
+            console.log('e', e)
         }
     })
 }

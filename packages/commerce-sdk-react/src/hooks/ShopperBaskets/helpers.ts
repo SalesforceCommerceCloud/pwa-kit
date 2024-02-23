@@ -11,20 +11,13 @@
 // and then add the item to the newly created basket using the addItemToBasket mutation.
 import {useCustomerBaskets, useCustomerId, useShopperBasketsMutation} from '../index'
 import {onClient} from '../../utils'
-export const ShopperBasketsMutationHelpers = {
-    addItemToNewOrExistingBasket: 'addItemToNewOrExistingBasket'
-} as const
+// export const ShopperBasketsMutationHelpers = {
+//     addItemToNewOrExistingBasket: 'addItemToNewOrExistingBasket'
+// } as const
 
-export type ShopperBasketsMutationHelper =
-    (typeof ShopperBasketsMutationHelpers)[keyof typeof ShopperBasketsMutationHelpers]
-export function useShopperBasketsHelper<Mutation extends ShopperBasketsMutationHelper>(
-    mutation: Mutation
-) {
-    // WHAT GOES HERE??
-    // return mutation
-}
-
-export const addItemToNewOrExistingBasket = async () => {
+// export type ShopperBasketsMutationHelper =
+//     (typeof ShopperBasketsMutationHelpers)[keyof typeof ShopperBasketsMutationHelpers]
+export function useShopperBasketsMutationHelper() {
     const customerId = useCustomerId()
     const {data: basketsData} = useCustomerBaskets(
         {parameters: {customerId}},
@@ -32,22 +25,57 @@ export const addItemToNewOrExistingBasket = async () => {
             enabled: !!customerId && onClient()
         }
     )
-
     const createBasket = useShopperBasketsMutation('createBasket')
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
-    if (basketsData && basketsData.total > 0) {
-        return addItemToBasketMutation
-    } else {
-        createBasket.mutate(
-            {
-                body: {}
-            },
-            {
-                onSuccess: (data) => {
-                    // need to test if this works?
-                    return {addItemToBasketMutation, newlyCreatedBasket: data}
-                }
+    return {
+        //@ts-ignore TODO add type here
+        addItemToNewOrExistingBasket: async (body) => {
+            const currentBasket = basketsData?.baskets?.[0]
+
+            if (currentBasket && currentBasket.total > 0) {
+                debugger
+                return await addItemToBasketMutation.mutateAsync({
+                    parameters: {basketId: currentBasket.basketId!},
+                    body
+                })
+            } else {
+                const data = await createBasket.mutateAsync({
+                    body: {}
+                })
+                const res = await addItemToBasketMutation.mutateAsync({
+                    parameters: {basketId: data.basketId!},
+                    body
+                })
+                return res
             }
-        )
+        }
     }
 }
+
+// export const addItemToNewOrExistingBasket = async () => {
+//     const customerId = useCustomerId()
+//     const {data: basketsData} = useCustomerBaskets(
+//         {parameters: {customerId}},
+//         {
+//             enabled: !!customerId && onClient()
+//         }
+//     )
+//
+//     const createBasket = useShopperBasketsMutation('createBasket')
+//     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
+//     if (basketsData && basketsData.total > 0) {
+//         return () => addItemToBasketMutation
+//     } else {
+//         createBasket.mutate(
+//             {
+//                 body: {}
+//             },
+//             {
+//                 onSuccess: (data) => {
+//                     // need to test if this works?
+//                     return {mutation: addItemToBasketMutation, basket}
+//                 }
+//             }
+//         )
+//     }
+// }

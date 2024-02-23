@@ -16,7 +16,8 @@ import {
     useProduct,
     useCategory,
     useShopperCustomersMutation,
-    useCustomerId
+    useCustomerId,
+    useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -60,7 +61,8 @@ const ProductDetail = () => {
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading, mutations} = useCurrentBasket()
-    const {addItemToBasket} = mutations
+    const basketMutationHelpers = useShopperBasketsMutationHelper()
+    // const {addItemToBasket} = mutations
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
@@ -232,9 +234,8 @@ const ProductDetail = () => {
                 price: variant.price,
                 quantity
             }))
-
-            await addItemToBasket(productItems)
-
+            // await addItemToBasket(productItems)
+            await basketMutationHelpers.addItemToNewOrExistingBasket(productItems)
             einstein.sendAddToCart(productItems)
 
             // If the items were successfully added, set the return value to be used
