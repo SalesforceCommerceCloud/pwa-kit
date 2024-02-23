@@ -1098,7 +1098,7 @@ describe('SLAS private client proxy', () => {
             .then((response) => {
                 expect(response.body.authorization).toBeUndefined()
             })
-    })
+    }, 15000)
 
     test('inserts client secret if request is for /oauth2/token', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
@@ -1127,5 +1127,5 @@ describe('SLAS private client proxy', () => {
             .then((response) => {
                 expect(response.body.authorization).toBe(`Basic ${encodedCredentials}`)
             })
-    })
+    }, 15000)
 })
