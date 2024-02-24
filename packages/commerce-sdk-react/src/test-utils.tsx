@@ -15,6 +15,7 @@ import {
 } from '@tanstack/react-query'
 import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
+import userEvent from '@testing-library/user-event'
 
 // Note: this host does NOT exist
 // it is intentional b/c we can catch those unintercepted requests
@@ -71,13 +72,15 @@ export const renderWithProviders = (
     children: React.ReactElement,
     props?: TestProviderProps,
     options?: Omit<RenderOptions, 'wrapper'>
-): void => {
-    render(children, {
+) => {
+    const user = userEvent.setup()
+    const res = render(children, {
         wrapper: ({children}: {children?: React.ReactNode}) => (
             <TestProviders {...props}>{children}</TestProviders>
         ),
         ...options
     })
+    return {user, ...res}
 }
 
 /**
