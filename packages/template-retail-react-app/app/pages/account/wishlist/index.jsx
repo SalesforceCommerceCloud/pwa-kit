@@ -16,7 +16,7 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
 import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
 import {HeartIcon} from '@salesforce/retail-react-app/app/components/icons'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
+import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
 import WishlistPrimaryAction from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-secondary-button-group'
 
