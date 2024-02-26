@@ -234,7 +234,6 @@ const ProductDetail = () => {
                 price: variant.price,
                 quantity
             }))
-            // await addItemToBasket(productItems)
             await basketMutationHelpers.addItemToNewOrExistingBasket(productItems)
             einstein.sendAddToCart(productItems)
 
