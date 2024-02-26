@@ -56,7 +56,9 @@ return (
                 proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
                 headers={headers}
                 OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
-                {{answers.project.commerce.isSlasClientPrivate ? "clientSecret={'_PLACEHOLDER_PROXY-SLAS_SECRET'}" : ''}}
+                {{#if answers.project.commerce.isSlasPrivate}}
+                clientSecret='_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_SECRET'
+                {{/if}}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
