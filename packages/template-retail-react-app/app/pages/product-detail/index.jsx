@@ -67,7 +67,6 @@ const ProductDetail = () => {
     if (res) {
         res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
-    // const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
