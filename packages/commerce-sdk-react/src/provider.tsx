@@ -54,7 +54,7 @@ export const AuthContext = React.createContext({} as Auth)
  * Initialize a set of Commerce API clients and make it available to all of descendant components
  *
  * @group Components
- * 
+ *
  * @example
  * ```js
     import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -75,11 +75,11 @@ export const AuthContext = React.createContext({} as Auth)
                     {children}
                 </CommerceApiProvider>
         )
-    } 
+    }
 
     export default App
  * ```
- * 
+ *
  * @returns Provider to wrap your app with
  */
 const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {

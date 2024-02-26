@@ -29,7 +29,14 @@ const options = {
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
     // except by Safari.
-    protocol: 'http'
+    protocol: 'http',
+
+    // Option for whether to set up a special endpoint for handling
+    // private SLAS clients
+    // Set this to false if using a SLAS public client
+    // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
+    // environment variable as this endpoint will return HTTP 501 if it is not set
+    useSLASPrivateClient: false
 }
 
 const runtime = getRuntime()
@@ -67,6 +74,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.set('Cache-Control', `max-age=31536000`)
         res.send()
     })
+
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
