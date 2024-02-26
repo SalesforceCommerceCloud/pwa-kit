@@ -107,15 +107,10 @@ const Account = () => {
         navigate('/login')
     }
 
-    // // Do not render anything in the account page on the server!
-    // if (!onClient) {
-    //     return null
-    // }
-
     // If we have customer data and they are not registered, push to login page
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
-    if (customerType !== null && !isRegistered) {
+    if (customerType !== null && !isRegistered && onClient) {
         const path = buildUrl('/login')
         return <Redirect to={{pathname: path, state: {directedFrom: '/account'}}} />
     }
