@@ -62,7 +62,6 @@ const ProductDetail = () => {
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading, mutations} = useCurrentBasket()
     const basketMutationHelpers = useShopperBasketsMutationHelper()
-    // const {addItemToBasket} = mutations
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
