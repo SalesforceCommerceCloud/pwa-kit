@@ -61,7 +61,7 @@ const ProductDetail = () => {
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading, mutations} = useCurrentBasket()
-    const basketMutationHelpers = useShopperBasketsMutationHelper()
+    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
@@ -232,7 +232,7 @@ const ProductDetail = () => {
                 price: variant.price,
                 quantity
             }))
-            await basketMutationHelpers.addItemToNewOrExistingBasket(productItems)
+            await addItemToNewOrExistingBasket(productItems)
             einstein.sendAddToCart(productItems)
 
             // If the items were successfully added, set the return value to be used
