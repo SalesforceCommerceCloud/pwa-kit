@@ -12,7 +12,6 @@ import {screen, waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
 
 const basketId = '10cf6aa40edba4fcfcc6915594'
-//  order is important in this mock since it will be called in this order from all the tests
 const mockAsyncMutate = jest.fn()
 
 jest.mock('../ShopperCustomers', () => {
@@ -104,6 +103,7 @@ describe('useShopperBasketsMutationHelper.addItemToNewOrExistingBasket', functio
     })
 
     test('should call a basket mutation before calling add to cart mutation', async () => {
+        // order is important since mockAsyncMutate will represent createBasket and addToBasket mutation in the order of executions
         mockAsyncMutate
             .mockImplementationOnce(() => ({
                 productItems: [],

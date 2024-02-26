@@ -9,8 +9,9 @@ import {useCustomerId, useShopperBasketsMutation} from '../index'
 import {useCustomerBaskets} from '../ShopperCustomers'
 import {onClient} from '../../utils'
 import {ApiClients, Argument} from '../types'
+import {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 type Client = ApiClients['shopperBaskets']
-
+type Basket = ShopperBasketsTypes.Basket
 export function useShopperBasketsMutationHelper() {
     const customerId = useCustomerId()
     const {data: basketsData} = useCustomerBaskets(
@@ -27,13 +28,13 @@ export function useShopperBasketsMutationHelper() {
         // If a basket does not exist, create a new basket using the createBasket mutation
         // and then add the item to the newly created basket using the addItemToBasket mutation.
         addItemToNewOrExistingBasket: async (
-            body: Argument<Client['addItemToBasket']> extends {body: infer B} ? B : undefined
-        ) => {
+            productItem: Argument<Client['addItemToBasket']> extends {body: infer B} ? B : undefined
+        ): Promise<Basket> => {
             if (basketsData && basketsData.total > 0) {
                 const currentBasket = basketsData?.baskets?.[0]!
                 return await addItemToBasketMutation.mutateAsync({
                     parameters: {basketId: currentBasket.basketId!},
-                    body
+                    body: productItem
                 })
             } else {
                 const data = await createBasket.mutateAsync({
@@ -41,7 +42,7 @@ export function useShopperBasketsMutationHelper() {
                 })
                 const res = await addItemToBasketMutation.mutateAsync({
                     parameters: {basketId: data.basketId!},
-                    body
+                    body: productItem
                 })
                 return res
             }
