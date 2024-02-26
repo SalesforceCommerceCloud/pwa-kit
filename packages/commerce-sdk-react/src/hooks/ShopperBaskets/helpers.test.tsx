@@ -13,20 +13,7 @@ import jwt from 'jsonwebtoken'
 
 const basketId = '10cf6aa40edba4fcfcc6915594'
 //  order is important in this mock since it will be called in this order from all the tests
-const mockAsyncMutate = jest
-    .fn()
-    .mockImplementationOnce(() => ({
-        productItems: [{id: 'product-id-111', quantity: 20}],
-        basketId
-    }))
-    .mockImplementationOnce(() => ({
-        productItems: [],
-        basketId
-    }))
-    .mockImplementationOnce(() => ({
-        productItems: [{id: 'product-id', quantity: 2}],
-        basketId
-    }))
+const mockAsyncMutate = jest.fn()
 
 jest.mock('../ShopperCustomers', () => {
     const originalModule = jest.requireActual('../ShopperCustomers')
@@ -78,6 +65,10 @@ describe('useShopperBasketsMutationHelper.addItemToNewOrExistingBasket', functio
     })
 
     test('should perform add to cart mutation when basket is already created', async () => {
+        mockAsyncMutate.mockImplementationOnce(() => ({
+            productItems: [{id: 'product-id-111', quantity: 20}],
+            basketId
+        }))
         // @ts-expect-error ts complains because mockImplementation is not part of declared type from useCustomerBaskets queries
         useCustomerBaskets.mockImplementation(() => {
             return {
@@ -113,6 +104,15 @@ describe('useShopperBasketsMutationHelper.addItemToNewOrExistingBasket', functio
     })
 
     test('should call a basket mutation before calling add to cart mutation', async () => {
+        mockAsyncMutate
+            .mockImplementationOnce(() => ({
+                productItems: [],
+                basketId
+            }))
+            .mockImplementationOnce(() => ({
+                productItems: [{id: 'product-id', quantity: 2}],
+                basketId
+            }))
         // @ts-expect-error ts complains because mockImplementation is not part of declared type from useCustomerBaskets queries
         useCustomerBaskets.mockImplementation(() => {
             return {
@@ -132,6 +132,8 @@ describe('useShopperBasketsMutationHelper.addItemToNewOrExistingBasket', functio
         })
         const addToCartBtn = screen.getByText(/add to cart/i)
         await user.click(addToCartBtn)
+        expect(mockAsyncMutate).toHaveBeenCalledTimes(2)
+
         await waitFor(() => expect(mockAsyncMutate.mock.calls[0][0]).toEqual({body: {}}))
         await waitFor(() =>
             expect(mockAsyncMutate.mock.calls[1][0]).toEqual({

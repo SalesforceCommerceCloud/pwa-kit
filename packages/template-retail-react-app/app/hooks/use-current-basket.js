@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {
-    useCustomerId,
-    useCustomerBaskets,
-    useShopperBasketsMutation
-} from '@salesforce/commerce-sdk-react'
+import {useCustomerId, useCustomerBaskets} from '@salesforce/commerce-sdk-react'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
@@ -25,33 +21,12 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         }
     )
 
-    const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
-    const createBasket = useShopperBasketsMutation('createBasket')
     const currentBasket =
         basketsData?.baskets?.find((basket) => basket?.basketId === id) || basketsData?.baskets?.[0]
 
     return {
         ...restOfQuery,
         data: currentBasket,
-        mutations: {
-            addItemToBasket: async (body) => {
-                if (basketsData?.total > 0) {
-                    return await addItemToBasketMutation.mutateAsync({
-                        parameters: {basketId: currentBasket.basketId},
-                        body
-                    })
-                } else {
-                    const data = await createBasket.mutateAsync({
-                        body: {}
-                    })
-                    const rest = await addItemToBasketMutation.mutateAsync({
-                        parameters: {basketId: data.basketId},
-                        body
-                    })
-                    return rest
-                }
-            }
-        },
         derivedData: {
             hasBasket: basketsData?.total > 0,
             totalItems:
