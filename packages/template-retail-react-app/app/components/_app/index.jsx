@@ -357,6 +357,7 @@ const App = (props) => {
                                                         categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
                                                     }
                                                     itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
                                                     itemComponent={DrawerMenuItemWithData}
                                                 />
                                             </HideOnDesktop>
@@ -367,6 +368,7 @@ const App = (props) => {
                                                         categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
                                                     }
                                                     itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
                                                     contentComponent={ListMenuContentWithData}
                                                 />
                                             </HideOnMobile>

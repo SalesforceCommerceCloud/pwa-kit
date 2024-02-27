@@ -24,7 +24,7 @@ import {
     useTheme
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-const ListMenuPopover = ({contentComponent, items, item, name, itemsKey, maxColumns}) => {
+const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) => {
     const initialFocusRef = useRef()
     const {isOpen, onClose, onOpen} = useDisclosure()
     const ContentComponent = contentComponent || ListMenuContent
@@ -49,7 +49,6 @@ const ListMenuPopover = ({contentComponent, items, item, name, itemsKey, maxColu
                         isOpen={isOpen}
                         onOpen={onOpen}
                         onClose={onClose}
-                        hasItems={!!items}
                     />
                     {isOpen && (
                         <PopoverContent data-testid="popover-menu" {...baseStyle.popoverContent}>
@@ -72,7 +71,6 @@ const ListMenuPopover = ({contentComponent, items, item, name, itemsKey, maxColu
 
 ListMenuPopover.propTypes = {
     contentComponent: PropTypes.elementType,
-    items: PropTypes.array,
     item: PropTypes.object,
     name: PropTypes.string,
     maxColumns: PropTypes.number,
