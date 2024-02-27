@@ -9,7 +9,7 @@ import {useCustomerId, useShopperBasketsMutation} from '../index'
 import {useCustomerBaskets} from '../ShopperCustomers'
 import {onClient} from '../../utils'
 import {ApiClients, Argument} from '../types'
-import {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
 type Client = ApiClients['shopperBaskets']
 type Basket = ShopperBasketsTypes.Basket
 
@@ -48,20 +48,28 @@ export function useShopperBasketsMutationHelper() {
             productItem: Argument<Client['addItemToBasket']> extends {body: infer B} ? B : undefined
         ): Promise<Basket> => {
             if (basketsData && basketsData.total > 0) {
-                const currentBasket = basketsData?.baskets?.[0]!
+                // we know that if basketData.total > 0, current basket will always be available
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const currentBasket = basketsData?.baskets && basketsData.baskets[0]!
                 return await addItemToBasketMutation.mutateAsync({
-                    parameters: {basketId: currentBasket.basketId!},
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    parameters: {basketId: currentBasket!.basketId!},
                     body: productItem
                 })
             } else {
                 const data = await createBasket.mutateAsync({
                     body: {}
                 })
-                const res = await addItemToBasketMutation.mutateAsync({
-                    parameters: {basketId: data.basketId!},
-                    body: productItem
-                })
-                return res
+                if (!data) {
+                    throw Error('Something is wrong. Please try again')
+                } else {
+                    return await addItemToBasketMutation.mutateAsync({
+                        // we know that data is always available here
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        parameters: {basketId: data.basketId!},
+                        body: productItem
+                    })
+                }
             }
         }
     }

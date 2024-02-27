@@ -44,13 +44,15 @@ const MockComponent = () => {
         <div>
             <button
                 onClick={() => {
-                    helpers.addItemToNewOrExistingBasket([
-                        {
-                            productId: 'product-123',
-                            price: 100,
-                            quantity: 1
-                        }
-                    ])
+                    helpers
+                        .addItemToNewOrExistingBasket([
+                            {
+                                productId: 'product-123',
+                                price: 100,
+                                quantity: 1
+                            }
+                        ])
+                        .catch((e) => console.log('e', e))
                 }}
             >
                 Add to cart
