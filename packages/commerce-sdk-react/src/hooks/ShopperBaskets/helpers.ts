@@ -7,7 +7,6 @@
 
 import {useCustomerId, useShopperBasketsMutation} from '../index'
 import {useCustomerBaskets} from '../ShopperCustomers'
-import {onClient} from '../../utils'
 import {ApiClients, Argument} from '../types'
 import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
 type Client = ApiClients['shopperBaskets']
@@ -41,7 +40,6 @@ export function useShopperBasketsMutationHelper() {
             enabled: !!customerId
         }
     )
-    console.log('customerId', customerId)
     const createBasket = useShopperBasketsMutation('createBasket')
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     return {
@@ -61,7 +59,6 @@ export function useShopperBasketsMutationHelper() {
                 const data = await createBasket.mutateAsync({
                     body: {}
                 })
-                console.log('data', data)
                 if (!data) {
                     throw Error('Something is wrong. Please try again')
                 } else {
