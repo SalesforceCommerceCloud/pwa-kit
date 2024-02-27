@@ -187,6 +187,7 @@ const App = (props) => {
     const {data: basket} = useCurrentBasket()
 
     const updateBasket = useShopperBasketsMutation('updateBasket')
+    const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
 
     useEffect(() => {
         // update the basket currency if it doesn't match the current locale currency
