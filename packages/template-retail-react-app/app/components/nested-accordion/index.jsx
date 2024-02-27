@@ -40,6 +40,7 @@ const NestedAccordion = (props) => {
         itemsAfter,
         itemsBefore,
         itemsKey = 'items',
+        itemsCountKey = 'count',
         fontWeights = [],
         fontSizes = [],
         urlBuilder = (item) => `/${item.id}`,
@@ -62,6 +63,7 @@ const NestedAccordion = (props) => {
 
             {items.filter(filter).map((item) => {
                 const {id, name} = item
+                const itemsCount = item[itemsCountKey] || item[itemsKey]?.length || 0
 
                 return (
                     <AccordionItem key={id} border="none">
@@ -70,7 +72,7 @@ const NestedAccordion = (props) => {
                                 {/* Heading */}
                                 <h2>
                                     {/* Show item as a leaf node if it has no visible child items. */}
-                                    {items && items.filter(filter).length > 0 ? (
+                                    {itemsCount > 0 ? (
                                         <AccordionButton {...styles.internalButton}>
                                             {/* Replace default expanded/collapsed icons. */}
                                             {isExpanded ? (
@@ -111,7 +113,8 @@ const NestedAccordion = (props) => {
                                             {...styles.nestedAccordion}
                                             {...props}
                                             item={item}
-                                            itemsKey={'categories'}
+                                            itemsKey={itemsKey}
+                                            itemsCountKey={itemsCountKey}
                                             initialDepth={depth + 1}
                                             itemComponent={NestedAccordion}
                                             isExpanded={isExpanded}
@@ -167,6 +170,11 @@ NestedAccordion.propTypes = {
      * can specify a custom key name for chile items. (e.g. children)
      */
     itemsKey: PropTypes.string,
+    /**
+     * This property represents the item key that represents the count of sub-items. This is used
+     * to display a leaf node of a sub nested accordion.
+     */
+    itemsCountKey: PropTypes.string,
     /**
      * Programatically filter out items that you do not want to show. You can do this by
      * supplying a string that will be used to access an items value, the the value is truthy

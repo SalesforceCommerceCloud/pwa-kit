@@ -70,6 +70,18 @@ export default {
                 bottom: '0px'
             }
         },
+        listMenuTriggerlessLinkActive: {
+            textDecoration: 'none',
+            _before: {
+                position: 'absolute',
+                backgroundColor: 'black',
+                content: 'attr(name)',
+                height: '2px',
+                width: '-webkit-fill-available',
+                color: 'transparent',
+                bottom: '0px'
+            }
+        },
         listMenuTriggerLinkIcon: {
             marginTop: 3,
             marginRight: 3,
