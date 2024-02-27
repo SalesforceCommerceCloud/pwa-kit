@@ -60,7 +60,7 @@ const ProductDetail = () => {
     const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {isLoading: isBasketLoading, mutations} = useCurrentBasket()
+    const {isLoading: isBasketLoading} = useCurrentBasket()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const {res} = useServerContext()
     if (res) {
