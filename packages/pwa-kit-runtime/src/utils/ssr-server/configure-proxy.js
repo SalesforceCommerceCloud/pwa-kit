@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import proxy from 'http-proxy-middleware'
+import {createProxyMiddleware} from 'http-proxy-middleware'
 import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from '../ssr-proxying'
 import {proxyConfigs} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
@@ -190,7 +190,7 @@ export const configureProxy = ({
         target: targetOrigin
     }
 
-    const proxyFunc = proxy(config)
+    const proxyFunc = createProxyMiddleware(config)
 
     // For a standard proxy, we're done
     if (!caching) {
