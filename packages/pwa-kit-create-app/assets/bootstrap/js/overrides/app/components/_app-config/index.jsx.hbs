@@ -1,9 +1,9 @@
 /*
-* Copyright (c) 2021, salesforce.com, inc.
-* All rights reserved.
-* SPDX-License-Identifier: BSD-3-Clause
-* For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
-*/
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -14,8 +14,8 @@ import 'focus-visible/dist/focus-visible'
 import theme from '@salesforce/retail-react-app/app/theme'
 import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
 import {
-resolveSiteFromUrl,
-resolveLocaleFromUrl
+    resolveSiteFromUrl,
+    resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
@@ -27,38 +27,38 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 /**
-* Use the AppConfig component to inject extra arguments into the getProps
-* methods for all Route Components in the app – typically you'd want to do this
-* to inject a connector instance that can be used in all Pages.
-*
-* You can also use the AppConfig to configure a state-management library such
-* as Redux, or Mobx, if you like.
-*/
+ * Use the AppConfig component to inject extra arguments into the getProps
+ * methods for all Route Components in the app – typically you'd want to do this
+ * to inject a connector instance that can be used in all Pages.
+ *
+ * You can also use the AppConfig to configure a state-management library such
+ * as Redux, or Mobx, if you like.
+ */
 const AppConfig = ({children, locals = {}}) => {
-const {correlationId} = useCorrelationId()
-const headers = {
-'correlation-id': correlationId
-}
+    const {correlationId} = useCorrelationId()
+    const headers = {
+        'correlation-id': correlationId
+    }
 
-const commerceApiConfig = locals.appConfig.commerceAPI
+    const commerceApiConfig = locals.appConfig.commerceAPI
 
-const appOrigin = getAppOrigin()
+    const appOrigin = getAppOrigin()
 
-return (
+    return (
         <CommerceApiProvider
-                shortCode={commerceApiConfig.parameters.shortCode}
-                clientId={commerceApiConfig.parameters.clientId}
-                organizationId={commerceApiConfig.parameters.organizationId}
-                siteId={locals.site?.id}
-                locale={locals.locale?.id}
-                currency={locals.locale?.preferredCurrency}
-                redirectURI={`${appOrigin}/callback`}
-                proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
-                headers={headers}
-                OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
-                {{#if answers.project.commerce.isSlasPrivate}}
-                clientSecret='_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_SECRET'
-                {{/if}}
+            shortCode={commerceApiConfig.parameters.shortCode}
+            clientId={commerceApiConfig.parameters.clientId}
+            organizationId={commerceApiConfig.parameters.organizationId}
+            siteId={locals.site?.id}
+            locale={locals.locale?.id}
+            currency={locals.locale?.preferredCurrency}
+            redirectURI={`${appOrigin}/callback`}
+            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            headers={headers}
+            OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
+            {{#if answers.project.commerce.isSlasPrivate}}
+            clientSecret="_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_SECRET"
+            {{/if}}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
@@ -69,18 +69,18 @@ return (
 }
 
 AppConfig.restore = (locals = {}) => {
-const path =
-    typeof window === 'undefined'
-    ? locals.originalUrl
-    : `${window.location.pathname}${window.location.search}`
+    const path =
+        typeof window === 'undefined'
+            ? locals.originalUrl
+            : `${window.location.pathname}${window.location.search}`
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
 
     const {app: appConfig} = getConfig()
     const apiConfig = {
-    ...appConfig.commerceAPI,
-    einsteinConfig: appConfig.einsteinAPI
-}
+        ...appConfig.commerceAPI,
+        einsteinConfig: appConfig.einsteinAPI
+    }
 
     apiConfig.parameters.siteId = site.id
 
