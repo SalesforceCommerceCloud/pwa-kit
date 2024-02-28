@@ -184,24 +184,10 @@ const App = (props) => {
     // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
     const {data: customer} = useCurrentCustomer()
-    const {data: baskets} = useCustomerBaskets(
-        {parameters: {customerId: customer.customerId}},
-        {enabled: !!customer.customerId && !isServer}
-    )
     const {data: basket} = useCurrentBasket()
 
-    const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
-
-    useEffect(() => {
-        // Create a new basket if the current customer doesn't have one.
-        if (baskets?.total === 0) {
-            createBasket.mutate({
-                body: {}
-            })
-        }
-    }, [baskets])
 
     useEffect(() => {
         // update the basket currency if it doesn't match the current locale currency
