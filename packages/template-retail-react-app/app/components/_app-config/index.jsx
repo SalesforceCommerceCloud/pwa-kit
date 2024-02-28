@@ -4,6 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+/*
+ * Developer note! When updating this file, make sure to also update the
+ * _app-config template file in pwa-kit-create-app
+ */
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -55,6 +60,7 @@ const AppConfig = ({children, locals = {}}) => {
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
+            // Uncomment 'clientSecret' to use SLAS private client login flows
             // clientSecret="enable-client_secret"
             OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
         >
