@@ -7,7 +7,11 @@
 
 /*
  * Developer note! When updating this file, make sure to also update the
- * _app-config template file in pwa-kit-create-app
+ * _app-config template files in pwa-kit-create-app.
+ *
+ * In the pwa-kit-create-app, the templates are found under:
+ * - assets/bootstrap/js/overrides/app/components/_app-config
+ * - assets/templates/@salesforce/retail-react-app/app/components/_app-config
  */
 import React from 'react'
 import PropTypes from 'prop-types'
