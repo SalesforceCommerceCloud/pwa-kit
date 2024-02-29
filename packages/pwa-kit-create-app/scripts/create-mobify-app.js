@@ -188,6 +188,21 @@ const RETAIL_REACT_APP_QUESTIONS = [
         validate: validClientId
     },
     {
+        name: 'project.commerce.isSlasPrivate',
+        message: 'Is your SLAS client private?',
+        type: 'list',
+        choices: [
+            {
+                name: 'No',
+                value: false
+            },
+            {
+                name: 'Yes',
+                value: true
+            }
+        ]
+    },
+    {
         name: 'project.commerce.siteId',
         message: 'What is your Site ID in Business Manager?',
         validate: validSiteId
@@ -248,6 +263,7 @@ const PRESETS = [
             ['project.commerce.siteId']: 'RefArch',
             ['project.commerce.organizationId']: 'f_ecom_zzte_053',
             ['project.commerce.shortCode']: 'kv7kzm78',
+            ['project.commerce.isSlasPrivate']: false,
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             ['project.einstein.siteId']: 'aaij-MobileFirst'
         },
@@ -272,6 +288,32 @@ const PRESETS = [
             ['project.commerce.siteId']: 'RefArch',
             ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
             ['project.commerce.shortCode']: 'kv7kzm78',
+            ['project.commerce.isSlasPrivate']: false,
+            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            ['project.einstein.siteId']: 'aaij-MobileFirst'
+        },
+        assets: ['translations'],
+        private: true
+    },
+    {
+        id: 'retail-react-app-private-slas-client',
+        name: 'Retail React App Private SLAS client project',
+        description: '',
+        templateSource: {
+            type: TEMPLATE_SOURCE_NPM,
+            id: '@salesforce/retail-react-app'
+        },
+        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        answers: {
+            ['project.extend']: true,
+            ['project.hybrid']: false,
+            ['project.name']: 'retail-react-app',
+            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+            ['project.commerce.clientId']: 'c131a4df-2d7b-4a67-802f-45152e911cc2',
+            ['project.commerce.siteId']: 'RefArch',
+            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
+            ['project.commerce.shortCode']: 'kv7kzm78',
+            ['project.commerce.isSlasPrivate']: true,
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             ['project.einstein.siteId']: 'aaij-MobileFirst'
         },
@@ -297,7 +339,8 @@ const PRESETS = [
             ['project.commerce.organizationId']: 'f_ecom_bdpx_dev',
             ['project.commerce.shortCode']: 'xitgmcd3',
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst'
+            ['project.einstein.siteId']: 'aaij-MobileFirst',
+            ['project.commerce.isSlasPrivate']: false
         },
         assets: ['translations'],
         private: true
