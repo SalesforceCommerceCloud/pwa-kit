@@ -625,7 +625,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _handleMissingSlasPrivateEnvVar(app) {
-        app.use([SLAS_CUSTOM_PROXY_PATH], (_, res) => {
+        app.use(SLAS_CUSTOM_PROXY_PATH, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
@@ -652,7 +652,7 @@ export const RemoteServerFactory = {
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
         app.use(
-            [SLAS_CUSTOM_PROXY_PATH],
+            SLAS_CUSTOM_PROXY_PATH,
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
