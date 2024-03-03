@@ -69,6 +69,9 @@ type AuthDataMap = Record<
 
 const isParentTrusted = isOriginTrusted(getParentOrigin())
 
+// TODO: figure out where to expose this config
+const usePartitionedCookies = true
+
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
  * the storage type and the key when stored in that storage. You can also pass in a "callback"
@@ -111,6 +114,13 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'cookie',
         key: isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g',
         callback: (store) => {
+            console.log('GUEST: cc-nx-g callback')
+            if(usePartitionedCookies && !isParentTrusted) {
+                // const guestCookie = store.get('cc-nx-g')
+                // store.delete('cc-nx-g')
+                // store.set('cc-nx-g', guestCookie, { secure: true, partitioned: true })
+                store.delete('cc-nx', { secure: true, partitioned: true })
+            }
             store.delete(isParentTrusted ? 'cc-nx-iframe' : 'cc-nx')
         }
     },
@@ -118,6 +128,13 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'cookie',
         key: isParentTrusted ? 'cc-nx-iframe' : 'cc-nx',
         callback: (store) => {
+            console.log('REGISTERED USER: cc-nx callback')
+            if(usePartitionedCookies && !isParentTrusted) {
+                // const registeredUserCookie = store.get('cc-nx')
+                // store.delete('cc-nx')
+                // store.set('cc-nx', registeredUserCookie, { secure: true, partitioned: true })
+                store.delete('cc-nx-g', { secure: true, partitioned: true })
+            }
             store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
     },
@@ -290,6 +307,7 @@ class Auth {
      * @param token access_token received on SLAS authentication
      * @returns {boolean} true if JWT is valid; false otherwise
      */
+    // NOTE: this is the method that compares local storage and cookie storage when auth state changes
     private isTokenValidForHybrid(token: string) {
         return !this.isTokenExpired(token) && !this.hasSFRAAuthStateChanged()
     }
@@ -306,7 +324,7 @@ class Auth {
         this.set('id_token', res.id_token)
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
-        this.set('usid', res.usid)
+        this.set('usid', res.usid, {...(usePartitionedCookies && { secure: true, partitioned: true })})
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
@@ -315,10 +333,12 @@ class Auth {
             : 'refresh_token_registered_copy'
 
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: res.refresh_token_expires_in
+            expires: res.refresh_token_expires_in,
+            ...(usePartitionedCookies && { secure: true, partitioned: true }),
         })
         this.set(refreshTokenCopyKey, res.refresh_token, {
-            expires: res.refresh_token_expires_in
+            expires: res.refresh_token_expires_in,
+            ...(usePartitionedCookies && { secure: true, partitioned: true })
         })
     }
 
@@ -365,7 +385,7 @@ class Auth {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid)
+            this.set('usid', usid, {...(usePartitionedCookies && { secure: true, partitioned: true })})
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
