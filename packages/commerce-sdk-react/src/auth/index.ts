@@ -63,6 +63,7 @@ type AuthDataMap = Record<
     {
         storageType: StorageType
         key: string
+        isPartitionedCookieTarget?: boolean
         callback?: (storage: BaseStorage) => void
     }
 >
@@ -71,6 +72,11 @@ const isParentTrusted = isOriginTrusted(getParentOrigin())
 
 // TODO: figure out where to expose this config
 const usePartitionedCookies = true
+const partitionedCookieAttributes: Cookies.CookieAttributes = {
+    sameSite: 'none',
+    secure: true,
+    partitioned: true
+}
 
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
@@ -88,7 +94,8 @@ const DATA_MAP: AuthDataMap = {
     },
     usid: {
         storageType: 'cookie',
-        key: 'usid'
+        key: 'usid',
+        isPartitionedCookieTarget: true
     },
     enc_user_id: {
         storageType: 'local',
@@ -113,28 +120,32 @@ const DATA_MAP: AuthDataMap = {
     refresh_token_guest: {
         storageType: 'cookie',
         key: isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g',
+        isPartitionedCookieTarget: true,
         callback: (store) => {
             console.log('GUEST: cc-nx-g callback')
-            if(usePartitionedCookies && !isParentTrusted) {
+            if (usePartitionedCookies && !isParentTrusted) {
                 // const guestCookie = store.get('cc-nx-g')
                 // store.delete('cc-nx-g')
                 // store.set('cc-nx-g', guestCookie, { secure: true, partitioned: true })
-                store.delete('cc-nx', { secure: true, partitioned: true })
+                store.delete('cc-nx', partitionedCookieAttributes)
             }
+            // TODO: potentially move into else statement
             store.delete(isParentTrusted ? 'cc-nx-iframe' : 'cc-nx')
         }
     },
     refresh_token_registered: {
         storageType: 'cookie',
         key: isParentTrusted ? 'cc-nx-iframe' : 'cc-nx',
+        isPartitionedCookieTarget: true,
         callback: (store) => {
             console.log('REGISTERED USER: cc-nx callback')
-            if(usePartitionedCookies && !isParentTrusted) {
+            if (usePartitionedCookies && !isParentTrusted) {
                 // const registeredUserCookie = store.get('cc-nx')
                 // store.delete('cc-nx')
                 // store.set('cc-nx', registeredUserCookie, { secure: true, partitioned: true })
-                store.delete('cc-nx-g', { secure: true, partitioned: true })
+                store.delete('cc-nx-g', partitionedCookieAttributes)
             }
+            // TODO: potentially move into else statement
             store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
     },
@@ -224,6 +235,11 @@ class Auth {
         this.fetchedToken = config.fetchedToken || ''
 
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
+
+        // TODO: potentially add this in
+        // because we don't want a case where an app starts up after toggling on partitioned cookies
+        // where there are multiple cookies with and without partitioned flags
+        // this.clearStorage();
     }
 
     get(name: AuthDataKeys) {
@@ -243,9 +259,13 @@ class Auth {
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
-            const {key, storageType} = DATA_MAP[keyName]
+            const {key, storageType, isPartitionedCookieTarget} = DATA_MAP[keyName]
             const store = this.stores[storageType]
-            store.delete(key)
+            store.delete(key, {
+                ...(usePartitionedCookies &&
+                    isPartitionedCookieTarget &&
+                    partitionedCookieAttributes)
+            })
         })
     }
 
@@ -324,7 +344,7 @@ class Auth {
         this.set('id_token', res.id_token)
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
-        this.set('usid', res.usid, {...(usePartitionedCookies && { secure: true, partitioned: true })})
+        this.set('usid', res.usid, {...(usePartitionedCookies && partitionedCookieAttributes)})
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
@@ -334,11 +354,11 @@ class Auth {
 
         this.set(refreshTokenKey, res.refresh_token, {
             expires: res.refresh_token_expires_in,
-            ...(usePartitionedCookies && { secure: true, partitioned: true }),
+            ...(usePartitionedCookies && partitionedCookieAttributes)
         })
+
         this.set(refreshTokenCopyKey, res.refresh_token, {
-            expires: res.refresh_token_expires_in,
-            ...(usePartitionedCookies && { secure: true, partitioned: true })
+            expires: res.refresh_token_expires_in
         })
     }
 
@@ -385,7 +405,7 @@ class Auth {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid, {...(usePartitionedCookies && { secure: true, partitioned: true })})
+            this.set('usid', usid, {...(usePartitionedCookies && partitionedCookieAttributes)})
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
