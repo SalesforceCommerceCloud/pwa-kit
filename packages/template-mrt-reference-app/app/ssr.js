@@ -47,6 +47,15 @@ const pkg = require('../package.json')
 const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
 const {isolationTests} = require('./isolation-actions')
+const Sentry = require('@sentry/node')
+Sentry.init({
+    dsn: process.env.TEST_DSN,
+    initialScope: {
+        tags: {
+            'customer': 'CHOAM',
+        }
+    }
+})
 
 /**
  * Custom error class
@@ -153,6 +162,17 @@ const exception = (req) => {
     // Intentionally throw an exception so that we can check for it
     // in logs.
     throw new IntentionalError(jsonFromRequest(req))
+}
+
+const exception2 = (req, res) => {
+    // Intentionally throw an exception so that we can check for it
+    // in logs.
+    console.log("exception2")
+    console.log(`Client2 ${JSON.stringify(Sentry.getClient(), null, 4)}`)
+    let event_id = Sentry.captureException(new IntentionalError("exception2"))
+    console.log(`EventID ${event_id}`)
+    Sentry.flush().then((result) => console.log(`Flush ${result}`))
+    res.json(jsonFromRequest(req))
 }
 
 /**
@@ -278,6 +298,7 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/headers', headerTest)
     app.get('/isolation', isolationTests)
     app.get('/set-response-headers', responseHeadersTest)
+    app.get('/exception2', exception2)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)
