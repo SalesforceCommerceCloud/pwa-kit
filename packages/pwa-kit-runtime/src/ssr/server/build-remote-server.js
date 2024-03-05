@@ -11,7 +11,8 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE
+    NO_CACHE,
+    SLAS_CUSTOM_PROXY_PATH
 } from './constants'
 import {
     catchAndLog,
@@ -623,48 +624,53 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    _handleMissingSlasPrivateEnvVar(app) {
+        app.use(SLAS_CUSTOM_PROXY_PATH, (_, res) => {
+            return res.status(501).json({
+                message:
+                    'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
+            })
+        })
+    },
+
+    /**
+     * @private
+     */
     _setupSlasPrivateClientProxy(app, options) {
         if (!options.useSLASPrivateClient) {
             return
         }
-        const endpointPath = '/mobify/scapi/shopper/auth'
-        localDevLog(`Proxying ${endpointPath} to ${options.slasTarget}`)
+        localDevLog(`Proxying ${SLAS_CUSTOM_PROXY_PATH} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
         if (!clientSecret) {
-            throw new Error(
-                `SSR server cannot initialize: missing environment variable PWA_KIT_SLAS_CLIENT_SECRET`
-            )
-        } else {
-            const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
-                'base64'
-            )
-
-            app.use(
-                [endpointPath],
-                createProxyMiddleware({
-                    target: options.slasTarget,
-                    changeOrigin: true,
-                    pathRewrite: {[endpointPath]: ''},
-                    onProxyReq: (outGoingReq, incomingReq) => {
-                        // We pattern match and add client secrets only to endpoints that
-                        // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                        // By default, this regex matches only calls to SLAS /oauth2/token
-                        // (see option defaults at the top of this file).
-                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                        // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                        // purpose so we don't want to overwrite the header for those calls.
-                        if (incomingReq.path?.match(options.applySLASPrivateClientToEndpoints)) {
-                            outGoingReq.setHeader(
-                                'Authorization',
-                                `Basic ${encodedSlasCredentials}`
-                            )
-                        }
-                    }
-                })
-            )
+            this._handleMissingSlasPrivateEnvVar(app)
+            return
         }
+
+        const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+
+        app.use(
+            SLAS_CUSTOM_PROXY_PATH,
+            createProxyMiddleware({
+                target: options.slasTarget,
+                changeOrigin: true,
+                pathRewrite: {[SLAS_CUSTOM_PROXY_PATH]: ''},
+                onProxyReq: (outGoingReq, incomingReq) => {
+                    // We pattern match and add client secrets only to endpoints that
+                    // match the regex specified by options.applySLASPrivateClientToEndpoints.
+                    // By default, this regex matches only calls to SLAS /oauth2/token
+                    // (see option defaults at the top of this file).
+                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                    // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                    // purpose so we don't want to overwrite the header for those calls.
+                    if (incomingReq.path?.match(options.applySLASPrivateClientToEndpoints)) {
+                        outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                    }
+                }
+            })
+        )
     },
 
     /**
