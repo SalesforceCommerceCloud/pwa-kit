@@ -12,7 +12,7 @@ import {getCustomKeys, mergeOptions, omitNullableParameters, pick} from '../util
 import * as queryKeyHelpers from './queryKeyHelpers'
 import paramKeysMap from './paramKeys'
 
-type Client = ApiClients["shopperSeo"]
+type Client = ApiClients['shopperSeo']
 
 /**
  * Gets URL mapping information for a URL that a shopper clicked or typed in.

@@ -19,7 +19,6 @@ export type QueryKeys = {
         '/product-search',
         Params<'getUrlMapping'>
     ]
-
 }
 
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
