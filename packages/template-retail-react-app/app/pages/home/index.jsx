@@ -35,6 +35,7 @@ import {heroFeatures, features} from '@salesforce/retail-react-app/app/pages/hom
 
 //Hooks
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import {useUrlMapping} from "@salesforce/commerce-sdk-react";
 
 // Constants
 import {
@@ -72,6 +73,15 @@ const Home = () => {
     useEffect(() => {
         einstein.sendViewPage(pathname)
     }, [])
+
+
+    //TODO: Remove after PR is approved. This is for hook testing and verifying
+    const {data} = useUrlMapping({
+        parameters: {
+            urlSegment: '/sample-product'
+        }
+    })
+    console.log('data', data)
 
     return (
         <Box data-testid="home-page" layerStyle="page">
