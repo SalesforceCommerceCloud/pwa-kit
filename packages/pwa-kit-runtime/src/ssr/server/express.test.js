@@ -1047,6 +1047,8 @@ describe('SLAS private client proxy', () => {
     const slasTarget = `http://localhost:${proxyPort}${proxyPath}`
 
     beforeAll(() => {
+        // by setting slasTarget, rather than forwarding the request to SLAS,
+        // we send the proxy request here so we can return the request headers
         proxyApp = express()
         proxyApp.use(proxyPath, (req, res) => {
             res.send(req.headers)
@@ -1096,6 +1098,8 @@ describe('SLAS private client proxy', () => {
             .get('/mobify/scapi/shopper/auth/somePath')
             .then((response) => {
                 expect(response.body.authorization).toBeUndefined()
+                expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
+                expect(response.body['x-mobify']).toBe('true')
             })
     }, 15000)
 
@@ -1125,6 +1129,8 @@ describe('SLAS private client proxy', () => {
             .get('/mobify/scapi/shopper/auth/oauth2/token')
             .then((response) => {
                 expect(response.body.authorization).toBe(`Basic ${encodedCredentials}`)
+                expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
+                expect(response.body['x-mobify']).toBe('true')
             })
     }, 15000)
 })

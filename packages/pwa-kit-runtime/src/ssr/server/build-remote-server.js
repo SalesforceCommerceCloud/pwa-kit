@@ -40,6 +40,8 @@ import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
+import {rewriteProxyRequestHeaders} from '../../utils/ssr-proxying'
+import {verboseProxyLogging} from '../../utils/ssr-server/utils'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import {morganStream} from '../../utils/morgan-stream'
@@ -159,7 +161,8 @@ export const RemoteServerFactory = {
         options.allowCookies = this._getAllowCookies(options)
 
         // For test only – configure the SLAS private client secret proxy endpoint
-        options.slasTarget = options.slasTarget || this._getSlasEndpoint(options)
+        options.slasHostName = this._getSlasEndpoint(options)
+        options.slasTarget = options.slasTarget || `https://${options.slasHostName}`
 
         return options
     },
@@ -209,7 +212,7 @@ export const RemoteServerFactory = {
     _getSlasEndpoint(options) {
         if (!options.useSLASPrivateClient) return undefined
         const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
-        return `https://${shortCode}.api.commercecloud.salesforce.com`
+        return `${shortCode}.api.commercecloud.salesforce.com`
     },
 
     /**
@@ -658,6 +661,29 @@ export const RemoteServerFactory = {
                 changeOrigin: true,
                 pathRewrite: {[SLAS_CUSTOM_PROXY_PATH]: ''},
                 onProxyReq: (outGoingReq, incomingReq) => {
+                    // Rewrite key headers.
+                    const newHeaders = rewriteProxyRequestHeaders({
+                        headers: incomingReq.headers,
+                        logging: !isRemote() && verboseProxyLogging,
+                        proxyPath: SLAS_CUSTOM_PROXY_PATH,
+                        targetHost: options.slasHostName,
+                        targetProtocol: 'https'
+                    })
+
+                    Object.entries(newHeaders).forEach(
+                        // setHeader always replaces any current value.
+                        ([key, value]) => outGoingReq.setHeader(key, value)
+                    )
+
+                    Object.keys(incomingReq.headers).forEach((key) => {
+                        // We delete the header on any falsy value, since
+                        // there's no use case where we supply an empty header
+                        // value.
+                        if (!newHeaders[key]) {
+                            outGoingReq.removeHeader(key)
+                        }
+                    })
+
                     // We pattern match and add client secrets only to endpoints that
                     // match the regex specified by options.applySLASPrivateClientToEndpoints.
                     // By default, this regex matches only calls to SLAS /oauth2/token
