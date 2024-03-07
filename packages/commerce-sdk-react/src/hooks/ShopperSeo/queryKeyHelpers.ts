@@ -16,7 +16,7 @@ export type QueryKeys = {
         '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
-        '/product-search',
+        '/url-mapping',
         Params<'getUrlMapping'>
     ]
 }
@@ -35,7 +35,7 @@ export const getUrlMapping: QueryKeyHelper<'getUrlMapping'> = {
         '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
-        '/product-search'
+        '/url-mapping'
     ],
     queryKey: (params: Params<'getUrlMapping'>) => {
         const paramKeys = [...paramKeysMap['getUrlMapping'], ...getCustomKeys(params)]

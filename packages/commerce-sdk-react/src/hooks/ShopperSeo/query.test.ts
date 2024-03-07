@@ -30,7 +30,7 @@ type TestMap = {[K in keyof Queries]: DataType<K>}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
     // Type assertion so we don't need to use the full type
-    useUrlMapping: {urlSegment: '/sameple-product-redirected'} as DataType<'useUrlMapping'>
+    useUrlMapping: {urlSegment: '/sample-product-redirected'} as DataType<'useUrlMapping'>
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>
