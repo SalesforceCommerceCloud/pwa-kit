@@ -193,12 +193,12 @@ const RETAIL_REACT_APP_QUESTIONS = [
         type: 'list',
         choices: [
             {
-                name: 'No',
-                value: false
-            },
-            {
                 name: 'Yes',
                 value: true
+            },
+            {
+                name: 'No',
+                value: false
             }
         ]
     },
