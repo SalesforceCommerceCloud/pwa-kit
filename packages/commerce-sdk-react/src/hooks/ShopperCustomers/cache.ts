@@ -93,11 +93,17 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
                     updater: createUpdateFunction((result: CustomerProductListResult) => {
-                        // Add new list to front of the lists.
-                        result.data.unshift(response)
+                        // if a user has no product list, data will not present in the response.
+                        if (!result.data) {
+                            result.data = [response]
+                        } else {
+                            // Add new list to front of the lists.
+                            result.data.unshift(response)
+                        }
+
                         result.limit++
                         result.total++
-
+                        console.log('result', result)
                         return result
                     })
                 },
