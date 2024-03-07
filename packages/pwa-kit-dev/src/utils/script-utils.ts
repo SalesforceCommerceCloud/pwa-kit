@@ -303,8 +303,13 @@ export class CloudAPIClient {
         return data['token']
     }
 
-    /** Polls MRT for deployment status every 30 seconds. */
-    async waitForDeploy(project: string, environment: string): Promise<void> {
+    /**
+     * Polls MRT for deployment status every 30 seconds.
+     * @param project project slug
+     * @param environment environment slug
+     * @returns the hostname of the deployed environment
+     */
+    async waitForDeploy(project: string, environment: string): Promise<string> {
         return new Promise((resolve, reject) => {
             /** Milliseconds to wait between checks. */
             const delay = 30_000
@@ -328,7 +333,7 @@ export class CloudAPIClient {
                     throw new Error(`${res.status} ${res.statusText}${detail}`)
                 }
 
-                const data: {state: string} = await res.json()
+                const data: {state: string; ssr_external_hostname: string} = await res.json()
                 if (typeof data.state !== 'string') {
                     return reject(
                         new Error('An unknown state occurred when polling the deployment.')
@@ -347,7 +352,7 @@ export class CloudAPIClient {
                         return reject(new Error('Deployment failed.'))
                     case 'ACTIVE':
                         // Success!
-                        return resolve()
+                        return resolve(data.ssr_external_hostname)
                     default:
                         // Unknown - reject with confusion
                         return reject(new Error(`Unknown deployment state "${data.state}".`))

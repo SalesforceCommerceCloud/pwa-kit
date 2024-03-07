@@ -12,7 +12,7 @@
     "lerna": "lerna",
     "lint": "lerna run --stream lint",
     "lint:fix": "lerna run lint:fix",
-    "start": "npm start --prefix packages/template-retail-react-app",
+    "start": "npm start --prefix packages/template-retail-react-app --",
     "pretest": "npm run lint",
     "test": "lerna run --stream --concurrency=1 test",
     "test:max-file-size": "lerna run --stream test:max-file-size",
