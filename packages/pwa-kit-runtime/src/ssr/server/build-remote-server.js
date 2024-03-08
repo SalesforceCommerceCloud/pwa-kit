@@ -40,8 +40,7 @@ import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
-import {rewriteProxyRequestHeaders} from '../../utils/ssr-proxying'
-import {verboseProxyLogging} from '../../utils/ssr-server/utils'
+import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import {morganStream} from '../../utils/morgan-stream'
@@ -660,28 +659,13 @@ export const RemoteServerFactory = {
                 target: options.slasTarget,
                 changeOrigin: true,
                 pathRewrite: {[SLAS_CUSTOM_PROXY_PATH]: ''},
-                onProxyReq: (outGoingReq, incomingReq) => {
-                    // Rewrite key headers.
-                    const newHeaders = rewriteProxyRequestHeaders({
-                        headers: incomingReq.headers,
-                        logging: !isRemote() && verboseProxyLogging,
+                onProxyReq: (proxyRequest, incomingRequest) => {
+                    applyProxyRequestHeaders({
+                        proxyRequest,
+                        incomingRequest,
                         proxyPath: SLAS_CUSTOM_PROXY_PATH,
                         targetHost: options.slasHostName,
                         targetProtocol: 'https'
-                    })
-
-                    Object.entries(newHeaders).forEach(
-                        // setHeader always replaces any current value.
-                        ([key, value]) => outGoingReq.setHeader(key, value)
-                    )
-
-                    Object.keys(incomingReq.headers).forEach((key) => {
-                        // We delete the header on any falsy value, since
-                        // there's no use case where we supply an empty header
-                        // value.
-                        if (!newHeaders[key]) {
-                            outGoingReq.removeHeader(key)
-                        }
                     })
 
                     // We pattern match and add client secrets only to endpoints that
@@ -691,8 +675,8 @@ export const RemoteServerFactory = {
                     // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
                     // SLAS logout (/oauth2/logout), use the Authorization header for a different
                     // purpose so we don't want to overwrite the header for those calls.
-                    if (incomingReq.path?.match(options.applySLASPrivateClientToEndpoints)) {
-                        outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
+                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
                 }
             })
