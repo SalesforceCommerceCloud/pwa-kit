@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import React, {useRef, useState, useEffect} from 'react'
+import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
 import {
@@ -56,10 +56,27 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {noop} from "@salesforce/retail-react-app/app/utils/utils";
 
+export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
+    dialogTitle: defineMessage({
+        defaultMessage: 'Out of Stock items',
+        id: 'confirmation_modal.remove_cart_item.title.out_of_stock'
+    }),
+    confirmationMessage: defineMessage({
+        defaultMessage: 'Some of the items are out of stock and need to be removed from cart',
+        id: 'confirmation_modal.remove_cart_item.message.need_to_remove'
+    }),
+    primaryActionLabel: defineMessage({
+        defaultMessage: 'Yes, remove items',
+        id: 'confirmation_modal.remove_cart_item.action.remove'
+    }),
+    onPrimaryAction: noop
+}
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+    const unavailableProductIdsRef = useRef(null)
 
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products} = useProducts(
@@ -72,6 +89,12 @@ const Cart = () => {
         {
             enabled: Boolean(productIds),
             select: (result) => {
+                // if a product is offline, the getProducts will not return its product detail.
+                // we compare the response ids with the ones in basket to figure which product has become unavailable
+                const resProductIds = result.data.map(i => i.id)
+                const unavailableProductIds = productIds.split(',').filter(id => !resProductIds.includes(id))
+                unavailableProductIdsRef.current = unavailableProductIds
+                // setOfflineProductIds(offlineProductIds)
                 // Convert array into key/value object with key is the product id
                 return result?.data?.reduce((result, item) => {
                     const key = item.id
@@ -81,9 +104,10 @@ const Cart = () => {
             }
         }
     )
+
+
     const {data: customer} = useCurrentCustomer()
     const {customerId, isRegistered} = customer
-
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
@@ -102,6 +126,12 @@ const Cart = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const modalProps = useDisclosure()
+    const unavailableProductsModalProps = useDisclosure()
+    useEffect(() => {
+        if (unavailableProductIdsRef.current?.length > 0) {
+            unavailableProductsModalProps.onOpen()
+        }
+    }, [unavailableProductIdsRef.current])
 
     /******************* Shipping Methods for basket shipment *******************/
     // do this action only if the basket shipping method is not defined
@@ -297,6 +327,15 @@ const Cart = () => {
             setCartItemLoading(false)
             setSelectedItem(undefined)
         }
+    }
+
+    const handleUnavailableProducts = async () => {
+        const productItems = basket?.productItems?.filter(item => unavailableProductIdsRef.current?.includes(item.productId))
+        for (let item of productItems) {
+            await handleRemoveItem(item)
+        }
+        unavailableProductIdsRef.current = null
+        unavailableProductsModalProps.onClose()
     }
     /***************************** Update Cart **************************/
 
@@ -536,7 +575,16 @@ const Cart = () => {
             >
                 <CartCta />
             </Box>
+            <ConfirmationModal
+                {...REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG}
+                hideAlternateAction={true}
+                onPrimaryAction={() => {
+                    handleUnavailableProducts()
+                }}
 
+                onAlternateAction={() => {}}
+                {...unavailableProductsModalProps}
+            />
             <ConfirmationModal
                 {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
                 onPrimaryAction={() => {
@@ -545,6 +593,8 @@ const Cart = () => {
                 onAlternateAction={() => {}}
                 {...modalProps}
             />
+
+
         </Box>
     )
 }
