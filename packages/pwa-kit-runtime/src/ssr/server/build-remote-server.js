@@ -40,6 +40,7 @@ import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
+import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import {morganStream} from '../../utils/morgan-stream'
@@ -159,7 +160,8 @@ export const RemoteServerFactory = {
         options.allowCookies = this._getAllowCookies(options)
 
         // For test only – configure the SLAS private client secret proxy endpoint
-        options.slasTarget = options.slasTarget || this._getSlasEndpoint(options)
+        options.slasHostName = this._getSlasEndpoint(options)
+        options.slasTarget = options.slasTarget || `https://${options.slasHostName}`
 
         return options
     },
@@ -209,7 +211,7 @@ export const RemoteServerFactory = {
     _getSlasEndpoint(options) {
         if (!options.useSLASPrivateClient) return undefined
         const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
-        return `https://${shortCode}.api.commercecloud.salesforce.com`
+        return `${shortCode}.api.commercecloud.salesforce.com`
     },
 
     /**
@@ -657,7 +659,15 @@ export const RemoteServerFactory = {
                 target: options.slasTarget,
                 changeOrigin: true,
                 pathRewrite: {[SLAS_CUSTOM_PROXY_PATH]: ''},
-                onProxyReq: (outGoingReq, incomingReq) => {
+                onProxyReq: (proxyRequest, incomingRequest) => {
+                    applyProxyRequestHeaders({
+                        proxyRequest,
+                        incomingRequest,
+                        proxyPath: SLAS_CUSTOM_PROXY_PATH,
+                        targetHost: options.slasHostName,
+                        targetProtocol: 'https'
+                    })
+
                     // We pattern match and add client secrets only to endpoints that
                     // match the regex specified by options.applySLASPrivateClientToEndpoints.
                     // By default, this regex matches only calls to SLAS /oauth2/token
@@ -665,8 +675,8 @@ export const RemoteServerFactory = {
                     // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
                     // SLAS logout (/oauth2/logout), use the Authorization header for a different
                     // purpose so we don't want to overwrite the header for those calls.
-                    if (incomingReq.path?.match(options.applySLASPrivateClientToEndpoints)) {
-                        outGoingReq.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
+                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
                 }
             })
