@@ -56,7 +56,7 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {noop} from "@salesforce/retail-react-app/app/utils/utils";
+import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     dialogTitle: defineMessage({
@@ -91,8 +91,10 @@ const Cart = () => {
             select: (result) => {
                 // if a product is offline, the getProducts will not return its product detail.
                 // we compare the response ids with the ones in basket to figure which product has become unavailable
-                const resProductIds = result.data.map(i => i.id)
-                const unavailableProductIds = productIds.split(',').filter(id => !resProductIds.includes(id))
+                const resProductIds = result.data.map((i) => i.id)
+                const unavailableProductIds = productIds
+                    .split(',')
+                    .filter((id) => !resProductIds.includes(id))
                 unavailableProductIdsRef.current = unavailableProductIds
                 // setOfflineProductIds(offlineProductIds)
                 // Convert array into key/value object with key is the product id
@@ -104,7 +106,6 @@ const Cart = () => {
             }
         }
     )
-
 
     const {data: customer} = useCurrentCustomer()
     const {customerId, isRegistered} = customer
@@ -330,7 +331,9 @@ const Cart = () => {
     }
 
     const handleUnavailableProducts = async () => {
-        const productItems = basket?.productItems?.filter(item => unavailableProductIdsRef.current?.includes(item.productId))
+        const productItems = basket?.productItems?.filter((item) =>
+            unavailableProductIdsRef.current?.includes(item.productId)
+        )
         for (let item of productItems) {
             await handleRemoveItem(item)
         }
@@ -581,7 +584,6 @@ const Cart = () => {
                 onPrimaryAction={() => {
                     handleUnavailableProducts()
                 }}
-
                 onAlternateAction={() => {}}
                 {...unavailableProductsModalProps}
             />
@@ -593,8 +595,6 @@ const Cart = () => {
                 onAlternateAction={() => {}}
                 {...modalProps}
             />
-
-
         </Box>
     )
 }
