@@ -26,7 +26,7 @@ const ConfirmationModal = ({
     confirmationMessage = CONFIRMATION_DIALOG_DEFAULT_CONFIG.confirmationMessage,
     primaryActionLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.primaryActionLabel,
     alternateActionLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.alternateActionLabel,
-    hideAlternateAction,
+    hideAlternateAction = false,
     onPrimaryAction = noop,
     onAlternateAction = noop,
     ...props
@@ -108,7 +108,11 @@ ConfirmationModal.propTypes = {
     /**
      * Action to execute if user selects alternate or secondary action
      */
-    onAlternateAction: PropTypes.func
+    onAlternateAction: PropTypes.func,
+    /**
+     * Flag to hide of show alternative button
+     */
+    hideAlternateAction: PropTypes.bool,
 }
 
 export default ConfirmationModal
