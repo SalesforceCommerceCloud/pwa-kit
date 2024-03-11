@@ -103,7 +103,6 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
 
                         result.limit++
                         result.total++
-                        console.log('result', result)
                         return result
                     })
                 },
