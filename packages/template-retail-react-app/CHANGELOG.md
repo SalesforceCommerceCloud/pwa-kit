@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+- Fix checkout shipping method fetching [#1693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1693)
 - Fix invalid query params warnings [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
 - Fix internal server error on account pages [#1675](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1675)
 - Fix `product-item` component imports to ensure that it is overridable. [#1672](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1672)
