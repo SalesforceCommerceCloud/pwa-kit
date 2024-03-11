@@ -112,7 +112,7 @@ ConfirmationModal.propTypes = {
     /**
      * Flag to hide of show alternative button
      */
-    hideAlternateAction: PropTypes.bool,
+    hideAlternateAction: PropTypes.bool
 }
 
 export default ConfirmationModal
