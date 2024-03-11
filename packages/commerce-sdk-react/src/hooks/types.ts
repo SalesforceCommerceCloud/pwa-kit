@@ -15,7 +15,8 @@ import {
     ShopperOrders,
     ShopperProducts,
     ShopperPromotions,
-    ShopperSearch
+    ShopperSearch,
+    ShopperSeo
 } from 'commerce-sdk-isomorphic'
 
 // --- GENERAL UTILITIES --- //
@@ -90,6 +91,7 @@ export interface ApiClients {
     shopperProducts: ShopperProducts<ApiClientConfigParams>
     shopperPromotions: ShopperPromotions<ApiClientConfigParams>
     shopperSearch: ShopperSearch<ApiClientConfigParams>
+    shopperSeo: ShopperSeo<ApiClientConfigParams>
 }
 
 export type ApiClient = ApiClients[keyof ApiClients]
