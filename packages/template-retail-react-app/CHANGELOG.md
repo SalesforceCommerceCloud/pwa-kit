@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+- Fix promo codes not being properly applied in cart [#1692](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1692)
 - Fix invalid query params warnings [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
 - Fix internal server error on account pages [#1675](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1675)
 - Fix `product-item` component imports to ensure that it is overridable. [#1672](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1672)
