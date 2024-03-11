@@ -34,17 +34,15 @@ export const usePromoCode = () => {
 
     const submitPromoCode = async ({code}) => {
         try {
-            await applyPromoCodeMutation.mutateAsync(
-                {
-                    parameters: {basketId: basket?.basketId},
-                    body: {
-                        code
-                    }
+            await applyPromoCodeMutation.mutateAsync({
+                parameters: {basketId: basket?.basketId},
+                body: {
+                    code
                 }
-            )
+            })
 
             form.reset({code: ''})
-            
+
             toast({
                 title: formatMessage({
                     defaultMessage: 'Promotion applied',
