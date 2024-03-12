@@ -60,6 +60,9 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'refresh_token_guest_copy'
     | 'refresh_token_registered_copy'
+    | 'access_token_sfra_1'
+    | 'access_token_sfra_2'
+    | 'access_token_sfra_3'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -145,6 +148,24 @@ const DATA_MAP: AuthDataMap = {
         callback: (store) => {
             store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
+    },
+    // For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
+    // We do this by having SFRA store the access token in cookies. If these cookies are present, PWA checks
+    // compares the access token from the cookie with the one in local store. If the tokens are different,
+    // discard the access token in local store and replace it with the access token from the cookie.
+    // ECOM has a 1200 character limit on the values of cookies. The access token easily exceeds this amount
+    // so it sends the access token in chunks across several cookies.
+    access_token_sfra_1: {
+        storageType: 'cookie',
+        key: 'token_1'
+    },
+    access_token_sfra_2: {
+        storageType: 'cookie',
+        key: 'token_2'
+    },
+    access_token_sfra_3: {
+        storageType: 'cookie',
+        key: 'token_3'
     },
     customer_type: {
         storageType: 'local',
@@ -275,35 +296,29 @@ class Auth {
 
     /**
      * WARNING: This function is relevant to be used in Hybrid deployments only.
-     * Compares the refresh_token keys for guest('cc-nx-g') and registered('cc-nx') login from the cookie received from SFRA with the copy stored in localstorage on PWA Kit
-     * to determine if the login state of the shopper on SFRA site has changed. If the keys are different we return true considering the login state did change. If the keys are same,
-     * we compare the values of the refresh_token to cover an edge case where the login state might have changed multiple times on SFRA and the eventual refresh_token key might be same
-     * as that on PWA Kit which would incorrectly show both keys to be the same even though the sessions are different.
-     * @returns {boolean} true if the keys do not match (login state changed), false otherwise.
+     * When SFRA sends an auth token, it does so by splitting the JWT across
+     * multiple cookies to get around a character limit on ECOM cookie values.
+     * This method fetches the chunks and returns the combined token.
+     * @returns {string} access token or undefined
      */
-    private hasSFRAAuthStateChanged() {
-        const refreshTokenKey =
-            (this.get('refresh_token_registered') && 'refresh_token_registered') ||
-            'refresh_token_guest'
+    private getSFRAAuthToken() {
+        console.log('getting SFRA tokens')
+        const accessTokenChunk1 = this.get('access_token_sfra_1')
+        const accessTokenChunk2 = this.get('access_token_sfra_2')
+        const accessTokenChunk3 = this.get('access_token_sfra_3')
 
-        const refreshTokenCopyKey =
-            (this.get('refresh_token_registered_copy') && 'refresh_token_registered_copy') ||
-            'refresh_token_guest_copy'
-
-        if (DATA_MAP[refreshTokenKey].key !== DATA_MAP[refreshTokenCopyKey].key) {
-            return true
-        }
-
-        return this.get(refreshTokenKey) !== this.get(refreshTokenCopyKey)
+        // Combines the access token chunks without any 'null' or 'undefined'
+        const accessToken = [accessTokenChunk1, accessTokenChunk2, accessTokenChunk3].join('')
+        return accessToken ? accessToken : undefined
     }
 
-    /**
-     * Used to validate JWT expiry and ensure auth state consistency with SFRA in a hybrid setup
-     * @param token access_token received on SLAS authentication
-     * @returns {boolean} true if JWT is valid; false otherwise
-     */
-    private isTokenValidForHybrid(token: string) {
-        return !this.isTokenExpired(token) && !this.hasSFRAAuthStateChanged()
+    private clearSFRAAuthToken() {
+        const keys = ['access_token_sfra_1','access_token_sfra_2','access_token_sfra_3'] as AuthDataKeys[]
+        keys.forEach((keyName) => {
+            const {key, storageType} = DATA_MAP[keyName]
+            const store = this.stores[storageType]
+            store.delete(key)
+        })
     }
 
     /**
@@ -379,7 +394,9 @@ class Auth {
      * 3. PKCE flow
      */
     async ready() {
+        console.log('in ready')
         if (this.fetchedToken && this.fetchedToken !== '') {
+            console.log(`fetchedToken`)
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
@@ -388,13 +405,30 @@ class Auth {
             return this.data
         }
         if (this.pendingToken) {
+            console.log(`pendingToken`)
             return await this.pendingToken
         }
-        const accessToken = this.get('access_token')
+        let accessToken = this.get('access_token')
 
-        if (accessToken && this.isTokenValidForHybrid(accessToken)) {
+        // If SFRA has changed the auth state, it will send an auth token via cookies.
+        // We prioritize using this access token from SFRA over the access token in local storage.
+        const sfraAuthToken = this.getSFRAAuthToken()
+        console.log(`SFRA Auth Token = ${sfraAuthToken}`)
+
+        if (sfraAuthToken && accessToken !== sfraAuthToken) {
+            console.log(`In Auth Token Override`)
+            this.set('access_token', sfraAuthToken)
+            accessToken = this.get('access_token')
+            // SFRA -> PWA access token cookie handoff is succesful
+            // so we can clear the SFRA made cookies now
+            this.clearSFRAAuthToken()
+        }
+
+        console.log(`Access token ${accessToken}`)
+        if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
+        console.log(`Starting Refresh`)
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -437,6 +471,7 @@ class Auth {
         fn: (...args: Args) => Promise<Data>
     ): (...args: Args) => Promise<Data> {
         return async (...args) => {
+            console.log('when ready')
             await this.ready()
             return await fn(...args)
         }
