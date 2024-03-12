@@ -33,38 +33,35 @@ export const usePromoCode = () => {
     const removePromoCodeMutation = useShopperBasketsMutation('removeCouponFromBasket')
 
     const submitPromoCode = async ({code}) => {
-        applyPromoCodeMutation.mutate(
-            {
+        try {
+            await applyPromoCodeMutation.mutateAsync({
                 parameters: {basketId: basket?.basketId},
                 body: {
                     code
                 }
-            },
-            {
-                onSuccess: () => {
-                    form.reset({code: ''})
-                    toast({
-                        title: formatMessage({
-                            defaultMessage: 'Promotion applied',
-                            id: 'use_promocode.info.promo_applied'
-                        }),
-                        status: 'success',
-                        position: 'top-right',
-                        isClosable: true
-                    })
-                },
-                onError: () => {
-                    form.setError('code', {
-                        type: 'manual',
-                        message: formatMessage({
-                            defaultMessage:
-                                'Check the code and try again, it may already be applied or the promo has expired.',
-                            id: 'use_promocode.error.check_the_code'
-                        })
-                    })
-                }
-            }
-        )
+            })
+
+            form.reset({code: ''})
+
+            toast({
+                title: formatMessage({
+                    defaultMessage: 'Promotion applied',
+                    id: 'use_promocode.info.promo_applied'
+                }),
+                status: 'success',
+                position: 'top-right',
+                isClosable: true
+            })
+        } catch (e) {
+            form.setError('code', {
+                type: 'manual',
+                message: formatMessage({
+                    defaultMessage:
+                        'Check the code and try again, it may already be applied or the promo has expired.',
+                    id: 'use_promocode.error.check_the_code'
+                })
+            })
+        }
     }
 
     const removePromoCode = async (couponItemId) => {
