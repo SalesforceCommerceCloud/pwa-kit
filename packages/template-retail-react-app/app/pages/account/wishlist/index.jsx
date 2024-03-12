@@ -78,11 +78,14 @@ const AccountWishlist = () => {
     }
 
     const handleUnavailableProducts = async (unavailableProductIds) => {
-        console.log('unavailableProductIds', unavailableProductIds)
+        if (!unavailableProductIds.length) return
         for (const id of unavailableProductIds) {
+            const item = wishListItems?.find((item) => {
+                return item.productId.toString() === id.toString()
+            })
             const parameters = {
                 customerId: customer.customerId,
-                itemId: id,
+                itemId: item?.id,
                 listId: wishListData?.id
             }
             await deleteCustomerProductListItem.mutateAsync({parameters})
