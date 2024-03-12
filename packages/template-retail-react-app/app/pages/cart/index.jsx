@@ -42,7 +42,8 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    TOAST_MESSAGE_ALREADY_IN_WISHLIST
+    TOAST_MESSAGE_ALREADY_IN_WISHLIST,
+    REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG
 } from '@salesforce/retail-react-app/app/constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
@@ -56,29 +57,15 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 
-export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
-    dialogTitle: defineMessage({
-        defaultMessage: 'Out of Stock items',
-        id: 'confirmation_modal.remove_cart_item.title.out_of_stock'
-    }),
-    confirmationMessage: defineMessage({
-        defaultMessage: 'Some of the items are out of stock and need to be removed from cart',
-        id: 'confirmation_modal.remove_cart_item.message.need_to_remove'
-    }),
-    primaryActionLabel: defineMessage({
-        defaultMessage: 'Yes, remove items',
-        id: 'confirmation_modal.remove_cart_item.action.remove'
-    }),
-    onPrimaryAction: noop
-}
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
-    const unavailableProductIdsRef = useRef(null)
+    // const unavailableProductIdsRef = useRef(null)
 
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
+    console.log('productIds', productIds)
     const {data: products} = useProducts(
         {
             parameters: {
@@ -89,15 +76,6 @@ const Cart = () => {
         {
             enabled: Boolean(productIds),
             select: (result) => {
-                // if a product is offline, the getProducts will not return its product detail.
-                // we compare the response ids with the ones in basket to figure which product has become unavailable
-                const resProductIds = result.data.map((i) => i.id)
-                const unavailableProductIds = productIds
-                    .split(',')
-                    .filter((id) => !resProductIds.includes(id))
-                unavailableProductIdsRef.current = unavailableProductIds
-                // setOfflineProductIds(offlineProductIds)
-                // Convert array into key/value object with key is the product id
                 return result?.data?.reduce((result, item) => {
                     const key = item.id
                     result[key] = item
@@ -128,11 +106,11 @@ const Cart = () => {
     const navigate = useNavigation()
     const modalProps = useDisclosure()
     const unavailableProductsModalProps = useDisclosure()
-    useEffect(() => {
-        if (unavailableProductIdsRef.current?.length > 0) {
-            unavailableProductsModalProps.onOpen()
-        }
-    }, [unavailableProductIdsRef.current])
+    // useEffect(() => {
+    //     if (unavailableProductIdsRef.current?.length > 0) {
+    //         unavailableProductsModalProps.onOpen()
+    //     }
+    // }, [unavailableProductIdsRef.current])
 
     /******************* Shipping Methods for basket shipment *******************/
     // do this action only if the basket shipping method is not defined
@@ -330,15 +308,13 @@ const Cart = () => {
         }
     }
 
-    const handleUnavailableProducts = async () => {
+    const handleUnavailableProducts = async (unavailableProductIds) => {
         const productItems = basket?.productItems?.filter((item) =>
-            unavailableProductIdsRef.current?.includes(item.productId)
+            unavailableProductIds?.includes(item.productId)
         )
         for (let item of productItems) {
             await handleRemoveItem(item)
         }
-        unavailableProductIdsRef.current = null
-        unavailableProductsModalProps.onClose()
     }
     /***************************** Update Cart **************************/
 
@@ -579,21 +555,17 @@ const Cart = () => {
                 <CartCta />
             </Box>
             <ConfirmationModal
-                {...REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG}
-                hideAlternateAction={true}
-                onPrimaryAction={() => {
-                    handleUnavailableProducts()
-                }}
-                onAlternateAction={() => {}}
-                {...unavailableProductsModalProps}
-            />
-            <ConfirmationModal
                 {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
                 onPrimaryAction={() => {
                     handleRemoveItem(selectedItem)
                 }}
                 onAlternateAction={() => {}}
                 {...modalProps}
+            />
+
+            <UnavailableProductConfirmationModal
+                productIds={productIds.split(',')}
+                handleUnavailableProducts={handleUnavailableProducts}
             />
         </Box>
     )

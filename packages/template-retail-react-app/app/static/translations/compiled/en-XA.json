@@ -1798,7 +1798,7 @@
     },
     {
       "type": 0,
-      "value": "Ẏḗḗş, řḗḗḿǿǿṽḗḗ īŧḗḗḿş"
+      "value": "Řḗḗḿǿǿṽḗḗ"
     },
     {
       "type": 0,
@@ -1819,14 +1819,14 @@
       "value": "]"
     }
   ],
-  "confirmation_modal.remove_cart_item.message.need_to_remove": [
+  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Şǿǿḿḗḗ ǿǿƒ ŧħḗḗ īŧḗḗḿş ȧȧřḗḗ ǿǿŭŭŧ ǿǿƒ şŧǿǿƈķ ȧȧƞḓ ƞḗḗḗḗḓ ŧǿǿ ƀḗḗ řḗḗḿǿǿṽḗḗḓ ƒřǿǿḿ ƈȧȧřŧ"
+      "value": "Şǿǿḿḗḗ īŧḗḗḿş ȧȧřḗḗ ƞǿǿ ŀǿǿƞɠḗḗř ȧȧṽȧȧīŀȧȧƀŀḗḗ ǿǿƞŀīƞḗḗ ȧȧƞḓ ẇīŀŀ ƀḗḗ řḗḗḿǿǿṽḗḗḓ ƒřǿǿḿ ẏǿǿŭŭř ƈȧȧřŧ."
     },
     {
       "type": 0,
@@ -1861,14 +1861,14 @@
       "value": "]"
     }
   ],
-  "confirmation_modal.remove_cart_item.title.out_of_stock": [
+  "confirmation_modal.remove_cart_item.title.items_unavailable": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ǿŭŭŧ ǿǿƒ Şŧǿǿƈķ īŧḗḗḿş"
+      "value": "Īŧḗḗḿş Ŭƞȧȧṽȧȧīŀȧȧƀŀḗḗ"
     },
     {
       "type": 0,

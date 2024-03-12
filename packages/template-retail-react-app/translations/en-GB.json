@@ -344,13 +344,13 @@
     "defaultMessage": "No, keep item"
   },
   "confirmation_modal.remove_cart_item.action.remove": {
-    "defaultMessage": "Yes, remove items"
+    "defaultMessage": "Remove"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
     "defaultMessage": "Yes, remove item"
   },
-  "confirmation_modal.remove_cart_item.message.need_to_remove": {
-    "defaultMessage": "Some of the items are out of stock and need to be removed from cart"
+  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
+    "defaultMessage": "Some items are no longer available online and will be removed from your cart."
   },
   "confirmation_modal.remove_cart_item.message.sure_to_remove": {
     "defaultMessage": "Are you sure you want to remove this item from your cart?"
@@ -358,8 +358,8 @@
   "confirmation_modal.remove_cart_item.title.confirm_remove": {
     "defaultMessage": "Confirm Remove Item"
   },
-  "confirmation_modal.remove_cart_item.title.out_of_stock": {
-    "defaultMessage": "Out of Stock items"
+  "confirmation_modal.remove_cart_item.title.items_unavailable": {
+    "defaultMessage": "Items Unavailable"
   },
   "confirmation_modal.remove_wishlist_item.action.no": {
     "defaultMessage": "No, keep item"
