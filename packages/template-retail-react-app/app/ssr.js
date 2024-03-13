@@ -45,7 +45,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false
+    useSLASPrivateClient: true
 }
 
 const runtime = getRuntime()
@@ -61,7 +61,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                 directives: {
                     'img-src': [
                         // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
+                        '*.commercecloud.salesforce.com',
+                        '*.demandware.net'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
