@@ -42,8 +42,7 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    TOAST_MESSAGE_ALREADY_IN_WISHLIST,
-    REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG
+    TOAST_MESSAGE_ALREADY_IN_WISHLIST
 } from '@salesforce/retail-react-app/app/constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
@@ -62,10 +61,7 @@ import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/ap
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
-    // const unavailableProductIdsRef = useRef(null)
-
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    console.log('productIds', productIds)
     const {data: products} = useProducts(
         {
             parameters: {
@@ -105,12 +101,6 @@ const Cart = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const modalProps = useDisclosure()
-    const unavailableProductsModalProps = useDisclosure()
-    // useEffect(() => {
-    //     if (unavailableProductIdsRef.current?.length > 0) {
-    //         unavailableProductsModalProps.onOpen()
-    //     }
-    // }, [unavailableProductIdsRef.current])
 
     /******************* Shipping Methods for basket shipment *******************/
     // do this action only if the basket shipping method is not defined
