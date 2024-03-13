@@ -75,9 +75,11 @@ const logAndFormatError = (err) => {
 // Because multi-value params are not supported in `aws-serverless-express` create a proper
 // search string using the `query` property. We pay special attention to the order the params
 // as best as we can.
-const getLocationSearch = (req) => {
+export const getLocationSearch = (req, opts = {}) => {
+    const {interpretPlusSignAsSpace = false} = opts
     const [_, search] = req.originalUrl.split('?')
     const params = new URLSearchParams(search)
+
     const newParams = new URLSearchParams()
     const orderedKeys = [...new Set(params.keys())]
 
@@ -88,11 +90,17 @@ const getLocationSearch = (req) => {
         const values = Array.isArray(value) ? value : [value]
 
         values.forEach((v) => {
-            newParams.append(key, v)
+            // To have feature parity to SFRA, the + sign can be treated as space
+            // However, this could potential a breaking change since not all users want to treat it as such
+            // Therefore, we create a flag for it via the app configuration
+            newParams.append(
+                key,
+                interpretPlusSignAsSpace ? decodeURIComponent(v).replace(/\+/, ' ') : v
+            )
         })
     })
-    const searchString = newParams.toString()
 
+    const searchString = newParams.toString()
     // Update the location objects reference.
     return searchString ? `?${searchString}` : ''
 }
@@ -118,9 +126,12 @@ export const render = async (req, res, next) => {
     const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname] = req.originalUrl.split('?')
+
     const location = {
         pathname,
-        search: getLocationSearch(req)
+        search: getLocationSearch(req, {
+            interpretPlusSignAsSpace: config?.app?.url?.interpretPlusSignAsSpace
+        })
     }
 
     // Step 1 - Find the match.

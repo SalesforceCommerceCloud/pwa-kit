@@ -1,6 +1,6 @@
 {
   "name": "internal-lib-build",
-  "version": "3.3.0-dev",
+  "version": "3.5.0-dev",
   "private": true,
   "description": "Build tools for *libraries* in the monorepo",
   "bugs": {
@@ -42,7 +42,7 @@
     "@babel/register": "^7.21.0",
     "@babel/runtime": "^7.21.0",
     "@babel/runtime-corejs2": "^7.21.0",
-    "@babel/traverse": "^7.21.3",
+    "@babel/traverse": "^7.23.2",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.3.0",
     "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
@@ -60,7 +60,7 @@
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.3.0-dev",
+    "@salesforce/pwa-kit-dev": "3.5.0-dev",
     "npm-packlist": "^4.0.0",
     "typescript": "4.9.5"
   },
@@ -73,10 +73,7 @@
     }
   },
   "engines": {
-    "node": "^16.11.0 || ^18.0.0",
-    "npm": "^8.0.0 || ^9.0.0"
-  },
-  "overrides": {
-    "nwsapi": "2.2.2"
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,8 +7,8 @@
 
 import React, {forwardRef, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useHistory, useLocation} from 'react-router-dom'
-import {useIntl} from 'react-intl'
+import {useLocation} from 'react-router-dom'
+import {useIntl, FormattedMessage} from 'react-intl'
 
 import {
     Flex,
@@ -25,8 +25,6 @@ import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
 // project components
-import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
-import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
 import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'
 import Link from '@salesforce/retail-react-app/app/components/link'
@@ -37,6 +35,8 @@ import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
+import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, productType}) => {
@@ -104,7 +104,6 @@ const ProductView = forwardRef(
     ) => {
         const showToast = useToast()
         const intl = useIntl()
-        const history = useHistory()
         const location = useLocation()
         const {
             isOpen: isAddToCartModalOpen,
@@ -311,13 +310,14 @@ const ProductView = forwardRef(
                                 />
                                 <HideOnMobile>
                                     {showFullLink && product && (
-                                        <Link to={`/product/${product.master.masterId}`}>
-                                            <Text color="blue.600">
-                                                {intl.formatMessage({
-                                                    defaultMessage: 'See full details',
-                                                    id: 'product_view.link.full_details'
-                                                })}
-                                            </Text>
+                                        <Link
+                                            to={`/product/${product.master.masterId}`}
+                                            color="blue.600"
+                                        >
+                                            <FormattedMessage
+                                                id="product_view.link.full_details"
+                                                defaultMessage="See full details"
+                                            />
                                         </Link>
                                     )}
                                 </HideOnMobile>
@@ -356,63 +356,70 @@ const ProductView = forwardRef(
                                     <Skeleton height={20} width={64} />
                                 </>
                             ) : (
-                                <>
-                                    {/* Attribute Swatches */}
-                                    {variationAttributes.map((variationAttribute) => {
-                                        const {
-                                            id,
-                                            name,
-                                            selectedValue,
-                                            values = []
-                                        } = variationAttribute
-                                        return (
-                                            <SwatchGroup
-                                                key={id}
-                                                onChange={(_, href) => {
-                                                    if (!href) return
-                                                    history.replace(href)
-                                                }}
-                                                variant={id === 'color' ? 'circle' : 'square'}
-                                                value={selectedValue?.value}
-                                                displayName={selectedValue?.name || ''}
-                                                label={name}
-                                            >
-                                                {values.map(
-                                                    ({href, name, image, value, orderable}) => (
-                                                        <Swatch
-                                                            key={value}
-                                                            href={href}
-                                                            disabled={!orderable}
-                                                            value={value}
-                                                            name={name}
-                                                        >
-                                                            {image ? (
-                                                                <Box
-                                                                    height="100%"
-                                                                    width="100%"
-                                                                    minWidth="32px"
-                                                                    backgroundRepeat="no-repeat"
-                                                                    backgroundSize="cover"
-                                                                    backgroundColor={name.toLowerCase()}
-                                                                    backgroundImage={
-                                                                        image
-                                                                            ? `url(${
-                                                                                  image.disBaseLink ||
-                                                                                  image.link
-                                                                              })`
-                                                                            : ''
-                                                                    }
-                                                                />
-                                                            ) : (
-                                                                name
-                                                            )}
-                                                        </Swatch>
-                                                    )
-                                                )}
-                                            </SwatchGroup>
-                                        )
-                                    })}
-                                </>
+                                variationAttributes.map(({id, name, selectedValue, values}) => {
+                                    const swatches = values.map(
+                                        ({href, name, image, value, orderable}, index) => {
+                                            const content = image ? (
+                                                <Box
+                                                    height="100%"
+                                                    width="100%"
+                                                    minWidth="32px"
+                                                    backgroundRepeat="no-repeat"
+                                                    backgroundSize="cover"
+                                                    backgroundColor={name.toLowerCase()}
+                                                    backgroundImage={`url(${
+                                                        image.disBaseLink || image.link
+                                                    })`}
+                                                />
+                                            ) : (
+                                                name
+                                            )
+                                            const hasSelection = Boolean(selectedValue?.value)
+                                            const isSelected = selectedValue?.value === value
+                                            const isFirst = index === 0
+                                            // To mimic the behavior of a native radio input, only
+                                            // one swatch should receive tab focus; the rest can be
+                                            // selected using arrow keys when the swatch group has
+                                            // focus. The focused element is the selected option or
+                                            // the first in the group, if no option is selected.
+                                            // This is a slight difference, for simplicity, from the
+                                            // native element, where the first element is focused on
+                                            // `Tab` and the _last_ element is focused on `Shift+Tab`
+                                            const isFocusable =
+                                                isSelected || (!hasSelection && isFirst)
+                                            return (
+                                                <Swatch
+                                                    key={value}
+                                                    href={href}
+                                                    disabled={!orderable}
+                                                    value={value}
+                                                    name={name}
+                                                    variant={id === 'color' ? 'circle' : 'square'}
+                                                    selected={isSelected}
+                                                    isFocusable={isFocusable}
+                                                >
+                                                    {content}
+                                                </Swatch>
+                                            )
+                                        }
+                                    )
+                                    return (
+                                        <SwatchGroup
+                                            key={id}
+                                            value={selectedValue?.value}
+                                            displayName={selectedValue?.name || ''}
+                                            label={intl.formatMessage(
+                                                {
+                                                    defaultMessage: '{variantType}',
+                                                    id: 'product_view.label.variant_type'
+                                                },
+                                                {variantType: name}
+                                            )}
+                                        >
+                                            {swatches}
+                                        </SwatchGroup>
+                                    )
+                                })
                             )}
 
                             {/* Quantity Selector */}
@@ -421,10 +428,9 @@ const ProductView = forwardRef(
                                     <Box fontWeight="bold">
                                         <label htmlFor="quantity">
                                             {intl.formatMessage({
-                                                defaultMessage: 'Quantity',
+                                                defaultMessage: 'Quantity:',
                                                 id: 'product_view.label.quantity'
                                             })}
-                                            :
                                         </label>
                                     </Box>
 
@@ -473,13 +479,14 @@ const ProductView = forwardRef(
                             </Box>
                             <HideOnDesktop>
                                 {showFullLink && product && (
-                                    <Link to={`/product/${product.master.masterId}`}>
-                                        <Text color="blue.600">
-                                            {intl.formatMessage({
-                                                defaultMessage: 'See full details',
-                                                id: 'product_view.link.full_details'
-                                            })}
-                                        </Text>
+                                    <Link
+                                        to={`/product/${product.master.masterId}`}
+                                        color="blue.600"
+                                    >
+                                        <FormattedMessage
+                                            id="product_view.link.full_details"
+                                            defaultMessage="See full details"
+                                        />
                                     </Link>
                                 )}
                             </HideOnDesktop>

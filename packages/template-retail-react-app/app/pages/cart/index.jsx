@@ -26,7 +26,7 @@ import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
+import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 
@@ -41,7 +41,8 @@ import {
     EINSTEIN_RECOMMENDERS,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
+    TOAST_MESSAGE_ALREADY_IN_WISHLIST
 } from '@salesforce/retail-react-app/app/constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
@@ -56,6 +57,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
+const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
@@ -92,6 +94,7 @@ const Cart = () => {
 
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
+    const [localIsGiftItems, setLocalIsGiftItems] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -150,34 +153,51 @@ const Cart = () => {
             if (!customerId || !wishlist) {
                 return
             }
-            await createCustomerProductListItem.mutateAsync({
-                parameters: {
-                    listId: wishlist.id,
-                    customerId
-                },
-                body: {
-                    // NOTE: APi does not respect quantity, it always adds 1
-                    quantity: product.quantity,
-                    productId: product.productId,
-                    public: false,
-                    priority: 1,
-                    type: 'product'
-                }
-            })
-            toast({
-                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                status: 'success',
-                action: (
-                    // it would be better if we could use <Button as={Link}>
-                    // but unfortunately the Link component is not compatible
-                    // with Chakra Toast, since the ToastManager is rendered via portal
-                    // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                    </Button>
-                )
-            })
+
+            const isItemInWishlist = wishlist?.customerProductListItems?.find(
+                (i) => i.productId === product?.id
+            )
+
+            if (!isItemInWishlist) {
+                await createCustomerProductListItem.mutateAsync({
+                    parameters: {
+                        listId: wishlist.id,
+                        customerId
+                    },
+                    body: {
+                        // NOTE: APi does not respect quantity, it always adds 1
+                        quantity: product.quantity,
+                        productId: product.productId,
+                        public: false,
+                        priority: 1,
+                        type: 'product'
+                    }
+                })
+                toast({
+                    title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                    status: 'success',
+                    action: (
+                        // it would be better if we could use <Button as={Link}>
+                        // but unfortunately the Link component is not compatible
+                        // with Chakra Toast, since the ToastManager is rendered via portal
+                        // and the toast doesn't have access to intl provider, which is a
+                        // requirement of the Link component.
+                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                            {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        </Button>
+                    )
+                })
+            } else {
+                toast({
+                    title: formatMessage(TOAST_MESSAGE_ALREADY_IN_WISHLIST),
+                    status: 'info',
+                    action: (
+                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                            {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        </Button>
+                    )
+                })
+            }
         } catch {
             showError()
         }
@@ -236,6 +256,48 @@ const Cart = () => {
             setSelectedItem(undefined)
         }
     }
+
+    const handleIsAGiftChange = async (product, checked) => {
+        try {
+            const previousVal = localIsGiftItems[product.itemId]
+            setLocalIsGiftItems({
+                ...localIsGiftItems,
+                [product.itemId]: checked
+            })
+            setCartItemLoading(true)
+            setSelectedItem(product)
+            await updateItemInBasketMutation.mutateAsync(
+                {
+                    parameters: {basketId: basket?.basketId, itemId: product.itemId},
+                    body: {
+                        productId: product.id,
+                        quantity: parseInt(product.quantity),
+                        gift: checked
+                    }
+                },
+                {
+                    onSettled: () => {
+                        // reset the state
+                        setCartItemLoading(false)
+                        setSelectedItem(undefined)
+                    },
+                    onSuccess: () => {
+                        setLocalIsGiftItems({...localIsGiftItems, [product.itemId]: undefined})
+                    },
+                    onError: () => {
+                        // reset the quantity to the previous value
+                        setLocalIsGiftItems({...localIsGiftItems, [product.itemId]: previousVal})
+                        showError()
+                    }
+                }
+            )
+        } catch (e) {
+            showError()
+        } finally {
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
+        }
+    }
     /***************************** Update Cart **************************/
 
     /***************************** Update quantity **************************/
@@ -271,7 +333,7 @@ const Cart = () => {
                 }
             }
         )
-    }, 750)
+    }, DEBOUNCE_WAIT)
 
     const handleChangeItemQuantity = async (product, value) => {
         const {stockLevel} = products[product.productId].inventory
@@ -366,6 +428,14 @@ const Cart = () => {
                                                 index={idx}
                                                 secondaryActions={
                                                     <CartSecondaryButtonGroup
+                                                        isAGift={
+                                                            localIsGiftItems[productItem.itemId]
+                                                                ? localIsGiftItems[
+                                                                      productItem.itemId
+                                                                  ]
+                                                                : productItem.gift
+                                                        }
+                                                        onIsAGiftChange={handleIsAGiftChange}
                                                         onAddToWishlistClick={handleAddToWishlist}
                                                         onEditClick={(product) => {
                                                             setSelectedItem(product)

@@ -62,11 +62,11 @@ test('renders Header', async () => {
     renderWithProviders(<Header />)
 
     await waitFor(() => {
-        const menu = document.querySelector('button[aria-label="Menu"]')
-        const logo = document.querySelector('button[aria-label="Logo"]')
-        const account = document.querySelector('svg[aria-label="My account"]')
-        const cart = document.querySelector('button[aria-label="My cart"]')
-        const wishlist = document.querySelector('button[aria-label="Wishlist"]')
+        const menu = screen.getByLabelText('Menu')
+        const logo = screen.getByLabelText('Logo')
+        const account = screen.getByLabelText('My account')
+        const cart = screen.getByLabelText('My cart, number of items: 0')
+        const wishlist = screen.getByLabelText('Wishlist')
         const searchInput = document.querySelector('input[type="search"]')
         expect(menu).toBeInTheDocument()
         expect(logo).toBeInTheDocument()
@@ -91,10 +91,10 @@ test('renders Header with event handlers', async () => {
         />
     )
     await waitFor(() => {
-        const menu = document.querySelector('button[aria-label="Menu"]')
-        const logo = document.querySelector('button[aria-label="Logo"]')
-        const account = document.querySelector('svg[aria-label="My account"]')
-        const cart = document.querySelector('button[aria-label="My cart"]')
+        const menu = screen.getByLabelText('Menu')
+        const logo = screen.getByLabelText('Logo')
+        const account = screen.getByLabelText('My account')
+        const cart = screen.getByLabelText('My cart, number of items: 0')
         expect(menu).toBeInTheDocument()
         fireEvent.click(menu)
         expect(onMenuClick).toHaveBeenCalledTimes(1)
@@ -124,8 +124,13 @@ test.each(testBaskets)(
         renderWithProviders(<Header />)
 
         await waitFor(() => {
-            // Look for badge.
-            const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
+            const cart = screen.getByLabelText('My cart, number of items: 0')
+            const badge = document.querySelector(
+                'button[aria-label="My cart, number of items: 0"] .chakra-badge'
+            )
+
+            // Cart icon should exist but with no badge
+            expect(cart).toBeInTheDocument()
             expect(badge).not.toBeInTheDocument()
         })
     }
@@ -136,7 +141,7 @@ test('renders cart badge when basket is loaded', async () => {
 
     await waitFor(() => {
         // Look for badge.
-        const badge = document.querySelector('button[aria-label="My cart"] .chakra-badge')
+        const badge = screen.getByLabelText('My cart, number of items: 2')
         expect(badge).toBeInTheDocument()
     })
 })
@@ -149,10 +154,10 @@ test('route to account page when an authenticated users click on account icon', 
 
     await waitFor(() => {
         // Look for account icon
-        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+        const accountTrigger = screen.getByLabelText('Open account menu')
         expect(accountTrigger).toBeInTheDocument()
     })
-    const accountIcon = document.querySelector('svg[aria-label="My account"]')
+    const accountIcon = screen.getByLabelText('My account')
     fireEvent.click(accountIcon)
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
@@ -174,7 +179,7 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
 
     await waitFor(() => {
         // Look for account icon
-        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+        const accountTrigger = screen.getByLabelText('Open account menu')
         expect(accountTrigger).toBeInTheDocument()
     })
     const wishlistIcon = screen.getByRole('button', {name: /wishlist/i})
@@ -200,10 +205,10 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
 
     await waitFor(() => {
         // Look for account icon
-        const accountTrigger = document.querySelector('svg[aria-label="My account trigger"]')
+        const accountTrigger = screen.getByLabelText('Open account menu')
         expect(accountTrigger).toBeInTheDocument()
     })
-    const accountIcon = document.querySelector('svg[aria-label="My account"]')
+    const accountIcon = screen.getByLabelText('My account')
     fireEvent.click(accountIcon)
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))

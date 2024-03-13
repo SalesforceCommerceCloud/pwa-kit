@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Badge,
     Box,
@@ -19,6 +19,7 @@ import {HOME_HREF} from '@salesforce/retail-react-app/app/constants'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 const CheckoutHeader = () => {
+    const intl = useIntl()
     const {
         derivedData: {totalItems}
     } = useCurrentBasket()
@@ -45,6 +46,13 @@ const CheckoutHeader = () => {
                                 <Badge variant="notification">{totalItems}</Badge>
                             </Center>
                         }
+                        aria-label={intl.formatMessage(
+                            {
+                                id: 'checkout_header.link.assistive_msg.cart',
+                                defaultMessage: 'Back to cart, number of items: {numItems}'
+                            },
+                            {numItems: totalItems}
+                        )}
                     >
                         <FormattedMessage
                             defaultMessage="Back to cart"

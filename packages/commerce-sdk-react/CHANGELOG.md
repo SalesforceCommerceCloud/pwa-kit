@@ -1,4 +1,17 @@
-## v1.2.0-dev (Nov 03, 2023)
+## v1.4.0-dev (Jan 22, 2024)
+- Fix invalid query params warnings and allow custom query [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
+- Fix cannot read properties of undefined (reading 'unshift') [#1689](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1689)
+- Add Shopper SEO hook [#1688](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1688)
+
+## v1.3.0 (Jan 19, 2024)
+
+- Add support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+
+## v1.2.0 (Dec 08, 2023)
+
+- Add StorefrontPreview component 'onContextChange' property to prepare for future Storefront Preview release [#1527](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1527)
+- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
+
 ## v1.1.0 (Nov 03, 2023)
 
 - Add StorefrontPreview component [#1508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1508)

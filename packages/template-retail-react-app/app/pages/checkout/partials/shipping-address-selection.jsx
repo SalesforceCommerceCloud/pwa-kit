@@ -119,6 +119,16 @@ const ShippingAddressSelection = ({
     const [isEditingAddress, setIsEditingAddress] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(undefined)
 
+    // keep track of the edit buttons so we can focus on them later for accessibility
+    const [editBtnRefs, setEditBtnRefs] = useState({})
+    useEffect(() => {
+        const currentRefs = {}
+        customer.addresses?.forEach(({addressId}) => {
+            currentRefs[addressId] = React.createRef()
+        })
+        setEditBtnRefs(currentRefs)
+    }, [customer.addresses])
+
     const defaultForm = useForm({
         mode: 'onChange',
         shouldUnregister: false,
@@ -195,6 +205,14 @@ const ShippingAddressSelection = ({
         form.reset({...address})
     }
 
+    const headingText = formatMessage({
+        defaultMessage: 'Shipping Address',
+        id: 'shipping_address.title.shipping_address'
+    })
+    const shippingAddressHeading = Array.from(document.querySelectorAll('h2')).find(
+        (element) => element.textContent === headingText
+    )
+
     const removeSavedAddress = async (addressId) => {
         if (addressId === selectedAddressId) {
             setSelectedAddressId(undefined)
@@ -202,12 +220,20 @@ const ShippingAddressSelection = ({
             form.reset({addressId: ''})
         }
 
-        await removeCustomerAddress.mutateAsync({
-            parameters: {
-                customerId: customer.customerId,
-                addressName: addressId
+        await removeCustomerAddress.mutateAsync(
+            {
+                parameters: {
+                    customerId: customer.customerId,
+                    addressName: addressId
+                }
+            },
+            {
+                onSuccess: () => {
+                    // Focus on header after successful remove for accessibility
+                    shippingAddressHeading?.focus()
+                }
             }
-        })
+        )
     }
 
     // Opens/closes the 'add address' form. Notice that when toggling either state,
@@ -218,6 +244,11 @@ const ShippingAddressSelection = ({
             form.reset({...address})
             setIsEditingAddress(true)
         } else {
+            // Focus on the edit button that opened the form when the form closes
+            // otherwise focus on the heading if we can't find the button
+            const focusAfterClose =
+                editBtnRefs[selectedAddressId]?.current ?? shippingAddressHeading
+            focusAfterClose?.focus()
             setSelectedAddressId(undefined)
             form.reset({addressId: ''})
             setIsEditingAddress(!isEditingAddress)
@@ -257,6 +288,7 @@ const ShippingAddressSelection = ({
                                                         removeSavedAddress(address.addressId)
                                                     }
                                                     onEdit={() => toggleAddressEdit(address)}
+                                                    editBtnRef={editBtnRefs[address.addressId]}
                                                     data-testid={`sf-checkout-shipping-address-${index}`}
                                                 >
                                                     <AddressDisplay address={address} />

@@ -5,12 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, render, fireEvent, waitFor} from '@testing-library/react'
-import {Router, useHistory, useLocation} from 'react-router-dom'
-import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group/index'
-import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
-import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import {createMemoryHistory} from 'history'
+import {Router, useHistory, useLocation} from 'react-router-dom'
+import {screen, fireEvent, waitFor} from '@testing-library/react'
+
+import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group/index'
+import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 const data = {
     id: 'color',
@@ -108,7 +110,7 @@ describe('Swatch Component', () => {
         const history = createMemoryHistory()
         history.push('/en-GB/swatch-example?color=JJ2XNXX')
 
-        render(
+        renderWithProviders(
             <Router history={history}>
                 <Page />
             </Router>
@@ -120,7 +122,7 @@ describe('Swatch Component', () => {
         const history = createMemoryHistory()
         history.push('/en-GB/swatch-example')
 
-        render(
+        renderWithProviders(
             <Router history={history}>
                 <Page />
             </Router>

@@ -300,6 +300,52 @@ describe('ShopperCustomers mutations', () => {
             expect(result.current.lists.data).toEqual(newlistResult)
             assertUpdateQuery(result.current.query, data)
         })
+
+        // We want to make sure our code can handle the case
+        // where API does not include data key from getProductLists where it should be (API bug)
+        test('`createCustomerProductList` updates cache on success when there is not data key in fetched product list', async () => {
+            const listResult = {
+                limit: 0,
+                total: 0
+            }
+            const data: ShopperCustomersTypes.CustomerProductList = {
+                id: 'listId', // MUST match parameters used
+                customerProductListItems: []
+            }
+            const newlistResult = {
+                ...baseListResult,
+                data: [
+                    {
+                        ...baseProductList,
+                        customerProductListItems: []
+                    }
+                ]
+            }
+            const options = createOptions<'createCustomerProductList'>(data)
+            mockQueryEndpoint(customersEndpoint, listResult) // getCustomerProductLists
+            mockMutationEndpoints(customersEndpoint, data) // this mutation
+            mockQueryEndpoint(customersEndpoint, {test: 'this should not get used'}) // getCustomerProductList refetch
+            const {result} = renderHookWithProviders(
+                (props: {enabled: boolean} = {enabled: false}) => ({
+                    lists: queries.useCustomerProductLists(queryOptions),
+                    mutation: useShopperCustomersMutation('createCustomerProductList'),
+                    // Initially disabled; not needed until after the creation mutation
+                    query: queries.useCustomerProductList(queryOptions, props)
+                })
+            )
+
+            // 1. Populate cache with initial data
+            await waitAndExpectSuccess(() => result.current.lists)
+            expect(result.current.lists.data).toEqual(listResult)
+            expect(result.current.query.data).toBeUndefined()
+
+            // 2. Do creation mutation
+            act(() => result.current.mutation.mutate(options))
+            await waitAndExpectSuccess(() => result.current.mutation)
+            expect(result.current.mutation.data).toEqual(data)
+            expect(result.current.lists.data).toEqual(newlistResult)
+            assertUpdateQuery(result.current.query, data)
+        })
         test('`updateCustomerProductList` updates cache on success', async () => {
             const listResult = baseListResult
             const oldList = baseProductList

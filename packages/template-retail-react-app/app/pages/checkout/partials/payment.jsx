@@ -109,9 +109,9 @@ const Payment = () => {
         // Using destructuring to remove properties from the object...
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
-        return updateBillingAddressForBasket({
+        return await updateBillingAddressForBasket({
             body: address,
-            parameters: {basketId: basket.basketId, shipmentId: 'me'}
+            parameters: {basketId: basket.basketId}
         })
     }
     const onPaymentRemoval = async () => {
@@ -131,8 +131,14 @@ const Payment = () => {
         if (!appliedPayment) {
             await onPaymentSubmit(paymentFormValues)
         }
-        await onBillingSubmit()
-        goToNextStep()
+
+        // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
+        // submit, `undefined` is returned.
+        const updatedBasket = await onBillingSubmit()
+
+        if (updatedBasket) {
+            goToNextStep()
+        }
     })
 
     return (

@@ -11,11 +11,11 @@ import {
     ShopperLoginTypes,
     ShopperCustomersTypes
 } from 'commerce-sdk-isomorphic'
-import jwtDecode, {JwtPayload} from 'jwt-decode'
+import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {onClient} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -67,6 +67,8 @@ type AuthDataMap = Record<
     }
 >
 
+const isParentTrusted = isOriginTrusted(getParentOrigin())
+
 /**
  * A map of the data that this auth module stores. This maps the name of the property to
  * the storage type and the key when stored in that storage. You can also pass in a "callback"
@@ -107,16 +109,16 @@ const DATA_MAP: AuthDataMap = {
     },
     refresh_token_guest: {
         storageType: 'cookie',
-        key: 'cc-nx-g',
+        key: isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g',
         callback: (store) => {
-            store.delete('cc-nx')
+            store.delete(isParentTrusted ? 'cc-nx-iframe' : 'cc-nx')
         }
     },
     refresh_token_registered: {
         storageType: 'cookie',
-        key: 'cc-nx',
+        key: isParentTrusted ? 'cc-nx-iframe' : 'cc-nx',
         callback: (store) => {
-            store.delete('cc-nx-g')
+            store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
     },
     refresh_token_expires_in: {
@@ -129,16 +131,16 @@ const DATA_MAP: AuthDataMap = {
     // This triggers a new fetch for access_token using the current refresh_token from cookie storage and makes sure customer auth state is always in sync between SFRA and PWA sites in a hybrid setup.
     refresh_token_guest_copy: {
         storageType: 'local',
-        key: 'cc-nx-g',
+        key: isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g',
         callback: (store) => {
-            store.delete('cc-nx')
+            store.delete(isParentTrusted ? 'cc-nx-iframe' : 'cc-nx')
         }
     },
     refresh_token_registered_copy: {
         storageType: 'local',
-        key: 'cc-nx',
+        key: isParentTrusted ? 'cc-nx-iframe' : 'cc-nx',
         callback: (store) => {
-            store.delete('cc-nx-g')
+            store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
     },
     customer_type: {
@@ -160,8 +162,6 @@ class Auth {
     private shopperCustomersClient: ShopperCustomers<ApiClientConfigParams>
     private redirectURI: string
     private pendingToken: Promise<TokenResponse> | undefined
-    private REFRESH_TOKEN_EXPIRATION_DAYS_REGISTERED = 90
-    private REFRESH_TOKEN_EXPIRATION_DAYS_GUEST = 30
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private OCAPISessionsURL: string
@@ -314,15 +314,11 @@ class Auth {
             ? 'refresh_token_guest_copy'
             : 'refresh_token_registered_copy'
 
-        const refreshTokenExpiry = isGuest
-            ? this.REFRESH_TOKEN_EXPIRATION_DAYS_GUEST
-            : this.REFRESH_TOKEN_EXPIRATION_DAYS_REGISTERED
-
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: refreshTokenExpiry
+            expires: res.refresh_token_expires_in
         })
         this.set(refreshTokenCopyKey, res.refresh_token, {
-            expires: refreshTokenExpiry
+            expires: res.refresh_token_expires_in
         })
     }
 

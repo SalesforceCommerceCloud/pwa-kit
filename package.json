@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit",
-  "version": "3.3.0-dev",
+  "version": "3.5.0-dev",
   "scripts": {
     "bump-version": "node ./scripts/bump-version/index.js",
     "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
@@ -22,6 +22,7 @@
     "@playwright/test": "^1.36.0",
     "commander": "^9.5.0",
     "eslint-plugin-header": "^3.1.1",
+    "eslint-plugin-no-relative-import-paths": "^1.5.3",
     "jsdom": "^22.1.0",
     "lerna": "^6.6.1",
     "semver": "^7.5.2",
@@ -29,8 +30,8 @@
     "syncpack": "^10.1.0"
   },
   "engines": {
-    "node": "^16.11.0 || ^18.0.0",
-    "npm": "^8.0.0 || ^9.0.0"
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "dependencies": {
     "node-fetch": "^2.6.9"

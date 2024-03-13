@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 import React from 'react'
-import {Box, Button, Wrap, WrapItem} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
+import {Box, Button, Wrap, WrapItem} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
-
-import {FormattedMessage} from 'react-intl'
+import {REMOVE_FILTER} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
+    const {formatMessage} = useIntl()
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
 
     let selectedFilters = []
@@ -61,6 +62,7 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
                                 onClick={() =>
                                     toggleFilter({value: filter.apiLabel}, filter.value, true)
                                 }
+                                aria-label={formatMessage(REMOVE_FILTER, {label: filter.uiLabel})}
                             >
                                 {filter.uiLabel}
                             </Button>
@@ -77,6 +79,10 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
                             variant="link"
                             size="sm"
                             onClick={handleReset}
+                            aria-label={formatMessage({
+                                id: 'selected_refinements.action.assistive_msg.clear_all',
+                                defaultMessage: 'Clear all filters'
+                            })}
                         >
                             <FormattedMessage
                                 defaultMessage="Clear All"

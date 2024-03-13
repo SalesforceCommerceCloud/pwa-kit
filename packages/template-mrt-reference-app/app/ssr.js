@@ -46,6 +46,7 @@ const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
 const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
+const {isolationTests} = require('./isolation-actions')
 
 /**
  * Custom error class
@@ -126,6 +127,7 @@ const filterAndSortObjectKeys = (o, whitelist) =>
  */
 const jsonFromRequest = (req) => {
     return {
+        args: req.query,
         protocol: req.protocol,
         method: req.method,
         path: req.path,
@@ -173,7 +175,8 @@ const tlsVersionTest = async (_, res) => {
  * Express handler that enables the cache and returns a JSON response with diagnostic values.
  */
 const cacheTest = async (req, res) => {
-    res.set('Cache-Control', 's-maxage=60')
+    let duration = req.params.duration || '60'
+    res.set('Cache-Control', `s-maxage=${duration}`)
     res.json(jsonFromRequest(req))
 }
 
@@ -189,6 +192,28 @@ const cookieTest = async (req, res) => {
     }
     res.set('Cache-Control', 'private, max-age=60')
     res.json(jsonFromRequest(req))
+}
+
+/**
+ * Express handler that sets single and multi-value response headers
+ * and returns a JSON response with diagnostic values.
+ * Use ?header1=value1&header2=value2 to set two response headers.
+ * Use ?header3=value4&header3=value5 to set multi value headers
+ */
+const responseHeadersTest = async (req, res) => {
+    for (const [key, value] of Object.entries(req.query)) {
+        // If value is an array then a multi-value header will be created
+        res.set(key, value)
+    }
+    res.json(jsonFromRequest(req))
+}
+
+/**
+ * Express handler that echos back a JSON response with
+ * headers supplied in the request.
+ */
+const headerTest = async (req, res) => {
+    res.json({headers: redactAndSortObjectKeys(req.headers)})
 }
 
 /**
@@ -248,7 +273,11 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
     app.get('/cache', cacheTest)
+    app.get('/cache/:duration(\\d+)', cacheTest)
     app.get('/cookie', cookieTest)
+    app.get('/headers', headerTest)
+    app.get('/isolation', isolationTests)
+    app.get('/set-response-headers', responseHeadersTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)

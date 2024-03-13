@@ -355,6 +355,12 @@
       "value": "You Might Also Like"
     }
   ],
+  "auth_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Close login form"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -413,6 +419,18 @@
       "value": "Password Reset"
     }
   ],
+  "carousel.button.scroll_left.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Scroll carousel left"
+    }
+  ],
+  "carousel.button.scroll_right.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Scroll carousel right"
+    }
+  ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
@@ -459,12 +477,6 @@
     {
       "type": 0,
       "value": "This is a gift."
-    }
-  ],
-  "cart_secondary_button_group.link_learn_more": [
-    {
-      "type": 0,
-      "value": "Learn More"
     }
   ],
   "cart_skeleton.heading.order_summary": [
@@ -767,6 +779,16 @@
       "value": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
     }
   ],
+  "checkout_header.link.assistive_msg.cart": [
+    {
+      "type": 0,
+      "value": "Back to cart, number of items: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
+    }
+  ],
   "checkout_header.link.cart": [
     {
       "type": 0,
@@ -807,6 +829,24 @@
     {
       "type": 0,
       "value": "Payment"
+    }
+  ],
+  "colorRefinements.label.hitCount": [
+    {
+      "type": 1,
+      "value": "colorLabel"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "colorHitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
     }
   ],
   "confirmation_modal.default.action.no": [
@@ -933,6 +973,12 @@
     {
       "type": 0,
       "value": "This 4-digit code can be found on the front of your card."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code_aria_label": [
+    {
+      "type": 0,
+      "value": "Security code info"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1135,6 +1181,18 @@
       "value": "Top Sellers"
     }
   ],
+  "field.password.assistive_msg.hide_password": [
+    {
+      "type": 0,
+      "value": "Hide password"
+    }
+  ],
+  "field.password.assistive_msg.show_password": [
+    {
+      "type": 0,
+      "value": "Show password"
+    }
+  ],
   "footer.column.account": [
     {
       "type": 0,
@@ -1311,6 +1369,12 @@
       "value": " added to wishlist"
     }
   ],
+  "global.info.already_in_wishlist": [
+    {
+      "type": 0,
+      "value": "Item is already in wishlist"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
@@ -1341,10 +1405,20 @@
       "value": "My account"
     }
   ],
-  "header.button.assistive_msg.my_cart": [
+  "header.button.assistive_msg.my_account_menu": [
     {
       "type": 0,
-      "value": "My cart"
+      "value": "Open account menu"
+    }
+  ],
+  "header.button.assistive_msg.my_cart_with_num_items": [
+    {
+      "type": 0,
+      "value": "My cart, number of items: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
     }
   ],
   "header.button.assistive_msg.wishlist": [
@@ -1535,6 +1609,12 @@
       "value": "The React PWA Starter Store for Retail"
     }
   ],
+  "icons.assistive_msg.lock": [
+    {
+      "type": 0,
+      "value": "Secure"
+    }
+  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,
@@ -1567,6 +1647,12 @@
     {
       "type": 0,
       "value": "Please select all your options above"
+    }
+  ],
+  "list_menu.nav.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Main navigation"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2079,10 +2165,22 @@
       "value": "Next"
     }
   ],
+  "pagination.link.next.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Next Page"
+    }
+  ],
   "pagination.link.prev": [
     {
       "type": 0,
       "value": "Prev"
+    }
+  ],
+  "pagination.link.prev.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Previous Page"
     }
   ],
   "password_card.info.password_updated": [
@@ -2253,6 +2351,70 @@
       "value": "Filter"
     }
   ],
+  "product_list.refinements.button.assistive_msg.add_filter": [
+    {
+      "type": 0,
+      "value": "Add filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Add filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter": [
+    {
+      "type": 0,
+      "value": "Remove filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Remove filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "product_list.select.sort_by": [
     {
       "type": 0,
@@ -2263,16 +2425,54 @@
       "value": "sortOption"
     }
   ],
-  "product_tile.assistive_msg.wishlist": [
+  "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
-      "value": "Wishlist"
+      "value": "Scroll products left"
+    }
+  ],
+  "product_scroller.assistive_msg.scroll_right": [
+    {
+      "type": 0,
+      "value": "Scroll products right"
+    }
+  ],
+  "product_tile.assistive_msg.add_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Add "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " to wishlist"
+    }
+  ],
+  "product_tile.assistive_msg.remove_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Remove "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " from wishlist"
     }
   ],
   "product_tile.label.starting_at_price": [
     {
       "type": 0,
-      "value": "Starting at"
+      "value": "Starting at "
+    },
+    {
+      "type": 1,
+      "value": "price"
     }
   ],
   "product_view.button.add_set_to_cart": [
@@ -2305,16 +2505,46 @@
       "value": "Update"
     }
   ],
+  "product_view.label.assistive_msg.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "Decrement Quantity"
+    }
+  ],
+  "product_view.label.assistive_msg.quantity_increment": [
+    {
+      "type": 0,
+      "value": "Increment Quantity"
+    }
+  ],
   "product_view.label.quantity": [
     {
       "type": 0,
       "value": "Quantity"
     }
   ],
+  "product_view.label.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "−"
+    }
+  ],
+  "product_view.label.quantity_increment": [
+    {
+      "type": 0,
+      "value": "+"
+    }
+  ],
   "product_view.label.starting_at_price": [
     {
       "type": 0,
       "value": "Starting at"
+    }
+  ],
+  "product_view.label.variant_type": [
+    {
+      "type": 1,
+      "value": "variantType"
     }
   ],
   "product_view.link.full_details": [
@@ -2363,6 +2593,12 @@
     {
       "type": 0,
       "value": "Apply"
+    }
+  ],
+  "promo_popover.assistive_msg.info": [
+    {
+      "type": 0,
+      "value": "Info"
     }
   ],
   "promo_popover.heading.promo_applied": [
@@ -2517,6 +2753,12 @@
       "value": "Cancel"
     }
   ],
+  "selected_refinements.action.assistive_msg.clear_all": [
+    {
+      "type": 0,
+      "value": "Clear all filters"
+    }
+  ],
   "selected_refinements.action.clear_all": [
     {
       "type": 0,
@@ -2619,6 +2861,16 @@
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
     }
   ],
+  "swatch_group.selected.label": [
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    }
+  ],
   "toggle_card.action.edit": [
     {
       "type": 0,
@@ -2711,6 +2963,12 @@
     {
       "type": 0,
       "value": "Address"
+    }
+  ],
+  "use_address_fields.label.address_form": [
+    {
+      "type": 0,
+      "value": "Address Form"
     }
   ],
   "use_address_fields.label.city": [
