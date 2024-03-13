@@ -302,7 +302,6 @@ class Auth {
      * @returns {string} access token or undefined
      */
     private getSFRAAuthToken() {
-        console.log('getting SFRA tokens')
         const accessTokenChunk1 = this.get('access_token_sfra_1')
         const accessTokenChunk2 = this.get('access_token_sfra_2')
         const accessTokenChunk3 = this.get('access_token_sfra_3')
@@ -394,9 +393,7 @@ class Auth {
      * 3. PKCE flow
      */
     async ready() {
-        console.log('in ready')
         if (this.fetchedToken && this.fetchedToken !== '') {
-            console.log(`fetchedToken`)
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
@@ -405,7 +402,6 @@ class Auth {
             return this.data
         }
         if (this.pendingToken) {
-            console.log(`pendingToken`)
             return await this.pendingToken
         }
         let accessToken = this.get('access_token')
@@ -428,7 +424,6 @@ class Auth {
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
-        console.log(`Starting Refresh`)
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -471,7 +466,6 @@ class Auth {
         fn: (...args: Args) => Promise<Data>
     ): (...args: Args) => Promise<Data> {
         return async (...args) => {
-            console.log('when ready')
             await this.ready()
             return await fn(...args)
         }
