@@ -45,7 +45,7 @@ export default function ShippingOptions() {
             }
         },
         {
-            enabled: Boolean(basket?.basketId) && step === STEPS.ShippingOptions
+            enabled: Boolean(basket?.basketId) && step === STEPS.SHIPPING_OPTIONS
         }
     )
 
