@@ -244,6 +244,8 @@ class Auth {
             return this._pendingLogin
         }
         let retries = 0
+
+        console.log('auth login')
         const startLoginFlow = () => {
             let authorizationMethod = '_loginAsGuest'
             if (credentials) {
@@ -253,13 +255,16 @@ class Auth {
             } else if (this.refreshToken) {
                 authorizationMethod = '_refreshAccessToken'
             }
+
+            console.log('auth login authorizationMethod', authorizationMethod)
             return this[authorizationMethod](credentials)
                 .then((result) => {
                     // Uncomment the following line for phased launch
-                    // this._onClient && this.createOCAPISession()
+                    this._onClient && this.createOCAPISession()
                     return result
                 })
                 .catch((error) => {
+                    console.log('auth login error', error)
                     const retryErrors = [INVALID_TOKEN, EXPIRED_TOKEN]
                     if (retries === 0 && retryErrors.includes(error.message)) {
                         retries = 1 // we only retry once

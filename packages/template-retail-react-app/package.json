@@ -91,5 +91,8 @@
         "iOS >= 9.0",
         "Android >= 4.4.4",
         "last 4 ChromeAndroid versions"
-    ]
+    ],
+    "dependencies": {
+        "@paralleldrive/cuid2": "^2.2.2"
+    }
 }
