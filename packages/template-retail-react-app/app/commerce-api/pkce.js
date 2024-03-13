@@ -7,6 +7,9 @@
 import {nanoid} from 'nanoid'
 import {encode as base64encode} from 'base64-arraybuffer'
 
+import { init } from '@paralleldrive/cuid2'
+
+
 // Server Side
 const randomstring = require('randomstring')
 
@@ -19,7 +22,12 @@ const isServer = typeof window === 'undefined'
  * @returns {String} The 128 character length code verifier.
  */
 export const createCodeVerifier = () => {
-    return isServer ? randomstring.generate(128) : nanoid(128)
+    const length = 228
+    const cuid = init({ length });
+
+    let result =isServer ? randomstring.generate(128) : cuid()
+    console.log('createCodeVerifier result:', result)
+    return result
 }
 
 /**
@@ -38,11 +46,30 @@ export const generateCodeChallenge = async (codeVerifier) => {
         })
     } else {
         const encoder = new TextEncoder()
+        console.log('generateCodeChallenge codeVerifier:', codeVerifier)
         const data = encoder.encode(codeVerifier)
+        console.log('generateCodeChallenge data:', data)
         const digest = await window.crypto.subtle.digest('SHA-256', data)
+        console.log('generateCodeChallenge digest:', digest)
+
+        const hashArray = Array.from(new Uint8Array(digest)); // convert buffer to byte array
+        console.log('generateCodeChallenge hashArray:', hashArray)
+        const hashHex = hashArray
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join(""); // convert bytes to hex string
+        console.log('generateCodeChallenge hashHex:', hashHex)
+
+
 
         base64Digest = base64encode(digest)
+
+
+
     }
 
-    return base64Digest.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+    console.log('generateCodeChallenge base64Digest:', base64Digest)
+    let result = base64Digest.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+    console.log('generateCodeChallenge result:', result)
+    return result
 }
+
