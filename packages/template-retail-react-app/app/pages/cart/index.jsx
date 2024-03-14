@@ -457,7 +457,7 @@ const Cart = () => {
                                                     ...(products &&
                                                         products[productItem.productId]),
                                                     isProductUnavailable:
-                                                        !products[productItem.productId],
+                                                        !products?.[productItem.productId],
                                                     price: productItem.price,
                                                     quantity: localQuantity[productItem.itemId]
                                                         ? localQuantity[productItem.itemId]
