@@ -60,7 +60,7 @@ const OrderProductImages = ({productItems}) => {
                           >
                               <Img
                                   alt={image?.alt}
-                                  src={image?.disBaseLink || image?.link}
+                                  src={image?.link}
                                   fallback={<Box background="gray.100" boxSize="full" />}
                               />
                           </AspectRatio>

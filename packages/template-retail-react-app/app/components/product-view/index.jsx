@@ -367,9 +367,7 @@ const ProductView = forwardRef(
                                                     backgroundRepeat="no-repeat"
                                                     backgroundSize="cover"
                                                     backgroundColor={name.toLowerCase()}
-                                                    backgroundImage={`url(${
-                                                        image.disBaseLink || image.link
-                                                    })`}
+                                                    backgroundImage={`url(${image.link})`}
                                                 />
                                             ) : (
                                                 name

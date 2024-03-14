@@ -107,7 +107,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                 <Box {...styles.heroImageGroup}>
                     <AspectRatio {...styles.heroImage} ratio={1}>
                         <DynamicImage
-                            src={`${heroImage.disBaseLink || heroImage.link}[?sw={width}&q=60]`}
+                            src={`${heroImage.link}[?sw={width}&q=60]`}
                             widths={{
                                 base: '100vw',
                                 lg: heroImageMaxWidth
@@ -145,7 +145,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                                 >
                                     <Img
                                         alt={image.alt}
-                                        src={image.disBaseLink || image.link}
+                                        src={image.link}
                                         loading={loadingStrategy}
                                     />
                                 </Box>

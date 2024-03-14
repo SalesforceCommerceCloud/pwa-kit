@@ -421,7 +421,7 @@ const useEinstein = () => {
                         ...rec,
                         ...product,
                         productId: rec.id,
-                        image: {disBaseLink: rec.imageUrl, alt: rec.productName}
+                        image: {link: rec.imageUrl, alt: rec.productName}
                     }
                 })
             }

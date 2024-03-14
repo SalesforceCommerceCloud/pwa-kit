@@ -90,7 +90,7 @@ const ProductTile = (props) => {
                     {image && (
                         <AspectRatio {...styles.image}>
                             <DynamicImage
-                                src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
+                                src={`${image.link}[?sw={width}&q=60]`}
                                 widths={dynamicImageProps?.widths}
                                 imageProps={{
                                     alt: image.alt,
