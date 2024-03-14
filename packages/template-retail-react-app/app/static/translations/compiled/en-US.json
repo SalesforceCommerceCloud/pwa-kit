@@ -1655,6 +1655,12 @@
       "value": "Sale"
     }
   ],
+  "item_image.label.unavailable": [
+    {
+      "type": 0,
+      "value": "Unavailable"
+    }
+  ],
   "item_price.label.starting_at": [
     {
       "type": 0,

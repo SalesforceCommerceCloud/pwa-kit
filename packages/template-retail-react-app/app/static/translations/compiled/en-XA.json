@@ -3495,6 +3495,20 @@
       "value": "]"
     }
   ],
+  "item_image.label.unavailable": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƞȧȧṽȧȧīŀȧȧƀŀḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "item_price.label.starting_at": [
     {
       "type": 0,

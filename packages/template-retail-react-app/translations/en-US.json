@@ -695,6 +695,10 @@
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
   },
+  "item_image.label.unavailable": {
+    "defaultMessage": "Unavailable",
+    "description": "A unavailable badge placed on top of a product image"
+  },
   "item_price.label.starting_at": {
     "defaultMessage": "Starting at"
   },
