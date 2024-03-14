@@ -29,7 +29,18 @@ import OrderSummary from '@salesforce/retail-react-app/app/components/order-summ
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-skeleton'
-import {useUsid, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useUsid,
+    useShopperOrdersMutation,
+    useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import {
+    API_ERROR_MESSAGE,
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
+} from '@salesforce/retail-react-app/app/constants'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -163,6 +174,43 @@ const Checkout = () => {
 const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
+    const {formatMessage} = useIntl()
+    const productIds = basket?.productItems?.map(({productId}) => productId) ?? []
+    const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
+    const toast = useToast()
+    const [showLoading, setShowLoading] = useState(false)
+
+    const handleRemoveItem = async (product) => {
+        await removeItemFromBasketMutation.mutateAsync(
+            {
+                parameters: {basketId: basket.basketId, itemId: product.itemId}
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        status: 'success'
+                    })
+                },
+                onError: () => {
+                    toast({
+                        title: formatMessage(API_ERROR_MESSAGE),
+                        status: 'error'
+                    })
+                }
+            }
+        )
+    }
+    const handleUnavailableProducts = async (unavailableProductIds) => {
+        setShowLoading(true)
+        const productItems = basket?.productItems?.filter((item) =>
+            unavailableProductIds?.includes(item.productId)
+        )
+        for (let item of productItems) {
+            await handleRemoveItem(item)
+        }
+        setShowLoading(false)
+    }
 
     if (!customer || !customer.customerId || !basket || !basket.basketId) {
         return <CheckoutSkeleton />
@@ -170,7 +218,13 @@ const CheckoutContainer = () => {
 
     return (
         <CheckoutProvider>
+            {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+
             <Checkout />
+            <UnavailableProductConfirmationModal
+                productIds={productIds}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
         </CheckoutProvider>
     )
 }

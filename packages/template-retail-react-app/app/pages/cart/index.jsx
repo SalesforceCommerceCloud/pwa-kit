@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState, useEffect} from 'react'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
+import React, {useState} from 'react'
+import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
 import {
@@ -456,6 +456,8 @@ const Cart = () => {
                                                     ...productItem,
                                                     ...(products &&
                                                         products[productItem.productId]),
+                                                    isProductUnavailable:
+                                                        !products[productItem.productId],
                                                     price: productItem.price,
                                                     quantity: localQuantity[productItem.itemId]
                                                         ? localQuantity[productItem.itemId]

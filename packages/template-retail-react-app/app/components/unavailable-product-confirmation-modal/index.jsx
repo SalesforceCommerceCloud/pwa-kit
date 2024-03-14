@@ -6,6 +6,7 @@
  */
 
 import React, {useEffect, useRef} from 'react'
+import PropTypes from 'prop-types'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/constants'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
@@ -48,6 +49,8 @@ const UnavailableProductConfirmationModal = ({
 
     return (
         <ConfirmationModal
+            closeOnEsc={false}
+            closeOnOverlayClick={false}
             {...REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG}
             hideAlternateAction={true}
             onPrimaryAction={async () => {
@@ -59,6 +62,11 @@ const UnavailableProductConfirmationModal = ({
             {...unavailableProductsModalProps}
         />
     )
+}
+
+UnavailableProductConfirmationModal.propTypes = {
+    productIds: PropTypes.array,
+    handleUnavailableProducts: PropTypes.func
 }
 
 export default UnavailableProductConfirmationModal
