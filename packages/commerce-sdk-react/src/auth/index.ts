@@ -131,6 +131,10 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'local',
         key: 'refresh_token_expires_in'
     },
+    customer_type: {
+        storageType: 'local',
+        key: 'customer_type'
+    },
     // For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
     // So we maintain a copy of the refersh_tokens in the local storage which is compared to the actual refresh_token stored in cookie storage.
     // If the key or value of the refresh_token in local storage is different from the one in cookie storage, this indicates a change in customer auth state and we invalidate the access_token in PWA Kit.
@@ -149,27 +153,27 @@ const DATA_MAP: AuthDataMap = {
             store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
     },
-    // For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
-    // We do this by having SFRA store the access token in cookies. If these cookies are present, PWA checks
-    // compares the access token from the cookie with the one in local store. If the tokens are different,
-    // discard the access token in local store and replace it with the access token from the cookie.
-    // ECOM has a 1200 character limit on the values of cookies. The access token easily exceeds this amount
-    // so it sends the access token in chunks across several cookies.
+    /*
+     * For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
+     * We do this by having SFRA store the access token in cookies. If these cookies are present, PWA checks
+     * compares the access token from the cookie with the one in local store. If the tokens are different,
+     * discard the access token in local store and replace it with the access token from the cookie.
+     * ECOM has a 1200 character limit on the values of cookies. The access token easily exceeds this amount
+     * so it sends the access token in chunks across several cookies.
+     *
+     * From observation, the JWT tends to come in at around 2250 characters so 2 to 3 parts should be enough.
+     */
     access_token_sfra_1: {
         storageType: 'cookie',
-        key: 'token_1'
+        key: 'cc-at'
     },
     access_token_sfra_2: {
         storageType: 'cookie',
-        key: 'token_2'
+        key: 'cc-at_2'
     },
     access_token_sfra_3: {
         storageType: 'cookie',
-        key: 'token_3'
-    },
-    customer_type: {
-        storageType: 'local',
-        key: 'customer_type'
+        key: 'cc-at_3'
     }
 }
 
