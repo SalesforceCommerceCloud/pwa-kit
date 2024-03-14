@@ -6,14 +6,13 @@
  */
 import React, {useState} from 'react'
 import {Button, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import Link from '@salesforce/retail-react-app/app/components/link'
+import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 
 /**
  * Renders primary action on a product-item card in the form of a button.
@@ -22,15 +21,13 @@ import Link from '@salesforce/retail-react-app/app/components/link'
  */
 const WishlistPrimaryAction = () => {
     const variant = useItemVariant()
-    const {data: basket} = useCurrentBasket()
+    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const {formatMessage} = useIntl()
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
-
-    const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
 
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
@@ -50,34 +47,28 @@ const WishlistPrimaryAction = () => {
                   }
               ]
 
-        addItemToBasket.mutate(
-            {body: productItems, parameters: {basketId: basket?.basketId}},
-            {
-                onSuccess: () => {
-                    showToast({
-                        title: formatMessage(
-                            {
-                                defaultMessage:
-                                    '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                                id: 'wishlist_primary_action.info.added_to_cart'
-                            },
-                            {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
-                        ),
-                        status: 'success'
-                    })
-                    onClose()
-                },
-                onError: () => {
-                    showToast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
-                    })
-                },
-                onSettled: () => {
-                    setIsLoading(false)
-                }
-            }
-        )
+        try {
+            await addItemToNewOrExistingBasket(productItems)
+            showToast({
+                title: formatMessage(
+                    {
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                        id: 'wishlist_primary_action.info.added_to_cart'
+                    },
+                    {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
+                ),
+                status: 'success'
+            })
+            onClose()
+        } catch (e) {
+            showToast({
+                title: formatMessage(API_ERROR_MESSAGE),
+                status: 'error'
+            })
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     const buttonText = {

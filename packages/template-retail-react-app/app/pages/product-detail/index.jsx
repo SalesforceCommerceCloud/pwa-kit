@@ -15,9 +15,9 @@ import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/sh
 import {
     useProduct,
     useCategory,
-    useShopperBasketsMutation,
     useShopperCustomersMutation,
-    useCustomerId
+    useCustomerId,
+    useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -60,13 +60,12 @@ const ProductDetail = () => {
     const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {data: basket} = useCurrentBasket()
-    const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
+    const {isLoading: isBasketLoading} = useCurrentBasket()
+    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const {res} = useServerContext()
     if (res) {
         res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
-    const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -234,10 +233,7 @@ const ProductDetail = () => {
                 quantity
             }))
 
-            await addItemToBasketMutation.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: productItems
-            })
+            await addItemToNewOrExistingBasket(productItems)
 
             einstein.sendAddToCart(productItems)
 
@@ -245,6 +241,7 @@ const ProductDetail = () => {
             // by the add to cart modal.
             return productSelectionValues
         } catch (error) {
+            console.log('error', error)
             showError(error)
         }
     }

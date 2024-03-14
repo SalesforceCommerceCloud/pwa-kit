@@ -1083,6 +1083,20 @@
       "value": "]"
     }
   ],
+  "category_links.button_text": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈȧȧŧḗḗɠǿǿřīḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "cc_radio_group.action.remove": [
     {
       "type": 0,

@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-import ListMenu from '@salesforce/retail-react-app/app/components/list-menu/index'
+import {ListMenu} from '@salesforce/retail-react-app/app/components/list-menu'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {mockCategories} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import userEvent from '@testing-library/user-event'
@@ -14,7 +14,7 @@ import userEvent from '@testing-library/user-event'
 describe('ListMenu', () => {
     test('ListMenu renders without errors', async () => {
         const user = userEvent.setup()
-        renderWithProviders(<ListMenu root={mockCategories.root} />)
+        renderWithProviders(<ListMenu root={mockCategories.root} itemsKey="categories" />)
 
         const categoryTrigger = screen.getByText(/Mens/i)
         await user.hover(categoryTrigger)
