@@ -343,14 +343,23 @@
   "confirmation_modal.remove_cart_item.action.no": {
     "defaultMessage": "No, keep item"
   },
+  "confirmation_modal.remove_cart_item.action.remove": {
+    "defaultMessage": "Remove"
+  },
   "confirmation_modal.remove_cart_item.action.yes": {
     "defaultMessage": "Yes, remove item"
+  },
+  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
+    "defaultMessage": "Some items are no longer available online and will be removed from your cart."
   },
   "confirmation_modal.remove_cart_item.message.sure_to_remove": {
     "defaultMessage": "Are you sure you want to remove this item from your cart?"
   },
   "confirmation_modal.remove_cart_item.title.confirm_remove": {
     "defaultMessage": "Confirm Remove Item"
+  },
+  "confirmation_modal.remove_cart_item.title.items_unavailable": {
+    "defaultMessage": "Items Unavailable"
   },
   "confirmation_modal.remove_wishlist_item.action.no": {
     "defaultMessage": "No, keep item"
@@ -685,6 +694,10 @@
   "item_image.label.sale": {
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
+  },
+  "item_image.label.unavailable": {
+    "defaultMessage": "Unavailable",
+    "description": "A unavailable badge placed on top of a product image"
   },
   "item_price.label.starting_at": {
     "defaultMessage": "Starting at"
