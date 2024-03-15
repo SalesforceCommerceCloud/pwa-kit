@@ -88,8 +88,13 @@ jobs:
       #     git commit -am "Release ${{ env.nightly_version }}"
       #     git push --set-upstream origin nightly-releases
 
-      # - name: Check Repository Clean
-      #   uses: "./.github/actions/check_clean"
+
+      - name: Commit changes so lerna doesn't complain
+        run: |-
+          git commit -am "Release ${{ env.nightly_version }}"
+
+      - name: Check Repository Clean
+        uses: "./.github/actions/check_clean"
 
       - name: Publish to NPM
         uses: "./.github/actions/publish_to_npm"

@@ -97,13 +97,13 @@ const publishPackages = (packages = [], isNightly = false) => {
 }
 
 const verifyCleanWorkingTree = () => {
-    // const isWorkingTreeClean = sh.exec('git status --porcelain', {silent: true}).trim() === ''
-    // if (!isWorkingTreeClean) {
-    //     console.error(
-    //         'There are some uncommitted changes. `lerna publish` expects a clean working tree.'
-    //     )
-    //     process.exit(1)
-    // }
+    const isWorkingTreeClean = sh.exec('git status --porcelain', {silent: true}).trim() === ''
+    if (!isWorkingTreeClean) {
+        console.error(
+            'There are some uncommitted changes. `lerna publish` expects a clean working tree.'
+        )
+        process.exit(1)
+    }
 }
 
 main()
