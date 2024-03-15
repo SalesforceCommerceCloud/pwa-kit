@@ -121,6 +121,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin(config),
             shopperOrders: new ShopperOrders(config),
+            // TODO: js proxy?
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),

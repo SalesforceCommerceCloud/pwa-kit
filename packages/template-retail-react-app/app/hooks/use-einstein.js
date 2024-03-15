@@ -406,7 +406,8 @@ const useEinstein = () => {
             const token = await getTokenWhenReady()
             // Fetch the product details for the recommendations
             const products = await api.shopperProducts.getProducts({
-                parameters: {ids: ids.join(',')},
+                // TODO: how to auto-inject cache breaker into this `parameters`?
+                parameters: {ids: ids.join(','), c_cache_breaker: new Date().getTime()},
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
