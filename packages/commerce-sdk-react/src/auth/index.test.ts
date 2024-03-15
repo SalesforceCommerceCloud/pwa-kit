@@ -138,60 +138,75 @@ describe('Auth', () => {
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
     })
-    test('hasSFRAAuthStateChanged', () => {
-        // Should return true if refresh_token keys are different
+    test('getAccessToken from local store', () => {
         const auth = new Auth(config)
         // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
+        auth.set('access_token', 'token')
         // @ts-expect-error private method
-        auth.set('refresh_token_registered_copy', '456')
-        // @ts-expect-error private method
-        expect(auth.hasSFRAAuthStateChanged(true)).toBe(true)
-
-        // Should return true if refresh_token keys are same but values are different
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', '456')
-        // @ts-expect-error private method
-        expect(auth.hasSFRAAuthStateChanged(true)).toBe(true)
-
-        // Should return false if refresh_token keys are same
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', '123')
-        // @ts-expect-error private method
-        expect(auth.hasSFRAAuthStateChanged(true)).toBe(false)
+        expect(auth.getAccessToken()).toBe('token')
     })
-    test('isTokenValidForHybrid', () => {
+    test('use SFRA token over local store token if present', () => {
         const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token', 'token')
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_1', '123')
+        // @ts-expect-error private method
+        expect(auth.getAccessToken()).toBe('123')
+        expect(auth.get('access_token_sfra_1')).toBeFalsy()
+    })
+    test('access token is cleared if SFRA sends refresh', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token', 'token')
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_1', 'refresh')
+        // @ts-expect-error private method
+        expect(auth.getAccessToken()).toBeFalsy()
+        expect(auth.get('access_token_sfra_1')).toBeFalsy()
+    })
+    test('missing first chunk of SFRA token returns empty token', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_2', '456')
+        // @ts-expect-error private method
+        expect(auth.getSFRAAuthToken()).toBeFalsy()
+    })
+    test('get combined 2 part SFRA auth token', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_1', '123')
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_2', '456')
+        // @ts-expect-error private method
+        expect(auth.getSFRAAuthToken()).toBe('123456')
+    })
+    test('get combined 3 part SFRA auth token', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_1', '123')
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_2', '456')
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_3', '789')
+        // @ts-expect-error private method
+        expect(auth.getSFRAAuthToken()).toBe('123456789')
+    })
+    test('clear SFRA auth tokens', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_1', '123')
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_2', '456')
+        // @ts-expect-error private method
+        auth.set('access_token_sfra_3', '789')
 
-        // Return false if JWT Expired
-        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
         // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', '123')
-        // @ts-expect-error private method
-        expect(auth.isTokenValidForHybrid(JWTExpired, true)).toBe(false)
+        auth.clearSFRAAuthToken()
 
-        // Return false if SFRA Auth state changed
-        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
-        // @ts-expect-error private method
-        auth.set('refresh_token_registered_copy', '456')
-        // @ts-expect-error private method
-        expect(auth.isTokenValidForHybrid(JWTNotExpired, true)).toBe(false)
-
-        // Return true if JWT NOT expired and SFRA Auth state NOT changed
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', '123')
-        // @ts-expect-error private method
-        expect(auth.isTokenValidForHybrid(JWTNotExpired, true)).toBe(true)
+        expect(auth.get('access_token_sfra_1')).toBeFalsy()
+        expect(auth.get('access_token_sfra_2')).toBeFalsy()
+        expect(auth.get('access_token_sfra_3')).toBeFalsy()
     })
     test('site switch clears auth storage', () => {
         const auth = new Auth(config)
