@@ -155,7 +155,7 @@ const DATA_MAP: AuthDataMap = {
     },
     /*
      * For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
-     * We do this by having SFRA store the access token in cookies. If these cookies are present, PWA checks
+     * We do this by having SFRA store the access token in cookies. If these cookies are present, PWA
      * compares the access token from the cookie with the one in local store. If the tokens are different,
      * discard the access token in local store and replace it with the access token from the cookie.
      * ECOM has a 1200 character limit on the values of cookies. The access token easily exceeds this amount
@@ -299,6 +299,40 @@ class Auth {
     }
 
     /**
+     * Returns the SLAS access token or null if the access token is not found in local store
+     * or if SFRA wants PWA to trigger refresh token login.
+     *
+     * On PWA-only sites, this returns the access token from local storage.
+     * On Hybrid sites, this checks whether SFRA has sent an auth token via cookies.
+     * Returns an access token from SFRA if it exist.
+     * If not, the access token from local store is returned.
+     */
+    private getAccessToken() {
+        let accessToken = this.get('access_token')
+        const sfraAuthToken = this.getSFRAAuthToken()
+
+        if (sfraAuthToken && accessToken !== sfraAuthToken) {
+            /*
+             * If SFRA sends 'refresh', we return null here so PWA can trigger a login refresh
+             * This key is used when logout is triggered in SFRA but the redirect after logout
+             * sends the user to PWA.
+             */
+            if (sfraAuthToken === 'refresh') {
+                this.clearSFRAAuthToken()
+                return null
+            }
+
+            this.set('access_token', sfraAuthToken)
+            accessToken = sfraAuthToken
+            // SFRA -> PWA access token cookie handoff is succesful so we clear the SFRA made cookies.
+            // We don't want these cookies to persist and continue overriding what is in local store.
+            this.clearSFRAAuthToken()
+        }
+
+        return accessToken
+    }
+
+    /**
      * WARNING: This function is relevant to be used in Hybrid deployments only.
      * When SFRA sends an auth token, it does so by splitting the JWT across
      * multiple cookies to get around a character limit on ECOM cookie values.
@@ -310,13 +344,18 @@ class Auth {
         const accessTokenChunk2 = this.get('access_token_sfra_2')
         const accessTokenChunk3 = this.get('access_token_sfra_3')
 
+        if (!accessTokenChunk1) return undefined
+
         // Combines the access token chunks without any 'null' or 'undefined'
-        const accessToken = [accessTokenChunk1, accessTokenChunk2, accessTokenChunk3].join('')
-        return accessToken ? accessToken : undefined
+        return [accessTokenChunk1, accessTokenChunk2, accessTokenChunk3].join('')
     }
 
     private clearSFRAAuthToken() {
-        const keys = ['access_token_sfra_1','access_token_sfra_2','access_token_sfra_3'] as AuthDataKeys[]
+        const keys = [
+            'access_token_sfra_1',
+            'access_token_sfra_2',
+            'access_token_sfra_3'
+        ] as AuthDataKeys[]
         keys.forEach((keyName) => {
             const {key, storageType} = DATA_MAP[keyName]
             const store = this.stores[storageType]
@@ -408,23 +447,8 @@ class Auth {
         if (this.pendingToken) {
             return await this.pendingToken
         }
-        let accessToken = this.get('access_token')
+        const accessToken = this.getAccessToken()
 
-        // If SFRA has changed the auth state, it will send an auth token via cookies.
-        // We prioritize using this access token from SFRA over the access token in local storage.
-        const sfraAuthToken = this.getSFRAAuthToken()
-        console.log(`SFRA Auth Token = ${sfraAuthToken}`)
-
-        if (sfraAuthToken && accessToken !== sfraAuthToken) {
-            console.log(`In Auth Token Override`)
-            this.set('access_token', sfraAuthToken)
-            accessToken = this.get('access_token')
-            // SFRA -> PWA access token cookie handoff is succesful
-            // so we can clear the SFRA made cookies now
-            this.clearSFRAAuthToken()
-        }
-
-        console.log(`Access token ${accessToken}`)
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
