@@ -299,13 +299,18 @@ class Auth {
     }
 
     /**
-     * Returns the SLAS access token or null if the access token is not found in local store
-     * or if SFRA wants PWA to trigger refresh token login.
+     * Returns the SLAS access token or an empty string if the access token
+     * is not found in local store or if SFRA wants PWA to trigger refresh token login.
      *
      * On PWA-only sites, this returns the access token from local storage.
      * On Hybrid sites, this checks whether SFRA has sent an auth token via cookies.
      * Returns an access token from SFRA if it exist.
      * If not, the access token from local store is returned.
+     *
+     * This is only used within this Auth module since other modules consider the access
+     * token from this.get('access_token') to be the source of truth.
+     *
+     * @returns {string} access token
      */
     private getAccessToken() {
         let accessToken = this.get('access_token')
@@ -313,13 +318,14 @@ class Auth {
 
         if (sfraAuthToken && accessToken !== sfraAuthToken) {
             /*
-             * If SFRA sends 'refresh', we return null here so PWA can trigger a login refresh
+             * If SFRA sends 'refresh', we return an empty token here so PWA can trigger a login refresh
              * This key is used when logout is triggered in SFRA but the redirect after logout
              * sends the user to PWA.
              */
             if (sfraAuthToken === 'refresh') {
+                this.set('access_token', '')
                 this.clearSFRAAuthToken()
-                return null
+                return ''
             }
 
             this.set('access_token', sfraAuthToken)
@@ -337,14 +343,14 @@ class Auth {
      * When SFRA sends an auth token, it does so by splitting the JWT across
      * multiple cookies to get around a character limit on ECOM cookie values.
      * This method fetches the chunks and returns the combined token.
-     * @returns {string} access token or undefined
+     * @returns {string} access token
      */
     private getSFRAAuthToken() {
         const accessTokenChunk1 = this.get('access_token_sfra_1')
         const accessTokenChunk2 = this.get('access_token_sfra_2')
         const accessTokenChunk3 = this.get('access_token_sfra_3')
 
-        if (!accessTokenChunk1) return undefined
+        if (!accessTokenChunk1) return ''
 
         // Combines the access token chunks without any 'null' or 'undefined'
         return [accessTokenChunk1, accessTokenChunk2, accessTokenChunk3].join('')
