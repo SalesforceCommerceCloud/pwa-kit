@@ -79,17 +79,19 @@ const AccountWishlist = () => {
 
     const handleUnavailableProducts = async (unavailableProductIds) => {
         if (!unavailableProductIds.length) return
-        for (const id of unavailableProductIds) {
-            const item = wishListItems?.find((item) => {
-                return item.productId.toString() === id.toString()
+        await Promise.all(
+            unavailableProductIds.map(async (id) => {
+                const item = wishListItems?.find((item) => {
+                    return item.productId.toString() === id.toString()
+                })
+                const parameters = {
+                    customerId: customer.customerId,
+                    itemId: item?.id,
+                    listId: wishListData?.id
+                }
+                await deleteCustomerProductListItem.mutateAsync({parameters})
             })
-            const parameters = {
-                customerId: customer.customerId,
-                itemId: item?.id,
-                listId: wishListData?.id
-            }
-            await deleteCustomerProductListItem.mutateAsync({parameters})
-        }
+        )
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {

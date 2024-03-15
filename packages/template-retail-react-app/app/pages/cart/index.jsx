@@ -62,7 +62,7 @@ const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products} = useProducts(
+    const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             parameters: {
                 ids: productIds,
@@ -302,9 +302,12 @@ const Cart = () => {
         const productItems = basket?.productItems?.filter((item) =>
             unavailableProductIds?.includes(item.productId)
         )
-        for (let item of productItems) {
-            await handleRemoveItem(item)
-        }
+
+        await Promise.all(
+            productItems.map(async (item) => {
+                await handleRemoveItem(item)
+            })
+        )
     }
     /***************************** Update Cart **************************/
 
@@ -456,8 +459,9 @@ const Cart = () => {
                                                     ...productItem,
                                                     ...(products &&
                                                         products[productItem.productId]),
-                                                    isProductUnavailable:
-                                                        !products?.[productItem.productId],
+                                                    isProductUnavailable: !isProductsLoading
+                                                        ? !products?.[productItem.productId]
+                                                        : undefined,
                                                     price: productItem.price,
                                                     quantity: localQuantity[productItem.itemId]
                                                         ? localQuantity[productItem.itemId]

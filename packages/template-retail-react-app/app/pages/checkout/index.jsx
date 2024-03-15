@@ -178,7 +178,7 @@ const CheckoutContainer = () => {
     const productIds = basket?.productItems?.map(({productId}) => productId) ?? []
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const toast = useToast()
-    const [showLoading, setShowLoading] = useState(false)
+    const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
 
     const handleRemoveItem = async (product) => {
         await removeItemFromBasketMutation.mutateAsync(
@@ -202,14 +202,14 @@ const CheckoutContainer = () => {
         )
     }
     const handleUnavailableProducts = async (unavailableProductIds) => {
-        setShowLoading(true)
+        setIsDeletingUnavailableItem(true)
         const productItems = basket?.productItems?.filter((item) =>
             unavailableProductIds?.includes(item.productId)
         )
         for (let item of productItems) {
             await handleRemoveItem(item)
         }
-        setShowLoading(false)
+        setIsDeletingUnavailableItem(false)
     }
 
     if (!customer || !customer.customerId || !basket || !basket.basketId) {
@@ -218,7 +218,7 @@ const CheckoutContainer = () => {
 
     return (
         <CheckoutProvider>
-            {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
             <Checkout />
             <UnavailableProductConfirmationModal
