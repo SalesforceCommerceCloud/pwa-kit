@@ -38,8 +38,10 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
         enabled?: boolean
     }
 ) => {
-    // @ts-ignore
-    apiOptions.parameters.c_cache_breaker = new Date().getTime()
+    if (onClient() && Boolean(window.STOREFRONT_PREVIEW)) {
+        // @ts-ignore
+        apiOptions.parameters.c_cache_breaker = new Date().getTime()
+    }
 
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
     // This type assertion is NOT safe in all cases. However, we know that `requiredParameters` is
