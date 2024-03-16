@@ -150,63 +150,29 @@ describe('Auth', () => {
         // @ts-expect-error private method
         auth.set('access_token', 'token')
         // @ts-expect-error private method
-        auth.set('access_token_sfra_1', '123')
+        auth.set('access_token_sfra', '123')
         // @ts-expect-error private method
         expect(auth.getAccessToken()).toBe('123')
-        expect(auth.get('access_token_sfra_1')).toBeFalsy()
+        expect(auth.get('access_token_sfra')).toBeFalsy()
     })
     test('access token is cleared if SFRA sends refresh', () => {
         const auth = new Auth(config)
         // @ts-expect-error private method
         auth.set('access_token', 'token')
         // @ts-expect-error private method
-        auth.set('access_token_sfra_1', 'refresh')
+        auth.set('access_token_sfra', 'refresh')
         // @ts-expect-error private method
         expect(auth.getAccessToken()).toBeFalsy()
-        expect(auth.get('access_token_sfra_1')).toBeFalsy()
-    })
-    test('missing first chunk of SFRA token returns empty token', () => {
-        const auth = new Auth(config)
-        // @ts-expect-error private method
-        auth.set('access_token_sfra_2', '456')
-        // @ts-expect-error private method
-        expect(auth.getSFRAAuthToken()).toBeFalsy()
-    })
-    test('get combined 2 part SFRA auth token', () => {
-        const auth = new Auth(config)
-        // @ts-expect-error private method
-        auth.set('access_token_sfra_1', '123')
-        // @ts-expect-error private method
-        auth.set('access_token_sfra_2', '456')
-        // @ts-expect-error private method
-        expect(auth.getSFRAAuthToken()).toBe('123456')
-    })
-    test('get combined 3 part SFRA auth token', () => {
-        const auth = new Auth(config)
-        // @ts-expect-error private method
-        auth.set('access_token_sfra_1', '123')
-        // @ts-expect-error private method
-        auth.set('access_token_sfra_2', '456')
-        // @ts-expect-error private method
-        auth.set('access_token_sfra_3', '789')
-        // @ts-expect-error private method
-        expect(auth.getSFRAAuthToken()).toBe('123456789')
+        expect(auth.get('access_token_sfra')).toBeFalsy()
     })
     test('clear SFRA auth tokens', () => {
         const auth = new Auth(config)
         // @ts-expect-error private method
-        auth.set('access_token_sfra_1', '123')
-        // @ts-expect-error private method
-        auth.set('access_token_sfra_2', '456')
-        // @ts-expect-error private method
-        auth.set('access_token_sfra_3', '789')
-
+        auth.set('access_token_sfra', '123')
         // @ts-expect-error private method
         auth.clearSFRAAuthToken()
 
-        expect(auth.get('access_token_sfra_1')).toBeFalsy()
-        expect(auth.get('access_token_sfra_2')).toBeFalsy()
-        expect(auth.get('access_token_sfra_3')).toBeFalsy()
+        expect(auth.get('access_token_sfra')).toBeFalsy()
     })
     test('site switch clears auth storage', () => {
         const auth = new Auth(config)

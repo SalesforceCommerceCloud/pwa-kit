@@ -31,13 +31,43 @@ export class CookieStorage extends BaseStorage {
     }
     get(key: string) {
         const suffixedKey = this.getSuffixedKey(key)
-        return Cookies.get(suffixedKey) || ''
+        let value = Cookies.get(suffixedKey) || ''
+
+        if (value) {
+            // Some values, like the access token, may be split
+            // across multiple keys to fit under ECOM cookie size
+            // thresholds. We check for and append additional chunks here.
+            let chunk = 2
+            let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
+            while(additionalPart) {
+                value.concat(additionalPart)
+                chunk++
+                additionalPart = Cookies.get(`${suffixedKey}_${chunk}`) || ''
+            }
+        }
+
+        return value
     }
     delete(key: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
+
         Cookies.remove(suffixedKey, {
             ...getDefaultCookieAttributes(),
             ...options
         })
+
+        // Some values, like the access token, may be split
+        // across multiple keys to fit under ECOM cookie size
+        // thresholds. We check for and delete additional chunks here.
+        let chunk = 2
+        let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
+        while(additionalPart) {
+            Cookies.remove(`${suffixedKey}_${chunk}`, {
+                ...getDefaultCookieAttributes(),
+                ...options
+            })
+            chunk++
+            additionalPart = Cookies.get(`${suffixedKey}_${chunk}`) || ''
+        }
     }
 }

@@ -60,9 +60,7 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'refresh_token_guest_copy'
     | 'refresh_token_registered_copy'
-    | 'access_token_sfra_1'
-    | 'access_token_sfra_2'
-    | 'access_token_sfra_3'
+    | 'access_token_sfra'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -158,22 +156,16 @@ const DATA_MAP: AuthDataMap = {
      * We do this by having SFRA store the access token in cookies. If these cookies are present, PWA
      * compares the access token from the cookie with the one in local store. If the tokens are different,
      * discard the access token in local store and replace it with the access token from the cookie.
+     *
      * ECOM has a 1200 character limit on the values of cookies. The access token easily exceeds this amount
      * so it sends the access token in chunks across several cookies.
      *
-     * From observation, the JWT tends to come in at around 2250 characters so 2 to 3 parts should be enough.
+     * The JWT tends to come in at around 2250 characters so there's usually
+     * both a cc-at and cc-at_2.
      */
-    access_token_sfra_1: {
+    access_token_sfra: {
         storageType: 'cookie',
         key: 'cc-at'
-    },
-    access_token_sfra_2: {
-        storageType: 'cookie',
-        key: 'cc-at_2'
-    },
-    access_token_sfra_3: {
-        storageType: 'cookie',
-        key: 'cc-at_3'
     }
 }
 
@@ -314,7 +306,7 @@ class Auth {
      */
     private getAccessToken() {
         let accessToken = this.get('access_token')
-        const sfraAuthToken = this.getSFRAAuthToken()
+        const sfraAuthToken = this.get('access_token_sfra')
 
         if (sfraAuthToken && accessToken !== sfraAuthToken) {
             /*
@@ -338,35 +330,10 @@ class Auth {
         return accessToken
     }
 
-    /**
-     * WARNING: This function is relevant to be used in Hybrid deployments only.
-     * When SFRA sends an auth token, it does so by splitting the JWT across
-     * multiple cookies to get around a character limit on ECOM cookie values.
-     * This method fetches the chunks and returns the combined token.
-     * @returns {string} access token
-     */
-    private getSFRAAuthToken() {
-        const accessTokenChunk1 = this.get('access_token_sfra_1')
-        const accessTokenChunk2 = this.get('access_token_sfra_2')
-        const accessTokenChunk3 = this.get('access_token_sfra_3')
-
-        if (!accessTokenChunk1) return ''
-
-        // Combines the access token chunks without any 'null' or 'undefined'
-        return [accessTokenChunk1, accessTokenChunk2, accessTokenChunk3].join('')
-    }
-
     private clearSFRAAuthToken() {
-        const keys = [
-            'access_token_sfra_1',
-            'access_token_sfra_2',
-            'access_token_sfra_3'
-        ] as AuthDataKeys[]
-        keys.forEach((keyName) => {
-            const {key, storageType} = DATA_MAP[keyName]
-            const store = this.stores[storageType]
-            store.delete(key)
-        })
+        const {key, storageType} = DATA_MAP[ 'access_token_sfra']
+        const store = this.stores[storageType]
+        store.delete(key)
     }
 
     /**
