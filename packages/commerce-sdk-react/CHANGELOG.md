@@ -1,3 +1,4 @@
+## v1.4.0-gpt-nightly-20240318193820 (Mar 18, 2024)
 ## v1.4.0-dev (Jan 22, 2024)
 - Fix invalid query params warnings and allow custom query [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
 - Fix cannot read properties of undefined (reading 'unshift') [#1689](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1689)
