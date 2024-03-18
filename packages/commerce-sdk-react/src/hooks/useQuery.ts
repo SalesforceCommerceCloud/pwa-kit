@@ -48,7 +48,17 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     // missing parameters. This will result in a runtime error. I think that this is an acceptable
     // trade-off, as the behavior is opt-in by the end user, and it feels like adding type safety
     // for this case would add significantly more complexity.
-    const wrappedMethod = async () => await authenticatedMethod(apiOptions as Options)
+    const wrappedMethod = async () => {
+        try {
+            return await authenticatedMethod(apiOptions as Options)
+        } catch (e) {
+            if (typeof e === 'object' && e !== null && 'response' in e) {
+                const json = await (e.response as Response).json()
+                throw json
+            }
+            throw e
+        }
+    }
     return useReactQuery(hookConfig.queryKey, wrappedMethod, {
         enabled:
             // Individual hooks can provide `enabled` checks that are done in ADDITION to

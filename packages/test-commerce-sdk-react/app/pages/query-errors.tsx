@@ -16,14 +16,7 @@ const QueryErrors = () => {
 
     // Type assertion because we're explicitly violating the expected type
     const products = useProducts({parameters: {FOO: ''}} as any, {enabled: true})
-    const product = useProduct(
-        {parameters: {id: '25502228Mxxx'}},
-        {
-            onError: async (error) => {
-                console.log(await error.response.json())
-            }
-        }
-    )
+    const product = useProduct({parameters: {id: '25502228Mxxx'}})
     /** Errors don't nicely serialize to JSON, so we have to do it ourselves. */
     const toLoggable = (err: unknown) => {
         if (err instanceof Error) {
@@ -33,6 +26,9 @@ const QueryErrors = () => {
         }
         return err
     }
+
+    console.log('product.error')
+    console.log(product.error)
 
     return (
         <>
