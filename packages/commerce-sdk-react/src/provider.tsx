@@ -20,7 +20,7 @@ import {
     ShopperBasketsTypes
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
-import {ApiClientConfigParams, ApiClients} from './hooks/types'
+import {ApiClientConfigParams, ApiClients, ApiClient} from './hooks/types'
 import {onClient} from './utils'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
@@ -113,7 +113,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
         fetchOptions
     }
-    const apiClients = useMemo(() => {
+    const apiClients: ApiClients = useMemo(() => {
         const clients = {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
@@ -129,22 +129,18 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         }
         const isInStorefrontPreview = onClient() && window.STOREFRONT_PREVIEW
 
-        Object.values(clients).forEach((client) => {
-            const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(client))
-            const getMethods = methods.filter((method) => method.startsWith('get'))
-            console.log('--- getMethods', getMethods)
-
-            getMethods.forEach((getMethod) => {
-                // @ts-ignore
-                client[getMethod] = new Proxy(client[getMethod], {
-                    apply(target, thisArg, argumentsList) {
-                        if (isInStorefrontPreview) {
-                            argumentsList[0].parameters.c_cache_breaker = new Date().getTime()
-                        }
-                        return target.call(thisArg, ...argumentsList)
+        proxyGetRequests(clients, {
+            apply(target, thisArg, argumentsList) {
+                if (isInStorefrontPreview) {
+                    if (argumentsList.length === 0) {
+                        argumentsList[0] = {parameters: {c_cache_breaker: new Date().getTime()}}
+                    } else {
+                        argumentsList[0].parameters = argumentsList[0].parameters ?? {}
+                        argumentsList[0].parameters.c_cache_breaker = new Date().getTime()
                     }
-                })
-            })
+                }
+                return target.call(thisArg, ...argumentsList)
+            }
         })
 
         return clients
@@ -207,6 +203,18 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             </CommerceApiContext.Provider>
         </ConfigContext.Provider>
     )
+}
+
+const proxyGetRequests = (clients: ApiClients, handlers: ProxyHandler<any>) => {
+    Object.values(clients).forEach((client: ApiClient) => {
+        const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(client))
+        const getMethods = methods.filter((method) => method.startsWith('get'))
+
+        getMethods.forEach((getMethod) => {
+            // @ts-ignore
+            client[getMethod] = new Proxy(client[getMethod], handlers)
+        })
+    })
 }
 
 export default CommerceApiProvider
