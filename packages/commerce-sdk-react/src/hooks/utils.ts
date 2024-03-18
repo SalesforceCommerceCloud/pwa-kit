@@ -138,3 +138,15 @@ export const getCustomKeys = <T extends object>(obj: T) => {
     }
     return Object.keys(obj).filter((key: string): key is `c_${string}` => key.startsWith('c_'))
 }
+
+export const handleApiError = async <T>(func: () => Promise<T>): Promise<T> => {
+    try {
+        return await func()
+    } catch (e) {
+        if (typeof e === 'object' && e !== null && 'response' in e) {
+            const json = await (e.response as Response).json()
+            throw json
+        }
+        throw e
+    }
+}
