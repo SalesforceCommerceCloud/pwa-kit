@@ -404,16 +404,9 @@ const useEinstein = () => {
         const ids = reco.recs?.map((rec) => rec.id)
         if (ids?.length > 0) {
             const token = await getTokenWhenReady()
-            const isInStorefrontPreview =
-                typeof window !== 'undefined' && Boolean(window.STOREFRONT_PREVIEW)
-
             // Fetch the product details for the recommendations
             const products = await api.shopperProducts.getProducts({
-                // TODO: how to auto-inject cache breaker into this `parameters`?
-                parameters: {
-                    ids: ids.join(','),
-                    ...(isInStorefrontPreview ? {c_cache_breaker: new Date().getTime()} : {})
-                },
+                parameters: {ids: ids.join(',')},
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

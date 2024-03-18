@@ -21,6 +21,7 @@ import {
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
+import {onClient} from './utils'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -113,7 +114,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchOptions
     }
     const apiClients = useMemo(() => {
-        return {
+        const clients = {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
             shopperCustomers: new ShopperCustomers(config),
@@ -121,12 +122,32 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin(config),
             shopperOrders: new ShopperOrders(config),
-            // TODO: js proxy?
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),
             shopperSeo: new ShopperSeo(config)
         }
+        const isInStorefrontPreview = onClient() && window.STOREFRONT_PREVIEW
+
+        Object.values(clients).forEach((client) => {
+            const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(client))
+            const getMethods = methods.filter((method) => method.startsWith('get'))
+            console.log('--- getMethods', getMethods)
+
+            getMethods.forEach((getMethod) => {
+                // @ts-ignore
+                client[getMethod] = new Proxy(client[getMethod], {
+                    apply(target, thisArg, argumentsList) {
+                        if (isInStorefrontPreview) {
+                            argumentsList[0].parameters.c_cache_breaker = new Date().getTime()
+                        }
+                        return target.call(thisArg, ...argumentsList)
+                    }
+                })
+            })
+        })
+
+        return clients
     }, [
         clientId,
         organizationId,
