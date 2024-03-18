@@ -17,18 +17,6 @@ const QueryErrors = () => {
     // Type assertion because we're explicitly violating the expected type
     const products = useProducts({parameters: {FOO: ''}} as any, {enabled: true})
     const product = useProduct({parameters: {id: '25502228Mxxx'}})
-    /** Errors don't nicely serialize to JSON, so we have to do it ourselves. */
-    const toLoggable = (err: unknown) => {
-        if (err instanceof Error) {
-            // Clone all keys onto a plain object
-            const keys = Object.getOwnPropertyNames(err) as Array<keyof Error>
-            return keys.reduce((acc, key) => ({...acc, [key]: err[key]}), {})
-        }
-        return err
-    }
-
-    console.log('product.error')
-    console.log(product.error)
 
     return (
         <>
@@ -58,7 +46,7 @@ const QueryErrors = () => {
                 <Json
                     data={{
                         isLoading: products.isLoading,
-                        error: toLoggable(products.error),
+                        error: products.error,
                         data: products.data
                     }}
                 />
@@ -73,7 +61,7 @@ const QueryErrors = () => {
                 <Json
                     data={{
                         isLoading: product.isLoading,
-                        error: toLoggable(product.error),
+                        error: product.error,
                         data: product.data
                     }}
                 />
