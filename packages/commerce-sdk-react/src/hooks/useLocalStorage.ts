@@ -29,7 +29,8 @@ function useLocalStorage(key: string): Value {
     };
 
     const getLocalStorageServerSnapshot = () => {
-        throw Error("useLocalStorage is a client-only hook");
+        // local store is not available on the server
+        return null
     };
 
     // function dispatchStorageEvent(newValue: Value) {
