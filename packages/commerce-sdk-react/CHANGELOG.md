@@ -1,3 +1,6 @@
+## v1.4.0-nightly-20240319080251 (Mar 19, 2024)
+## v1.4.0-dev (Mar 19, 2024)
+## v3.5.0-nightly-20240319080251 (Mar 19, 2024)
 ## v1.4.0-dev (Jan 22, 2024)
 - Fix invalid query params warnings and allow custom query [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
 - Fix cannot read properties of undefined (reading 'unshift') [#1689](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1689)
