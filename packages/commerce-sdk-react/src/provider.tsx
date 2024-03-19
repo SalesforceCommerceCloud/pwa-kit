@@ -20,7 +20,7 @@ import {
     ShopperBasketsTypes
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
-import {ApiClientConfigParams, ApiClients, ApiClient} from './hooks/types'
+import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {onClient} from './utils'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
@@ -212,12 +212,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
  * Via the built-in Proxy object, modify the behaviour of each GET request for the given SCAPI clients
  */
 const proxyGetRequests = (clients: ApiClients, handlers: ProxyHandler<any>) => {
-    Object.values(clients).forEach((client: ApiClient) => {
+    Object.values(clients).forEach((client: Record<string, any>) => {
         const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(client))
         const getMethods = methods.filter((method) => method.startsWith('get'))
 
         getMethods.forEach((getMethod) => {
-            // @ts-ignore
             client[getMethod] = new Proxy(client[getMethod], handlers)
         })
     })
