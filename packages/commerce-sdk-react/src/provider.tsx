@@ -127,11 +127,14 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperSearch: new ShopperSearch(config),
             shopperSeo: new ShopperSeo(config)
         }
-        const isInStorefrontPreview = onClient() && window.STOREFRONT_PREVIEW
+        const isInStorefrontPreview = () => onClient() && window.STOREFRONT_PREVIEW
 
+        // In Storefront Preview mode, add cache breaker for the SCAPI's GET requests.
+        // Otherwise, it's possible to get stale responses after the Shopper Context is set.
+        // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
         proxyGetRequests(clients, {
             apply(target, thisArg, argumentsList) {
-                if (isInStorefrontPreview) {
+                if (isInStorefrontPreview()) {
                     if (argumentsList.length === 0) {
                         argumentsList[0] = {parameters: {c_cache_breaker: new Date().getTime()}}
                     } else {
@@ -205,6 +208,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     )
 }
 
+/**
+ * Via the built-in Proxy object, modify the behaviour of each GET request for the given SCAPI clients
+ */
 const proxyGetRequests = (clients: ApiClients, handlers: ProxyHandler<any>) => {
     Object.values(clients).forEach((client: ApiClient) => {
         const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(client))
