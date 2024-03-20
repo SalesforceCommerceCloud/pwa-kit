@@ -20,6 +20,7 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 import OverridesResolverPlugin from './overrides-plugin'
+import ExtensionsResolverPlugin from './extension-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
@@ -184,43 +185,51 @@ const baseConfig = (target) => {
                     path: buildDir
                 },
                 resolve: {
-                    ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
-                        ? {
-                              plugins: [
-                                  new OverridesResolverPlugin({
-                                      extends: [EXT_EXTENDS],
-                                      overridesDir: EXT_OVERRIDES_DIR,
-                                      projectDir: process.cwd()
-                                  })
-                              ]
-                          }
-                        : {}),
+                    plugins: [
+                        new ExtensionsResolverPlugin({
+                            extends: [EXT_EXTENDS],
+                            overridesDir: EXT_OVERRIDES_DIR,
+                            projectDir: process.cwd()
+                        })
+                    ],
+                    // ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
+                    //     ? {
+                    //           plugins: [
+                    //               new OverridesResolverPlugin({
+                    //                   extends: [EXT_EXTENDS],
+                    //                   overridesDir: EXT_OVERRIDES_DIR,
+                    //                   projectDir: process.cwd()
+                    //               })
+                    //           ]
+                    //       }
+                    //     : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
                             }))
-                        ),
-                        ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
-                            ? Object.assign(
-                                  // NOTE: when an array of `extends` dirs are accepted, don't coerce here
-                                  ...[EXT_EXTENDS].map((extendTarget) => ({
-                                      [extendTarget]: path.resolve(
-                                          projectDir,
-                                          'node_modules',
-                                          ...extendTarget.split('/')
-                                      )
-                                  }))
-                              )
-                            : {}),
-                        ...(EXT_EXTENDABLE
-                            ? Object.assign(
-                                  ...[EXT_EXTENDABLE].map((item) => ({
-                                      [item]: path.resolve(projectDir)
-                                  }))
-                              )
-                            : {})
+                        )
+                        // ,
+                        // ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
+                        //     ? Object.assign(
+                        //           // NOTE: when an array of `extends` dirs are accepted, don't coerce here
+                        //           ...[EXT_EXTENDS].map((extendTarget) => ({
+                        //               [extendTarget]: path.resolve(
+                        //                   projectDir,
+                        //                   'node_modules',
+                        //                   ...extendTarget.split('/')
+                        //               )
+                        //           }))
+                        //       )
+                        //     : {}),
+                        // ...(EXT_EXTENDABLE
+                        //     ? Object.assign(
+                        //           ...[EXT_EXTENDABLE].map((item) => ({
+                        //               [item]: path.resolve(projectDir)
+                        //           }))
+                        //       )
+                        //     : {})
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
