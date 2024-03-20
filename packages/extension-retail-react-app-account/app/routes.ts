@@ -1,5 +1,4 @@
 import _routes from '_/app/routes'
-// import _routes from '@salesforce/extension-retail-react-app-base/app/routes'
 import loadable, {LoadableComponent} from '@loadable/component'
 
 // Make this page its own chunk.

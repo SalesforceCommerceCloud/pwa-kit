@@ -33,17 +33,16 @@ class ExtensionsResolverPlugin {
         // What do I need to know?
         // 1. Are we importing from the base project?
         // 2. Are we importing from an extension? and which index is it?
-
         const {extensions} = this.pkg.mobify
 
         if (requestContext.request.startsWith('_')) {
             const target = resolver.ensureHook('resolve')
-            debugger
             const moduleName = this.parseModuleName(requestContext.context.issuer)
             const isBaseProject = moduleName === this.pkg.name
             const isExtension = extensions.includes(moduleName.replace('extension-', ''))
             let targetExtension
-            let targetExtensionFQ
+            let targetExtensionFQ // Fully Qualified (e.g. has @salesforce namespace and "extension" prefix.)
+            
             if (isBaseProject) {
                 targetExtension = extensions[extensions.length - 1]
             }
@@ -65,29 +64,23 @@ class ExtensionsResolverPlugin {
                 console.log('REQUEST:', requestContext.request)
                 console.log('ISSUER: ', requestContext.context.issuer)
                 console.log('CALCULATED TARGET: ', targetExtensionFQ)
+                console.log('PROJECT DIR: ', this.projectDir)
                 console.log('\n')
             }
 
             if (!targetExtension) {
-                // callback()
+                // NOTE: Do we allow the first project extension in the list to using _ imports? Is the router a special case?
                 console.log('EXITING BECAUSE WE ARE AT THE END OF THE EXTENSIONS!')
                 return
             }
-            // Update the request context
-            // requestContext.path = requestContext.path.replace(moduleName, `extension-${targetExtension}`)
 
             // NOTE: We overwrite the path to always be the base project where all the dependencies (extensions) are installed.
-            requestContext.path = `/Users/bchypak/Projects/pwa-kit/packages/example-project/app`
+            requestContext.path = this.projectDir
             requestContext.context.issuer = requestContext.context.issuer.replace(moduleName, `extension-${targetExtension}`)
-            
-            if (requestContext.context.compiler === 'server') {
-                console.log('NEW PATH: ', requestContext.path)
-                console.log('NEW ISSUER: ', requestContext.context.issuer)
-                console.log('\n')
-            }
-
             requestContext.request = requestContext.request.replace('_', targetExtensionFQ)
-            resolveContext.stack = undefined
+            resolveContext.stack = undefined // NOTE: This is where we might actually have to do the resolution.
+
+            debugger
             resolver.doResolve(
                 target,
                 requestContext,
