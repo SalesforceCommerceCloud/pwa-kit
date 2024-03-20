@@ -21,7 +21,6 @@ import {
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-import {onClient} from './utils'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -113,8 +112,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
         fetchOptions
     }
-    const apiClients: ApiClients = useMemo(() => {
-        const clients = {
+    const apiClients = useMemo(() => {
+        return {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
             shopperCustomers: new ShopperCustomers(config),
@@ -127,26 +126,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperSearch: new ShopperSearch(config),
             shopperSeo: new ShopperSeo(config)
         }
-        const isInStorefrontPreview = () => onClient() && window.STOREFRONT_PREVIEW
-
-        // In Storefront Preview mode, add cache breaker for the SCAPI's GET requests.
-        // Otherwise, it's possible to get stale responses after the Shopper Context is set.
-        // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
-        proxyGetRequests(clients, {
-            apply(target, thisArg, argumentsList) {
-                if (isInStorefrontPreview()) {
-                    if (argumentsList.length === 0) {
-                        argumentsList[0] = {parameters: {c_cache_breaker: new Date().getTime()}}
-                    } else {
-                        argumentsList[0].parameters = argumentsList[0].parameters ?? {}
-                        argumentsList[0].parameters.c_cache_breaker = new Date().getTime()
-                    }
-                }
-                return target.call(thisArg, ...argumentsList)
-            }
-        })
-
-        return clients
     }, [
         clientId,
         organizationId,
@@ -206,20 +185,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             </CommerceApiContext.Provider>
         </ConfigContext.Provider>
     )
-}
-
-/**
- * Via the built-in Proxy object, modify the behaviour of each GET request for the given SCAPI clients
- */
-const proxyGetRequests = (clients: ApiClients, handlers: ProxyHandler<any>) => {
-    Object.values(clients).forEach((client: Record<string, any>) => {
-        const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(client))
-        const getMethods = methods.filter((method) => method.startsWith('get'))
-
-        getMethods.forEach((getMethod) => {
-            client[getMethod] = new Proxy(client[getMethod], handlers)
-        })
-    })
 }
 
 export default CommerceApiProvider
