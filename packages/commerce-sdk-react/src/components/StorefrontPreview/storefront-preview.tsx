@@ -50,7 +50,11 @@ export const StorefrontPreview = ({
                     history[action](path, ...args)
                 }
             }
+        }
+    }, [enabled, getToken, onContextChange])
 
+    useEffect(() => {
+        if (enabled && isHostTrusted) {
             // In Storefront Preview mode, add cache breaker for the SCAPI's GET requests.
             // Otherwise, it's possible to get stale responses after the Shopper Context is set.
             // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
@@ -66,7 +70,7 @@ export const StorefrontPreview = ({
                 }
             })
         }
-    }, [enabled, getToken, onContextChange])
+    }, [apiClients])
 
     return (
         <>
