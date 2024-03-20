@@ -146,14 +146,33 @@ describe('Auth', () => {
         expect(auth.getAccessToken()).toBe('token')
     })
     test('use SFRA token over local store token if present', () => {
+        const customerId = 'customerId'
+        const customerType = 'guest'
+        const customerTypeUpperCase = 'Guest'
+        const usid = 'usid'
+        const sfraJWT = jwt.sign(
+            {
+                exp: Math.floor(Date.now() / 1000) + 1000,
+                isb: `uido:slas::upn:${customerTypeUpperCase}::uidn:Guest User::gcid:${customerId}::chid:siteId`,
+                sub: `cc-slas::realm::scid:scid::usid:${usid}`
+            },
+            'secret'
+        )
+
         const auth = new Auth(config)
         // @ts-expect-error private method
         auth.set('access_token', 'token')
         // @ts-expect-error private method
-        auth.set('access_token_sfra', '123')
+        auth.set('access_token_sfra', sfraJWT)
         // @ts-expect-error private method
-        expect(auth.getAccessToken()).toBe('123')
+        expect(auth.getAccessToken()).toBe(sfraJWT)
         expect(auth.get('access_token_sfra')).toBeFalsy()
+
+        // Check that local store is updated
+        expect(auth.get('access_token')).toBe(sfraJWT)
+        expect(auth.get('customer_id')).toBe(customerId)
+        expect(auth.get('customer_type')).toBe(customerType)
+        expect(auth.get('usid')).toBe(usid)
     })
     test('access token is cleared if SFRA sends refresh', () => {
         const auth = new Auth(config)
