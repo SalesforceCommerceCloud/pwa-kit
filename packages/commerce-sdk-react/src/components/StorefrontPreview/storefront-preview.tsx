@@ -70,7 +70,7 @@ export const StorefrontPreview = ({
                 }
             })
         }
-    }, [apiClients])
+    }, [apiClients, enabled])
 
     return (
         <>
