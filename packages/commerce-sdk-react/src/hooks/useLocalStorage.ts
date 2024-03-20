@@ -22,20 +22,20 @@ function useLocalStorage(key: string): Value {
         return window.localStorage.getItem(key)
     }
 
-    const useLocalStorageSubscribe = (callback: any) => {
+    const subscribeToLocalStorage = (callback: any) => {
         window.addEventListener('storage', callback)
         return () => window.removeEventListener('storage', callback)
     }
 
     const getLocalStorageServerSnapshot = () => {
-        // local store is not available on the server
+        // local storage is not available on the server
         return null
     }
 
     const getLocalStorageSnapshot = () => readValue()
 
     const store: Value = useSyncExternalStore(
-        useLocalStorageSubscribe,
+        subscribeToLocalStorage,
         getLocalStorageSnapshot,
         getLocalStorageServerSnapshot
     )
