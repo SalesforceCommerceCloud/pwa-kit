@@ -161,7 +161,10 @@ const jsonFromRequest = (req) => {
 /**
  * Express handler that returns a JSON response with diagnostic values
  */
-const echo = (req, res) => res.json(jsonFromRequest(req))
+const echo = async (req, res) => {
+    await new Promise((resolve) => { setTimeout(resolve, 20000) })
+    res.json(jsonFromRequest(req))
+}
 
 /**
  * Express handler that throws an IntentionalError
@@ -215,30 +218,30 @@ const cookieTest = async (req, res) => {
  */
 const loggingMiddleware = (req, res, next) => {
     // Log using winston 
-    logger.log('info', 'json log using winston that triggers KeyError');
-    logger.log({'metadata': 'defined by cust', 'level':'info', 'log':'json log using winston', 'telemetryEvent': 'telemetryEvent field defined by customer'});
+    // logger.log('info', 'json log using winston that triggers KeyError');
+    // logger.log({'metadata': 'defined by cust', 'level':'info', 'log':'json log using winston', 'telemetryEvent': 'telemetryEvent field defined by customer'});
     
     // Log using process.stdout.write
     // process.stdout.write(JSON.stringify({"jinsu-test": "this is a json log using process.stdout.write"}))
     
     // Log at each log level
-    console.log({"jinsu-test": "this is a json log using console.log"})
-    console.warn({"jinsu-test": "this is a json log using console.warn"})
-    console.debug({"jinsu-test": "this is a json log using console.debug"})
-    console.info({"jinsu-test": "this is a json log using console.info"})
-    console.error({"jinsu-test": "this is a json log using console.error"})
+    // console.log({"jinsu-test": "this is a json log using console.log"})
+    // console.warn({"jinsu-test": "this is a json log using console.warn"})
+    // console.debug({"jinsu-test": "this is a json log using console.debug"})
+    // console.info({"jinsu-test": "this is a json log using console.info"})
+    // console.error({"jinsu-test": "this is a json log using console.error"})
 
-    console.log(`Request: ${req.method} ${req.originalUrl}`)
+    // console.log(`Request: ${req.method} ${req.originalUrl}`)
     console.log(`Request headers: ${JSON.stringify(req.headers, null, 2)}`)
     // Arrange to log response status and headers
-    res.on('finish', () => {
-        const statusCode = res._header ? String(res.statusCode) : String(-1)
-        console.log(`Response status: ${statusCode}`)
-        if (res.headersSent) {
-            const headers = JSON.stringify(res.getHeaders(), null, 2)
-            console.log(`Response headers: ${headers}`)
-        }
-    })
+    // res.on('finish', () => {
+    //     const statusCode = res._header ? String(res.statusCode) : String(-1)
+    //     console.log(`Response status: ${statusCode}`)
+    //     if (res.headersSent) {
+    //         const headers = JSON.stringify(res.getHeaders(), null, 2)
+    //         console.log(`Response headers: ${headers}`)
+    //     }
+    // })
 
     return next()
 }
