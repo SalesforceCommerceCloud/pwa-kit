@@ -227,9 +227,6 @@ describe('Auth', () => {
         const auth = new Auth(config)
         const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
 
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', 'refresh_token_guest') // Simulates SFRA auth state has NOT changed and token is valid.
-
         const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: JWTNotExpired,
@@ -314,9 +311,6 @@ describe('Auth', () => {
         const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
 
         // To simulate real-world scenario, let's first test with a good valid token
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', 'refresh_token_guest') // Simulates SFRA auth state has NOT changed and token is valid.
-
         const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: JWTNotExpired,
@@ -353,9 +347,6 @@ describe('Auth', () => {
         const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
 
         // To simulate real-world scenario, let's first test with a good valid token
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', 'refresh_token_guest') // Simulates SFRA auth state has NOT changed and token is valid.
-
         const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: JWTNotExpired,
