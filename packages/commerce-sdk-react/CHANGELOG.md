@@ -4,6 +4,7 @@
 - Fix invalid query params warnings and allow custom query [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
 - Fix cannot read properties of undefined (reading 'unshift') [#1689](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1689)
 - Add Shopper SEO hook [#1688](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1688)
+- Update useLocalStorage implementation to be more responsive [#1703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1703)
 
 ## v1.3.0 (Jan 19, 2024)
 

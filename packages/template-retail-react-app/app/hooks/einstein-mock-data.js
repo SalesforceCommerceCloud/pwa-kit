@@ -429,6 +429,163 @@ export const mockSearchResults = {
     total: 4
 }
 
+export const mockNoSearchResults = {
+    limit: 0,
+    query: 'dsflksajfdklsafj',
+    refinements: [
+        {
+            attributeId: 'cgid',
+            label: 'Category'
+        },
+        {
+            attributeId: 'c_refinementColor',
+            label: 'Colour',
+            values: [
+                {
+                    hitCount: 0,
+                    label: 'Beige',
+                    presentationId: 'beige',
+                    value: 'Beige'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Black',
+                    presentationId: 'black',
+                    value: 'Black'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Blue',
+                    presentationId: 'blue',
+                    value: 'Blue'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Navy',
+                    presentationId: 'navy',
+                    value: 'Navy'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Brown',
+                    presentationId: 'brown',
+                    value: 'Brown'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Green',
+                    presentationId: 'green',
+                    value: 'Green'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Grey',
+                    presentationId: 'grey',
+                    value: 'Grey'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Orange',
+                    presentationId: 'orange',
+                    value: 'Orange'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Pink',
+                    presentationId: 'pink',
+                    value: 'Pink'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Purple',
+                    presentationId: 'purple',
+                    value: 'Purple'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Red',
+                    presentationId: 'red',
+                    value: 'Red'
+                },
+                {
+                    hitCount: 0,
+                    label: 'White',
+                    presentationId: 'white',
+                    value: 'White'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Yellow',
+                    presentationId: 'yellow',
+                    value: 'Yellow'
+                },
+                {
+                    hitCount: 0,
+                    label: 'Miscellaneous',
+                    presentationId: 'miscellaneous',
+                    value: 'Miscellaneous'
+                }
+            ]
+        },
+        {
+            attributeId: 'price',
+            label: 'Price'
+        },
+        {
+            attributeId: 'c_isNew',
+            label: 'New Arrival'
+        },
+        {
+            attributeId: 'brand',
+            label: 'By brand'
+        }
+    ],
+    searchPhraseSuggestions: {
+        suggestedTerms: [
+            {
+                originalTerm: 'dsflksajfdklsafj'
+            }
+        ]
+    },
+    selectedSortingOption: 'best-matches',
+    sortingOptions: [
+        {
+            id: 'best-matches',
+            label: 'Best Matches'
+        },
+        {
+            id: 'price-low-to-high',
+            label: 'Price Low To High'
+        },
+        {
+            id: 'price-high-to-low',
+            label: 'Price High to Low'
+        },
+        {
+            id: 'product-name-ascending',
+            label: 'Product Name A - Z'
+        },
+        {
+            id: 'product-name-descending',
+            label: 'Product Name Z - A'
+        },
+        {
+            id: 'brand',
+            label: 'Brand'
+        },
+        {
+            id: 'most-popular',
+            label: 'Most Popular'
+        },
+        {
+            id: 'top-sellers',
+            label: 'Top Sellers'
+        }
+    ],
+    offset: 0,
+    total: 0
+}
+
 export const mockBasket = {
     adjustedMerchandizeTotalTax: 1.5,
     adjustedShippingTotalTax: 0.3,
