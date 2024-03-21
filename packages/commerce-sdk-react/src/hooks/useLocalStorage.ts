@@ -10,29 +10,36 @@ type Value = string | null
 
 /**
  * @internal
- *
  */
-function useLocalStorage(key: string): Value {
-    const readValue = (): Value => {
-        // TODO: Use detectLocalStorageAvailable when app can better handle clients without storage
-        if (typeof window === 'undefined') {
-            return null
-        }
-
-        return window.localStorage.getItem(key)
-    }
-
-    const subscribeToLocalStorage = (callback: any) => {
-        window.addEventListener('storage', callback)
-        return () => window.removeEventListener('storage', callback)
-    }
-
-    const getLocalStorageServerSnapshot = () => {
-        // local storage is not available on the server
+const readValue = (key: string): Value => {
+    // TODO: Use detectLocalStorageAvailable when app can better handle clients without storage
+    if (typeof window === 'undefined') {
         return null
     }
+    return window.localStorage.getItem(key)
+}
 
-    const getLocalStorageSnapshot = () => readValue()
+/**
+ * @internal
+ */
+const subscribeToLocalStorage = (callback: any) => {
+    window.addEventListener('storage', callback)
+    return () => window.removeEventListener('storage', callback)
+}
+
+/**
+ * @internal
+ */
+const getLocalStorageServerSnapshot = () => {
+    // local storage is not available on the server
+    return null
+}
+
+/**
+ * @internal
+ */
+function useLocalStorage(key: string): Value {
+    const getLocalStorageSnapshot = () => readValue(key)
 
     const store: Value = useSyncExternalStore(
         subscribeToLocalStorage,
