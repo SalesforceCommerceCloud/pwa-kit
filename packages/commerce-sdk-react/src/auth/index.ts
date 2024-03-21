@@ -58,8 +58,6 @@ type AuthDataKeys =
     | Exclude<keyof AuthData, 'refresh_token'>
     | 'refresh_token_guest'
     | 'refresh_token_registered'
-    | 'refresh_token_guest_copy'
-    | 'refresh_token_registered_copy'
     | 'access_token_sfra'
 
 type AuthDataMap = Record<
@@ -132,24 +130,6 @@ const DATA_MAP: AuthDataMap = {
     customer_type: {
         storageType: 'local',
         key: 'customer_type'
-    },
-    // For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
-    // So we maintain a copy of the refersh_tokens in the local storage which is compared to the actual refresh_token stored in cookie storage.
-    // If the key or value of the refresh_token in local storage is different from the one in cookie storage, this indicates a change in customer auth state and we invalidate the access_token in PWA Kit.
-    // This triggers a new fetch for access_token using the current refresh_token from cookie storage and makes sure customer auth state is always in sync between SFRA and PWA sites in a hybrid setup.
-    refresh_token_guest_copy: {
-        storageType: 'local',
-        key: isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g',
-        callback: (store) => {
-            store.delete(isParentTrusted ? 'cc-nx-iframe' : 'cc-nx')
-        }
-    },
-    refresh_token_registered_copy: {
-        storageType: 'local',
-        key: isParentTrusted ? 'cc-nx-iframe' : 'cc-nx',
-        callback: (store) => {
-            store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
-        }
     },
     /*
      * For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
@@ -357,14 +337,8 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-        const refreshTokenCopyKey = isGuest
-            ? 'refresh_token_guest_copy'
-            : 'refresh_token_registered_copy'
 
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: res.refresh_token_expires_in
-        })
-        this.set(refreshTokenCopyKey, res.refresh_token, {
             expires: res.refresh_token_expires_in
         })
     }
