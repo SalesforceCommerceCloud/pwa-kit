@@ -65,7 +65,19 @@ beforeEach(() => {
     global.server.use(
         // mock product details
         rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.json({data: [{id: '701642811398M'}]}))
+            return res(
+                ctx.json({
+                    data: [
+                        {
+                            id: '701643070725M',
+                            currency: 'GBP',
+                            name: 'Long Sleeve Crew Neck',
+                            pricePerUnit: 19.18,
+                            price: 19.18
+                        }
+                    ]
+                })
+            )
         }),
         // mock the available shipping methods
         rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
@@ -162,11 +174,13 @@ beforeEach(() => {
 
         // mock place order
         rest.post('*/orders', (req, res, ctx) => {
-            currentBasket = {
+            const response = {
+                ...currentBasket,
                 ...scapiOrderResponse,
-                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'}
+                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
+                status: 'created'
             }
-            return res(ctx.json(currentBasket))
+            return res(ctx.json(response))
         }),
 
         rest.get('*/baskets', (req, res, ctx) => {
@@ -272,11 +286,13 @@ test('Can proceed through checkout steps as guest', async () => {
 
         // mock place order
         rest.post('*/orders', (req, res, ctx) => {
-            currentBasket = {
+            const response = {
+                ...currentBasket,
                 ...scapiOrderResponse,
-                customerInfo: {...scapiOrderResponse.customerInfo, email: 'test@test.com'}
+                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
+                status: 'created'
             }
-            return res(ctx.json(currentBasket))
+            return res(ctx.json(response))
         }),
 
         rest.get('*/baskets', (req, res, ctx) => {
