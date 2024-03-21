@@ -29,6 +29,37 @@ class ExtensionsResolverPlugin {
         return issuer.replace(enclosingDir, '').split('/')[1]
     }
 
+    // NOTE: I should not have have to copy this from the Resolver.js code. Find a better way to do this.
+    createStackEntry(hook, request) {
+		return (
+			hook.name +
+			": (" +
+			request.path +
+			") " +
+			(request.request || "") +
+			(request.query || "") +
+			(request.fragment || "") +
+			(request.directory ? " directory" : "") +
+			(request.module ? " module" : "")
+		);
+	}
+
+    getFirstValidExtension(resolver, packages, request) {
+        debugger
+        const fs = resolver.fileSystem
+
+        return packages
+                .reverse()
+                .find((pkg) => {
+                    const resource = `${this.projectDir}/node_modules/@salesforce/extension-${pkg}${request}.ts`
+                    
+                    try {
+                        fs.statSync(resource)
+                        return true
+                    } catch {}
+                })
+    }
+
     handleHook(requestContext, resolveContext, callback, resolver) {
         // What do I need to know?
         // 1. Are we importing from the base project?
@@ -43,17 +74,23 @@ class ExtensionsResolverPlugin {
             let targetExtension
             let targetExtensionFQ // Fully Qualified (e.g. has @salesforce namespace and "extension" prefix.)
             
+            let packages
             if (isBaseProject) {
                 targetExtension = extensions[extensions.length - 1]
+                packages = extensions
             }
 
             if (isExtension) {
                 const index = extensions.indexOf(moduleName.replace('extension-', ''))
                 targetExtension = extensions[index - 1]
+                packages = extensions.slice(0, index)
             }
 
+
             targetExtensionFQ = `@salesforce/extension-${targetExtension}`
-            
+            const myTargetExtension = this.getFirstValidExtension(resolver, [...packages], requestContext.request.replace('_', '')) // packages, request
+            targetExtensionFQ = `@salesforce/extension-${myTargetExtension}`
+
             // Focus on one compiler to get a clear picture of what is happening.
             if (requestContext.context.compiler === 'server') {
                 console.log('MODULE NAME: ', moduleName)
@@ -65,22 +102,24 @@ class ExtensionsResolverPlugin {
                 console.log('ISSUER: ', requestContext.context.issuer)
                 console.log('CALCULATED TARGET: ', targetExtensionFQ)
                 console.log('PROJECT DIR: ', this.projectDir)
+                console.log('SMART TARGET: ', myTargetExtension)
                 console.log('\n')
             }
 
-            if (!targetExtension) {
-                // NOTE: Do we allow the first project extension in the list to using _ imports? Is the router a special case?
-                console.log('EXITING BECAUSE WE ARE AT THE END OF THE EXTENSIONS!')
-                return
-            }
+            // if (!targetExtension) {
+            //     // NOTE: Do we allow the first project extension in the list to using _ imports? Is the router a special case?
+            //     console.log('EXITING BECAUSE WE ARE AT THE END OF THE EXTENSIONS!')
+            //     return
+            // }
 
+            debugger
             // NOTE: We overwrite the path to always be the base project where all the dependencies (extensions) are installed.
             requestContext.path = this.projectDir
             requestContext.context.issuer = requestContext.context.issuer.replace(moduleName, `extension-${targetExtension}`)
             requestContext.request = requestContext.request.replace('_', targetExtensionFQ)
             resolveContext.stack = undefined // NOTE: This is where we might actually have to do the resolution.
+        
 
-            debugger
             resolver.doResolve(
                 target,
                 requestContext,

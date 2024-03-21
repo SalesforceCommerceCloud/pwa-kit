@@ -10,7 +10,7 @@ interface Props {
     value: number
 }
 
-const Home = ({value}: Props) => {
+const StoreFinder = ({value}: Props) => {
     return (
         <div>
             <h1>Store Finder</h1>
@@ -18,6 +18,6 @@ const Home = ({value}: Props) => {
     )
 }
 
-Home.getTemplateName = () => 'home'
+StoreFinder.getTemplateName = () => 'store-finder'
 
-export default Home
+export default StoreFinder
