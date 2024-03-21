@@ -58,8 +58,7 @@ type AuthDataKeys =
     | Exclude<keyof AuthData, 'refresh_token'>
     | 'refresh_token_guest'
     | 'refresh_token_registered'
-    | 'refresh_token_guest_copy'
-    | 'refresh_token_registered_copy'
+    | 'access_token_sfra'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -128,27 +127,25 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'local',
         key: 'refresh_token_expires_in'
     },
-    // For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
-    // So we maintain a copy of the refersh_tokens in the local storage which is compared to the actual refresh_token stored in cookie storage.
-    // If the key or value of the refresh_token in local storage is different from the one in cookie storage, this indicates a change in customer auth state and we invalidate the access_token in PWA Kit.
-    // This triggers a new fetch for access_token using the current refresh_token from cookie storage and makes sure customer auth state is always in sync between SFRA and PWA sites in a hybrid setup.
-    refresh_token_guest_copy: {
-        storageType: 'local',
-        key: isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g',
-        callback: (store) => {
-            store.delete(isParentTrusted ? 'cc-nx-iframe' : 'cc-nx')
-        }
-    },
-    refresh_token_registered_copy: {
-        storageType: 'local',
-        key: isParentTrusted ? 'cc-nx-iframe' : 'cc-nx',
-        callback: (store) => {
-            store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
-        }
-    },
     customer_type: {
         storageType: 'local',
         key: 'customer_type'
+    },
+    /*
+     * For Hybrid setups, we need a mechanism to inform PWA Kit whenever customer login state changes on SFRA.
+     * We do this by having SFRA store the access token in cookies. If these cookies are present, PWA
+     * compares the access token from the cookie with the one in local store. If the tokens are different,
+     * discard the access token in local store and replace it with the access token from the cookie.
+     *
+     * ECOM has a 1200 character limit on the values of cookies. The access token easily exceeds this amount
+     * so it sends the access token in chunks across several cookies.
+     *
+     * The JWT tends to come in at around 2250 characters so there's usually
+     * both a cc-at and cc-at_2.
+     */
+    access_token_sfra: {
+        storageType: 'cookie',
+        key: 'cc-at'
     }
 }
 
@@ -274,36 +271,54 @@ class Auth {
     }
 
     /**
-     * WARNING: This function is relevant to be used in Hybrid deployments only.
-     * Compares the refresh_token keys for guest('cc-nx-g') and registered('cc-nx') login from the cookie received from SFRA with the copy stored in localstorage on PWA Kit
-     * to determine if the login state of the shopper on SFRA site has changed. If the keys are different we return true considering the login state did change. If the keys are same,
-     * we compare the values of the refresh_token to cover an edge case where the login state might have changed multiple times on SFRA and the eventual refresh_token key might be same
-     * as that on PWA Kit which would incorrectly show both keys to be the same even though the sessions are different.
-     * @returns {boolean} true if the keys do not match (login state changed), false otherwise.
+     * Returns the SLAS access token or an empty string if the access token
+     * is not found in local store or if SFRA wants PWA to trigger refresh token login.
+     *
+     * On PWA-only sites, this returns the access token from local storage.
+     * On Hybrid sites, this checks whether SFRA has sent an auth token via cookies.
+     * Returns an access token from SFRA if it exist.
+     * If not, the access token from local store is returned.
+     *
+     * This is only used within this Auth module since other modules consider the access
+     * token from this.get('access_token') to be the source of truth.
+     *
+     * @returns {string} access token
      */
-    private hasSFRAAuthStateChanged() {
-        const refreshTokenKey =
-            (this.get('refresh_token_registered') && 'refresh_token_registered') ||
-            'refresh_token_guest'
+    private getAccessToken() {
+        let accessToken = this.get('access_token')
+        const sfraAuthToken = this.get('access_token_sfra')
 
-        const refreshTokenCopyKey =
-            (this.get('refresh_token_registered_copy') && 'refresh_token_registered_copy') ||
-            'refresh_token_guest_copy'
+        if (sfraAuthToken && accessToken !== sfraAuthToken) {
+            /*
+             * If SFRA sends 'refresh', we return an empty token here so PWA can trigger a login refresh
+             * This key is used when logout is triggered in SFRA but the redirect after logout
+             * sends the user to PWA.
+             */
+            if (sfraAuthToken === 'refresh') {
+                this.set('access_token', '')
+                this.clearSFRAAuthToken()
+                return ''
+            }
 
-        if (DATA_MAP[refreshTokenKey].key !== DATA_MAP[refreshTokenCopyKey].key) {
-            return true
+            const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
+            this.set('access_token', sfraAuthToken)
+            this.set('customer_id', customerId)
+            this.set('usid', usid)
+            this.set('customer_type', isGuest ? 'guest' : 'registered')
+
+            accessToken = sfraAuthToken
+            // SFRA -> PWA access token cookie handoff is succesful so we clear the SFRA made cookies.
+            // We don't want these cookies to persist and continue overriding what is in local store.
+            this.clearSFRAAuthToken()
         }
 
-        return this.get(refreshTokenKey) !== this.get(refreshTokenCopyKey)
+        return accessToken
     }
 
-    /**
-     * Used to validate JWT expiry and ensure auth state consistency with SFRA in a hybrid setup
-     * @param token access_token received on SLAS authentication
-     * @returns {boolean} true if JWT is valid; false otherwise
-     */
-    private isTokenValidForHybrid(token: string) {
-        return !this.isTokenExpired(token) && !this.hasSFRAAuthStateChanged()
+    private clearSFRAAuthToken() {
+        const {key, storageType} = DATA_MAP['access_token_sfra']
+        const store = this.stores[storageType]
+        store.delete(key)
     }
 
     /**
@@ -322,14 +337,8 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-        const refreshTokenCopyKey = isGuest
-            ? 'refresh_token_guest_copy'
-            : 'refresh_token_registered_copy'
 
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: res.refresh_token_expires_in
-        })
-        this.set(refreshTokenCopyKey, res.refresh_token, {
             expires: res.refresh_token_expires_in
         })
     }
@@ -390,9 +399,9 @@ class Auth {
         if (this.pendingToken) {
             return await this.pendingToken
         }
-        const accessToken = this.get('access_token')
+        const accessToken = this.getAccessToken()
 
-        if (accessToken && this.isTokenValidForHybrid(accessToken)) {
+        if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')

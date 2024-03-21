@@ -11,7 +11,8 @@ import {
     mockCategory,
     mockSearchResults,
     mockBasket,
-    mockRecommenderDetails
+    mockRecommenderDetails,
+    mockNoSearchResults
 } from '@salesforce/retail-react-app/app/hooks/einstein-mock-data'
 import fetchMock from 'jest-fetch-mock'
 
@@ -61,6 +62,23 @@ describe('EinsteinAPI', () => {
                     'x-cq-client-id': 'test-id'
                 },
                 body: '{"searchText":"tie","products":[{"id":"25752986M","sku":"25752986M","altId":"","altIdType":""},{"id":"25752235M","sku":"25752235M","altId":"","altIdType":""},{"id":"25752218M","sku":"25752218M","altId":"","altIdType":""},{"id":"25752981M","sku":"25752981M","altId":"","altIdType":""}],"showProducts":true,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+            }
+        )
+    })
+
+    test('viewSearch: no search results', async () => {
+        const searchTerm = 'dsflksajfdklsafj'
+        await einsteinApi.sendViewSearch(searchTerm, mockNoSearchResults, {cookieId: 'test-usid'})
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/viewSearch',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                // Most importantly, the body should contain `products=[]` and `showProducts=false`
+                body: '{"searchText":"dsflksajfdklsafj","products":[],"showProducts":false,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })

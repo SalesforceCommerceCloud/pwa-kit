@@ -50,6 +50,24 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                             />
                         </Badge>
                     )}
+                    {variant.isProductUnavailable && (
+                        <Badge
+                            position="absolute"
+                            top={0}
+                            left={0}
+                            marginLeft={2}
+                            marginTop={2}
+                            fontSize="10px"
+                            variant="solid"
+                            colorScheme="red"
+                        >
+                            <FormattedMessage
+                                defaultMessage="Unavailable"
+                                id="item_image.label.unavailable"
+                                description="A unavailable badge placed on top of a product image"
+                            />
+                        </Badge>
+                    )}
 
                     {image && (
                         <Image

@@ -161,14 +161,13 @@ export class EinsteinAPI {
         const endpoint = `/activities/${this.siteId}/viewSearch`
         const method = 'POST'
 
-        const products = searchResults?.hits?.map((product) =>
-            this._constructEinsteinProduct(product)
-        )
+        const products =
+            searchResults?.hits?.map((product) => this._constructEinsteinProduct(product)) ?? []
 
         const body = {
             searchText,
             products,
-            showProducts: true, // Needed by Reports and Dashboards to differentiate searches with results vs no results
+            showProducts: Boolean(products.length), // Needed by Reports and Dashboards to differentiate searches with results vs no results
             ...args
         }
 
