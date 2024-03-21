@@ -11,6 +11,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import {getAssetUrl} from '../../../../ssr/universal/utils'
 
 /**
  * The Document is a special component that can be overridden in a project, it

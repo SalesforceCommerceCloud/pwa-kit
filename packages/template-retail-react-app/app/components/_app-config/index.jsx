@@ -26,6 +26,8 @@ import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
+// import '../../theme/sass/sass-test.scss'
+
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this

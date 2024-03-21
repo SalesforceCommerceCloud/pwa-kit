@@ -141,7 +141,10 @@ export const DevServerMixin = {
             config = require(projectWebpackPath)
         }
         app.__compiler = webpack(config)
-        app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
+        app.__devMiddleware = webpackDevMiddleware(app.__compiler, {
+            serverSideRender: true,
+            writeToDisk: (path) => /style\.css$/.test(path)
+        })
         app.__isInitialBuild = true
         app.__webpackReady = () => Boolean(app.__devMiddleware.context.state)
         app.__devMiddleware.waitUntilValid(() => {

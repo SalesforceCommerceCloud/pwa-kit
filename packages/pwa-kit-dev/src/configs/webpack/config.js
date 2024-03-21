@@ -23,6 +23,8 @@ import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
@@ -238,7 +240,11 @@ const baseConfig = (target) => {
                     sdkReplacementPlugin(),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
-                    target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
+                    target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
+
+                    new MiniCssExtractPlugin({
+                        filename: 'static/style.css'
+                    })
                 ].filter(Boolean),
 
                 module: {
@@ -265,6 +271,24 @@ const baseConfig = (target) => {
                             use: {
                                 loader: findDepInStack('source-map-loader')
                             }
+                        },
+                        {
+                            test: /\.(sa|sc|c)ss$/,
+                            use: [
+                                {
+                                    loader: MiniCssExtractPlugin.loader
+                                },
+                                {
+                                    loader: findDepInStack('css-loader')
+                                }
+                            ],
+                        },
+                        {
+                          test: /\.(woff|woff2)$/i,
+                          type: 'asset/resource',
+                          generator: {
+                            filename: 'static/fonts/[hash][ext][query]'
+                          }
                         }
                     ].filter(Boolean)
                 }
