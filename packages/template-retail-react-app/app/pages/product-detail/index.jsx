@@ -48,7 +48,7 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
-const ProductDetail = () => {
+const ProductDetail = (props) => {
     const {formatMessage} = useIntl()
     const history = useHistory()
     const location = useLocation()
@@ -69,7 +69,11 @@ const ProductDetail = () => {
     const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
-    const {productId} = useParams()
+    let {productId} = useParams()
+    if (props.productId) {
+        productId = props.productId
+    }
+
     const urlParams = new URLSearchParams(location.search)
     const {
         data: product,
@@ -89,7 +93,6 @@ const ProductDetail = () => {
             keepPreviousData: true
         }
     )
-
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
     const {

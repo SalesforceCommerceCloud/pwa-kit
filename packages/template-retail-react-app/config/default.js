@@ -10,12 +10,12 @@ const sites = require('./sites.js')
 module.exports = {
     app: {
         url: {
-            site: 'path',
-            locale: 'path',
-            showDefaults: true,
+            site: 'none',
+            locale: 'none',
+            showDefaults: false,
             interpretPlusSignAsSpace: false
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'RefArch',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'

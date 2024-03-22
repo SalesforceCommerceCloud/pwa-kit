@@ -23,6 +23,8 @@ import {
     Link
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
+import {Link as RouteLink} from 'react-router-dom'
+
 // Project Components
 import Hero from '@salesforce/retail-react-app/app/components/hero'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -80,6 +82,13 @@ const Home = () => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+
+            <Link
+                as={RouteLink}
+                to="/custom-url"
+            >
+                This is a custom page link!
+            </Link>
 
             <Hero
                 title={intl.formatMessage({

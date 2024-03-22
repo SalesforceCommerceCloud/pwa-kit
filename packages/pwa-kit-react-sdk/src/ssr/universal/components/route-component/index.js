@@ -402,10 +402,10 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  *
  * @private
  */
-export const getRoutes = (locals) => {
+export const getRoutes = async (locals) => {
     let _routes = routes
     if (typeof routes === 'function') {
-        _routes = routes()
+        _routes = await routes(locals)
     }
     const allRoutes = [
         // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
