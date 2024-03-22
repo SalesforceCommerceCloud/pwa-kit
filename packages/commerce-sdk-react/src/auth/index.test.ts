@@ -56,13 +56,8 @@ const config = {
 }
 
 const configSLASPrivate = {
-    clientId: 'clientId',
-    organizationId: 'organizationId',
-    shortCode: 'shortCode',
-    siteId: 'siteId',
-    proxy: 'proxy',
-    redirectURI: 'redirectURI',
-    enablePrivateClient: true
+    ...config,
+    enablePWAKitPrivateClient: true
 }
 
 describe('Auth', () => {
@@ -424,6 +419,20 @@ describe('Auth', () => {
         const auth = new Auth(config)
         await auth.logout()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
+    })
+    test('PWA private client mode takes priority', async () => {
+        const auth = new Auth({...configSLASPrivate, clientSecret: 'someSecret'})
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
+        const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
+    })
+    test('Can set a client secret', async () => {
+        const auth = new Auth({...config, clientSecret: 'someSecret'})
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
+        const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: 'someSecret'})
     })
     test('running on the server uses a shared context memory store', () => {
         const refreshTokenGuest = 'guest'

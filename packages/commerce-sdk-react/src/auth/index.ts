@@ -16,7 +16,11 @@ import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
 import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
-import {SLAS_SECRET_WARNING_MSG, SLAS_SECRET_PLACEHOLDER} from '../constant'
+import {
+    SLAS_SECRET_WARNING_MSG,
+    SLAS_SECRET_PLACEHOLDER,
+    SLAS_SECRET_OVERRIDE_MSG
+} from '../constant'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -26,7 +30,7 @@ interface AuthConfig extends ApiClientConfigParams {
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
     OCAPISessionsURL?: string
-    enablePrivateClient?: boolean
+    enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
 }
@@ -166,7 +170,7 @@ class Auth {
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private OCAPISessionsURL: string
-    private clientSecretPlaceholder: string
+    private clientSecret: string
     private silenceWarnings: boolean
 
     constructor(config: AuthConfig) {
@@ -175,7 +179,7 @@ class Auth {
         const privateClientEndpoint = `${baseUrl}/mobify/scapi/shopper/auth`
 
         this.client = new ShopperLogin({
-            proxy: config.enablePrivateClient ? privateClientEndpoint : config.proxy,
+            proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -218,11 +222,16 @@ class Auth {
         // We think there are users of Commerce SDK React and Commerce SDK isomorphic outside of PWA
         // For these users to use a private client, they must have some way to set a client secret
         // PWA users should not need to touch this.
-        this.clientSecretPlaceholder = config.enablePrivateClient
-            ? SLAS_SECRET_PLACEHOLDER // PWA proxy is enabled, assume project is PWA
-            : config.clientSecret
-            ? config.clientSecret
-            : ''
+        if (config.enablePWAKitPrivateClient && config.clientSecret) {
+            this.logWarning(SLAS_SECRET_OVERRIDE_MSG)
+        }
+
+        this.clientSecret = config.enablePWAKitPrivateClient
+            ? // PWA proxy is enabled, assume project is PWA and that the proxy will handle setting the secret
+              // We can pass any truthy value here to satisfy commerce-sdk-isomorphic requirements
+              SLAS_SECRET_PLACEHOLDER
+            : config.clientSecret || ''
+
         this.silenceWarnings = config.silenceWarnings || false
     }
 
@@ -423,7 +432,7 @@ class Auth {
                             this.client,
                             {refreshToken},
                             {
-                                clientSecret: this.clientSecretPlaceholder
+                                clientSecret: this.clientSecret
                             }
                         ),
                     !!refreshTokenGuest
@@ -464,11 +473,7 @@ class Auth {
      *
      */
     async loginGuestUser() {
-        if (
-            this.clientSecretPlaceholder &&
-            onClient() &&
-            this.clientSecretPlaceholder !== SLAS_SECRET_PLACEHOLDER
-        ) {
+        if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
@@ -476,13 +481,13 @@ class Auth {
         const guestPrivateArgs = [
             this.client,
             {...(usid && {usid})},
-            {clientSecret: this.clientSecretPlaceholder}
+            {clientSecret: this.clientSecret}
         ] as const
         const guestPublicArgs = [
             this.client,
             {redirectURI: this.redirectURI, ...(usid && {usid})}
         ] as const
-        const callback = this.clientSecretPlaceholder
+        const callback = this.clientSecret
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
             : () => helpers.loginGuestUser(...guestPublicArgs)
 
@@ -524,11 +529,7 @@ class Auth {
      *
      */
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
-        if (
-            this.clientSecretPlaceholder &&
-            onClient() &&
-            this.clientSecretPlaceholder !== SLAS_SECRET_PLACEHOLDER
-        ) {
+        if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const redirectURI = this.redirectURI
@@ -538,7 +539,7 @@ class Auth {
             this.client,
             {
                 ...credentials,
-                clientSecret: this.clientSecretPlaceholder
+                clientSecret: this.clientSecret
             },
             {
                 redirectURI,

@@ -32,7 +32,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     headers?: Record<string, string>
     fetchedToken?: string
     OCAPISessionsURL?: string
-    enablePrivateClient?: boolean
+    enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
 }
@@ -99,7 +99,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         currency,
         fetchedToken,
         OCAPISessionsURL,
-        enablePrivateClient,
+        enablePWAKitPrivateClient,
         clientSecret,
         silenceWarnings
     } = props
@@ -154,7 +154,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchOptions,
             fetchedToken,
             OCAPISessionsURL,
-            enablePrivateClient,
+            enablePWAKitPrivateClient,
             clientSecret,
             silenceWarnings
         })
@@ -168,7 +168,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchOptions,
         fetchedToken,
         OCAPISessionsURL,
-        enablePrivateClient,
+        enablePWAKitPrivateClient,
         clientSecret,
         silenceWarnings
     ])
