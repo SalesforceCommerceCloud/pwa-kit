@@ -9,7 +9,6 @@ const { exec } = require("child_process");
 const { isPrompt } = require("./utils.js");
 
 const runGeneratorWithResponses = (cmd, cliResponses = []) => {
-  console.log("executing cmd", cmd);
   const child = exec(cmd);
   return new Promise((resolve, reject) => {
     let expectedPrompt, response;

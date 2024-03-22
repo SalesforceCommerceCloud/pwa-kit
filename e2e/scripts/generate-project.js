@@ -33,7 +33,6 @@ const main = async (opts) => {
     const preset = GENERATE_WITH_PRESET.find((o) => o.projectKey === project);
 
     if (preset) {
-      console.log("Preset", preset)
       generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset.presetId}`
     }
     
