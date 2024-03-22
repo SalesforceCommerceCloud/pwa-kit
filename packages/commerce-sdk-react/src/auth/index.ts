@@ -26,6 +26,7 @@ interface AuthConfig extends ApiClientConfigParams {
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
     OCAPISessionsURL?: string
+    enablePrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
 }
@@ -165,7 +166,7 @@ class Auth {
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
     private OCAPISessionsURL: string
-    private clientSecret: string
+    private clientSecretPlaceholder: string
     private silenceWarnings: boolean
 
     constructor(config: AuthConfig) {
@@ -174,7 +175,7 @@ class Auth {
         const privateClientEndpoint = `${baseUrl}/mobify/scapi/shopper/auth`
 
         this.client = new ShopperLogin({
-            proxy: config.clientSecret ? privateClientEndpoint : config.proxy,
+            proxy: config.enablePrivateClient ? privateClientEndpoint : config.proxy,
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -214,7 +215,12 @@ class Auth {
 
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
-        this.clientSecret = config.clientSecret || ''
+        // We think there are users of Commerce SDK React and Commerce SDK isomorphic outside of PWA
+        // For these users to use a private client, they must have some way to set a client secret
+        // PWA users should not need to touch this.
+        this.clientSecretPlaceholder = config.enablePrivateClient
+            ? "_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_SECRET" // PWA proxy is enabled, assume project is PWA
+            : config.clientSecret ? config.clientSecret : ''
         this.silenceWarnings = config.silenceWarnings || false
     }
 
@@ -415,7 +421,7 @@ class Auth {
                             this.client,
                             {refreshToken},
                             {
-                                clientSecret: this.clientSecret
+                                clientSecret: this.clientSecretPlaceholder
                             }
                         ),
                     !!refreshTokenGuest
@@ -456,17 +462,17 @@ class Auth {
      *
      */
     async loginGuestUser() {
-        if (this.clientSecret && onClient()) {
+        if (this.clientSecretPlaceholder && onClient()) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
         const isGuest = true
-        const guestPrivateArgs = [this.client, {}, {clientSecret: this.clientSecret}] as const
+        const guestPrivateArgs = [this.client, {...(usid && {usid})}, {clientSecret: this.clientSecretPlaceholder}] as const
         const guestPublicArgs = [
             this.client,
             {redirectURI: this.redirectURI, ...(usid && {usid})}
         ] as const
-        const callback = this.clientSecret
+        const callback = this.clientSecretPlaceholder
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
             : () => helpers.loginGuestUser(...guestPublicArgs)
 
@@ -498,8 +504,7 @@ class Auth {
         })
         await this.loginRegisteredUserB2C({
             username: login,
-            password,
-            clientSecret: this.clientSecret
+            password
         })
         return res
     }
@@ -509,13 +514,16 @@ class Auth {
      *
      */
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
-        if (this.clientSecret && onClient()) {
+        if (this.clientSecretPlaceholder && onClient()) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const isGuest = false
-        const token = await helpers.loginRegisteredUserB2C(this.client, credentials, {
+        const token = await helpers.loginRegisteredUserB2C(this.client, {
+            ...credentials,
+            clientSecret: this.clientSecretPlaceholder
+            }, {
             redirectURI,
             ...(usid && {usid})
         })

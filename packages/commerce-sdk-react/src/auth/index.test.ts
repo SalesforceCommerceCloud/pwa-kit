@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 
-const SLAS_PRIVATE_SECRET_PLACEHOLDER = 'slas-private-secret-placeholder'
+const SLAS_PRIVATE_SECRET_PLACEHOLDER = '_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_SECRET'
 
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
@@ -63,7 +63,7 @@ const configSLASPrivate = {
     siteId: 'siteId',
     proxy: 'proxy',
     redirectURI: 'redirectURI',
-    clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
+    enablePrivateClient: true
 }
 
 describe('Auth', () => {
@@ -411,8 +411,7 @@ describe('Auth', () => {
         const auth = new Auth(configSLASPrivate)
         await auth.loginRegisteredUserB2C({
             username: 'test',
-            password: 'test',
-            clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
+            password: 'test'
         })
         expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
         const functionArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][1]

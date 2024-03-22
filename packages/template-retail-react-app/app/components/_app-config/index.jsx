@@ -64,8 +64,8 @@ const AppConfig = ({children, locals = {}}) => {
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
-            // Uncomment 'clientSecret' to use SLAS private client login flows
-            // clientSecret="_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_SECRET"
+            // Uncomment 'enablePrivateClient' to use SLAS private client login flows
+            enablePrivateClient={true}
             OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
