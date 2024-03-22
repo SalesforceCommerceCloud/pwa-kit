@@ -22,6 +22,7 @@ import WishlistSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages
 
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 
 const numberOfSkeletonItems = 3
 
@@ -60,6 +61,7 @@ const AccountWishlist = () => {
     const deleteCustomerProductListItem = useShopperCustomersMutation(
         'deleteCustomerProductListItem'
     )
+
     const {data: customer} = useCurrentCustomer()
 
     const handleSecondaryAction = async (itemId, promise) => {
@@ -73,6 +75,23 @@ const AccountWishlist = () => {
             setWishlistItemLoading(false)
             setSelectedItem(undefined)
         }
+    }
+
+    const handleUnavailableProducts = async (unavailableProductIds) => {
+        if (!unavailableProductIds.length) return
+        await Promise.all(
+            unavailableProductIds.map(async (id) => {
+                const item = wishListItems?.find((item) => {
+                    return item.productId.toString() === id.toString()
+                })
+                const parameters = {
+                    customerId: customer.customerId,
+                    itemId: item?.id,
+                    listId: wishListData?.id
+                }
+                await deleteCustomerProductListItem.mutateAsync({parameters})
+            })
+        )
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
@@ -197,6 +216,11 @@ const AccountWishlist = () => {
                         }
                     />
                 ))}
+
+            <UnavailableProductConfirmationModal
+                productIds={productIds}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
         </Stack>
     )
 }
