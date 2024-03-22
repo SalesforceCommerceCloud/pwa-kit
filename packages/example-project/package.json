@@ -40,7 +40,7 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
-    "extensions": ["retail-react-app-base", "retail-react-app-storefinder", "retail-react-app-account"],
+    "extensions": ["retail-react-app-base", "retail-react-app-storefinder-api", "retail-react-app-storefinder", "retail-react-app-account"],
     "ssrEnabled": true,
     "ssrOnly": [
       "ssr.js",

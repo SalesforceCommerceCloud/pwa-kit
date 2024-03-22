@@ -6,33 +6,26 @@
  */
 import path from 'path'
 
-// import forEachBail from 'enhanced-resolve/lib/forEachBail'
-// import {basename} from 'enhanced-resolve/lib/getPaths'
-
 function forEachBail(array, iterator, callback) {
-	if (array.length === 0) return callback();
-    console.log('forEachBail: ', array)
-    debugger
-	let i = 0;
+	if (array.length === 0) {
+        return callback()
+    }
+
+    let i = 0
 	const next = () => {
 		/** @type {boolean|undefined} */
-		let loop = undefined;
-        console.log('calling iterator with: ', array[i], i)
+		let loop = undefined
+
 		iterator(
 			array[i++],
 			(err, result) => {
-                if (err || result !== undefined) {
-                    debugger
-                    console.log('MMMM DID NOT FIND THE DEP LETS LOOK IN THE NEXT PACKAGE')
-                    // return callback(err, result);
+                // NOTE: This logic needs to be cleaned up, but for now I will not touch it!
+                if (err || !result) {
+                    // do nothing?
                 } else if (i >= array.length) {
-                    debugger
-                    console.log('MMMM DID NOT FIND THE DEP IN ALL OF THE ARRAY, THAT SHOULD NOT HAVE HAPPENED')
                     loop = true;
                     return callback(err, result)
                 } else {
-                    debugger
-                    console.log('LOOKS LIKE WE SUCCEEDED, LETS RETURN')
                     loop = true;
                     return callback(err, result);
                 }
@@ -40,12 +33,16 @@ function forEachBail(array, iterator, callback) {
                 loop = true;
 			},
 			i
-		);
-		if (!loop) loop = false;
-		return loop;
-	};
+		)
+
+        if (!loop) {
+            loop = false
+        }
+
+		return loop
+	}
 	while (next());
-};
+}
 
 /**
  * @class ExtensionsResolverPlugin
@@ -82,7 +79,6 @@ class ExtensionsResolverPlugin {
 
         if (isExtension) {
             const index = extensions.indexOf(moduleName.replace('extension-', ''))
-            targetExtension = extensions[index - 1]
             packages = extensions.slice(0, index)
         }
 
@@ -99,16 +95,10 @@ class ExtensionsResolverPlugin {
             callback()
             return
         }
-        console.log('__+_+_+_+_+__+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+___+_++_+_+__')
+
         const target = resolver.ensureHook('resolve')
         const packages = this.getExtensions(request)
         const moduleName = this.parseModuleName(request.context.issuer)
-
-        if (request.context.compiler === 'server') {
-            console.log('ISSUER: ', request.context.issuer)
-            console.log('REQUEST: ', request.request)
-            console.log('PACKAGES: ', packages)
-        }
 
         forEachBail(
             packages,
@@ -126,12 +116,6 @@ class ExtensionsResolverPlugin {
                     stack: undefined
                 }
                 
-                if (request.context.compiler === 'server') {
-                    console.log('NEW ISSUER: ', req.context.issuer)
-                    console.log('NEW REQUEST: ', req.request)
-                    console.log('NEW PATH: ', req.path)
-                }
-                
                 resolver.doResolve(
                     target, 
                     req, 
@@ -139,6 +123,7 @@ class ExtensionsResolverPlugin {
                     resolveContext, 
                     innerCallback
                 )
+                
             },
             callback
         )
