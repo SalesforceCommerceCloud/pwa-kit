@@ -281,7 +281,7 @@ jobs:
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
 
-      - name: Generate Retail App Demo
+      - name: Generate Retail App Private Client
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-private-client"
