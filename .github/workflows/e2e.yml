@@ -280,9 +280,6 @@ jobs:
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
 
-      - name: Clear Verdaccio Storage
-        run: rm -rf packages/pwa-kit-create-app/local-npm-repo/storage
-
       - name: Generate Retail App Private Client
         uses: ./.github/actions/e2e_generate_app
         with:
