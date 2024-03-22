@@ -52,16 +52,15 @@ export const CustomPropTypes = {
 }
 
 /**
- * Via the built-in Proxy object, modify the behaviour of each GET request for the given SCAPI clients
+ * Via the built-in Proxy object, modify the behaviour of each request for the given SCAPI clients
  * @private
  */
-export const proxyGetRequests = (clients: ApiClients, handlers: ProxyHandler<any>) => {
+export const proxyRequests = (clients: ApiClients, handlers: ProxyHandler<any>) => {
     Object.values(clients).forEach((client: Record<string, any>) => {
         const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(client))
-        const getMethods = methods.filter((method) => method.startsWith('get'))
 
-        getMethods.forEach((getMethod) => {
-            client[getMethod] = new Proxy(client[getMethod], handlers)
+        methods.forEach((method) => {
+            client[method] = new Proxy(client[method], handlers)
         })
     })
 }

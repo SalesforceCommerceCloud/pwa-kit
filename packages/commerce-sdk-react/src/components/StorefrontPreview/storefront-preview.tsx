@@ -8,7 +8,7 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
-import {CustomPropTypes, detectStorefrontPreview, getClientScript, proxyGetRequests} from './utils'
+import {CustomPropTypes, detectStorefrontPreview, getClientScript, proxyRequests} from './utils'
 import {useHistory} from 'react-router-dom'
 import type {LocationDescriptor} from 'history'
 import {useCommerceApi} from '../../hooks'
@@ -55,11 +55,10 @@ export const StorefrontPreview = ({
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
-            // In Storefront Preview mode, add cache breaker for the SCAPI's GET requests.
+            // In Storefront Preview mode, add cache breaker for all SCAPI's requests.
             // Otherwise, it's possible to get stale responses after the Shopper Context is set.
             // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
-            // TODO: proxy _all_ requests
-            proxyGetRequests(apiClients, {
+            proxyRequests(apiClients, {
                 apply(target, thisArg, argumentsList) {
                     argumentsList[0] = {
                         ...argumentsList[0],
