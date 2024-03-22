@@ -117,9 +117,7 @@ describe('ShopperOrders mutations', () => {
             result.current.mutate(options as Opts)
         })
         await waitAndExpectError(() => result.current)
-        // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
-        // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
-        expect(result.current.error).toHaveProperty('response')
+        expect(result.current.error).toStrictEqual({error: true})
     })
     test('`createOrder` updates the cache on success', async () => {
         const [mutationName, options] = createTestCase
