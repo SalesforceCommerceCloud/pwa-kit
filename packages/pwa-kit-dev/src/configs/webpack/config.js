@@ -192,17 +192,6 @@ const baseConfig = (target) => {
                             projectDir: process.cwd()
                         })
                     ],
-                    // ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
-                    //     ? {
-                    //           plugins: [
-                    //               new OverridesResolverPlugin({
-                    //                   extends: [EXT_EXTENDS],
-                    //                   overridesDir: EXT_OVERRIDES_DIR,
-                    //                   projectDir: process.cwd()
-                    //               })
-                    //           ]
-                    //       }
-                    //     : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
                         ...Object.assign(

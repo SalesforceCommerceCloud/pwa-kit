@@ -5,7 +5,47 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path from 'path'
-import glob from 'glob'
+
+// import forEachBail from 'enhanced-resolve/lib/forEachBail'
+// import {basename} from 'enhanced-resolve/lib/getPaths'
+
+function forEachBail(array, iterator, callback) {
+	if (array.length === 0) return callback();
+    console.log('forEachBail: ', array)
+    debugger
+	let i = 0;
+	const next = () => {
+		/** @type {boolean|undefined} */
+		let loop = undefined;
+        console.log('calling iterator with: ', array[i], i)
+		iterator(
+			array[i++],
+			(err, result) => {
+                if (err || result !== undefined) {
+                    debugger
+                    console.log('MMMM DID NOT FIND THE DEP LETS LOOK IN THE NEXT PACKAGE')
+                    // return callback(err, result);
+                } else if (i >= array.length) {
+                    debugger
+                    console.log('MMMM DID NOT FIND THE DEP IN ALL OF THE ARRAY, THAT SHOULD NOT HAVE HAPPENED')
+                    loop = true;
+                    return callback(err, result)
+                } else {
+                    debugger
+                    console.log('LOOKS LIKE WE SUCCEEDED, LETS RETURN')
+                    loop = true;
+                    return callback(err, result);
+                }
+                if (loop === false) while (next());
+                loop = true;
+			},
+			i
+		);
+		if (!loop) loop = false;
+		return loop;
+	};
+	while (next());
+};
 
 /**
  * @class ExtensionsResolverPlugin
@@ -29,107 +69,80 @@ class ExtensionsResolverPlugin {
         return issuer.replace(enclosingDir, '').split('/')[1]
     }
 
-    // NOTE: I should not have have to copy this from the Resolver.js code. Find a better way to do this.
-    createStackEntry(hook, request) {
-		return (
-			hook.name +
-			": (" +
-			request.path +
-			") " +
-			(request.request || "") +
-			(request.query || "") +
-			(request.fragment || "") +
-			(request.directory ? " directory" : "") +
-			(request.module ? " module" : "")
-		);
-	}
+    getExtensions(request) {
+        const {extensions} = this.pkg.mobify
+        const moduleName = this.parseModuleName(request.context.issuer)
+        const isBaseProject = moduleName === this.pkg.name
+        const isExtension = extensions.includes(moduleName.replace('extension-', ''))
+        let packages
 
-    getFirstValidExtension(resolver, packages, request) {
-        debugger
-        const fs = resolver.fileSystem
+        if (isBaseProject) {
+            packages = extensions
+        }
+
+        if (isExtension) {
+            const index = extensions.indexOf(moduleName.replace('extension-', ''))
+            targetExtension = extensions[index - 1]
+            packages = extensions.slice(0, index)
+        }
+
+        packages = [...packages]
+        packages.reverse()
 
         return packages
-                .reverse()
-                .find((pkg) => {
-                    const resource = `${this.projectDir}/node_modules/@salesforce/extension-${pkg}${request}.ts`
-                    
-                    try {
-                        fs.statSync(resource)
-                        return true
-                    } catch {}
-                })
     }
 
-    handleHook(requestContext, resolveContext, callback, resolver) {
-        // What do I need to know?
-        // 1. Are we importing from the base project?
-        // 2. Are we importing from an extension? and which index is it?
-        const {extensions} = this.pkg.mobify
+    handleHook(request, resolveContext, callback, resolver) {
 
-        if (requestContext.request.startsWith('_')) {
-            const target = resolver.ensureHook('resolve')
-            const moduleName = this.parseModuleName(requestContext.context.issuer)
-            const isBaseProject = moduleName === this.pkg.name
-            const isExtension = extensions.includes(moduleName.replace('extension-', ''))
-            let targetExtension
-            let targetExtensionFQ // Fully Qualified (e.g. has @salesforce namespace and "extension" prefix.)
-            
-            let packages
-            if (isBaseProject) {
-                targetExtension = extensions[extensions.length - 1]
-                packages = extensions
-            }
-
-            if (isExtension) {
-                const index = extensions.indexOf(moduleName.replace('extension-', ''))
-                targetExtension = extensions[index - 1]
-                packages = extensions.slice(0, index)
-            }
-
-
-            targetExtensionFQ = `@salesforce/extension-${targetExtension}`
-            const myTargetExtension = this.getFirstValidExtension(resolver, [...packages], requestContext.request.replace('_', '')) // packages, request
-            targetExtensionFQ = `@salesforce/extension-${myTargetExtension}`
-
-            // Focus on one compiler to get a clear picture of what is happening.
-            if (requestContext.context.compiler === 'server') {
-                console.log('MODULE NAME: ', moduleName)
-                console.log('CONTEXT IS PROJECT: ', isBaseProject)
-                console.log('CONTEXT IS EXTENSION: ', isExtension)
-                console.log('EXTENSIONS: ', extensions)
-                console.log('PATH: ', requestContext.path)
-                console.log('REQUEST:', requestContext.request)
-                console.log('ISSUER: ', requestContext.context.issuer)
-                console.log('CALCULATED TARGET: ', targetExtensionFQ)
-                console.log('PROJECT DIR: ', this.projectDir)
-                console.log('SMART TARGET: ', myTargetExtension)
-                console.log('\n')
-            }
-
-            // if (!targetExtension) {
-            //     // NOTE: Do we allow the first project extension in the list to using _ imports? Is the router a special case?
-            //     console.log('EXITING BECAUSE WE ARE AT THE END OF THE EXTENSIONS!')
-            //     return
-            // }
-
-            debugger
-            // NOTE: We overwrite the path to always be the base project where all the dependencies (extensions) are installed.
-            requestContext.path = this.projectDir
-            requestContext.context.issuer = requestContext.context.issuer.replace(moduleName, `extension-${targetExtension}`)
-            requestContext.request = requestContext.request.replace('_', targetExtensionFQ)
-            resolveContext.stack = undefined // NOTE: This is where we might actually have to do the resolution.
-        
-
-            resolver.doResolve(
-                target,
-                requestContext,
-                `${this.constructor.name} found base override file`,
-                resolveContext,
-                callback
-            )
-        } else {
+        // Early exit for none Feature Loader imports
+        if (!request.request.startsWith('_')) {
             callback()
+            return
         }
+        console.log('__+_+_+_+_+__+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+___+_++_+_+__')
+        const target = resolver.ensureHook('resolve')
+        const packages = this.getExtensions(request)
+        const moduleName = this.parseModuleName(request.context.issuer)
+
+        if (request.context.compiler === 'server') {
+            console.log('ISSUER: ', request.context.issuer)
+            console.log('REQUEST: ', request.request)
+            console.log('PACKAGES: ', packages)
+        }
+
+        forEachBail(
+            packages,
+            (feature, innerCallback) => {
+                // approach taken from: https://github.com/webpack/enhanced-resolve/blob/v4.0.0/lib/CloneBasenamePlugin.js
+                const featureModule = `@salesforce/extension-${feature}`
+                const req = {
+                    ...request,
+                    context: {
+                        ...request.context,
+                        issuer: request.context.issuer.replace(moduleName, `extension-${feature}`)
+                    },
+                    path: this.projectDir,
+                    request: request.request.replace('_', featureModule),
+                    stack: undefined
+                }
+                
+                if (request.context.compiler === 'server') {
+                    console.log('NEW ISSUER: ', req.context.issuer)
+                    console.log('NEW REQUEST: ', req.request)
+                    console.log('NEW PATH: ', req.path)
+                }
+                
+                resolver.doResolve(
+                    target, 
+                    req, 
+                    `${this.constructor.name} found base override file`, 
+                    resolveContext, 
+                    innerCallback
+                )
+            },
+            callback
+        )
+
     }
 
     apply(resolver) {
