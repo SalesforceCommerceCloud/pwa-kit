@@ -3,8 +3,10 @@ import loadable, {LoadableComponent} from '@loadable/component'
 
 // Make this page its own chunk.
 const Home = loadable(() => import('./pages/home'))
-const ProductDetail = loadable(() => import('./pages/product-detail'))
+const ProductDetail = loadable(() => import('_/pages/product-detail'))
 const ProductList = loadable(() => import('./pages/product-list'))
+
+// import ProductDetail from '_/pages/product-detail'
 
 // This is the "customizeApp" function that the runtimes create handler calls.
 const routes = [

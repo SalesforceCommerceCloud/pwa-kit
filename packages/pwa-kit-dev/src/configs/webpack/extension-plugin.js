@@ -100,18 +100,28 @@ class ExtensionsResolverPlugin {
         const packages = this.getExtensions(request)
         const moduleName = this.parseModuleName(request.context.issuer)
 
+        // If we aren't importing the routes file, add the `.` to the pacakges so we include the 
+        // base project as the highest priority override location.
+        const isRouter = request.request.includes('/app/routes')
+        if (!isRouter) {
+            packages.unshift('.')
+        }
+
         forEachBail(
             packages,
             (feature, innerCallback) => {
                 // approach taken from: https://github.com/webpack/enhanced-resolve/blob/v4.0.0/lib/CloneBasenamePlugin.js
-                const featureModule = `@salesforce/extension-${feature}`
+                // DEVELOPER NOTE: This is were we probably want to distringuish the types of extensions, there could be modules,
+                // file references, tupals, etc.
+                const isLocalDevExtension = feature === '.'
+                const featureModule = isLocalDevExtension ? feature : `@salesforce/extension-${feature}`
                 const req = {
                     ...request,
                     context: {
                         ...request.context,
-                        issuer: request.context.issuer.replace(moduleName, `extension-${feature}`)
+                        issuer: isLocalDevExtension ? request.context.issuer : request.context.issuer.replace(moduleName, `extension-${feature}`)
                     },
-                    path: this.projectDir,
+                    path: this.projectDir + '/app',
                     request: request.request.replace('_', featureModule),
                     stack: undefined
                 }
