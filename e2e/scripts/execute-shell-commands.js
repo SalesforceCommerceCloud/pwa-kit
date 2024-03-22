@@ -11,7 +11,7 @@ const { isPrompt } = require("./utils.js");
 const runGeneratorWithResponses = (cmd, cliResponses) => {
   const child = exec(cmd);
   return new Promise((resolve, reject) => {
-    if (cliResponses) {
+    if (cliResponses.expectedPrompt) {
       let { expectedPrompt, response } = cliResponses.shift();
       let isGenratorRunning = false;
 
