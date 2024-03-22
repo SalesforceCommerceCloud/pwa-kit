@@ -7,6 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useLocation, Redirect} from 'react-router-dom'
 
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
@@ -26,6 +27,12 @@ import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
+import useBlock from '@salesforce/retail-react-app/app/hooks/use-block'
+import {useUrlMapping} from '@salesforce/retail-react-app/app/pages/seo-url-mapping/use-url-mapping'
+
+const wait = async (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
@@ -36,6 +43,7 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
  */
 const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
+    const {pathname, search} = useLocation()
     const headers = {
         'correlation-id': correlationId
     }
@@ -43,6 +51,38 @@ const AppConfig = ({children, locals = {}}) => {
     const commerceApiConfig = locals.appConfig.commerceAPI
 
     const appOrigin = getAppOrigin()
+
+    const REDIRECTS_ENABLED = true
+    useBlock(async (location) => {
+        // If the redirect feature is not enabled we don't need to circumvent the normal routing flow, so we return
+        // "false" to not block.
+        if (!REDIRECTS_ENABLED) {
+            return false
+        } 
+
+        // If the redirect feature IS enabled there are 2 ways we can solve the problem. 
+        // 1. We can block navigation until we check to see if there is a redirect for the clicked link.
+        // 2. We navigate the an intermediate page that will handle checking for a url mapping and do what is
+        //    needs to do.
+        // There are pros and cons to each, the first option we don't have an intermediate page so it's not as jarring, 
+        // but we will have lag in all links transitioning. The second options doesn't have this lag in transition, but 
+        // it has this secondary page that we must show (loader) that happens on all links. 
+        // 
+        // DEVELOPER NOTE: I think its a really bad idea to implement redirects in a single page app.
+        // This gets caught by the catch-all route.
+        return `/_seo-url-mapping?locationPathname=${location.pathname}&locationSearch=${location.search}`
+    })
+    const {data: urlMapping} = useUrlMapping({
+        parameters: {
+            urlSegment: pathname
+        }
+    })
+
+    // DEVELOPER NOTE: Think about when we need to run this code, should we only be doing it when we are
+    // on the server?
+    if (urlMapping?.redirectUrl) {
+        return <Redirect to={`/global/en-GB/${urlMapping.redirectUrl.destinationType}/${urlMapping.redirectUrl.destinationId}${search}`} />
+    }
 
     return (
         <CommerceApiProvider
@@ -120,7 +160,83 @@ const options = {
                 retry: false
             }
         }
+    },
+    // NOTE: The API for `dehydratedState` will be an object in the form of a react query client cache state
+    // object, it can also be a function that returns the same object or an asyn function that returns that same 
+    // object type. We are going to use this API to make a pre-fetch to get the mapping information for the given
+    // pathname which is passed in via a context object argument.
+    // DEVELOPER NOTE: We should probably place this function in another file and only apply the enhancement if the feature
+    // is enabled. 
+    // DEVELOPER NOTE: Is it possible through overrides to break this feature? Probably.
+    dehydratedState: async ({location}) => {
+        const {pathname} = location
+        const queries = []
+
+        // NOTE: This function is essentially simulating the getUrlMapping endpoint of the 
+        // Shopper SEO API.
+        await new Promise((resolve) => setTimeout(resolve, 200))
+        
+        if (pathname === '/custom-product-path') {
+            queries.push({
+                // This represents the smallest definition of a query state, you absoloutly need
+                // `dataUpdatedAt` and `status`.
+                state: {
+                    data: {
+                        resourceId: '66936828M',
+                        resourceType: 'PRODUCT'
+                    },
+                    dataUpdatedAt: Date.now(),
+                    status: 'success'
+                },
+                queryKey: [
+                    'url-mappings',
+                    '/custom-product-path'
+                ]
+            })
+        } else if (pathname === '/custom-product-path-bad') {
+            queries.push({
+                state: {
+                    dataUpdatedAt: Date.now(),
+                    error: 'No seo url found!',
+                    errorUpdatedAt: Date.now(),
+                    status: 'error'
+                },
+                queryKey: [
+                    'url-mappings',
+                    '/custom-product-path-bad'
+                ]
+            })
+        } else if (pathname === '/global/en-GB/product/52416781M') {
+            queries.push({
+                state: {
+                    data: {
+                        redirectUrl: {
+                            copySourceParams: false,
+                            destinationId: "42416786M",
+                            destinationType: "product",
+                            statusCode: "301",
+                            destinationUrl: "https://staging-c7testing-cdd.demandware.net/s/SiteGenesis/casual%20to%20dressy%20trousers/?lang=en_US"
+                        },
+                        resourceId: '52416781M',
+                        resourceType: 'product'
+                    },
+                    dataUpdatedAt: Date.now(),
+                    status: 'success'
+                },
+                queryKey: [
+                    'url-mappings',
+                    '/global/en-GB/product/52416781M'
+                ]
+            })
+        }
+
+        return {
+            queries
+        }
     }
 }
 
-export default withReactQuery(AppConfig, options)
+export default withReactQuery(
+    AppConfig, 
+    options
+)

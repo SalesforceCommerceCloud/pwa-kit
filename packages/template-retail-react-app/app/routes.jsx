@@ -43,7 +43,12 @@ const ProductList = loadable(() => import('./pages/product-list'), {
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
+const SEOUrlMapping = loadable(() => import('./pages/seo-url-mapping'))
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+
+// Use the Configuration to set this value.
+const ENABLE_SEO_ROUTES = true
+const CatchAll = ENABLE_SEO_ROUTES ? SEOUrlMapping : PageNotFound
 
 export const routes = [
     {
@@ -107,7 +112,7 @@ export const routes = [
     },
     {
         path: '*',
-        component: PageNotFound
+        component: CatchAll
     }
 ]
 

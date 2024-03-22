@@ -22,6 +22,7 @@ import {
     Container,
     Link
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Link as RouteLink} from 'react-router-dom'
 
 // Project Components
 import Hero from '@salesforce/retail-react-app/app/components/hero'
@@ -80,6 +81,28 @@ const Home = () => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+            <Link
+                as={RouteLink}
+                to="/custom-product-path"
+                
+            >
+                This is a custom product page link!
+            </Link>
+            <br/>
+            <Link
+                as={RouteLink}
+                to="/custom-product-path-bad"
+                
+            >
+                This is a custom product page link that is not valid!
+            </Link>
+            <br/>
+            <Link
+                as={RouteLink}
+                to="/global/en-GB/product/52416781M"
+            >
+                This link has a redirect!
+            </Link>
 
             <Hero
                 title={intl.formatMessage({
