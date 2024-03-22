@@ -260,8 +260,6 @@ describe('ShopperBaskets mutations', () => {
             expect(result.current.mutation.error).toBeNull()
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectError(() => result.current.mutation)
-            // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
-            // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
             expect(result.current.mutation.error).toStrictEqual(mutationResponse)
             assertUpdateQuery(result.current.basket, oldBasket)
             assertUpdateQuery(result.current.customerBaskets, oldCustomerBaskets)
