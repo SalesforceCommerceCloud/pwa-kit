@@ -58,13 +58,15 @@ export const StorefrontPreview = ({
             // In Storefront Preview mode, add cache breaker for the SCAPI's GET requests.
             // Otherwise, it's possible to get stale responses after the Shopper Context is set.
             // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
+            // TODO: proxy _all_ requests
             proxyGetRequests(apiClients, {
                 apply(target, thisArg, argumentsList) {
-                    if (argumentsList.length === 0) {
-                        argumentsList[0] = {parameters: {c_cache_breaker: new Date().getTime()}}
-                    } else {
-                        argumentsList[0].parameters = argumentsList[0].parameters ?? {}
-                        argumentsList[0].parameters.c_cache_breaker = new Date().getTime()
+                    argumentsList[0] = {
+                        ...argumentsList[0],
+                        parameters: {
+                            ...argumentsList[0]?.parameters,
+                            c_cache_breaker: new Date().getTime()
+                        }
                     }
                     return target.call(thisArg, ...argumentsList)
                 }
