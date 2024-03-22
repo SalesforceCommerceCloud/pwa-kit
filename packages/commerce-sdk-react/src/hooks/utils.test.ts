@@ -6,7 +6,7 @@
  */
 
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import {mergeOptions, getCustomKeys} from './utils'
+import {mergeOptions, getCustomKeys, handleApiError} from './utils'
 
 describe('Hook utils', () => {
     test('mergeOptions merges body, header, and options', () => {
@@ -67,5 +67,25 @@ describe('getCustomKey', function () {
             some_key: 'hello'
         })
         expect(res).toEqual([])
+    })
+})
+
+describe('handleApiError', () => {
+    test('should return the result of the function if no error is thrown', async () => {
+        const mockFunc = jest.fn().mockResolvedValue('success')
+        const result = await handleApiError(mockFunc)
+        expect(result).toBe('success')
+    })
+
+    test('should throw the error response if the error is an object with a response property', async () => {
+        const mockResponse = {json: jest.fn().mockResolvedValue('error response')}
+        const mockFunc = jest.fn().mockRejectedValue({response: mockResponse})
+        await expect(handleApiError(mockFunc)).rejects.toEqual('error response')
+        expect(mockResponse.json).toHaveBeenCalled()
+    })
+
+    test('should throw the original error if the error is not an object with a response property', async () => {
+        const mockFunc = jest.fn().mockRejectedValue('error')
+        await expect(handleApiError(mockFunc)).rejects.toEqual('error')
     })
 })
