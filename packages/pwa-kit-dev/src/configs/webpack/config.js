@@ -199,26 +199,6 @@ const baseConfig = (target) => {
                                 [dep]: findDepInStack(dep)
                             }))
                         )
-                        // ,
-                        // ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
-                        //     ? Object.assign(
-                        //           // NOTE: when an array of `extends` dirs are accepted, don't coerce here
-                        //           ...[EXT_EXTENDS].map((extendTarget) => ({
-                        //               [extendTarget]: path.resolve(
-                        //                   projectDir,
-                        //                   'node_modules',
-                        //                   ...extendTarget.split('/')
-                        //               )
-                        //           }))
-                        //       )
-                        //     : {}),
-                        // ...(EXT_EXTENDABLE
-                        //     ? Object.assign(
-                        //           ...[EXT_EXTENDABLE].map((item) => ({
-                        //               [item]: path.resolve(projectDir)
-                        //           }))
-                        //       )
-                        //     : {})
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },

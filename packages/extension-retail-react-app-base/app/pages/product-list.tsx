@@ -13,7 +13,7 @@ interface Props {
 const ProductList = ({value}: Props) => {
     return (
         <div>
-            <h1>Product Detail Page</h1>
+            <h1>Product List Page</h1>
         </div>
     )
 }

@@ -8,7 +8,6 @@
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import pkg from '../package.json'
-import applyHandlers from './handlers'
 
 const options = {
     // The build directory (an absolute path)
@@ -32,7 +31,14 @@ const runtime = getRuntime()
 
 
 const {handler} = runtime.createHandler(options, (app) => {
-    applyHandlers({app, runtime})
+    // Handle the redirect from SLAS as to avoid error
+    app.get('/callback?*', (req, res) => {
+        res.send()
+    })
+
+    app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
+
+    app.get('*', runtime.render)
 })
 
 // SSR requires that we export a single handler function called 'get', that

@@ -18,6 +18,6 @@ const Account = ({value}: Props) => {
     )
 }
 
-Account.getTemplateName = () => 'home'
+Account.getTemplateName = () => 'account'
 
 export default Account
