@@ -36,7 +36,7 @@
     "semver": "^7.3.8",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
-    "tar": "^6.1.13"
+    "tar": "^6.2.1"
   },
   "devDependencies": {
     "internal-lib-build": "^2.7.4",
