@@ -269,7 +269,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: npm
 
       - name: Update NPM version
         if: env.IS_DEFAULT_NPM == 'false'
