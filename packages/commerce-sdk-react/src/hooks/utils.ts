@@ -138,3 +138,19 @@ export const getCustomKeys = <T extends object>(obj: T) => {
     }
     return Object.keys(obj).filter((key: string): key is `c_${string}` => key.startsWith('c_'))
 }
+
+// The error thrown by the commerce-sdk-isomorphic methods is an object with a `response` property
+// that contains the error response. We make the hooks eaiser to use by awaiting the error response
+// and throw it directly. This enables access to error directly via query.error or mutation.error
+// Otherwise it's a pain to access errors.
+export const handleApiError = async <T>(func: () => Promise<T>): Promise<T> => {
+    try {
+        return await func()
+    } catch (e) {
+        if (typeof e === 'object' && e !== null && 'response' in e) {
+            const json = await (e.response as Response).json()
+            throw json
+        }
+        throw e
+    }
+}

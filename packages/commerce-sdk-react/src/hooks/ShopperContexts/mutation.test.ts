@@ -76,7 +76,7 @@ describe('Shopper Contexts mutation hooks', () => {
         // 1. Populate cache with initial data
         expect(result.current.query.error).toBeNull()
         await waitAndExpectError(() => result.current.query)
-        expect(result.current.query.error).toHaveProperty('response')
+        expect(result.current.query.error).toBeTruthy()
 
         // 2. Do creation mutation
         act(() => result.current.mutation.mutate(options))
