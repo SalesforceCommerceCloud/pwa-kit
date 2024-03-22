@@ -65,7 +65,7 @@ const AppConfig = ({children, locals = {}}) => {
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
             // Uncomment 'enablePrivateClient' to use SLAS private client login flows.
-            // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this
+            // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             // enablePrivateClient={true}
             OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
         >

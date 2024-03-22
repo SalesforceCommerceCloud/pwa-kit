@@ -16,3 +16,5 @@ export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
 
 export const SLAS_SECRET_WARNING_MSG =
     'You are potentially exposing SLAS secret on browser. Make sure to keep it safe and secure!'
+
+export const SLAS_SECRET_PLACEHOLDER = '_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_SECRET'

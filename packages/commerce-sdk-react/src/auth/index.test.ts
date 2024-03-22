@@ -8,8 +8,7 @@ import Auth, {AuthData} from './'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
-
-const SLAS_PRIVATE_SECRET_PLACEHOLDER = '_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_SECRET'
+import {SLAS_SECRET_PLACEHOLDER} from '../constant'
 
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
@@ -376,7 +375,7 @@ describe('Auth', () => {
         await auth.ready()
         expect(helpers.refreshAccessToken).toHaveBeenCalled()
         const funcArg = (helpers.refreshAccessToken as jest.Mock).mock.calls[0][2]
-        expect(funcArg).toMatchObject({clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER})
+        expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
     })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
@@ -396,7 +395,7 @@ describe('Auth', () => {
         await auth.loginGuestUser()
         expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
         const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
-        expect(funcArg).toMatchObject({clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER})
+        expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
     })
 
     test('loginRegisteredUserB2C', async () => {
@@ -418,7 +417,7 @@ describe('Auth', () => {
         expect(functionArg).toMatchObject({
             username: 'test',
             password: 'test',
-            clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
+            clientSecret: SLAS_SECRET_PLACEHOLDER
         })
     })
     test('logout', async () => {

@@ -16,7 +16,7 @@ import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
 import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
-import {SLAS_SECRET_WARNING_MSG} from '../constant'
+import {SLAS_SECRET_WARNING_MSG, SLAS_SECRET_PLACEHOLDER} from '../constant'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -219,8 +219,10 @@ class Auth {
         // For these users to use a private client, they must have some way to set a client secret
         // PWA users should not need to touch this.
         this.clientSecretPlaceholder = config.enablePrivateClient
-            ? "_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_SECRET" // PWA proxy is enabled, assume project is PWA
-            : config.clientSecret ? config.clientSecret : ''
+            ? SLAS_SECRET_PLACEHOLDER // PWA proxy is enabled, assume project is PWA
+            : config.clientSecret
+            ? config.clientSecret
+            : ''
         this.silenceWarnings = config.silenceWarnings || false
     }
 
@@ -462,12 +464,20 @@ class Auth {
      *
      */
     async loginGuestUser() {
-        if (this.clientSecretPlaceholder && onClient()) {
+        if (
+            this.clientSecretPlaceholder &&
+            onClient() &&
+            this.clientSecretPlaceholder !== SLAS_SECRET_PLACEHOLDER
+        ) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
         const isGuest = true
-        const guestPrivateArgs = [this.client, {...(usid && {usid})}, {clientSecret: this.clientSecretPlaceholder}] as const
+        const guestPrivateArgs = [
+            this.client,
+            {...(usid && {usid})},
+            {clientSecret: this.clientSecretPlaceholder}
+        ] as const
         const guestPublicArgs = [
             this.client,
             {redirectURI: this.redirectURI, ...(usid && {usid})}
@@ -514,19 +524,27 @@ class Auth {
      *
      */
     async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
-        if (this.clientSecretPlaceholder && onClient()) {
+        if (
+            this.clientSecretPlaceholder &&
+            onClient() &&
+            this.clientSecretPlaceholder !== SLAS_SECRET_PLACEHOLDER
+        ) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const isGuest = false
-        const token = await helpers.loginRegisteredUserB2C(this.client, {
-            ...credentials,
-            clientSecret: this.clientSecretPlaceholder
-            }, {
-            redirectURI,
-            ...(usid && {usid})
-        })
+        const token = await helpers.loginRegisteredUserB2C(
+            this.client,
+            {
+                ...credentials,
+                clientSecret: this.clientSecretPlaceholder
+            },
+            {
+                redirectURI,
+                ...(usid && {usid})
+            }
+        )
         this.handleTokenResponse(token, isGuest)
         if (onClient() && this.OCAPISessionsURL) {
             void this.createOCAPISession()
