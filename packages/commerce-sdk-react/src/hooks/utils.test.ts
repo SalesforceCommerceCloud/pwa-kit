@@ -80,12 +80,12 @@ describe('handleApiError', () => {
     test('should throw the error response if the error is an object with a response property', async () => {
         const mockResponse = {json: jest.fn().mockResolvedValue('error response')}
         const mockFunc = jest.fn().mockRejectedValue({response: mockResponse})
-        await expect(handleApiError(mockFunc)).rejects.toEqual('error response')
+        await expect(handleApiError(mockFunc)).rejects.toBe('error response')
         expect(mockResponse.json).toHaveBeenCalled()
     })
 
     test('should throw the original error if the error is not an object with a response property', async () => {
         const mockFunc = jest.fn().mockRejectedValue('error')
-        await expect(handleApiError(mockFunc)).rejects.toEqual('error')
+        await expect(handleApiError(mockFunc)).rejects.toBe('error')
     })
 })
