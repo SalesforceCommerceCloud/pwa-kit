@@ -314,7 +314,7 @@ jobs:
     steps:
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result == 'success' }}
+        if: ${{ needs.run-generator-private-client.result == 'success' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -326,7 +326,7 @@ jobs:
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result != 'success'  }}
+        if: ${{ needs.run-generator-private-client.result != 'success'  }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
