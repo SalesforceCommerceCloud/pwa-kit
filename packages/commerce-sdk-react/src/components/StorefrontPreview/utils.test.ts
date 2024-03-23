@@ -6,7 +6,7 @@
  */
 import type {DOMWindow, JSDOM} from 'jsdom'
 import {getParentOrigin} from '../../utils'
-import {getClientScript, detectStorefrontPreview} from './utils'
+import {getClientScript, detectStorefrontPreview, proxyRequests} from './utils'
 
 const LOCALHOST_ORIGIN = 'http://localhost:4000'
 const RUNTIME_ADMIN_ORIGIN = 'https://runtime.commercecloud.com'
@@ -90,6 +90,35 @@ describe('Storefront Preview utils', () => {
         test('returns false for non-trusted ancestor origin', () => {
             setAncestorOrigins(OTHER_ORIGIN)
             expect(detectStorefrontPreview()).toBe(false)
+        })
+    })
+
+    describe('proxyRequests', () => {
+        test('proxy handlers applied to all client methods', () => {
+            // Mock clients with methods to be proxied
+            const clients = {clientA: {}, clientB: {}}
+            Object.setPrototypeOf(clients.clientA, {
+                method1: jest.fn(),
+                method2: jest.fn()
+            })
+            Object.setPrototypeOf(clients.clientB, {
+                method3: jest.fn(),
+                method4: jest.fn()
+            })
+
+            // Mock handlers
+            const handlers = {
+                apply: jest.fn()
+            }
+
+            proxyRequests(clients, handlers)
+
+            clients.clientA.method1()
+            clients.clientA.method2()
+            clients.clientB.method3()
+            clients.clientB.method4()
+
+            expect(handlers.apply).toHaveBeenCalledTimes(4)
         })
     })
 })
