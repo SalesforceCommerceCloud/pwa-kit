@@ -42,6 +42,10 @@ module.exports = {
         response: "987fc116-d30c-4537-93cb-c2bd433c3b5a\n",
       },
       {
+        expectedPrompt: /Is your SLAS client private?/i,
+        response: "2\n",
+      },
+      {
         expectedPrompt: /What is your Site ID in Business Manager?/i,
         response: "RefArch\n",
       },
@@ -76,6 +80,10 @@ module.exports = {
       {
         expectedPrompt: /What is your SLAS Client ID?/i,
         response: "987fc116-d30c-4537-93cb-c2bd433c3b5a\n",
+      },
+      {
+        expectedPrompt: /Is your SLAS client private?/i,
+        response: "2\n",
       },
       {
         expectedPrompt: /What is your Site ID in Business Manager?/i,
