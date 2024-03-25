@@ -15,6 +15,7 @@ import {
 } from '@tanstack/react-query'
 import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
+import {ApiClients} from './hooks/types'
 
 // Note: this host does NOT exist
 // it is intentional b/c we can catch those unintercepted requests
@@ -222,3 +223,17 @@ export const waitAndExpectError = async <Data, Err, Vars, Ctx>(
         {interval: WAIT_FOR_INTERVAL}
     )
 }
+
+export const apiClientsKeys: (keyof ApiClients)[] = [
+    'shopperBaskets',
+    'shopperContexts',
+    'shopperCustomers',
+    'shopperExperience',
+    'shopperGiftCertificates',
+    'shopperLogin',
+    'shopperOrders',
+    'shopperProducts',
+    'shopperPromotions',
+    'shopperSearch',
+    'shopperSeo'
+]
