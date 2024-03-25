@@ -12,7 +12,7 @@ import {Helmet} from 'react-helmet'
 
 declare global {
     interface Window {
-        STOREFRONT_PREVIEW: Record<string, unknown>
+        STOREFRONT_PREVIEW?: Record<string, unknown>
     }
 }
 
@@ -25,16 +25,8 @@ jest.mock('./utils', () => {
 })
 
 describe('Storefront Preview Component', function () {
-    const oldWindow = window
-
     beforeEach(() => {
-        // eslint-disable-next-line
-        window = {...oldWindow}
-    })
-
-    afterEach(() => {
-        // eslint-disable-next-line
-        window = oldWindow
+        delete window.STOREFRONT_PREVIEW
     })
 
     test('Renders children when enabled', () => {
@@ -91,23 +83,18 @@ describe('Storefront Preview Component', function () {
         })
     })
 
-    test('getToken is defined in window.STOREFRONT_PREVIEW when it is defined', () => {
-        window.STOREFRONT_PREVIEW = {}
+    test('window.STOREFRONT_PREVIEW is defined properly', () => {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
-        render(<StorefrontPreview getToken={() => 'my-token'} />)
-        expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
-    })
-
-    test('onContextChange is defined in window.STOREFRONT_PREVIEW when it is defined', () => {
-        window.STOREFRONT_PREVIEW = {}
-        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
-
-        render(<StorefrontPreview enabled={true} getToken={() => 'my-token'} onContextChange={() => undefined} />)
-        expect(window.STOREFRONT_PREVIEW.onContextChange).toBeDefined()
-    })
-
-    test('experimental unsafe props are defined', () => {
-        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate).toBeDefined()
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                onContextChange={() => {}}
+            />
+        )
+        expect(window.STOREFRONT_PREVIEW?.getToken).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW?.onContextChange).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate).toBeDefined()
     })
 })
