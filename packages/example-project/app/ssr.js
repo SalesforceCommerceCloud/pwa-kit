@@ -29,7 +29,6 @@ const options = {
 
 const runtime = getRuntime()
 
-
 const {handler} = runtime.createHandler(options, (app) => {
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {

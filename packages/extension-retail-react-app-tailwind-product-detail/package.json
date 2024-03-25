@@ -1,5 +1,5 @@
 {
-  "name": "example-project",
+  "name": "@salesforce/extension-retail-react-app-tailwind-product-detail",
   "version": "3.5.0-dev",
   "private": true,
   "scripts": {
@@ -18,12 +18,6 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/extension-retail-react-app-account": "3.5.0-dev",
-    "@salesforce/extension-retail-react-app-discovery-pages": "3.5.0-dev",
-    "@salesforce/extension-retail-react-app-empty-extension": "3.5.0-dev",
-    "@salesforce/extension-retail-react-app-custom-home": "3.5.0-dev",
-    "@salesforce/extension-retail-react-app-storefinder": "3.5.0-dev",
-    "@salesforce/extension-retail-react-app-tailwind-product-detail": "3.5.0-dev",
     "@salesforce/pwa-kit-dev": "3.5.0-dev",
     "@salesforce/pwa-kit-react-sdk": "3.5.0-dev",
     "@salesforce/pwa-kit-runtime": "3.5.0-dev",
@@ -36,7 +30,15 @@
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.3.4",
     "typescript": "4.9.5",
-     
+
+    "@headlessui/react": "^1.7.18",
+    "@heroicons/react": "^2.1.3",
+    "tailwindcss": "^3.4.1",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "@tailwindcss/aspect-ratio": "^0.4.2"
+  },
+  "peerDependencies": {
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.3",
     "tailwindcss": "^3.4.1",
@@ -49,14 +51,7 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
-    "extensions": [
-      "retail-react-app-discovery-pages", 
-      "retail-react-app-custom-home", 
-      "retail-react-app-empty-extension", 
-      "retail-react-app-storefinder",
-      "retail-react-app-tailwind-product-detail",
-      "retail-react-app-account"
-    ],
+    "extends": ["retail-react-app-base", "retail-react-app-storefinder"],
     "ssrEnabled": true,
     "ssrOnly": [
       "ssr.js",
