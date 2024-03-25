@@ -247,6 +247,8 @@ jobs:
   run-generator-private-client:
     strategy:
       fail-fast: false
+      # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
+      max-parallel: 1
       matrix:
         # Run all matrix env at once because we will not deploy demo app to MRT.
         node: [16, 18, 20]
