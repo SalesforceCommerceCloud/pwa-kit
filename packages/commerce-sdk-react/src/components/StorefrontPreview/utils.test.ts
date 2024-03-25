@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import type {DOMWindow, JSDOM} from 'jsdom'
+import {useCommerceApi} from '../../hooks'
+import {renderHookWithProviders} from '../../test-utils'
 import {getParentOrigin} from '../../utils'
 import {getClientScript, detectStorefrontPreview, proxyRequests} from './utils'
 
@@ -22,6 +24,8 @@ const mockTop = new Proxy({} as DOMWindow, {
         throw new Error(`window.top['${String(prop)}'] is not mocked.`)
     }
 })
+
+jest.mock('../../auth/index.ts')
 
 describe('Storefront Preview utils', () => {
     let originalLocation: string
@@ -94,29 +98,18 @@ describe('Storefront Preview utils', () => {
     })
 
     describe('proxyRequests', () => {
-        test('proxy handlers applied to all client methods', () => {
-            // Mock clients with methods to be proxied
-            const clients = {clientA: {}, clientB: {}}
-            Object.setPrototypeOf(clients.clientA, {
-                method1: jest.fn(),
-                method2: jest.fn()
-            })
-            Object.setPrototypeOf(clients.clientB, {
-                method3: jest.fn(),
-                method4: jest.fn()
-            })
-
-            // Mock handlers
-            const handlers = {
-                apply: jest.fn()
-            }
+        test('proxy handlers applied to all client methods', async () => {
+            const {result} = renderHookWithProviders(() => useCommerceApi())
+            const clients = result.current
+            const shopperBaskets = clients.shopperBaskets
+            const handlers = {apply: jest.fn()}
 
             proxyRequests(clients, handlers)
 
-            clients.clientA.method1()
-            clients.clientA.method2()
-            clients.clientB.method3()
-            clients.clientB.method4()
+            await shopperBaskets.getBasket()
+            await shopperBaskets.getTaxesFromBasket()
+            await shopperBaskets.getPriceBooksForBasket()
+            await shopperBaskets.getShippingMethodsForShipment()
 
             expect(handlers.apply).toHaveBeenCalledTimes(4)
         })
