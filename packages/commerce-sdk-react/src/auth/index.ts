@@ -219,18 +219,33 @@ class Auth {
 
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
-        // We think there are users of Commerce SDK React and Commerce SDK isomorphic outside of PWA
-        // For these users to use a private client, they must have some way to set a client secret
-        // PWA users should not need to touch this.
+        /*
+         * There are 2 ways to enable SLAS private client mode.
+         * If enablePWAKitPrivateClient=true, we route SLAS calls to /mobify/scapi/shopper/auth
+         * and set an internal placeholder as the client secret. The proxy will override the placeholder
+         * with the actual client secret so any truthy value as the placeholder works here.
+         *
+         * If enablePWAKitPrivateClient=false and clientSecret is provided as a non-empty string,
+         * private client mode is enabled but we don't route calls to /mobify/scapi/shopper/auth
+         * This is how non-PWA Kit consumers of commerce-sdk-react can enable private client and set a secret
+         *
+         * If both enablePWAKitPrivateClient and clientSecret are truthy, enablePWAKitPrivateClient takes
+         * priority and we ignore whatever was set for clientSecret. This prints a warning about the clientSecret
+         * being ignored.
+         *
+         * If both enablePWAKitPrivateClient and clientSecret are falsey, we are in SLAS public client mode.
+         */
         if (config.enablePWAKitPrivateClient && config.clientSecret) {
             this.logWarning(SLAS_SECRET_OVERRIDE_MSG)
         }
-
         this.clientSecret = config.enablePWAKitPrivateClient
             ? // PWA proxy is enabled, assume project is PWA and that the proxy will handle setting the secret
               // We can pass any truthy value here to satisfy commerce-sdk-isomorphic requirements
               SLAS_SECRET_PLACEHOLDER
-            : config.clientSecret || ''
+            : // We think there are users of Commerce SDK React and Commerce SDK isomorphic outside of PWA
+              // For these users to use a private client, they must have some way to set a client secret
+              // PWA users should not need to touch this.
+              config.clientSecret || ''
 
         this.silenceWarnings = config.silenceWarnings || false
     }
