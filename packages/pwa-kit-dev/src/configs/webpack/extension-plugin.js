@@ -30,6 +30,7 @@ function forEachBail(array, iterator, callback) {
                     return callback(err, result);
                 }
                 if (loop === false) while (next());
+                
                 loop = true;
 			},
 			i
@@ -73,19 +74,20 @@ class ExtensionsResolverPlugin {
         const isExtension = extensions.includes(moduleName.replace('extension-', ''))
         let packages
 
-        if (isBaseProject) {
-            packages = extensions
-        }
+        const isSelfReference = request.context.issuer.includes(request.request.substr(1))
 
-        if (isExtension) {
+        // DEV NOTE: This is going to need some cleanup. It's mainly working on trail and error.
+        if (isSelfReference && !isBaseProject) {
             const index = extensions.indexOf(moduleName.replace('extension-', ''))
             packages = extensions.slice(0, index)
+        } else {
+            packages = extensions
         }
+        // console.log('GET EXTENSIONS: ', packages)
+        // console.log('ISSUER: ', request.context.issuer)
+        // console.log('REQUEST: ', request.request)
 
-        packages = [...packages]
-        packages.reverse()
-
-        return packages
+        return [...packages].reverse()
     }
 
     handleHook(request, resolveContext, callback, resolver) {
@@ -100,16 +102,29 @@ class ExtensionsResolverPlugin {
         const packages = this.getExtensions(request)
         const moduleName = this.parseModuleName(request.context.issuer)
 
-        // If we aren't importing the routes file, add the `.` to the pacakges so we include the 
+        // If we aren't importing the routes file, add the `.` to the packages so we include the 
         // base project as the highest priority override location.
         const isRouter = request.request.includes('/app/routes')
         if (!isRouter) {
             packages.unshift('.')
         }
 
+        if (request.context.compiler === 'server' && request.request.includes('home')) {
+            console.log('PACKAGES: ', packages)
+        }
+        
         forEachBail(
             packages,
             (feature, innerCallback) => {
+                if (!feature) {
+                    throw new Error('"feature" not defined.')
+                }
+
+                if (request.context.compiler === 'server' && request.request.includes('home')) {
+                    console.log('OLD REQUEST: ')
+                    console.log(request)
+                }
+
                 // approach taken from: https://github.com/webpack/enhanced-resolve/blob/v4.0.0/lib/CloneBasenamePlugin.js
                 // DEVELOPER NOTE: This is were we probably want to distringuish the types of extensions, there could be modules,
                 // file references, tupals, etc.
@@ -122,8 +137,13 @@ class ExtensionsResolverPlugin {
                         issuer: isLocalDevExtension ? request.context.issuer : request.context.issuer.replace(moduleName, `extension-${feature}`)
                     },
                     path: this.projectDir + '/app',
-                    request: request.request.replace('_', featureModule),
+                    request: request.request.replace('_', featureModule + `${request.request.includes('home') ? '/app' : ''}`),
                     stack: undefined
+                }
+                
+                if (request.context.compiler === 'server' && request.request.includes('home')) {
+                    console.log('NEW REQUEST: ')
+                    console.log(req)
                 }
                 
                 resolver.doResolve(

@@ -1,5 +1,5 @@
 {
-  "name": "example-project",
+  "name": "@salesforce/extension-retail-react-app-custom-home",
   "version": "3.5.0-dev",
   "private": true,
   "scripts": {
@@ -18,11 +18,6 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/extension-retail-react-app-account": "3.5.0-dev",
-    "@salesforce/extension-retail-react-app-base": "3.5.0-dev",
-    "@salesforce/extension-retail-react-app-empty-extension": "3.5.0-dev",
-    "@salesforce/extension-retail-react-app-custom-home": "3.5.0-dev",
-    "@salesforce/extension-retail-react-app-storefinder": "3.5.0-dev",
     "@salesforce/pwa-kit-dev": "3.5.0-dev",
     "@salesforce/pwa-kit-react-sdk": "3.5.0-dev",
     "@salesforce/pwa-kit-runtime": "3.5.0-dev",
@@ -41,7 +36,7 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
-    "extensions": ["retail-react-app-base", "retail-react-app-custom-home", "retail-react-app-empty-extension", "retail-react-app-storefinder", "retail-react-app-account"],
+    "extends": ["retail-react-app-base", "retail-react-app-storefinder"],
     "ssrEnabled": true,
     "ssrOnly": [
       "ssr.js",
