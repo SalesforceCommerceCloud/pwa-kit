@@ -14,6 +14,7 @@ const StoreFinder = ({value}: Props) => {
     return (
         <div>
             <h1>Store Finder</h1>
+            <p>This page was provided by the `extension-retail-react-app-storefinder` package.</p>
         </div>
     )
 }

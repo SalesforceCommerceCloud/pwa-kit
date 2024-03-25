@@ -14,6 +14,8 @@ const ProductDetail = ({value}: Props) => {
     return (
         <div>
             <h1>Product Detail Page</h1>
+            <p>This page was provided by the `extension-retail-react-app-discovery-pages` package.</p>
+
         </div>
     )
 }

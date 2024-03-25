@@ -109,9 +109,9 @@ class ExtensionsResolverPlugin {
             packages.unshift('.')
         }
 
-        if (request.context.compiler === 'server' && request.request.includes('home')) {
-            console.log('PACKAGES: ', packages)
-        }
+        // if (request.context.compiler === 'server' && request.request.includes('home')) {
+        //     console.log('PACKAGES: ', packages)
+        // }
         
         forEachBail(
             packages,
@@ -120,10 +120,10 @@ class ExtensionsResolverPlugin {
                     throw new Error('"feature" not defined.')
                 }
 
-                if (request.context.compiler === 'server' && request.request.includes('home')) {
-                    console.log('OLD REQUEST: ')
-                    console.log(request)
-                }
+                // if (request.context.compiler === 'server' && request.request.includes('home')) {
+                //     console.log('OLD REQUEST: ')
+                //     console.log(request)
+                // }
 
                 // approach taken from: https://github.com/webpack/enhanced-resolve/blob/v4.0.0/lib/CloneBasenamePlugin.js
                 // DEVELOPER NOTE: This is were we probably want to distringuish the types of extensions, there could be modules,
@@ -137,14 +137,16 @@ class ExtensionsResolverPlugin {
                         issuer: isLocalDevExtension ? request.context.issuer : request.context.issuer.replace(moduleName, `extension-${feature}`)
                     },
                     path: this.projectDir + '/app',
-                    request: request.request.replace('_', featureModule + `${request.request.includes('home') ? '/app' : ''}`),
+                    // NOTE: Here we are just adjusting the file path because we are not including "app". This logic will be handled properly
+                    // in the final version.
+                    request: request.request.replace('_', featureModule + `${!!request.request.match(/\/(home|product-list|product-details)/) ? '/app' : ''}`),
                     stack: undefined
                 }
                 
-                if (request.context.compiler === 'server' && request.request.includes('home')) {
-                    console.log('NEW REQUEST: ')
-                    console.log(req)
-                }
+                // if (request.context.compiler === 'server' && request.request.includes('home')) {
+                //     console.log('NEW REQUEST: ')
+                //     console.log(req)
+                // }
                 
                 resolver.doResolve(
                     target, 

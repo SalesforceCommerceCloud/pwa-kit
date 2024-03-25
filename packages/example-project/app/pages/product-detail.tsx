@@ -14,6 +14,7 @@ const ProductDetail = ({value}: Props) => {
     return (
         <div>
             <h1>Product Detail Project Override</h1>
+            <p>If you are seeing this it means that customer projects are able to override files defined in extensions.</p>
         </div>
     )
 }

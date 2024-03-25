@@ -1,5 +1,5 @@
 {
-  "name": "@salesforce/extension-retail-react-app-base",
+  "name": "@salesforce/extension-retail-react-app-discovery-pages",
   "version": "3.5.0-dev",
   "private": true,
   "scripts": {
