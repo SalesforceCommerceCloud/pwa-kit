@@ -35,20 +35,6 @@ export const DEFAULT_TEST_CONFIG = {
     OCAPISessionsURL: `${DEFAULT_TEST_HOST}/mobify/proxy/ocapi/s/RefArch/dw/shop/v22_8/sessions`
 }
 
-export const API_CLIENTS_KEYS: (keyof ApiClients)[] = [
-    'shopperBaskets',
-    'shopperContexts',
-    'shopperCustomers',
-    'shopperExperience',
-    'shopperGiftCertificates',
-    'shopperLogin',
-    'shopperOrders',
-    'shopperProducts',
-    'shopperPromotions',
-    'shopperSearch',
-    'shopperSeo'
-]
-
 export const createQueryClient = () => {
     return new QueryClient({
         logger: {
