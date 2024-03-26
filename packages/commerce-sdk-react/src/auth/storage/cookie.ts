@@ -33,7 +33,6 @@ export class CookieStorage extends BaseStorage {
         const suffixedKey = this.getSuffixedKey(key)
         let value = Cookies.get(suffixedKey) || ''
 
-        // TODO: How can we automate a test for this?
         if (value) {
             // Some values, like the access token, may be split
             // across multiple keys to fit under ECOM cookie size
@@ -60,7 +59,6 @@ export class CookieStorage extends BaseStorage {
         // Some values, like the access token, may be split
         // across multiple keys to fit under ECOM cookie size
         // thresholds. We check for and delete additional chunks here.
-        // TODO: How can we automate a test for this?
         let chunk = 2
         let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
         while (additionalPart) {
