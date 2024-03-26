@@ -84,7 +84,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function ProductDetail() {
+const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState(product.colors[0])
   const [selectedSize, setSelectedSize] = useState(product.sizes[2])
     
@@ -336,3 +336,7 @@ export default function ProductDetail() {
     </div>
   )
 }
+
+ProductDetail.getTemplateName = () => 'product-detail'
+
+export default ProductDetail

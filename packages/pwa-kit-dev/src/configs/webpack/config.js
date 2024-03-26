@@ -222,6 +222,10 @@ const baseConfig = (target) => {
                 module: {
                     rules: [
                         ruleForBabelLoader(),
+                        {
+                            test: /(\.jsx|\.tsx)$/,
+                            loader: '/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/src/configs/webpack/loaders/dev-loader.js'
+                        },
                         target === 'node' && {
                             test: /\.svg$/,
                             loader: findDepInStack('svg-sprite-loader')
