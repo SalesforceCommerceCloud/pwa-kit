@@ -288,7 +288,7 @@ class Auth {
         let accessToken = this.get('access_token')
         const sfraAuthToken = this.get('access_token_sfra')
 
-        if (sfraAuthToken && accessToken !== sfraAuthToken) {
+        if (sfraAuthToken) {
             /*
              * If SFRA sends 'refresh', we return an empty token here so PWA can trigger a login refresh
              * This key is used when logout is triggered in SFRA but the redirect after logout
