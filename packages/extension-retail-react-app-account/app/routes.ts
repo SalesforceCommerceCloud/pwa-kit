@@ -1,4 +1,4 @@
-import _routes from '_/app/routes'
+import _routes from '*/app/routes'
 import loadable, {LoadableComponent} from '@loadable/component'
 
 // Make this page its own chunk.

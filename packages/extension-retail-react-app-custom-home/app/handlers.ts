@@ -1,7 +1,7 @@
 // Note: the base extension should not need to do this. Also this "_" extension resolver is context aware. E.g.
 // if I'm using it in an extension that is the 2nd in the array, it will import from the first occurance of the 
 // file before it.
-// import handlers from '_/app/handlers'
+// import handlers from '*/app/handlers'
 
 export default ({app, runtime}: any) => {
     // Apply the handlers from the extension previous.

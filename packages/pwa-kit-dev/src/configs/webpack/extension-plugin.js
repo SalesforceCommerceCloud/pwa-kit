@@ -93,7 +93,7 @@ class ExtensionsResolverPlugin {
     handleHook(request, resolveContext, callback, resolver) {
 
         // Early exit for none Feature Loader imports
-        if (!request.request.startsWith('_')) {
+        if (!request.request.startsWith('*')) {
             callback()
             return
         }
@@ -139,7 +139,7 @@ class ExtensionsResolverPlugin {
                     path: this.projectDir + '/app',
                     // NOTE: Here we are just adjusting the file path because we are not including "app". This logic will be handled properly
                     // in the final version.
-                    request: request.request.replace('_', featureModule + `${!!request.request.match(/\/(home|product-list|product-detail)/) ? '/app' : ''}`),
+                    request: request.request.replace('*', featureModule + `${!!request.request.match(/\/(home|product-list|product-detail)/) ? '/app' : ''}`),
                     stack: undefined
                 }
                 

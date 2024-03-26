@@ -6,7 +6,7 @@
  */
 
 // NOTE: Could this be done in the SDK? Probably. It would be better to get it out of sight from the end user.
-import _routes from '_/app/routes'
+import _routes from '*/app/routes'
 import loadable, {LoadableComponent} from '@loadable/component'
 
 const Welcome = loadable(() => import('./pages/welcome'))

@@ -1,4 +1,4 @@
-import _routes from '_/app/routes'
+import _routes from '*/app/routes'
 // import _routes from '@salesforce/extension-retail-react-app-storefinder/app/routes'
 
 import loadable, {LoadableComponent} from '@loadable/component'
