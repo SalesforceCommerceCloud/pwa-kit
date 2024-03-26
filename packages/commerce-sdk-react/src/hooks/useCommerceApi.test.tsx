@@ -6,15 +6,17 @@
  */
 import 'react'
 import useCommerceApi from './useCommerceApi'
-import {apiClientsKeys, renderHookWithProviders} from '../test-utils'
+import {API_CLIENTS_KEYS, renderHookWithProviders} from '../test-utils'
 
 jest.mock('../auth/index.ts')
 
 describe('useCommerceApi', () => {
     test('returns a set of api clients', () => {
         const {result} = renderHookWithProviders(() => useCommerceApi())
-        apiClientsKeys.forEach((name) => {
-            expect(result.current[name]).toBeDefined()
+        const apiClients = result.current
+
+        API_CLIENTS_KEYS.forEach((key) => {
+            expect(apiClients[key]).toBeDefined()
         })
     })
 })
