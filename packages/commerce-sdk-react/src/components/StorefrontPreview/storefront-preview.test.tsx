@@ -104,7 +104,7 @@ describe('Storefront Preview Component', function () {
         expect(window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate).toBeDefined()
     })
 
-    test('cache breaker is added to the parameters of SCAPI requests', () => {
+    test('cache breaker is added to the parameters of SCAPI requests, only if in storefront preview', () => {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
         mockQueryEndpoint('baskets/123', {})
 
@@ -114,7 +114,7 @@ describe('Storefront Preview Component', function () {
         }))
 
         let getBasketSpy
-        const MockedComponent = () => {
+        const MockedComponent = ({enableStorefrontPreview}: {enableStorefrontPreview: boolean}) => {
             const apiClients = useCommerceApi()
             getBasketSpy = jest.spyOn(apiClients.shopperBaskets, 'getBasket')
             useEffect(() => {
@@ -122,12 +122,19 @@ describe('Storefront Preview Component', function () {
                     parameters: {basketId: '123'}
                 })
             }, [])
-            return <StorefrontPreview enabled={true} getToken={() => 'my-token'} />
+            return (
+                <StorefrontPreview enabled={enableStorefrontPreview} getToken={() => 'my-token'} />
+            )
         }
-        renderWithProviders(<MockedComponent />)
 
+        renderWithProviders(<MockedComponent enableStorefrontPreview={true} />)
         expect(getBasketSpy).toHaveBeenCalledWith({
             parameters: {basketId: '123', c_cache_breaker: 1000}
+        })
+
+        renderWithProviders(<MockedComponent enableStorefrontPreview={false} />)
+        expect(getBasketSpy).toHaveBeenCalledWith({
+            parameters: {basketId: '123'}
         })
     })
 })
