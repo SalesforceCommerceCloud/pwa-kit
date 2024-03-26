@@ -3,6 +3,7 @@
 - Fix cannot read properties of undefined (reading 'unshift') [#1689](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1689)
 - Add Shopper SEO hook [#1688](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1688)
 - Update useLocalStorage implementation to be more responsive [#1703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1703)
+- Storefront Preview: avoid stale cached Commerce API responses, whenever the Shopper Context is set [#1701](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1701)
 
 ## v1.3.0 (Jan 19, 2024)
 
