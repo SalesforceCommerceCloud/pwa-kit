@@ -15,7 +15,6 @@ import {
 } from '@tanstack/react-query'
 import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
-import {ApiClients} from './hooks/types'
 
 // Note: this host does NOT exist
 // it is intentional b/c we can catch those unintercepted requests
