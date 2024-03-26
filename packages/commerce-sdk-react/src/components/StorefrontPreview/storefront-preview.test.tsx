@@ -4,11 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useEffect} from 'react'
 import {render, waitFor} from '@testing-library/react'
 import StorefrontPreview from './storefront-preview'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
+import {mockQueryEndpoint, renderWithProviders} from '../../test-utils'
+import {useCommerceApi} from '../../hooks'
 
 declare global {
     interface Window {
@@ -23,10 +25,14 @@ jest.mock('./utils', () => {
         detectStorefrontPreview: jest.fn()
     }
 })
+jest.mock('../../auth/index.ts')
 
 describe('Storefront Preview Component', function () {
     beforeEach(() => {
         delete window.STOREFRONT_PREVIEW
+    })
+    afterEach(() => {
+        jest.restoreAllMocks()
     })
 
     test('Renders children when enabled', () => {
@@ -96,5 +102,32 @@ describe('Storefront Preview Component', function () {
         expect(window.STOREFRONT_PREVIEW?.getToken).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.onContextChange).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate).toBeDefined()
+    })
+
+    test('cache breaker is added to the parameters of SCAPI requests', () => {
+        ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+        mockQueryEndpoint('baskets/123', {})
+
+        // @ts-ignore
+        jest.spyOn(global, 'Date').mockImplementation(() => ({
+            getTime: () => 1000
+        }))
+
+        let getBasketSpy
+        const MockedComponent = () => {
+            const apiClients = useCommerceApi()
+            getBasketSpy = jest.spyOn(apiClients.shopperBaskets, 'getBasket')
+            useEffect(() => {
+                void apiClients.shopperBaskets.getBasket({
+                    parameters: {basketId: '123'}
+                })
+            }, [])
+            return <StorefrontPreview enabled={true} getToken={() => 'my-token'} />
+        }
+        renderWithProviders(<MockedComponent />)
+
+        expect(getBasketSpy).toHaveBeenCalledWith({
+            parameters: {basketId: '123', c_cache_breaker: 1000}
+        })
     })
 })
