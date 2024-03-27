@@ -27,7 +27,7 @@ const main = async (opts) => {
     const preset = config.PRESET[project];
 
     if (preset) {
-      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset.presetId}`
+      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`
     }
     
     const stdout = await runGeneratorWithResponses(
