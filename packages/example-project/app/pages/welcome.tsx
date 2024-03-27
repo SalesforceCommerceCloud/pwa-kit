@@ -15,7 +15,7 @@ interface Props {
 const Welcome = ({value}: Props) => {
     return (
         <div>
-            <h1>Welcome to Extensibility 2.0</h1>
+            <h1>Welcome to Extensibility 2.0 (devMode=true)</h1>
             <h4>Routes:</h4>
             <ul>
                 {routes.map(({path}) => {
