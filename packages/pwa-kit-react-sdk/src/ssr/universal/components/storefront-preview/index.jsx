@@ -10,8 +10,6 @@ import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {detectStorefrontPreview, getClientScript} from './utils'
 import {useHistory} from 'react-router-dom'
-// TODO
-import CommerceAPI from '../../../../../../template-retail-react-app/app/commerce-api'
 
 /**
  *
@@ -19,6 +17,7 @@ import CommerceAPI from '../../../../../../template-retail-react-app/app/commerc
  * @param  {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  * @param  {Array} experimentalUnsafeAdditionalSearchParams - An array of key/value search params to add when context changes
  * @param  {boolean} experimentalUnsafeReloadServerSide - if true, will reload the page on server side when context changes
+ * @param  {Object} apiClients - CommerceAPI instance
  */
 export const StorefrontPreview = ({
     children,
@@ -26,7 +25,7 @@ export const StorefrontPreview = ({
     getToken,
     experimentalUnsafeAdditionalSearchParams = [],
     experimentalUnsafeReloadServerSide,
-    apiClients
+    apiClients = {}
 }) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
@@ -109,7 +108,9 @@ StorefrontPreview.propTypes = {
     },
     experimentalUnsafeAdditionalSearchParams: PropTypes.array,
     experimentalUnsafeReloadServerSide: PropTypes.bool,
-    apiClients: PropTypes.instanceOf(CommerceAPI)
+    apiClients: PropTypes.shape({
+        willSendRequest: PropTypes.func
+    })
 }
 
 export default StorefrontPreview
