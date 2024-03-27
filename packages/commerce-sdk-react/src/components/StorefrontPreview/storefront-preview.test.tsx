@@ -4,15 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useEffect} from 'react'
 import {render, waitFor} from '@testing-library/react'
 import StorefrontPreview from './storefront-preview'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
+import {mockQueryEndpoint, renderWithProviders} from '../../test-utils'
+import {useCommerceApi} from '../../hooks'
 
 declare global {
     interface Window {
-        STOREFRONT_PREVIEW: Record<string, unknown>
+        STOREFRONT_PREVIEW?: Record<string, unknown>
     }
 }
 
@@ -23,18 +25,14 @@ jest.mock('./utils', () => {
         detectStorefrontPreview: jest.fn()
     }
 })
+jest.mock('../../auth/index.ts')
 
 describe('Storefront Preview Component', function () {
-    const oldWindow = window
-
     beforeEach(() => {
-        // eslint-disable-next-line
-        window = {...oldWindow}
+        delete window.STOREFRONT_PREVIEW
     })
-
     afterEach(() => {
-        // eslint-disable-next-line
-        window = oldWindow
+        jest.restoreAllMocks()
     })
 
     test('Renders children when enabled', () => {
@@ -91,23 +89,48 @@ describe('Storefront Preview Component', function () {
         })
     })
 
-    test('getToken is defined in window.STOREFRONT_PREVIEW when it is defined', () => {
-        window.STOREFRONT_PREVIEW = {}
+    test('window.STOREFRONT_PREVIEW is defined properly', () => {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
 
-        render(<StorefrontPreview getToken={() => 'my-token'} />)
-        expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
+        render(
+            <StorefrontPreview
+                enabled={true}
+                getToken={() => 'my-token'}
+                onContextChange={() => {}}
+            />
+        )
+        expect(window.STOREFRONT_PREVIEW?.getToken).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW?.onContextChange).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate).toBeDefined()
     })
 
-    test('onContextChange is defined in window.STOREFRONT_PREVIEW when it is defined', () => {
-        window.STOREFRONT_PREVIEW = {}
+    test('cache breaker is added to the parameters of SCAPI requests, only if in storefront preview', () => {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
+        mockQueryEndpoint('baskets/123', {})
 
-        render(<StorefrontPreview enabled={true} getToken={() => 'my-token'} onContextChange={() => undefined} />)
-        expect(window.STOREFRONT_PREVIEW.onContextChange).toBeDefined()
-    })
+        jest.spyOn(Date, 'now').mockImplementation(() => 1000)
 
-    test('experimental unsafe props are defined', () => {
-        expect(window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate).toBeDefined()
+        let getBasketSpy
+        const parameters = {basketId: '123'}
+        const MockedComponent = ({enableStorefrontPreview}: {enableStorefrontPreview: boolean}) => {
+            const apiClients = useCommerceApi()
+            getBasketSpy = jest.spyOn(apiClients.shopperBaskets, 'getBasket')
+            useEffect(() => {
+                void apiClients.shopperBaskets.getBasket({parameters})
+            }, [])
+            return (
+                <StorefrontPreview enabled={enableStorefrontPreview} getToken={() => 'my-token'} />
+            )
+        }
+
+        renderWithProviders(<MockedComponent enableStorefrontPreview={true} />)
+        expect(getBasketSpy).toHaveBeenCalledWith({
+            parameters: {...parameters, c_cache_breaker: 1000}
+        })
+
+        renderWithProviders(<MockedComponent enableStorefrontPreview={false} />)
+        expect(getBasketSpy).toHaveBeenCalledWith({
+            parameters
+        })
     })
 })

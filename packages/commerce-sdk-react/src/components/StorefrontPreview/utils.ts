@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {ApiClients} from '../../hooks/types'
 import {DEVELOPMENT_ORIGIN, getParentOrigin, isOriginTrusted} from '../../utils'
 
 /** Detects whether the storefront is running in an iframe as part of Storefront Preview.
@@ -30,10 +31,10 @@ export const CustomPropTypes = {
     /**
      * This custom PropType ensures that the prop is only required when the known prop
      * "enabled" is set to "true".
-     * 
-     * @param props 
-     * @param propName 
-     * @param componentName 
+     *
+     * @param props
+     * @param propName
+     * @param componentName
      * @returns
      */
     requiredFunctionWhenEnabled: (props: any, propName: any, componentName: any) => {
@@ -48,4 +49,18 @@ export const CustomPropTypes = {
             )
         }
     }
+}
+
+/**
+ * Via the built-in Proxy object, modify the behaviour of each request for the given SCAPI clients
+ * @private
+ */
+export const proxyRequests = (clients: ApiClients, handlers: ProxyHandler<any>) => {
+    Object.values(clients).forEach((client: Record<string, any>) => {
+        const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(client))
+
+        methods.forEach((method) => {
+            client[method] = new Proxy(client[method], handlers)
+        })
+    })
 }
