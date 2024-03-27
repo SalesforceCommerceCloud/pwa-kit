@@ -21,5 +21,5 @@ const routes = [
         component: Welcome as LoadableComponent<unknown>
     }
 ]
-
+console.log('routes: ', routes)
 export default routes

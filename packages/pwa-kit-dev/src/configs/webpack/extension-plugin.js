@@ -120,7 +120,7 @@ class ExtensionsResolverPlugin {
                     throw new Error('"feature" not defined.')
                 }
 
-                // if (request.context.compiler === 'server' && request.request.includes('home')) {
+                // if (request.context.compiler === 'server' && request.request.includes('routes')) {
                 //     console.log('OLD REQUEST: ')
                 //     console.log(request)
                 // }
@@ -143,7 +143,7 @@ class ExtensionsResolverPlugin {
                     stack: undefined
                 }
                 
-                // if (request.context.compiler === 'server' && request.request.includes('home')) {
+                // if (request.context.compiler === 'server' && request.request.includes('routes')) {
                 //     console.log('NEW REQUEST: ')
                 //     console.log(req)
                 // }

@@ -213,7 +213,7 @@ const baseConfig = (target) => {
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
-                    sdkReplacementPlugin(),
+                    // sdkReplacementPlugin(),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
@@ -222,10 +222,10 @@ const baseConfig = (target) => {
                 module: {
                     rules: [
                         ruleForBabelLoader(),
-                        {
-                            test: /(\.jsx|\.tsx)$/,
-                            loader: '/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/src/configs/webpack/loaders/dev-loader.js'
-                        },
+                        // {
+                        //     test: /(\.jsx|\.tsx)$/,
+                        //     loader: '/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/src/configs/webpack/loaders/dev-loader.js'
+                        // },
                         target === 'node' && {
                             test: /\.svg$/,
                             loader: findDepInStack('svg-sprite-loader')

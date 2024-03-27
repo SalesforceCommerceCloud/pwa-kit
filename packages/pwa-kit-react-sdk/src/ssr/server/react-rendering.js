@@ -21,7 +21,8 @@ import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
-import App from '../universal/components/_app'
+import App from '*/app/components/_app'
+
 import Throw404 from '../universal/components/throw-404'
 
 import {getAppConfig} from '../universal/compatibility'
