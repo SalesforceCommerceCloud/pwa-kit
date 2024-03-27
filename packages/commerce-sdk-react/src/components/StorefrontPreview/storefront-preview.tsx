@@ -64,7 +64,7 @@ export const StorefrontPreview = ({
                         ...argumentsList[0],
                         parameters: {
                             ...argumentsList[0]?.parameters,
-                            c_cache_breaker: new Date().getTime()
+                            c_cache_breaker: Date.now()
                         }
                     }
                     return target.call(thisArg, ...argumentsList)
