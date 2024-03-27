@@ -10,6 +10,8 @@ import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {detectStorefrontPreview, getClientScript} from './utils'
 import {useHistory} from 'react-router-dom'
+// TODO
+import CommerceAPI from '../../../../../../template-retail-react-app/app/commerce-api'
 
 /**
  *
@@ -23,7 +25,8 @@ export const StorefrontPreview = ({
     enabled = true,
     getToken,
     experimentalUnsafeAdditionalSearchParams = [],
-    experimentalUnsafeReloadServerSide
+    experimentalUnsafeReloadServerSide,
+    apiClients
 }) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
@@ -46,6 +49,28 @@ export const StorefrontPreview = ({
         experimentalUnsafeAdditionalSearchParams,
         experimentalUnsafeReloadServerSide
     ])
+
+    useEffect(() => {
+        if (enabled && isHostTrusted) {
+            const originalWillSendRequest = apiClients.willSendRequest
+
+            // In Storefront Preview mode, add cache breaker for all SCAPI's requests.
+            // Otherwise, it's possible to get stale responses after the Shopper Context is set.
+            // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
+            apiClients.willSendRequest = async (...params) => {
+                const newParams = await originalWillSendRequest.apply(apiClients, params)
+
+                if (newParams[0] && typeof newParams[0] === 'object') {
+                    newParams[0].parameters = {
+                        ...newParams[0].parameters,
+                        c_cache_breaker: Date.now()
+                    }
+                }
+                return newParams
+            }
+        }
+    }, [apiClients, enabled])
+
     return (
         <>
             {enabled && isHostTrusted && (
@@ -83,7 +108,8 @@ StorefrontPreview.propTypes = {
         }
     },
     experimentalUnsafeAdditionalSearchParams: PropTypes.array,
-    experimentalUnsafeReloadServerSide: PropTypes.bool
+    experimentalUnsafeReloadServerSide: PropTypes.bool,
+    apiClients: PropTypes.instanceOf(CommerceAPI)
 }
 
 export default StorefrontPreview
