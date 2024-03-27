@@ -8,11 +8,15 @@
 const { exec } = require("child_process");
 const { isPrompt } = require("./utils.js");
 
-const runGeneratorWithResponses = (cmd, cliResponses) => {
+const runGeneratorWithResponses = (cmd, cliResponses = []) => {
   const child = exec(cmd);
   return new Promise((resolve, reject) => {
-    let { expectedPrompt, response } = cliResponses.shift();
+    let expectedPrompt, response;
+    if (cliResponses && cliResponses.length) {
+      ({ expectedPrompt, response } = cliResponses.shift());
+    }
     let isGenratorRunning = false;
+
     child.stdout.on("data", (data) => {
       console.log(data);
       if (isPrompt(data, /Running the generator/i)) {

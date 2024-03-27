@@ -22,7 +22,13 @@ const main = async (opts) => {
     await mkdirIfNotExists(config.GENERATED_PROJECTS_DIR);
     const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
     // TODO: Update script to setup local verdaccio npm repo to allow running 'npx @salesforce/pwa-kit-create-app' to generate apps
-    const generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
+    let generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
+    const preset = config.PRESET[project];
+
+    if (preset) {
+      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`
+    }
+    
     const stdout = await runGeneratorWithResponses(
       generateAppCommand,
       config.CLI_RESPONSES[project]
@@ -44,6 +50,7 @@ program.addArgument(
     "retail-app-demo",
     "retail-app-ext",
     "retail-app-no-ext",
+    "retail-app-private-client",
   ])
 );
 

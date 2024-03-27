@@ -129,6 +129,17 @@ export const DevServerMixin = {
     /**
      * @private
      */
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _handleMissingSlasPrivateEnvVar(app) {
+        throw new Error(
+            `Server cannot start. Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set. Please set this environment variable to proceed.`
+        )
+    },
+
+    /**
+     * @private
+     */
     _addSDKInternalHandlers(app) {
         // This is separated out because these routes must not have our SSR middleware applied to them.
         // But the SSR render function must!

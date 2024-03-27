@@ -11,7 +11,7 @@ const statAsync = promisify(fs.stat);
 const mkdirAsync = promisify(fs.mkdir);
 
 const isPrompt = (streamData, expectedText) => {
-  if (!streamData || !expectedText) return;
+  if (!streamData || !expectedText) return false;
 
   if (types.isRegExp(expectedText)) {
     return streamData.match(expectedText);
