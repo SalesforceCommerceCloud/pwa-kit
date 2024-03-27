@@ -110,7 +110,7 @@ describe('Storefront Preview Component', function () {
 
         // @ts-ignore
         jest.spyOn(global, 'Date').mockImplementation(() => ({
-            getTime: () => 1000
+            now: () => 1000
         }))
 
         let getBasketSpy
