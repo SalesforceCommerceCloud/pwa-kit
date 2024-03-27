@@ -108,10 +108,7 @@ describe('Storefront Preview Component', function () {
         ;(detectStorefrontPreview as jest.Mock).mockReturnValue(true)
         mockQueryEndpoint('baskets/123', {})
 
-        // @ts-ignore
-        jest.spyOn(global, 'Date').mockImplementation(() => ({
-            now: () => 1000
-        }))
+        jest.spyOn(Date, 'now').mockImplementation(() => 1000)
 
         let getBasketSpy
         const parameters = {basketId: '123'}
