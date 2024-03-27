@@ -82,7 +82,6 @@ module.exports = function (source) {
     const fileName = this.resourcePath.split('/').pop()
     const moduleName = map[fileName]
     if (moduleName) {
-        console.log('Enhancing Module: ', moduleName)
         source = source.replace(
             /export default ([A-Z]\w+)/, 
             enhanceSourceWith(
