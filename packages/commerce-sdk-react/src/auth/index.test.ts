@@ -8,8 +8,7 @@ import Auth, {AuthData} from './'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
-
-const SLAS_PRIVATE_SECRET_PLACEHOLDER = 'slas-private-secret-placeholder'
+import {SLAS_SECRET_PLACEHOLDER} from '../constant'
 
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
@@ -57,13 +56,8 @@ const config = {
 }
 
 const configSLASPrivate = {
-    clientId: 'clientId',
-    organizationId: 'organizationId',
-    shortCode: 'shortCode',
-    siteId: 'siteId',
-    proxy: 'proxy',
-    redirectURI: 'redirectURI',
-    clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
+    ...config,
+    enablePWAKitPrivateClient: true
 }
 
 describe('Auth', () => {
@@ -376,7 +370,7 @@ describe('Auth', () => {
         await auth.ready()
         expect(helpers.refreshAccessToken).toHaveBeenCalled()
         const funcArg = (helpers.refreshAccessToken as jest.Mock).mock.calls[0][2]
-        expect(funcArg).toMatchObject({clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER})
+        expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
     })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
@@ -396,7 +390,7 @@ describe('Auth', () => {
         await auth.loginGuestUser()
         expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
         const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
-        expect(funcArg).toMatchObject({clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER})
+        expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
     })
 
     test('loginRegisteredUserB2C', async () => {
@@ -411,21 +405,34 @@ describe('Auth', () => {
         const auth = new Auth(configSLASPrivate)
         await auth.loginRegisteredUserB2C({
             username: 'test',
-            password: 'test',
-            clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
+            password: 'test'
         })
         expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
         const functionArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][1]
         expect(functionArg).toMatchObject({
             username: 'test',
             password: 'test',
-            clientSecret: SLAS_PRIVATE_SECRET_PLACEHOLDER
+            clientSecret: SLAS_SECRET_PLACEHOLDER
         })
     })
     test('logout', async () => {
         const auth = new Auth(config)
         await auth.logout()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
+    })
+    test('PWA private client mode takes priority', async () => {
+        const auth = new Auth({...configSLASPrivate, clientSecret: 'someSecret'})
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
+        const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
+    })
+    test('Can set a client secret', async () => {
+        const auth = new Auth({...config, clientSecret: 'someSecret'})
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
+        const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: 'someSecret'})
     })
     test('running on the server uses a shared context memory store', () => {
         const refreshTokenGuest = 'guest'
