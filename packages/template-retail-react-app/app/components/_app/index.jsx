@@ -56,6 +56,7 @@ import {
 import Seo from '../seo'
 import {resolveSiteFromUrl} from '../../utils/site-utils'
 import useMultiSite from '../../hooks/use-multi-site'
+import {useCommerceAPI} from '../../commerce-api/contexts'
 
 const App = (props) => {
     const {
@@ -67,6 +68,7 @@ const App = (props) => {
 
     const appOrigin = getAppOrigin()
 
+    const apiClients = useCommerceAPI()
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
@@ -153,7 +155,10 @@ const App = (props) => {
         <Box className="sf-app" {...styles.container}>
             {/* For pwa-kit v2, we need to use this getToken prop to make sure it can work properly
                 with Storefront Preview feature*/}
-            <StorefrontPreview getToken={() => window.localStorage.getItem('token')}>
+            <StorefrontPreview
+                getToken={() => window.localStorage.getItem('token')}
+                apiClients={apiClients}
+            >
                 <IntlProvider
                     onError={(err) => {
                         if (err.code === 'MISSING_TRANSLATION') {
