@@ -9,13 +9,6 @@ const config = require("../config.js");
 const { program, Argument } = require("commander");
 const { mkdirIfNotExists } = require("./utils.js");
 
-const GENERATE_WITH_PRESET = [
-  {
-    projectKey: "retail-app-private-client",
-    presetId: "retail-react-app-private-slas-client",
-  },
-];
-
 const main = async (opts) => {
   const { args } = opts;
   const [project] = args;
@@ -30,7 +23,7 @@ const main = async (opts) => {
     const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
     // TODO: Update script to setup local verdaccio npm repo to allow running 'npx @salesforce/pwa-kit-create-app' to generate apps
     let generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
-    const preset = GENERATE_WITH_PRESET.find((o) => o.projectKey === project);
+    const preset = config.PRESET[project];
 
     if (preset) {
       generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset.presetId}`

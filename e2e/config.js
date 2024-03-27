@@ -102,6 +102,9 @@ module.exports = {
     ],
     "retail-app-private-client": [],
   },
+  PRESET: {
+    "retail-app-private-client": "retail-react-app-private-slas-client",
+  },
   EXPECTED_GENERATED_ARTIFACTS: {
     "retail-app-demo": [
       ".eslintignore",
