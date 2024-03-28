@@ -1,0 +1,5 @@
+build
+docs
+coverage
+scripts/generator/assets
+app/static

@@ -1,0 +1,32 @@
+.nyc_output
+build.tar
+
+coverage
+tests/reports
+tests/screenshots
+tests/lighthouse-reports/
+lighthouse/audit*
+.lighthouseci
+
+.tern-port
+app/integration-manager/docs
+messaging/*.csr
+
+# Local App Configuration Files
+config/local.*
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+build/
+tmp/
+*.log
+node_modules
+
+# Generated files
+app/cache-hash-manifest.json
+app/loader-cache-hash-manifest.json
+
+.vscode
