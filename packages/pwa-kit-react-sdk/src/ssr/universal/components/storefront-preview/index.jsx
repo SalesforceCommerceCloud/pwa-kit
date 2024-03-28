@@ -12,12 +12,16 @@ import {detectStorefrontPreview, getClientScript} from './utils'
 import {useHistory} from 'react-router-dom'
 
 /**
+ * @callback onInitCallback
+ */
+
+/**
  *
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
  * @param  {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  * @param  {Array} experimentalUnsafeAdditionalSearchParams - An array of key/value search params to add when context changes
  * @param  {boolean} experimentalUnsafeReloadServerSide - if true, will reload the page on server side when context changes
- * @param  {function} onInit
+ * @param  {onInitCallback} onInit - callback that runs when initializing Storefront Preview
  */
 export const StorefrontPreview = ({
     children,
