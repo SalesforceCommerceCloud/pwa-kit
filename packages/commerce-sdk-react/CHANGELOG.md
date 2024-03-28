@@ -3,7 +3,7 @@
 ## v1.4.0-dev.1 (Mar 22, 2024)
 ## v1.4.0-dev (Jan 22, 2024)
 
-- Add Support for SLAS private flow [#1649](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1649)
+- Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
 - Fix invalid query params warnings and allow custom query [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
 - Fix cannot read properties of undefined (reading 'unshift') [#1689](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1689)
 - Add Shopper SEO hook [#1688](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1688)
