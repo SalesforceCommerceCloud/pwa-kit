@@ -59,11 +59,9 @@ export const StorefrontPreview = ({
             apiClients.willSendRequest = async (...params) => {
                 const newParams = await originalWillSendRequest.apply(apiClients, params)
 
-                if (newParams[0] && typeof newParams[0] === 'object') {
-                    newParams[0].parameters = {
-                        ...newParams[0].parameters,
-                        c_cache_breaker: Date.now()
-                    }
+                newParams[0].parameters = {
+                    ...newParams[0].parameters,
+                    c_cache_breaker: Date.now()
                 }
                 return newParams
             }
