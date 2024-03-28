@@ -7,11 +7,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
-import {Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, Text} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useItemVariant} from '.'
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/extension-retail-react-app-core/app/components/responsive'
+import {useCurrency} from '@salesforce/extension-retail-react-app-core/app/hooks'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
 
 const PricePerItem = ({currency, basket, basePrice}) => {
     const {currency: activeCurrency} = useCurrency()

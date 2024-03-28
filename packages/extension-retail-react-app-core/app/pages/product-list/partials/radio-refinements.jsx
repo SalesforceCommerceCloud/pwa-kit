@@ -8,11 +8,11 @@
 import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Box, Text, Radio, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Text, Radio, Stack} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {
     ADD_FILTER,
     REMOVE_FILTER
-} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
+} from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/refinements-utils'
 
 const RadioRefinement = ({filter, value, toggleFilter, isSelected}) => {
     const buttonRef = useRef()

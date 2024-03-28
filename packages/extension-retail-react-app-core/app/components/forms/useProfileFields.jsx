@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl} from 'react-intl'
-import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
+import {formatPhoneNumber} from '@salesforce/extension-retail-react-app-core/app/utils/phone-utils'
 
 export default function useProfileFields({
     form: {

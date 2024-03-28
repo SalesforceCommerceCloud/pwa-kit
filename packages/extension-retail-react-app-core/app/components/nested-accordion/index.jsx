@@ -18,10 +18,10 @@ import {
 
     // Hooks
     useStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import Link from '@salesforce/retail-react-app/app/components/link'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 // Icons
-import {ChevronDownIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronDownIcon, ChevronRightIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 /**
  * The nested accordion allows you to create, as the name suggest, a nests

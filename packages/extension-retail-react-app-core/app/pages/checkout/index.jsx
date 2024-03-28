@@ -15,20 +15,20 @@ import {
     Grid,
     GridItem,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
 import {
     CheckoutProvider,
     useCheckout
-} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
-import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
-import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
-import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
-import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-skeleton'
+} from '@salesforce/extension-retail-react-app-core/app/pages/checkout/util/checkout-context'
+import ContactInfo from '@salesforce/extension-retail-react-app-core/app/pages/checkout/partials/contact-info'
+import ShippingAddress from '@salesforce/extension-retail-react-app-core/app/pages/checkout/partials/shipping-address'
+import ShippingOptions from '@salesforce/extension-retail-react-app-core/app/pages/checkout/partials/shipping-options'
+import Payment from '@salesforce/extension-retail-react-app-core/app/pages/checkout/partials/payment'
+import OrderSummary from '@salesforce/extension-retail-react-app-core/app/components/order-summary'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
+import CheckoutSkeleton from '@salesforce/extension-retail-react-app-core/app/pages/checkout/partials/checkout-skeleton'
 import {useUsid, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 
 const Checkout = () => {

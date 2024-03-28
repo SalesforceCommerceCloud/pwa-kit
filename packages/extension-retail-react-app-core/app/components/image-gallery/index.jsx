@@ -21,9 +21,9 @@ import {
     ListItem,
     List,
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
-import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {findImageGroupBy} from '@salesforce/extension-retail-react-app-core/app/utils/image-groups-utils'
+import DynamicImage from '@salesforce/extension-retail-react-app-core/app/components/dynamic-image'
 
 const EnterKeyNumber = 13
 

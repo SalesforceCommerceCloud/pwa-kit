@@ -8,8 +8,8 @@
 import {
     getDisplayPrice,
     getDisplayVariationValues
-} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {mockedCustomerProductListsDetails} from '@salesforce/retail-react-app/app/mocks/mock-data'
+} from '@salesforce/extension-retail-react-app-core/app/utils/product-utils'
+import {mockedCustomerProductListsDetails} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 
 const variationAttributes = [
     {

@@ -8,7 +8,7 @@
 import {
     getResponsiveImageAttributes,
     getSrc
-} from '@salesforce/retail-react-app/app/utils/responsive-image'
+} from '@salesforce/extension-retail-react-app-core/app/utils/responsive-image'
 
 const disImageURL = {
     withOptionalParams:

@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import OfflineBanner from '@salesforce/retail-react-app/app/components/offline-banner/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import OfflineBanner from '@salesforce/extension-retail-react-app-core/app/components/offline-banner/index'
 import {screen} from '@testing-library/react'
 
 test('OfflineBanner component is rendered appropriately', () => {

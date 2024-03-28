@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen, within} from '@testing-library/react'
-import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import DisplayPrice from '@salesforce/extension-retail-react-app-core/app/components/display-price/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 describe('DisplayPrice', function () {
     test('should render without error', () => {

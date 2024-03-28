@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
+import {findImageGroupBy} from '@salesforce/extension-retail-react-app-core/app/utils/image-groups-utils'
 
 it.each([undefined, []])('returns undefined', (groups) => {
     expect(findImageGroupBy(groups, {})).toBeUndefined()

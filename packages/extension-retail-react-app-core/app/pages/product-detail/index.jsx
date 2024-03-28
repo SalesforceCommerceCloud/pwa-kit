@@ -11,7 +11,7 @@ import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Stack} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {
     useProduct,
     useCategory,
@@ -21,16 +21,16 @@ import {
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useVariant} from '@salesforce/retail-react-app/app/hooks'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
+import {useVariant} from '@salesforce/extension-retail-react-app-core/app/hooks'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import useEinstein from '@salesforce/extension-retail-react-app-core/app/hooks/use-einstein'
+import useActiveData from '@salesforce/extension-retail-react-app-core/app/hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
-import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
-import ProductView from '@salesforce/retail-react-app/app/components/product-view'
-import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
+import RecommendedProducts from '@salesforce/extension-retail-react-app-core/app/components/recommended-products'
+import ProductView from '@salesforce/extension-retail-react-app-core/app/components/product-view'
+import InformationAccordion from '@salesforce/extension-retail-react-app-core/app/pages/product-detail/partials/information-accordion'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 
@@ -42,11 +42,11 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST
-} from '@salesforce/retail-react-app/app/constants'
-import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
+} from '@salesforce/extension-retail-react-app-core/app/constants'
+import {rebuildPathWithParams} from '@salesforce/extension-retail-react-app-core/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
+import {useWishList} from '@salesforce/extension-retail-react-app-core/app/hooks/use-wish-list'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()

@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import NestedAccordion from '@salesforce/retail-react-app/app/components/nested-accordion/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import NestedAccordion from '@salesforce/extension-retail-react-app-core/app/components/nested-accordion/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 const mockItem = {
     id: 't1',

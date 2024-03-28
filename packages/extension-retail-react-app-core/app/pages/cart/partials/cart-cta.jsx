@@ -6,15 +6,15 @@
  */
 import React, {Fragment} from 'react'
 import {FormattedMessage} from 'react-intl'
-import {Flex, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Flex, Button} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {
     AmexIcon,
     DiscoverIcon,
     LockIcon,
     MastercardIcon,
     VisaIcon
-} from '@salesforce/retail-react-app/app/components/icons'
-import Link from '@salesforce/retail-react-app/app/components/link'
+} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 
 const CartCta = () => {
     return (

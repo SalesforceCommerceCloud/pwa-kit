@@ -15,11 +15,11 @@ import {
     Stack,
     Text,
     Tooltip
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {LockIcon, PaypalIcon} from '@salesforce/retail-react-app/app/components/icons'
-import CreditCardFields from '@salesforce/retail-react-app/app/components/forms/credit-card-fields'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
+import {LockIcon, PaypalIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import CreditCardFields from '@salesforce/extension-retail-react-app-core/app/components/forms/credit-card-fields'
+import {useCurrency} from '@salesforce/extension-retail-react-app-core/app/hooks'
 
 const PaymentForm = ({form, onSubmit}) => {
     const {formatMessage} = useIntl()

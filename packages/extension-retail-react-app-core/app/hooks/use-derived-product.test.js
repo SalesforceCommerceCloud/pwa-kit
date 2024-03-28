@@ -10,9 +10,9 @@ import PropTypes from 'prop-types'
 
 import {screen} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks/use-derived-product'
-import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {useDerivedProduct} from '@salesforce/extension-retail-react-app-core/app/hooks/use-derived-product'
+import mockProductDetail from '@salesforce/extension-retail-react-app-core/app/mocks/variant-750518699578M'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 const MockComponent = ({product}) => {
     const {inventoryMessage, quantity, variationParams, variant} = useDerivedProduct(product)

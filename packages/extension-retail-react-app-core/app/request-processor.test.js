@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {processRequest} from '@salesforce/retail-react-app/app/request-processor'
+import {processRequest} from '@salesforce/extension-retail-react-app-core/app/request-processor'
 
 describe('processRequest', () => {
     test('returns valid values', () => {

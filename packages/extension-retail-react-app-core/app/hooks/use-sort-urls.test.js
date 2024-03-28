@@ -10,7 +10,7 @@ import {Router} from 'react-router'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useSortUrls} from '@salesforce/retail-react-app/app/hooks/use-sort-urls'
+import {useSortUrls} from '@salesforce/extension-retail-react-app-core/app/hooks/use-sort-urls'
 
 const MOCK_SORT_OPTIONS = [{id: 'high-to-low'}, {id: 'low-to-high'}]
 

@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {fireEvent} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import Hero from '@salesforce/retail-react-app/app/components/hero/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import Hero from '@salesforce/extension-retail-react-app-core/app/components/hero/index'
 
 test('Hero renders without errors', () => {
     const data = {

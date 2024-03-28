@@ -11,17 +11,17 @@ import {rest} from 'msw'
 import {
     renderWithProviders,
     createPathWithDefaults
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import {
     mockOrderHistory,
     mockedGuestCustomer,
     mockedRegisteredCustomer,
     mockOrderProducts,
     mockPasswordUpdateFalure
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import Account from '@salesforce/retail-react-app/app/pages/account/index'
-import Login from '@salesforce/retail-react-app/app/pages/login'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
+import Account from '@salesforce/extension-retail-react-app-core/app/pages/account/index'
+import Login from '@salesforce/extension-retail-react-app-core/app/pages/login'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
 
 const MockedComponent = () => {
     return (

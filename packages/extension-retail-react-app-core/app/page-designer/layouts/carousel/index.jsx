@@ -14,9 +14,9 @@ import {
     Stack,
     useBreakpoint,
     useBreakpointValue
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {Component, regionPropType} from '@salesforce/commerce-sdk-react/components'
-import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 import {useEffect} from 'react'
 import {useIntl} from 'react-intl'
 

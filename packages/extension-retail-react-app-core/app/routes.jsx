@@ -17,8 +17,8 @@ import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Components
-import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
+import {Skeleton} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {configureRoutes} from '@salesforce/extension-retail-react-app-core/app/utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -111,9 +111,4 @@ export const routes = [
     }
 ]
 
-export default () => {
-    const config = getConfig()
-    return configureRoutes(routes, config, {
-        ignoredRoutes: ['/callback', '*']
-    })
-}
+export default routes

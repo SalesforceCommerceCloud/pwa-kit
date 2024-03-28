@@ -8,9 +8,9 @@
 import React from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Box, Button, Wrap, WrapItem} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
-import {REMOVE_FILTER} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
+import {Box, Button, Wrap, WrapItem} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {CloseIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import {REMOVE_FILTER} from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/refinements-utils'
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()

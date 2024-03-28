@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithReactIntl} from '@salesforce/retail-react-app/app/utils/test-utils'
-import LoginRedirect from '@salesforce/retail-react-app/app/pages/login-redirect/index'
+import {renderWithReactIntl} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import LoginRedirect from '@salesforce/extension-retail-react-app-core/app/pages/login-redirect/index'
 
 test('Login Redirect renders without errors', () => {
     const {getByRole} = renderWithReactIntl(<LoginRedirect />)

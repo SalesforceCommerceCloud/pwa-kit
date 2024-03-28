@@ -13,9 +13,9 @@ import {
     IconButton,
     Skeleton,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'
-import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import ProductTile from '@salesforce/extension-retail-react-app-core/app/components/product-tile'
+import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 import {useIntl} from 'react-intl'
 
 /**

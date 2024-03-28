@@ -15,15 +15,15 @@ import {
     AccordionButton,
     AccordionPanel,
     AccordionIcon
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import PropTypes from 'prop-types'
-import ColorRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/color-refinements'
-import SizeRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/size-refinements'
-import RadioRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/radio-refinements'
-import CheckboxRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/checkbox-refinements'
-import LinkRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/link-refinements'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
-import {FILTER_ACCORDION_SATE} from '@salesforce/retail-react-app/app/constants'
+import ColorRefinements from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/color-refinements'
+import SizeRefinements from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/size-refinements'
+import RadioRefinements from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/radio-refinements'
+import CheckboxRefinements from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/checkbox-refinements'
+import LinkRefinements from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/link-refinements'
+import {isServer} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
+import {FILTER_ACCORDION_SATE} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 /** Map of refinement attribute IDs to the components used to display values as filter options. */
 export const componentMap = {

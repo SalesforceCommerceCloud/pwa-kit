@@ -6,8 +6,8 @@
  */
 import {useCallback} from 'react'
 import {useHistory} from 'react-router'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {removeSiteLocaleFromPath} from '@salesforce/retail-react-app/app/utils/url'
+import useMultiSite from '@salesforce/extension-retail-react-app-core/app/hooks/use-multi-site'
+import {removeSiteLocaleFromPath} from '@salesforce/extension-retail-react-app-core/app/utils/url'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale

@@ -14,7 +14,7 @@ import {
     useSearchParams,
     stringify,
     parse
-} from '@salesforce/retail-react-app/app/hooks/use-search-params'
+} from '@salesforce/extension-retail-react-app-core/app/hooks/use-search-params'
 
 const MockComponent = () => {
     const [params] = useSearchParams()

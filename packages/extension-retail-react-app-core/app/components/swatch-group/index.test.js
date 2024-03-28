@@ -9,10 +9,10 @@ import {createMemoryHistory} from 'history'
 import {Router, useHistory, useLocation} from 'react-router-dom'
 import {screen, fireEvent, waitFor} from '@testing-library/react'
 
-import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
-import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group/index'
-import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {Box} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import SwatchGroup from '@salesforce/extension-retail-react-app-core/app/components/swatch-group/index'
+import Swatch from '@salesforce/extension-retail-react-app-core/app/components/swatch-group/swatch'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 const data = {
     id: 'color',

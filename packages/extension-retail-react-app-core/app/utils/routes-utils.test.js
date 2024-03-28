@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
+import {configureRoutes} from '@salesforce/extension-retail-react-app-core/app/utils/routes-utils'
 
 describe('configureRoutes', function () {
     const cases = [

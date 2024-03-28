@@ -16,20 +16,20 @@ import {
     SimpleGrid,
     Stack,
     Tooltip
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {
     formatCreditCardNumber,
     getCreditCardIcon
-} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import useCreditCardFields from '@salesforce/retail-react-app/app/components/forms/useCreditCardFields'
-import Field from '@salesforce/retail-react-app/app/components/field'
+} from '@salesforce/extension-retail-react-app-core/app/utils/cc-utils'
+import useCreditCardFields from '@salesforce/extension-retail-react-app-core/app/components/forms/useCreditCardFields'
+import Field from '@salesforce/extension-retail-react-app-core/app/components/field'
 import {
     AmexIcon,
     DiscoverIcon,
     MastercardIcon,
     VisaIcon,
     InfoIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 const CreditCardFields = ({form, prefix = ''}) => {
     const {formatMessage} = useIntl()

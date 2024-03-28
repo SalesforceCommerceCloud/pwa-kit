@@ -17,13 +17,13 @@ import {
     BreadcrumbLink as ChakraBreadcrumbLink,
     // Hooks
     useStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 // Icons
-import {ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronRightIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 // Others
-import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import {categoryUrlBuilder} from '@salesforce/extension-retail-react-app-core/app/utils/url'
 
 /**
  * A simplification of the Chakra `Breadcrumb` component for our project needs. Given

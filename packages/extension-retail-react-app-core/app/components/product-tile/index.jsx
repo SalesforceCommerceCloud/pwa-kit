@@ -7,7 +7,7 @@
 
 import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
-import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {HeartIcon, HeartSolidIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 // Components
 import {
@@ -18,17 +18,17 @@ import {
     Stack,
     useMultiStyleConfig,
     IconButton
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import DynamicImage from '@salesforce/extension-retail-react-app-core/app/components/dynamic-image'
 
 // Hooks
 import {useIntl} from 'react-intl'
 
 // Other
-import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {productUrlBuilder} from '@salesforce/extension-retail-react-app-core/app/utils/url'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
+import withRegistration from '@salesforce/extension-retail-react-app-core/app/components/with-registration'
+import {useCurrency} from '@salesforce/extension-retail-react-app-core/app/hooks'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 

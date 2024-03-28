@@ -9,7 +9,7 @@ import {Router} from 'react-router'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {usePageUrls} from '@salesforce/retail-react-app/app/hooks/use-page-urls'
+import {usePageUrls} from '@salesforce/extension-retail-react-app-core/app/hooks/use-page-urls'
 
 const MockComponent = () => {
     const urls = usePageUrls({total: 100})

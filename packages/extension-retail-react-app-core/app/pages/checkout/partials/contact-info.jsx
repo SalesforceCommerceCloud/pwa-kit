@@ -20,21 +20,21 @@ import {
     Container,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
+import {useCheckout} from '@salesforce/extension-retail-react-app-core/app/pages/checkout/util/checkout-context'
+import useLoginFields from '@salesforce/extension-retail-react-app-core/app/components/forms/useLoginFields'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
-} from '@salesforce/retail-react-app/app/components/toggle-card'
-import Field from '@salesforce/retail-react-app/app/components/field'
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+} from '@salesforce/extension-retail-react-app-core/app/components/toggle-card'
+import Field from '@salesforce/extension-retail-react-app-core/app/components/field'
+import {AuthModal, useAuthModal} from '@salesforce/extension-retail-react-app-core/app/hooks/use-auth-modal'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 const ContactInfo = () => {

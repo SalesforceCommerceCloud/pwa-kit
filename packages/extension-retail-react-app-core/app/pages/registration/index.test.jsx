@@ -10,13 +10,13 @@ import {
     guestToken,
     registerUserToken,
     renderWithProviders
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import Account from '@salesforce/retail-react-app/app/pages/account'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import Account from '@salesforce/extension-retail-react-app-core/app/pages/account'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockedRegisteredCustomer} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 
 const MockedComponent = () => {
     const match = {

@@ -6,9 +6,9 @@
  */
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
-import {Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
-import RecentSearches from '@salesforce/retail-react-app/app/components/search/partials/recent-searches'
-import Suggestions from '@salesforce/retail-react-app/app/components/search/partials/suggestions'
+import {Stack} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import RecentSearches from '@salesforce/extension-retail-react-app-core/app/components/search/partials/recent-searches'
+import Suggestions from '@salesforce/extension-retail-react-app-core/app/components/search/partials/suggestions'
 
 const SearchSuggestions = ({recentSearches, searchSuggestions, closeAndNavigate}) => {
     const useSuggestions = searchSuggestions && searchSuggestions?.categorySuggestions?.length

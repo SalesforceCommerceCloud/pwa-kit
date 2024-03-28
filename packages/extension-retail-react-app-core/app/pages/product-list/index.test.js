@@ -11,15 +11,15 @@ import {rest} from 'msw'
 import {
     mockProductSearch,
     mockedEmptyCustomerProductList
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
+} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {
     createPathWithDefaults,
     renderWithProviders
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import ProductList from '.'
-import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
+import EmptySearchResults from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/empty-results'
 
 jest.setTimeout(60000)
 let mockProductListSearchResponse = mockProductSearch

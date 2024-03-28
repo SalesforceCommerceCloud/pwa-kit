@@ -13,10 +13,10 @@ import {
     Text,
     AspectRatio,
     useTheme
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {Link} from 'react-router-dom'
 
-import {ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronRightIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 /**
  * BasicTile component is used on content pages like home page.

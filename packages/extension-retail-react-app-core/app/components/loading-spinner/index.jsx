@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Box, Spinner} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Spinner} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import PropTypes from 'prop-types'
 
 const LoadingSpinner = ({wrapperStyles = {}, spinnerStyles = {}}) => {

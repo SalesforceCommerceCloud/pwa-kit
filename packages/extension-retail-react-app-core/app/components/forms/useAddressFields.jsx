@@ -5,12 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl, defineMessages} from 'react-intl'
-import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
+import {formatPhoneNumber} from '@salesforce/extension-retail-react-app-core/app/utils/phone-utils'
 import {
     stateOptions,
     provinceOptions
-} from '@salesforce/retail-react-app/app/components/forms/state-province-options'
-import {SHIPPING_COUNTRY_CODES} from '@salesforce/retail-react-app/app/constants'
+} from '@salesforce/extension-retail-react-app-core/app/components/forms/state-province-options'
+import {SHIPPING_COUNTRY_CODES} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const messages = defineMessages({
     required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},

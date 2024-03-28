@@ -9,7 +9,7 @@ import {useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 
 // Utils
-import {buildUrlSet} from '@salesforce/retail-react-app/app/utils/url'
+import {buildUrlSet} from '@salesforce/extension-retail-react-app-core/app/utils/url'
 
 /*
  * Generate a memoized list of page size urls. Chaning the page size will reset

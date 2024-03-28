@@ -6,15 +6,15 @@
  */
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import AppConfig from '@salesforce/retail-react-app/app/components/_app-config/index.jsx'
+import AppConfig from '@salesforce/extension-retail-react-app-core/app/components/_app-config/index.jsx'
 
 import {CorrelationIdProvider} from '@salesforce/pwa-kit-react-sdk/ssr/universal/contexts'
 import {uuidv4} from '@salesforce/pwa-kit-react-sdk/utils/uuidv4.client'
 import {StaticRouter} from 'react-router-dom'
 
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
 import {rest} from 'msw'
-import {registerUserToken} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {registerUserToken} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 describe('AppConfig', () => {
     let originalFetch

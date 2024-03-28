@@ -11,8 +11,8 @@ import {
     getParamsFromPath,
     getDefaultSite,
     getSiteByReference
-} from '@salesforce/retail-react-app/app/utils/site-utils'
-import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
+} from '@salesforce/extension-retail-react-app-core/app/utils/site-utils'
+import {HOME_HREF, urlPartPositions} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.

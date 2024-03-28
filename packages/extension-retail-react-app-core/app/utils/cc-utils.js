@@ -9,7 +9,7 @@ import {
     DiscoverIcon,
     MastercardIcon,
     VisaIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 /**
  * Formats a credit card number against given criteria

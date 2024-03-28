@@ -21,27 +21,27 @@ import {
     Stack,
     Container,
     Link
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 // Project Components
-import Hero from '@salesforce/retail-react-app/app/components/hero'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
-import Section from '@salesforce/retail-react-app/app/components/section'
-import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
+import Hero from '@salesforce/extension-retail-react-app-core/app/components/hero'
+import Seo from '@salesforce/extension-retail-react-app-core/app/components/seo'
+import Section from '@salesforce/extension-retail-react-app-core/app/components/section'
+import ProductScroller from '@salesforce/extension-retail-react-app-core/app/components/product-scroller'
 
 // Others
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-import {heroFeatures, features} from '@salesforce/retail-react-app/app/pages/home/data'
+import {heroFeatures, features} from '@salesforce/extension-retail-react-app-core/app/pages/home/data'
 
 //Hooks
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useEinstein from '@salesforce/extension-retail-react-app-core/app/hooks/use-einstein'
 
 // Constants
 import {
     MAX_CACHE_AGE,
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT
-} from '@salesforce/retail-react-app/app/constants'
+} from '@salesforce/extension-retail-react-app-core/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
 

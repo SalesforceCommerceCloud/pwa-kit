@@ -14,10 +14,10 @@ import {
     Button,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {AlertIcon, BrandLogo} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import LoginFields from '@salesforce/extension-retail-react-app-core/app/components/forms/login-fields'
+import {noop} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
     return (

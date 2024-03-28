@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import Link from '@salesforce/retail-react-app/app/components/link/index'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link/index'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const originalLocation = window.location
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {

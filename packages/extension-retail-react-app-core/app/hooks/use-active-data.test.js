@@ -7,14 +7,14 @@
 /*global dw*/
 /* eslint-disable no-import-assign */
 /* eslint-disable react-hooks/rules-of-hooks */
-import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+import useActiveData from '@salesforce/extension-retail-react-app-core/app/hooks/use-active-data'
 import {
     mockCategory,
     mockProduct,
     mockSearchResults
-} from '@salesforce/retail-react-app/app/hooks/einstein-mock-data'
-import * as constants from '@salesforce/retail-react-app/app/constants'
-import {DEFAULT_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
+} from '@salesforce/extension-retail-react-app-core/app/hooks/einstein-mock-data'
+import * as constants from '@salesforce/extension-retail-react-app-core/app/constants'
+import {DEFAULT_SEARCH_PARAMS} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const activeDataApi = useActiveData()
 

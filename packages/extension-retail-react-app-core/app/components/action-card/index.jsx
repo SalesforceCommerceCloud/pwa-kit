@@ -6,9 +6,9 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {Stack, Box, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, Box, Button} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {FormattedMessage} from 'react-intl'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import LoadingSpinner from '@salesforce/extension-retail-react-app-core/app/components/loading-spinner'
 
 /**
  * Renders a card-style box with optional edit and remove buttons. Used for

@@ -19,10 +19,10 @@ import {
 
     // Hooks
     useStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 // Icons
-import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 // Constants
 const SELECT_ID = 'pagination'

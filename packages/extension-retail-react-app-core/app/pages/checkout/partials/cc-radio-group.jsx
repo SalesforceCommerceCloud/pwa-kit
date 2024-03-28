@@ -15,11 +15,11 @@ import {
     SimpleGrid,
     FormControl,
     FormErrorMessage
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
-import {RadioCard, RadioCardGroup} from '@salesforce/retail-react-app/app/components/radio-card'
-import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {PlusIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import {RadioCard, RadioCardGroup} from '@salesforce/extension-retail-react-app-core/app/components/radio-card'
+import {getCreditCardIcon} from '@salesforce/extension-retail-react-app-core/app/utils/cc-utils'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 
 const CCRadioGroup = ({
     form,

@@ -13,7 +13,7 @@ import {
     Stack,
     Text,
     Container
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 /**
  * Section component used on content pages like home page.

@@ -6,7 +6,7 @@
  */
 
 import {useCustomerProductLists, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 const onClient = typeof window !== 'undefined'
 // TODO: remove `listId` input -> use the first list of type wish_list instead
 // (mimic the logic in the other older hook 'use-wishlist.js')

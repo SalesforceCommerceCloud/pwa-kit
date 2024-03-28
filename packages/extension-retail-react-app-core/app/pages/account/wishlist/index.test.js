@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import AccountWishlist from '.'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
 import {
@@ -14,7 +14,7 @@ import {
     mockedEmptyWishList,
     mockedProductLists,
     mockedWishListProducts
-} from '@salesforce/retail-react-app/app/pages/account/wishlist/index.mock'
+} from '@salesforce/extension-retail-react-app-core/app/pages/account/wishlist/index.mock'
 
 beforeEach(() => {
     jest.resetModules()

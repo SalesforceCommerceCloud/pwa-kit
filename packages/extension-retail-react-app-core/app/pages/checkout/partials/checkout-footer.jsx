@@ -17,15 +17,15 @@ import {
     Flex,
     Spacer,
     useStyles
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import LinksList from '@salesforce/retail-react-app/app/components/links-list'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import LinksList from '@salesforce/extension-retail-react-app-core/app/components/links-list'
 import {
     VisaIcon,
     MastercardIcon,
     AmexIcon,
     DiscoverIcon
-} from '@salesforce/retail-react-app/app/components/icons'
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
+} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/extension-retail-react-app-core/app/components/responsive'
 
 const CheckoutFooter = ({...otherProps}) => {
     const styles = useMultiStyleConfig('CheckoutFooter')

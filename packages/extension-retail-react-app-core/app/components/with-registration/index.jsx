@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {AuthModal, useAuthModal} from '@salesforce/extension-retail-react-app-core/app/hooks/use-auth-modal'
 import PropTypes from 'prop-types'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {noop} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 
 /**
  * Higher-order component that modifies the given component's `onClick` to show the login form if

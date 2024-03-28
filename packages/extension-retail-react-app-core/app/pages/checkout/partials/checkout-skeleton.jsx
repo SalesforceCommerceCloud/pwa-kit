@@ -12,7 +12,7 @@ import {
     GridItem,
     Skeleton,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 const CheckoutSkeleton = () => {
     return (

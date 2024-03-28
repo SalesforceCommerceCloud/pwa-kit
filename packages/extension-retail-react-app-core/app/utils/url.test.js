@@ -16,9 +16,9 @@ import {
     absoluteUrl,
     createUrlTemplate,
     removeSiteLocaleFromPath
-} from '@salesforce/retail-react-app/app/utils/url'
-import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+} from '@salesforce/extension-retail-react-app-core/app/utils/url'
+import {getUrlConfig} from '@salesforce/extension-retail-react-app-core/app/utils/site-utils'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
 
 afterEach(() => {
     jest.clearAllMocks()

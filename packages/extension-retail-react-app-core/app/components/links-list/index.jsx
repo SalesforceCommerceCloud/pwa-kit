@@ -13,8 +13,8 @@ import {
     Heading,
     HStack,
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import Link from '@salesforce/retail-react-app/app/components/link'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 
 const LinksList = ({
     links = [],

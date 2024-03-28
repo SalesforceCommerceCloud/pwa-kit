@@ -6,12 +6,12 @@
  */
 
 /* istanbul ignore file */
-export {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search-params'
-export {useLimitUrls} from '@salesforce/retail-react-app/app/hooks/use-limit-urls'
-export {usePageUrls} from '@salesforce/retail-react-app/app/hooks/use-page-urls'
-export {useSortUrls} from '@salesforce/retail-react-app/app/hooks/use-sort-urls'
-export {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
-export {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
-export {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
-export {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks/use-derived-product'
-export {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
+export {useSearchParams} from '@salesforce/extension-retail-react-app-core/app/hooks/use-search-params'
+export {useLimitUrls} from '@salesforce/extension-retail-react-app-core/app/hooks/use-limit-urls'
+export {usePageUrls} from '@salesforce/extension-retail-react-app-core/app/hooks/use-page-urls'
+export {useSortUrls} from '@salesforce/extension-retail-react-app-core/app/hooks/use-sort-urls'
+export {useVariant} from '@salesforce/extension-retail-react-app-core/app/hooks/use-variant'
+export {useVariationAttributes} from '@salesforce/extension-retail-react-app-core/app/hooks/use-variation-attributes'
+export {useVariationParams} from '@salesforce/extension-retail-react-app-core/app/hooks/use-variation-params'
+export {useDerivedProduct} from '@salesforce/extension-retail-react-app-core/app/hooks/use-derived-product'
+export {useCurrency} from '@salesforce/extension-retail-react-app-core/app/hooks/use-currency'

@@ -6,10 +6,10 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AspectRatio, Box, Badge, Image} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {AspectRatio, Box, Badge, Image} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useItemVariant} from '.'
 import {FormattedMessage} from 'react-intl'
-import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
+import {findImageGroupBy} from '@salesforce/extension-retail-react-app-core/app/utils/image-groups-utils'
 
 /**
  * In the context of a cart product item variant, this component renders the item's

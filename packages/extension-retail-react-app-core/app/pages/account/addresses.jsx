@@ -21,21 +21,21 @@ import {
     Skeleton,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import FormActionButtons from '@salesforce/extension-retail-react-app-core/app/components/forms/form-action-buttons'
 import {useForm} from 'react-hook-form'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
 
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import {LocationIcon, PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
-import ActionCard from '@salesforce/retail-react-app/app/components/action-card'
-import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
-import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
-import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import LoadingSpinner from '@salesforce/extension-retail-react-app-core/app/components/loading-spinner'
+import {LocationIcon, PlusIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import ActionCard from '@salesforce/extension-retail-react-app-core/app/components/action-card'
+import AddressFields from '@salesforce/extension-retail-react-app-core/app/components/forms/address-fields'
+import AddressDisplay from '@salesforce/extension-retail-react-app-core/app/components/address-display'
+import PageActionPlaceHolder from '@salesforce/extension-retail-react-app-core/app/components/page-action-placeholder'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {nanoid} from 'nanoid'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const DEFAULT_SKELETON_COUNT = 3
 

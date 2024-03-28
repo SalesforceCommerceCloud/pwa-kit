@@ -12,11 +12,11 @@ import {
     Button,
     Center,
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {
     ADD_FILTER,
     REMOVE_FILTER
-} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
+} from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/refinements-utils'
 
 const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const {formatMessage} = useIntl()

@@ -6,7 +6,7 @@
  */
 
 import {useCallback, useContext} from 'react'
-import {MultiSiteContext} from '@salesforce/retail-react-app/app/contexts'
+import {MultiSiteContext} from '@salesforce/extension-retail-react-app-core/app/contexts'
 
 /**
  * Custom React hook to get the function that returns usefule multi-site values, the site, the locale and

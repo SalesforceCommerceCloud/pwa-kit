@@ -20,15 +20,15 @@ import {
     createStylesContext,
     Button,
     FormControl
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useIntl} from 'react-intl'
 
-import LinksList from '@salesforce/retail-react-app/app/components/links-list'
-import SocialIcons from '@salesforce/retail-react-app/app/components/social-icons'
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
-import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import LinksList from '@salesforce/extension-retail-react-app-core/app/components/links-list'
+import SocialIcons from '@salesforce/extension-retail-react-app-core/app/components/social-icons'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/extension-retail-react-app-core/app/components/responsive'
+import {getPathWithLocale} from '@salesforce/extension-retail-react-app-core/app/utils/url'
+import LocaleText from '@salesforce/extension-retail-react-app-core/app/components/locale-text'
+import useMultiSite from '@salesforce/extension-retail-react-app-core/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')

@@ -7,9 +7,9 @@
 
 import React from 'react'
 import {renderHook} from '@testing-library/react'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
-import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
-import {DEFAULT_CURRENCY} from '@salesforce/retail-react-app/app/constants'
+import {useCurrency} from '@salesforce/extension-retail-react-app-core/app/hooks/use-currency'
+import {CurrencyProvider} from '@salesforce/extension-retail-react-app-core/app/contexts'
+import {DEFAULT_CURRENCY} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const wrapper = ({children}) => <CurrencyProvider>{children}</CurrencyProvider>
 

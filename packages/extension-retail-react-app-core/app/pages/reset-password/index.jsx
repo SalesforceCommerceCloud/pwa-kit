@@ -14,17 +14,17 @@ import {
     Container,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {
     useShopperCustomersMutation,
     ShopperCustomersMutations
 } from '@salesforce/commerce-sdk-react'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
-import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
-import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import Seo from '@salesforce/extension-retail-react-app-core/app/components/seo'
+import ResetPasswordForm from '@salesforce/extension-retail-react-app-core/app/components/reset-password'
+import {BrandLogo} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import useEinstein from '@salesforce/extension-retail-react-app-core/app/hooks/use-einstein'
 import {useLocation} from 'react-router-dom'
 
 const ResetPassword = () => {

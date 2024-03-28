@@ -17,8 +17,8 @@ import {
     InputRightElement,
     Select,
     Checkbox
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {VisibilityIcon, VisibilityOffIcon} from '@salesforce/retail-react-app/app/components/icons'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {VisibilityIcon, VisibilityOffIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 import {useIntl} from 'react-intl'
 
 const Field = ({

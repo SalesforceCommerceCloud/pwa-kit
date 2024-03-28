@@ -19,7 +19,7 @@ import {
     Text,
     useDisclosure,
     useToast
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {
     AuthHelpers,
     useAuthHelper,
@@ -31,15 +31,15 @@ import {
     useShopperBasketsMutation,
     ShopperCustomersMutations
 } from '@salesforce/commerce-sdk-react'
-import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import LoginForm from '@salesforce/retail-react-app/app/components/login'
-import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
-import RegisterForm from '@salesforce/retail-react-app/app/components/register'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import {BrandLogo} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import LoginForm from '@salesforce/extension-retail-react-app-core/app/components/login'
+import ResetPasswordForm from '@salesforce/extension-retail-react-app-core/app/components/reset-password'
+import RegisterForm from '@salesforce/extension-retail-react-app-core/app/components/register'
+import {noop} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import {usePrevious} from '@salesforce/extension-retail-react-app-core/app/hooks/use-previous'
+import {isServer} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
 const PASSWORD_VIEW = 'password'

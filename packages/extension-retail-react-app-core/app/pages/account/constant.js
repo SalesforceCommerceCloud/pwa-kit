@@ -11,7 +11,7 @@ import {
     LocationIcon,
     ReceiptIcon,
     HeartIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 export const messages = defineMessages({
     profile: {defaultMessage: 'Account Details', id: 'global.account.link.account_details'},

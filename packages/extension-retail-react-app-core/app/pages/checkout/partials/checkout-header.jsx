@@ -12,11 +12,11 @@ import {
     Button,
     Flex,
     Center
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import {BasketIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import {HOME_HREF} from '@salesforce/retail-react-app/app/constants'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
+import {BasketIcon, BrandLogo} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import {HOME_HREF} from '@salesforce/extension-retail-react-app-core/app/constants'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
 
 const CheckoutHeader = () => {
     const intl = useIntl()

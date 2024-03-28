@@ -17,23 +17,23 @@ import {
     Stack,
     Text,
     useToast
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
-import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {AlertIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
-} from '@salesforce/retail-react-app/app/components/toggle-card'
-import ProfileFields from '@salesforce/retail-react-app/app/components/forms/profile-fields'
-import UpdatePasswordFields from '@salesforce/retail-react-app/app/components/forms/update-password-fields'
-import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
+} from '@salesforce/extension-retail-react-app-core/app/components/toggle-card'
+import ProfileFields from '@salesforce/extension-retail-react-app-core/app/components/forms/profile-fields'
+import UpdatePasswordFields from '@salesforce/extension-retail-react-app-core/app/components/forms/update-password-fields'
+import FormActionButtons from '@salesforce/extension-retail-react-app-core/app/components/forms/form-action-buttons'
 import {
     useShopperCustomersMutation,
     useAuthHelper,
     AuthHelpers
 } from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the

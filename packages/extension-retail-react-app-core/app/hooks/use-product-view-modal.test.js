@@ -12,13 +12,13 @@ import {screen, fireEvent, waitFor} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {IntlProvider} from 'react-intl'
 
-import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
-import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
+import mockProductDetail from '@salesforce/extension-retail-react-app-core/app/mocks/variant-750518699578M'
+import {useProductViewModal} from '@salesforce/extension-retail-react-app-core/app/hooks/use-product-view-modal'
 import {
     DEFAULT_LOCALE,
     renderWithProviders
-} from '@salesforce/retail-react-app/app/utils/test-utils'
-import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import messages from '@salesforce/extension-retail-react-app-core/app/static/translations/compiled/en-GB.json'
 import {rest} from 'msw'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {

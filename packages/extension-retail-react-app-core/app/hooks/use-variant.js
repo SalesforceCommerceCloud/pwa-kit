@@ -6,7 +6,7 @@
  */
 
 // Hooks
-import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
+import {useVariationParams} from '@salesforce/extension-retail-react-app-core/app/hooks/use-variation-params'
 
 /**
  * This hook returns the currently selected

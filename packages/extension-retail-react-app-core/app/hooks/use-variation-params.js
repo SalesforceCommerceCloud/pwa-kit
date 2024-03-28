@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp-search-params'
+import {usePDPSearchParams} from '@salesforce/extension-retail-react-app-core/app/hooks/use-pdp-search-params'
 
 /*
  * This hook will return only the params that are also product attributes for the

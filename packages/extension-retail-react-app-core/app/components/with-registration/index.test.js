@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Button} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {screen, waitFor} from '@testing-library/react'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import withRegistration from '@salesforce/extension-retail-react-app-core/app/components/with-registration/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
-import {mockedGuestCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockedGuestCustomer} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 
 const ButtonWithRegistration = withRegistration(Button)
 

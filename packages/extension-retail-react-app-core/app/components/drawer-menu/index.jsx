@@ -10,9 +10,9 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
 // Project Components
-import LocaleSelector from '@salesforce/retail-react-app/app/components/locale-selector'
-import NestedAccordion from '@salesforce/retail-react-app/app/components/nested-accordion'
-import SocialIcons from '@salesforce/retail-react-app/app/components/social-icons'
+import LocaleSelector from '@salesforce/extension-retail-react-app-core/app/components/locale-selector'
+import NestedAccordion from '@salesforce/extension-retail-react-app-core/app/components/nested-accordion'
+import SocialIcons from '@salesforce/extension-retail-react-app-core/app/components/social-icons'
 // Components
 import {
     Box,
@@ -39,24 +39,24 @@ import {
     // Hooks
     useBreakpointValue,
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 // Icons
 import {
     BrandLogo,
     LocationIcon,
     SignoutIcon,
     UserIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 // Others
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {getPathWithLocale, categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {noop} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
+import {getPathWithLocale, categoryUrlBuilder} from '@salesforce/extension-retail-react-app-core/app/utils/url'
+import LoadingSpinner from '@salesforce/extension-retail-react-app-core/app/components/loading-spinner'
 
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import useMultiSite from '@salesforce/extension-retail-react-app-core/app/hooks/use-multi-site'
 
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign

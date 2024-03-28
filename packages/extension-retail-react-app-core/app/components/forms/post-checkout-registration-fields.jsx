@@ -6,10 +6,10 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Stack, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
-import useRegistrationFields from '@salesforce/retail-react-app/app/components/forms/useRegistrationFields'
-import PasswordRequirements from '@salesforce/retail-react-app/app/components/forms/password-requirements'
-import Field from '@salesforce/retail-react-app/app/components/field'
+import {Stack, Box} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import useRegistrationFields from '@salesforce/extension-retail-react-app-core/app/components/forms/useRegistrationFields'
+import PasswordRequirements from '@salesforce/extension-retail-react-app-core/app/components/forms/password-requirements'
+import Field from '@salesforce/extension-retail-react-app-core/app/components/field'
 
 const PostCheckoutRegistrationFields = ({form, prefix = ''}) => {
     const fields = useRegistrationFields({form, prefix})

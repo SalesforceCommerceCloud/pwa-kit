@@ -5,14 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {mockWishListDetails} from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action.mock'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import WishlistPrimaryAction from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action'
+import {mockWishListDetails} from '@salesforce/extension-retail-react-app-core/app/pages/account/wishlist/partials/wishlist-primary-action.mock'
+import ItemVariantProvider from '@salesforce/extension-retail-react-app-core/app/components/item-variant'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import WishlistPrimaryAction from '@salesforce/extension-retail-react-app-core/app/pages/account/wishlist/partials/wishlist-primary-action'
 import {screen, waitFor} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {rest} from 'msw'
-import {basketWithProductSet} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
+import {basketWithProductSet} from '@salesforce/extension-retail-react-app-core/app/pages/product-detail/index.mock'
 
 const MockedComponent = ({variant}) => {
     return (

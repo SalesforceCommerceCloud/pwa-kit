@@ -7,21 +7,21 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Box, Flex, Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Flex, Skeleton} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
+import {useWishList} from '@salesforce/extension-retail-react-app-core/app/hooks/use-wish-list'
 
-import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
-import {HeartIcon} from '@salesforce/retail-react-app/app/components/icons'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
-import WishlistPrimaryAction from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action'
-import WishlistSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-secondary-button-group'
+import PageActionPlaceHolder from '@salesforce/extension-retail-react-app-core/app/components/page-action-placeholder'
+import {HeartIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import ProductItem from '@salesforce/extension-retail-react-app-core/app/components/product-item'
+import WishlistPrimaryAction from '@salesforce/extension-retail-react-app-core/app/pages/account/wishlist/partials/wishlist-primary-action'
+import WishlistSecondaryButtonGroup from '@salesforce/extension-retail-react-app-core/app/pages/account/wishlist/partials/wishlist-secondary-button-group'
 
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 
 const numberOfSkeletonItems = 3
 

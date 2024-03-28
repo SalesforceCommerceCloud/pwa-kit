@@ -10,18 +10,18 @@ import {
     mockCustomerBaskets,
     mockedCustomerProductLists,
     productsResponse
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
+} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import {
     basketWithProductSet,
     mockProductInWishlist,
     mockWishlistWithItem,
     einsteinRecommendation
-} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
-import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+} from '@salesforce/extension-retail-react-app-core/app/pages/product-detail/index.mock'
+import mockedProductSet from '@salesforce/extension-retail-react-app-core/app/mocks/product-set-winter-lookM'
 import userEvent from '@testing-library/user-event'
 
 jest.setTimeout(60000)

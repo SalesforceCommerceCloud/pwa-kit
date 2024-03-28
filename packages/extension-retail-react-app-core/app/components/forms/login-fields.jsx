@@ -6,9 +6,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
-import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
-import Field from '@salesforce/retail-react-app/app/components/field'
+import {Stack} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import useLoginFields from '@salesforce/extension-retail-react-app-core/app/components/forms/useLoginFields'
+import Field from '@salesforce/extension-retail-react-app-core/app/components/field'
 
 const LoginFields = ({form, prefix = ''}) => {
     const fields = useLoginFields({form, prefix})

@@ -8,10 +8,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import {screen, fireEvent, waitFor} from '@testing-library/react'
-import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery/index'
-import {Skeleton as ImageGallerySkeleton} from '@salesforce/retail-react-app/app/components/image-gallery/index'
+import ImageGallery from '@salesforce/extension-retail-react-app-core/app/components/image-gallery/index'
+import {Skeleton as ImageGallerySkeleton} from '@salesforce/extension-retail-react-app-core/app/components/image-gallery/index'
 import {createMemoryHistory} from 'history'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 const MockComponent = ({imageGroups = [], selectedVariationAttributes = {}}) => {
     return !imageGroups.length ? (

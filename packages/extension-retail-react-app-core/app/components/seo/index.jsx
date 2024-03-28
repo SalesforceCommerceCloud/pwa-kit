@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
 
-import {DEFAULT_SITE_TITLE} from '@salesforce/retail-react-app/app/constants'
+import {DEFAULT_SITE_TITLE} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const Seo = ({title, description, noIndex, children, ...props}) => {
     const fullTitle = title ? `${title} | ${DEFAULT_SITE_TITLE}` : DEFAULT_SITE_TITLE

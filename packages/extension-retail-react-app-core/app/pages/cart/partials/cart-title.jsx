@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {FormattedMessage} from 'react-intl'
-import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {Text} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
 
 const CartTitle = () => {
     const {

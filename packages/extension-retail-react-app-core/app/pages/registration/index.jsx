@@ -8,15 +8,15 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Container} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
-import RegisterForm from '@salesforce/retail-react-app/app/components/register'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import Seo from '@salesforce/extension-retail-react-app-core/app/components/seo'
+import RegisterForm from '@salesforce/extension-retail-react-app-core/app/components/register'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import useEinstein from '@salesforce/extension-retail-react-app-core/app/hooks/use-einstein'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const Registration = () => {
     const {formatMessage} = useIntl()

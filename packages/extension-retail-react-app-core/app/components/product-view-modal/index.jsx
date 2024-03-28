@@ -13,9 +13,9 @@ import {
     ModalCloseButton,
     ModalContent,
     ModalOverlay
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import ProductView from '@salesforce/retail-react-app/app/components/product-view'
-import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import ProductView from '@salesforce/extension-retail-react-app-core/app/components/product-view'
+import {useProductViewModal} from '@salesforce/extension-retail-react-app-core/app/hooks/use-product-view-modal'
 
 /**
  * A Modal that contains Product View

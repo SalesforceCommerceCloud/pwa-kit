@@ -15,7 +15,7 @@ import {
 
     // Hooks
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 // Icons
 import {
@@ -24,7 +24,7 @@ import {
     SocialPinterestIcon,
     SocialTwitterIcon,
     SocialYoutubeIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 /**
  *

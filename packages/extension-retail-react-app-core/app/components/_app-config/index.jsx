@@ -6,25 +6,25 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {ChakraProvider} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from '@salesforce/retail-react-app/app/theme'
-import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
+import theme from '@salesforce/extension-retail-react-app-core/app/theme'
+import {MultiSiteProvider} from '@salesforce/extension-retail-react-app-core/app/contexts'
 import {
     resolveSiteFromUrl,
     resolveLocaleFromUrl
-} from '@salesforce/retail-react-app/app/utils/site-utils'
+} from '@salesforce/extension-retail-react-app-core/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
+import {createUrlTemplate} from '@salesforce/extension-retail-react-app-core/app/utils/url'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+// import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -60,7 +60,7 @@ const AppConfig = ({children, locals = {}}) => {
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
             </MultiSiteProvider>
-            <ReactQueryDevtools />
+            {/* <ReactQueryDevtools /> */}
         </CommerceApiProvider>
     )
 }

@@ -9,23 +9,23 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 
 // Chakra Components
-import {Box, Fade, Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Fade, Flex, Stack, Text} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 // Project Components
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
-import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
-import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
-import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/extension-retail-react-app-core/app/components/responsive'
+import ItemVariantProvider from '@salesforce/extension-retail-react-app-core/app/components/item-variant'
+import CartItemVariantImage from '@salesforce/extension-retail-react-app-core/app/components/item-variant/item-image'
+import CartItemVariantName from '@salesforce/extension-retail-react-app-core/app/components/item-variant/item-name'
+import CartItemVariantAttributes from '@salesforce/extension-retail-react-app-core/app/components/item-variant/item-attributes'
+import CartItemVariantPrice from '@salesforce/extension-retail-react-app-core/app/components/item-variant/item-price'
+import LoadingSpinner from '@salesforce/extension-retail-react-app-core/app/components/loading-spinner'
+import QuantityPicker from '@salesforce/extension-retail-react-app-core/app/components/quantity-picker'
 
 // Utilities
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {noop} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
 
 // Hooks
-import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import {useDerivedProduct} from '@salesforce/extension-retail-react-app-core/app/hooks'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.

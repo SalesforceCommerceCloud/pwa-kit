@@ -8,22 +8,22 @@ import React from 'react'
 import {
     renderWithProviders,
     createPathWithDefaults
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {screen, waitFor, within} from '@testing-library/react'
-import SearchInput from '@salesforce/retail-react-app/app/components/search/index'
-import Suggestions from '@salesforce/retail-react-app/app/components/search/partials/suggestions'
+import SearchInput from '@salesforce/extension-retail-react-app-core/app/components/search/index'
+import Suggestions from '@salesforce/extension-retail-react-app-core/app/components/search/partials/suggestions'
 import {
     clearSessionJSONItem,
     getSessionJSONItem,
     setSessionJSONItem,
     noop
-} from '@salesforce/retail-react-app/app/utils/utils'
-import {RECENT_SEARCH_KEY, RECENT_SEARCH_LIMIT} from '@salesforce/retail-react-app/app/constants'
-import mockSearchResults from '@salesforce/retail-react-app/app/mocks/searchResults'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
+import {RECENT_SEARCH_KEY, RECENT_SEARCH_LIMIT} from '@salesforce/extension-retail-react-app-core/app/constants'
+import mockSearchResults from '@salesforce/extension-retail-react-app-core/app/mocks/searchResults'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
 import {rest} from 'msw'
-import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockCustomerBaskets} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 
 beforeEach(() => {
     clearSessionJSONItem(RECENT_SEARCH_KEY)

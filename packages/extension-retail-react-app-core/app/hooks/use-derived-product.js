@@ -6,11 +6,11 @@
  */
 
 import {useEffect, useState} from 'react'
-import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
+import {useVariant} from '@salesforce/extension-retail-react-app-core/app/hooks/use-variant'
 import {useIntl} from 'react-intl'
-import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
-import {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
-import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {useVariationParams} from '@salesforce/extension-retail-react-app-core/app/hooks/use-variation-params'
+import {useVariationAttributes} from '@salesforce/extension-retail-react-app-core/app/hooks/use-variation-attributes'
+import {getDisplayPrice} from '@salesforce/extension-retail-react-app-core/app/utils/product-utils'
 
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'

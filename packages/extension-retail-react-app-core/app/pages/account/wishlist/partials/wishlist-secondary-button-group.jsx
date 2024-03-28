@@ -10,18 +10,18 @@ import {
     Button,
     ButtonGroup,
     useDisclosure
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
+import {useWishList} from '@salesforce/extension-retail-react-app-core/app/hooks/use-wish-list'
 
-import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal/index'
-import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import ConfirmationModal from '@salesforce/extension-retail-react-app-core/app/components/confirmation-modal/index'
+import {useItemVariant} from '@salesforce/extension-retail-react-app-core/app/components/item-variant'
+import {noop} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     dialogTitle: defineMessage({

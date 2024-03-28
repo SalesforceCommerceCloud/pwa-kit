@@ -9,11 +9,11 @@ import {useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 
 // Other Hooks
-import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
+import {useVariationParams} from '@salesforce/extension-retail-react-app-core/app/hooks/use-variation-params'
 
 // Utils
-import {updateSearchParams} from '@salesforce/retail-react-app/app/utils/url'
-import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp-search-params'
+import {updateSearchParams} from '@salesforce/extension-retail-react-app-core/app/utils/url'
+import {usePDPSearchParams} from '@salesforce/extension-retail-react-app-core/app/hooks/use-pdp-search-params'
 
 /**
  * Return the first image in the `swatch` type image group for a given

@@ -20,24 +20,24 @@ import {
     VStack,
     Fade,
     useTheme
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
-import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {useDerivedProduct} from '@salesforce/extension-retail-react-app-core/app/hooks'
+import {useAddToCartModalContext} from '@salesforce/extension-retail-react-app-core/app/hooks/use-add-to-cart-modal'
 
 // project components
-import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
-import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import {Skeleton as ImageGallerySkeleton} from '@salesforce/retail-react-app/app/components/image-gallery'
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
-import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
-import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
-import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
+import ImageGallery from '@salesforce/extension-retail-react-app-core/app/components/image-gallery'
+import Breadcrumb from '@salesforce/extension-retail-react-app-core/app/components/breadcrumb'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
+import withRegistration from '@salesforce/extension-retail-react-app-core/app/components/with-registration'
+import {Skeleton as ImageGallerySkeleton} from '@salesforce/extension-retail-react-app-core/app/components/image-gallery'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/extension-retail-react-app-core/app/components/responsive'
+import QuantityPicker from '@salesforce/extension-retail-react-app-core/app/components/quantity-picker'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
+import DisplayPrice from '@salesforce/extension-retail-react-app-core/app/components/display-price'
+import Swatch from '@salesforce/extension-retail-react-app-core/app/components/swatch-group/swatch'
+import SwatchGroup from '@salesforce/extension-retail-react-app-core/app/components/swatch-group'
+import {getDisplayPrice} from '@salesforce/extension-retail-react-app-core/app/utils/product-utils'
 
 const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, productType}) => {
     const isProductASet = productType?.set

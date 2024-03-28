@@ -8,8 +8,8 @@ import React from 'react'
 import {
     renderWithProviders,
     withPageProvider
-} from '@salesforce/retail-react-app/app/utils/test-utils'
-import Carousel from '@salesforce/retail-react-app/app/page-designer/layouts/carousel/index'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import Carousel from '@salesforce/extension-retail-react-app-core/app/page-designer/layouts/carousel/index'
 
 const SAMPLE_REGION = {
     id: 'TEST_REGION',

@@ -15,9 +15,9 @@ import {
     IconButton,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
-import {BrandLogo, FileIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {BrandLogo, FileIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 import {useHistory} from 'react-router-dom'
 
 // <Error> is rendered when:

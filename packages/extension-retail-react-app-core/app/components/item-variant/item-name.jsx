@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {useItemVariant} from '.'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 
 /**
  * In the context of a cart product item variant, this components simply renders

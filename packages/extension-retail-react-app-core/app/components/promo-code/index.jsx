@@ -15,13 +15,13 @@ import {
     AccordionItem,
     AccordionPanel,
     useToast
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
-import {ChevronDownIcon, ChevronUpIcon} from '@salesforce/retail-react-app/app/components/icons'
-import PromoCodeFields from '@salesforce/retail-react-app/app/components/forms/promo-code-fields'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {ChevronDownIcon, ChevronUpIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import PromoCodeFields from '@salesforce/extension-retail-react-app-core/app/components/forms/promo-code-fields'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
 
 export const usePromoCode = () => {
     const {formatMessage} = useIntl()

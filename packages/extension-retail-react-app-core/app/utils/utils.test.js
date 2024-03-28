@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import * as utils from '@salesforce/retail-react-app/app/utils/utils'
+import * as utils from '@salesforce/extension-retail-react-app-core/app/utils/utils'
 import EventEmitter from 'events'
-import {flatten, shallowEquals} from '@salesforce/retail-react-app/app/utils/utils'
+import {flatten, shallowEquals} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
 
 afterEach(() => {
     jest.clearAllMocks()

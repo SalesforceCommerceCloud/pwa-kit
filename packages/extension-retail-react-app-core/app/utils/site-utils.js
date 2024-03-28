@@ -6,7 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
+import {absoluteUrl} from '@salesforce/extension-retail-react-app-core/app/utils/url'
 
 /**
  * This functions takes an url and returns a site object,

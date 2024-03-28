@@ -43,22 +43,22 @@ import {
     DrawerOverlay,
     DrawerContent,
     DrawerCloseButton
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 // Project Components
-import Pagination from '@salesforce/retail-react-app/app/components/pagination'
+import Pagination from '@salesforce/extension-retail-react-app-core/app/components/pagination'
 import ProductTile, {
     Skeleton as ProductTileSkeleton
-} from '@salesforce/retail-react-app/app/components/product-tile'
-import {HideOnDesktop} from '@salesforce/retail-react-app/app/components/responsive'
-import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
-import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/selected-refinements'
-import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
-import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/page-header'
-import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/above-page-header'
+} from '@salesforce/extension-retail-react-app-core/app/components/product-tile'
+import {HideOnDesktop} from '@salesforce/extension-retail-react-app-core/app/components/responsive'
+import Refinements from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/refinements'
+import SelectedRefinements from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/selected-refinements'
+import EmptySearchResults from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/empty-results'
+import PageHeader from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/page-header'
+import AbovePageHeader from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/above-page-header'
 
 // Icons
-import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {FilterIcon, ChevronDownIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 // Hooks
 import {
@@ -66,10 +66,10 @@ import {
     usePageUrls,
     useSortUrls,
     useSearchParams
-} from '@salesforce/retail-react-app/app/hooks'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+} from '@salesforce/extension-retail-react-app-core/app/hooks'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
+import useEinstein from '@salesforce/extension-retail-react-app-core/app/hooks/use-einstein'
+import useActiveData from '@salesforce/extension-retail-react-app-core/app/hooks/use-active-data'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
@@ -82,11 +82,11 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST
-} from '@salesforce/retail-react-app/app/constants'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+} from '@salesforce/extension-retail-react-app-core/app/constants'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import LoadingSpinner from '@salesforce/extension-retail-react-app-core/app/components/loading-spinner'
+import {useWishList} from '@salesforce/extension-retail-react-app-core/app/hooks/use-wish-list'
+import {isHydrated} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.

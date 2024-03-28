@@ -6,13 +6,13 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Button, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, Button, Box} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
-import {clearSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
-import {RECENT_SEARCH_KEY} from '@salesforce/retail-react-app/app/constants'
+import {clearSessionJSONItem} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
+import {RECENT_SEARCH_KEY} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 import {FormattedMessage} from 'react-intl'
-import {searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import {searchUrlBuilder} from '@salesforce/extension-retail-react-app-core/app/utils/url'
 
 const RecentSearches = ({recentSearches, closeAndNavigate}) => {
     const clearSearches = () => {

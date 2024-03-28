@@ -8,8 +8,8 @@ import React from 'react'
 import {
     renderWithProviders,
     withPageProvider
-} from '@salesforce/retail-react-app/app/utils/test-utils'
-import MobileGrid2r2c from '@salesforce/retail-react-app/app/page-designer/layouts/mobileGrid2r2c/index'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import MobileGrid2r2c from '@salesforce/extension-retail-react-app-core/app/page-designer/layouts/mobileGrid2r2c/index'
 
 test('MobileGrid2r2c renders without errors', () => {
     const MobileGrid2r2cWithPageProvider = withPageProvider(MobileGrid2r2c)

@@ -9,16 +9,16 @@ import {screen, waitFor} from '@testing-library/react'
 import {
     createPathWithDefaults,
     renderWithProviders
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import {rest} from 'msw'
-import AccountAddresses from '@salesforce/retail-react-app/app/pages/account/addresses'
+import AccountAddresses from '@salesforce/extension-retail-react-app-core/app/pages/account/addresses'
 import {
     mockedRegisteredCustomerWithNoAddress,
     mockedRegisteredCustomer
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
+} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 
 import {Route, Switch} from 'react-router-dom'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
 
 let mockCustomer = {}
 

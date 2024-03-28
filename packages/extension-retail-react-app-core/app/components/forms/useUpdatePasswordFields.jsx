@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl} from 'react-intl'
-import {validatePassword} from '@salesforce/retail-react-app/app/utils/password-utils'
+import {validatePassword} from '@salesforce/extension-retail-react-app-core/app/utils/password-utils'
 
 export default function useUpdatePasswordFields({
     form: {

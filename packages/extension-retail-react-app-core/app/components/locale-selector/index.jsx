@@ -19,7 +19,7 @@ import {
 
     // Hooks
     useStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 // Icons
 import {
@@ -31,9 +31,9 @@ import {
     FlagITIcon,
     FlagCNIcon,
     FlagJPIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
-import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
+import LocaleText from '@salesforce/extension-retail-react-app-core/app/components/locale-text'
 
 // NOTE: If you want to have flags shown next to a selectable locale, update this
 // mapping object with the short code as the key for the desired icon.

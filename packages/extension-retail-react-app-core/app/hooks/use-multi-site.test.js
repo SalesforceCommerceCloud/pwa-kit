@@ -7,10 +7,10 @@
 
 import React from 'react'
 import {renderHook} from '@testing-library/react'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {DEFAULT_LOCALE} from '@salesforce/retail-react-app/app/utils/test-utils'
+import useMultiSite from '@salesforce/extension-retail-react-app-core/app/hooks/use-multi-site'
+import {MultiSiteProvider} from '@salesforce/extension-retail-react-app-core/app/contexts'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
+import {DEFAULT_LOCALE} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 const wrapper = ({children}) => <MultiSiteProvider>{children}</MultiSiteProvider>
 

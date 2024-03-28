@@ -13,9 +13,9 @@ import {
     Stack,
     Center,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {AccountIcon, BasketIcon} from '@salesforce/retail-react-app/app/components/icons'
-import Link from '@salesforce/retail-react-app/app/components/link'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {AccountIcon, BasketIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 
 const EmptyCart = ({isRegistered}) => {
     return (

@@ -23,18 +23,18 @@ import {
     ModalOverlay,
     Stack,
     useBreakpointValue
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
-import {LockIcon} from '@salesforce/retail-react-app/app/components/icons'
-import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
+import RecommendedProducts from '@salesforce/extension-retail-react-app-core/app/components/recommended-products'
+import {LockIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import {findImageGroupBy} from '@salesforce/extension-retail-react-app-core/app/utils/image-groups-utils'
 import {
     getDisplayPrice,
     getDisplayVariationValues
-} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
-import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+} from '@salesforce/extension-retail-react-app-core/app/utils/product-utils'
+import {EINSTEIN_RECOMMENDERS} from '@salesforce/extension-retail-react-app-core/app/constants'
+import DisplayPrice from '@salesforce/extension-retail-react-app-core/app/components/display-price'
 
 /**
  * This is the context for managing the AddToCartModal.

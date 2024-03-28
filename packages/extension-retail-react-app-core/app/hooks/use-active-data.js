@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /*global dw*/
-import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {ACTIVE_DATA_ENABLED} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const useActiveData = () => {
     // Returns true when the feature flag is enabled and the tracking scripts have been executed

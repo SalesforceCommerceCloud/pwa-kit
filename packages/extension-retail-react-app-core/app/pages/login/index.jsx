@@ -8,7 +8,7 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, defineMessage} from 'react-intl'
-import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Container} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {
     AuthHelpers,
     useAuthHelper,
@@ -17,15 +17,15 @@ import {
     useCustomerType,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import Seo from '@salesforce/extension-retail-react-app-core/app/components/seo'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import LoginForm from '@salesforce/retail-react-app/app/components/login'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import useEinstein from '@salesforce/extension-retail-react-app-core/app/hooks/use-einstein'
+import LoginForm from '@salesforce/extension-retail-react-app-core/app/components/login'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
+import {usePrevious} from '@salesforce/extension-retail-react-app-core/app/hooks/use-previous'
+import {isServer} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
     id: 'login_page.error.incorrect_username_or_password'

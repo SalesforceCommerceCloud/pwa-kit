@@ -7,8 +7,8 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 
-import Footer from '@salesforce/retail-react-app/app/components/footer/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import Footer from '@salesforce/extension-retail-react-app-core/app/components/footer/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 test('renders component', () => {
     renderWithProviders(<Footer />)

@@ -7,9 +7,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Skeleton, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Skeleton, Text} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useIntl} from 'react-intl'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrency} from '@salesforce/extension-retail-react-app-core/app/hooks'
 
 const DisplayPrice = ({
     basePrice,

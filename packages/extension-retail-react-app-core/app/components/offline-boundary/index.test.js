@@ -8,8 +8,8 @@ import React from 'react'
 import {screen} from '@testing-library/react'
 // import userEvent from '@testing-library/user-event'
 
-import OfflineBoundary from '@salesforce/retail-react-app/app/components/offline-boundary/index'
-import {renderWithRouter} from '@salesforce/retail-react-app/app/utils/test-utils'
+import OfflineBoundary from '@salesforce/extension-retail-react-app-core/app/components/offline-boundary/index'
+import {renderWithRouter} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 // class ChunkLoadError extends Error {
 //     constructor(...params) {

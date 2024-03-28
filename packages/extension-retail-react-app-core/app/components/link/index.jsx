@@ -6,9 +6,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Link as ChakraLink} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Link as ChakraLink} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import useMultiSite from '@salesforce/extension-retail-react-app-core/app/hooks/use-multi-site'
 
 const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
     const _href = to || href

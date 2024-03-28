@@ -8,8 +8,8 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import CheckboxRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/checkbox-refinements'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import CheckboxRefinements from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/checkbox-refinements'
 
 const data = {
     attributeId: 'c_refinementColor',

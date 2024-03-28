@@ -12,12 +12,12 @@ import {rest} from 'msw'
 import {
     renderWithProviders,
     createPathWithDefaults
-} from '@salesforce/retail-react-app/app/utils/test-utils'
-import Confirmation from '@salesforce/retail-react-app/app/pages/checkout/confirmation'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import Confirmation from '@salesforce/extension-retail-react-app-core/app/pages/checkout/confirmation'
 import {
     mockOrder,
     mockProducts
-} from '@salesforce/retail-react-app/app/pages/checkout/confirmation.mock'
+} from '@salesforce/extension-retail-react-app-core/app/pages/checkout/confirmation.mock'
 
 const MockedComponent = () => {
     return (

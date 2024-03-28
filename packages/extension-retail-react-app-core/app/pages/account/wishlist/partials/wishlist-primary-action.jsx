@@ -5,15 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {Button, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button, useDisclosure} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
-import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import {useItemVariant} from '@salesforce/extension-retail-react-app-core/app/components/item-variant'
+import ProductViewModal from '@salesforce/extension-retail-react-app-core/app/components/product-view-modal'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 
 /**
  * Renders primary action on a product-item card in the form of a button.

@@ -7,16 +7,16 @@
 
 import React from 'react'
 import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import Cart from '@salesforce/retail-react-app/app/pages/cart/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import Cart from '@salesforce/extension-retail-react-app-core/app/pages/cart/index'
 import {
     mockShippingMethods,
     mockCustomerBaskets,
     mockEmptyBasket,
     mockCartVariant,
     mockedCustomerProductLists
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import mockVariant from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
+} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
+import mockVariant from '@salesforce/extension-retail-react-app-core/app/mocks/variant-750518699578M'
 import {rest} from 'msw'
 
 const mockProduct = {

@@ -12,12 +12,12 @@ import {
     renderWithProviders,
     createPathWithDefaults,
     guestToken
-} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import {AuthModal, useAuthModal} from '@salesforce/extension-retail-react-app-core/app/hooks/use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import Account from '@salesforce/retail-react-app/app/pages/account'
+import Account from '@salesforce/extension-retail-react-app-core/app/pages/account'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockedRegisteredCustomer} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 
 jest.setTimeout(60000)
 

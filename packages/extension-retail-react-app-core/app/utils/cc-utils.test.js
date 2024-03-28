@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import * as utils from '@salesforce/retail-react-app/app/utils/cc-utils'
+import * as utils from '@salesforce/extension-retail-react-app-core/app/utils/cc-utils'
 
 test('formatCreditCardNumber returns number with proper spaces', () => {
     const opts = {

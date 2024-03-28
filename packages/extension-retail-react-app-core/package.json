@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/extension-retail-react-app-core",
-  "version": "2.4.0-dev",
+  "version": "3.5.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {

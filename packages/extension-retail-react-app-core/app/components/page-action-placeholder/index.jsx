@@ -7,8 +7,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Button, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {Box, Button, Stack, Text} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {PlusIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 const PageActionPlaceHolder = ({heading, text, icon, buttonText, buttonProps, onButtonClick}) => {
     return (

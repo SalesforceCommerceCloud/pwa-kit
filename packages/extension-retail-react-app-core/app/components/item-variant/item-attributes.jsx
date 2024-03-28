@@ -8,11 +8,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import {Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
-import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {Flex, Stack, Text} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {useItemVariant} from '@salesforce/extension-retail-react-app-core/app/components/item-variant'
+import PromoPopover from '@salesforce/extension-retail-react-app-core/app/components/promo-popover'
+import {useCurrency} from '@salesforce/extension-retail-react-app-core/app/hooks'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
 import {usePromotions} from '@salesforce/commerce-sdk-react'
 
 /**

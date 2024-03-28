@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getSites} from '@salesforce/retail-react-app/app/utils/site-utils'
-import {urlPartPositions} from '@salesforce/retail-react-app/app/constants'
+import {getSites} from '@salesforce/extension-retail-react-app-core/app/utils/site-utils'
+import {urlPartPositions} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 /**
  * Construct literal routes based on url config

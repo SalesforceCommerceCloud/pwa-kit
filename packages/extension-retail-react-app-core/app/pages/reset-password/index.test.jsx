@@ -10,9 +10,9 @@ import {rest} from 'msw'
 import {
     createPathWithDefaults,
     renderWithProviders
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import ResetPassword from '.'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
 
 const mockRegisteredCustomer = {
     authType: 'registered',

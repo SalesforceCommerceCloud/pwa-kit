@@ -11,7 +11,7 @@ import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
 
 // Project Components
-import LinksList from '@salesforce/retail-react-app/app/components/links-list'
+import LinksList from '@salesforce/extension-retail-react-app-core/app/components/links-list'
 
 // Components
 import {
@@ -31,11 +31,11 @@ import {
     // Hooks
     useTheme,
     useDisclosure
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import Link from '@salesforce/retail-react-app/app/components/link'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 // Others
-import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
-import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {categoryUrlBuilder} from '@salesforce/extension-retail-react-app-core/app/utils/url'
+import {ChevronDownIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
 const MAXIMUM_NUMBER_COLUMNS = 5
 

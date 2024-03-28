@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import PageNotFound from '@salesforce/retail-react-app/app/pages/page-not-found/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import PageNotFound from '@salesforce/extension-retail-react-app-core/app/pages/page-not-found/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import {screen} from '@testing-library/react'
 
 // Set up and clean up

@@ -12,10 +12,10 @@ import {
     Button,
     Stack,
     StackDivider
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import useUpdatePasswordFields from '@salesforce/retail-react-app/app/components/forms/useUpdatePasswordFields'
-import Field from '@salesforce/retail-react-app/app/components/field'
-import PasswordRequirements from '@salesforce/retail-react-app/app/components/forms/password-requirements'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import useUpdatePasswordFields from '@salesforce/extension-retail-react-app-core/app/components/forms/useUpdatePasswordFields'
+import Field from '@salesforce/extension-retail-react-app-core/app/components/field'
+import PasswordRequirements from '@salesforce/extension-retail-react-app-core/app/components/forms/password-requirements'
 
 const UpdatePasswordFields = ({form, prefix = ''}) => {
     const fields = useUpdatePasswordFields({form, prefix})

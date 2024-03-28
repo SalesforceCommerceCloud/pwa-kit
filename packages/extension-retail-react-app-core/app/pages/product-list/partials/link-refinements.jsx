@@ -6,9 +6,9 @@
  */
 
 import React from 'react'
-import {Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, Text} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import PropTypes from 'prop-types'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 
 const LinkRefinements = ({filter}) => {
     return (

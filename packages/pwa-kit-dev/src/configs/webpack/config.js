@@ -56,6 +56,8 @@ export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDS_WIN = pkg?.ccExtensibility?.extends?.replace('/', '\\')
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
+export const APP_EXTENSIONS = [] //pkg?.mobify?.extensions
+
 // TODO: can these be handled in package.json as peerDependencies?
 // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
 
@@ -72,12 +74,16 @@ export const DEPS_TO_DEDUPE = [
     'react-router-dom',
     'react-dom',
     'react-helmet',
+    'react-hook-form',
     'webpack-hot-middleware',
     'react-intl',
     '@chakra-ui/icons',
+    '@chakra-ui/layout',
     '@chakra-ui/react',
     '@chakra-ui/skip-nav',
-    '@emotion/react'
+    '@chakra-ui/theme',
+    '@emotion/react',
+    '@tanstack/match-sorter-utils'
 ]
 
 if (EXT_EXTENDABLE && EXT_EXTENDS) {
@@ -198,7 +204,14 @@ const baseConfig = (target) => {
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
                             }))
-                        )
+                        ),
+                        ...APP_EXTENSIONS.reduce((aliases, extensionShortName) => {
+                            const extensionLongName = `@salesforce/extension-${extensionShortName}`
+                            return {
+                                ...aliases,
+                                [extensionLongName]: path.resolve(projectDir, 'node_modules', ...extensionLongName.split('/'))
+                            }
+                        }, {})
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -213,7 +226,7 @@ const baseConfig = (target) => {
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
-                    // sdkReplacementPlugin(),
+                    sdkReplacementPlugin(),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
@@ -222,10 +235,10 @@ const baseConfig = (target) => {
                 module: {
                     rules: [
                         ruleForBabelLoader(),
-                        // {
-                        //     test: /(\.jsx|\.tsx)$/,
-                        //     loader: '/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/src/configs/webpack/loaders/dev-loader.js'
-                        // },
+                        {
+                            test: /(\.jsx|\.tsx)$/,
+                            loader: '/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/src/configs/webpack/loaders/dev-loader.js'
+                        },
                         target === 'node' && {
                             test: /\.svg$/,
                             loader: findDepInStack('svg-sprite-loader')

@@ -8,8 +8,8 @@ import React from 'react'
 import {useIntl} from 'react-intl'
 import {within} from '@testing-library/dom'
 import {render} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import * as Icons from '@salesforce/retail-react-app/app/components/icons/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import * as Icons from '@salesforce/extension-retail-react-app-core/app/components/icons/index'
 
 jest.mock('react-intl', () => ({
     ...jest.requireActual('react-intl'),

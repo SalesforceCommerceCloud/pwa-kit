@@ -14,17 +14,17 @@ import {
     Heading,
     SimpleGrid,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useForm, Controller} from 'react-hook-form'
-import {shallowEquals} from '@salesforce/retail-react-app/app/utils/utils'
-import {RadioCard, RadioCardGroup} from '@salesforce/retail-react-app/app/components/radio-card'
-import ActionCard from '@salesforce/retail-react-app/app/components/action-card'
-import {PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
-import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
-import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
-import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
-import {MESSAGE_PROPTYPE} from '@salesforce/retail-react-app/app/utils/locale'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {shallowEquals} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
+import {RadioCard, RadioCardGroup} from '@salesforce/extension-retail-react-app-core/app/components/radio-card'
+import ActionCard from '@salesforce/extension-retail-react-app-core/app/components/action-card'
+import {PlusIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import AddressDisplay from '@salesforce/extension-retail-react-app-core/app/components/address-display'
+import AddressFields from '@salesforce/extension-retail-react-app-core/app/components/forms/address-fields'
+import FormActionButtons from '@salesforce/extension-retail-react-app-core/app/components/forms/form-action-buttons'
+import {MESSAGE_PROPTYPE} from '@salesforce/extension-retail-react-app-core/app/utils/locale'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 const saveButtonMessage = defineMessage({

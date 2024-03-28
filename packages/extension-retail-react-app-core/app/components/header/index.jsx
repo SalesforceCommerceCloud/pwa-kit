@@ -26,14 +26,14 @@ import {
     Divider,
     useDisclosure,
     useMediaQuery
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
 
-import Link from '@salesforce/retail-react-app/app/components/link'
-import Search from '@salesforce/retail-react-app/app/components/search'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
+import Search from '@salesforce/extension-retail-react-app-core/app/components/search'
+import withRegistration from '@salesforce/extension-retail-react-app-core/app/components/with-registration'
 import {
     AccountIcon,
     BrandLogo,
@@ -42,12 +42,12 @@ import {
     ChevronDownIcon,
     HeartIcon,
     SignoutIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 
-import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account/constant'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {navLinks, messages} from '@salesforce/extension-retail-react-app-core/app/pages/account/constant'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import LoadingSpinner from '@salesforce/extension-retail-react-app-core/app/components/loading-spinner'
+import {isHydrated, noop} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 /**

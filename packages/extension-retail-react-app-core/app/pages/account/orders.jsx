@@ -7,8 +7,8 @@
 
 import React from 'react'
 import {Route, Switch, useRouteMatch} from 'react-router'
-import OrderHistory from '@salesforce/retail-react-app/app/pages/account/order-history'
-import OrderDetail from '@salesforce/retail-react-app/app/pages/account/order-detail'
+import OrderHistory from '@salesforce/extension-retail-react-app-core/app/pages/account/order-history'
+import OrderDetail from '@salesforce/extension-retail-react-app-core/app/pages/account/order-detail'
 
 const AccountOrders = () => {
     const {path} = useRouteMatch()

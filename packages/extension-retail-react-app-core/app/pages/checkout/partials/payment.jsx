@@ -16,27 +16,27 @@ import {
     Stack,
     Text,
     Divider
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
+import {useCheckout} from '@salesforce/extension-retail-react-app-core/app/pages/checkout/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber,
     getCreditCardIcon
-} from '@salesforce/retail-react-app/app/utils/cc-utils'
+} from '@salesforce/extension-retail-react-app-core/app/utils/cc-utils'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
-} from '@salesforce/retail-react-app/app/components/toggle-card'
-import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout/partials/payment-form'
-import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
-import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
-import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+} from '@salesforce/extension-retail-react-app-core/app/components/toggle-card'
+import PaymentForm from '@salesforce/extension-retail-react-app-core/app/pages/checkout/partials/payment-form'
+import ShippingAddressSelection from '@salesforce/extension-retail-react-app-core/app/pages/checkout/partials/shipping-address-selection'
+import AddressDisplay from '@salesforce/extension-retail-react-app-core/app/components/address-display'
+import {PromoCode, usePromoCode} from '@salesforce/extension-retail-react-app-core/app/components/promo-code'
+import {API_ERROR_MESSAGE} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const Payment = () => {
     const {formatMessage} = useIntl()

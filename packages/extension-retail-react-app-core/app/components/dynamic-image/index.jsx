@@ -6,8 +6,8 @@
  */
 import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {Img, Box, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {getResponsiveImageAttributes} from '@salesforce/retail-react-app/app/utils/responsive-image'
+import {Img, Box, useTheme} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {getResponsiveImageAttributes} from '@salesforce/extension-retail-react-app-core/app/utils/responsive-image'
 
 /**
  * Quickly create a responsive image using your dynamic image service

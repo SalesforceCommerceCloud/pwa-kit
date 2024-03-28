@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Image} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Image} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 /**
  * Simple ImageTile component that can be used inside any Layout component.

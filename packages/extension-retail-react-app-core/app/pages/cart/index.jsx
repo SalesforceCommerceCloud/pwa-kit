@@ -16,24 +16,24 @@ import {
     Container,
     useDisclosure,
     Button
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 // Project Components
-import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'
-import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
-import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
-import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
-import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
-import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
-import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
-import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
-import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
+import CartCta from '@salesforce/extension-retail-react-app-core/app/pages/cart/partials/cart-cta'
+import CartSecondaryButtonGroup from '@salesforce/extension-retail-react-app-core/app/pages/cart/partials/cart-secondary-button-group'
+import CartSkeleton from '@salesforce/extension-retail-react-app-core/app/pages/cart/partials/cart-skeleton'
+import CartTitle from '@salesforce/extension-retail-react-app-core/app/pages/cart/partials/cart-title'
+import ConfirmationModal from '@salesforce/extension-retail-react-app-core/app/components/confirmation-modal'
+import EmptyCart from '@salesforce/extension-retail-react-app-core/app/pages/cart/partials/empty-cart'
+import OrderSummary from '@salesforce/extension-retail-react-app-core/app/components/order-summary'
+import ProductItem from '@salesforce/extension-retail-react-app-core/app/components/product-item'
+import ProductViewModal from '@salesforce/extension-retail-react-app-core/app/components/product-view-modal'
+import RecommendedProducts from '@salesforce/extension-retail-react-app-core/app/components/recommended-products'
 
 // Hooks
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useToast} from '@salesforce/extension-retail-react-app-core/app/hooks/use-toast'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import {useWishList} from '@salesforce/extension-retail-react-app-core/app/hooks/use-wish-list'
 
 // Constants
 import {
@@ -43,19 +43,19 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST
-} from '@salesforce/retail-react-app/app/constants'
-import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
+} from '@salesforce/extension-retail-react-app-core/app/constants'
+import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/extension-retail-react-app-core/app/pages/cart/partials/cart-secondary-button-group'
 
 // Utilities
 import debounce from 'lodash/debounce'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
 import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {

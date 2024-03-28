@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {fireEvent} from '@testing-library/react'
-import LocaleSelector from '@salesforce/retail-react-app/app/components/locale-selector/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import LocaleSelector from '@salesforce/extension-retail-react-app-core/app/components/locale-selector/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 const supportedLocales = ['en-GB', 'fr-FR', 'it-IT', 'zh-CN', 'ja-JP']
 

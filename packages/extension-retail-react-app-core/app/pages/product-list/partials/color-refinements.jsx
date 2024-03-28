@@ -14,14 +14,14 @@ import {
     Button,
     Center,
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import PropTypes from 'prop-types'
-import {cssColorGroups} from '@salesforce/retail-react-app/app/constants'
+import {cssColorGroups} from '@salesforce/extension-retail-react-app-core/app/constants'
 import {useIntl} from 'react-intl'
 import {
     ADD_FILTER_HIT_COUNT,
     REMOVE_FILTER_HIT_COUNT
-} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
+} from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/refinements-utils'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const intl = useIntl()

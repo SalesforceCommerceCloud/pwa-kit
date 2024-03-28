@@ -6,9 +6,9 @@
  */
 import React from 'react'
 import userEvent from '@testing-library/user-event'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {

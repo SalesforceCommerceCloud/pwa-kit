@@ -14,12 +14,12 @@ import {
     Flex,
     Stack,
     useDisclosure
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {defineMessage, FormattedMessage} from 'react-intl'
-import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
-import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal/index'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useItemVariant} from '@salesforce/extension-retail-react-app-core/app/components/item-variant'
+import ConfirmationModal from '@salesforce/extension-retail-react-app-core/app/components/confirmation-modal/index'
+import {noop} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 
 export const REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     dialogTitle: defineMessage({

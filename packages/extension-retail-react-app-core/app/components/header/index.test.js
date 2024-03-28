@@ -8,21 +8,21 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import userEvent from '@testing-library/user-event'
 import {fireEvent, screen, waitFor, act} from '@testing-library/react'
-import Header from '@salesforce/retail-react-app/app/components/header/index'
+import Header from '@salesforce/extension-retail-react-app-core/app/components/header/index'
 import {
     renderWithProviders,
     createPathWithDefaults
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import {rest} from 'msw'
 import {createMemoryHistory} from 'history'
 import {
     mockCustomerBaskets,
     mockedRegisteredCustomer
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
+} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 
-jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
+jest.mock('@salesforce/extension-retail-react-app-core/app/components/shared/ui', () => {
     const originalModule = jest.requireActual(
-        '@salesforce/retail-react-app/app/components/shared/ui'
+        '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
     )
     return {
         ...originalModule,

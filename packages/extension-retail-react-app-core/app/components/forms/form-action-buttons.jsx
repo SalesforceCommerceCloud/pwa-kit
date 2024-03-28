@@ -7,8 +7,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {MESSAGE_PROPTYPE} from '@salesforce/retail-react-app/app/utils/locale.js'
+import {Button, Stack} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {MESSAGE_PROPTYPE} from '@salesforce/extension-retail-react-app-core/app/utils/locale.js'
 
 /**
  * Renders a form submit button and a cancel button with configurable labels and callbacks

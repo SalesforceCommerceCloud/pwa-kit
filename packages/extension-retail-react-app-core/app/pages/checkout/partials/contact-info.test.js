@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen, within} from '@testing-library/react'
-import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import ContactInfo from '@salesforce/extension-retail-react-app-core/app/pages/checkout/partials/contact-info'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 jest.mock('../util/checkout-context', () => {
     return {

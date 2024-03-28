@@ -11,9 +11,9 @@ import {
     determineTargetLocale,
     fetchTranslations,
     getTargetLocale
-} from '@salesforce/retail-react-app/app/utils/locale'
+} from '@salesforce/extension-retail-react-app-core/app/utils/locale'
 
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 jest.mock('cross-fetch', () => {
     return async (url) => {

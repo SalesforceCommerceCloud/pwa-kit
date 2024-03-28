@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import Footer from '@salesforce/retail-react-app/app/theme/components/project/footer'
+import Footer from '@salesforce/extension-retail-react-app-core/app/theme/components/project/footer'
 
 const {baseStyle} = Footer
 

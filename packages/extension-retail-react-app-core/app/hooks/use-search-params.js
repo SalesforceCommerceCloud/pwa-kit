@@ -9,7 +9,7 @@ import {useLocation} from 'react-router-dom'
 import queryString from 'query-string'
 
 // Constants
-import {DEFAULT_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
+import {DEFAULT_SEARCH_PARAMS} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const PARSE_OPTIONS = {
     parseBooleans: true,

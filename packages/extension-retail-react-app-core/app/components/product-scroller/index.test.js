@@ -7,8 +7,8 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import ProductScroller from '@salesforce/extension-retail-react-app-core/app/components/product-scroller/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 // Our component uses `scrollBy` on an html element, which we need
 // to create ourselves as its not in jsdom by default. Here we make

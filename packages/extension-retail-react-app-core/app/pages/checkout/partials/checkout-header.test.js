@@ -7,8 +7,8 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 
-import CheckoutHeader from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-header'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import CheckoutHeader from '@salesforce/extension-retail-react-app-core/app/pages/checkout/partials/checkout-header'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 
 test('renders component', () => {
     renderWithProviders(<CheckoutHeader />)

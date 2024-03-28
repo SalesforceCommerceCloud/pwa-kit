@@ -7,8 +7,8 @@
 import React, {useState} from 'react'
 import {screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import QuantityPicker from '@salesforce/extension-retail-react-app-core/app/components/quantity-picker/index'
 
 const MockComponent = () => {
     const [quantity, setQuantity] = useState(5)

@@ -21,17 +21,17 @@ import {
     AspectRatio,
     Img,
     Skeleton
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {usePageUrls, useSearchParams} from '@salesforce/retail-react-app/app/hooks'
-import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronRightIcon, ReceiptIcon} from '@salesforce/retail-react-app/app/components/icons'
-import Pagination from '@salesforce/retail-react-app/app/components/pagination'
+import useNavigation from '@salesforce/extension-retail-react-app-core/app/hooks/use-navigation'
+import {usePageUrls, useSearchParams} from '@salesforce/extension-retail-react-app-core/app/hooks'
+import PageActionPlaceHolder from '@salesforce/extension-retail-react-app-core/app/components/page-action-placeholder'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
+import {ChevronRightIcon, ReceiptIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import Pagination from '@salesforce/extension-retail-react-app-core/app/components/pagination'
 import PropTypes from 'prop-types'
-import {DEFAULT_ORDERS_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
+import {DEFAULT_ORDERS_SEARCH_PARAMS} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''

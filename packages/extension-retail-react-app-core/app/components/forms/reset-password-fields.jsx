@@ -6,9 +6,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
-import useResetPasswordFields from '@salesforce/retail-react-app/app/components/forms/useResetPasswordFields'
-import Field from '@salesforce/retail-react-app/app/components/field'
+import {Box} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import useResetPasswordFields from '@salesforce/extension-retail-react-app-core/app/components/forms/useResetPasswordFields'
+import Field from '@salesforce/extension-retail-react-app-core/app/components/field'
 
 const ResetPasswordFields = ({form, prefix = ''}) => {
     const fields = useResetPasswordFields({form, prefix})

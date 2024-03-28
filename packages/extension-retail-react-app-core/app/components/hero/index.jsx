@@ -13,7 +13,7 @@ import {
     Heading,
     Stack,
     Image
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 const Hero = ({title, img, actions, ...props}) => {
     const {src, alt} = img

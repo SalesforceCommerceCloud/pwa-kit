@@ -12,7 +12,7 @@ import {
     Box,
     HStack,
     useStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {FormattedMessage} from 'react-intl'
 
 /**

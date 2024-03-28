@@ -14,11 +14,11 @@ import {
     Stack,
     Text,
     Link as ChakraLink
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import RegistrationFields from '@salesforce/retail-react-app/app/components/forms/registration-fields'
-import Link from '@salesforce/retail-react-app/app/components/link'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {AlertIcon, BrandLogo} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import {noop} from '@salesforce/extension-retail-react-app-core/app/utils/utils'
+import RegistrationFields from '@salesforce/extension-retail-react-app-core/app/components/forms/registration-fields'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
 
 const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
     return (

@@ -8,11 +8,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Box, Checkbox, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Checkbox, Stack} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {
     ADD_FILTER,
     REMOVE_FILTER
-} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
+} from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/refinements-utils'
 
 const CheckboxRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const {formatMessage} = useIntl()

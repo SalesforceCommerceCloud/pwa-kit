@@ -20,17 +20,17 @@ import {
     Grid,
     SimpleGrid,
     Skeleton
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import {getCreditCardIcon} from '@salesforce/extension-retail-react-app-core/app/utils/cc-utils'
 import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
-import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
-import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
-import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
-import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
+import Link from '@salesforce/extension-retail-react-app-core/app/components/link'
+import {ChevronLeftIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import OrderSummary from '@salesforce/extension-retail-react-app-core/app/components/order-summary'
+import ItemVariantProvider from '@salesforce/extension-retail-react-app-core/app/components/item-variant'
+import CartItemVariantImage from '@salesforce/extension-retail-react-app-core/app/components/item-variant/item-image'
+import CartItemVariantName from '@salesforce/extension-retail-react-app-core/app/components/item-variant/item-name'
+import CartItemVariantAttributes from '@salesforce/extension-retail-react-app-core/app/components/item-variant/item-attributes'
+import CartItemVariantPrice from '@salesforce/extension-retail-react-app-core/app/components/item-variant/item-price'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 

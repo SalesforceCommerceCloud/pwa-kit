@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
-import {mockedCustomerProductListsDetails} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import ProductItem from '@salesforce/extension-retail-react-app-core/app/components/product-item'
+import {mockedCustomerProductListsDetails} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
 import {screen} from '@testing-library/react'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {

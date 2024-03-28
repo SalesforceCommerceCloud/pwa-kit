@@ -12,10 +12,10 @@ import {
     GridItem,
     SimpleGrid,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import useAddressFields from '@salesforce/retail-react-app/app/components/forms/useAddressFields'
-import Field from '@salesforce/retail-react-app/app/components/field'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
+import useAddressFields from '@salesforce/extension-retail-react-app-core/app/components/forms/useAddressFields'
+import Field from '@salesforce/extension-retail-react-app-core/app/components/field'
+import {useCurrentCustomer} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-customer'
 
 const AddressFields = ({form, prefix = ''}) => {
     const {data: customer} = useCurrentCustomer()

@@ -12,13 +12,13 @@ import {
     Flex,
     Stack,
     Link
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
-import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
-import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
-import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
+import {SearchIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
+import RecommendedProducts from '@salesforce/extension-retail-react-app-core/app/components/recommended-products'
+import {EINSTEIN_RECOMMENDERS} from '@salesforce/extension-retail-react-app-core/app/constants'
 
 const contactUsMessage = defineMessage({
     id: 'empty_search_results.link.contact_us',

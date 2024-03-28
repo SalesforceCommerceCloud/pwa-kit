@@ -10,13 +10,13 @@ import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
 import {rest} from 'msw'
 
-import App from '@salesforce/retail-react-app/app/components/_app/index.jsx'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {DEFAULT_LOCALE} from '@salesforce/retail-react-app/app/utils/test-utils'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import * as constants from '@salesforce/retail-react-app/app/constants'
+import App from '@salesforce/extension-retail-react-app-core/app/components/_app/index.jsx'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import {DEFAULT_LOCALE} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import useMultiSite from '@salesforce/extension-retail-react-app-core/app/hooks/use-multi-site'
+import messages from '@salesforce/extension-retail-react-app-core/app/static/translations/compiled/en-GB.json'
+import mockConfig from '@salesforce/extension-retail-react-app-core/config/mocks/default'
+import * as constants from '@salesforce/extension-retail-react-app-core/app/constants'
 
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 

@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Button, Stack, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, Button, Stack, Box} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 
 const Suggestions = ({suggestions, closeAndNavigate}) => {
     if (!suggestions) {

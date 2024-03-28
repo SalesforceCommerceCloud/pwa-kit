@@ -15,21 +15,21 @@ import {
     RadioGroup,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@salesforce/extension-retail-react-app-core/app/components/shared/ui'
 import {useForm, Controller} from 'react-hook-form'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {useCheckout} from '@salesforce/extension-retail-react-app-core/app/pages/checkout/util/checkout-context'
+import {ChevronDownIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
-} from '@salesforce/retail-react-app/app/components/toggle-card'
+} from '@salesforce/extension-retail-react-app-core/app/components/toggle-card'
 import {
     useShippingMethodsForShipment,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrentBasket} from '@salesforce/extension-retail-react-app-core/app/hooks/use-current-basket'
+import {useCurrency} from '@salesforce/extension-retail-react-app-core/app/hooks'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()

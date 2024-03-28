@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import DrawerMenu from '@salesforce/retail-react-app/app/components/drawer-menu/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {mockCategories} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import DrawerMenu from '@salesforce/extension-retail-react-app-core/app/components/drawer-menu/index'
+import {renderWithProviders} from '@salesforce/extension-retail-react-app-core/app/utils/test-utils'
+import {mockCategories} from '@salesforce/extension-retail-react-app-core/app/mocks/mock-data'
 
 describe('DrawerMenu', () => {
     test('Renders DrawerMenu without errors', async () => {

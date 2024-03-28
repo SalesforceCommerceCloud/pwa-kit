@@ -10,7 +10,7 @@ import {Router} from 'react-router'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useLimitUrls} from '@salesforce/retail-react-app/app/hooks/use-limit-urls'
+import {useLimitUrls} from '@salesforce/extension-retail-react-app-core/app/hooks/use-limit-urls'
 
 const MockComponent = () => {
     const urls = useLimitUrls()
