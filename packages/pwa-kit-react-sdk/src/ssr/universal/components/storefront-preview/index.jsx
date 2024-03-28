@@ -17,7 +17,7 @@ import {useHistory} from 'react-router-dom'
  * @param  {function(): string | Promise<string>} getToken - A method that returns the access token for the current user
  * @param  {Array} experimentalUnsafeAdditionalSearchParams - An array of key/value search params to add when context changes
  * @param  {boolean} experimentalUnsafeReloadServerSide - if true, will reload the page on server side when context changes
- * @param  {Object} apiClients - CommerceAPI instance
+ * @param  {function} onInit
  */
 export const StorefrontPreview = ({
     children,
@@ -25,7 +25,8 @@ export const StorefrontPreview = ({
     getToken,
     experimentalUnsafeAdditionalSearchParams = [],
     experimentalUnsafeReloadServerSide,
-    apiClients = {}
+    // eslint-disable-next-line
+    onInit = () => {}
 }) => {
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
@@ -51,22 +52,9 @@ export const StorefrontPreview = ({
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
-            const originalWillSendRequest = apiClients.willSendRequest
-
-            // In Storefront Preview mode, add cache breaker for all SCAPI's requests.
-            // Otherwise, it's possible to get stale responses after the Shopper Context is set.
-            // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
-            apiClients.willSendRequest = async (...params) => {
-                const newParams = await originalWillSendRequest.apply(apiClients, params)
-
-                newParams[0].parameters = {
-                    ...newParams[0].parameters,
-                    c_cache_breaker: Date.now()
-                }
-                return newParams
-            }
+            onInit()
         }
-    }, [apiClients, enabled])
+    }, [enabled])
 
     return (
         <>
@@ -106,9 +94,7 @@ StorefrontPreview.propTypes = {
     },
     experimentalUnsafeAdditionalSearchParams: PropTypes.array,
     experimentalUnsafeReloadServerSide: PropTypes.bool,
-    apiClients: PropTypes.shape({
-        willSendRequest: PropTypes.func
-    })
+    onInit: PropTypes.func
 }
 
 export default StorefrontPreview

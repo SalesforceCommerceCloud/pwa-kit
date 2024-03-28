@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {getAssetUrl} from 'pwa-kit-react-sdk/ssr/universal/utils'
@@ -116,6 +116,23 @@ const App = (props) => {
         onClose()
     }, [location])
 
+    const initStorefrontPreview = useCallback(() => {
+        const originalWillSendRequest = apiClients.willSendRequest
+
+        // In Storefront Preview mode, add cache breaker for all SCAPI's requests.
+        // Otherwise, it's possible to get stale responses after the Shopper Context is set.
+        // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
+        apiClients.willSendRequest = async (...params) => {
+            const newParams = await originalWillSendRequest.apply(apiClients, params)
+
+            newParams[0].parameters = {
+                ...newParams[0].parameters,
+                c_cache_breaker: Date.now()
+            }
+            return newParams
+        }
+    }, [apiClients])
+
     const onLogoClick = () => {
         // Goto the home page.
         const path = buildUrl(HOME_HREF)
@@ -157,7 +174,7 @@ const App = (props) => {
                 with Storefront Preview feature*/}
             <StorefrontPreview
                 getToken={() => window.localStorage.getItem('token')}
-                apiClients={apiClients}
+                onInit={initStorefrontPreview}
             >
                 <IntlProvider
                     onError={(err) => {
