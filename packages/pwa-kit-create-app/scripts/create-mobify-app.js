@@ -334,10 +334,35 @@ const PRESETS = [
             ['project.hybrid']: true,
             ['project.name']: 'retail-react-app',
             ['project.commerce.instanceUrl']: 'https://test.phased-launch-testing.com/',
-            ['project.commerce.clientId']: '50b359ea-4224-4125-b75d-dd80ff4b0f00',
+            ['project.commerce.clientId']: '99b4e081-00cf-454a-95b0-26ac2b824931',
             ['project.commerce.siteId']: 'RefArch',
             ['project.commerce.organizationId']: 'f_ecom_bdpx_dev',
             ['project.commerce.shortCode']: 'xitgmcd3',
+            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            ['project.einstein.siteId']: 'aaij-MobileFirst',
+            ['project.commerce.isSlasPrivate']: true
+        },
+        assets: ['translations'],
+        private: true
+    },
+    {
+        id: 'retail-react-app-hybrid-public-client-test-project',
+        name: 'Retail React App Hybrid Test Private SLAS client project',
+        description: '',
+        templateSource: {
+            type: TEMPLATE_SOURCE_NPM,
+            id: '@salesforce/retail-react-app'
+        },
+        questions: [...EXTENSIBILITY_QUESTIONS, ...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        answers: {
+            ['project.extend']: true,
+            ['project.hybrid']: true,
+            ['project.name']: 'retail-react-app',
+            ['project.commerce.instanceUrl']: 'https://www.phased-launch-testing.com/',
+            ['project.commerce.clientId']: 'e7e22b7f-a904-4f3a-8022-49dbee696485',
+            ['project.commerce.siteId']: 'RefArch',
+            ['project.commerce.organizationId']: 'f_ecom_bjnl_prd',
+            ['project.commerce.shortCode']: 'performance-001',
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             ['project.einstein.siteId']: 'aaij-MobileFirst',
             ['project.commerce.isSlasPrivate']: false
