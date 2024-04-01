@@ -23,7 +23,12 @@ module.exports = function (source) {
                 if (hidden) {
                     setStyle({})
                 } else {
-                    setStyle({animation: 'blink 1s linear infinite'})
+                    setStyle({
+                        border: '2px solid red',
+                        margin: '-2px',
+                        borderRadius: 5,
+                        animation: 'blink 1s linear infinite'
+                    })
                 }
             }, [hidden])
 
@@ -38,8 +43,8 @@ module.exports = function (source) {
                             null : 
                             <div 
                                 style={{
-                                    position: 'absolute',
-                                    top: 0,
+                                    position: 'fixed',
+                                    bottom: 0,
                                     left: 0,
                                     backgroundColor: 'lightblue',
                                     border: '1px solid black',
@@ -47,7 +52,7 @@ module.exports = function (source) {
                                     margin: '4px',
                                     borderRadius: '4px',
                                     width: 'calc(100% + 8px)',
-                                    opacity: 0.75
+                                    zIndex: 100000
                                 }}
                             >
                                 <b>Component Location:</b> ${filePath.replace('/Users/bchypak/Projects/pwa-kit/packages/', '@')} <br/>
@@ -55,7 +60,7 @@ module.exports = function (source) {
                             </div>
                     }
                     
-                    <${moduleName} {...props}/>
+                    <${moduleName} {...props} />
                 </div>
             )
         }
@@ -81,17 +86,26 @@ module.exports = function (source) {
     // Apply some transformations to the source...
     const fileName = this.resourcePath.split('/').pop()
     const moduleName = map[fileName]
-    if (moduleName) {
-        source = source.replace(
-            /export default ([A-Z]\w+)/, 
-            enhanceSourceWith(
-                componentWrapper, 
-                {
-                    moduleName, 
-                    filePath: this.resourcePath
-                }
+    if (moduleName || this.resourcePath.match(/\/(components|pages)\//)) {
+        // console.log('FILE NAME: ', this.resourcePath)
+        // console.log('MODULE NAME: ', moduleName)
+        const match = source.match(/export default ([A-Z]\w+)\n/)
+        if (match && ['Refinements', 'Header', 'ProductDetail', 'ProductList', 'ProductTile'].includes(match[1])) {
+            source = source.replace(
+                /export default ([A-Z]\w+)\n/, 
+                enhanceSourceWith(
+                    componentWrapper, 
+                    {
+                        moduleName: moduleName || match[1], 
+                        filePath: this.resourcePath
+                    }
+                )
             )
-        )
+
+
+            console.log('NEW SOURCE: ', source)
+        }
+    
     }
     return source
 }
