@@ -322,7 +322,7 @@ const PRESETS = [
     },
     {
         id: 'retail-react-app-hybrid-test-project',
-        name: 'Retail React App Hybrid Test Project',
+        name: 'Retail React App Hybrid Test Private SLAS Project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
@@ -347,7 +347,7 @@ const PRESETS = [
     },
     {
         id: 'retail-react-app-hybrid-public-client-test-project',
-        name: 'Retail React App Hybrid Test Private SLAS client project',
+        name: 'Retail React App Hybrid Test Public SLAS client project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
