@@ -21,7 +21,6 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 
 import OverridesResolverPlugin from './overrides-plugin'
 import ExtensionsResolverPlugin from './extension-plugin'
-import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 const projectDir = process.cwd()
@@ -56,6 +55,8 @@ export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDS_WIN = pkg?.ccExtensibility?.extends?.replace('/', '\\')
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
+export const APP_EXTENSIONS = pkg?.mobify?.extensions
+
 // TODO: can these be handled in package.json as peerDependencies?
 // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
 
@@ -77,7 +78,9 @@ export const DEPS_TO_DEDUPE = [
     '@chakra-ui/icons',
     '@chakra-ui/react',
     '@chakra-ui/skip-nav',
-    '@emotion/react'
+    '@emotion/react',
+
+    '@salesforce/commerce-sdk-react'
 ]
 
 if (EXT_EXTENDABLE && EXT_EXTENDS) {
@@ -198,7 +201,14 @@ const baseConfig = (target) => {
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
                             }))
-                        )
+                        ),
+                        ...APP_EXTENSIONS.reduce((aliases, extensionShortName) => {
+                            const extensionLongName = `@salesforce/extension-${extensionShortName}`
+                            return {
+                                ...aliases,
+                                [extensionLongName]: path.resolve(projectDir, 'node_modules', ...extensionLongName.split('/'))
+                            }
+                        }, {})
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -212,8 +222,6 @@ const baseConfig = (target) => {
                     }),
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
-
-                    sdkReplacementPlugin(),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})

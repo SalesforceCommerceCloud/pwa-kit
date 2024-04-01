@@ -23,7 +23,7 @@ import {configureRoutes} from '@salesforce/extension-retail-react-app-core/app/u
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Pages
-const Home = loadable(() => import('./pages/home'), {fallback})
+const Home = loadable(() => import('*/pages/home'), {fallback})
 const Login = loadable(() => import('./pages/login'), {fallback})
 const Registration = loadable(() => import('./pages/registration'), {
     fallback
@@ -36,7 +36,7 @@ const Checkout = loadable(() => import('./pages/checkout'), {
 })
 const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
-const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
+const ProductDetail = loadable(() => import('*/pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {
     fallback
 })
@@ -104,10 +104,6 @@ export const routes = [
     {
         path: '/account/wishlist',
         component: Wishlist
-    },
-    {
-        path: '*',
-        component: PageNotFound
     }
 ]
 

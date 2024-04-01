@@ -112,6 +112,7 @@ const useLazyLoadCategories = () => {
 }
 
 const App = (props) => {
+    console.log('RENDERING: App (core extension)')
     const {children} = props
     const {data: categoriesTree} = useLazyLoadCategories()
     const categories = flatten(categoriesTree || {}, 'categories')

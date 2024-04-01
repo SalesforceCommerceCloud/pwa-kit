@@ -11,7 +11,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
 import Throw404 from '../../components/throw-404'
 import {getAppConfig} from '../../compatibility'
-import routes from '../../routes'
+import routes from '*/app/routes'
 import {pages as pageEvents} from '../../events'
 import {withLegacyGetProps} from '../../components/with-legacy-get-props'
 import Refresh from '../refresh'
@@ -403,6 +403,7 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  * @private
  */
 export const getRoutes = (locals) => {
+    console.log('GET_ROUTES: ', routes)
     let _routes = routes
     if (typeof routes === 'function') {
         _routes = routes()

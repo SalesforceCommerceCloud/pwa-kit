@@ -35,6 +35,8 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
  * as Redux, or Mobx, if you like.
  */
 const AppConfig = ({children, locals = {}}) => {
+    console.log('RENDERING: AppConfig')
+
     const {correlationId} = useCorrelationId()
     const headers = {
         'correlation-id': correlationId
@@ -43,7 +45,6 @@ const AppConfig = ({children, locals = {}}) => {
     const commerceApiConfig = locals.appConfig.commerceAPI
 
     const appOrigin = getAppOrigin()
-
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}

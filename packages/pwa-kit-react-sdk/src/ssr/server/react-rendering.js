@@ -21,7 +21,7 @@ import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import Document from '../universal/components/_document'
-import App from '../universal/components/_app'
+import App from '*/app/components/_app'
 import Throw404 from '../universal/components/throw-404'
 
 import {getAppConfig} from '../universal/compatibility'
@@ -167,7 +167,7 @@ export const render = async (req, res, next) => {
 
     if (component === Throw404) {
         appState = {}
-        appStateError = new errors.HTTPNotFound('Not found')
+        appStateError = new errors.HTTPNotFound('Not found : component is Throw404')
     } else {
         const ret = await AppConfig.initAppState({
             App: WrappedApp,

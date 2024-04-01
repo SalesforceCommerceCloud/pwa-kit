@@ -33,6 +33,7 @@ import PropTypes from 'prop-types'
  * @param {string} props.correlationId
  */
 const Error = ({message, stack, status, correlationId}) => {
+    console.log('Error: ', {message, stack, status, correlationId})
     return (
         <div>
             <h1>Error Status: {status}</h1>

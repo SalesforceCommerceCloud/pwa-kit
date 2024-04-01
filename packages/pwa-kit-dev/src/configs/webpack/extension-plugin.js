@@ -10,12 +10,11 @@ function forEachBail(array, iterator, callback) {
 	if (array.length === 0) {
         return callback()
     }
-
     let i = 0
 	const next = () => {
 		/** @type {boolean|undefined} */
-		let loop = undefined
-
+		let loop = false
+        
 		iterator(
 			array[i++],
 			(err, result) => {
@@ -36,11 +35,7 @@ function forEachBail(array, iterator, callback) {
 			i
 		)
 
-        if (!loop) {
-            loop = false
-        }
-
-		return loop
+        return loop
 	}
 	while (next());
 }
@@ -68,14 +63,26 @@ class ExtensionsResolverPlugin {
     }
 
     getExtensions(request) {
-        const {extensions} = this.pkg.mobify
+        let {extensions} = this.pkg.mobify
         const moduleName = this.parseModuleName(request.context.issuer)
         const isBaseProject = moduleName === this.pkg.name
         const isExtension = extensions.includes(moduleName.replace('extension-', ''))
         let packages
 
-        const isSelfReference = request.context.issuer.includes(request.request.substr(1))
+        let extras = isBaseProject ? [] : ['.']
+        extensions = [...extensions, ...extras]
 
+        /**
+         * 
+         * Note for future ben. It looks like this package list calculation is messing things up. 
+         * and it needs to be fixed.
+         * 
+         * 
+         * 
+         * 
+         */
+        const isSelfReference = request.context.issuer.includes(request.request.substr(1))
+        // console.log('isSelfReference: ', request.context.issuer,  request.request.substr(1), request.context.issuer.includes(request.request.substr(1)))
         // DEV NOTE: This is going to need some cleanup. It's mainly working on trail and error.
         if (isSelfReference && !isBaseProject) {
             const index = extensions.indexOf(moduleName.replace('extension-', ''))
@@ -104,12 +111,11 @@ class ExtensionsResolverPlugin {
 
         // If we aren't importing the routes file, add the `.` to the packages so we include the 
         // base project as the highest priority override location.
-        const isRouter = request.request.includes('/app/routes')
-        if (!isRouter) {
-            packages.unshift('.')
-        }
+        
+        // console.log('isRouter? ', request.request, request.request.includes('/app/routes'))
+        
 
-        // if (request.context.compiler === 'server' && request.request.includes('home')) {
+        // if (request.context.compiler === 'server' && request.request.includes('routes')) {
         //     console.log('PACKAGES: ', packages)
         // }
         
@@ -120,7 +126,7 @@ class ExtensionsResolverPlugin {
                     throw new Error('"feature" not defined.')
                 }
 
-                // if (request.context.compiler === 'server' && request.request.includes('home')) {
+                // if (request.context.compiler === 'server' && request.request.includes('routes')) {
                 //     console.log('OLD REQUEST: ')
                 //     console.log(request)
                 // }
@@ -136,14 +142,14 @@ class ExtensionsResolverPlugin {
                         ...request.context,
                         issuer: isLocalDevExtension ? request.context.issuer : request.context.issuer.replace(moduleName, `extension-${feature}`)
                     },
-                    path: this.projectDir + '/app',
+                    path: this.projectDir,
                     // NOTE: Here we are just adjusting the file path because we are not including "app". This logic will be handled properly
                     // in the final version.
                     request: request.request.replace('*', featureModule + `${!!request.request.match(/\/(home|product-list|product-detail)/) ? '/app' : ''}`),
                     stack: undefined
                 }
                 
-                // if (request.context.compiler === 'server' && request.request.includes('home')) {
+                // if (request.context.compiler === 'server' && request.request.includes('routes')) {
                 //     console.log('NEW REQUEST: ')
                 //     console.log(req)
                 // }
