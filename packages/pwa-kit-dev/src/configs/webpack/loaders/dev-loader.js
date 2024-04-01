@@ -86,8 +86,6 @@ module.exports = function (source) {
     const fileName = this.resourcePath.split('/').pop()
     const moduleName = map[fileName]
     if (moduleName || this.resourcePath.match(/\/(components|pages)\//)) {
-        // console.log('FILE NAME: ', this.resourcePath)
-        // console.log('MODULE NAME: ', moduleName)
         const match = source.match(/export default ([A-Z]\w+)\n/)
         if (match && ['Refinements', 'Header', 'ProductDetail', 'ProductList', 'ProductTile'].includes(match[1])) {
             source = source.replace(
@@ -100,9 +98,6 @@ module.exports = function (source) {
                     }
                 )
             )
-
-
-            console.log('NEW SOURCE: ', source)
         }
     
     }

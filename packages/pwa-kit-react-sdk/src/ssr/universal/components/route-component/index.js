@@ -403,7 +403,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  * @private
  */
 export const getRoutes = (locals) => {
-    console.log('GET_ROUTES: ', routes)
     let _routes = routes
     if (typeof routes === 'function') {
         _routes = routes()
