@@ -25,9 +25,8 @@ module.exports = function (source) {
                 } else {
                     setStyle({
                         border: '2px solid red',
-                        margin: '-2px',
-                        borderRadius: 5,
-                        animation: 'blink 1s linear infinite'
+                        boxSizing: 'border-box',
+                        borderRadius: 5
                     })
                 }
             }, [hidden])
