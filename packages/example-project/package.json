@@ -90,7 +90,7 @@
   },
   "mobify": {
     "extensions": [
-      "retail-react-app-core", 
+      "retail-react-app-discovery-pages", 
       "retail-react-app-custom-home", 
       "retail-react-app-empty-extension", 
       "retail-react-app-storefinder",
