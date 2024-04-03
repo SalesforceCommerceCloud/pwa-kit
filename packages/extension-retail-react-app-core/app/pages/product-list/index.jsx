@@ -56,6 +56,8 @@ import SelectedRefinements from '@salesforce/extension-retail-react-app-core/app
 import EmptySearchResults from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/empty-results'
 import PageHeader from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/page-header'
 import AbovePageHeader from '@salesforce/extension-retail-react-app-core/app/pages/product-list/partials/above-page-header'
+import Sort from '@salesforce/extension-retail-react-app-core/app/components/sort'
+
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '@salesforce/extension-retail-react-app-core/app/components/icons'
@@ -714,49 +716,3 @@ ProductList.propTypes = {
 
 export default ProductList
 
-const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
-    const intl = useIntl()
-    const history = useHistory()
-
-    return (
-        <FormControl
-            aria-label={intl.formatMessage({
-                id: 'product_list.drawer.title.sort_by',
-                defaultMessage: 'Sort By'
-            })}
-            data-testid="sf-product-list-sort"
-            id="page_sort"
-            width="auto"
-            {...otherProps}
-        >
-            <Select
-                value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
-                onChange={({target}) => {
-                    history.push(target.value)
-                }}
-                height={11}
-                width="240px"
-            >
-                {sortUrls.map((href, index) => (
-                    <option key={href} value={href}>
-                        {intl.formatMessage(
-                            {
-                                id: 'product_list.select.sort_by',
-                                defaultMessage: 'Sort By: {sortOption}'
-                            },
-                            {
-                                sortOption: productSearchResult?.sortingOptions[index]?.label
-                            }
-                        )}
-                    </option>
-                ))}
-            </Select>
-        </FormControl>
-    )
-}
-
-Sort.propTypes = {
-    sortUrls: PropTypes.array,
-    productSearchResult: PropTypes.object,
-    basePath: PropTypes.string
-}

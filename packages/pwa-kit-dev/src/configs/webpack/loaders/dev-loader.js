@@ -54,8 +54,13 @@ module.exports = function (source) {
                                     zIndex: 100000
                                 }}
                             >
-                                <b>Component Location:</b> ${filePath.replace('/Users/bchypak/Projects/pwa-kit/packages/', '@')} <br/>
-                                <a href="/">View Code</a>
+                                <b>Component:</b> &lt;${moduleName} /&gt;<br/>
+                                <b>Location:</b> <i>${filePath.replace('/Users/bchypak/Projects/pwa-kit/packages/', '@')}</i><br/>
+                                <b>Description:</b><br/> 
+                                <p>This is a description of the component pull out of the JS or TS Docs</p><br/>
+                                <div style={{float: 'right', color: 'blue', paddingRight: 8}}>
+                                    <a href="/">View Code</a>
+                                </div>
                             </div>
                     }
                     
@@ -87,7 +92,7 @@ module.exports = function (source) {
     const moduleName = map[fileName]
     if (moduleName || this.resourcePath.match(/\/(components|pages)\//)) {
         const match = source.match(/export default ([A-Z]\w+)\n/)
-        if (match && ['Refinements', 'Header', 'ProductDetail', 'ProductList', 'ProductTile'].includes(match[1])) {
+        if (match && ['Pagination', 'Sort', 'PageHeader', 'Refinements', 'Header', 'ProductDetail', 'ProductList', 'ProductTile', 'StoreFinder', 'Home', 'Account'].includes(match[1])) {
             source = source.replace(
                 /export default ([A-Z]\w+)\n/, 
                 enhanceSourceWith(
