@@ -14,6 +14,7 @@ const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
 const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+const zlib = require('zlib')
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
@@ -222,6 +223,56 @@ const main = async () => {
                 error('Failed to save credentials.')
                 throw e
             }
+        })
+
+    program
+        .command('save-local-bundle')
+        .description('Build bundle and save locally')
+        .addOption(
+            new program.Option(
+                '-b, --buildDirectory <buildDirectory>',
+                'a custom project build directory that you want to push'
+            ).default(p.join(process.cwd(), 'build'), './build')
+        )
+        .addOption(
+            new program.Option(
+                '-s, --projectSlug <projectSlug>',
+                "a project slug that differs from the name property in your project's package.json"
+            )
+                // We load the slug from the package.json by default, but we don't want to do that
+                // unless we need to, so it is loaded conditionally in the action implementation
+                .default(null, "the 'name' key from the package.json")
+        )
+        .addOption(
+            new program.Option(
+                '-p, --bundlePath <path/to/local/>',
+                'the path to save the bundle locally'
+            ).default(process.cwd(), './build.xxx')
+        )
+        .addOption(new program.Option('-z, --gzip', 'gzip the tar file'))
+        .action(async ({buildDirectory, projectSlug, bundlePath, gzip}) => {
+            const mobify = getConfig({buildDirectory}) || {}
+
+            if (!projectSlug) {
+                projectSlug = await getProjectName()
+            }
+
+            const bundle = await scriptUtils.createBundle({
+                message: 'Local',
+                ssr_parameters: mobify.ssrParameters,
+                ssr_only: mobify.ssrOnly,
+                ssr_shared: mobify.ssrShared,
+                buildDirectory,
+                projectSlug
+            })
+            let data = Buffer.from(bundle.data, 'base64')
+            let filename = 'build.tar'
+            if (gzip) {
+                filename = 'build.tgz'
+                data = zlib.gzipSync(data)
+            }
+            let finalPath = p.join(bundlePath, filename)
+            fse.outputFileSync(finalPath, data)
         })
 
     program
