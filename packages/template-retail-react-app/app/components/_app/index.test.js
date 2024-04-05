@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect} from 'react'
+import PropTypes from 'prop-types'
 import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
 
@@ -16,24 +17,29 @@ import messages from '../../translations/compiled/en-GB.json'
 import mockConfig from '../../../config/mocks/default'
 import {useCommerceAPI} from '../../commerce-api/contexts.js'
 
+console.warn('FYI this test file mocks: console.log, <StorefrontPreview>')
+
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 jest.mock('pwa-kit-react-sdk/storefront-preview', () => {
     const MockedComponent = ({children, onInit}) => {
         onInit && onInit()
         return <>{children}</>
     }
+    MockedComponent.propTypes = {
+        children: PropTypes.element,
+        onInit: PropTypes.func
+    }
     return MockedComponent
 })
 
 let windowSpy
-console.warn('FYI these are mocked: console.log, <StorefrontPreview>')
 beforeAll(() => {
-    // jest.spyOn(console, 'log').mockImplementation(jest.fn())
+    jest.spyOn(console, 'log').mockImplementation(jest.fn())
     jest.spyOn(console, 'groupCollapsed').mockImplementation(jest.fn())
 })
 
 afterAll(() => {
-    // console.log.mockRestore()
+    console.log.mockRestore()
     console.groupCollapsed.mockRestore()
 })
 beforeEach(() => {
@@ -41,7 +47,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-    // console.log.mockClear()
+    console.log.mockClear()
     console.groupCollapsed.mockClear()
     windowSpy.mockRestore()
 })
