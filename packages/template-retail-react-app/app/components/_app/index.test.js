@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect} from 'react'
-import PropTypes from 'prop-types'
 import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
 
@@ -21,13 +20,10 @@ console.warn('FYI this test file mocks: console.log, <StorefrontPreview>')
 
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 jest.mock('pwa-kit-react-sdk/storefront-preview', () => {
+    // eslint-disable-next-line
     const MockedComponent = ({children, onInit}) => {
         onInit && onInit()
         return <>{children}</>
-    }
-    MockedComponent.propTypes = {
-        children: PropTypes.element,
-        onInit: PropTypes.func
     }
     return MockedComponent
 })
