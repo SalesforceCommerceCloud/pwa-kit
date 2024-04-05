@@ -29,6 +29,12 @@
       "value": "Agregar dirección"
     }
   ],
+  "account_addresses.info.address_removed": [
+    {
+      "type": 0,
+      "value": "Dirección eliminada"
+    }
+  ],
   "account_addresses.info.address_updated": [
     {
       "type": 0,
@@ -56,7 +62,7 @@
   "account_addresses.page_action_placeholder.message.add_new_address": [
     {
       "type": 0,
-      "value": "Agregue un nuevo método de dirección para finalizar la compra (checkout) más rápido."
+      "value": "Agregue un nuevo método de dirección para una finalización de la compra (checkout) más rápida."
     }
   ],
   "account_addresses.title.addresses": [
@@ -143,6 +149,24 @@
       "value": "Regresar a Historial de pedidos"
     }
   ],
+  "account_order_detail.shipping_status.not_shipped": [
+    {
+      "type": 0,
+      "value": "No enviado"
+    }
+  ],
+  "account_order_detail.shipping_status.part_shipped": [
+    {
+      "type": 0,
+      "value": "Parcialmente enviado"
+    }
+  ],
+  "account_order_detail.shipping_status.shipped": [
+    {
+      "type": 0,
+      "value": "Enviado"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,
@@ -219,36 +243,6 @@
       "value": "Historial de pedidos"
     }
   ],
-  "account_payment_methods.button.add_method": [
-    {
-      "type": 0,
-      "value": "Agregar método de pago"
-    }
-  ],
-  "account_payment_methods.description.add_method_for_faster_checkout": [
-    {
-      "type": 0,
-      "value": "Agregue un nuevo método de pago para finalizar la compra (checkout) más rápido."
-    }
-  ],
-  "account_payment_methods.heading.no_saved_methods": [
-    {
-      "type": 0,
-      "value": "No hay métodos de pago guardados"
-    }
-  ],
-  "account_payment_methods.info.new_method_saved": [
-    {
-      "type": 0,
-      "value": "Nuevo método de pago guardado"
-    }
-  ],
-  "account_payment_methods.title.payment_methods": [
-    {
-      "type": 0,
-      "value": "Métodos de pago"
-    }
-  ],
   "account_wishlist.button.continue_shopping": [
     {
       "type": 0,
@@ -301,7 +295,7 @@
           "value": [
             {
               "type": 0,
-              "value": "artículo agregado"
+              "value": "artículo"
             }
           ]
         },
@@ -309,7 +303,7 @@
           "value": [
             {
               "type": 0,
-              "value": "artículos agregados"
+              "value": "artículos"
             }
           ]
         }
@@ -320,7 +314,7 @@
     },
     {
       "type": 0,
-      "value": " al carrito"
+      "value": " agregado(s) al carrito"
     }
   ],
   "add_to_cart_modal.label.cart_subtotal": [
@@ -359,6 +353,12 @@
     {
       "type": 0,
       "value": "Es posible que también le interese"
+    }
+  ],
+  "auth_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Cerrar formato de inicio de sesión"
     }
   ],
   "auth_modal.description.now_signed_in": [
@@ -419,10 +419,16 @@
       "value": "Restablecimiento de contraseña"
     }
   ],
-  "card_payment_form.heading.new_payment_method": [
+  "carousel.button.scroll_left.assistive_msg": [
     {
       "type": 0,
-      "value": "Agregar forma de pago nueva"
+      "value": "Desplazar carrusel a la izquierda"
+    }
+  ],
+  "carousel.button.scroll_right.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Desplazar carrusel a la derecha"
     }
   ],
   "cart.info.removed_from_cart": [
@@ -471,12 +477,6 @@
     {
       "type": 0,
       "value": "Este es un regalo."
-    }
-  ],
-  "cart_secondary_button_group.link_learn_more": [
-    {
-      "type": 0,
-      "value": "Más información"
     }
   ],
   "cart_skeleton.heading.order_summary": [
@@ -779,6 +779,16 @@
       "value": "Salesforce o sus afiliados. Todos los derechos reservados. Esta es solo una tienda de demostración. Los pedidos realizados NO se procesarán."
     }
   ],
+  "checkout_header.link.assistive_msg.cart": [
+    {
+      "type": 0,
+      "value": "Regresar al carrito, número de artículos: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
+    }
+  ],
   "checkout_header.link.cart": [
     {
       "type": 0,
@@ -821,6 +831,24 @@
       "value": "Pago"
     }
   ],
+  "colorRefinements.label.hitCount": [
+    {
+      "type": 1,
+      "value": "colorLabel"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "colorHitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "confirmation_modal.default.action.no": [
     {
       "type": 0,
@@ -851,10 +879,22 @@
       "value": "No, conservar artículo"
     }
   ],
+  "confirmation_modal.remove_cart_item.action.remove": [
+    {
+      "type": 0,
+      "value": "Eliminar"
+    }
+  ],
   "confirmation_modal.remove_cart_item.action.yes": [
     {
       "type": 0,
       "value": "Sí, eliminar artículo"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": [
+    {
+      "type": 0,
+      "value": "Algunos artículos ya no están disponibles en línea y se eliminarán de su carrito."
     }
   ],
   "confirmation_modal.remove_cart_item.message.sure_to_remove": [
@@ -867,6 +907,12 @@
     {
       "type": 0,
       "value": "Confirmar eliminación del artículo"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.title.items_unavailable": [
+    {
+      "type": 0,
+      "value": "Artículos no disponibles"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.no": [
@@ -947,6 +993,12 @@
       "value": "Este código de 4 dígitos se puede encontrar en la parte de atrás de su tarjeta."
     }
   ],
+  "credit_card_fields.tool_tip.security_code_aria_label": [
+    {
+      "type": 0,
+      "value": "Información del código de seguridad"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -975,12 +1027,6 @@
     {
       "type": 0,
       "value": "Historial de pedidos"
-    }
-  ],
-  "drawer_menu.button.payment_methods": [
-    {
-      "type": 0,
-      "value": "Métodos de pago"
     }
   ],
   "drawer_menu.link.about_us": [
@@ -1096,7 +1142,7 @@
     },
     {
       "type": 0,
-      "value": ". Intente buscar un producto o haga clic en "
+      "value": ". Intente buscar un producto o "
     },
     {
       "type": 1,
@@ -1151,6 +1197,18 @@
     {
       "type": 0,
       "value": "Éxito de ventas"
+    }
+  ],
+  "field.password.assistive_msg.hide_password": [
+    {
+      "type": 0,
+      "value": "Ocultar contraseña"
+    }
+  ],
+  "field.password.assistive_msg.show_password": [
+    {
+      "type": 0,
+      "value": "Mostrar contraseña"
     }
   ],
   "footer.column.account": [
@@ -1279,12 +1337,6 @@
       "value": "Historial de pedidos"
     }
   ],
-  "global.account.link.payment_methods": [
-    {
-      "type": 0,
-      "value": "Métodos de pago"
-    }
-  ],
   "global.account.link.wishlist": [
     {
       "type": 0,
@@ -1335,6 +1387,12 @@
       "value": " agregado(s) a la lista de deseos"
     }
   ],
+  "global.info.already_in_wishlist": [
+    {
+      "type": 0,
+      "value": "El artículo ya está en la lista de deseos."
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
@@ -1365,10 +1423,20 @@
       "value": "Mi cuenta"
     }
   ],
-  "header.button.assistive_msg.my_cart": [
+  "header.button.assistive_msg.my_account_menu": [
     {
       "type": 0,
-      "value": "Mi carrito"
+      "value": "Abrir menú de la cuenta"
+    }
+  ],
+  "header.button.assistive_msg.my_cart_with_num_items": [
+    {
+      "type": 0,
+      "value": "Mi carrito, número de artículos: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
     }
   ],
   "header.button.assistive_msg.wishlist": [
@@ -1436,7 +1504,7 @@
   "home.features.description.components": [
     {
       "type": 0,
-      "value": "Desarrollado a partir de la Chakra UI, una biblioteca de componentes de React simple, modular y accesible."
+      "value": "Desarrollado a partir de la IU Chakra, una biblioteca de componentes de React simple, modular y accesible."
     }
   ],
   "home.features.description.einstein_recommendations": [
@@ -1490,7 +1558,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login y API Access Service"
+      "value": "Shopper Login y API Access Service (SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1559,6 +1627,12 @@
       "value": "React PWA Starter Store para venta minorista"
     }
   ],
+  "icons.assistive_msg.lock": [
+    {
+      "type": 0,
+      "value": "Seguro"
+    }
+  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,
@@ -1581,10 +1655,28 @@
       "value": "Ofertas"
     }
   ],
+  "item_image.label.unavailable": [
+    {
+      "type": 0,
+      "value": "No disponible"
+    }
+  ],
+  "item_price.label.starting_at": [
+    {
+      "type": 0,
+      "value": "Comienza en"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,
       "value": "Seleccione todas las opciones anteriores"
+    }
+  ],
+  "list_menu.nav.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Navegación principal"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2097,10 +2189,22 @@
       "value": "Siguiente"
     }
   ],
+  "pagination.link.next.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Página siguiente"
+    }
+  ],
   "pagination.link.prev": [
     {
       "type": 0,
       "value": "Anterior"
+    }
+  ],
+  "pagination.link.prev.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Página anterior"
     }
   ],
   "password_card.info.password_updated": [
@@ -2151,28 +2255,10 @@
       "value": "1 letra en mayúscula"
     }
   ],
-  "payment_selection.button.save_and_continue": [
-    {
-      "type": 0,
-      "value": "Guardar y continuar"
-    }
-  ],
-  "payment_selection.heading.add_new_card": [
-    {
-      "type": 0,
-      "value": "Agregar tarjeta nueva"
-    }
-  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "Tarjeta de crédito"
-    }
-  ],
-  "payment_selection.message.select_payment_method": [
-    {
-      "type": 0,
-      "value": "Seleccione un método de pago."
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2289,6 +2375,70 @@
       "value": "Filtrar"
     }
   ],
+  "product_list.refinements.button.assistive_msg.add_filter": [
+    {
+      "type": 0,
+      "value": "Agregar filtro: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Agregar filtro: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter": [
+    {
+      "type": 0,
+      "value": "Eliminar filtro: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Eliminar filtro: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "product_list.select.sort_by": [
     {
       "type": 0,
@@ -2299,10 +2449,66 @@
       "value": "sortOption"
     }
   ],
-  "product_tile.assistive_msg.wishlist": [
+  "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
-      "value": "Lista de deseos"
+      "value": "Desplazar productos a la izquierda"
+    }
+  ],
+  "product_scroller.assistive_msg.scroll_right": [
+    {
+      "type": 0,
+      "value": "Desplazar productos a la derecha"
+    }
+  ],
+  "product_tile.assistive_msg.add_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Agregar "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " a la lista de deseos"
+    }
+  ],
+  "product_tile.assistive_msg.remove_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Eliminar "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " de la lista de deseos"
+    }
+  ],
+  "product_tile.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "Comienza en "
+    },
+    {
+      "type": 1,
+      "value": "price"
+    }
+  ],
+  "product_view.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Agregar conjunto al carrito"
+    }
+  ],
+  "product_view.button.add_set_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Agregar conjunto a la lista de deseos"
     }
   ],
   "product_view.button.add_to_cart": [
@@ -2323,10 +2529,46 @@
       "value": "Actualización"
     }
   ],
+  "product_view.label.assistive_msg.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "Cantidad de decremento"
+    }
+  ],
+  "product_view.label.assistive_msg.quantity_increment": [
+    {
+      "type": 0,
+      "value": "Incrementar cantidad"
+    }
+  ],
   "product_view.label.quantity": [
     {
       "type": 0,
       "value": "Cantidad"
+    }
+  ],
+  "product_view.label.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "−"
+    }
+  ],
+  "product_view.label.quantity_increment": [
+    {
+      "type": 0,
+      "value": "+"
+    }
+  ],
+  "product_view.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "Comienza en"
+    }
+  ],
+  "product_view.label.variant_type": [
+    {
+      "type": 1,
+      "value": "variantType"
     }
   ],
   "product_view.link.full_details": [
@@ -2375,6 +2617,12 @@
     {
       "type": 0,
       "value": "Aplicar"
+    }
+  ],
+  "promo_popover.assistive_msg.info": [
+    {
+      "type": 0,
+      "value": "Información"
     }
   ],
   "promo_popover.heading.promo_applied": [
@@ -2533,6 +2781,12 @@
       "value": "Cancelar"
     }
   ],
+  "selected_refinements.action.assistive_msg.clear_all": [
+    {
+      "type": 0,
+      "value": "Borrar todos los filtros"
+    }
+  ],
   "selected_refinements.action.clear_all": [
     {
       "type": 0,
@@ -2635,6 +2889,16 @@
       "value": "¿Está seguro de que desea cerrar sesión? Deberá volver a registrarse para continuar con su pedido actual."
     }
   ],
+  "swatch_group.selected.label": [
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    }
+  ],
   "toggle_card.action.edit": [
     {
       "type": 0,
@@ -2727,6 +2991,12 @@
     {
       "type": 0,
       "value": "Dirección"
+    }
+  ],
+  "use_address_fields.label.address_form": [
+    {
+      "type": 0,
+      "value": "Formato de direcciones"
     }
   ],
   "use_address_fields.label.city": [
@@ -3145,16 +3415,28 @@
       "value": "Contraseña nueva"
     }
   ],
+  "wishlist_primary_action.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Agregar conjunto al carrito"
+    }
+  ],
   "wishlist_primary_action.button.add_to_cart": [
     {
       "type": 0,
       "value": "Agregar al carrito"
     }
   ],
-  "wishlist_primary_action.button.select_options": [
+  "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
-      "value": "Seleccionar opciones"
+      "value": "Ver toda la información"
+    }
+  ],
+  "wishlist_primary_action.button.view_options": [
+    {
+      "type": 0,
+      "value": "Ver opciones"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
@@ -3173,7 +3455,7 @@
           "value": [
             {
               "type": 0,
-              "value": "artículo agregado"
+              "value": "artículo"
             }
           ]
         },
@@ -3181,7 +3463,7 @@
           "value": [
             {
               "type": 0,
-              "value": "artículos agregados"
+              "value": "artículos"
             }
           ]
         }
@@ -3192,7 +3474,7 @@
     },
     {
       "type": 0,
-      "value": " al carrito"
+      "value": " agregado(s) al carrito"
     }
   ],
   "wishlist_secondary_button_group.action.remove": [
