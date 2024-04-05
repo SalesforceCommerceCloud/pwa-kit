@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
-import {screen} from '@testing-library/react'
+import React, {useEffect} from 'react'
+import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
 
 import App from './index.jsx'
@@ -14,18 +14,26 @@ import {DEFAULT_LOCALE} from '../../utils/test-utils'
 import useMultiSite from '../../hooks/use-multi-site'
 import messages from '../../translations/compiled/en-GB.json'
 import mockConfig from '../../../config/mocks/default'
+import {useCommerceAPI} from '../../commerce-api/contexts.js'
+
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
 jest.mock('pwa-kit-react-sdk/storefront-preview', () => {
-    return ({children}) => children
+    const MockedComponent = ({children, onInit}) => {
+        onInit && onInit()
+        return <>{children}</>
+    }
+    return MockedComponent
 })
+
 let windowSpy
+console.warn('FYI these are mocked: console.log, <StorefrontPreview>')
 beforeAll(() => {
-    jest.spyOn(console, 'log').mockImplementation(jest.fn())
+    // jest.spyOn(console, 'log').mockImplementation(jest.fn())
     jest.spyOn(console, 'groupCollapsed').mockImplementation(jest.fn())
 })
 
 afterAll(() => {
-    console.log.mockRestore()
+    // console.log.mockRestore()
     console.groupCollapsed.mockRestore()
 })
 beforeEach(() => {
@@ -33,7 +41,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-    console.log.mockClear()
+    // console.log.mockClear()
     console.groupCollapsed.mockClear()
     windowSpy.mockRestore()
 })
@@ -96,5 +104,40 @@ describe('App', () => {
 
         expect(hreflangLinks.some((link) => hasGeneralLocale(link))).toBe(true)
         expect(hreflangLinks.some((link) => link.hrefLang === 'x-default')).toBe(true)
+    })
+
+    test('adds cache breaker to the parameters of SCAPI requests', async () => {
+        useMultiSite.mockImplementation(() => resultUseMultiSite)
+        const dateSpy = jest.spyOn(Date, 'now').mockImplementation(() => 1000)
+        let didReceiveResponseSpy
+
+        const MockedComponent = () => {
+            const apiClients = useCommerceAPI()
+            useEffect(() => {
+                didReceiveResponseSpy = jest.spyOn(apiClients, 'didReceiveResponse')
+            }, [])
+
+            return (
+                <App
+                    targetLocale={DEFAULT_LOCALE}
+                    defaultLocale={DEFAULT_LOCALE}
+                    messages={messages}
+                />
+            )
+        }
+        renderWithProviders(<MockedComponent />)
+
+        await waitFor(() => {
+            expect(didReceiveResponseSpy).toHaveBeenCalledWith(expect.anything(), [
+                expect.objectContaining({
+                    parameters: expect.objectContaining({
+                        c_cache_breaker: 1000
+                    })
+                })
+            ])
+        })
+
+        dateSpy.mockRestore()
+        didReceiveResponseSpy.mockRestore()
     })
 })

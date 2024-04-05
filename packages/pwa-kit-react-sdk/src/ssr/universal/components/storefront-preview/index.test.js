@@ -164,45 +164,11 @@ describe('Storefront Preview Component', function () {
         expect(window.STOREFRONT_PREVIEW.experimentalUnsafeReloadServerSide).toBe(true)
     })
 
-    test('if storefront preview, cache breaker is added to the parameters of SCAPI requests', async () => {
+    test('runs the onInit callback', () => {
         detectStorefrontPreview.mockReturnValue(true)
-        jest.spyOn(Date, 'now').mockImplementation(() => 1000)
+        const handleInit = jest.fn()
 
-        const parameters = {basketId: '123'}
-        const originalWillSendRequest = jest.fn().mockReturnValue([{parameters}])
-        const apiClients = {
-            willSendRequest: originalWillSendRequest
-        }
-
-        mount(<StorefrontPreview getToken={() => 'my-token'} apiClients={apiClients} />)
-        const params = await apiClients.willSendRequest()
-
-        expect(originalWillSendRequest).toBeCalled()
-        expect(params).toEqual([
-            {
-                parameters: {
-                    ...parameters,
-                    c_cache_breaker: 1000
-                }
-            }
-        ])
-    })
-
-    test('if not on storefront preview, SCAPI cache breaker is not added', async () => {
-        detectStorefrontPreview.mockReturnValue(false)
-
-        const parameters = {basketId: '123'}
-        const apiClients = {
-            willSendRequest: jest.fn().mockReturnValue([{parameters}])
-        }
-        mount(<StorefrontPreview getToken={() => 'my-token'} apiClients={apiClients} />)
-        const params = await apiClients.willSendRequest()
-
-        // Expect the parameters to remain the same
-        expect(params).toEqual([
-            {
-                parameters
-            }
-        ])
+        mount(<StorefrontPreview getToken={() => 'my-token'} onInit={handleInit} />)
+        expect(handleInit).toBeCalled()
     })
 })
