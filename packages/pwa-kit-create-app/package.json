@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/pwa-kit-create-app",
-  "version": "3.5.0-dev",
+  "version": "3.5.0-dev.1",
   "description": "Salesforce's project generator tool",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-create-app#readme",
   "bugs": {
@@ -35,11 +35,11 @@
     "semver": "^7.5.2",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
-    "tar": "^6.1.13"
+    "tar": "^6.2.1"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.5.0-dev",
-    "internal-lib-build": "3.5.0-dev",
+    "@salesforce/pwa-kit-dev": "3.5.0-dev.1",
+    "internal-lib-build": "3.5.0-dev.1",
     "verdaccio": "^5.22.1"
   },
   "engines": {
