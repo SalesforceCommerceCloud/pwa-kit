@@ -1,4 +1,6 @@
 ## v2.8.3 (Apr 05, 2024)
+-   Storefront Preview: avoid stale cached Commerce API responses, whenever the Shopper Context is set [#1727](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1727)
+
 ## v2.8.2 (Dec 01, 2023)
 ## v2.8.1 (Nov 08, 2023)
 ## v2.8.0 (Nov 03, 2023)
