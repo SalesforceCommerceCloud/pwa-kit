@@ -11,7 +11,7 @@ const config = {
             require('@babel/preset-env'),
             {
                 targets: {
-                    node: 18
+                    node: "current"
                 }
             }
         ],
@@ -19,6 +19,20 @@ const config = {
         require('@babel/preset-react')
     ],
     plugins: [
+        [
+            // NOTE: Once working create a pr to the repo so get mentioned in their README.
+            require('babel-plugin-module-resolver'),
+            {
+                alias: {
+                    "*/app/handlers": "@salesforce/extension-retail-react-app-storefinder/app/handlers"
+                    // "*/app/handlers": () => {
+                    //     console.log('BABEL PLUGIN ARGS: ')
+                    //     return "@salesforce/extension-retail-react-app-storefinder/app/handlers"
+                    // }
+                },
+                loglevel: 'silly'
+            }
+        ],
         require('@babel/plugin-transform-async-to-generator'),
         require('@babel/plugin-proposal-object-rest-spread'),
         require('@babel/plugin-transform-object-assign'),

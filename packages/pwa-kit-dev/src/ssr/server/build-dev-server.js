@@ -189,6 +189,7 @@ export const DevServerMixin = {
             res.set('Clear-Site-Data', '"cache", "storage"')
             res.send()
         })
+
     },
 
     /**

@@ -59,6 +59,7 @@ const getProjectName = async () => {
     return projectPkg.name
 }
 
+// NOTE: This isn't required with the latest extensibility work.
 const getAppEntrypoint = async () => {
     const defaultPath = p.join(process.cwd(), 'app', 'ssr.js')
     if (await fse.pathExists(defaultPath)) return defaultPath
@@ -254,6 +255,7 @@ const main = async () => {
                 process.exit(1)
             }
 
+            console.log('Running: ', `${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`)
             execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
                 env: {
                     ...process.env,

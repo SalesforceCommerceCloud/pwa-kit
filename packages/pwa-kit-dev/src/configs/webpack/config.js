@@ -83,18 +83,6 @@ export const DEPS_TO_DEDUPE = [
     '@salesforce/commerce-sdk-react'
 ]
 
-if (EXT_EXTENDABLE && EXT_EXTENDS) {
-    const extendsAsArr = Array.isArray(EXT_EXTENDS) ? EXT_EXTENDS : [EXT_EXTENDS]
-    const conflicts = extendsAsArr.filter((x) => EXT_EXTENDABLE?.includes(x))
-    if (conflicts?.length) {
-        throw new Error(
-            `Dependencies in 'extendable' and 'extends' cannot overlap, fix these: ${conflicts.join(
-                ', '
-            )}"`
-        )
-    }
-}
-
 const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
     new BundleAnalyzerPlugin({
         analyzerMode: 'static',
@@ -190,8 +178,6 @@ const baseConfig = (target) => {
                 resolve: {
                     plugins: [
                         new ExtensionsResolverPlugin({
-                            extends: [EXT_EXTENDS],
-                            overridesDir: EXT_OVERRIDES_DIR,
                             projectDir: process.cwd()
                         })
                     ],
@@ -296,17 +282,6 @@ const withChunking = (config) => {
                         // 3. If extending another template, don't include the
                         //    baseline route files in vendor.js
                         test: (module) => {
-                            if (
-                                EXT_EXTENDS &&
-                                EXT_OVERRIDES_DIR &&
-                                module?.context?.includes(
-                                    `${path.sep}${
-                                        path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
-                                    }${path.sep}`
-                                )
-                            ) {
-                                return false
-                            }
                             return module?.context?.match?.(/(node_modules)|(packages\/(.*)dist)/)
                         },
                         name: 'vendor',
@@ -334,16 +309,7 @@ const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
-            ? // TODO: handle for array here when that's supported
-              {
-                  exclude: new RegExp(
-                      `${path.sep}node_modules(?!${path.sep}${
-                          path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
-                      })`
-                  )
-              }
-            : {exclude: /node_modules/}),
+        exclude: /node_modules/,
         use: [
             {
                 loader: findDepInStack('babel-loader'),

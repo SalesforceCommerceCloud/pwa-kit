@@ -66,6 +66,7 @@
     "babel-loader": "^8.3.0",
     "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
     "babel-plugin-formatjs": "10.4.0",
+    "babel-plugin-module-resolver": "^5.0.0",
     "chalk": "^4.1.2",
     "commander": "^9.5.0",
     "compression": "1.7.4",

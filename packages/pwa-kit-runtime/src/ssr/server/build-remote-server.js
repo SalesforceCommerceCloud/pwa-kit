@@ -314,6 +314,7 @@ export const RemoteServerFactory = {
      */
     _createExpressApp(options) {
         const app = express()
+
         app.disable('x-powered-by')
 
         const mixin = {
@@ -922,7 +923,9 @@ export const RemoteServerFactory = {
     createHandler(options, customizeApp) {
         process.on('unhandledRejection', catchAndLog)
         const app = this._createApp(options)
+
         customizeApp(app)
+
         return this._createHandler(app)
     },
 

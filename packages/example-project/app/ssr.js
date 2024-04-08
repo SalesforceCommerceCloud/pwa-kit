@@ -8,6 +8,7 @@
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import pkg from '../package.json'
+import handlers from '*/app/handlers'
 
 const options = {
     // The build directory (an absolute path)
@@ -30,12 +31,16 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    // Handle the redirect from SLAS as to avoid error
-    app.get('/callback?*', (req, res) => {
-        res.send()
-    })
+    // // Handle the redirect from SLAS as to avoid error
+    // app.get('/callback?*', (req, res) => {
+    //     res.send()
+    // })
 
-    app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
+    // app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
+    console.log('HANDLERS: ', handlers)
+    Object.keys(handlers).forEach((key) => {
+        app.get(key, handlers[key])
+    })
 
     app.get('*', runtime.render)
 })
