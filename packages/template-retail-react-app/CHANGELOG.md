@@ -12,6 +12,7 @@
 - Fix handling of offline products on Cart, Checkout, Order History, and Wishlist pages [#1691](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1691)
 - Fix tracking of `viewSearch` event for Einstein analytics, in the case of no-search-results [#1702](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1702)
 - Remove invalid header `_sfdc_customer_id` due to recent MRT HTTP3 upgrade [#1731](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1731)
+- Add `productId` and `categoryId` to the ProductDetail and ProductList components respectively [#1738](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1738)
 
 ## v2.3.1 (Jan 23, 2024)
 
