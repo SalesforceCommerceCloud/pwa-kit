@@ -11,6 +11,7 @@
 - Fix locale selector navigating back to default locale [#1670](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1670)
 - Fix handling of offline products on Cart, Checkout, Order History, and Wishlist pages [#1691](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1691)
 - Fix tracking of `viewSearch` event for Einstein analytics, in the case of no-search-results [#1702](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1702)
+- Remove invalid header `_sfdc_customer_id` due to recent MRT HTTP3 upgrade [#1731](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1731)
 
 ## v2.3.1 (Jan 23, 2024)
 
