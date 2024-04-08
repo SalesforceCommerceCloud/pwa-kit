@@ -48,7 +48,7 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
-const ProductDetail = () => {
+const ProductDetail = (props) => {
     const {formatMessage} = useIntl()
     const history = useHistory()
     const location = useLocation()
@@ -56,9 +56,11 @@ const ProductDetail = () => {
     const activeData = useActiveData()
     const toast = useToast()
     const navigate = useNavigation()
+    const params = useParams()
     const [productSetSelection, setProductSetSelection] = useState({})
     const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
+
     /****************************** Basket *********************************/
     const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
@@ -69,7 +71,7 @@ const ProductDetail = () => {
     const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
-    const {productId} = useParams()
+    const productId = props?.productId || params?.productId
     const urlParams = new URLSearchParams(location.search)
     const {
         data: product,

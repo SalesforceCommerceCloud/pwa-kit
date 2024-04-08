@@ -91,7 +91,7 @@ export const routes = [
     },
     {
         path: '/product/:productId',
-        component: ProductDetail
+        component: () => <ProductDetail productId="52416781M" />
     },
     {
         path: '/search',
@@ -99,7 +99,7 @@ export const routes = [
     },
     {
         path: '/category/:categoryId',
-        component: ProductList
+        component: () => <ProductList categoryId="mens" />
     },
     {
         path: '/account/wishlist',
