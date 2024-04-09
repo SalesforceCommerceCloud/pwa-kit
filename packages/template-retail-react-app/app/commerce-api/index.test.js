@@ -108,6 +108,12 @@ jest.mock('commerce-sdk-isomorphic', () => {
     }
 })
 
+jest.mock('pwa-kit-react-sdk/ssr/universal/components/storefront-preview/utils', () => {
+    return {
+        detectStorefrontPreview: () => true
+    }
+})
+
 beforeEach(() => {
     jest.resetModules()
     // Clearing out mocked local storage before each test so tokens don't get mixed
@@ -137,7 +143,7 @@ describe('CommerceAPI', () => {
         const config = getAPI().getConfig()
         expect(config.parameters).toEqual(apiConfig.parameters)
     })
-    test('calls willSendResponse with request name and options (including auto-injected locale and currency)', () => {
+    test('calls willSendRequest with request name and options (including auto-injected locale and currency)', () => {
         const api = getAPI()
         const spy = jest.spyOn(api, 'willSendRequest')
         api.shopperProducts.getProduct({parameters: {id: '123'}})
@@ -171,6 +177,25 @@ describe('CommerceAPI', () => {
         expect(spy).toHaveBeenCalledWith('getProduct', {
             parameters: {id: '123', locale: 'en-GB', currency: 'EUR'}
         })
+    })
+    test('adds cache breaker if on storefront preview', async () => {
+        const dateSpy = jest.spyOn(Date, 'now').mockImplementation(() => 1000)
+
+        const api = getAPI()
+        const didReceiveResponseSpy = jest.spyOn(api, 'didReceiveResponse')
+
+        await api.shopperProducts.getProduct({
+            parameters: {id: '123', locale: 'en-US'}
+        })
+        expect(didReceiveResponseSpy).toHaveBeenLastCalledWith(expect.anything(), [
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    c_cache_breaker: 1000
+                })
+            })
+        ])
+
+        dateSpy.mockRestore()
     })
     test('applies updated options when calling sdk methods', async () => {
         class MyAPI extends CommerceAPI {

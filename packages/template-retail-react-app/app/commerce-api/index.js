@@ -8,9 +8,10 @@
 /* eslint-disable no-unused-vars */
 import * as sdk from 'commerce-sdk-isomorphic'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {detectStorefrontPreview} from 'pwa-kit-react-sdk/ssr/universal/components/storefront-preview/utils'
 import ShopperBaskets from './shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
-import {getTenantId, isError} from './utils'
+import {isError} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
 
@@ -62,6 +63,8 @@ class CommerceAPI {
         if (this._config.einsteinConfig?.einsteinId) {
             this.einstein = new EinsteinAPI(this)
         }
+
+        this.isStorefrontPreview = detectStorefrontPreview()
 
         // A mapping of property names to the SDK class constructors we'll be
         // providing instances for.
@@ -208,7 +211,14 @@ class CommerceAPI {
         const [fetchOptions, ...restParams] = params
         const newFetchOptions = {
             ...fetchOptions,
-            headers: {...fetchOptions.headers, Authorization: this.auth.authToken}
+            headers: {...fetchOptions.headers, Authorization: this.auth.authToken},
+            // In Storefront Preview mode, add cache breaker for all SCAPI's requests.
+            // Otherwise, it's possible to get stale responses after the Shopper Context is set.
+            // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
+            parameters: {
+                ...fetchOptions.parameters,
+                ...(this.isStorefrontPreview ? {c_cache_breaker: Date.now()} : {})
+            }
         }
         return [newFetchOptions, ...restParams]
     }
