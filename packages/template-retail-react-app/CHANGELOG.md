@@ -1,5 +1,5 @@
 ## v2.8.x
-- Storefront Preview: avoid stale cached Commerce API responses, whenever the Shopper Context is set [link to PR]()
+- Storefront Preview: avoid stale cached Commerce API responses, whenever the Shopper Context is set [#1740](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1740)
 
 ## v2.8.1 (Nov 8, 2023)
 
