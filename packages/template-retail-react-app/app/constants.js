@@ -12,6 +12,7 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 export const DEFAULT_LOCALE = 'en-US'
 export const DEFAULT_SITE_TITLE = 'Retail React App'
 export const MAX_CACHE_AGE = 60 * 15 // 15 min
+export const STALE_WHILE_REVALIDATE = 365 * 24 * 60 * 60 * 1 // 1 year
 
 // Constants used for product searching.
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
