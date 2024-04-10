@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
 
@@ -29,6 +29,7 @@ import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import debounce from 'lodash/debounce'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -75,8 +76,13 @@ const ProductTile = (props) => {
     const localizedProductName = product.name ?? product.productName
 
     const {currency: activeCurrency} = useCurrency()
-    const isFavouriteLoading = useRef(false)
+    const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
+    const debounceToggleFav = debounce(async (e) => {
+        setFavouriteLoading(true)
+        await onFavouriteToggle(!isFavourite)
+        setFavouriteLoading(false)
+    }, 500)
 
     return (
         <Box {...styles.container}>
@@ -126,44 +132,30 @@ const ProductTile = (props) => {
                 </Text>
             </Link>
             {enableFavourite && (
-                <Box
-                    onClick={(e) => {
-                        // stop click event from bubbling
-                        // to avoid user from clicking the underlying
-                        // product while the favourite icon is disabled
-                        e.preventDefault()
-                    }}
-                >
-                    <IconButtonWithRegistration
-                        data-testid="wishlist-button"
-                        aria-label={
-                            isFavourite
-                                ? intl.formatMessage(
-                                      {
-                                          id: 'product_tile.assistive_msg.remove_from_wishlist',
-                                          defaultMessage: 'Remove {product} from wishlist'
-                                      },
-                                      {product: localizedProductName}
-                                  )
-                                : intl.formatMessage(
-                                      {
-                                          id: 'product_tile.assistive_msg.add_to_wishlist',
-                                          defaultMessage: 'Add {product} to wishlist'
-                                      },
-                                      {product: localizedProductName}
-                                  )
-                        }
-                        icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
-                        {...styles.favIcon}
-                        onClick={async () => {
-                            if (!isFavouriteLoading.current) {
-                                isFavouriteLoading.current = true
-                                await onFavouriteToggle(!isFavourite)
-                                isFavouriteLoading.current = false
-                            }
-                        }}
-                    />
-                </Box>
+                <IconButtonWithRegistration
+                    data-testid="wishlist-button"
+                    aria-label={
+                        isFavourite
+                            ? intl.formatMessage(
+                                  {
+                                      id: 'product_tile.assistive_msg.remove_from_wishlist',
+                                      defaultMessage: 'Remove {product} from wishlist'
+                                  },
+                                  {product: localizedProductName}
+                              )
+                            : intl.formatMessage(
+                                  {
+                                      id: 'product_tile.assistive_msg.add_to_wishlist',
+                                      defaultMessage: 'Add {product} to wishlist'
+                                  },
+                                  {product: localizedProductName}
+                              )
+                    }
+                    disabled={isFavouriteLoading}
+                    icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
+                    {...styles.favIcon}
+                    onClick={debounceToggleFav}
+                />
             )}
         </Box>
     )

@@ -49,7 +49,7 @@ const withRegistration = (
                     authModal.onOpen()
                 }
             } else {
-                onClick()
+                onClick(e)
             }
         }
 
