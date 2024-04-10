@@ -1,6 +1,6 @@
 {
   "name": "template-express-minimal",
-  "version": "3.5.0-dev.1",
+  "version": "3.5.0-nightly-20240410080150",
   "private": true,
   "license": "See license in LICENSE",
   "scripts": {
@@ -15,8 +15,8 @@
     "test": "pwa-kit-dev test"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.5.0-dev.1",
-    "@salesforce/pwa-kit-runtime": "3.5.0-dev.1",
+    "@salesforce/pwa-kit-dev": "3.5.0-nightly-20240410080150",
+    "@salesforce/pwa-kit-runtime": "3.5.0-nightly-20240410080150",
     "supertest": "^4.0.2"
   },
   "mobify": {
