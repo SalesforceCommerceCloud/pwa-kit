@@ -14,7 +14,9 @@ const productSearch = [
     'locale',
     'expand',
     'offset',
-    'limit'
+    'limit',
+    'select',
+    'allImages'
 ] as const
 const getSearchSuggestions = [
     'organizationId',
