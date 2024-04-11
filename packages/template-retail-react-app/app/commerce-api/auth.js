@@ -9,7 +9,7 @@
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {createCodeVerifier, generateCodeChallenge} from './pkce'
-import {isTokenExpired, createGetTokenBody, hasSFRAAuthStateChanged} from './utils'
+import {isTokenExpired, createGetTokenBody, parseSlasJWT} from './utils'
 import {
     usidStorageKey,
     cidStorageKey,
@@ -17,6 +17,7 @@ import {
     tokenStorageKey,
     refreshTokenRegisteredStorageKey,
     refreshTokenGuestStorageKey,
+    accessTokenFromSFRAKey,
     oidStorageKey,
     dwSessionIdKey,
     REFRESH_TOKEN_COOKIE_AGE,
@@ -48,12 +49,11 @@ class Auth {
         this._api = api
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
-        this._storageCopy = this._onClient ? new LocalStorage() : new Map()
 
         // To store tokens as cookies
         // change the next line to
-        // this._storage = this._onClient ? new CookieStorage() : new Map()
-        this._storage = this._onClient ? new LocalStorage() : new Map()
+        this._storage = this._onClient ? new CookieStorage() : new Map()
+        // this._storage = this._onClient ? new LocalStorage() : new Map()
 
         const configOid = api._config.parameters.organizationId
         if (!this.oid) {
@@ -140,11 +140,27 @@ class Auth {
         this._storage.set(oidStorageKey, oid)
     }
 
+    get accessTokenFromSFRA() {
+        let accessToken = this._storage.get(accessTokenFromSFRAKey)
+
+        if (accessToken) {
+            // The access token sent from SFRA may be split
+            // across multiple keys to fit under ECOM cookie size
+            // thresholds. We check for and append additional chunks here.
+            let chunk = 2
+            let additionalPart = Cookies.get(`${accessTokenFromSFRAKey}_${chunk}`)
+            while (additionalPart) {
+                accessToken = accessToken.concat(additionalPart)
+                chunk++
+                additionalPart = Cookies.get(`${accessTokenFromSFRAKey}_${chunk}`) || ''
+            }
+        }
+
+        return accessToken
+    }
+
     get isTokenValid() {
-        return (
-            !isTokenExpired(this.authToken) &&
-            !hasSFRAAuthStateChanged(this._storage, this._storageCopy)
-        )
+        return !isTokenExpired(this.authToken)
     }
 
     /**
@@ -163,17 +179,11 @@ class Auth {
                 expires: REFRESH_TOKEN_COOKIE_AGE
             })
             this._storage.delete(refreshTokenGuestStorageKey)
-
-            this._storageCopy.set(refreshTokenRegisteredStorageKey, token)
-            this._storageCopy.delete(refreshTokenGuestStorageKey)
             return
         }
 
         this._storage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
         this._storage.delete(refreshTokenRegisteredStorageKey)
-
-        this._storageCopy.set(refreshTokenGuestStorageKey, token)
-        this._storageCopy.delete(refreshTokenRegisteredStorageKey)
     }
 
     /**
@@ -233,6 +243,38 @@ class Auth {
     }
 
     /**
+     * On hybrid sites, it is possible for SFRA to send us an access token (ie. the user logs in SFRA).
+     * If SFRA sends a token, this method updates this Auth instance
+     *
+     * On PWA-only sites, this returns the access token from local storage.
+     * On Hybrid sites, this checks whether SFRA has sent an auth token via cookies.
+     * Returns an access token from SFRA if it exist.
+     * If not, the access token from local store is returned.
+     */
+    updateTokenWithSFRAToken() {
+        const sfraAuthToken = this.accessTokenFromSFRA
+        /*
+         * If SFRA sends 'refresh', we set an empty access token here so PWA can trigger a login refresh
+         * This key is used when logout is triggered in SFRA but the redirect after logout
+         * sends the user to PWA.
+         */
+        if (sfraAuthToken === 'refresh') {
+            this.authToken = ''
+            this._clearSFRAAuth()
+            return
+        }
+
+        const {customerId, usid} = parseSlasJWT(sfraAuthToken)
+        this.authToken = `Bearer ${sfraAuthToken}`
+        this.usid = usid
+        this.cid = customerId
+
+        // SFRA -> PWA access token cookie handoff is succesful so we clear the SFRA made cookies.
+        // We don't want these cookies to persist and continue overriding what is in local store.
+        this._clearSFRAAuth()
+    }
+
+    /**
      * Authorizes the customer as a registered or guest user.
      * @param {CustomerCredentials} [credentials]
      * @returns {Promise}
@@ -246,6 +288,7 @@ class Auth {
         let retries = 0
         const startLoginFlow = () => {
             let authorizationMethod = '_loginAsGuest'
+            let tokenIsValid = this.isTokenValid
             if (credentials) {
                 authorizationMethod = '_loginWithCredentials'
             } else if (this.isTokenValid) {
@@ -255,8 +298,11 @@ class Auth {
             }
             return this[authorizationMethod](credentials)
                 .then((result) => {
-                    // Uncomment the following line for phased launch
-                    // this._onClient && this.createOCAPISession()
+                    // Uncomment the following lines for phased launch
+                    if (!tokenIsValid) {
+                        // if we got a new token, we should session bridge
+                        this._onClient && this.createOCAPISession()
+                    }
                     return result
                 })
                 .catch((error) => {
@@ -502,6 +548,27 @@ class Auth {
         this._storage.delete(cidStorageKey)
         this._storage.delete(encUserIdStorageKey)
         this._storage.delete(dwSessionIdKey)
+        this._storage.delete(accessTokenFromSFRAKey)
+        this._clearSFRAAuth()
+    }
+
+    /**
+     * Removes the stored auth token sent from SFRA.
+     * @private
+     */
+    _clearSFRAAuth() {
+        this._storage.delete(accessTokenFromSFRAKey)
+
+        // The access token sent from SFRA may be split
+        // across multiple keys to fit under ECOM cookie size
+        // thresholds. We check for and delete additional chunks here.
+        let chunk = 2
+        let additionalPart = this._storage.get(`${accessTokenFromSFRAKey}_${chunk}`)
+        while (additionalPart) {
+            this._storage.delete(`${accessTokenFromSFRAKey}_${chunk}`)
+            chunk++
+            additionalPart = this._storage.get(`${accessTokenFromSFRAKey}_${chunk}`) || ''
+        }
     }
 }
 
