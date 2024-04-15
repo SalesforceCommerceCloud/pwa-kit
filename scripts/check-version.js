@@ -12,21 +12,8 @@ const childProc = require('child_process')
 const fs = require('fs')
 const pkg = require('../package.json')
 
-const isWin = process.platform === 'win32'
-const extension = isWin ? '.cmd' : ''
-
-const npm = `npm${extension}`
-
-const spawnSync = (...args) => {
-    const proc = childProc.spawnSync(...args)
-    if (proc.status !== 0) {
-        throw proc.stderr.toString()
-    }
-    return proc
-}
-
 if (!fs.existsSync(path.join('node_modules', 'semver'))) {
-    spawnSync(npm, [
+    childProc.spawnSync('npm', [
         'install',
         `semver@${pkg.devDependencies['semver']}`,
         '--loglevel=silent',
@@ -41,7 +28,7 @@ const semver = require('semver')
 const requiredNode = pkg.engines.node
 const foundNode = process.version
 const requiredNpm = pkg.engines.npm
-const foundNpm = spawnSync(npm, ['-v']).stdout.toString().trim()
+const foundNpm = childProc.spawnSync('npm', ['-v']).stdout.toString().trim()
 
 const warnings = []
 
