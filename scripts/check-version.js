@@ -16,7 +16,7 @@ const isWin = process.platform === 'win32'
 const extension = isWin ? '.cmd' : ''
 
 const npm = `npm${extension}`
-
+console.log('test')
 const spawnSync = (...args) => {
     const proc = childProc.spawnSync(...args)
     if (proc.status !== 0) {
