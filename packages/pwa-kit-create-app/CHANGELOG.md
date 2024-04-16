@@ -1,3 +1,5 @@
+## v3.6.0-dev (Apr 16, 2024)
+
 ## v3.5.0 (Apr 15, 2024)
 
 - Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
