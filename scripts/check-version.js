@@ -19,8 +19,6 @@ const npm = `npm${extension}`
 
 const spawnSync = (...args) => {
     const proc = childProc.spawnSync(...args)
-    console.log(proc)
-    console.log(proc.status)
     if (proc.status !== 0) {
         throw proc.stderr.toString()
     }
