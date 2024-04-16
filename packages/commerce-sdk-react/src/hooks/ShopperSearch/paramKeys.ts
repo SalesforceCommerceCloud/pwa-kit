@@ -16,8 +16,11 @@ const productSearch = [
     'offset',
     'limit',
     'select',
-    'allImages'
+    'allImages',
+    'allVariationProperties',
+    'perPricebook'
 ] as const
+
 const getSearchSuggestions = [
     'organizationId',
     'siteId',
