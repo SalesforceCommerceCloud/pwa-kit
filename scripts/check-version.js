@@ -26,22 +26,26 @@ const spawnSync = (...args) => {
 }
 
 if (!fs.existsSync(path.join('node_modules', 'semver'))) {
-    spawnSync(npm, [
-        'install',
-        `semver@${pkg.devDependencies['semver']}`,
-        '--loglevel=silent',
-        '--no-save',
-        '--no-package-lock',
-        '--ignore-scripts',
-        '--no-audit'
-    ])
+    spawnSync(
+        npm,
+        [
+            'install',
+            `semver@${pkg.devDependencies['semver']}`,
+            '--loglevel=silent',
+            '--no-save',
+            '--no-package-lock',
+            '--ignore-scripts',
+            '--no-audit'
+        ],
+        {shell: true}
+    )
 }
 
 const semver = require('semver')
 const requiredNode = pkg.engines.node
 const foundNode = process.version
 const requiredNpm = pkg.engines.npm
-const foundNpm = spawnSync(npm, ['-v']).stdout.toString().trim()
+const foundNpm = spawnSync(npm, ['-v'], {shell: true}).stdout.toString().trim()
 
 const warnings = []
 

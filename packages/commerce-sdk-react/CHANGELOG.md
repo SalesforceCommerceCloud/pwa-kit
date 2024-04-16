@@ -1,4 +1,4 @@
-## v1.4.0-dev (Jan 22, 2024)
+## v1.4.0 (Apr 15, 2024)
 
 - Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
 - Fix invalid query params warnings and allow custom query [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
