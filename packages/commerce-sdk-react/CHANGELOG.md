@@ -1,3 +1,6 @@
+## v1.4.2 (Apr 17, 2024)
+- Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
+
 ## v1.4.1 (Apr 16, 2024)
 - Add missing params keys `allVariationProperties` and `perPricebook`  for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
 

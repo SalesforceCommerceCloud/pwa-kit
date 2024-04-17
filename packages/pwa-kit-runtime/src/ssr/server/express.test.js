@@ -1066,12 +1066,12 @@ describe('SLAS private client proxy', () => {
 
     test('should not create proxy by default', () => {
         const app = RemoteServerFactory._createApp(opts())
-        return request(app).get('/mobify/scapi/shopper/auth').expect(404)
+        return request(app).get('/mobify/slas/private').expect(404)
     })
 
     test('should return HTTP 501 if PWA_KIT_SLAS_CLIENT_SECRET env var not set', () => {
         const app = RemoteServerFactory._createApp(opts({useSLASPrivateClient: true}))
-        return request(app).get('/mobify/scapi/shopper/auth').expect(501)
+        return request(app).get('/mobify/slas/private').expect(501)
     })
 
     test('does not insert client secret if request not for /oauth2/token', async () => {
@@ -1095,7 +1095,7 @@ describe('SLAS private client proxy', () => {
         )
 
         return await request(app)
-            .get('/mobify/scapi/shopper/auth/somePath')
+            .get('/mobify/slas/private/somePath')
             .then((response) => {
                 expect(response.body.authorization).toBeUndefined()
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
@@ -1126,7 +1126,7 @@ describe('SLAS private client proxy', () => {
         )
 
         return await request(app)
-            .get('/mobify/scapi/shopper/auth/oauth2/token')
+            .get('/mobify/slas/private/oauth2/token')
             .then((response) => {
                 expect(response.body.authorization).toBe(`Basic ${encodedCredentials}`)
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
