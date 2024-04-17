@@ -1,5 +1,5 @@
 ## v1.4.1 (Apr 16, 2024)
-- Add missing params keys for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
+- Add missing params keys `allVariationProperties` and `perPricebook`  for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
 
 ## v1.4.0 (Apr 15, 2024)
 
