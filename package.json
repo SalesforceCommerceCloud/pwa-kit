@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit",
-  "version": "3.5.0-dev.1",
+  "version": "3.6.0-dev",
   "scripts": {
     "bump-version": "node ./scripts/bump-version/index.js",
     "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
