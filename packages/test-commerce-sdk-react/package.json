@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/commerce-sdk-react": "1.4.0",
+    "@salesforce/commerce-sdk-react": "1.4.1",
     "@salesforce/pwa-kit-dev": "3.5.0",
     "@salesforce/pwa-kit-react-sdk": "3.5.0",
     "@salesforce/pwa-kit-runtime": "3.5.0",

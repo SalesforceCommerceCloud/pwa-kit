@@ -1,3 +1,6 @@
+## v2.4.1 (Apr 17, 2024)
+- Update dependency commerce-sdk-react to 1.4.1 to have access to all params keys for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
+
 ## v2.4.0 (Apr 15, 2024)
 
 ### New Feature
