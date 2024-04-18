@@ -7,7 +7,7 @@
 import jwtDecode from 'jwt-decode'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
-import {refreshTokenGuestStorageKey, refreshTokenRegisteredStorageKey} from './constants'
+import {accessTokenFromSFRAKey} from './constants'
 import fetch from 'cross-fetch'
 
 /**
@@ -29,6 +29,33 @@ export function isTokenExpired(token) {
     }
 
     return true
+}
+
+/**
+ * Decode SLAS JWT and extract information such as customer id, usid, etc.
+ * @param {string} jwt - The JWT bearer token to be inspected
+ */
+export function parseSlasJWT(jwt) {
+    const payload = jwtDecode(jwt)
+    const {sub, isb} = payload
+
+    if (!sub || !isb) {
+        throw new Error('Unable to parse access token payload: missing sub and isb.')
+    }
+
+    // ISB format
+    // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
+    const isbParts = isb.split('::')
+    const isGuest = isbParts[1] === 'upn:Guest'
+    const customerId = isGuest ? isbParts[3].replace('gcid:', '') : isbParts[4].replace('rcid:', '')
+    // SUB format
+    // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
+    const usid = sub.split('::')[3].replace('usid:', '')
+    return {
+        isGuest,
+        customerId,
+        usid
+    }
 }
 
 // Returns fomrulated body for SopperLogin getToken endpoint
@@ -274,27 +301,17 @@ export const convertSnakeCaseToSentenceCase = (text) => {
 export const noop = () => {}
 
 /**
+ * @deprecated
  * WARNING: This function is relevant to be used in Hybrid deployments only.
- * Compares the refresh_token keys for guest('cc-nx-g') and registered('cc-nx') login from the cookie received from SFRA with the copy stored in localstorage on PWA Kit
- * to determine if the login state of the shopper on SFRA site has changed. If the keys are different we return true considering the login state did change. If the keys are same,
- * we compare the values of the refresh_token to cover an edge case where the login state might have changed multiple times on SFRA and the eventual refresh_token key might be same
- * as that on PWA Kit which would incorrectly show both keys to be the same even though the sessions are different.
+ *
+ * This function checks to see if SFRA has updated the auth state. Returns true if SFRA has sent an
+ * access token for PWA to consume.
+ *
  * @param {Storage} storage Cookie storage on PWA Kit in hybrid deployment.
- * @param {LocalStorage} storageCopy Local storage holding the copy of the refresh_token in hybrid deployment.
- * @returns {boolean} true if the keys do not match (login state changed), false otherwise.
+ * @param {LocalStorage} storageCopy No-op. Used by old implementaiton. Kept here to prevent breaking change.
+ * @returns {boolean} true if SFRA has updated the auth state, false otherwise.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function hasSFRAAuthStateChanged(storage, storageCopy) {
-    let refreshTokenKey =
-        (storage.get(refreshTokenGuestStorageKey) && refreshTokenGuestStorageKey) ||
-        (storage.get(refreshTokenRegisteredStorageKey) && refreshTokenRegisteredStorageKey)
-
-    let refreshTokenCopyKey =
-        (storageCopy.get(refreshTokenGuestStorageKey) && refreshTokenGuestStorageKey) ||
-        (storageCopy.get(refreshTokenRegisteredStorageKey) && refreshTokenRegisteredStorageKey)
-
-    if (refreshTokenKey !== refreshTokenCopyKey) {
-        return true
-    }
-
-    return storage.get(refreshTokenKey) !== storageCopy.get(refreshTokenCopyKey)
+    return storage.get(accessTokenFromSFRAKey) ? true : false
 }

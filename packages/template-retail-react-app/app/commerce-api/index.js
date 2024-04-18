@@ -199,6 +199,11 @@ class CommerceAPI {
             await pendingLogin
         }
 
+        // If SFRA sent us an access token, replace our access token with that
+        if (this.auth.accessTokenFromSFRA) {
+            this.auth.updateTokenWithSFRAToken()
+        }
+
         // If the token is invalid (missing, past/nearing expiration), we issue
         //  a login call, which will attempt to refresh the token or get a new
         //  guest token. Once login is complete, we can proceed.
