@@ -1,3 +1,6 @@
+## v2.8.3 (Apr 09, 2024)
+- Upgrade vulnerable dependency [#1737](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1737)
+
 ## v2.8.2 (Dec 01, 2023)
 - Upgrade vulnerable dependency [#1562](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1562)
 
