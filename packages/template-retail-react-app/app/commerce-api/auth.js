@@ -52,8 +52,8 @@ class Auth {
 
         // To store tokens as cookies
         // change the next line to
-        this._storage = this._onClient ? new CookieStorage() : new Map()
-        // this._storage = this._onClient ? new LocalStorage() : new Map()
+        // this._storage = this._onClient ? new CookieStorage() : new MemoryStorage()
+        this._storage = this._onClient ? new LocalStorage() : new MemoryStorage()
 
         const configOid = api._config.parameters.organizationId
         if (!this.oid) {
@@ -161,6 +161,10 @@ class Auth {
 
     get isTokenValid() {
         return !isTokenExpired(this.authToken)
+    }
+
+    get storage() {
+        return this._storage
     }
 
     /**
@@ -578,6 +582,7 @@ class Storage {
     set(key, value, options) {}
     get(key) {}
     delete(key) {}
+    type() {}
 }
 
 class CookieStorage extends Storage {
@@ -596,6 +601,9 @@ class CookieStorage extends Storage {
     delete(key) {
         Cookies.remove(key)
     }
+    type() {
+        return 'cookie-store'
+    }
 }
 
 class LocalStorage extends Storage {
@@ -613,5 +621,27 @@ class LocalStorage extends Storage {
     }
     delete(key) {
         window.localStorage.removeItem(key)
+    }
+    type() {
+        return 'local-store'
+    }
+}
+
+class MemoryStorage extends Storage {
+    constructor(...args) {
+        super(args)
+        this.map = new Map()
+    }
+    set(key, value) {
+        this.map.set(key, value)
+    }
+    get(key) {
+        return this.map.get(key)
+    }
+    delete(key) {
+        this.map.delete(key)
+    }
+    type() {
+        return 'memory-store'
     }
 }
