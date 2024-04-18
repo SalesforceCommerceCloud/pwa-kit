@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useContext, useMemo} from 'react'
+import {useContext, useMemo, useEffect} from 'react'
 import {nanoid} from 'nanoid'
 import {useCommerceAPI, CustomerContext} from '../contexts'
+import useStorage from './useStorage'
 
 const AuthTypes = Object.freeze({GUEST: 'guest', REGISTERED: 'registered'})
 
@@ -19,6 +20,11 @@ const NEW_CUSTOMER_MAX_AGE = 2 * 1000 // 2 seconds in milliseconds
 export default function useCustomer() {
     const api = useCommerceAPI()
     const {customer, setCustomer} = useContext(CustomerContext)
+
+    // Watch `cid` in local store / cookie store for any changes in auth state
+    // We use this to update the customer object and trigger re-renders
+    // if the auth state is changed in a different browser tab
+    const customerId = useStorage('cid')
 
     const self = useMemo(() => {
         return {
@@ -374,6 +380,12 @@ export default function useCustomer() {
             }
         }
     }, [customer, setCustomer])
+
+    useEffect(() => {
+        if (customer && customerId != customer.customerId) {
+            self.login()
+        }
+    }, [customerId])
 
     return self
 }
