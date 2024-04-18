@@ -405,7 +405,11 @@ const useEinstein = () => {
             const token = await getTokenWhenReady()
             // Fetch the product details for the recommendations
             const products = await api.shopperProducts.getProducts({
-                parameters: {ids: ids.join(',')},
+                parameters: {
+                    ids: ids.join(','),
+                    perPricebook: true,
+                    expand: ['prices', 'variations', 'availability', 'promotions']
+                },
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

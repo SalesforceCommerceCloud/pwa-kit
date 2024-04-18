@@ -29,6 +29,7 @@ import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -66,15 +67,34 @@ const ProductTile = (props) => {
         ...rest
     } = props
 
-    const {currency, image, price, productId, hitType} = product
+    const {image, productId, hitType} = product
+    // NOTE: swatches will implement later to set variant accordingly,
+    // for now we use the first variant that has price book to set up discount price
+    // Not all variants has set in a priceBook, a.k.a not having tieredPrices.
+    const variant = product?.variants?.find((i) => !!i?.tieredPrices)
+    let currentPrice = variant ? variant?.price : product?.price
 
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
+    const isProductASet = hitType === 'set' || !!product?.type?.set
 
-    const {currency: activeCurrency} = useCurrency()
+    // standard product will have tieredPrices directly under product object
+    // product set does not have tierPieces, we go with priceRanges
+    const tieredPrices = isProductASet
+        ? product?.priceRanges
+        : variant
+        ? variant?.tieredPrices
+        : product?.tieredPrices
+
+    // we will choose the list price from the price book that contains the highest value to display strike through price
+    const maxPriceTier = Math.max(...tieredPrices?.map((item) => item.price || item.maxPrice))
+    let listPrice = tieredPrices?.find(
+        (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
+    )
+
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
 
@@ -104,26 +124,13 @@ const ProductTile = (props) => {
                 {/* Title */}
                 <Text {...styles.title}>{localizedProductName}</Text>
 
-                {/* Price */}
-                <Text {...styles.price} data-testid="product-tile-price">
-                    {hitType === 'set'
-                        ? intl.formatMessage(
-                              {
-                                  id: 'product_tile.label.starting_at_price',
-                                  defaultMessage: 'Starting at {price}'
-                              },
-                              {
-                                  price: intl.formatNumber(price, {
-                                      style: 'currency',
-                                      currency: currency || activeCurrency
-                                  })
-                              }
-                          )
-                        : intl.formatNumber(price, {
-                              style: 'currency',
-                              currency: currency || activeCurrency
-                          })}
-                </Text>
+                {/*/!* Price *!/*/}
+                {/*Price and discount price will show for first variant for now. We will implement the swatch into PLP later*/}
+                <DisplayPrice
+                    basePrice={isProductASet ? listPrice?.minPrice : listPrice?.price}
+                    isProductASet={isProductASet}
+                    discountPrice={currentPrice}
+                />
             </Link>
             {enableFavourite && (
                 <Box

@@ -22,34 +22,40 @@ const DisplayPrice = ({
 }) => {
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
+    const discountPriceText = intl.formatNumber(discountPrice, {
+        style: 'currency',
+        currency: currency || activeCurrency
+    })
+    const basePriceText = intl.formatNumber(basePrice, {
+        style: 'currency',
+        currency: currency || activeCurrency
+    })
     return (
         <Skeleton isLoaded={basePrice} display={'flex'} {...skeletonProps}>
-            <Text fontWeight="bold" fontSize="md" mr={1}>
-                {isProductASet &&
-                    `${intl.formatMessage({
+            {isProductASet && (
+                <Text fontWeight="bold" fontSize="md" mr={1}>
+                    {intl.formatMessage({
                         id: 'product_view.label.starting_at_price',
                         defaultMessage: 'Starting at'
-                    })} `}
-            </Text>
-            {typeof discountPrice === 'number' && (
-                <Text as="b" {...discountPriceProps}>
-                    {intl.formatNumber(discountPrice, {
-                        style: 'currency',
-                        currency: currency || activeCurrency
                     })}
                 </Text>
             )}
-            <Text
-                as={typeof discountPrice === 'number' ? 's' : 'b'}
-                ml={typeof discountPrice === 'number' ? 2 : 0}
-                fontWeight={discountPrice ? 'normal' : 'bold'}
-                {...basePriceProps}
-            >
-                {intl.formatNumber(basePrice, {
-                    style: 'currency',
-                    currency: currency || activeCurrency
-                })}
-            </Text>
+            {typeof discountPrice === 'number' && (
+                <Text as="b" {...discountPriceProps} aria-label={`Sale price ${discountPriceText}`}>
+                    {discountPriceText}
+                </Text>
+            )}
+            {basePrice > discountPrice && (
+                <Text
+                    aria-label={`Original price ${basePriceText}`}
+                    as={typeof discountPrice === 'number' ? 's' : 'b'}
+                    ml={typeof discountPrice === 'number' ? 2 : 0}
+                    fontWeight={discountPrice ? 'normal' : 'bold'}
+                    {...basePriceProps}
+                >
+                    {basePriceText}
+                </Text>
+            )}
         </Skeleton>
     )
 }
