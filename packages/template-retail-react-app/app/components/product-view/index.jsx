@@ -58,6 +58,7 @@ const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, 
             <DisplayPrice
                 basePrice={basePrice}
                 discountPrice={discountPrice}
+                discountPriceProps={{as: 'b'}}
                 currency={currency}
                 isProductASet={isProductASet}
             />

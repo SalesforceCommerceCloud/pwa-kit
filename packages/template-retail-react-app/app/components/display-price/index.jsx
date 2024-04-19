@@ -42,7 +42,7 @@ const DisplayPrice = ({
                 </Text>
             )}
             {typeof discountPrice === 'number' && (
-                <Text as="b" {...discountPriceProps} aria-label={`Sale price ${discountPriceText}`}>
+                <Text {...discountPriceProps} aria-label={`Sale price ${discountPriceText}`}>
                     {discountPriceText}
                 </Text>
             )}

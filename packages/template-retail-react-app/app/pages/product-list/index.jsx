@@ -150,14 +150,7 @@ const ProductList = (props) => {
                 ...restOfParams,
                 perPricebook: true,
                 allVariationProperties: true,
-                expand: [
-                    'availability',
-                    'prices',
-                    'represented_products',
-                    'variations',
-                    'custom_properties',
-                    'images'
-                ],
+                expand: ['availability', 'prices', 'variations', 'custom_properties', 'images'],
                 refine: _refine
             }
         },

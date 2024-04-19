@@ -66,14 +66,7 @@ const Home = () => {
             refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
             perPricebook: true,
             allVariationProperties: true,
-            expand: [
-                'availability',
-                'prices',
-                'represented_products',
-                'variations',
-                'custom_properties',
-                'images'
-            ],
+            expand: ['availability', 'prices', 'variations', 'custom_properties', 'images'],
             limit: HOME_SHOP_PRODUCTS_LIMIT
         }
     })

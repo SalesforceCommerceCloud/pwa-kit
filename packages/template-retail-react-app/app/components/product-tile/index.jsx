@@ -128,8 +128,13 @@ const ProductTile = (props) => {
                 {/*/!* Price *!/*/}
                 {/*Price and discount price will show for first variant for now. We will implement the swatch into PLP later*/}
                 <DisplayPrice
-                    basePrice={isProductASet ? listPrice?.minPrice : listPrice?.price}
+                    basePrice={isProductASet ? listPrice?.maxPrice : listPrice?.price}
                     isProductASet={isProductASet}
+                    discountPriceProps={
+                        listPrice?.maxPrice > currentPrice || listPrice?.price > currentPrice
+                            ? {as: 'b'}
+                            : {as: 'p'}
+                    }
                     discountPrice={currentPrice}
                 />
             </Link>
