@@ -30,6 +30,7 @@ const DisplayPrice = ({
         style: 'currency',
         currency: currency || activeCurrency
     })
+
     return (
         <Skeleton isLoaded={basePrice} display={'flex'} {...skeletonProps}>
             {isProductASet && (

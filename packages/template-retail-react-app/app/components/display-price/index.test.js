@@ -16,7 +16,7 @@ describe('DisplayPrice', function () {
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
     })
 
-    test('should render according html tag for prices', () => {
+    test('should render html tags for prices accordingly', () => {
         const {container} = renderWithProviders(
             <DisplayPrice currency="GBP" basePrice={100} discountPrice={90} />
         )
@@ -28,9 +28,9 @@ describe('DisplayPrice', function () {
         expect(basePriceTag).toHaveLength(1)
     })
 
-    test('should not render discount price if not available', () => {
-        renderWithProviders(<DisplayPrice currency="GBP" basePrice={100} />)
+    test('should not render base price if discount price is the same as base price', () => {
+        renderWithProviders(<DisplayPrice currency="GBP" basePrice={100} discountPrice={100} />)
         expect(screen.queryByText(/£90\.00/i)).not.toBeInTheDocument()
-        expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
+        expect(screen.queryByText(/£100\.00/i)).toBeInTheDocument()
     })
 })
