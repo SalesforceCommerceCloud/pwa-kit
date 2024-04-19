@@ -28,7 +28,6 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
@@ -90,7 +89,9 @@ const ProductTile = (props) => {
         : product?.tieredPrices
 
     // we will choose the list price from the price book that contains the highest value to display strike through price
-    const maxPriceTier = Math.max(...tieredPrices?.map((item) => item.price || item.maxPrice))
+    const maxPriceTier = tieredPrices
+        ? Math.max(...(tieredPrices || []).map((item) => item.price || item.maxPrice))
+        : 0
     let listPrice = tieredPrices?.find(
         (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
     )
@@ -191,6 +192,9 @@ ProductTile.propTypes = {
             link: PropTypes.string
         }),
         price: PropTypes.number,
+        priceRanges: PropTypes.array,
+        tieredPrices: PropTypes.array,
+
         // `name` is present and localized when `product` is provided by a RecommendedProducts component
         // (from Shopper Products `getProducts` endpoint), but is not present when `product` is
         // provided by a ProductList component.
@@ -204,7 +208,11 @@ ProductTile.propTypes = {
         // Note: useEinstein() transforms snake_case property names from the API response to camelCase
         productName: PropTypes.string,
         productId: PropTypes.string,
-        hitType: PropTypes.string
+        hitType: PropTypes.string,
+        variants: PropTypes.array,
+        type: PropTypes.shape({
+            set: PropTypes.bool
+        })
     }),
     /**
      * Enable adding/removing product as a favourite.

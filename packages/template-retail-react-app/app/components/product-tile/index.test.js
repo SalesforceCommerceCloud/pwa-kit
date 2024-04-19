@@ -90,10 +90,9 @@ test('Renders Skeleton', () => {
 })
 
 test('Product set - renders the appropriate price label', async () => {
-    const {getByTestId} = renderWithProviders(<ProductTile product={mockProductSet} />)
+    const {getByText} = renderWithProviders(<ProductTile product={mockProductSet} />)
 
-    const container = getByTestId('product-tile-price')
-    expect(container).toHaveTextContent(/starting at/i)
+    expect(getByText(/starting at/i)).toBeInTheDocument()
 })
 
 test('Remove from wishlist cannot be muti-clicked', () => {
@@ -108,3 +107,203 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     fireEvent.click(wishlistButton)
     expect(onClick).toHaveBeenCalledTimes(1)
 })
+
+test.only('renders strike through price', () => {
+    const {getByText} = renderWithProviders(<ProductTile product={data} />)
+    expect(getByText(/black flat front wool suit/i)).toBeInTheDocument()
+    expect(getByText(/£191\.99/i)).toBeInTheDocument()
+    expect(getByText(/£320\.00/i)).toBeInTheDocument()
+})
+
+const data = {
+    currency: 'GBP',
+    hitType: 'master',
+    image: {
+        alt: 'Black Flat Front Wool Suit, , large',
+        disBaseLink:
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3d8972fe/images/large/PG.52001DAN84Q.BLACKWL.PZ.jpg',
+        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3d8972fe/images/large/PG.52001DAN84Q.BLACKWL.PZ.jpg',
+        title: 'Black Flat Front Wool Suit, '
+    },
+    orderable: true,
+    price: 191.99,
+    pricePerUnit: 191.99,
+    priceRanges: [
+        {
+            maxPrice: 320,
+            minPrice: 320,
+            pricebook: 'gbp-m-list-prices'
+        },
+        {
+            maxPrice: 191.99,
+            minPrice: 191.99,
+            pricebook: 'gbp-m-sale-prices'
+        }
+    ],
+    productId: '25686544M',
+    productName: 'Black Flat Front Wool Suit',
+    productType: {
+        master: true
+    },
+    representedProduct: {
+        id: '750518703077M',
+        c_color: 'BLACKWL',
+        c_refinementColor: 'black',
+        c_size: '048',
+        c_width: 'V'
+    },
+    representedProducts: [
+        {
+            id: '750518703077M'
+        },
+        {
+            id: '750518703060M'
+        },
+        {
+            id: '750518703039M'
+        },
+        {
+            id: '750518703046M'
+        }
+    ],
+    variants: [
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518703077M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKWL',
+                size: '048',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518703060M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKWL',
+                size: '046',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518703039M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKWL',
+                size: '042',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518703046M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKWL',
+                size: '043',
+                width: 'V'
+            }
+        }
+    ],
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Colour',
+            values: [
+                {
+                    name: 'Black',
+                    orderable: true,
+                    value: 'BLACKWL'
+                }
+            ]
+        },
+        {
+            id: 'size',
+            name: 'Size',
+            values: [
+                {
+                    name: '42',
+                    orderable: true,
+                    value: '042'
+                },
+                {
+                    name: '43',
+                    orderable: true,
+                    value: '043'
+                },
+                {
+                    name: '46',
+                    orderable: true,
+                    value: '046'
+                },
+                {
+                    name: '48',
+                    orderable: true,
+                    value: '048'
+                }
+            ]
+        },
+        {
+            id: 'width',
+            name: 'Width',
+            values: [
+                {
+                    name: 'Regular',
+                    orderable: true,
+                    value: 'V'
+                }
+            ]
+        }
+    ]
+}
