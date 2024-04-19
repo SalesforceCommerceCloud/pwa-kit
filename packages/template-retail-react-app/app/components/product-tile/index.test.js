@@ -108,7 +108,7 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
 })
 
-test.only('renders strike through price', () => {
+test('renders strike through price', () => {
     const {getByText} = renderWithProviders(<ProductTile product={data} />)
     expect(getByText(/black flat front wool suit/i)).toBeInTheDocument()
     expect(getByText(/£191\.99/i)).toBeInTheDocument()
