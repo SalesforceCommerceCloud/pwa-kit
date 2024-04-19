@@ -1063,9 +1063,6 @@
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
   },
-  "product_tile.label.starting_at_price": {
-    "defaultMessage": "Starting at {price}"
-  },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
   },
