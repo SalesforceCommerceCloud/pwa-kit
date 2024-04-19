@@ -1,7 +1,11 @@
-## v1.4.0-dev.1 (Mar 22, 2024)
-## v3.5.0-dev.1 (Mar 22, 2024)
-## v1.4.0-dev.1 (Mar 22, 2024)
-## v1.4.0-dev (Jan 22, 2024)
+## v1.5.0-dev (Apr 17, 2024)
+## v1.4.2 (Apr 17, 2024)
+- Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
+
+## v1.4.1 (Apr 16, 2024)
+- Add missing params keys `allVariationProperties` and `perPricebook`  for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
+
+## v1.4.0 (Apr 15, 2024)
 
 - Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
 - Fix invalid query params warnings and allow custom query [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
