@@ -1260,7 +1260,7 @@
     "defaultMessage": "Veuillez indiquer votre numéro de téléphone."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "Veuillez indiquer votre {postalOrZip}."
+    "defaultMessage": "Veuillez indiquer votre ."
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "Veuillez indiquer votre adresse."
@@ -1272,7 +1272,7 @@
     "defaultMessage": "Veuillez sélectionner votre pays."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "Veuillez sélectionner votre {stateOrProvince}."
+    "defaultMessage": "Veuillez sélectionner votre ."
   },
   "use_address_fields.error.required": {
     "defaultMessage": "Obligatoire"

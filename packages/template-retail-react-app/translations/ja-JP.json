@@ -1260,7 +1260,7 @@
     "defaultMessage": "電話番号を入力してください。"
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "{postalOrZip}を入力してください。"
+    "defaultMessage": "を入力してください。"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "住所を入力してください。"
@@ -1272,7 +1272,7 @@
     "defaultMessage": "国を選択してください。"
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "{stateOrProvince}を選択してください。"
+    "defaultMessage": "を選択してください。"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "必須"

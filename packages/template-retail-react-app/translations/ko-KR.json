@@ -1260,7 +1260,7 @@
     "defaultMessage": "전화번호를 입력하십시오."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "{postalOrZip}를 입력하십시오."
+    "defaultMessage": "를 입력하십시오."
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "주소를 입력하십시오."
@@ -1272,7 +1272,7 @@
     "defaultMessage": "국가를 선택하십시오."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "{stateOrProvince}를 선택하십시오."
+    "defaultMessage": "를 선택하십시오."
   },
   "use_address_fields.error.required": {
     "defaultMessage": "필수"

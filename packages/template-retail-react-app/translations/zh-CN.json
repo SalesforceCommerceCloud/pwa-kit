@@ -1260,7 +1260,7 @@
     "defaultMessage": "请输入您的电话号码。"
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "请输入您的{postalOrZip}。"
+    "defaultMessage": "请输入您的。"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "请输入您的地址。"
@@ -1272,7 +1272,7 @@
     "defaultMessage": "请输入您所在国家/地区。"
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "请选择您所在的{stateOrProvince}。"
+    "defaultMessage": "请选择您所在的。"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "必填"
