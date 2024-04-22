@@ -143,7 +143,6 @@ const ProductTile = (props) => {
                 <Text {...styles.title}>{localizedProductName}</Text>
 
                 {/*/!* Price *!/*/}
-                {/*Price and discount price will show for first variant for now. We will implement the swatch into PLP later*/}
                 <DisplayPrice
                     basePrice={isProductASet ? listPrice?.maxPrice : listPrice?.price}
                     isProductASet={isProductASet}
