@@ -154,7 +154,7 @@ export default function useAddressFields({
             rules: {
                 required:
                     countryCode === 'CA'
-                        ? 'Please select your province.'
+                        ? 'Please select your province.' // FYI we won't translate this
                         : formatMessage({
                               defaultMessage: 'Please select your state.',
                               id: 'use_address_fields.error.please_select_your_state_or_province',
@@ -172,7 +172,7 @@ export default function useAddressFields({
             rules: {
                 required:
                     countryCode === 'CA'
-                        ? 'Please enter your postal code.'
+                        ? 'Please enter your postal code.' // FYI we won't translate this
                         : formatMessage({
                               defaultMessage: 'Please enter your zip code.',
                               id: 'use_address_fields.error.please_enter_your_postal_or_zip',
