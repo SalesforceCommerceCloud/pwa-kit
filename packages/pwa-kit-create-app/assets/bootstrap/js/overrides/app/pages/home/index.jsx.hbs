@@ -52,7 +52,7 @@ const Home = () => {
     // and these objects are undefined on the client side.
     const {res} = useServerContext()
     if (res) {
-        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=31536000`)
+        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate={STALE_WHILE_REVALIDATE}`)
     }
 
     const {data: productSearchResult, isLoading} = useProductSearch({
