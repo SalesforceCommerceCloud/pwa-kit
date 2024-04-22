@@ -7,7 +7,7 @@
 import React from 'react'
 import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components/product-tile/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {fireEvent, within, screen} from '@testing-library/react'
+import {fireEvent, within} from '@testing-library/react'
 
 test('Renders links and images', () => {
     const {getAllByRole} = renderWithProviders(<ProductTile product={mockProductSearchItem} />)

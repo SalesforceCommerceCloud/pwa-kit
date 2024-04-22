@@ -208,6 +208,7 @@ ProductTile.propTypes = {
      */
     product: PropTypes.shape({
         currency: PropTypes.string,
+        representedProduct: PropTypes.object,
         image: PropTypes.shape({
             alt: PropTypes.string,
             disBaseLink: PropTypes.string,
@@ -233,7 +234,9 @@ ProductTile.propTypes = {
         hitType: PropTypes.string,
         variants: PropTypes.array,
         type: PropTypes.shape({
-            set: PropTypes.bool
+            set: PropTypes.bool,
+            bundle: PropTypes.bool,
+            item: PropTypes.bool
         })
     }),
     /**
