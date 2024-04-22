@@ -29,6 +29,7 @@ import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -67,26 +68,42 @@ const ProductTile = (props) => {
     } = props
 
     const {image, productId, hitType} = product
+
     // NOTE: swatches will implement later to set variant accordingly,
-    // for now we use the first variant that has price book to set up discount price
-    // Not all variants has set in a priceBook, a.k.a not having tieredPrices.
-    const variant = product?.variants?.find((i) => !!i?.tieredPrices)
-    let currentPrice = variant ? variant?.price : product?.price
+    // On first load, get the variant that is the represent product
+    // this is for variant product, standard/set/bundles does not have variants
+    // Also, product tile can be used in RecommendedProducts where it calls getProducts which does not have representedProduct
+    // in that case we use the first variant that has price book to set up discount price
+    // Not all variants has set in a priceBook, meaning not having tieredPrices.
+    const variant = product?.variants?.find(
+        (i) => i?.productId === product?.representedProduct?.id || !!i?.tieredPrices
+    )
+
+    // prioritize variant promotionalPrice over standard price
+    let currentPrice = variant
+        ? getDisplayPrice(variant)?.discountPrice || variant?.price
+        : product?.price
 
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
-    const isProductASet = hitType === 'set' || !!product?.type?.set
 
-    // standard product will have tieredPrices directly under product object
-    // product set does not have tierPieces, we go with priceRanges
-    const tieredPrices = isProductASet
-        ? product?.priceRanges
-        : variant
-        ? variant?.tieredPrices
-        : product?.tieredPrices
+    // check for both data returned from getProducts and productSearch
+    const isProductASet = hitType === 'set' || !!product?.type?.set
+    const isProductABundle = hitType === 'bundle' || !!product?.type?.bundle
+    const isProductAStandard = hitType === 'product' || !!product?.type?.item
+    let tieredPrices
+    if (variant) {
+        tieredPrices = variant?.tieredPrices
+    } else if (isProductABundle || isProductAStandard) {
+        tieredPrices = product?.tieredPrices
+    } else {
+        // if none applies, we assume this is a product set
+        // product sets do not have tierPieces, we go with priceRanges
+        tieredPrices = product?.priceRanges
+    }
 
     // we will choose the list price from the price book that contains the highest value to display strike through price
     const maxPriceTier = tieredPrices
