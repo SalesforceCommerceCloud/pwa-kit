@@ -2920,15 +2920,7 @@
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "請輸入您的"
-    },
-    {
-      "type": 1,
-      "value": "postalOrZip"
-    },
-    {
-      "type": 0,
-      "value": "。"
+      "value": "請輸入您的。"
     }
   ],
   "use_address_fields.error.please_select_your_address": [
@@ -2952,15 +2944,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "請選擇您的"
-    },
-    {
-      "type": 1,
-      "value": "stateOrProvince"
-    },
-    {
-      "type": 0,
-      "value": "。"
+      "value": "請選擇您的。"
     }
   ],
   "use_address_fields.error.required": [

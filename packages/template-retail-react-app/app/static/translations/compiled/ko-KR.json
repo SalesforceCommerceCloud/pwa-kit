@@ -2903,10 +2903,6 @@
   ],
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
-      "type": 1,
-      "value": "postalOrZip"
-    },
-    {
       "type": 0,
       "value": "를 입력하십시오."
     }
@@ -2930,10 +2926,6 @@
     }
   ],
   "use_address_fields.error.please_select_your_state_or_province": [
-    {
-      "type": 1,
-      "value": "stateOrProvince"
-    },
     {
       "type": 0,
       "value": "를 선택하십시오."
