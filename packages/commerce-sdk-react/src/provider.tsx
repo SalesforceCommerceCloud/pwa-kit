@@ -84,7 +84,7 @@ export const AuthContext = React.createContext({} as Auth)
  * ```
  * Note: The provider can enable SLAS Private Client mode in 2 ways.
  * `enablePWAKitPrivateClient` sets commerce-sdk-react to work with the PWA proxy
- * `/mobify/scapi/api/auth` to set the private client secret. PWA users should use
+ * `/mobify/slas/private` to set the private client secret. PWA users should use
  * this option.
  *
  * Non-PWA Kit users can enable private client mode by passing in a client secret

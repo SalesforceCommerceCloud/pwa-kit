@@ -176,7 +176,7 @@ class Auth {
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret
         const baseUrl = config.proxy.split(`/mobify/proxy/api`)[0]
-        const privateClientEndpoint = `${baseUrl}/mobify/scapi/shopper/auth`
+        const privateClientEndpoint = `${baseUrl}/mobify/slas/private`
 
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
@@ -221,12 +221,12 @@ class Auth {
 
         /*
          * There are 2 ways to enable SLAS private client mode.
-         * If enablePWAKitPrivateClient=true, we route SLAS calls to /mobify/scapi/shopper/auth
+         * If enablePWAKitPrivateClient=true, we route SLAS calls to /mobify/slas/private
          * and set an internal placeholder as the client secret. The proxy will override the placeholder
          * with the actual client secret so any truthy value as the placeholder works here.
          *
          * If enablePWAKitPrivateClient=false and clientSecret is provided as a non-empty string,
-         * private client mode is enabled but we don't route calls to /mobify/scapi/shopper/auth
+         * private client mode is enabled but we don't route calls to /mobify/slas/private
          * This is how non-PWA Kit consumers of commerce-sdk-react can enable private client and set a secret
          *
          * If both enablePWAKitPrivateClient and clientSecret are truthy, enablePWAKitPrivateClient takes
