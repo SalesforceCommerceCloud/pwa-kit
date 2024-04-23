@@ -42,13 +42,33 @@ const DisplayPrice = ({
                 </Text>
             )}
             {typeof discountPrice === 'number' && (
-                <Text as="b" {...discountPriceProps} aria-label={`Sale price ${discountPriceText}`}>
+                <Text
+                    as="b"
+                    {...discountPriceProps}
+                    aria-label={intl.formatMessage(
+                        {
+                            id: 'product_tile.assistive_msg.sale_price',
+                            defaultMessage: 'Sale price {discountPrice}'
+                        },
+                        {
+                            discountPrice: discountPriceText
+                        }
+                    )}
+                >
                     {discountPriceText}
                 </Text>
             )}
             {basePrice > discountPrice && (
                 <Text
-                    aria-label={`Original price ${basePriceText}`}
+                    aria-label={intl.formatMessage(
+                        {
+                            id: 'product_tile.assistive_msg.base_price',
+                            defaultMessage: 'Sale price {basePrice}'
+                        },
+                        {
+                            basePrice: basePriceText
+                        }
+                    )}
                     as={typeof discountPrice === 'number' ? 's' : 'b'}
                     ml={typeof discountPrice === 'number' ? 2 : 0}
                     fontWeight={discountPrice ? 'normal' : 'bold'}

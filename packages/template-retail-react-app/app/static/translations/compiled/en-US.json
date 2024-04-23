@@ -2475,6 +2475,16 @@
       "value": " to wishlist"
     }
   ],
+  "product_tile.assistive_msg.base_price": [
+    {
+      "type": 0,
+      "value": "Sale price "
+    },
+    {
+      "type": 1,
+      "value": "basePrice"
+    }
+  ],
   "product_tile.assistive_msg.remove_from_wishlist": [
     {
       "type": 0,
@@ -2487,6 +2497,16 @@
     {
       "type": 0,
       "value": " from wishlist"
+    }
+  ],
+  "product_tile.assistive_msg.sale_price": [
+    {
+      "type": 0,
+      "value": "Sale price "
+    },
+    {
+      "type": 1,
+      "value": "discountPrice"
     }
   ],
   "product_view.button.add_set_to_cart": [
