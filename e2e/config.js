@@ -7,6 +7,7 @@
 
 module.exports = {
   RETAIL_APP_HOME:
+    process.env.RETAIL_APP_HOME ||
     "https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com",
   GENERATED_PROJECTS_DIR: "../generated-projects",
   GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
@@ -39,6 +40,10 @@ module.exports = {
       {
         expectedPrompt: /What is your SLAS Client ID?/i,
         response: "987fc116-d30c-4537-93cb-c2bd433c3b5a\n",
+      },
+      {
+        expectedPrompt: /Is your SLAS client private?/i,
+        response: "2\n",
       },
       {
         expectedPrompt: /What is your Site ID in Business Manager?/i,
@@ -77,6 +82,10 @@ module.exports = {
         response: "987fc116-d30c-4537-93cb-c2bd433c3b5a\n",
       },
       {
+        expectedPrompt: /Is your SLAS client private?/i,
+        response: "2\n",
+      },
+      {
         expectedPrompt: /What is your Site ID in Business Manager?/i,
         response: "RefArch\n",
       },
@@ -91,6 +100,10 @@ module.exports = {
         response: "kv7kzm78\n",
       },
     ],
+    "retail-app-private-client": [],
+  },
+  PRESET: {
+    "retail-app-private-client": "retail-react-app-private-slas-client",
   },
   EXPECTED_GENERATED_ARTIFACTS: {
     "retail-app-demo": [

@@ -149,7 +149,7 @@ const ProductList = (props) => {
         {
             parameters: {
                 ...restOfParams,
-                refine: searchParams._refine
+                refine: _refine
             }
         },
         {

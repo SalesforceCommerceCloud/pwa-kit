@@ -13,9 +13,10 @@ import path from 'path'
 import sinon from 'sinon'
 import superagent from 'superagent'
 import request from 'supertest'
+import express from 'express'
 
 import {PersistentCache} from '../../utils/ssr-cache'
-import {CachedResponse, getHashForString} from '../../utils/ssr-server'
+import {CachedResponse} from '../../utils/ssr-server'
 // We need to mock isRemote in some tests, so we need to import it directly from
 // the file it was defined in, because of the way jest works.
 import * as ssrServerUtils from '../../utils/ssr-server/utils'
@@ -84,7 +85,8 @@ const opts = (overrides = {}) => {
             https: httpsAgent
         },
         defaultCacheTimeSeconds: 123,
-        enableLegacyRemoteProxying: false
+        enableLegacyRemoteProxying: false,
+        useSLASPrivateClient: false
     }
     return {
         ...defaults,
@@ -1034,4 +1036,101 @@ describe('DevServer middleware', () => {
             ['The SSR Server has _strictSSL turned off for https requests']
         ])
     })
+})
+
+describe('SLAS private client proxy', () => {
+    const savedEnvironment = Object.assign({}, process.env)
+
+    let proxyApp
+    const proxyPort = 12345
+    const proxyPath = '/responseHeaders'
+    const slasTarget = `http://localhost:${proxyPort}${proxyPath}`
+
+    beforeAll(() => {
+        // by setting slasTarget, rather than forwarding the request to SLAS,
+        // we send the proxy request here so we can return the request headers
+        proxyApp = express()
+        proxyApp.use(proxyPath, (req, res) => {
+            res.send(req.headers)
+        })
+        proxyApp.listen(proxyPort)
+    })
+
+    afterEach(() => {
+        process.env = savedEnvironment
+    })
+
+    afterAll(() => {
+        proxyApp.close()
+    })
+
+    test('should not create proxy by default', () => {
+        const app = RemoteServerFactory._createApp(opts())
+        return request(app).get('/mobify/slas/private').expect(404)
+    })
+
+    test('should return HTTP 501 if PWA_KIT_SLAS_CLIENT_SECRET env var not set', () => {
+        const app = RemoteServerFactory._createApp(opts({useSLASPrivateClient: true}))
+        return request(app).get('/mobify/slas/private').expect(501)
+    })
+
+    test('does not insert client secret if request not for /oauth2/token', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'clientId',
+                                shortCode: 'shortCode'
+                            }
+                        }
+                    }
+                },
+                useSLASPrivateClient: true,
+                slasTarget: slasTarget
+            })
+        )
+
+        return await request(app)
+            .get('/mobify/slas/private/somePath')
+            .then((response) => {
+                expect(response.body.authorization).toBeUndefined()
+                expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
+                expect(response.body['x-mobify']).toBe('true')
+            })
+    }, 15000)
+
+    test('inserts client secret if request is for /oauth2/token', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'clientId',
+                                shortCode: 'shortCode'
+                            }
+                        }
+                    }
+                },
+                useSLASPrivateClient: true,
+                slasTarget: slasTarget
+            })
+        )
+
+        return await request(app)
+            .get('/mobify/slas/private/oauth2/token')
+            .then((response) => {
+                expect(response.body.authorization).toBe(`Basic ${encodedCredentials}`)
+                expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
+                expect(response.body['x-mobify']).toBe('true')
+            })
+    }, 15000)
 })

@@ -14,8 +14,13 @@ const productSearch = [
     'locale',
     'expand',
     'offset',
-    'limit'
+    'limit',
+    'select',
+    'allImages',
+    'allVariationProperties',
+    'perPricebook'
 ] as const
+
 const getSearchSuggestions = [
     'organizationId',
     'siteId',
