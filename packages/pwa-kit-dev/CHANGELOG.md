@@ -1,3 +1,4 @@
+## v3.6.0-nightly-20240424080152 (Apr 24, 2024)
 ## v3.6.0-dev (Apr 17, 2024)
 ## v3.5.1 (Apr 17, 2024)
 - Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
