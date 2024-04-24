@@ -5,9 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef} from 'react'
+import React, {useMemo, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
 import {
@@ -28,7 +30,6 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -66,7 +67,7 @@ const ProductTile = (props) => {
         ...rest
     } = props
 
-    const {currency, image, price, productId, hitType} = product
+    const {image, productId, hitType} = product
 
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
@@ -74,10 +75,48 @@ const ProductTile = (props) => {
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
 
-    const {currency: activeCurrency} = useCurrency()
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
 
+    // NOTE: swatches will implement later to set variant accordingly,
+    // On first load, get the variant that is the represent product
+    // this is for variant product, standard/set/bundles does not have variants
+    // Also, product tile can be used in RecommendedProducts where it calls getProducts which does not have representedProduct
+    // in that case we use the first variant that has price book to set up discount price
+    // Not all variants has set in a priceBook, meaning not having tieredPrices.
+    const variant = useMemo(() => {
+        return product?.variants?.find(
+            (i) => i?.productId === product?.representedProduct?.id || !!i?.tieredPrices
+        )
+    }, [product])
+    // prioritize variant promotionalPrice over standard price
+    let currentPrice = variant
+        ? getDisplayPrice(variant)?.discountPrice || variant?.price
+        : product?.price
+
+    // check for both data returned from getProducts and productSearch
+    const isProductASet = hitType === 'set' || !!product?.type?.set
+    const isProductABundle = hitType === 'bundle' || !!product?.type?.bundle
+    const isProductAStandard = hitType === 'product' || !!product?.type?.item
+    let tieredPrices
+    if (variant) {
+        tieredPrices = variant?.tieredPrices
+    } else if (isProductABundle || isProductAStandard) {
+        tieredPrices = product?.tieredPrices
+    } else {
+        // if none applies, we assume this is a product set
+        // product sets do not have tierPieces, we go with priceRanges
+        tieredPrices = product?.priceRanges
+    }
+
+    let listPrice = useMemo(() => {
+        const maxPriceTier = tieredPrices
+            ? Math.max(...(tieredPrices || []).map((item) => item.price || item.maxPrice))
+            : 0
+        return tieredPrices?.find(
+            (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
+        )
+    }, [tieredPrices])
     return (
         <Box {...styles.container}>
             <Link
@@ -105,25 +144,20 @@ const ProductTile = (props) => {
                 <Text {...styles.title}>{localizedProductName}</Text>
 
                 {/* Price */}
-                <Text {...styles.price} data-testid="product-tile-price">
-                    {hitType === 'set'
-                        ? intl.formatMessage(
-                              {
-                                  id: 'product_tile.label.starting_at_price',
-                                  defaultMessage: 'Starting at {price}'
-                              },
-                              {
-                                  price: intl.formatNumber(price, {
-                                      style: 'currency',
-                                      currency: currency || activeCurrency
-                                  })
-                              }
-                          )
-                        : intl.formatNumber(price, {
-                              style: 'currency',
-                              currency: currency || activeCurrency
-                          })}
-                </Text>
+                <DisplayPrice
+                    strikethroughPrice={
+                        listPrice?.maxPrice > currentPrice || listPrice?.price > currentPrice
+                            ? listPrice?.price || listPrice?.maxPrice
+                            : null
+                    }
+                    isProductASet={isProductASet}
+                    currentPriceProps={
+                        listPrice?.maxPrice > currentPrice || listPrice?.price > currentPrice
+                            ? {as: 'b'}
+                            : {as: 'span'}
+                    }
+                    currentPrice={currentPrice}
+                />
             </Link>
             {enableFavourite && (
                 <Box
@@ -178,12 +212,15 @@ ProductTile.propTypes = {
      */
     product: PropTypes.shape({
         currency: PropTypes.string,
+        representedProduct: PropTypes.object,
         image: PropTypes.shape({
             alt: PropTypes.string,
             disBaseLink: PropTypes.string,
             link: PropTypes.string
         }),
         price: PropTypes.number,
+        priceRanges: PropTypes.array,
+        tieredPrices: PropTypes.array,
         // `name` is present and localized when `product` is provided by a RecommendedProducts component
         // (from Shopper Products `getProducts` endpoint), but is not present when `product` is
         // provided by a ProductList component.
@@ -197,7 +234,13 @@ ProductTile.propTypes = {
         // Note: useEinstein() transforms snake_case property names from the API response to camelCase
         productName: PropTypes.string,
         productId: PropTypes.string,
-        hitType: PropTypes.string
+        hitType: PropTypes.string,
+        variants: PropTypes.array,
+        type: PropTypes.shape({
+            set: PropTypes.bool,
+            bundle: PropTypes.bool,
+            item: PropTypes.bool
+        })
     }),
     /**
      * Enable adding/removing product as a favourite.

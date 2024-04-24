@@ -5281,6 +5281,24 @@
       "value": "]"
     }
   ],
+  "product_tile.assistive_msg.original_price": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "şŧřīķḗḗŧħřǿǿŭŭɠħ ƥřīƈḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "strikethroughPrice"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "product_tile.assistive_msg.remove_from_wishlist": [
     {
       "type": 0,
@@ -5303,18 +5321,18 @@
       "value": "]"
     }
   ],
-  "product_tile.label.starting_at_price": [
+  "product_tile.assistive_msg.sale_price": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Şŧȧȧřŧīƞɠ ȧȧŧ "
+      "value": "ƈŭŭřřḗḗƞŧ ƥřīƈḗḗ "
     },
     {
       "type": 1,
-      "value": "price"
+      "value": "currentPrice"
     },
     {
       "type": 0,

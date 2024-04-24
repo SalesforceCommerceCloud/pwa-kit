@@ -1063,11 +1063,14 @@
   "product_tile.assistive_msg.add_to_wishlist": {
     "defaultMessage": "Add {product} to wishlist"
   },
+  "product_tile.assistive_msg.original_price": {
+    "defaultMessage": "strikethrough price {strikethroughPrice}"
+  },
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
   },
-  "product_tile.label.starting_at_price": {
-    "defaultMessage": "Starting at {price}"
+  "product_tile.assistive_msg.sale_price": {
+    "defaultMessage": "current price {currentPrice}"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"

@@ -149,6 +149,8 @@ const ProductList = (props) => {
         {
             parameters: {
                 ...restOfParams,
+                perPricebook: true,
+                allVariationProperties: true,
                 refine: _refine
             }
         },

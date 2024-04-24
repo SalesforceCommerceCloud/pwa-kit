@@ -56,8 +56,8 @@ const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, 
             </Skeleton>
 
             <DisplayPrice
-                basePrice={basePrice}
-                discountPrice={discountPrice}
+                strikethroughPrice={basePrice}
+                currentPrice={discountPrice}
                 currency={currency}
                 isProductASet={isProductASet}
             />

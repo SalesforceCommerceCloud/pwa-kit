@@ -11,25 +11,27 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 
 describe('DisplayPrice', function () {
     test('should render without error', () => {
-        renderWithProviders(<DisplayPrice currency="GBP" basePrice={100} discountPrice={90} />)
+        renderWithProviders(
+            <DisplayPrice currency="GBP" currentPrice={90} strikethroughPrice={100} />
+        )
         expect(screen.getByText(/£90\.00/i)).toBeInTheDocument()
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
     })
 
     test('should render according html tag for prices', () => {
         const {container} = renderWithProviders(
-            <DisplayPrice currency="GBP" basePrice={100} discountPrice={90} />
+            <DisplayPrice currency="GBP" currentPrice={90} strikethroughPrice={100} />
         )
-        const discountPriceTag = container.querySelectorAll('b')
-        const basePriceTag = container.querySelectorAll('s')
-        expect(within(discountPriceTag[0]).getByText(/£90\.00/i)).toBeDefined()
-        expect(within(basePriceTag[0]).getByText(/£100\.00/i)).toBeDefined()
-        expect(discountPriceTag).toHaveLength(1)
-        expect(basePriceTag).toHaveLength(1)
+        const currentPriceTag = container.querySelectorAll('b')
+        const strikethroughPriceTag = container.querySelectorAll('s')
+        expect(within(currentPriceTag[0]).getByText(/£90\.00/i)).toBeDefined()
+        expect(within(strikethroughPriceTag[0]).getByText(/£100\.00/i)).toBeDefined()
+        expect(currentPriceTag).toHaveLength(1)
+        expect(strikethroughPriceTag).toHaveLength(1)
     })
 
     test('should not render discount price if not available', () => {
-        renderWithProviders(<DisplayPrice currency="GBP" basePrice={100} />)
+        renderWithProviders(<DisplayPrice currency="GBP" currentPrice={100} />)
         expect(screen.queryByText(/£90\.00/i)).not.toBeInTheDocument()
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
     })

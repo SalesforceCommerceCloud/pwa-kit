@@ -2481,6 +2481,16 @@
       "value": " to wishlist"
     }
   ],
+  "product_tile.assistive_msg.original_price": [
+    {
+      "type": 0,
+      "value": "strikethrough price "
+    },
+    {
+      "type": 1,
+      "value": "strikethroughPrice"
+    }
+  ],
   "product_tile.assistive_msg.remove_from_wishlist": [
     {
       "type": 0,
@@ -2495,14 +2505,14 @@
       "value": " from wishlist"
     }
   ],
-  "product_tile.label.starting_at_price": [
+  "product_tile.assistive_msg.sale_price": [
     {
       "type": 0,
-      "value": "Starting at "
+      "value": "current price "
     },
     {
       "type": 1,
-      "value": "price"
+      "value": "currentPrice"
     }
   ],
   "product_view.button.add_set_to_cart": [
