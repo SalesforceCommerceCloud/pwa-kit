@@ -45,7 +45,7 @@
     "@lhci/cli": "^0.11.0",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
-    "@salesforce/commerce-sdk-react": "1.5.0-dev",
+    "@salesforce/commerce-sdk-react": "1.5.0-gpt-nightly-20240424215020",
     "@salesforce/pwa-kit-dev": "3.6.0-dev",
     "@salesforce/pwa-kit-react-sdk": "3.6.0-dev",
     "@salesforce/pwa-kit-runtime": "3.6.0-dev",
