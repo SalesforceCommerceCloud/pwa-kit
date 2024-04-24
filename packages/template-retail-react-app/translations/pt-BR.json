@@ -481,7 +481,7 @@
     "defaultMessage": "Confira a ortografia e tente novamente ou {link}."
   },
   "empty_search_results.link.contact_us": {
-    "defaultMessage": "Entrar em contato"
+    "defaultMessage": "Entre em contato"
   },
   "empty_search_results.recommended_products.title.most_viewed": {
     "defaultMessage": "Mais visto"
@@ -508,10 +508,10 @@
     "defaultMessage": "Sobre nós"
   },
   "footer.link.contact_us": {
-    "defaultMessage": "Entrar em contato"
+    "defaultMessage": "Entre em contato"
   },
   "footer.link.order_status": {
-    "defaultMessage": "Estado do pedido"
+    "defaultMessage": "Estado dos pedidos"
   },
   "footer.link.privacy_policy": {
     "defaultMessage": "Política de privacidade"
@@ -610,7 +610,7 @@
     "defaultMessage": "Entre em contato com nossa equipe de suporte."
   },
   "home.description.here_to_help_line_2": {
-    "defaultMessage": "Eles vão levá-lo ao lugar certo."
+    "defaultMessage": "Eles vão levar você ao lugar certo."
   },
   "home.description.shop_products": {
     "defaultMessage": "Esta seção tem conteúdo do catálogo. {docLink} sobre como substitui-lo.",
@@ -671,13 +671,13 @@
     "defaultMessage": "Implantar no Managed Runtime"
   },
   "home.link.contact_us": {
-    "defaultMessage": "Entrar em contato"
+    "defaultMessage": "Entre em contato"
   },
   "home.link.get_started": {
     "defaultMessage": "Começar"
   },
   "home.link.read_docs": {
-    "defaultMessage": "Ler documentos"
+    "defaultMessage": "Leia os documentos"
   },
   "home.title.react_starter_store": {
     "defaultMessage": "React PWA Starter Store para varejo"
@@ -892,7 +892,7 @@
     "defaultMessage": "Remover"
   },
   "order_summary.cart_items.action.num_of_items_in_cart": {
-    "defaultMessage": "{itemCount, plural, =0 {0 itens} one {# item} other {# itens}}) no carrinho",
+    "defaultMessage": "{itemCount, plural, =0 {0 itens} one {# item} other {# itens}} no carrinho",
     "description": "clicking it would expand/show the items in cart"
   },
   "order_summary.cart_items.link.edit_cart": {
@@ -1260,7 +1260,7 @@
     "defaultMessage": "Insira seu telefone."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "Insira seu ."
+    "defaultMessage": "Insira seu código postal."
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "Insira seu endereço."
@@ -1272,7 +1272,7 @@
     "defaultMessage": "Selecione o país."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "Selecione o ."
+    "defaultMessage": "Selecione estado/província."
   },
   "use_address_fields.error.required": {
     "defaultMessage": "Requerido"

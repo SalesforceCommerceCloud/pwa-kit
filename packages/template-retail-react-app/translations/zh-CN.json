@@ -613,7 +613,7 @@
     "defaultMessage": "他们将向您提供适当指导。"
   },
   "home.description.shop_products": {
-    "defaultMessage": "本节包含目录中的内容。{docLink}（关于如何进行更换）",
+    "defaultMessage": "本节包含目录中的内容。{docLink}了解如何进行更换。",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
@@ -647,7 +647,7 @@
     "defaultMessage": "我的账户"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Shopper Login and API Access Service (SLAS)"
   },
   "home.features.heading.wishlist": {
     "defaultMessage": "愿望清单"
@@ -668,7 +668,7 @@
     "defaultMessage": "在 Github 下载"
   },
   "home.hero_features.link.on_managed_runtime": {
-    "defaultMessage": "Managed Runtime 部署"
+    "defaultMessage": "在 Managed Runtime 中部署"
   },
   "home.link.contact_us": {
     "defaultMessage": "联系我们"
@@ -1260,7 +1260,7 @@
     "defaultMessage": "请输入您的电话号码。"
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "请输入您的。"
+    "defaultMessage": "请输入您的邮政编码。"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "请输入您的地址。"
@@ -1272,7 +1272,7 @@
     "defaultMessage": "请输入您所在国家/地区。"
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "请选择您所在的。"
+    "defaultMessage": "请选择您所在的州／省。"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "必填"

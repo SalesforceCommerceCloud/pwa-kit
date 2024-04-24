@@ -1488,7 +1488,7 @@
     },
     {
       "type": 0,
-      "value": "如何取代。"
+      "value": "來了解如何取代。"
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1696,7 +1696,7 @@
   "locale_text.message.cs-CZ": [
     {
       "type": 0,
-      "value": "捷克文 (捷克共和國)"
+      "value": "捷克文 (捷克)"
     }
   ],
   "locale_text.message.da-DK": [
@@ -1888,7 +1888,7 @@
   "locale_text.message.ko-KR": [
     {
       "type": 0,
-      "value": "韓文 (大韓民國)"
+      "value": "韓文 (韓國)"
     }
   ],
   "locale_text.message.nl-BE": [
@@ -2920,7 +2920,7 @@
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "請輸入您的。"
+      "value": "請輸入您的郵遞區號。"
     }
   ],
   "use_address_fields.error.please_select_your_address": [
@@ -2944,7 +2944,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "請選擇您的。"
+      "value": "請選擇您的州/省。"
     }
   ],
   "use_address_fields.error.required": [

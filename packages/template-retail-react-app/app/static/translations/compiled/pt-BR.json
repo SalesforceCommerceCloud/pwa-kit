@@ -1188,7 +1188,7 @@
   "empty_search_results.link.contact_us": [
     {
       "type": 0,
-      "value": "Entrar em contato"
+      "value": "Entre em contato"
     }
   ],
   "empty_search_results.recommended_products.title.most_viewed": [
@@ -1242,13 +1242,13 @@
   "footer.link.contact_us": [
     {
       "type": 0,
-      "value": "Entrar em contato"
+      "value": "Entre em contato"
     }
   ],
   "footer.link.order_status": [
     {
       "type": 0,
-      "value": "Estado do pedido"
+      "value": "Estado dos pedidos"
     }
   ],
   "footer.link.privacy_policy": [
@@ -1482,7 +1482,7 @@
   "home.description.here_to_help_line_2": [
     {
       "type": 0,
-      "value": "Eles vão levá-lo ao lugar certo."
+      "value": "Eles vão levar você ao lugar certo."
     }
   ],
   "home.description.shop_products": [
@@ -1610,7 +1610,7 @@
   "home.link.contact_us": [
     {
       "type": 0,
-      "value": "Entrar em contato"
+      "value": "Entre em contato"
     }
   ],
   "home.link.get_started": [
@@ -1622,7 +1622,7 @@
   "home.link.read_docs": [
     {
       "type": 0,
-      "value": "Ler documentos"
+      "value": "Leia os documentos"
     }
   ],
   "home.title.react_starter_store": [
@@ -2090,7 +2090,7 @@
     },
     {
       "type": 0,
-      "value": ") no carrinho"
+      "value": " no carrinho"
     }
   ],
   "order_summary.cart_items.link.edit_cart": [
@@ -2936,7 +2936,7 @@
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "Insira seu ."
+      "value": "Insira seu código postal."
     }
   ],
   "use_address_fields.error.please_select_your_address": [
@@ -2960,7 +2960,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "Selecione o ."
+      "value": "Selecione estado/província."
     }
   ],
   "use_address_fields.error.required": [

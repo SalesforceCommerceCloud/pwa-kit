@@ -1460,7 +1460,7 @@
   "home.description.shop_products": [
     {
       "type": 0,
-      "value": "이 섹션에는 카탈로그의 컨텐츠가 포함되어 있습니다. 대체하는 방법을 안내하는 "
+      "value": "이 섹션에는 카탈로그의 컨텐츠가 포함되어 있습니다. 대체하는 방법은 "
     },
     {
       "type": 1,
@@ -1468,7 +1468,7 @@
     },
     {
       "type": 0,
-      "value": " 문서입니다."
+      "value": "에서 확인하세요."
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1480,7 +1480,7 @@
   "home.features.description.components": [
     {
       "type": 0,
-      "value": "이용이 간편한 모듈식 React 구성요소 라이브러리인 React Chakra UI를 사용하여 구축되었습니다."
+      "value": "이용이 간편한 모듈식 React 구성요소 라이브러리인 Chakra UI를 사용하여 구축되었습니다."
     }
   ],
   "home.features.description.einstein_recommendations": [
@@ -2904,7 +2904,7 @@
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "를 입력하십시오."
+      "value": "우편번호를 입력하십시오."
     }
   ],
   "use_address_fields.error.please_select_your_address": [
@@ -2928,7 +2928,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "를 선택하십시오."
+      "value": "시/도를 선택하십시오."
     }
   ],
   "use_address_fields.error.required": [

@@ -1260,7 +1260,7 @@
     "defaultMessage": "電話番号を入力してください。"
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "を入力してください。"
+    "defaultMessage": "郵便番号を入力してください。"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "住所を入力してください。"
@@ -1272,13 +1272,13 @@
     "defaultMessage": "国を選択してください。"
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "を選択してください。"
+    "defaultMessage": "州を選択してください。"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "必須"
   },
   "use_address_fields.error.state_code_invalid": {
-    "defaultMessage": "2 文字の都道府県コードを入力してください。"
+    "defaultMessage": "2 文字の州コードを入力してください。"
   },
   "use_address_fields.label.address": {
     "defaultMessage": "住所"
@@ -1308,10 +1308,10 @@
     "defaultMessage": "デフォルトとして設定"
   },
   "use_address_fields.label.province": {
-    "defaultMessage": "都道府県"
+    "defaultMessage": "州"
   },
   "use_address_fields.label.state": {
-    "defaultMessage": "都道府県"
+    "defaultMessage": "州"
   },
   "use_address_fields.label.zipCode": {
     "defaultMessage": "郵便番号"

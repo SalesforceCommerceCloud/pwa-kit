@@ -613,7 +613,7 @@
     "defaultMessage": "讓他們為您指點迷津。"
   },
   "home.description.shop_products": {
-    "defaultMessage": "此區塊包含來自目錄的內容。{docLink}如何取代。",
+    "defaultMessage": "此區塊包含來自目錄的內容。{docLink}來了解如何取代。",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
@@ -718,7 +718,7 @@
     "defaultMessage": "孟加拉文 (印度)"
   },
   "locale_text.message.cs-CZ": {
-    "defaultMessage": "捷克文 (捷克共和國)"
+    "defaultMessage": "捷克文 (捷克)"
   },
   "locale_text.message.da-DK": {
     "defaultMessage": "丹麥文 (丹麥)"
@@ -814,7 +814,7 @@
     "defaultMessage": "日文 (日本)"
   },
   "locale_text.message.ko-KR": {
-    "defaultMessage": "韓文 (大韓民國)"
+    "defaultMessage": "韓文 (韓國)"
   },
   "locale_text.message.nl-BE": {
     "defaultMessage": "荷蘭文 (比利時)"
@@ -1260,7 +1260,7 @@
     "defaultMessage": "請輸入您的電話號碼。"
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "請輸入您的。"
+    "defaultMessage": "請輸入您的郵遞區號。"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "請輸入您的地址。"
@@ -1272,7 +1272,7 @@
     "defaultMessage": "請選擇您的國家/地區。"
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "請選擇您的。"
+    "defaultMessage": "請選擇您的州/省。"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "必填"

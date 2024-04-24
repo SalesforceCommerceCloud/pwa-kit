@@ -2916,7 +2916,7 @@
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "を入力してください。"
+      "value": "郵便番号を入力してください。"
     }
   ],
   "use_address_fields.error.please_select_your_address": [
@@ -2940,7 +2940,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "を選択してください。"
+      "value": "州を選択してください。"
     }
   ],
   "use_address_fields.error.required": [
@@ -2952,7 +2952,7 @@
   "use_address_fields.error.state_code_invalid": [
     {
       "type": 0,
-      "value": "2 文字の都道府県コードを入力してください。"
+      "value": "2 文字の州コードを入力してください。"
     }
   ],
   "use_address_fields.label.address": [
@@ -3012,13 +3012,13 @@
   "use_address_fields.label.province": [
     {
       "type": 0,
-      "value": "都道府県"
+      "value": "州"
     }
   ],
   "use_address_fields.label.state": [
     {
       "type": 0,
-      "value": "都道府県"
+      "value": "州"
     }
   ],
   "use_address_fields.label.zipCode": [

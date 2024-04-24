@@ -253,7 +253,7 @@
     "defaultMessage": "Bestellungsnummer"
   },
   "checkout_confirmation.label.order_total": {
-    "defaultMessage": "Gesamtwert"
+    "defaultMessage": "Gesamtbetrag"
   },
   "checkout_confirmation.label.promo_applied": {
     "defaultMessage": "Werbeaktion angewendet"
@@ -472,7 +472,7 @@
     "defaultMessage": "Melden Sie sich an, um Ihre gespeicherten Artikel abzurufen oder mit dem Einkauf fortzufahren."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "Wir konnten in der Kategorie \"{category}\" nichts finden. Suchen Sie nach einem Produkt oder {link}."
+    "defaultMessage": "Wir konnten in der Kategorie \"{category}\" nichts finden. Suchen Sie nach einem Produkt oder setzen Sie sich mit unserem {link} in Verbindung."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
     "defaultMessage": "Wir konnten für die Anfrage \"{searchQuery}\" nichts finden."
@@ -610,7 +610,7 @@
     "defaultMessage": "Wenden Sie sich an unser Support-Team."
   },
   "home.description.here_to_help_line_2": {
-    "defaultMessage": "Es leitet Sie gern an die richtige Stelle weiter."
+    "defaultMessage": "Wir leiten Sie gern an die richtige Stelle weiter."
   },
   "home.description.shop_products": {
     "defaultMessage": "Dieser Abschnitt enthält Content vom Katalog. Hier erfahren Sie, wie dieser ersetzt werden kann: {docLink}.",
@@ -703,7 +703,7 @@
     "defaultMessage": "Ab"
   },
   "lCPCxk": {
-    "defaultMessage": "Bitte all Ihre Optionen oben auswählen"
+    "defaultMessage": "Bitte alle Optionen oben auswählen"
   },
   "list_menu.nav.assistive_msg": {
     "defaultMessage": "Hauptnavigation"
@@ -908,7 +908,7 @@
     "defaultMessage": "Gratis"
   },
   "order_summary.label.order_total": {
-    "defaultMessage": "Gesamtwert"
+    "defaultMessage": "Gesamtbetrag"
   },
   "order_summary.label.promo_applied": {
     "defaultMessage": "Werbeaktion angewendet"
@@ -1260,7 +1260,7 @@
     "defaultMessage": "Bitte geben Sie Ihre Telefonnummer ein."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "Bitte geben Sie Ihre  ein."
+    "defaultMessage": "Bitte geben Sie Ihre Postleitzahl ein."
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "Bitte geben Sie Ihre Adresse ein."
@@ -1272,13 +1272,13 @@
     "defaultMessage": "Bitte wählen Sie Ihr Land aus."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "Bitte wählen Sie Ihr(en)  aus."
+    "defaultMessage": "Bitte wählen Sie Ihr Bundesland aus."
   },
   "use_address_fields.error.required": {
     "defaultMessage": "Erforderlich"
   },
   "use_address_fields.error.state_code_invalid": {
-    "defaultMessage": "Bitte geben Sie Bundesland/Kanton in Form von zwei Buchstaben ein."
+    "defaultMessage": "Bitte geben Sie das Bundesland in Form von zwei Buchstaben ein."
   },
   "use_address_fields.label.address": {
     "defaultMessage": "Adresse"
@@ -1308,7 +1308,7 @@
     "defaultMessage": "Als Standard festlegen"
   },
   "use_address_fields.label.province": {
-    "defaultMessage": "Kanton"
+    "defaultMessage": "Bundesland"
   },
   "use_address_fields.label.state": {
     "defaultMessage": "Bundesland"

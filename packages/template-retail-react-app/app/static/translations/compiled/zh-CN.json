@@ -1492,7 +1492,7 @@
     },
     {
       "type": 0,
-      "value": "（关于如何进行更换）"
+      "value": "了解如何进行更换。"
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1558,7 +1558,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login and API Access Service"
+      "value": "Shopper Login and API Access Service (SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1600,7 +1600,7 @@
   "home.hero_features.link.on_managed_runtime": [
     {
       "type": 0,
-      "value": "Managed Runtime 部署"
+      "value": "在 Managed Runtime 中部署"
     }
   ],
   "home.link.contact_us": [
@@ -2924,7 +2924,7 @@
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "请输入您的。"
+      "value": "请输入您的邮政编码。"
     }
   ],
   "use_address_fields.error.please_select_your_address": [
@@ -2948,7 +2948,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "请选择您所在的。"
+      "value": "请选择您所在的州／省。"
     }
   ],
   "use_address_fields.error.required": [
