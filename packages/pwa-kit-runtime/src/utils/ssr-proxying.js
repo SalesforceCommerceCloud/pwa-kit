@@ -683,12 +683,7 @@ export const rewriteProxyResponseHeaders = ({
  * @private
  * @type {string[]}
  */
-export const X_HEADERS_TO_REMOVE = [
-    'x-api-key',
-    'x-mobify-access-key',
-    'x-apigateway-event',
-    'x-apigateway-context'
-]
+export const X_HEADERS_TO_REMOVE = ['x-mobify-access-key']
 
 /**
  * X-header key and values to add to proxied requests
