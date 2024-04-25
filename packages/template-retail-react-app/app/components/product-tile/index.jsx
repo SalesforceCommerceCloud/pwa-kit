@@ -68,7 +68,6 @@ const ProductTile = (props) => {
     } = props
 
     const {image, productId, hitType} = product
-
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
@@ -117,6 +116,7 @@ const ProductTile = (props) => {
             (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
         )
     }, [tieredPrices])
+
     return (
         <Box {...styles.container}>
             <Link
@@ -150,7 +150,14 @@ const ProductTile = (props) => {
                             ? listPrice?.price || listPrice?.maxPrice
                             : null
                     }
-                    isProductASet={isProductASet}
+                    prefixLabel={
+                        isProductASet
+                            ? intl.formatMessage({
+                                  id: 'product_view.label.starting_at_price',
+                                  defaultMessage: 'Starting at'
+                              })
+                            : null
+                    }
                     currentPriceProps={
                         listPrice?.maxPrice > currentPrice || listPrice?.price > currentPrice
                             ? {as: 'b'}
@@ -238,6 +245,7 @@ ProductTile.propTypes = {
         variants: PropTypes.array,
         type: PropTypes.shape({
             set: PropTypes.bool,
+
             bundle: PropTypes.bool,
             item: PropTypes.bool
         })

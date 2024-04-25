@@ -59,7 +59,6 @@ const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, 
                 strikethroughPrice={basePrice}
                 currentPrice={discountPrice}
                 currency={currency}
-                isProductASet={isProductASet}
             />
         </VStack>
     )
