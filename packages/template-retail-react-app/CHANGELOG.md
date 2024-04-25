@@ -1,4 +1,6 @@
 ## v2.5.0-dev (Apr 17, 2024)
+- Use `stale-while-revalidate` cache control directive [#1744](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1744)
+
 ## v2.4.1 (Apr 17, 2024)
 - Update dependency commerce-sdk-react to 1.4.1 to have access to all params keys for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
 
