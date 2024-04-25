@@ -39,9 +39,9 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
-const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, productType}) => {
+const ProductViewHeader = ({name, currentPrice, listPrice, currency, category, productType}) => {
     const isProductASet = productType?.set
-
+    const intl = useIntl()
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -55,19 +55,29 @@ const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, 
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            <DisplayPrice
-                strikethroughPrice={basePrice}
-                currentPrice={discountPrice}
-                currency={currency}
-            />
+            <Skeleton isLoaded={currentPrice}>
+                <DisplayPrice
+                    strikethroughPrice={listPrice > currentPrice ? listPrice : null}
+                    currentPrice={currentPrice}
+                    currency={currency}
+                    prefixLabel={
+                        isProductASet
+                            ? intl.formatMessage({
+                                  id: 'product_view.label.starting_at_price',
+                                  defaultMessage: 'Starting at'
+                              })
+                            : null
+                    }
+                />
+            </Skeleton>
         </VStack>
     )
 }
 
 ProductViewHeader.propTypes = {
     name: PropTypes.string,
-    basePrice: PropTypes.number,
-    discountPrice: PropTypes.number,
+    currentPrice: PropTypes.number,
+    listPrice: PropTypes.number,
     currency: PropTypes.string,
     category: PropTypes.array,
     productType: PropTypes.object
@@ -124,7 +134,7 @@ const ProductView = forwardRef(
             stockLevel,
             stepQuantity
         } = useDerivedProduct(product, isProductPartOfSet)
-        const {basePrice, discountPrice} = getDisplayPrice(product)
+        const {listPrice, currentPrice} = getDisplayPrice(product)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)
@@ -290,8 +300,8 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
-                        basePrice={basePrice}
-                        discountPrice={discountPrice}
+                        listPrice={listPrice}
+                        currentPrice={currentPrice}
                         productType={product?.type}
                         currency={product?.currency}
                         category={category}
@@ -331,8 +341,8 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
-                                basePrice={basePrice}
-                                discountPrice={discountPrice}
+                                listPrice={listPrice}
+                                currentPrice={currentPrice}
                                 productType={product?.type}
                                 currency={product?.currency}
                                 category={category}

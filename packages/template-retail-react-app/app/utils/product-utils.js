@@ -35,19 +35,31 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
 }
 
 /**
- * This function extract the promotional price from a product. If there are more than one price, the smallest price will be picked
+ * This function extract the list price and current price of a product
+ * If a product has promotional price, it will prioritize that value for current price
+ * List price will take the highest value among the price book prices
  * @param {object} product - product detail object
- * @returns {{discountPrice: number, basePrice: number | string}}
+ * @returns {{listPrice: number, currentPrice: number}}
  */
 export const getDisplayPrice = (product) => {
-    const basePrice = product?.pricePerUnit || product?.price
     const promotionalPriceList = product?.productPromotions
         ?.map((promo) => promo.promotionalPrice)
         .filter((i) => i !== null && i !== undefined)
-    // choose the smallest price among the promotionalPrice
-    const discountPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : null
+    const promotionalPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : null
+    // prioritize variant promotionalPrice over standard price
+    let currentPrice = promotionalPrice || product?.price
+
+    let tieredPrices = product?.tieredPrices || product?.priceRanges
+    const maxPriceTier = tieredPrices
+        ? Math.max(...(tieredPrices || []).map((item) => item.price || item.maxPrice))
+        : 0
+
+    // find the tieredPrice with has the highest value price
+    const highestTieredPrice = tieredPrices?.find(
+        (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
+    )
     return {
-        basePrice,
-        discountPrice
+        listPrice: highestTieredPrice?.price || highestTieredPrice?.maxPrice,
+        currentPrice
     }
 }

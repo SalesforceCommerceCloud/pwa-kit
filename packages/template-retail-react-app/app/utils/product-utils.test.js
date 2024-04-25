@@ -55,23 +55,61 @@ test('getDisplayVariationValues', () => {
 })
 
 describe('getDisplayPrice', function () {
-    test('returns basePrice and discountPrice', () => {
-        const {basePrice, discountPrice} = getDisplayPrice(
-            mockedCustomerProductListsDetails.data[0]
-        )
+    test('returns listPrice and currentPrice for product that has only priceRanges', () => {
+        const data = {
+            name: 'product name',
+            price: 37.76,
+            priceRanges: [
+                {
+                    maxPrice: 40.76,
+                    minPrice: 30.76,
+                    pricebook: 'gbp-m-list-prices'
+                },
+                {
+                    maxPrice: 37.76,
+                    minPrice: 37.76,
+                    pricebook: 'gbp-m-sale-prices'
+                }
+            ]
+        }
+        const {listPrice, currentPrice} = getDisplayPrice(data)
 
-        expect(basePrice).toBe(199.0)
-        expect(discountPrice).toBe(189.0)
+        expect(listPrice).toBe(40.76)
+        expect(currentPrice).toBe(37.76)
     })
 
-    test('returns null if there is not discount promotion', () => {
+    test('returns listPrice and currentPrice for product that has only tieredPrices', () => {
         const data = {
-            ...mockedCustomerProductListsDetails.data[0],
-            productPromotions: []
+            name: 'product name',
+            price: 25.6,
+            priceRanges: [
+                {
+                    maxPrice: 25.6,
+                    minPrice: 25.6,
+                    pricebook: 'gbp-m-list-prices'
+                },
+                {
+                    maxPrice: 25.6,
+                    minPrice: 25.6,
+                    pricebook: 'gbp-m-sale-prices'
+                }
+            ],
+            tieredPrices: [
+                {
+                    price: 30.6,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 25.6,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ]
         }
-        const {basePrice, discountPrice} = getDisplayPrice(data)
+        const {listPrice, currentPrice} = getDisplayPrice(data)
 
-        expect(basePrice).toBe(199.0)
-        expect(discountPrice).toBeNull()
+        expect(listPrice).toBe(30.6)
+        expect(currentPrice).toBe(25.6)
     })
 })

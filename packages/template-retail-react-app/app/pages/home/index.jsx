@@ -65,7 +65,6 @@ const Home = () => {
         parameters: {
             refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
             perPricebook: true,
-            allVariationProperties: true,
             limit: HOME_SHOP_PRODUCTS_LIMIT
         }
     })

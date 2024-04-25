@@ -9,7 +9,6 @@ import React, {useMemo, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
-import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
 import {
@@ -30,6 +29,7 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
+import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -67,7 +67,7 @@ const ProductTile = (props) => {
         ...rest
     } = props
 
-    const {image, productId, hitType} = product
+    const {image, productId} = product
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
@@ -76,46 +76,21 @@ const ProductTile = (props) => {
 
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
-
     // NOTE: swatches will implement later to set variant accordingly,
-    // On first load, get the variant that is the represent product
-    // this is for variant product, standard/set/bundles does not have variants
+    // On first load, for variant product, get the variant that is the represent product
     // Also, product tile can be used in RecommendedProducts where it calls getProducts which does not have representedProduct
     // in that case we use the first variant that has price book to set up discount price
     // Not all variants has set in a priceBook, meaning not having tieredPrices.
-    const variant = useMemo(() => {
-        return product?.variants?.find(
-            (i) => i?.productId === product?.representedProduct?.id || !!i?.tieredPrices
-        )
-    }, [product])
-    // prioritize variant promotionalPrice over standard price
-    let currentPrice = variant
-        ? getDisplayPrice(variant)?.discountPrice || variant?.price
-        : product?.price
+    const variant = useMemo(
+        () =>
+            product?.variants?.find(
+                (i) => i?.productId === product?.representedProduct?.id || !!i?.tieredPrices
+            ),
+        [product]
+    )
 
-    // check for both data returned from getProducts and productSearch
-    const isProductASet = hitType === 'set' || !!product?.type?.set
-    const isProductABundle = hitType === 'bundle' || !!product?.type?.bundle
-    const isProductAStandard = hitType === 'product' || !!product?.type?.item
-    let tieredPrices
-    if (variant) {
-        tieredPrices = variant?.tieredPrices
-    } else if (isProductABundle || isProductAStandard) {
-        tieredPrices = product?.tieredPrices
-    } else {
-        // if none applies, we assume this is a product set
-        // product sets do not have tierPieces, we go with priceRanges
-        tieredPrices = product?.priceRanges
-    }
-
-    let listPrice = useMemo(() => {
-        const maxPriceTier = tieredPrices
-            ? Math.max(...(tieredPrices || []).map((item) => item.price || item.maxPrice))
-            : 0
-        return tieredPrices?.find(
-            (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
-        )
-    }, [tieredPrices])
+    const {listPrice, currentPrice} = getDisplayPrice({...product, ...variant})
+    const isASet = product?.hitType === 'set' || !!product?.type?.set
 
     return (
         <Box {...styles.container}>
@@ -145,24 +120,16 @@ const ProductTile = (props) => {
 
                 {/* Price */}
                 <DisplayPrice
-                    strikethroughPrice={
-                        listPrice?.maxPrice > currentPrice || listPrice?.price > currentPrice
-                            ? listPrice?.price || listPrice?.maxPrice
-                            : null
-                    }
+                    strikethroughPrice={listPrice > currentPrice ? listPrice : null}
                     prefixLabel={
-                        isProductASet
+                        isASet
                             ? intl.formatMessage({
                                   id: 'product_view.label.starting_at_price',
                                   defaultMessage: 'Starting at'
                               })
                             : null
                     }
-                    currentPriceProps={
-                        listPrice?.maxPrice > currentPrice || listPrice?.price > currentPrice
-                            ? {as: 'b'}
-                            : {as: 'span'}
-                    }
+                    currentPriceProps={listPrice > currentPrice ? {as: 'b'} : {as: 'span'}}
                     currentPrice={currentPrice}
                 />
             </Link>

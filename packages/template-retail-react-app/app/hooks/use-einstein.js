@@ -408,7 +408,15 @@ const useEinstein = () => {
                 parameters: {
                     ids: ids.join(','),
                     perPricebook: true,
-                    allVariationProperties: true
+                    expand: [
+                        'availability',
+                        'links',
+                        'promotions',
+                        'options',
+                        'images',
+                        'prices',
+                        'variations'
+                    ]
                 },
                 headers: {
                     Authorization: `Bearer ${token}`
