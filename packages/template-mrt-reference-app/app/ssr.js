@@ -80,14 +80,12 @@ const ENVS_TO_EXPOSE = [
     'tz'
 ]
 
-const HEADERS_TO_REDACT = ['x-api-key', 'x-apigateway-context', 'x-apigateway-event']
 
 const BADSSL_TLS1_1_URL = 'https://tls-v1-1.badssl.com:1011/'
 const BADSSL_TLS1_2_URL = 'https://tls-v1-2.badssl.com:1012/'
 
-const redactAndSortObjectKeys = (o, redactList = HEADERS_TO_REDACT) => {
-    const redact = (k) => ({[k]: redactList.includes(k) ? '*****' : o[k]})
-    return Object.assign({}, ...Object.keys(o).sort().map(redact))
+const sortObjectKeys = (o) => {
+    return Object.assign({}, ...Object.keys(o).sort())
 }
 
 /**
@@ -134,7 +132,7 @@ const jsonFromRequest = (req) => {
         query: req.query,
         route_path: req.route.path,
         body: req.body,
-        headers: redactAndSortObjectKeys(req.headers),
+        headers: sortObjectKeys(req.headers),
         ip: req.ip,
         env: filterAndSortObjectKeys(process.env, ENVS_TO_EXPOSE),
         timestamp: new Date().toISOString()
@@ -213,7 +211,7 @@ const responseHeadersTest = async (req, res) => {
  * headers supplied in the request.
  */
 const headerTest = async (req, res) => {
-    res.json({headers: redactAndSortObjectKeys(req.headers)})
+    res.json({headers: sortObjectKeys(req.headers)})
 }
 
 /**
