@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useRef, useState} from 'react'
+import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -134,7 +134,9 @@ const ProductView = forwardRef(
             stockLevel,
             stepQuantity
         } = useDerivedProduct(product, isProductPartOfSet)
-        const {listPrice, currentPrice} = getDisplayPrice(product)
+        const {listPrice, currentPrice} = useMemo(() => {
+            return getDisplayPrice(product, {quantity})
+        }, [product, quantity])
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)

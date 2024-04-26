@@ -39,27 +39,43 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
  * If a product has promotional price, it will prioritize that value for current price
  * List price will take the highest value among the price book prices
  * @param {object} product - product detail object
+ * @param {object} opts - product detail object
  * @returns {{listPrice: number, currentPrice: number}}
  */
-export const getDisplayPrice = (product) => {
+export const getDisplayPrice = (product, opts = {}) => {
+    const {quantity = 1} = opts
     const promotionalPriceList = product?.productPromotions
         ?.map((promo) => promo.promotionalPrice)
         .filter((i) => i !== null && i !== undefined)
     const promotionalPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : null
-    // prioritize variant promotionalPrice over standard price
-    let currentPrice = promotionalPrice || product?.price
 
-    let tieredPrices = product?.tieredPrices || product?.priceRanges
-    const maxPriceTier = tieredPrices
-        ? Math.max(...(tieredPrices || []).map((item) => item.price || item.maxPrice))
-        : 0
-
-    // find the tieredPrice with has the highest value price
-    const highestTieredPrice = tieredPrices?.find(
-        (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
+    // if a product has tieredPrices, get the tiered that has the closest quantity to current quantity
+    const closestTieredPrice = product?.tieredPrices?.reduce((prev, curr) => {
+        return Math.abs(curr.quantity - quantity) < Math.abs(prev.quantity - quantity) ? curr : prev
+    })
+    let currentPrice = Math.min(
+        ...[closestTieredPrice?.price, promotionalPrice, product?.price].filter(Boolean)
     )
+
+    // pick the price range that has the highest maxPrice
+    const maxPriceRange = product?.priceRanges
+        ? Math.max(...(product?.priceRanges || []).map((item) => item.maxPrice))
+        : 0
+    const priceRange = product?.priceRanges?.find((range) => range.maxPrice === maxPriceRange)
+
+    // TODO: how to deal with variant that does not have priceRanges, but tiredPrices
+    // tieredPrices is not suitable to use as list price
+    // let tieredPrices = product?.tieredPrices || product?.priceRanges
+    // const maxPriceTier = tieredPrices
+    //     ? Math.max(...(tieredPrices || []).map((item) => item.price || item.maxPrice))
+    //     : 0
+    //
+    // find the tieredPrice with has the highest value price
+    // const highestTieredPrice = tieredPrices?.find(
+    //     (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
+    // )
     return {
-        listPrice: highestTieredPrice?.price || highestTieredPrice?.maxPrice,
+        listPrice: priceRange?.maxPrice,
         currentPrice
     }
 }

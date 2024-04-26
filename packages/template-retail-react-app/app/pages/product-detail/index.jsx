@@ -80,6 +80,15 @@ const ProductDetail = () => {
             parameters: {
                 id: urlParams.get('pid') || productId,
                 perPricebook: true,
+                expand: [
+                    'availability',
+                    'promotions',
+                    'options',
+                    'images',
+                    'prices',
+                    'variations',
+                    'set_products'
+                ],
                 allImages: true
             }
         },
@@ -407,48 +416,48 @@ const ProductDetail = () => {
                 )}
 
                 {/* Product Recommendations */}
-                <Stack spacing={16}>
-                    {!isProductASet && (
-                        <RecommendedProducts
-                            title={
-                                <FormattedMessage
-                                    defaultMessage="Complete the Set"
-                                    id="product_detail.recommended_products.title.complete_set"
-                                />
-                            }
-                            recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
-                            products={[product]}
-                            mx={{base: -4, md: -8, lg: 0}}
-                            shouldFetch={() => product?.id}
-                        />
-                    )}
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="You might also like"
-                                id="product_detail.recommended_products.title.might_also_like"
-                            />
-                        }
-                        recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
+                {/*<Stack spacing={16}>*/}
+                {/*    {!isProductASet && (*/}
+                {/*        <RecommendedProducts*/}
+                {/*            title={*/}
+                {/*                <FormattedMessage*/}
+                {/*                    defaultMessage="Complete the Set"*/}
+                {/*                    id="product_detail.recommended_products.title.complete_set"*/}
+                {/*                />*/}
+                {/*            }*/}
+                {/*            recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}*/}
+                {/*            products={[product]}*/}
+                {/*            mx={{base: -4, md: -8, lg: 0}}*/}
+                {/*            shouldFetch={() => product?.id}*/}
+                {/*        />*/}
+                {/*    )}*/}
+                {/*    <RecommendedProducts*/}
+                {/*        title={*/}
+                {/*            <FormattedMessage*/}
+                {/*                defaultMessage="You might also like"*/}
+                {/*                id="product_detail.recommended_products.title.might_also_like"*/}
+                {/*            />*/}
+                {/*        }*/}
+                {/*        recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}*/}
+                {/*        products={[product]}*/}
+                {/*        mx={{base: -4, md: -8, lg: 0}}*/}
+                {/*        shouldFetch={() => product?.id}*/}
+                {/*    />*/}
 
-                    <RecommendedProducts
-                        // The Recently Viewed recommender doesn't use `products`, so instead we
-                        // provide a key to update the recommendations on navigation.
-                        key={location.key}
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Recently Viewed"
-                                id="product_detail.recommended_products.title.recently_viewed"
-                            />
-                        }
-                        recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
-                        mx={{base: -4, md: -8, lg: 0}}
-                    />
-                </Stack>
+                {/*    <RecommendedProducts*/}
+                {/*        // The Recently Viewed recommender doesn't use `products`, so instead we*/}
+                {/*        // provide a key to update the recommendations on navigation.*/}
+                {/*        key={location.key}*/}
+                {/*        title={*/}
+                {/*            <FormattedMessage*/}
+                {/*                defaultMessage="Recently Viewed"*/}
+                {/*                id="product_detail.recommended_products.title.recently_viewed"*/}
+                {/*            />*/}
+                {/*        }*/}
+                {/*        recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}*/}
+                {/*        mx={{base: -4, md: -8, lg: 0}}*/}
+                {/*    />*/}
+                {/*</Stack>*/}
             </Stack>
         </Box>
     )
