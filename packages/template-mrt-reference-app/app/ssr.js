@@ -33,10 +33,6 @@
  * will never cache any of the responses from this test server. You therefore
  * don't need to add cachebreakers when running tests.
  *
- * The server has a proxy configured to [HTTPBin](https://httpbin.org/). To send
- * a test request to it, use the path `/mobify/proxy/httpbin/` - for example,
- * `/mobify/proxy/httpbin/get`
- *
  * A test bundle file is available at `/mobify/bundle/<BUNDLE_NUMBER>/assets/mobify.png`
  * where BUNDLE_NUMBER is the most recently published bundle number.
  */
