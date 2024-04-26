@@ -137,14 +137,14 @@ test('renders a product set properly - parent item', () => {
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
     // (they're hidden with display:none style)
 
-    const startingAtLabel = screen.getAllByText(/starting at/i)[0]
+    const fromAtLabel = screen.getAllByText(/from/i)[0]
     const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
     const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
     const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
     const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
 
     // What should exist:
-    expect(startingAtLabel).toBeInTheDocument()
+    expect(fromAtLabel).toBeInTheDocument()
     expect(addSetToCartButton).toBeInTheDocument()
     expect(addSetToWishlistButton).toBeInTheDocument()
 
@@ -166,7 +166,7 @@ test('renders a product set properly - child item', () => {
     const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
     const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
     const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
-    const startingAtLabels = screen.queryAllByText(/starting at/i)
+    const fromLabels = screen.queryAllByText(/from/i)
 
     // What should exist:
     expect(addToCartButton).toBeInTheDocument()
@@ -175,7 +175,7 @@ test('renders a product set properly - child item', () => {
     expect(quantityPicker).toBeInTheDocument()
 
     // What should _not_ exist:
-    expect(startingAtLabels).toHaveLength(0)
+    expect(fromLabels).toHaveLength(0)
 })
 
 test('validateOrderability callback is called when adding a set to cart', async () => {

@@ -64,8 +64,8 @@ const ProductViewHeader = ({name, currentPrice, listPrice, currency, category, p
                     prefixLabel={
                         isProductASet
                             ? intl.formatMessage({
-                                  id: 'product_view.label.starting_at_price',
-                                  defaultMessage: 'Starting at'
+                                  id: 'product_view.label.from',
+                                  defaultMessage: 'From'
                               })
                             : null
                     }

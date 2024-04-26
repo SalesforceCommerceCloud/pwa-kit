@@ -702,8 +702,8 @@
     "defaultMessage": "Unavailable",
     "description": "A unavailable badge placed on top of a product image"
   },
-  "item_price.label.starting_at": {
-    "defaultMessage": "Starting at"
+  "item_price.label.from": {
+    "defaultMessage": "From"
   },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
@@ -1093,6 +1093,9 @@
   "product_view.label.assistive_msg.quantity_increment": {
     "defaultMessage": "Increment Quantity"
   },
+  "product_view.label.from": {
+    "defaultMessage": "From"
+  },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"
   },
@@ -1101,9 +1104,6 @@
   },
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"
-  },
-  "product_view.label.starting_at_price": {
-    "defaultMessage": "Starting at"
   },
   "product_view.label.variant_type": {
     "defaultMessage": "{variantType}"

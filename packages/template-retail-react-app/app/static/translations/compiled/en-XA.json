@@ -3523,14 +3523,14 @@
       "value": "]"
     }
   ],
-  "item_price.label.starting_at": [
+  "item_price.label.from": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Şŧȧȧřŧīƞɠ ȧȧŧ"
+      "value": "Ƒřǿǿḿ"
     },
     {
       "type": 0,
@@ -5437,6 +5437,20 @@
       "value": "]"
     }
   ],
+  "product_view.label.from": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒřǿǿḿ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "product_view.label.quantity": [
     {
       "type": 0,
@@ -5473,20 +5487,6 @@
     {
       "type": 0,
       "value": "+"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "product_view.label.starting_at_price": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şŧȧȧřŧīƞɠ ȧȧŧ"
     },
     {
       "type": 0,

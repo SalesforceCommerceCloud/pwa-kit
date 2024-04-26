@@ -124,8 +124,8 @@ const ProductTile = (props) => {
                     prefixLabel={
                         isASet
                             ? intl.formatMessage({
-                                  id: 'product_view.label.starting_at_price',
-                                  defaultMessage: 'Starting at'
+                                  id: 'product_view.label.from',
+                                  defaultMessage: 'From'
                               })
                             : null
                     }

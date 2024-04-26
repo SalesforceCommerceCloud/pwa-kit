@@ -30,7 +30,7 @@ test('Renders Skeleton', () => {
 test('Product set - renders the appropriate price label', async () => {
     const {getByText} = renderWithProviders(<ProductTile product={mockProductSearchItemSet} />)
 
-    expect(getByText(/starting at/i)).toBeInTheDocument()
+    expect(getByText(/from/i)).toBeInTheDocument()
 })
 
 test('Remove from wishlist cannot be muti-clicked', () => {
@@ -71,7 +71,7 @@ test('renders strike through price with set product', () => {
         <ProductTile product={mockProductSearchItemSet} />
     )
     expect(getByText(/Winter Look/i)).toBeInTheDocument()
-    expect(getByText(/Starting at/i)).toBeInTheDocument()
+    expect(getByText(/from/i)).toBeInTheDocument()
     expect(getByText(/£44\.16/i)).toBeInTheDocument()
     expect(getByText(/£101\.76/i)).toBeInTheDocument()
 
