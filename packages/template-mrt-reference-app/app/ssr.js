@@ -80,7 +80,12 @@ const BADSSL_TLS1_1_URL = 'https://tls-v1-1.badssl.com:1011/'
 const BADSSL_TLS1_2_URL = 'https://tls-v1-2.badssl.com:1012/'
 
 const sortObjectKeys = (o) => {
-    return Object.assign({}, ...Object.keys(o).sort())
+    return Object.assign(
+        {},
+        ...Object.keys(o)
+            .sort()
+            .map((k) => ({[k]: o[k]}))
+    )
 }
 
 /**
