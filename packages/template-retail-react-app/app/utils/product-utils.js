@@ -53,29 +53,21 @@ export const getDisplayPrice = (product, opts = {}) => {
     const closestTieredPrice = product?.tieredPrices?.reduce((prev, curr) => {
         return Math.abs(curr.quantity - quantity) < Math.abs(prev.quantity - quantity) ? curr : prev
     })
-    let currentPrice = Math.min(
-        ...[closestTieredPrice?.price, promotionalPrice, product?.price].filter(Boolean)
-    )
+    const salePrices = [closestTieredPrice?.price, promotionalPrice, product?.price].filter(Boolean)
+    // pick the smallest price among these price for the "current" price
+    let currentPrice = salePrices?.length ? Math.min(...salePrices) : 0
 
-    // pick the price range that has the highest maxPrice
-    const maxPriceRange = product?.priceRanges
-        ? Math.max(...(product?.priceRanges || []).map((item) => item.maxPrice))
+    let tieredPrices = product?.priceRanges || product?.tieredPrices || []
+    const maxPriceTier = tieredPrices
+        ? Math.max(...tieredPrices.map((item) => item.price || item.maxPrice))
         : 0
-    const priceRange = product?.priceRanges?.find((range) => range.maxPrice === maxPriceRange)
 
-    // TODO: how to deal with variant that does not have priceRanges, but tiredPrices
-    // tieredPrices is not suitable to use as list price
-    // let tieredPrices = product?.tieredPrices || product?.priceRanges
-    // const maxPriceTier = tieredPrices
-    //     ? Math.max(...(tieredPrices || []).map((item) => item.price || item.maxPrice))
-    //     : 0
-    //
     // find the tieredPrice with has the highest value price
-    // const highestTieredPrice = tieredPrices?.find(
-    //     (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
-    // )
+    const highestTieredPrice = tieredPrices?.find(
+        (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
+    )
     return {
-        listPrice: priceRange?.maxPrice,
+        listPrice: highestTieredPrice?.price || highestTieredPrice?.maxPrice,
         currentPrice
     }
 }

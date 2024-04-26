@@ -42,6 +42,7 @@ import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-ut
 const ProductViewHeader = ({name, currentPrice, listPrice, currency, category, productType}) => {
     const isProductASet = productType?.set
     const intl = useIntl()
+    console.log('currentPrice cccc', currentPrice)
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
