@@ -76,7 +76,6 @@ const ENVS_TO_EXPOSE = [
     'tz'
 ]
 
-
 const BADSSL_TLS1_1_URL = 'https://tls-v1-1.badssl.com:1011/'
 const BADSSL_TLS1_2_URL = 'https://tls-v1-2.badssl.com:1012/'
 
