@@ -327,9 +327,8 @@ describe('CommerceAPI', () => {
         expect(codeVerifier).toBeDefined()
         expect(redirectUri).toBeDefined()
     })
-    test('should regenerateCodeChallengeturn a code verifier of 128 chracters', () => {
+    test('should return a code verifier of 128 chracters', () => {
         const codeVerifier = createCodeVerifier()
-        console.log('codeVerifier:', codeVerifier)
         expect(codeVerifier.length).toEqual(128)
     })
     test('should return a code challenge of 43 chracters', async () => {
