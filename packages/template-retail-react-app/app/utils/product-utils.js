@@ -50,9 +50,10 @@ export const getDisplayPrice = (product, opts = {}) => {
     const promotionalPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : null
 
     // if a product has tieredPrices, get the tiered that has the higher closest quantity to current quantity
-    const filteredTiered = product?.tieredPrices?.filter((tiered) => tiered.quantity <= quantity)
+    const filteredTiered =
+        product?.tieredPrices?.filter((tiered) => tiered.quantity <= quantity) || []
     const closestTieredPrice =
-        !filteredTiered.length &&
+        filteredTiered.length &&
         filteredTiered.reduce((prev, curr) => {
             return Math.abs(curr.quantity - quantity) < Math.abs(prev.quantity - quantity)
                 ? curr
