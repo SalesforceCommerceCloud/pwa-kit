@@ -76,7 +76,7 @@ export const getDisplayPrice = (product, opts = {}) => {
     // find the tieredPrice with has the highest value price
     const highestTieredPrice = product?.tieredPrices?.find((tier) => tier.price === maxTieredPrice)
     return {
-        listPrice: highestPriceRange?.maxPrice || highestTieredPrice?.price,
+        listPrice: highestTieredPrice?.price || highestPriceRange?.maxPrice,
         currentPrice
     }
 }
