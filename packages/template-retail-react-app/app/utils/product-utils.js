@@ -63,17 +63,20 @@ export const getDisplayPrice = (product, opts = {}) => {
     // pick the smallest price among these price for the "current" price
     let currentPrice = salePrices?.length ? Math.min(...salePrices) : 0
 
-    let tieredPrices = product?.priceRanges || product?.tieredPrices || []
-    const maxPriceTier = tieredPrices
-        ? Math.max(...tieredPrices.map((item) => item.price || item.maxPrice))
+    // Master product and product set have priceRanges object, the others (variant/standard/bundle) have tieredPrices
+    const maxPriceRange = product?.priceRanges
+        ? Math.max(...product?.priceRanges?.map((item) => item.price || item.maxPrice))
         : 0
-
-    // find the tieredPrice with has the highest value price
-    const highestTieredPrice = tieredPrices?.find(
-        (tier) => tier.price === maxPriceTier || tier.maxPrice === maxPriceTier
+    const highestPriceRange = product?.priceRanges?.find(
+        (range) => range.maxPrice === maxPriceRange
     )
+    const maxTieredPrice = product?.tieredPrices
+        ? Math.max(...product?.tieredPrices?.map((item) => item.price || item.maxPrice))
+        : 0
+    // find the tieredPrice with has the highest value price
+    const highestTieredPrice = product?.tieredPrices?.find((tier) => tier.price === maxTieredPrice)
     return {
-        listPrice: highestTieredPrice?.price || highestTieredPrice?.maxPrice,
+        listPrice: highestPriceRange?.maxPrice || highestTieredPrice?.price,
         currentPrice
     }
 }
