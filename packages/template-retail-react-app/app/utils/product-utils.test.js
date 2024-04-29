@@ -130,7 +130,7 @@ describe('getDisplayPrice', function () {
         expect(currentPrice).toBe(15)
     })
 
-    test('should not pick the discounted when it does not reach the tierd quantity', () => {
+    test('should not pick the discounted tiered when it does not reach the tierd quantity', () => {
         const data = {
             name: 'product name',
             price: 25.6,
