@@ -5,8 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {isEmpty} from 'lodash'
-
 /**
  * Get the human-friendly version of the variation values that users have selected.
  * Useful for displaying these values in the UI.
@@ -54,7 +52,7 @@ export const getDisplayPrice = (product, opts = {}) => {
     // if a product has tieredPrices, get the tiered that has the higher closest quantity to current quantity
     const filteredTiered = product?.tieredPrices?.filter((tiered) => tiered.quantity <= quantity)
     const closestTieredPrice =
-        !isEmpty(filteredTiered) &&
+        !filteredTiered.length &&
         filteredTiered.reduce((prev, curr) => {
             return Math.abs(curr.quantity - quantity) < Math.abs(prev.quantity - quantity)
                 ? curr
