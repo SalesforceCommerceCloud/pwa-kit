@@ -9,7 +9,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl} from 'react-intl'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const DisplayPrice = ({
     strikethroughPrice,
@@ -20,16 +19,15 @@ const DisplayPrice = ({
     strikethroughPriceProps
 }) => {
     const intl = useIntl()
-    const {currency: activeCurrency} = useCurrency()
     const currentPriceText = intl.formatNumber(currentPrice, {
         style: 'currency',
-        currency: currency || activeCurrency
+        currency: currency
     })
     const strikethroughPriceText =
         strikethroughPrice &&
         intl.formatNumber(strikethroughPrice, {
             style: 'currency',
-            currency: currency || activeCurrency
+            currency: currency
         })
     return (
         <Box display={'flex'}>
@@ -81,7 +79,7 @@ const DisplayPrice = ({
 DisplayPrice.propTypes = {
     strikethroughPrice: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     currentPrice: PropTypes.number.isRequired,
-    currency: PropTypes.string,
+    currency: PropTypes.string.isRequired,
     prefixLabel: PropTypes.string,
     strikethroughPriceProps: PropTypes.object,
     currentPriceProps: PropTypes.object

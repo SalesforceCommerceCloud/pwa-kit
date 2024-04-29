@@ -21,7 +21,7 @@ import {
     Fade,
     useTheme
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
 // project components
@@ -111,6 +111,7 @@ const ProductView = forwardRef(
         },
         ref
     ) => {
+        const {currency: activeCurrency} = useCurrency()
         const showToast = useToast()
         const intl = useIntl()
         const location = useLocation()
@@ -305,7 +306,7 @@ const ProductView = forwardRef(
                         listPrice={listPrice}
                         currentPrice={currentPrice}
                         productType={product?.type}
-                        currency={product?.currency}
+                        currency={product?.currency || activeCurrency}
                         category={category}
                     />
                 </Box>
@@ -346,7 +347,7 @@ const ProductView = forwardRef(
                                 listPrice={listPrice}
                                 currentPrice={currentPrice}
                                 productType={product?.type}
-                                currency={product?.currency}
+                                currency={product?.currency || activeCurrency}
                                 category={category}
                             />
                         </Box>

@@ -30,6 +30,7 @@ import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -66,6 +67,7 @@ const ProductTile = (props) => {
         dynamicImageProps,
         ...rest
     } = props
+    const {currency} = useCurrency()
 
     const {image, productId} = product
     // ProductTile is used by two components, RecommendedProducts and ProductList.
@@ -129,6 +131,7 @@ const ProductTile = (props) => {
                               })
                             : null
                     }
+                    currency={currency}
                     currentPriceProps={listPrice > currentPrice ? {as: 'b'} : {as: 'span'}}
                     currentPrice={currentPrice}
                 />
