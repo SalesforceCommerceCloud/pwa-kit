@@ -26,7 +26,7 @@ import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-im
 import {useIntl} from 'react-intl'
 
 // Other
-import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
@@ -91,15 +91,15 @@ const ProductTile = (props) => {
 
     const {listPrice, currentPrice} = getDisplayPrice({...product, ...variant})
     const isASet = product?.hitType === 'set' || !!product?.type?.set
-
+    let productUrl = variant
+        ? rebuildPathWithParams(productUrlBuilder({id: productId}), {
+              ...variant.variationValues,
+              pid: variant.productId
+          })
+        : productUrlBuilder({id: productId})
     return (
         <Box {...styles.container}>
-            <Link
-                data-testid="product-tile"
-                to={productUrlBuilder({id: productId}, intl.local)}
-                {...styles.link}
-                {...rest}
-            >
+            <Link data-testid="product-tile" to={productUrl} {...styles.link} {...rest}>
                 <Box {...styles.imageWrapper}>
                     {image && (
                         <AspectRatio {...styles.image}>
