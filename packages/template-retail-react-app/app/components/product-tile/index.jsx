@@ -5,9 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef} from 'react'
+import React, {useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 // Components
 import {
@@ -21,14 +20,24 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 
+// Project Components
+import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
+import Link from '@salesforce/retail-react-app/app/components/link'
+import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
+import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
+import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
+
 // Hooks
 import {useIntl} from 'react-intl'
 
 // Other
 import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {
+    getVariantValueSwatch,
+    buildVariantValueHref,
+    isVariantValueOrderable
+} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -56,17 +65,59 @@ export const Skeleton = () => {
  * It also supports favourite products, controlled by a heart icon.
  */
 const ProductTile = (props) => {
-    const intl = useIntl()
+    // TODO: Make this a prop!
+    const selectableAttributeIds = ['color']
+
     const {
-        product,
+        dynamicImageProps,
         enableFavourite = false,
         isFavourite,
         onFavouriteToggle,
-        dynamicImageProps,
+        product,
         ...rest
     } = props
-
     const {currency, image, price, productId, hitType} = product
+
+    const intl = useIntl()
+    const {currency: activeCurrency} = useCurrency()
+    const isFavouriteLoading = useRef(false)
+    const styles = useMultiStyleConfig('ProductTile')
+
+    const representedAttributeValues = useMemo(
+        () =>
+            product?.variants.find((variant) => {
+                return variant.productId === product.representedProduct.id
+            })?.variationValues,
+        [product]
+    )
+    const [selectedAttributeValues, setSelectedAttributeValues] = useState(
+        representedAttributeValues
+    )
+
+    const variationAttributes = useMemo(() => {
+        return product?.variationAttributes.map((variationAttribute) => ({
+            ...variationAttribute,
+            values: variationAttribute.values.map((value) => {
+                const params = {
+                    // ...variationParams,
+                    [variationAttribute.id]: value.value
+                }
+
+                return {
+                    ...value,
+                    image: getVariantValueSwatch(product, value),
+                    // href: buildVariantValueHref({
+                    //     pathname: location.pathname,
+                    //     existingParams,
+                    //     newParams: params,
+                    //     productId: product.id,
+                    //     isProductPartOfSet
+                    // }),
+                    orderable: isVariantValueOrderable(product, params)
+                }
+            })
+        }))
+    }, [product])
 
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
@@ -74,9 +125,11 @@ const ProductTile = (props) => {
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
 
-    const {currency: activeCurrency} = useCurrency()
-    const isFavouriteLoading = useRef(false)
-    const styles = useMultiStyleConfig('ProductTile')
+    // TODO:
+    // - Make the variation attribute id configurable
+    // - The useDerivedProduct has a lot of usefulness to it, like adding the image, and href for products
+    //   we need to look to see how we can incorporate it back in here.
+    // - I've removed the orderable logic.. probably should add that back in? maybe?
 
     return (
         <Box {...styles.container}>
@@ -100,6 +153,75 @@ const ProductTile = (props) => {
                         </AspectRatio>
                     )}
                 </Box>
+
+                {/* Swatches */}
+                {variationAttributes
+                    ?.filter(({id}) => selectableAttributeIds.includes(id))
+                    ?.map(({id, values}) => {
+                        const attributeId = id
+                        return (
+                            <SwatchGroup
+                                key={id}
+                                // value={selectedValue?.value}
+                                value={selectedAttributeValues[attributeId]}
+                            >
+                                {values?.map(({id, name, value, image}, index) => {
+                                    console.log('image: ', image)
+                                    const content = image ? (
+                                        <Box
+                                            height="100%"
+                                            width="100%"
+                                            minWidth="32px"
+                                            backgroundRepeat="no-repeat"
+                                            backgroundSize="cover"
+                                            backgroundColor={name.toLowerCase()}
+                                            backgroundImage={`url(${
+                                                image.disBaseLink || image.link
+                                            })`}
+                                        />
+                                    ) : (
+                                        name
+                                    )
+
+                                    // const hasSelection = Boolean(selectedValue?.value)
+                                    const isSelected =
+                                        value === selectedAttributeValues[attributeId]
+                                    console.log(
+                                        'isSelected: ',
+                                        value,
+                                        selectedAttributeValues,
+                                        selectedAttributeValues[attributeId]
+                                    )
+                                    // const isFirst = index === 0
+
+                                    // To mimic the behavior of a native radio input, only
+                                    // one swatch should receive tab focus; the rest can be
+                                    // selected using arrow keys when the swatch group has
+                                    // focus. The focused element is the selected option or
+                                    // the first in the group, if no option is selected.
+                                    // This is a slight difference, for simplicity, from the
+                                    // native element, where the first element is focused on
+                                    // `Tab` and the _last_ element is focused on `Shift+Tab`
+                                    // const isFocusable =
+                                    //     isSelected || (!hasSelection && isFirst)
+
+                                    return (
+                                        <Swatch
+                                            key={value}
+                                            // href={href}
+                                            value={value}
+                                            name={name}
+                                            variant={attributeId === 'color' ? 'circle' : 'square'}
+                                            selected={isSelected}
+                                            // isFocusable={isFocusable}
+                                        >
+                                            {content}
+                                        </Swatch>
+                                    )
+                                })}
+                            </SwatchGroup>
+                        )
+                    })}
 
                 {/* Title */}
                 <Text {...styles.title}>{localizedProductName}</Text>
@@ -197,7 +319,10 @@ ProductTile.propTypes = {
         // Note: useEinstein() transforms snake_case property names from the API response to camelCase
         productName: PropTypes.string,
         productId: PropTypes.string,
-        hitType: PropTypes.string
+        representedProduct: PropTypes.object,
+        hitType: PropTypes.string,
+        variationAttributes: PropTypes.array,
+        variants: PropTypes.array
     }),
     /**
      * Enable adding/removing product as a favourite.

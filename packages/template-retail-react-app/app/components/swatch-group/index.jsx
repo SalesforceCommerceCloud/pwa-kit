@@ -24,16 +24,18 @@ const SwatchGroup = (props) => {
     const styles = useStyleConfig('SwatchGroup')
     return (
         <Flex {...styles.swatchGroup} role="radiogroup" aria-label={label}>
-            <HStack {...styles.swatchLabel}>
-                <Box fontWeight="semibold">
-                    <FormattedMessage
-                        id="swatch_group.selected.label"
-                        defaultMessage="{label}:"
-                        values={{label}}
-                    />
-                </Box>
-                <Box>{displayName}</Box>
-            </HStack>
+            {label && (
+                <HStack {...styles.swatchLabel}>
+                    <Box fontWeight="semibold">
+                        <FormattedMessage
+                            id="swatch_group.selected.label"
+                            defaultMessage="{label}:"
+                            values={{label}}
+                        />
+                    </Box>
+                    <Box>{displayName}</Box>
+                </HStack>
+            )}
             <Flex {...styles.swatchesWrapper}>{children}</Flex>
         </Flex>
     )

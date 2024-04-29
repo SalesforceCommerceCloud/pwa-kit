@@ -23,7 +23,7 @@ import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp
  * @param {Object} variationValue
  * @returns {Object} image
  */
-const getVariantValueSwatch = (product, variationValue) => {
+export const getVariantValueSwatch = (product, variationValue) => {
     const {imageGroups = []} = product
 
     const imageGroup = imageGroups
@@ -48,7 +48,7 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} location
  * @returns {String} a product url for the current variation value.
  */
-const buildVariantValueHref = ({
+export const buildVariantValueHref = ({
     pathname,
     existingParams,
     newParams,
@@ -76,7 +76,7 @@ const buildVariantValueHref = ({
  * @param {Object} variationParams
  * @returns
  */
-const isVariantValueOrderable = (product, variationParams) => {
+export const isVariantValueOrderable = (product, variationParams) => {
     return product.variants
         .filter(({variationValues}) =>
             Object.keys(variationParams).every(
