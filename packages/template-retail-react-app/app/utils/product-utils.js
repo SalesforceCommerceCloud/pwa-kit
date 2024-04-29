@@ -65,13 +65,13 @@ export const getDisplayPrice = (product, opts = {}) => {
 
     // Master product and product set have priceRanges object, the others (variant/standard/bundle) have tieredPrices
     const maxPriceRange = product?.priceRanges
-        ? Math.max(...product?.priceRanges?.map((item) => item.price || item.maxPrice))
+        ? Math.max(...(product?.priceRanges || []).map((item) => item.price || item.maxPrice))
         : 0
     const highestPriceRange = product?.priceRanges?.find(
         (range) => range.maxPrice === maxPriceRange
     )
     const maxTieredPrice = product?.tieredPrices
-        ? Math.max(...product?.tieredPrices?.map((item) => item.price || item.maxPrice))
+        ? Math.max(...(product?.tieredPrices || []).map((item) => item.price || item.maxPrice))
         : 0
     // find the tieredPrice with has the highest value price
     const highestTieredPrice = product?.tieredPrices?.find((tier) => tier.price === maxTieredPrice)
