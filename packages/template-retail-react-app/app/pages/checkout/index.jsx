@@ -62,11 +62,6 @@ const Checkout = () => {
         setIsLoading(true)
         try {
             const order = await createOrder({
-                // We send the SLAS usid via this header. This is required by ECOM to map
-                // Einstein events sent via the API with the finishOrder event fired by ECOM
-                // when an Order transitions from Created to New status.
-                // Without this, various order conversion metrics will not appear on reports and dashboards
-                headers: {_sfdc_customer_id: usid},
                 body: {basketId: basket.basketId}
             })
             navigate(`/checkout/confirmation/${order.orderNo}`)

@@ -38,9 +38,10 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 
 // Constants
 import {
-    MAX_CACHE_AGE,
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
-    HOME_SHOP_PRODUCTS_LIMIT
+    HOME_SHOP_PRODUCTS_LIMIT,
+    MAX_CACHE_AGE,
+    STALE_WHILE_REVALIDATE
 } from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
@@ -58,7 +59,10 @@ const Home = () => {
 
     const {res} = useServerContext()
     if (res) {
-        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
+        res.set(
+            'Cache-Control',
+            `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
+        )
     }
 
     const {data: productSearchResult, isLoading} = useProductSearch({

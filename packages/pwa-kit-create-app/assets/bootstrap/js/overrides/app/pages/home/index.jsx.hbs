@@ -25,10 +25,11 @@ import useEinstein from '{{preset.templateSource.id}}/app/hooks/use-einstein'
 
 // Constants
 import {
-    MAX_CACHE_AGE,
+    CUSTOM_HOME_TITLE,
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT,
-    CUSTOM_HOME_TITLE
+    MAX_CACHE_AGE,
+    STALE_WHILE_REVALIDATE
 } from '../../constants'
 
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
@@ -51,7 +52,10 @@ const Home = () => {
     // and these objects are undefined on the client side.
     const {res} = useServerContext()
     if (res) {
-        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
+        res.set(
+            'Cache-Control',
+            `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate={STALE_WHILE_REVALIDATE}`
+        )
     }
 
     const {data: productSearchResult, isLoading} = useProductSearch({

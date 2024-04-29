@@ -678,6 +678,21 @@ export const RemoteServerFactory = {
                     if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
+                },
+                onProxyRes: (proxyRes, req) => {
+                    if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
+                        console.error(
+                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`
+                        )
+                        console.error(
+                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`
+                        )
+                        console.error(
+                            `SLAS Private Client Proxy Request URL - ${req.protocol}://${req.get(
+                                'host'
+                            )}${req.originalUrl}`
+                        )
+                    }
                 }
             })
         )
