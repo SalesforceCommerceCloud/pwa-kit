@@ -102,7 +102,7 @@ describe('getDisplayPrice', function () {
         expect(currentPrice).toBe(25.6)
     })
 
-    test('returns pick the closest tieredPrices for product currentPrice if quantity is more than 1', () => {
+    test('returns pick the closest tieredPrices for product currentPrice quantity', () => {
         const data = {
             name: 'product name',
             price: 25.6,
@@ -128,5 +128,67 @@ describe('getDisplayPrice', function () {
 
         expect(listPrice).toBe(30.6)
         expect(currentPrice).toBe(15)
+    })
+
+    test('should not pick the discounted when it does not reach the tierd quantity', () => {
+        const data = {
+            name: 'product name',
+            price: 25.6,
+            tieredPrices: [
+                {
+                    price: 30.6,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 25.6,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                },
+                {
+                    price: 15,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 10
+                }
+            ]
+        }
+        const {listPrice, currentPrice} = getDisplayPrice(data, {quantity: 9})
+
+        expect(listPrice).toBe(30.6)
+        expect(currentPrice).toBe(25.6)
+    })
+
+    test('returns pick the promotional Price for product currentPrice when it is the lowest price among other sale prices', () => {
+        const data = {
+            name: 'product name',
+            price: 25.6,
+            productPromotions: [
+                {
+                    promotionalPrice: 10.99,
+                    id: 'promotional-price'
+                }
+            ],
+            tieredPrices: [
+                {
+                    price: 30.6,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 25.6,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                },
+                {
+                    price: 15,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 10
+                }
+            ]
+        }
+        const {listPrice, currentPrice} = getDisplayPrice(data, {quantity: 11})
+
+        expect(listPrice).toBe(30.6)
+        expect(currentPrice).toBe(10.99)
     })
 })
