@@ -29,6 +29,12 @@
       "value": "주소 추가"
     }
   ],
+  "account_addresses.info.address_removed": [
+    {
+      "type": 0,
+      "value": "주소가 제거됨"
+    }
+  ],
   "account_addresses.info.address_updated": [
     {
       "type": 0,
@@ -143,6 +149,24 @@
       "value": "주문 내역으로 돌아가기"
     }
   ],
+  "account_order_detail.shipping_status.not_shipped": [
+    {
+      "type": 0,
+      "value": "출고되지 않음"
+    }
+  ],
+  "account_order_detail.shipping_status.part_shipped": [
+    {
+      "type": 0,
+      "value": "부분 출고됨"
+    }
+  ],
+  "account_order_detail.shipping_status.shipped": [
+    {
+      "type": 0,
+      "value": "출고됨"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,
@@ -217,36 +241,6 @@
     {
       "type": 0,
       "value": "주문 내역"
-    }
-  ],
-  "account_payment_methods.button.add_method": [
-    {
-      "type": 0,
-      "value": "결제 방법 추가"
-    }
-  ],
-  "account_payment_methods.description.add_method_for_faster_checkout": [
-    {
-      "type": 0,
-      "value": "빠른 체크아웃을 위해 새 결제 방법을 추가합니다."
-    }
-  ],
-  "account_payment_methods.heading.no_saved_methods": [
-    {
-      "type": 0,
-      "value": "저장된 결제 방법 없음"
-    }
-  ],
-  "account_payment_methods.info.new_method_saved": [
-    {
-      "type": 0,
-      "value": "새 결제 방법 저장됨"
-    }
-  ],
-  "account_payment_methods.title.payment_methods": [
-    {
-      "type": 0,
-      "value": "결제 방법"
     }
   ],
   "account_wishlist.button.continue_shopping": [
@@ -361,6 +355,12 @@
       "value": "추천 상품"
     }
   ],
+  "auth_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "로그인 양식 닫기"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -411,10 +411,16 @@
       "value": "암호 재설정"
     }
   ],
-  "card_payment_form.heading.new_payment_method": [
+  "carousel.button.scroll_left.assistive_msg": [
     {
       "type": 0,
-      "value": "새 결제 방법 추가"
+      "value": "회전식 보기 왼쪽으로 스크롤"
+    }
+  ],
+  "carousel.button.scroll_right.assistive_msg": [
+    {
+      "type": 0,
+      "value": "회전식 보기 오른쪽으로 스크롤"
     }
   ],
   "cart.info.removed_from_cart": [
@@ -463,12 +469,6 @@
     {
       "type": 0,
       "value": "선물로 구매"
-    }
-  ],
-  "cart_secondary_button_group.link_learn_more": [
-    {
-      "type": 0,
-      "value": "자세히 알아보기"
     }
   ],
   "cart_skeleton.heading.order_summary": [
@@ -767,6 +767,16 @@
       "value": "Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
     }
   ],
+  "checkout_header.link.assistive_msg.cart": [
+    {
+      "type": 0,
+      "value": "카트로 돌아가기, 품목 수: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
+    }
+  ],
   "checkout_header.link.cart": [
     {
       "type": 0,
@@ -809,6 +819,24 @@
       "value": "결제"
     }
   ],
+  "colorRefinements.label.hitCount": [
+    {
+      "type": 1,
+      "value": "colorLabel"
+    },
+    {
+      "type": 0,
+      "value": "("
+    },
+    {
+      "type": 1,
+      "value": "colorHitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "confirmation_modal.default.action.no": [
     {
       "type": 0,
@@ -839,10 +867,22 @@
       "value": "아니요. 항목을 그대로 둡니다."
     }
   ],
+  "confirmation_modal.remove_cart_item.action.remove": [
+    {
+      "type": 0,
+      "value": "제거"
+    }
+  ],
   "confirmation_modal.remove_cart_item.action.yes": [
     {
       "type": 0,
       "value": "예. 항목을 제거합니다."
+    }
+  ],
+  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": [
+    {
+      "type": 0,
+      "value": "더 이상 온라인으로 구매할 수 없는 일부 품목이 카트에서 제거됩니다."
     }
   ],
   "confirmation_modal.remove_cart_item.message.sure_to_remove": [
@@ -855,6 +895,12 @@
     {
       "type": 0,
       "value": "항목 제거 확인"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.title.items_unavailable": [
+    {
+      "type": 0,
+      "value": "품목 구매 불가"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.no": [
@@ -935,6 +981,12 @@
       "value": "이 4자리 코드는 카드의 전면에서 확인할 수 있습니다."
     }
   ],
+  "credit_card_fields.tool_tip.security_code_aria_label": [
+    {
+      "type": 0,
+      "value": "보안 코드 정보"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -963,12 +1015,6 @@
     {
       "type": 0,
       "value": "주문 내역"
-    }
-  ],
-  "drawer_menu.button.payment_methods": [
-    {
-      "type": 0,
-      "value": "결제 방법"
     }
   ],
   "drawer_menu.link.about_us": [
@@ -1129,6 +1175,18 @@
       "value": "탑셀러"
     }
   ],
+  "field.password.assistive_msg.hide_password": [
+    {
+      "type": 0,
+      "value": "암호 숨기기"
+    }
+  ],
+  "field.password.assistive_msg.show_password": [
+    {
+      "type": 0,
+      "value": "암호 표시"
+    }
+  ],
   "footer.column.account": [
     {
       "type": 0,
@@ -1255,12 +1313,6 @@
       "value": "주문 내역"
     }
   ],
-  "global.account.link.payment_methods": [
-    {
-      "type": 0,
-      "value": "결제 방법"
-    }
-  ],
   "global.account.link.wishlist": [
     {
       "type": 0,
@@ -1311,6 +1363,12 @@
       "value": "이 위시리스트에 추가됨"
     }
   ],
+  "global.info.already_in_wishlist": [
+    {
+      "type": 0,
+      "value": "이미 위시리스트에 추가한 품목"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
@@ -1341,10 +1399,20 @@
       "value": "내 계정"
     }
   ],
-  "header.button.assistive_msg.my_cart": [
+  "header.button.assistive_msg.my_account_menu": [
     {
       "type": 0,
-      "value": "내 카트"
+      "value": "계정 메뉴 열기"
+    }
+  ],
+  "header.button.assistive_msg.my_cart_with_num_items": [
+    {
+      "type": 0,
+      "value": "내 카트, 품목 수: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
     }
   ],
   "header.button.assistive_msg.wishlist": [
@@ -1380,7 +1448,7 @@
   "home.description.here_to_help": [
     {
       "type": 0,
-      "value": "지원 담당자에게 문의하십시오."
+      "value": "지원 담당자에게 문의하세요."
     }
   ],
   "home.description.here_to_help_line_2": [
@@ -1392,7 +1460,7 @@
   "home.description.shop_products": [
     {
       "type": 0,
-      "value": "이 섹션에는 카탈로그의 컨텐츠가 포함되어 있습니다. 대체하는 방법을 안내하는 "
+      "value": "이 섹션에는 카탈로그의 컨텐츠가 포함되어 있습니다. 대체하는 방법은 "
     },
     {
       "type": 1,
@@ -1400,7 +1468,7 @@
     },
     {
       "type": 0,
-      "value": "입니다."
+      "value": "에서 확인하세요."
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1412,7 +1480,7 @@
   "home.features.description.components": [
     {
       "type": 0,
-      "value": "이용이 간편한 모듈식 React 구성요소 라이브러리인 React Chakra UI를 사용하여 구축되었습니다."
+      "value": "이용이 간편한 모듈식 React 구성요소 라이브러리인 Chakra UI를 사용하여 구축되었습니다."
     }
   ],
   "home.features.description.einstein_recommendations": [
@@ -1466,7 +1534,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login 및 API Access Service(SLAS)"
+      "value": "Shopper Login and API Access Service(SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1532,7 +1600,13 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "리테일용 React PWA 스타터 스토어"
+      "value": "소매점용 React PWA Starter Store"
+    }
+  ],
+  "icons.assistive_msg.lock": [
+    {
+      "type": 0,
+      "value": "보안"
     }
   ],
   "item_attributes.label.promotions": [
@@ -1557,10 +1631,28 @@
       "value": "판매"
     }
   ],
+  "item_image.label.unavailable": [
+    {
+      "type": 0,
+      "value": "사용 불가"
+    }
+  ],
+  "item_price.label.starting_at": [
+    {
+      "type": 0,
+      "value": "시작가"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,
-      "value": "위에서 옵션을 모두 선택하십시오."
+      "value": "위에서 옵션을 모두 선택하세요."
+    }
+  ],
+  "list_menu.nav.assistive_msg": [
+    {
+      "type": 0,
+      "value": "기본 탐색 메뉴"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2077,10 +2169,22 @@
       "value": "다음"
     }
   ],
+  "pagination.link.next.assistive_msg": [
+    {
+      "type": 0,
+      "value": "다음 페이지"
+    }
+  ],
   "pagination.link.prev": [
     {
       "type": 0,
       "value": "이전"
+    }
+  ],
+  "pagination.link.prev.assistive_msg": [
+    {
+      "type": 0,
+      "value": "이전 페이지"
     }
   ],
   "password_card.info.password_updated": [
@@ -2131,28 +2235,10 @@
       "value": "대문자 1개"
     }
   ],
-  "payment_selection.button.save_and_continue": [
-    {
-      "type": 0,
-      "value": "저장하고 계속하기"
-    }
-  ],
-  "payment_selection.heading.add_new_card": [
-    {
-      "type": 0,
-      "value": "새 카드 추가"
-    }
-  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "신용카드"
-    }
-  ],
-  "payment_selection.message.select_payment_method": [
-    {
-      "type": 0,
-      "value": "결제 방법을 선택십시오."
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2265,6 +2351,70 @@
       "value": "필터"
     }
   ],
+  "product_list.refinements.button.assistive_msg.add_filter": [
+    {
+      "type": 0,
+      "value": "필터 추가: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "필터 추가: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": "("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter": [
+    {
+      "type": 0,
+      "value": "필터 제거: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "필터 제거: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": "("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "product_list.select.sort_by": [
     {
       "type": 0,
@@ -2275,10 +2425,66 @@
       "value": "sortOption"
     }
   ],
-  "product_tile.assistive_msg.wishlist": [
+  "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
-      "value": "위시리스트"
+      "value": "제품 왼쪽으로 스크롤"
+    }
+  ],
+  "product_scroller.assistive_msg.scroll_right": [
+    {
+      "type": 0,
+      "value": "제품 오른쪽으로 스크롤"
+    }
+  ],
+  "product_tile.assistive_msg.add_to_wishlist": [
+    {
+      "type": 0,
+      "value": "위시리스트에 "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " 추가"
+    }
+  ],
+  "product_tile.assistive_msg.remove_from_wishlist": [
+    {
+      "type": 0,
+      "value": "위시리스트에서 "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " 제거"
+    }
+  ],
+  "product_tile.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "시작가: "
+    },
+    {
+      "type": 1,
+      "value": "price"
+    }
+  ],
+  "product_view.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "카트에 세트 추가"
+    }
+  ],
+  "product_view.button.add_set_to_wishlist": [
+    {
+      "type": 0,
+      "value": "위시리스트에 세트 추가"
     }
   ],
   "product_view.button.add_to_cart": [
@@ -2299,10 +2505,46 @@
       "value": "업데이트"
     }
   ],
+  "product_view.label.assistive_msg.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "수량 줄이기"
+    }
+  ],
+  "product_view.label.assistive_msg.quantity_increment": [
+    {
+      "type": 0,
+      "value": "수량 늘리기"
+    }
+  ],
   "product_view.label.quantity": [
     {
       "type": 0,
       "value": "수량"
+    }
+  ],
+  "product_view.label.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "−"
+    }
+  ],
+  "product_view.label.quantity_increment": [
+    {
+      "type": 0,
+      "value": "+"
+    }
+  ],
+  "product_view.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "시작가"
+    }
+  ],
+  "product_view.label.variant_type": [
+    {
+      "type": 1,
+      "value": "variantType"
     }
   ],
   "product_view.link.full_details": [
@@ -2351,6 +2593,12 @@
     {
       "type": 0,
       "value": "적용"
+    }
+  ],
+  "promo_popover.assistive_msg.info": [
+    {
+      "type": 0,
+      "value": "정보"
     }
   ],
   "promo_popover.heading.promo_applied": [
@@ -2505,6 +2753,12 @@
       "value": "취소"
     }
   ],
+  "selected_refinements.action.assistive_msg.clear_all": [
+    {
+      "type": 0,
+      "value": "필터 모두 지우기"
+    }
+  ],
   "selected_refinements.action.clear_all": [
     {
       "type": 0,
@@ -2607,6 +2861,16 @@
       "value": "로그아웃하시겠습니까? 현재 주문을 처리하려면 다시 로그인해야 합니다."
     }
   ],
+  "swatch_group.selected.label": [
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    }
+  ],
   "toggle_card.action.edit": [
     {
       "type": 0,
@@ -2639,12 +2903,8 @@
   ],
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
-      "type": 1,
-      "value": "postalOrZip"
-    },
-    {
       "type": 0,
-      "value": "를 입력하십시오."
+      "value": "우편번호를 입력하십시오."
     }
   ],
   "use_address_fields.error.please_select_your_address": [
@@ -2667,12 +2927,8 @@
   ],
   "use_address_fields.error.please_select_your_state_or_province": [
     {
-      "type": 1,
-      "value": "stateOrProvince"
-    },
-    {
       "type": 0,
-      "value": "를 선택하십시오."
+      "value": "시/도를 선택하십시오."
     }
   ],
   "use_address_fields.error.required": [
@@ -2691,6 +2947,12 @@
     {
       "type": 0,
       "value": "주소"
+    }
+  ],
+  "use_address_fields.label.address_form": [
+    {
+      "type": 0,
+      "value": "주소 양식"
     }
   ],
   "use_address_fields.label.city": [
@@ -3109,16 +3371,28 @@
       "value": "새 암호"
     }
   ],
+  "wishlist_primary_action.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "카트에 세트 추가"
+    }
+  ],
   "wishlist_primary_action.button.add_to_cart": [
     {
       "type": 0,
       "value": "카트에 추가"
     }
   ],
-  "wishlist_primary_action.button.select_options": [
+  "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
-      "value": "옵션 선택"
+      "value": "전체 세부 정보 보기"
+    }
+  ],
+  "wishlist_primary_action.button.view_options": [
+    {
+      "type": 0,
+      "value": "옵션 보기"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
