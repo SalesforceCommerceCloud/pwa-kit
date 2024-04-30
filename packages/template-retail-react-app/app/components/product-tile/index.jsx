@@ -98,7 +98,7 @@ const ProductTile = (props) => {
         // TODO: Once this is working, lets make it a utility.
         const opts = {
             viewType: 'large',
-            selectedAttributeId: 'color',
+            selectedAttributeId: selectableAttributeId,
             selectedAttributeValue: selectableAttributeValue
         }
         const {selectedAttributeId, selectedAttributeValue, viewType} = opts
@@ -119,11 +119,6 @@ const ProductTile = (props) => {
         return product?.variationAttributes.map((variationAttribute) => ({
             ...variationAttribute,
             values: variationAttribute.values.map((value) => {
-                const params = {
-                    // ...variationParams,
-                    [variationAttribute.id]: value.value
-                }
-
                 return {
                     ...value,
                     image: getVariantValueSwatch(product, value),
