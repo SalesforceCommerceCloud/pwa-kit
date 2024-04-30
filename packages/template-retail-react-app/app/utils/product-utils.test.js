@@ -59,24 +59,24 @@ describe('getDisplayPrice', function () {
     test('returns listPrice and currentPrice for product that has only priceRanges', () => {
         const data = {
             name: 'product name',
-            price: 37.76,
+            price: 30.76,
             priceRanges: [
                 {
                     maxPrice: 40.76,
-                    minPrice: 30.76,
+                    minPrice: 35.76,
                     pricebook: 'gbp-m-list-prices'
                 },
                 {
                     maxPrice: 37.76,
-                    minPrice: 37.76,
+                    minPrice: 30.76,
                     pricebook: 'gbp-m-sale-prices'
                 }
             ]
         }
         const {listPrice, currentPrice} = getDisplayPrice(data)
 
-        expect(listPrice).toBe(40.76)
-        expect(currentPrice).toBe(37.76)
+        expect(listPrice).toBe(35.76)
+        expect(currentPrice).toBe(30.76)
     })
 
     test('returns listPrice and currentPrice for product that has only tieredPrices', () => {

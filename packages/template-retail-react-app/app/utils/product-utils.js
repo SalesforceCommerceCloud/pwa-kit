@@ -63,20 +63,24 @@ export const getDisplayPrice = (product, opts = {}) => {
     // pick the smallest price among these price for the "current" price
     let currentPrice = salePrices?.length ? Math.min(...salePrices) : 0
 
-    // Master product and product set have priceRanges object, the others (variant/standard/bundle) have tieredPrices
+    // Master product and product set have priceRanges object
+    // the price returned from API is the smallest price among price book
+    // to figure out what is the original price, we find the lastest minPrice among the books
     const maxPriceRange = product?.priceRanges
-        ? Math.max(...(product?.priceRanges || []).map((item) => item.price || item.maxPrice))
+        ? Math.max(...(product?.priceRanges || []).map((item) => item.minPrice))
         : 0
     const highestPriceRange = product?.priceRanges?.find(
-        (range) => range.maxPrice === maxPriceRange
+        (range) => range.minPrice === maxPriceRange
     )
+    // for standard/variant/bundle product, they dont have priceRanges, only tieredPrices
+    // since the price is the lowest value returned from the API, each product will have at lease a single item tiered price
+    // the highest value of tieredPrices is presumptively the list price
     const maxTieredPrice = product?.tieredPrices
-        ? Math.max(...(product?.tieredPrices || []).map((item) => item.price || item.maxPrice))
+        ? Math.max(...(product?.tieredPrices || []).map((item) => item.price))
         : 0
-    // find the tieredPrice with has the highest value price
     const highestTieredPrice = product?.tieredPrices?.find((tier) => tier.price === maxTieredPrice)
     return {
-        listPrice: highestTieredPrice?.price || highestPriceRange?.maxPrice,
+        listPrice: highestTieredPrice?.price || highestPriceRange?.minPrice,
         currentPrice
     }
 }
