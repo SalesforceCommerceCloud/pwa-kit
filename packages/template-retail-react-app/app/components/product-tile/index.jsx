@@ -66,7 +66,7 @@ export const Skeleton = () => {
  */
 const ProductTile = (props) => {
     // TODO: Make this a prop!
-    const selectableAttributeIds = ['color']
+    const selectableAttributeId = 'color'
 
     const {
         dynamicImageProps,
@@ -86,43 +86,34 @@ const ProductTile = (props) => {
     // and it isn't always a variation. Maybe...
     const {currency, imageGroups, price, productId, hitType} = product
 
-    // const representedVariation = useMemo(
-    //     () =>
-    //         product?.variants.find((variant) => {
-    //             return variant.productId == product.representedProduct.id
-    //         })
-    //     [product]
-    // )
     const representedVariation = product?.variants.find((variant) => {
         return variant.productId == product.representedProduct.id
     })
     
-    const [selectedAttributeValues, setSelectedAttributeValues] = useState(
-        representedVariation?.variationValues || {}
+    const [selectableAttributeValue, setSelectableAttributeValue] = useState(
+        representedVariation?.variationValues?.[selectableAttributeId]
     )
 
     const image = useMemo(() => {
         // TODO: Once this is working, lets make it a utility.
         const opts = {
             viewType: 'large',
-            attributeValues: selectedAttributeValues
+            selectedAttributeId: 'color',
+            selectedAttributeValue: selectableAttributeValue
         }
-        const {attributeValues, viewType} = opts
-        debugger
+        const {selectedAttributeId, selectedAttributeValue, viewType} = opts
+        
         return imageGroups
             ?.filter((group) => group.viewType === viewType)
-            ?.filter(
-                ({variationAttributes = []}) => 
-                    variationAttributes
-                        .filter(({id, values}) => {
-                            // TODO: This needs to be made more generic
-                            return !!attributeValues[id] && values.find(({value}) => value === attributeValues?.[id]) 
-                        })
-                    ) > 0
+            ?.filter(({variationAttributes = []}) => 
+                variationAttributes.some(({id, values}) => 
+                    id === selectedAttributeId && !!values.find(({value}) => value === selectedAttributeValue)
+                )
+            )
             ?.[0] // First matched image group
             ?.images[0] // First image
 
-    }, [selectedAttributeValues])
+    }, [selectableAttributeValue])
 
     const variationAttributes = useMemo(() => {
         return product?.variationAttributes.map((variationAttribute) => ({
@@ -183,7 +174,7 @@ const ProductTile = (props) => {
 
                 {/* Swatches */}
                 {variationAttributes
-                    ?.filter(({id}) => selectableAttributeIds.includes(id))
+                    ?.filter(({id}) => selectableAttributeId == id)
                     ?.map(({id, values}) => {
                         const attributeId = id
                         return (
@@ -209,16 +200,11 @@ const ProductTile = (props) => {
                                         <Swatch
                                             key={value}
                                             // href={href}
-                                            onClick={(key, value) => {
-                                                setSelectedAttributeValues({
-                                                    ...selectedAttributeValues,
-                                                    [key]: value
-                                                })
-                                            }}
+                                            onClick={(key, value) => setSelectableAttributeValue(value)}
                                             value={value}
                                             name={name}
                                             variant={attributeId === 'color' ? 'circle' : 'square'}
-                                            selected={value === selectedAttributeValues[attributeId]}
+                                            selected={value === selectableAttributeValue}
                                         >
                                             {content}
                                         </Swatch>
@@ -228,7 +214,6 @@ const ProductTile = (props) => {
                         )
                     })}
 
-                <div>{JSON.stringify(selectedAttributeValues || {})}</div>
                 {/* Title */}
                 <Text {...styles.title}>{localizedProductName}</Text>
 
