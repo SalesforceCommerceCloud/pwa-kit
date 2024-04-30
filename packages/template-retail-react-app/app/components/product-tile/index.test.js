@@ -72,13 +72,13 @@ test('renders strike through price with set product', () => {
     )
     expect(getByText(/Winter Look/i)).toBeInTheDocument()
     expect(getByText(/from/i)).toBeInTheDocument()
+    expect(getByText(/£40\.16/i)).toBeInTheDocument()
     expect(getByText(/£44\.16/i)).toBeInTheDocument()
-    expect(getByText(/£101\.76/i)).toBeInTheDocument()
 
     const currentPriceTag = container.querySelectorAll('b')
     const strikethroughPriceTag = container.querySelectorAll('s')
-    expect(within(currentPriceTag[0]).getByText(/£44\.16/i)).toBeDefined()
-    expect(within(strikethroughPriceTag[0]).getByText(/£101\.76/i)).toBeDefined()
+    expect(within(currentPriceTag[0]).getByText(/£40\.16/i)).toBeDefined()
+    expect(within(strikethroughPriceTag[0]).getByText(/£44\.16/i)).toBeDefined()
     expect(currentPriceTag).toHaveLength(1)
     expect(strikethroughPriceTag).toHaveLength(1)
 })
@@ -118,7 +118,7 @@ const mockProductSearchItemSet = {
         title: 'Winter Look, '
     },
     orderable: true,
-    price: 44.16,
+    price: 40.16,
     priceMax: 71.03,
     pricePerUnit: 44.16,
     pricePerUnitMax: 71.03,
@@ -130,7 +130,7 @@ const mockProductSearchItemSet = {
         },
         {
             maxPrice: 71.03,
-            minPrice: 44.16,
+            minPrice: 40.16,
             pricebook: 'gbp-m-sale-prices'
         }
     ],
