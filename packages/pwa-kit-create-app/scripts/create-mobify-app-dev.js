@@ -124,7 +124,7 @@ const runGenerator = () => {
 
     const extension = process.platform === 'win32' ? '.cmd' : ''
     const npm = `npm${extension}`
-    const foundNpm = cp.spawnSync(npm, ['-v']).stdout.toString().trim()
+    const foundNpm = cp.spawnSync(npm, ['-v'], { shell: true }).stdout.toString().trim()
     const flags = semver.satisfies(foundNpm, '>=7') ? '-y' : ''
 
     const pathToNpxCache = p.join(sh.exec('npm config get cache', {silent: true}).trim(), '_npx')
