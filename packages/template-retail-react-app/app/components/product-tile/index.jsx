@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useMemo, useRef, useState} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 
 // Components
@@ -35,8 +35,8 @@ import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {
     getVariantValueSwatch,
-    buildVariantValueHref,
-    isVariantValueOrderable
+    // buildVariantValueHref,
+    // isVariantValueOrderable
 } from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
@@ -76,23 +76,53 @@ const ProductTile = (props) => {
         product,
         ...rest
     } = props
-    const {currency, image, price, productId, hitType} = product
 
     const intl = useIntl()
     const {currency: activeCurrency} = useCurrency()
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
 
-    const representedAttributeValues = useMemo(
-        () =>
-            product?.variants.find((variant) => {
-                return variant.productId === product.representedProduct.id
-            })?.variationValues,
-        [product]
-    )
+    // NOTE: Here I use the terminology "currentProduct" because there are various types of projects
+    // and it isn't always a variation. Maybe...
+    const {currency, imageGroups, price, productId, hitType} = product
+
+    // const representedVariation = useMemo(
+    //     () =>
+    //         product?.variants.find((variant) => {
+    //             return variant.productId == product.representedProduct.id
+    //         })
+    //     [product]
+    // )
+    const representedVariation = product?.variants.find((variant) => {
+        return variant.productId == product.representedProduct.id
+    })
+    
     const [selectedAttributeValues, setSelectedAttributeValues] = useState(
-        representedAttributeValues
+        representedVariation?.variationValues || {}
     )
+
+    const image = useMemo(() => {
+        // TODO: Once this is working, lets make it a utility.
+        const opts = {
+            viewType: 'large',
+            attributeValues: selectedAttributeValues
+        }
+        const {attributeValues, viewType} = opts
+        debugger
+        return imageGroups
+            ?.filter((group) => group.viewType === viewType)
+            ?.filter(
+                ({variationAttributes = []}) => 
+                    variationAttributes
+                        .filter(({id, values}) => {
+                            // TODO: This needs to be made more generic
+                            return !!attributeValues[id] && values.find(({value}) => value === attributeValues?.[id]) 
+                        })
+                    ) > 0
+            ?.[0] // First matched image group
+            ?.images[0] // First image
+
+    }, [selectedAttributeValues])
 
     const variationAttributes = useMemo(() => {
         return product?.variationAttributes.map((variationAttribute) => ({
@@ -113,7 +143,7 @@ const ProductTile = (props) => {
                     //     productId: product.id,
                     //     isProductPartOfSet
                     // }),
-                    orderable: isVariantValueOrderable(product, params)
+                    // orderable: isVariantValueOrderable(product, params)
                 }
             })
         }))
@@ -127,9 +157,6 @@ const ProductTile = (props) => {
 
     // TODO:
     // - Make the variation attribute id configurable
-    // - The useDerivedProduct has a lot of usefulness to it, like adding the image, and href for products
-    //   we need to look to see how we can incorporate it back in here.
-    // - I've removed the orderable logic.. probably should add that back in? maybe?
 
     return (
         <Box {...styles.container}>
@@ -160,13 +187,8 @@ const ProductTile = (props) => {
                     ?.map(({id, values}) => {
                         const attributeId = id
                         return (
-                            <SwatchGroup
-                                key={id}
-                                // value={selectedValue?.value}
-                                value={selectedAttributeValues[attributeId]}
-                            >
+                            <SwatchGroup key={id}>
                                 {values?.map(({id, name, value, image}, index) => {
-                                    console.log('image: ', image)
                                     const content = image ? (
                                         <Box
                                             height="100%"
@@ -182,38 +204,21 @@ const ProductTile = (props) => {
                                     ) : (
                                         name
                                     )
-
-                                    // const hasSelection = Boolean(selectedValue?.value)
-                                    const isSelected =
-                                        value === selectedAttributeValues[attributeId]
-                                    console.log(
-                                        'isSelected: ',
-                                        value,
-                                        selectedAttributeValues,
-                                        selectedAttributeValues[attributeId]
-                                    )
-                                    // const isFirst = index === 0
-
-                                    // To mimic the behavior of a native radio input, only
-                                    // one swatch should receive tab focus; the rest can be
-                                    // selected using arrow keys when the swatch group has
-                                    // focus. The focused element is the selected option or
-                                    // the first in the group, if no option is selected.
-                                    // This is a slight difference, for simplicity, from the
-                                    // native element, where the first element is focused on
-                                    // `Tab` and the _last_ element is focused on `Shift+Tab`
-                                    // const isFocusable =
-                                    //     isSelected || (!hasSelection && isFirst)
-
+                                    
                                     return (
                                         <Swatch
                                             key={value}
                                             // href={href}
+                                            onClick={(key, value) => {
+                                                setSelectedAttributeValues({
+                                                    ...selectedAttributeValues,
+                                                    [key]: value
+                                                })
+                                            }}
                                             value={value}
                                             name={name}
                                             variant={attributeId === 'color' ? 'circle' : 'square'}
-                                            selected={isSelected}
-                                            // isFocusable={isFocusable}
+                                            selected={value === selectedAttributeValues[attributeId]}
                                         >
                                             {content}
                                         </Swatch>
@@ -223,6 +228,7 @@ const ProductTile = (props) => {
                         )
                     })}
 
+                <div>{JSON.stringify(selectedAttributeValues || {})}</div>
                 {/* Title */}
                 <Text {...styles.title}>{localizedProductName}</Text>
 

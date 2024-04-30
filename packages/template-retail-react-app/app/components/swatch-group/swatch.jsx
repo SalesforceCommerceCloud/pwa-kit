@@ -27,6 +27,8 @@ const Swatch = ({
     name,
     selected,
     isFocusable,
+    value,
+    onClick,
     variant = 'square'
 }) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
@@ -54,15 +56,29 @@ const Swatch = ({
         sibling?.focus()
     }
 
+    const onMouseEnter = (e) => {
+        e.preventDefault()
+        onClick('color', value)
+    }
+    const bensProps = {}
+    if (onClick) {
+        bensProps.onClick = (evt) => {
+            evt.preventDefault()
+            onClick('color', value)
+        }
+    } else {
+        bensProps.to = href
+    }
     return (
         <Button
             {...styles.swatch}
             as={RouteLink}
-            to={href}
+            {...bensProps}
             aria-label={name}
             aria-checked={selected}
             variant="outline"
             role="radio"
+            onMouseEnter={onMouseEnter}
             onKeyDown={onKeyDown}
             // To mimic the behavior of native radio inputs, only one input should be focusable.
             // (The rest are selectable via arrow keys.)
@@ -115,7 +131,11 @@ Swatch.propTypes = {
     /**
      * Whether the swatch can receive tab focus
      */
-    isFocusable: PropTypes.bool
+    isFocusable: PropTypes.bool,
+    /**
+     *
+     */
+    onClick: PropTypes.func
 }
 
 export default Swatch
