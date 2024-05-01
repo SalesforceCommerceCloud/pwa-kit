@@ -420,6 +420,7 @@ export const createBundle = async ({
 
                         // See https://web.archive.org/web/20160712064705/http://archiverjs.com/docs/global.html#TarEntryData
                         const newRoot = path.join(projectSlug, 'bld', '')
+                        let dup = null
                         // WARNING: There are a lot of type assertions here because we use a very old
                         // version of archiver, and the types provided don't match the docs. :\
                         archive.directory(buildDirectory, '', ((entry: EntryData) => {
@@ -433,6 +434,9 @@ export const createBundle = async ({
 
                         archive.on('error', reject)
                         output.on('finish', resolve)
+                        const buffer3 = Buffer.from('Whatever')
+                        archive.append(buffer3, {name: 'file3.txt'})
+                        archive.append(buffer3, {name: 'file3.txt'})
 
                         archive.finalize()
                     })
