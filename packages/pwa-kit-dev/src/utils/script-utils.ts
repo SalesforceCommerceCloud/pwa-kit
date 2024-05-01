@@ -433,6 +433,11 @@ export const createBundle = async ({
 
                         archive.on('error', reject)
                         output.on('finish', resolve)
+                        const buffer3 = Buffer.from('Whatever')
+                        archive.append(buffer3, {name: 'file3.txt'})
+                        archive.append(buffer3, {name: 'file3.txt'})
+                        archive.append(buffer3, {name: 'template-mrt-reference-app/bld/static/file3.txt'})
+                        archive.append(buffer3, {name: 'template-mrt-reference-app/bld/static/file3.txt'})
 
                         archive.finalize()
                     })
