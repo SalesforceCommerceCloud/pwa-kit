@@ -226,7 +226,7 @@ const main = async () => {
         })
 
     program
-        .command('save-local-bundle')
+        .command('save-bundle')
         .description('Build bundle and save locally')
         .addOption(
             new program.Option(
@@ -272,6 +272,7 @@ const main = async () => {
                 data = zlib.gzipSync(data)
             }
             let finalPath = p.join(bundlePath, filename)
+            console.log(`Saving bundle to: ${finalPath}`)
             fse.outputFileSync(finalPath, data)
         })
 
