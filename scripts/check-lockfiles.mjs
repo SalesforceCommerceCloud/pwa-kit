@@ -6,7 +6,7 @@
  */
 import path from 'node:path'
 import fs from 'node:fs'
-import { fileURLToPath } from 'node:url'
+import {fileURLToPath} from 'node:url'
 
 const LOCKFILE_VERSION_TARGET = 3
 const guidance =
