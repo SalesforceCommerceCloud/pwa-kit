@@ -150,7 +150,10 @@ const ProductTile = (props) => {
                                 src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
                                 widths={dynamicImageProps?.widths}
                                 imageProps={{
-                                    alt: image.alt,
+                                    // treat img as a decorative item, we don't need to pass `image.alt`
+                                    // since it is the same as product name
+                                    // which can cause confusion for individuals who uses screen readers
+                                    alt: '',
                                     ...dynamicImageProps?.imageProps
                                 }}
                             />
