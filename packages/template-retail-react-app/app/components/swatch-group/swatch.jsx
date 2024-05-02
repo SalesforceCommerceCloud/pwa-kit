@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {
     Button,
@@ -14,6 +14,7 @@ import {
     useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Link as RouteLink} from 'react-router-dom'
+import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
  * The Swatch Component displays item inside `SwatchGroup`. For proper keyboard accessibility,
@@ -28,12 +29,12 @@ const Swatch = ({
     selected,
     isFocusable,
     value,
-    onClick,
+    handleMouseEnter = noop,
     variant = 'square'
 }) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
-    /** Mimic the behavior of native radio inputs by using arrow keys to select prev/next value. */
-    const onKeyDown = (evt) => {
+
+    const onKeyDown = useCallback((evt) => {
         let sibling
         // This is not a very react-y way implementation... ¯\_(ツ)_/¯
         switch (evt.key) {
@@ -54,32 +55,24 @@ const Swatch = ({
         }
         sibling?.click()
         sibling?.focus()
-    }
+    }, [])
 
-    const onMouseEnter = (e) => {
+    const onMouseEnter = useCallback((e) => {
         e.preventDefault()
-        onClick('color', value)
-    }
-    const bensProps = {}
-    if (onClick) {
-        bensProps.onClick = (evt) => {
-            evt.preventDefault()
-            onClick('color', value)
-        }
-    } else {
-        bensProps.to = href
-    }
+        handleMouseEnter(value)
+    }, [])
+
     return (
         <Button
             {...styles.swatch}
             as={RouteLink}
-            {...bensProps}
+            to={href}
             aria-label={name}
             aria-checked={selected}
-            variant="outline"
-            role="radio"
             onMouseEnter={onMouseEnter}
             onKeyDown={onKeyDown}
+            variant="outline"
+            role="radio"
             // To mimic the behavior of native radio inputs, only one input should be focusable.
             // (The rest are selectable via arrow keys.)
             tabIndex={isFocusable ? 0 : -1}
@@ -133,9 +126,9 @@ Swatch.propTypes = {
      */
     isFocusable: PropTypes.bool,
     /**
-     *
+     * This function is called whenever the mouse enters the swatch. The values is passed as the first argument.
      */
-    onClick: PropTypes.func
+    handleMouseEnter: PropTypes.func
 }
 
 export default Swatch

@@ -51,3 +51,34 @@ export const getDisplayPrice = (product) => {
         discountPrice
     }
 }
+
+/**
+ * Filters the provided product `ImageGroups` array with the optional filters.
+ *
+ * @param {ImageGroup[]} imageGroups
+ * @param {object} filters
+ * @param {string} filters.viewType
+ * @param {object} filters.variationValues
+ *
+ * @returns {ImageGroup[]} filteredImageGroups
+ */
+export const filterImageGroups = (imageGroups = [], filters = {}) => {
+    const {viewType, variationValues = {}} = filters
+    // NOTE: For future feature enhancement compatibility we use an object for the `variationValues` as
+    // we might want to filter on more than the one attribute id/value pair.
+    const [selectedAttributeId, selectedAttributeValue] = Object.entries(variationValues)[0] || []
+
+    // Filters
+    const typeFilter = viewType ? (group) => group.viewType === viewType : () => true
+    const attributeFilter =
+        !!selectedAttributeId && !!selectedAttributeValue
+            ? ({variationAttributes = []}) =>
+                  variationAttributes.some(
+                      ({id, values}) =>
+                          id === selectedAttributeId &&
+                          !!values.find(({value}) => value === selectedAttributeValue)
+                  )
+            : () => true
+
+    return imageGroups?.filter(typeFilter)?.filter(attributeFilter)
+}

@@ -5,8 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useMemo, useRef, useState} from 'react'
+import React, {useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // Components
 import {
@@ -31,13 +32,9 @@ import withRegistration from '@salesforce/retail-react-app/app/components/with-r
 import {useIntl} from 'react-intl'
 
 // Other
-import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {
-    getVariantValueSwatch,
-    // buildVariantValueHref,
-    // isVariantValueOrderable
-} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
+import {filterImageGroups} from '../../utils/product-utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -65,71 +62,73 @@ export const Skeleton = () => {
  * It also supports favourite products, controlled by a heart icon.
  */
 const ProductTile = (props) => {
-    // TODO: Make this a prop!
-    const selectableAttributeId = 'color'
-
     const {
         dynamicImageProps,
         enableFavourite = false,
+        imageViewType = 'large',
         isFavourite,
         onFavouriteToggle,
         product,
+        selectableAttributeId = 'color',
         ...rest
     } = props
+    const {currency, imageGroups, price, productId, hitType} = product
 
     const intl = useIntl()
+    const {buildUrl} = useMultiSite()
     const {currency: activeCurrency} = useCurrency()
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
 
-    // NOTE: Here I use the terminology "currentProduct" because there are various types of projects
-    // and it isn't always a variation. Maybe...
-    const {currency, imageGroups, price, productId, hitType} = product
+    const isMasterVariant = ['master', 'variant'].includes(hitType)
+    const initialVariationValue = isMasterVariant
+        ? product?.variants?.find((variant) => variant.productId == product.representedProduct.id)
+              ?.variationValues?.[selectableAttributeId]
+        : undefined
 
-    const representedVariation = product?.variants.find((variant) => {
-        return variant.productId == product.representedProduct.id
-    })
-    
-    const [selectableAttributeValue, setSelectableAttributeValue] = useState(
-        representedVariation?.variationValues?.[selectableAttributeId]
-    )
+    const [selectableAttributeValue, setSelectableAttributeValue] = useState(initialVariationValue)
 
     const image = useMemo(() => {
-        // TODO: Once this is working, lets make it a utility.
-        const opts = {
-            viewType: 'large',
-            selectedAttributeId: selectableAttributeId,
-            selectedAttributeValue: selectableAttributeValue
-        }
-        const {selectedAttributeId, selectedAttributeValue, viewType} = opts
-        
-        return imageGroups
-            ?.filter((group) => group.viewType === viewType)
-            ?.filter(({variationAttributes = []}) => 
-                variationAttributes.some(({id, values}) => 
-                    id === selectedAttributeId && !!values.find(({value}) => value === selectedAttributeValue)
-                )
-            )
-            ?.[0] // First matched image group
-            ?.images[0] // First image
+        // NOTE: If the selectable variation attribute doesn't exist in the products variation attributes
+        // array, lets not filter the image groups on it. This ensures we always return an image for non-variant
+        // type products.
+        const hasSelectableAttribute = product?.variationAttributes?.find(
+            ({id}) => id === selectableAttributeId
+        )
 
-    }, [selectableAttributeValue])
+        const variationValues = {[selectableAttributeId]: selectableAttributeValue}
+        const filteredImageGroups = filterImageGroups(imageGroups, {
+            viewType: imageViewType,
+            variationValues: hasSelectableAttribute ? variationValues : {}
+        })
 
+        // Return the first image of the first group.
+        return filteredImageGroups?.[0]?.images[0]
+    }, [product, selectableAttributeId, selectableAttributeValue, imageViewType])
+
+    const productUrl = useMemo(() => {
+        return rebuildPathWithParams(productUrlBuilder({id: productId}), {
+            [selectableAttributeId]: selectableAttributeValue
+        })
+    }, [product, selectableAttributeId, selectableAttributeValue])
+
+    // NOTE: variationAttributes are only defined for master/variant type products.
     const variationAttributes = useMemo(() => {
-        return product?.variationAttributes.map((variationAttribute) => ({
+        // NOTE: Decorate the product variant attributes to easily access images and hrefs.
+        return product?.variationAttributes?.map((variationAttribute) => ({
             ...variationAttribute,
             values: variationAttribute.values.map((value) => {
+                const variationValues = {[selectableAttributeId]: value.value}
+                const swatchImage = filterImageGroups(product.imageGroups, {
+                    viewType: 'swatch',
+                    variationValues
+                })?.[0]?.images[0]
+                const productHref = buildUrl(rebuildPathWithParams(productUrl, variationValues))
+
                 return {
                     ...value,
-                    image: getVariantValueSwatch(product, value),
-                    // href: buildVariantValueHref({
-                    //     pathname: location.pathname,
-                    //     existingParams,
-                    //     newParams: params,
-                    //     productId: product.id,
-                    //     isProductPartOfSet
-                    // }),
-                    // orderable: isVariantValueOrderable(product, params)
+                    image: swatchImage,
+                    href: productHref
                 }
             })
         }))
@@ -141,17 +140,9 @@ const ProductTile = (props) => {
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
 
-    // TODO:
-    // - Make the variation attribute id configurable
-
     return (
         <Box {...styles.container}>
-            <Link
-                data-testid="product-tile"
-                to={productUrlBuilder({id: productId}, intl.local)}
-                {...styles.link}
-                {...rest}
-            >
+            <Link data-testid="product-tile" to={productUrl} {...styles.link} {...rest}>
                 <Box {...styles.imageWrapper}>
                     {image && (
                         <AspectRatio {...styles.image}>
@@ -174,7 +165,7 @@ const ProductTile = (props) => {
                         const attributeId = id
                         return (
                             <SwatchGroup key={id}>
-                                {values?.map(({id, name, value, image}, index) => {
+                                {values?.map(({href, name, image, value}) => {
                                     const content = image ? (
                                         <Box
                                             height="100%"
@@ -190,12 +181,14 @@ const ProductTile = (props) => {
                                     ) : (
                                         name
                                     )
-                                    
+
                                     return (
                                         <Swatch
                                             key={value}
-                                            // href={href}
-                                            onClick={(key, value) => setSelectableAttributeValue(value)}
+                                            href={href}
+                                            handleMouseEnter={(value) =>
+                                                setSelectableAttributeValue(value)
+                                            }
                                             value={value}
                                             name={name}
                                             variant={attributeId === 'color' ? 'circle' : 'square'}
@@ -291,6 +284,7 @@ ProductTile.propTypes = {
             disBaseLink: PropTypes.string,
             link: PropTypes.string
         }),
+        imageGroups: PropTypes.array,
         price: PropTypes.number,
         // `name` is present and localized when `product` is provided by a RecommendedProducts component
         // (from Shopper Products `getProducts` endpoint), but is not present when `product` is
@@ -324,6 +318,15 @@ ProductTile.propTypes = {
      * interacts with favourite icon/button.
      */
     onFavouriteToggle: PropTypes.func,
+    /**
+     * The `viewType` of the image component. This defaults to 'large'.
+     */
+    imageViewType: PropTypes.string,
+    /**
+     * When displaying a master/variant product, this value represents the variation attribute that is displayed
+     * as a swatch below the main image. The default for this property is `color`.
+     */
+    selectableAttributeId: PropTypes.string,
     dynamicImageProps: PropTypes.object
 }
 

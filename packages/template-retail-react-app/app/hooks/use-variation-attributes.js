@@ -14,7 +14,7 @@ import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-var
 // Utils
 import {updateSearchParams} from '@salesforce/retail-react-app/app/utils/url'
 import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp-search-params'
-
+import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
 /**
  * Return the first image in the `swatch` type image group for a given
  * variation value of a product.
@@ -26,18 +26,12 @@ import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp
 export const getVariantValueSwatch = (product, variationValue) => {
     const {imageGroups = []} = product
 
-    const imageGroup = imageGroups
-        .filter(({viewType}) => viewType === 'swatch')
-        .find(({variationAttributes = []}) => {
-            const colorAttribute = variationAttributes.find(({id}) => id === 'color')
-            const colorValues = colorAttribute?.values || []
-
-            // A single image can represent multiple variation values, so we only need
-            // ensure the variation values appears in once of the images represented values.
-            return colorValues.some(({value}) => value === variationValue.value)
-        })
-
-    return imageGroup?.images?.[0]
+    return filterImageGroups(imageGroups, {
+        viewType: 'swatch',
+        variationValues: {
+            ['color']: variationValue.value
+        }
+    })?.[0]?.images?.[0]
 }
 
 /**
