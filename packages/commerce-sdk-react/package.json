@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/commerce-sdk-react",
-  "version": "1.5.0-dev",
+  "version": "1.5.0-gpt-nightly-20240502000716",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/ecom-react-hooks#readme",
   "bugs": {
