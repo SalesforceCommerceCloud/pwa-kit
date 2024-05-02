@@ -52,7 +52,8 @@
         "react-helmet": "^6.1.0",
         "react-hook-form": "^6.15.8",
         "react-intl": "^5.25.1",
-        "react-router-dom": "^5.3.4"
+        "react-router-dom": "^5.3.4",
+        "seedrandom": "^3.0.5"
     },
     "peerDependencies": {
         "@chakra-ui/system": "^1.12.1"
@@ -80,7 +81,7 @@
     "bundlesize": [
         {
             "path": "build/main.js",
-            "maxSize": "55 kB"
+            "maxSize": "56 kB"
         },
         {
             "path": "build/vendor.js",

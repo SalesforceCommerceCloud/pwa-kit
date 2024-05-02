@@ -1,3 +1,8 @@
+## v2.8.4 (May 2, 2024)
+
+- Fixed createCodeVerifier adding entropy to be successfully indexed by Google Search Console. [#1765](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1765)
+- Fixed Node.js on Windows blocking spawSync .cmd unless { shell: true } is used with trusted code. [#1765](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1765)
+
 ## v2.8.3 (Apr 9, 2024)
 
 - Storefront Preview: avoid stale cached Commerce API responses, whenever the Shopper Context is set [#1740](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1740)

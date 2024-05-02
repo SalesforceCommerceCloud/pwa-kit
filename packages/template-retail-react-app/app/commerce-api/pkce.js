@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {nanoid} from 'nanoid'
+import {customRandom, urlAlphabet} from 'nanoid'
 import {encode as base64encode} from 'base64-arraybuffer'
+import seedrandom from 'seedrandom'
 
 // Server Side
 const randomstring = require('randomstring')
@@ -14,12 +15,21 @@ const randomstring = require('randomstring')
 const isServer = typeof window === 'undefined'
 
 /**
+ * Adds entropy to nanoid() using seedrandom to ensure that the code_challenge sent to SCAPI by Google's crawler browser is unique.
+ * Solves the issue with Google's crawler getting the same result from nanoid() in two different runs, which results in the same PKCE code_challenge being used twice.
+ */
+const nanoid = () => {
+    const rng = seedrandom(+new Date(), {entropy: true})
+    return customRandom(urlAlphabet, 128, (size) => new Uint8Array(size).map(() => 256 * rng()))()
+}
+
+/**
  * Creates Code Verifier use for PKCE auth flow.
  *
  * @returns {String} The 128 character length code verifier.
  */
 export const createCodeVerifier = () => {
-    return isServer ? randomstring.generate(128) : nanoid(128)
+    return isServer ? randomstring.generate(128) : nanoid()
 }
 
 /**

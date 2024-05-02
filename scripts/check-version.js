@@ -13,9 +13,10 @@ const extension = isWin ? '.cmd' : ''
 const npm = `npm${extension}`
 
 const spawnSync = (...args) => {
-    const proc = childProc.spawnSync(...args)
+    const proc = childProc.spawnSync(...args, { shell: true })
     if (proc.status !== 0) {
-        throw proc.stderr.toString()
+        console.error(proc)
+        throw proc.stderr ? proc.stderr.toString() : 'Unknown error'
     }
     return proc
 }
