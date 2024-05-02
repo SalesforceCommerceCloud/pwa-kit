@@ -88,6 +88,7 @@ const ProductTile = (props) => {
 
     const [selectableAttributeValue, setSelectableAttributeValue] = useState(initialVariationValue)
 
+    // Primary image for the tile, the image is determined from the product and selected variation attributes.
     const image = useMemo(() => {
         // NOTE: If the selectable variation attribute doesn't exist in the products variation attributes
         // array, lets not filter the image groups on it. This ensures we always return an image for non-variant
@@ -106,6 +107,7 @@ const ProductTile = (props) => {
         return filteredImageGroups?.[0]?.images[0]
     }, [product, selectableAttributeId, selectableAttributeValue, imageViewType])
 
+    // Primary URL user to wrap the ProduceTile.
     const productUrl = useMemo(() => {
         return rebuildPathWithParams(productUrlBuilder({id: productId}), {
             [selectableAttributeId]: selectableAttributeValue
