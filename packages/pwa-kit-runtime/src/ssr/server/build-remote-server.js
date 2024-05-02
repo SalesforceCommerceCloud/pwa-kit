@@ -31,7 +31,7 @@ import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
 import URL from 'url'
-import {Headers, X_HEADERS_TO_REMOVE, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
+import {Headers, X_HEADERS_TO_REMOVE_ORIGIN, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import assert from 'assert'
 import semver from 'semver'
 import pkg from '../../../package.json'
@@ -599,7 +599,7 @@ export const RemoteServerFactory = {
             // do that now so that the rest of the code don't have to deal
             // with these headers, which can be large and may be accidentally
             // forwarded to other servers.
-            X_HEADERS_TO_REMOVE.forEach((key) => {
+            X_HEADERS_TO_REMOVE_ORIGIN.forEach((key) => {
                 delete req.headers[key]
             })
 
