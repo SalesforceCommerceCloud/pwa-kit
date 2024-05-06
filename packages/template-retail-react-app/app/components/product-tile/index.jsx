@@ -198,7 +198,7 @@ const ProductTile = (props) => {
                                             }
                                             value={value}
                                             name={name}
-                                            variant={attributeId === 'color' ? 'circle' : 'square'}
+                                            variant={'circle'}
                                             selected={value === selectableAttributeValue}
                                         >
                                             {content}
