@@ -32,6 +32,10 @@ import withRegistration from '@salesforce/retail-react-app/app/components/with-r
 import {useIntl} from 'react-intl'
 
 // Other
+import {
+    PRODUCT_TILE_IMAGE_VIEW_TYPE,
+    PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID
+} from '@salesforce/retail-react-app/app/constants'
 import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {filterImageGroups} from '../../utils/product-utils'
@@ -65,11 +69,11 @@ const ProductTile = (props) => {
     const {
         dynamicImageProps,
         enableFavourite = false,
-        imageViewType = 'large',
+        imageViewType = PRODUCT_TILE_IMAGE_VIEW_TYPE,
         isFavourite,
         onFavouriteToggle,
         product,
-        selectableAttributeId = 'color',
+        selectableAttributeId = PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID,
         ...rest
     } = props
     const {currency, imageGroups, price, productId, hitType} = product

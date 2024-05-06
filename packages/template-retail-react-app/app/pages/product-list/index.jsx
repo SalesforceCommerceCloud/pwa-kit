@@ -83,7 +83,9 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST,
-    STALE_WHILE_REVALIDATE
+    STALE_WHILE_REVALIDATE,
+    PRODUCT_TILE_IMAGE_VIEW_TYPE,
+    PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -549,6 +551,10 @@ const ProductList = (props) => {
                                                   product={productSearchItem}
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
+                                                  imageViewType={PRODUCT_TILE_IMAGE_VIEW_TYPE}
+                                                  selectableAttributeId={
+                                                      PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID
+                                                  }
                                                   onClick={() => {
                                                       if (searchQuery) {
                                                           einstein.sendClickSearch(
