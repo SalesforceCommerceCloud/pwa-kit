@@ -120,9 +120,10 @@ export const REQUIRED_EGPT_JSX_COMPONENTS = [
 export const Component = ({component}: ComponentProps) => {
     const pageContext = usePageContext()
     const {jsxParserComponents} = pageContext
-    const {data, typeId, ...rest} = component
+    const {custom, data, typeId, ...rest} = component
     const {code} = data || {}
     const isEinsteinAssistedComponent = typeId === 'headless.einsteinAssisted'
+    const products = custom?.products || []
     let instance = <ComponentNotFound typeId={typeId} />
     useEffect(() => {
         if (isEinsteinAssistedComponent) {
@@ -154,6 +155,9 @@ export const Component = ({component}: ComponentProps) => {
                 // from the PD custom editor, let's not have "code.code"
                 jsx={code.code.react}
                 {...component}
+                bindings={{
+                    products
+                }}
             />
         )
     } else if (pageContext?.components[component.typeId]) {
