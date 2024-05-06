@@ -62,7 +62,13 @@ export const getDisplayPrice = (product) => {
  *
  * @returns {ImageGroup[]} filteredImageGroups
  */
-export const filterImageGroups = (imageGroups = [], filters = {}) => {
+export const filterImageGroups = (imageGroups = [], filters) => {
+
+    if (!filters) {
+        throw new Error(`Missing required "filters" argument`)
+
+    }
+
     const {viewType, variationValues = {}} = filters
     // NOTE: For future feature enhancement compatibility we use an object for the `variationValues` as
     // we might want to filter on more than the one attribute id/value pair.
