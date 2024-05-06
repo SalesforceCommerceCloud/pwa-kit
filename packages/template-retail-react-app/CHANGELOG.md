@@ -1,5 +1,7 @@
 ## v2.5.0-dev (Apr 17, 2024)
 
+- Use `stale-while-revalidate` cache control directive [#1744](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1744)
+
 ### Bug Fixes
 
 -   Fix seo component not settings keywords meta tag [#1762](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1762)

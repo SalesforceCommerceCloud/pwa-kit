@@ -21,7 +21,7 @@ const https = require('https')
 const path = require('path')
 const zlib = require('zlib')
 
-const {X_HEADERS_TO_REMOVE} = require('../../utils/ssr-proxying')
+const {X_HEADERS_TO_REMOVE_ORIGIN} = require('../../utils/ssr-proxying')
 
 const TEST_PORT = 3446
 
@@ -346,7 +346,9 @@ describe('SSRServer Lambda integration', () => {
             body: undefined,
             // Other x-headers are added by AWSServerlessExpress
             headers: {
-                'x-api-key': '1234567890'
+                'x-api-key': '1234567890',
+                'x-apigateway-event': '{}',
+                'x-apigateway-context': '{}'
             }
         })
 
@@ -365,7 +367,7 @@ describe('SSRServer Lambda integration', () => {
             expect(response.statusCode).toBe(200)
             const decodedBody = response.isBase64Encoded ? atob(response.body) : response.body
             const reqHeaders = JSON.parse(decodedBody)
-            X_HEADERS_TO_REMOVE.forEach((key) => expect(reqHeaders[key]).toBeUndefined())
+            X_HEADERS_TO_REMOVE_ORIGIN.forEach((key) => expect(reqHeaders[key]).toBeUndefined())
         })
     })
 
