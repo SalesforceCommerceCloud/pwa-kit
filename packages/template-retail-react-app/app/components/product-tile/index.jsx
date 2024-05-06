@@ -150,21 +150,19 @@ const ProductTile = (props) => {
         <Box {...styles.container}>
             <Link data-testid="product-tile" to={productUrl} {...styles.link} {...rest}>
                 <Box {...styles.imageWrapper}>
-                    {image && (
-                        <AspectRatio {...styles.image}>
-                            <DynamicImage
-                                src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
-                                widths={dynamicImageProps?.widths}
-                                imageProps={{
-                                    // treat img as a decorative item, we don't need to pass `image.alt`
-                                    // since it is the same as product name
-                                    // which can cause confusion for individuals who uses screen readers
-                                    alt: '',
-                                    ...dynamicImageProps?.imageProps
-                                }}
-                            />
-                        </AspectRatio>
-                    )}
+                    <AspectRatio {...styles.image}>
+                        <DynamicImage
+                            src={`${image?.disBaseLink || image?.link || product?.image?.disBaseLink || product?.image?.disBaseLink}[?sw={width}&q=60]`}
+                            widths={dynamicImageProps?.widths}
+                            imageProps={{
+                                // treat img as a decorative item, we don't need to pass `image.alt`
+                                // since it is the same as product name
+                                // which can cause confusion for individuals who uses screen readers
+                                alt: '',
+                                ...dynamicImageProps?.imageProps
+                            }}
+                        />
+                    </AspectRatio>
                 </Box>
 
                 {/* Swatches */}
