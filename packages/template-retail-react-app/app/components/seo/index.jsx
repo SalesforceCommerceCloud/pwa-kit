@@ -18,7 +18,7 @@ const Seo = ({title, description, noIndex, keywords, children, ...props}) => {
             <title>{fullTitle}</title>
             {description && <meta name="description" content={description} />}
             {noIndex && <meta name="robots" content="noindex" />}
-            {keywords && <meta name='keywords' content={keywords} />}
+            {keywords && <meta name="keywords" content={keywords} />}
             {children}
         </Helmet>
     )
@@ -29,7 +29,7 @@ Seo.propTypes = {
     description: PropTypes.string,
     noIndex: PropTypes.bool,
     children: PropTypes.node,
-    keywords: PropTypes.string,
+    keywords: PropTypes.string
 }
 
 export default Seo
