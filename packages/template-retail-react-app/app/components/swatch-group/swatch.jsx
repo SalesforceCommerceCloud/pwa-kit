@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Button,
@@ -14,7 +14,7 @@ import {
     useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Link as RouteLink} from 'react-router-dom'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {useMediaQuery} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 /**
  * The Swatch Component displays item inside `SwatchGroup`. For proper keyboard accessibility,
@@ -29,10 +29,12 @@ const Swatch = ({
     selected,
     isFocusable,
     value,
-    handleMouseEnter = noop,
+    handleChange,
     variant = 'square'
 }) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
+    const [isDesktop] = useMediaQuery('(min-width: 992px)')
+    const [changeHandlers, setChangeHandlers] = useState({})
 
     const onKeyDown = useCallback((evt) => {
         let sibling
@@ -57,10 +59,23 @@ const Swatch = ({
         sibling?.focus()
     }, [])
 
-    const onMouseEnter = useCallback((e) => {
-        e.preventDefault()
-        handleMouseEnter(value)
-    }, [])
+    const onChange = useCallback(
+        (e) => {
+            e.preventDefault()
+            handleChange(value)
+        },
+        [handleChange]
+    )
+
+    useEffect(() => {
+        if (!handleChange) {
+            return
+        }
+
+        setChangeHandlers({
+            [isDesktop ? 'onMouseEnter' : 'onClick']: onChange
+        })
+    }, [onChange, isDesktop])
 
     return (
         <Button
@@ -69,13 +84,13 @@ const Swatch = ({
             to={href}
             aria-label={name}
             aria-checked={selected}
-            onMouseEnter={onMouseEnter}
             onKeyDown={onKeyDown}
             variant="outline"
             role="radio"
             // To mimic the behavior of native radio inputs, only one input should be focusable.
             // (The rest are selectable via arrow keys.)
             tabIndex={isFocusable ? 0 : -1}
+            {...changeHandlers}
         >
             <Center {...styles.swatchButton}>
                 {children}
@@ -126,9 +141,10 @@ Swatch.propTypes = {
      */
     isFocusable: PropTypes.bool,
     /**
-     * This function is called whenever the mouse enters the swatch. The values is passed as the first argument.
+     * This function is called whenever the mouse enters the swatch on desktop or when clicked on mobile.
+     * The values is passed as the first argument.
      */
-    handleMouseEnter: PropTypes.func
+    handleChange: PropTypes.func
 }
 
 export default Swatch

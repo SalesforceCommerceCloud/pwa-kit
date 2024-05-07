@@ -7,7 +7,6 @@
 
 import React, {useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // Components
 import {
@@ -79,7 +78,6 @@ const ProductTile = (props) => {
     const {currency, imageGroups, price, productId, hitType} = product
 
     const intl = useIntl()
-    const {buildUrl} = useMultiSite()
     const {currency: activeCurrency} = useCurrency()
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
@@ -181,9 +179,9 @@ const ProductTile = (props) => {
                                         <Swatch
                                             key={value}
                                             href={href}
-                                            handleMouseEnter={(value) =>
+                                            handleChange={(value) => {
                                                 setSelectableAttributeValue(value)
-                                            }
+                                            }}
                                             value={value}
                                             name={name}
                                             variant={'circle'}
