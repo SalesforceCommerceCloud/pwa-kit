@@ -63,10 +63,8 @@ export const getDisplayPrice = (product) => {
  * @returns {ImageGroup[]} filteredImageGroups
  */
 export const filterImageGroups = (imageGroups = [], filters) => {
-
     if (!filters) {
         throw new Error(`Missing required "filters" argument`)
-
     }
 
     const {viewType, variationValues = {}} = filters
@@ -87,4 +85,40 @@ export const filterImageGroups = (imageGroups = [], filters) => {
             : () => true
 
     return imageGroups?.filter(typeFilter)?.filter(attributeFilter)
+}
+
+import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
+
+/**
+ * Provided a product this function will return the variation attibutes decorated with
+ * `href` and `swatch` image for the given attribute values. This allows easier access
+ * when creating components that commonly use this information.
+ *
+ * @param {Product} product
+ * @param {object} opts
+ * @param {string} opts.swatchViewType - The `viewTypeId` for the swatch image. Defaults to `swatch`.
+ *
+ * @returns {VariationAttributes[]} decoratedVariationAttributes
+ */
+export const getDecoratedVariationAttributes = (product, opts = {}) => {
+    const swatchViewType = opts.swatchViewType || 'swatch'
+
+    return product?.variationAttributes?.map((variationAttribute) => ({
+        ...variationAttribute,
+        values: variationAttribute.values.map((value) => {
+            const variationValues = {[variationAttribute.id]: value.value}
+
+            return {
+                ...value,
+                swatch: filterImageGroups(product.imageGroups, {
+                    viewType: swatchViewType,
+                    variationValues
+                })?.[0]?.images[0],
+                href: rebuildPathWithParams(
+                    productUrlBuilder({id: product.productId}),
+                    variationValues
+                )
+            }
+        })
+    }))
 }

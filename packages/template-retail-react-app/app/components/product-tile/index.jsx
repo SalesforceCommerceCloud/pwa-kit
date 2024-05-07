@@ -38,7 +38,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {filterImageGroups} from '../../utils/product-utils'
+import {filterImageGroups, getDecoratedVariationAttributes} from '../../utils/product-utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -112,33 +112,16 @@ const ProductTile = (props) => {
     }, [product, selectableAttributeId, selectableAttributeValue, imageViewType])
 
     // Primary URL user to wrap the ProduceTile.
-    const productUrl = useMemo(() => {
-        return rebuildPathWithParams(productUrlBuilder({id: productId}), {
-            [selectableAttributeId]: selectableAttributeValue
-        })
-    }, [product, selectableAttributeId, selectableAttributeValue])
+    const productUrl = useMemo(
+        () =>
+            rebuildPathWithParams(productUrlBuilder({id: productId}), {
+                [selectableAttributeId]: selectableAttributeValue
+            }),
+        [product, selectableAttributeId, selectableAttributeValue]
+    )
 
     // NOTE: variationAttributes are only defined for master/variant type products.
-    const variationAttributes = useMemo(() => {
-        // NOTE: Decorate the product variant attributes to easily access images and hrefs.
-        return product?.variationAttributes?.map((variationAttribute) => ({
-            ...variationAttribute,
-            values: variationAttribute.values.map((value) => {
-                const variationValues = {[selectableAttributeId]: value.value}
-                const swatchImage = filterImageGroups(product.imageGroups, {
-                    viewType: 'swatch',
-                    variationValues
-                })?.[0]?.images[0]
-                const productHref = buildUrl(rebuildPathWithParams(productUrl, variationValues))
-
-                return {
-                    ...value,
-                    image: swatchImage,
-                    href: productHref
-                }
-            })
-        }))
-    }, [product])
+    const variationAttributes = useMemo(() => getDecoratedVariationAttributes(product), [product])
 
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
@@ -152,7 +135,12 @@ const ProductTile = (props) => {
                 <Box {...styles.imageWrapper}>
                     <AspectRatio {...styles.image}>
                         <DynamicImage
-                            src={`${image?.disBaseLink || image?.link || product?.image?.disBaseLink || product?.image?.disBaseLink}[?sw={width}&q=60]`}
+                            src={`${
+                                image?.disBaseLink ||
+                                image?.link ||
+                                product?.image?.disBaseLink ||
+                                product?.image?.disBaseLink
+                            }[?sw={width}&q=60]`}
                             widths={dynamicImageProps?.widths}
                             imageProps={{
                                 // treat img as a decorative item, we don't need to pass `image.alt`
@@ -172,8 +160,8 @@ const ProductTile = (props) => {
                         const attributeId = id
                         return (
                             <SwatchGroup key={id}>
-                                {values?.map(({href, name, image, value}) => {
-                                    const content = image ? (
+                                {values?.map(({href, name, swatch, value}) => {
+                                    const content = swatch ? (
                                         <Box
                                             height="100%"
                                             width="100%"
@@ -182,7 +170,7 @@ const ProductTile = (props) => {
                                             backgroundSize="cover"
                                             backgroundColor={name.toLowerCase()}
                                             backgroundImage={`url(${
-                                                image.disBaseLink || image.link
+                                                swatch?.disBaseLink || swatch.link
                                             })`}
                                         />
                                     ) : (

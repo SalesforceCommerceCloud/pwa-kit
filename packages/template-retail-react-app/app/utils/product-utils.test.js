@@ -6,6 +6,7 @@
  */
 
 import {
+    getDecoratedVariationAttributes,
     getDisplayPrice,
     getDisplayVariationValues,
     filterImageGroups
@@ -14,261 +15,661 @@ import {mockedCustomerProductListsDetails} from '@salesforce/retail-react-app/ap
 
 const imageGroups = [
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, , large",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg",
-                "title": "Striped Silk Tie, "
+                alt: 'Striped Silk Tie, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                title: 'Striped Silk Tie, '
             },
             {
-                "alt": "Striped Silk Tie, , large",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg",
-                "title": "Striped Silk Tie, "
+                alt: 'Striped Silk Tie, , large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg',
+                title: 'Striped Silk Tie, '
             }
         ],
-        "viewType": "large"
+        viewType: 'large'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, Red, large",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg",
-                "title": "Striped Silk Tie, Red"
+                alt: 'Striped Silk Tie, Red, large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                title: 'Striped Silk Tie, Red'
             },
             {
-                "alt": "Striped Silk Tie, Red, large",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg",
-                "title": "Striped Silk Tie, Red"
+                alt: 'Striped Silk Tie, Red, large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg',
+                title: 'Striped Silk Tie, Red'
             }
         ],
-        "variationAttributes": [
+        variationAttributes: [
             {
-                "id": "color",
-                "values": [
+                id: 'color',
+                values: [
                     {
-                        "value": "REDSI"
+                        value: 'REDSI'
                     }
                 ]
             }
         ],
-        "viewType": "large"
+        viewType: 'large'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, Turquoise, large",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw43346b0a/images/large/PG.949114314S.TURQUSI.PZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw43346b0a/images/large/PG.949114314S.TURQUSI.PZ.jpg",
-                "title": "Striped Silk Tie, Turquoise"
+                alt: 'Striped Silk Tie, Turquoise, large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw43346b0a/images/large/PG.949114314S.TURQUSI.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw43346b0a/images/large/PG.949114314S.TURQUSI.PZ.jpg',
+                title: 'Striped Silk Tie, Turquoise'
             },
             {
-                "alt": "Striped Silk Tie, Turquoise, large",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2db7f384/images/large/PG.949114314S.TURQUSI.BZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2db7f384/images/large/PG.949114314S.TURQUSI.BZ.jpg",
-                "title": "Striped Silk Tie, Turquoise"
+                alt: 'Striped Silk Tie, Turquoise, large',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2db7f384/images/large/PG.949114314S.TURQUSI.BZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2db7f384/images/large/PG.949114314S.TURQUSI.BZ.jpg',
+                title: 'Striped Silk Tie, Turquoise'
             }
         ],
-        "variationAttributes": [
+        variationAttributes: [
             {
-                "id": "color",
-                "values": [
+                id: 'color',
+                values: [
                     {
-                        "value": "TURQUSI"
+                        value: 'TURQUSI'
                     }
                 ]
             }
         ],
-        "viewType": "large"
+        viewType: 'large'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, , medium",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg",
-                "title": "Striped Silk Tie, "
+                alt: 'Striped Silk Tie, , medium',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg',
+                title: 'Striped Silk Tie, '
             },
             {
-                "alt": "Striped Silk Tie, , medium",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg",
-                "title": "Striped Silk Tie, "
+                alt: 'Striped Silk Tie, , medium',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg',
+                title: 'Striped Silk Tie, '
             }
         ],
-        "viewType": "medium"
+        viewType: 'medium'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, Red, medium",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg",
-                "title": "Striped Silk Tie, Red"
+                alt: 'Striped Silk Tie, Red, medium',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg',
+                title: 'Striped Silk Tie, Red'
             },
             {
-                "alt": "Striped Silk Tie, Red, medium",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg",
-                "title": "Striped Silk Tie, Red"
+                alt: 'Striped Silk Tie, Red, medium',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg',
+                title: 'Striped Silk Tie, Red'
             }
         ],
-        "variationAttributes": [
+        variationAttributes: [
             {
-                "id": "color",
-                "values": [
+                id: 'color',
+                values: [
                     {
-                        "value": "REDSI"
+                        value: 'REDSI'
                     }
                 ]
             }
         ],
-        "viewType": "medium"
+        viewType: 'medium'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, Turquoise, medium",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw343b458d/images/medium/PG.949114314S.TURQUSI.PZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw343b458d/images/medium/PG.949114314S.TURQUSI.PZ.jpg",
-                "title": "Striped Silk Tie, Turquoise"
+                alt: 'Striped Silk Tie, Turquoise, medium',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw343b458d/images/medium/PG.949114314S.TURQUSI.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw343b458d/images/medium/PG.949114314S.TURQUSI.PZ.jpg',
+                title: 'Striped Silk Tie, Turquoise'
             },
             {
-                "alt": "Striped Silk Tie, Turquoise, medium",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb6ce8e4f/images/medium/PG.949114314S.TURQUSI.BZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb6ce8e4f/images/medium/PG.949114314S.TURQUSI.BZ.jpg",
-                "title": "Striped Silk Tie, Turquoise"
+                alt: 'Striped Silk Tie, Turquoise, medium',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb6ce8e4f/images/medium/PG.949114314S.TURQUSI.BZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb6ce8e4f/images/medium/PG.949114314S.TURQUSI.BZ.jpg',
+                title: 'Striped Silk Tie, Turquoise'
             }
         ],
-        "variationAttributes": [
+        variationAttributes: [
             {
-                "id": "color",
-                "values": [
+                id: 'color',
+                values: [
                     {
-                        "value": "TURQUSI"
+                        value: 'TURQUSI'
                     }
                 ]
             }
         ],
-        "viewType": "medium"
+        viewType: 'medium'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, , small",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg",
-                "title": "Striped Silk Tie, "
+                alt: 'Striped Silk Tie, , small',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg',
+                title: 'Striped Silk Tie, '
             },
             {
-                "alt": "Striped Silk Tie, , small",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg",
-                "title": "Striped Silk Tie, "
+                alt: 'Striped Silk Tie, , small',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg',
+                title: 'Striped Silk Tie, '
             }
         ],
-        "viewType": "small"
+        viewType: 'small'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, Red, small",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg",
-                "title": "Striped Silk Tie, Red"
+                alt: 'Striped Silk Tie, Red, small',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg',
+                title: 'Striped Silk Tie, Red'
             },
             {
-                "alt": "Striped Silk Tie, Red, small",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg",
-                "title": "Striped Silk Tie, Red"
+                alt: 'Striped Silk Tie, Red, small',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg',
+                title: 'Striped Silk Tie, Red'
             }
         ],
-        "variationAttributes": [
+        variationAttributes: [
             {
-                "id": "color",
-                "values": [
+                id: 'color',
+                values: [
                     {
-                        "value": "REDSI"
+                        value: 'REDSI'
                     }
                 ]
             }
         ],
-        "viewType": "small"
+        viewType: 'small'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, Turquoise, small",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1bdc0e4/images/small/PG.949114314S.TURQUSI.PZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1bdc0e4/images/small/PG.949114314S.TURQUSI.PZ.jpg",
-                "title": "Striped Silk Tie, Turquoise"
+                alt: 'Striped Silk Tie, Turquoise, small',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1bdc0e4/images/small/PG.949114314S.TURQUSI.PZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1bdc0e4/images/small/PG.949114314S.TURQUSI.PZ.jpg',
+                title: 'Striped Silk Tie, Turquoise'
             },
             {
-                "alt": "Striped Silk Tie, Turquoise, small",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw78cf604d/images/small/PG.949114314S.TURQUSI.BZ.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw78cf604d/images/small/PG.949114314S.TURQUSI.BZ.jpg",
-                "title": "Striped Silk Tie, Turquoise"
+                alt: 'Striped Silk Tie, Turquoise, small',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw78cf604d/images/small/PG.949114314S.TURQUSI.BZ.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw78cf604d/images/small/PG.949114314S.TURQUSI.BZ.jpg',
+                title: 'Striped Silk Tie, Turquoise'
             }
         ],
-        "variationAttributes": [
+        variationAttributes: [
             {
-                "id": "color",
-                "values": [
+                id: 'color',
+                values: [
                     {
-                        "value": "TURQUSI"
+                        value: 'TURQUSI'
                     }
                 ]
             }
         ],
-        "viewType": "small"
+        viewType: 'small'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, Red, swatch",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda0ae10e/images/swatch/PG.949114314S.REDSI.CP.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda0ae10e/images/swatch/PG.949114314S.REDSI.CP.jpg",
-                "title": "Striped Silk Tie, Red"
+                alt: 'Striped Silk Tie, Red, swatch',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda0ae10e/images/swatch/PG.949114314S.REDSI.CP.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda0ae10e/images/swatch/PG.949114314S.REDSI.CP.jpg',
+                title: 'Striped Silk Tie, Red'
             }
         ],
-        "variationAttributes": [
+        variationAttributes: [
             {
-                "id": "color",
-                "values": [
+                id: 'color',
+                values: [
                     {
-                        "value": "REDSI"
+                        value: 'REDSI'
                     }
                 ]
             }
         ],
-        "viewType": "swatch"
+        viewType: 'swatch'
     },
     {
-        "images": [
+        images: [
             {
-                "alt": "Striped Silk Tie, Turquoise, swatch",
-                "disBaseLink": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d7226e5/images/swatch/PG.949114314S.TURQUSI.CP.jpg",
-                "link": "https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d7226e5/images/swatch/PG.949114314S.TURQUSI.CP.jpg",
-                "title": "Striped Silk Tie, Turquoise"
+                alt: 'Striped Silk Tie, Turquoise, swatch',
+                disBaseLink:
+                    'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d7226e5/images/swatch/PG.949114314S.TURQUSI.CP.jpg',
+                link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d7226e5/images/swatch/PG.949114314S.TURQUSI.CP.jpg',
+                title: 'Striped Silk Tie, Turquoise'
             }
         ],
-        "variationAttributes": [
+        variationAttributes: [
             {
-                "id": "color",
-                "values": [
+                id: 'color',
+                values: [
                     {
-                        "value": "TURQUSI"
+                        value: 'TURQUSI'
                     }
                 ]
             }
         ],
-        "viewType": "swatch"
+        viewType: 'swatch'
     }
 ]
+
+const product = {
+    currency: 'GBP',
+    hitType: 'master',
+    image: {
+        alt: 'Striped Silk Tie, , large',
+        disBaseLink:
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+        title: 'Striped Silk Tie, '
+    },
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                    title: 'Striped Silk Tie, '
+                },
+                {
+                    alt: 'Striped Silk Tie, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg',
+                    title: 'Striped Silk Tie, '
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, Red, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6e365a5e/images/large/PG.949114314S.REDSI.PZ.jpg',
+                    title: 'Striped Silk Tie, Red'
+                },
+                {
+                    alt: 'Striped Silk Tie, Red, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwdb89a542/images/large/PG.949114314S.REDSI.BZ.jpg',
+                    title: 'Striped Silk Tie, Red'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'REDSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, Turquoise, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw43346b0a/images/large/PG.949114314S.TURQUSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw43346b0a/images/large/PG.949114314S.TURQUSI.PZ.jpg',
+                    title: 'Striped Silk Tie, Turquoise'
+                },
+                {
+                    alt: 'Striped Silk Tie, Turquoise, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2db7f384/images/large/PG.949114314S.TURQUSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2db7f384/images/large/PG.949114314S.TURQUSI.BZ.jpg',
+                    title: 'Striped Silk Tie, Turquoise'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'TURQUSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg',
+                    title: 'Striped Silk Tie, '
+                },
+                {
+                    alt: 'Striped Silk Tie, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg',
+                    title: 'Striped Silk Tie, '
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, Red, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw17734eba/images/medium/PG.949114314S.REDSI.PZ.jpg',
+                    title: 'Striped Silk Tie, Red'
+                },
+                {
+                    alt: 'Striped Silk Tie, Red, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwf9ea1baf/images/medium/PG.949114314S.REDSI.BZ.jpg',
+                    title: 'Striped Silk Tie, Red'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'REDSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, Turquoise, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw343b458d/images/medium/PG.949114314S.TURQUSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw343b458d/images/medium/PG.949114314S.TURQUSI.PZ.jpg',
+                    title: 'Striped Silk Tie, Turquoise'
+                },
+                {
+                    alt: 'Striped Silk Tie, Turquoise, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb6ce8e4f/images/medium/PG.949114314S.TURQUSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb6ce8e4f/images/medium/PG.949114314S.TURQUSI.BZ.jpg',
+                    title: 'Striped Silk Tie, Turquoise'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'TURQUSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg',
+                    title: 'Striped Silk Tie, '
+                },
+                {
+                    alt: 'Striped Silk Tie, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg',
+                    title: 'Striped Silk Tie, '
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, Red, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw94a9de1f/images/small/PG.949114314S.REDSI.PZ.jpg',
+                    title: 'Striped Silk Tie, Red'
+                },
+                {
+                    alt: 'Striped Silk Tie, Red, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw9eb2a476/images/small/PG.949114314S.REDSI.BZ.jpg',
+                    title: 'Striped Silk Tie, Red'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'REDSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, Turquoise, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1bdc0e4/images/small/PG.949114314S.TURQUSI.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1bdc0e4/images/small/PG.949114314S.TURQUSI.PZ.jpg',
+                    title: 'Striped Silk Tie, Turquoise'
+                },
+                {
+                    alt: 'Striped Silk Tie, Turquoise, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw78cf604d/images/small/PG.949114314S.TURQUSI.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw78cf604d/images/small/PG.949114314S.TURQUSI.BZ.jpg',
+                    title: 'Striped Silk Tie, Turquoise'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'TURQUSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, Red, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda0ae10e/images/swatch/PG.949114314S.REDSI.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda0ae10e/images/swatch/PG.949114314S.REDSI.CP.jpg',
+                    title: 'Striped Silk Tie, Red'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'REDSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        },
+        {
+            images: [
+                {
+                    alt: 'Striped Silk Tie, Turquoise, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d7226e5/images/swatch/PG.949114314S.TURQUSI.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6d7226e5/images/swatch/PG.949114314S.TURQUSI.CP.jpg',
+                    title: 'Striped Silk Tie, Turquoise'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'TURQUSI'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        }
+    ],
+    price: 19.19,
+    pricePerUnit: 19.19,
+    priceRanges: [
+        {
+            maxPrice: 25.28,
+            minPrice: 25.28,
+            pricebook: 'gbp-m-list-prices'
+        },
+        {
+            maxPrice: 19.19,
+            minPrice: 19.19,
+            pricebook: 'gbp-m-sale-prices'
+        }
+    ],
+    productId: '25752986M',
+    productName: 'Striped Silk Tie',
+    productPromotions: [
+        {
+            calloutMsg: 'Get 20% off of this tie.',
+            promotionId: 'PromotionTest_WithoutQualifying'
+        }
+    ],
+    productType: {
+        master: true
+    },
+    representedProduct: {
+        id: '793775370033M'
+    },
+    variants: [
+        {
+            price: 19.19,
+            productId: '793775370033M',
+            productPromotions: [
+                {
+                    calloutMsg: 'Get 20% off of this tie.',
+                    promotionalPrice: 15.35,
+                    promotionId: 'PromotionTest_WithoutQualifying'
+                }
+            ],
+            tieredPrices: [
+                {
+                    price: 25.28,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 19.19,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'TURQUSI'
+            }
+        },
+        {
+            price: 19.19,
+            productId: '793775362380M',
+            tieredPrices: [
+                {
+                    price: 25.28,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 19.19,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'REDSI'
+            }
+        }
+    ],
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Colour',
+            values: [
+                {
+                    name: 'Red',
+                    value: 'REDSI'
+                },
+                {
+                    name: 'Turquoise',
+                    value: 'TURQUSI'
+                }
+            ]
+        }
+    ]
+}
 
 const variationAttributes = [
     {
@@ -335,7 +736,7 @@ describe('getDisplayPrice', function () {
     })
 })
 
-describe.only('filterImageGroups', function () {
+describe('filterImageGroups', function () {
     test('throws when "filters" argument is not provided', () => {
         expect(() => {
             filterImageGroups(imageGroups)
@@ -345,13 +746,15 @@ describe.only('filterImageGroups', function () {
     test('returns all image groups when "filters" object constains no filters', () => {
         const filteredImageGroups = filterImageGroups(imageGroups, {})
 
-        expect(filteredImageGroups.length).toBe(11)
+        expect(filteredImageGroups).toHaveLength(11)
     })
 
     test('returns an empty array when no image groups apply to provided filters', () => {
-        const filteredImageGroups = filterImageGroups(imageGroups, {viewType: 'nonexistentViewType'})
+        const filteredImageGroups = filterImageGroups(imageGroups, {
+            viewType: 'nonexistentViewType'
+        })
 
-        expect(filteredImageGroups.length).toBe(0)
+        expect(filteredImageGroups).toHaveLength(0)
     })
 
     test('returns non-zero length array with only images groups matching filters provided', () => {
@@ -359,15 +762,36 @@ describe.only('filterImageGroups', function () {
 
         // Return all image groups that are viewType = "swatch"
         filteredImageGroups = filterImageGroups(imageGroups, {viewType: 'swatch'})
-        expect(filteredImageGroups.length).toBe(2)
+        expect(filteredImageGroups).toHaveLength(2)
         expect(filteredImageGroups.every(({viewType}) => viewType === 'swatch')).toBe(true)
 
         // Return all image groups that apply to images with color = "TURQUSI"
         filteredImageGroups = filterImageGroups(imageGroups, {variationValues: {color: 'TURQUSI'}})
-        expect(filteredImageGroups.length).toBe(4) // We know there will be 4 because we control the test data!
+        expect(filteredImageGroups).toHaveLength(4) // We know there will be 4 because we control the test data!
 
         // Return all image groups that are viewType = "swatch" and color = "TURQUSI"
-        filteredImageGroups = filterImageGroups(imageGroups, {viewType: 'swatch', variationValues: {color: 'TURQUSI'}})
-        expect(filteredImageGroups.length).toBe(1) // We know there will be 1 because we control the test data!
+        filteredImageGroups = filterImageGroups(imageGroups, {
+            viewType: 'swatch',
+            variationValues: {color: 'TURQUSI'}
+        })
+        expect(filteredImageGroups).toHaveLength(1) // We know there will be 1 because we control the test data!
+    })
+})
+
+describe('getDecoratedVariationAttributes', function () {
+    test('returns variationAttributes array with "swatch" and "href" values', () => {
+        const variationAttributes = getDecoratedVariationAttributes(product)
+
+        // variationAttributes is defined and of known size.
+        expect(variationAttributes).toBeDefined()
+        expect(variationAttributes).toHaveLength(1)
+
+        // all values in all attributes are decorated.
+        variationAttributes.forEach((variationAttribute) => {
+            variationAttribute.values.forEach((value) => {
+                expect(value.href).toBeDefined()
+                expect(value.swatch).toBeDefined()
+            })
+        })
     })
 })
