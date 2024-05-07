@@ -14,7 +14,7 @@ import {
     useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Link as RouteLink} from 'react-router-dom'
-import {useMediaQuery} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useBreakpointValue} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 /**
  * The Swatch Component displays item inside `SwatchGroup`. For proper keyboard accessibility,
@@ -33,7 +33,7 @@ const Swatch = ({
     variant = 'square'
 }) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
-    const [isDesktop] = useMediaQuery('(min-width: 992px)')
+    const isDesktop = useBreakpointValue({base: false, lg: true})
     const [changeHandlers, setChangeHandlers] = useState({})
 
     const onKeyDown = useCallback((evt) => {
