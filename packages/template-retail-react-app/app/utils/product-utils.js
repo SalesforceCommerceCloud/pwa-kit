@@ -88,18 +88,16 @@ export const getPriceData = (product, opts = {}) => {
     }
     // since the price is the lowest value among price books, each product will have at lease a single item tiered price at quantity 1
     // the highest value of tieredPrices is presumptively the list price
-    const tieredPrices = variantWithLowestPrice?.variant.tieredPrices || product?.tieredPrices || []
-    const maxTieredPrice = tieredPrices.length
+    const tieredPrices =
+        variantWithLowestPrice?.variant?.tieredPrices || product?.tieredPrices || []
+    const maxTieredPrice = tieredPrices?.length
         ? Math.max(...tieredPrices.map((item) => item.price))
         : undefined
     const highestTieredPrice = tieredPrices.find((tier) => tier.price === maxTieredPrice)
     const listPrice = highestTieredPrice?.price
 
     // if a product has tieredPrices, get the tiered that has the higher closest quantity to current quantity
-    const filteredTiered =
-        (product?.tieredPrices || variantWithLowestPrice?.variants?.tieredPrices)?.filter(
-            (tiered) => tiered.quantity <= quantity
-        ) || []
+    const filteredTiered = tieredPrices.filter((tiered) => tiered.quantity <= quantity)
     const closestTieredPrice =
         filteredTiered.length &&
         filteredTiered.reduce((prev, curr) => {
@@ -116,7 +114,7 @@ export const getPriceData = (product, opts = {}) => {
         // For a product, set price is the lowest price of its children, so the price should be considered a range
         // For a master product, when it has more than 2 variants, we use the lowest priced variant, so it is  considered a range price
         //      but for master that has one variant, it is not considered range
-        isRange: (isMaster && product?.variants.length > 1) || isASet || false,
+        isRange: (isMaster && product?.variants?.length > 1) || isASet || false,
         hasRepresentedProduct,
         // priceMax is for product set
         tieredPrice: closestTieredPrice?.price,
