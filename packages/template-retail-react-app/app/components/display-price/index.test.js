@@ -39,8 +39,7 @@ describe('DisplayPrice', function () {
         renderWithProviders(
             <DisplayPrice currency="GBP" priceData={{...data, salePrice: 100, isOnSale: false}} />
         )
-        screen.logTestingPlaygroundURL()
-        expect(screen.queryByText(/£90\.00/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/£90\.`00/i)).not.toBeInTheDocument()
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
     })
 })
