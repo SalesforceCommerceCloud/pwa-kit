@@ -37,11 +37,9 @@ import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
-import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 
-const ProductViewHeader = ({name, currentPrice, listPrice, currency, category, productType}) => {
-    const isProductASet = productType?.set
-    const intl = useIntl()
+const ProductViewHeader = ({name, currency, priceData, category}) => {
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -55,20 +53,8 @@ const ProductViewHeader = ({name, currentPrice, listPrice, currency, category, p
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            <Skeleton isLoaded={currentPrice}>
-                <DisplayPrice
-                    strikethroughPrice={listPrice > currentPrice ? listPrice : null}
-                    currentPrice={currentPrice}
-                    currency={currency}
-                    prefixLabel={
-                        isProductASet
-                            ? intl.formatMessage({
-                                  id: 'product_view.label.from',
-                                  defaultMessage: 'From'
-                              })
-                            : null
-                    }
-                />
+            <Skeleton isLoaded={priceData?.salePrice}>
+                <DisplayPrice priceData={priceData} currency={currency} />
             </Skeleton>
         </VStack>
     )
@@ -76,11 +62,8 @@ const ProductViewHeader = ({name, currentPrice, listPrice, currency, category, p
 
 ProductViewHeader.propTypes = {
     name: PropTypes.string,
-    currentPrice: PropTypes.number,
-    listPrice: PropTypes.number,
     currency: PropTypes.string,
-    category: PropTypes.array,
-    productType: PropTypes.object
+    category: PropTypes.array
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -135,8 +118,8 @@ const ProductView = forwardRef(
             stockLevel,
             stepQuantity
         } = useDerivedProduct(product, isProductPartOfSet)
-        const {listPrice, currentPrice} = useMemo(() => {
-            return getDisplayPrice(product, {quantity})
+        const priceData = useMemo(() => {
+            return getPriceData(product, {quantity})
         }, [product, quantity])
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
@@ -303,9 +286,7 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
-                        listPrice={listPrice}
-                        currentPrice={currentPrice}
-                        productType={product?.type}
+                        priceData={priceData}
                         currency={product?.currency || activeCurrency}
                         category={category}
                     />
@@ -344,9 +325,7 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
-                                listPrice={listPrice}
-                                currentPrice={currentPrice}
-                                productType={product?.type}
+                                priceData={priceData}
                                 currency={product?.currency || activeCurrency}
                                 category={category}
                             />

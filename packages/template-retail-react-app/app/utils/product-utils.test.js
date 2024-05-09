@@ -6,7 +6,7 @@
  */
 
 import {
-    getDisplayPrice,
+    getPriceData,
     getDisplayVariationValues
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 
@@ -55,8 +55,8 @@ describe('getDisplayVariationValues', function () {
     })
 })
 
-describe('getDisplayPrice', function () {
-    test('returns listPrice and currentPrice for product that has only priceRanges', () => {
+describe('getPriceData', function () {
+    test('returns price data for master product that has more than one variant', () => {
         const data = {
             name: 'product name',
             price: 30.76,
@@ -73,13 +73,13 @@ describe('getDisplayPrice', function () {
                 }
             ]
         }
-        const {listPrice, currentPrice} = getDisplayPrice(data)
+        const {listPrice, currentPrice} = getPriceData(data)
 
         expect(listPrice).toBe(35.76)
         expect(currentPrice).toBe(30.76)
     })
 
-    test('returns listPrice and currentPrice for product that has only tieredPrices', () => {
+    test('returns price data for master product that has ONLY one variant', () => {
         const data = {
             name: 'product name',
             price: 25.6,
@@ -96,7 +96,7 @@ describe('getDisplayPrice', function () {
                 }
             ]
         }
-        const {listPrice, currentPrice} = getDisplayPrice(data)
+        const {listPrice, currentPrice} = getPriceData(data)
 
         expect(listPrice).toBe(30.6)
         expect(currentPrice).toBe(25.6)
@@ -124,7 +124,7 @@ describe('getDisplayPrice', function () {
                 }
             ]
         }
-        const {listPrice, currentPrice} = getDisplayPrice(data, {quantity: 11})
+        const {listPrice, currentPrice} = getPriceData(data, {quantity: 11})
 
         expect(listPrice).toBe(30.6)
         expect(currentPrice).toBe(15)
@@ -152,7 +152,7 @@ describe('getDisplayPrice', function () {
                 }
             ]
         }
-        const {listPrice, currentPrice} = getDisplayPrice(data, {quantity: 9})
+        const {listPrice, currentPrice} = getPriceData(data, {quantity: 9})
 
         expect(listPrice).toBe(30.6)
         expect(currentPrice).toBe(25.6)
@@ -186,7 +186,7 @@ describe('getDisplayPrice', function () {
                 }
             ]
         }
-        const {listPrice, currentPrice} = getDisplayPrice(data, {quantity: 11})
+        const {listPrice, currentPrice} = getPriceData(data, {quantity: 11})
 
         expect(listPrice).toBe(30.6)
         expect(currentPrice).toBe(10.99)

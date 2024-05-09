@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getSmallestValByProperty} from '@salesforce/retail-react-app/app/utils/utils'
+
 /**
  * Get the human-friendly version of the variation values that users have selected.
  * Useful for displaying these values in the UI.
@@ -35,23 +37,69 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
 }
 
 /**
- * This function extract the list price and current price of a product
- * If a product has promotional price, it will prioritize that value for current price
- * List price will take the highest value among the price book prices
+ * This function extract the price information of a given product
+ * If a product is a master,
+ *  salePrice: get the lowest price (including promotional prices) among variants
+ *  listPrice: get the list price of the variant that has lowest price (including promotional price)
+ *  maxPrice: the max price in tieredPrices of variant that has lowest price
  * @param {object} product - product detail object
- * @param {object} opts - product detail object
- * @returns {{listPrice: number, currentPrice: number}}
+ * @param {object} opts - options to pass into the function like intl, quantity, and currency
  */
-export const getDisplayPrice = (product, opts = {}) => {
+export const getPriceData = (product, opts = {}) => {
     const {quantity = 1} = opts
-    const promotionalPriceList = product?.productPromotions
-        ?.map((promo) => promo.promotionalPrice)
-        .filter((i) => i !== null && i !== undefined)
-    const promotionalPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : null
+    const isASet = product?.hitType === 'set' || !!product?.type?.set
+    const isMaster = product?.hitType === 'master' || !!product?.type?.master
+    const hasRepresentedProduct = !!product?.representedProduct?.id
+    let salePrice
+    let variantWithLowestPrice
+    // grab the variant that has the lowest price (including promotional price)
+    if (isMaster) {
+        const variants = product?.variants || []
+        variantWithLowestPrice = variants.reduce(
+            (minVariant, variant) => {
+                const promotions = variant.productPromotions || []
+                const smallestPromotionalPrice = getSmallestValByProperty(
+                    promotions,
+                    'promotionalPrice'
+                )
+                const variantSalePrice =
+                    smallestPromotionalPrice && smallestPromotionalPrice < variant.price
+                        ? smallestPromotionalPrice
+                        : variant.price
+                return variantSalePrice < minVariant.minPrice
+                    ? {minPrice: variantSalePrice, variant}
+                    : minVariant
+            },
+            {minPrice: Infinity, variant: null}
+        )
+    }
+
+    if (isMaster) {
+        salePrice = variantWithLowestPrice?.minPrice
+    } else {
+        const promotionalPrice = getSmallestValByProperty(
+            product?.productPromotions,
+            'promotionalPrice'
+        )
+        salePrice =
+            promotionalPrice && promotionalPrice < product?.price
+                ? promotionalPrice
+                : product?.price
+    }
+    // since the price is the lowest value among price books, each product will have at lease a single item tiered price at quantity 1
+    // the highest value of tieredPrices is presumptively the list price
+    const tieredPrices = variantWithLowestPrice?.variant.tieredPrices || product?.tieredPrices || []
+    const maxTieredPrice = tieredPrices.length
+        ? Math.max(...tieredPrices.map((item) => item.price))
+        : undefined
+    const highestTieredPrice = tieredPrices.find((tier) => tier.price === maxTieredPrice)
+    const listPrice = highestTieredPrice?.price
 
     // if a product has tieredPrices, get the tiered that has the higher closest quantity to current quantity
     const filteredTiered =
-        product?.tieredPrices?.filter((tiered) => tiered.quantity <= quantity) || []
+        (product?.tieredPrices || variantWithLowestPrice?.variants?.tieredPrices)?.filter(
+            (tiered) => tiered.quantity <= quantity
+        ) || []
     const closestTieredPrice =
         filteredTiered.length &&
         filteredTiered.reduce((prev, curr) => {
@@ -59,28 +107,19 @@ export const getDisplayPrice = (product, opts = {}) => {
                 ? curr
                 : prev
         })
-    const salePrices = [closestTieredPrice?.price, promotionalPrice, product?.price].filter(Boolean)
-    // pick the smallest price among these price for the "current" price
-    let currentPrice = salePrices?.length ? Math.min(...salePrices) : 0
-
-    // Master product and product set have priceRanges object
-    // the price returned from API is the smallest price among price book
-    // to figure out what is the original price, we find the lastest minPrice among the books
-    const maxPriceRange = product?.priceRanges
-        ? Math.max(...(product?.priceRanges || []).map((item) => item.minPrice))
-        : 0
-    const highestPriceRange = product?.priceRanges?.find(
-        (range) => range.minPrice === maxPriceRange
-    )
-    // for standard/variant/bundle product, they dont have priceRanges, only tieredPrices
-    // since the price is the lowest value returned from the API, each product will have at lease a single item tiered price
-    // the highest value of tieredPrices is presumptively the list price
-    const maxTieredPrice = product?.tieredPrices
-        ? Math.max(...(product?.tieredPrices || []).map((item) => item.price))
-        : 0
-    const highestTieredPrice = product?.tieredPrices?.find((tier) => tier.price === maxTieredPrice)
     return {
-        listPrice: highestTieredPrice?.price || highestPriceRange?.minPrice,
-        currentPrice
+        salePrice,
+        listPrice,
+        isOnSale: salePrice < listPrice,
+        isASet,
+        isMaster,
+        // For a product, set price is the lowest price of its children, so the price should be considered a range
+        // For a master product, when it has more than 2 variants, we use the lowest priced variant, so it is  considered a range price
+        //      but for master that has one variant, it is not considered range
+        isRange: (isMaster && product?.variants.length > 1) || isASet || false,
+        hasRepresentedProduct,
+        // priceMax is for product set
+        tieredPrice: closestTieredPrice?.price,
+        maxPrice: product?.priceMax || maxTieredPrice
     }
 }

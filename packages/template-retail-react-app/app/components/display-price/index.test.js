@@ -10,18 +10,23 @@ import DisplayPrice from '@salesforce/retail-react-app/app/components/display-pr
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 describe('DisplayPrice', function () {
+    const data = {
+        salePrice: 90,
+        listPrice: 100,
+        isASet: false,
+        isOnSale: true,
+        isMaster: true,
+        isRange: true,
+        hasRepresentedProduct: false
+    }
     test('should render without error', () => {
-        renderWithProviders(
-            <DisplayPrice currency="GBP" currentPrice={90} strikethroughPrice={100} />
-        )
+        renderWithProviders(<DisplayPrice currency="GBP" priceData={data} />)
         expect(screen.getByText(/£90\.00/i)).toBeInTheDocument()
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
     })
 
     test('should render according html tag for prices', () => {
-        const {container} = renderWithProviders(
-            <DisplayPrice currency="GBP" currentPrice={90} strikethroughPrice={100} />
-        )
+        const {container} = renderWithProviders(<DisplayPrice currency="GBP" priceData={data} />)
         const currentPriceTag = container.querySelectorAll('b')
         const strikethroughPriceTag = container.querySelectorAll('s')
         expect(within(currentPriceTag[0]).getByText(/£90\.00/i)).toBeDefined()
@@ -30,8 +35,11 @@ describe('DisplayPrice', function () {
         expect(strikethroughPriceTag).toHaveLength(1)
     })
 
-    test('should not render discount price if not available', () => {
-        renderWithProviders(<DisplayPrice currency="GBP" currentPrice={100} />)
+    test('should not render list price when price is not on sale', () => {
+        renderWithProviders(
+            <DisplayPrice currency="GBP" priceData={{...data, salePrice: 100, isOnSale: false}} />
+        )
+        screen.logTestingPlaygroundURL()
         expect(screen.queryByText(/£90\.00/i)).not.toBeInTheDocument()
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
     })

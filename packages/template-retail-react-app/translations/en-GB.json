@@ -1063,14 +1063,11 @@
   "product_tile.assistive_msg.add_to_wishlist": {
     "defaultMessage": "Add {product} to wishlist"
   },
-  "product_tile.assistive_msg.original_price": {
-    "defaultMessage": "strikethrough price {strikethroughPrice}"
-  },
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
   },
-  "product_tile.assistive_msg.sale_price": {
-    "defaultMessage": "current price {currentPrice}"
+  "product_tile.price_display": {
+    "defaultMessage": "{isMaster, select, true { { isRange, select, true {From} false {} other {} } } false {} other {} } {isASet, select, true {} false { { isOnSale, select, true { <b><price>{salePrice}</price></b> <s><price>{listPrice}</price></s> } false { { hasRepresentedProduct, select, true {<span><price>{salePrice}</price></span>} false {<b><price>{salePrice}</price></b>} other {<b><price>{salePrice}</price></b>} } } other {<b><price>{salePrice}</price></b>} } } other {} }"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
@@ -1092,9 +1089,6 @@
   },
   "product_view.label.assistive_msg.quantity_increment": {
     "defaultMessage": "Increment Quantity"
-  },
-  "product_view.label.from": {
-    "defaultMessage": "From"
   },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"

@@ -26,6 +26,7 @@ import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import {getSiteByReference} from '@salesforce/retail-react-app/app/utils/site-utils'
 import jwt from 'jsonwebtoken'
 import userEvent from '@testing-library/user-event'
+import {Text} from '@chakra-ui/react'
 // This JWT's payload is special
 // it includes 3 fields that commerce-sdk-react cares:
 // exp, isb and sub
@@ -79,7 +80,17 @@ export const DEFAULT_SITE = 'global'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
-        <IntlProvider locale={locale} defaultLocale={locale}>
+        <IntlProvider
+            defaultRichTextElements={{
+                b: (chunks) => <b>{chunks}</b>,
+                br: () => <br />,
+                p: (chunks) => <p>{chunks}</p>,
+                s: (chunks) => <s>{chunks}</s>,
+                span: (chunks) => <span>{chunks}</span>
+            }}
+            locale={locale}
+            defaultLocale={locale}
+        >
             {node}
         </IntlProvider>
     )
@@ -122,7 +133,18 @@ export const TestProviders = ({
 
     return (
         <ServerContext.Provider value={{}}>
-            <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+            <IntlProvider
+                defaultRichTextElements={{
+                    b: (chunks) => <b>{chunks}</b>,
+                    br: () => <br />,
+                    p: (chunks) => <p>{chunks}</p>,
+                    s: (chunks) => <s>{chunks}</s>,
+                    span: (chunks) => <span>{chunks}</span>
+                }}
+                locale={locale.id}
+                defaultLocale={DEFAULT_LOCALE}
+                messages={messages}
+            >
                 <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
                     <CommerceApiProvider
                         shortCode={commerceApiConfig.parameters.shortCode}

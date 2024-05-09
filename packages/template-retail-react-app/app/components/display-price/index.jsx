@@ -8,81 +8,94 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useIntl} from 'react-intl'
+import {FormattedMessage, FormattedNumber} from 'react-intl'
 
-const DisplayPrice = ({
-    strikethroughPrice,
-    currentPrice,
-    prefixLabel,
-    currency,
-    currentPriceProps,
-    strikethroughPriceProps
-}) => {
-    const intl = useIntl()
-    const currentPriceText = intl.formatNumber(currentPrice, {
-        style: 'currency',
-        currency: currency
-    })
-    const strikethroughPriceText =
-        strikethroughPrice &&
-        intl.formatNumber(strikethroughPrice, {
-            style: 'currency',
-            currency: currency
-        })
-    return (
-        <Box display={'flex'}>
-            {prefixLabel && (
-                <Text fontWeight="bold" fontSize="md" mr={1}>
-                    {prefixLabel}
-                </Text>
-            )}
-            <Text
-                as="b"
-                aria-label={intl.formatMessage(
-                    {
-                        id: 'product_tile.assistive_msg.sale_price',
-                        defaultMessage: 'current price {currentPrice}'
-                    },
-                    {
-                        currentPrice: currentPriceText
-                    }
-                )}
-                {...currentPriceProps}
-            >
-                {currentPriceText}
+/**
+ * @param priceData - price info extracted from a product
+ * // If a product is a set,
+ *      on PLP, don't show price at all
+ *      on PDP, the set children will have it own price as From X (cross) Y
+ * // if a product is a master
+ *      on PLP and PDP, show From X (cross) Y , the X and Y are
+ *          sale and list price of variant that has the lowest price (including promotionalPrice)
+ * // if a standard/bundle
+ *      show exact price on PLP and PDP as X (cross) Y
+ * @param currency - currency
+ */
+const DisplayPrice = ({priceData, currency}) => {
+    const PRICE_DATA_CUSTOM_TAGS = {
+        // we re-defined here since they are specific for this component
+        s: (chunks) => (
+            <Text as="s" color="gray.600">
+                {chunks}
             </Text>
-            {/*Allowing display price of 0*/}
-            {typeof strikethroughPrice === 'number' && (
-                <Text
-                    color="gray.600"
-                    aria-label={intl.formatMessage(
-                        {
-                            id: 'product_tile.assistive_msg.original_price',
-                            defaultMessage: 'strikethrough price {strikethroughPrice}'
-                        },
-                        {
-                            strikethroughPrice: strikethroughPriceText
-                        }
-                    )}
-                    as={typeof currentPrice === 'number' ? 's' : 'b'}
-                    ml={typeof currentPrice === 'number' ? 2 : 0}
-                    fontWeight={typeof currentPrice === 'number' ? 'normal' : 'bold'}
-                    {...strikethroughPriceProps}
-                >
-                    {strikethroughPriceText}
-                </Text>
-            )}
+        ),
+        price: (chunks) => <FormattedNumber style="currency" currency={currency} value={chunks} />
+    }
+    return (
+        <Box>
+            <FormattedMessage
+                id="product_tile.price_display"
+                defaultMessage="
+                   {isMaster, select,
+                        true
+                            {
+                                {
+                                    isRange, select,
+                                        true {From}
+                                        false {}
+                                        other {}
+                                }
+                            }
+                        false {}
+                        other {}
+                      }
+                   {isASet, select,
+                        true {}
+                        false
+                            {
+                                {
+                                    isOnSale, select,
+                                         true {
+                                            <b><price>{salePrice}</price></b> <s><price>{listPrice}</price></s>
+                                         }
+                                         false {
+                                            {
+                                                hasRepresentedProduct, select,
+                                                    true  {<span><price>{salePrice}</price></span>}
+                                                    false {<b><price>{salePrice}</price></b>}
+                                                    other {<b><price>{salePrice}</price></b>}
+                                            }
+                                         }
+                                         other {<b><price>{salePrice}</price></b>}
+                                }
+
+                            }
+                        other {}
+                   }
+                "
+                values={{
+                    ...priceData,
+                    ...PRICE_DATA_CUSTOM_TAGS
+                }}
+            />
         </Box>
     )
 }
 
 DisplayPrice.propTypes = {
-    strikethroughPrice: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    currentPrice: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
-    prefixLabel: PropTypes.string,
-    strikethroughPriceProps: PropTypes.object,
-    currentPriceProps: PropTypes.object
+    priceData: PropTypes.shape({
+        salePrice: PropTypes.number.isRequired,
+        isOnSale: PropTypes.bool.isRequired,
+        listPrice: PropTypes.number,
+        isASet: PropTypes.bool,
+        isMaster: PropTypes.bool,
+        isRange: PropTypes.bool,
+        hasRepresentedProduct: PropTypes.bool,
+        maxPrice: PropTypes.number,
+        tieredPrice: PropTypes.number
+    }),
+    currency: PropTypes.string
 }
 
 export default DisplayPrice

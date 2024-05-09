@@ -57,7 +57,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
 
 // Localization
-import {IntlProvider} from 'react-intl'
+import {FormattedNumber, IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten, isServer} from '@salesforce/retail-react-app/app/utils/utils'
@@ -74,6 +74,7 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
+import {Text} from '@chakra-ui/react'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -279,6 +280,15 @@ const App = (props) => {
                     )}
                 </Helmet>
                 <IntlProvider
+                    // provide global common html tags to intl object
+                    // https://formatjs.io/docs/react-intl/components/#defaultrichtextelements
+                    defaultRichTextElements={{
+                        b: (chunks) => <Text as="b">{chunks}</Text>,
+                        br: () => <br />,
+                        p: (chunks) => <Text as="p">{chunks}</Text>,
+                        s: (chunks) => <Text as="s">{chunks}</Text>,
+                        span: (chunks) => <Text as="span">{chunks}</Text>
+                    }}
                     onError={(err) => {
                         if (!messages) {
                             // During the ssr prepass phase the messages object has not loaded, so we can suppress

@@ -29,8 +29,9 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {PRICE_DISPLAY_FORMAT} from '@salesforce/retail-react-app/app/constants'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -78,30 +79,20 @@ const ProductTile = (props) => {
 
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
-    // NOTE: swatches will implement later to set variant accordingly,
-    // On first load, for variant product, get the variant that is the represent product
-    // Also, product tile can be used in RecommendedProducts where it calls getProducts which does not have representedProduct
-    // in that case we use the first variant that has price book to set up discount price
-    // Not all variants has set in a priceBook, meaning not having tieredPrices.
-    const variant = useMemo(
-        () =>
-            product?.variants?.find(
-                (i) => i?.productId === product?.representedProduct?.id || !!i?.tieredPrices
-            ),
-        [product]
-    )
 
-    const {listPrice, currentPrice} = getDisplayPrice({...product, ...variant})
-    const isASet = product?.hitType === 'set' || !!product?.type?.set
-    let productUrl = variant
-        ? rebuildPathWithParams(productUrlBuilder({id: productId}), {
-              ...variant.variationValues,
-              pid: variant.productId
-          })
-        : productUrlBuilder({id: productId})
+    //TODO variants needs to be filter according to selectedAttribute value
+    const variants = product?.variants
+
+    const priceData = getPriceData({...product, variants})
+
     return (
         <Box {...styles.container}>
-            <Link data-testid="product-tile" to={productUrl} {...styles.link} {...rest}>
+            <Link
+                data-testid="product-tile"
+                to={productUrlBuilder({id: productId}, intl.local)}
+                {...styles.link}
+                {...rest}
+            >
                 <Box {...styles.imageWrapper}>
                     {image && (
                         <AspectRatio {...styles.image}>
@@ -121,20 +112,7 @@ const ProductTile = (props) => {
                 <Text {...styles.title}>{localizedProductName}</Text>
 
                 {/* Price */}
-                <DisplayPrice
-                    strikethroughPrice={listPrice > currentPrice ? listPrice : null}
-                    prefixLabel={
-                        isASet
-                            ? intl.formatMessage({
-                                  id: 'product_view.label.from',
-                                  defaultMessage: 'From'
-                              })
-                            : null
-                    }
-                    currency={currency}
-                    currentPriceProps={listPrice > currentPrice ? {as: 'b'} : {as: 'span'}}
-                    currentPrice={currentPrice}
-                />
+                <DisplayPrice priceData={priceData} currency={currency} />
             </Link>
             {enableFavourite && (
                 <Box
