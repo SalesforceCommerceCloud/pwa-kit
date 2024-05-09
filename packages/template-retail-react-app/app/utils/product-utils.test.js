@@ -9,6 +9,12 @@ import {
     getPriceData,
     getDisplayVariationValues
 } from '@salesforce/retail-react-app/app/utils/product-utils'
+import {
+    mockMasterProductHitWithMultipleVariants,
+    mockMasterProductHitWithOneVariant,
+    mockProductSetHit,
+    mockStandardProductHit
+} from '@salesforce/retail-react-app/app/mocks/product-search-hit-data'
 
 describe('getDisplayVariationValues', function () {
     const variationAttributes = [
@@ -57,138 +63,62 @@ describe('getDisplayVariationValues', function () {
 
 describe('getPriceData', function () {
     test('returns price data for master product that has more than one variant', () => {
-        const data = {
-            name: 'product name',
-            price: 30.76,
-            priceRanges: [
-                {
-                    maxPrice: 40.76,
-                    minPrice: 35.76,
-                    pricebook: 'gbp-m-list-prices'
-                },
-                {
-                    maxPrice: 37.76,
-                    minPrice: 30.76,
-                    pricebook: 'gbp-m-sale-prices'
-                }
-            ]
-        }
-        const {listPrice, currentPrice} = getPriceData(data)
-
-        expect(listPrice).toBe(35.76)
-        expect(currentPrice).toBe(30.76)
+        const priceData = getPriceData(mockMasterProductHitWithMultipleVariants)
+        expect(priceData).toEqual({
+            salePrice: 191.99,
+            listPrice: 223.99,
+            isOnSale: true,
+            isASet: false,
+            isMaster: true,
+            isRange: true,
+            hasRepresentedProduct: true,
+            tieredPrice: 223.99,
+            maxPrice: 223.99
+        })
     })
 
     test('returns price data for master product that has ONLY one variant', () => {
-        const data = {
-            name: 'product name',
-            price: 25.6,
-            tieredPrices: [
-                {
-                    price: 30.6,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 25.6,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ]
-        }
-        const {listPrice, currentPrice} = getPriceData(data)
-
-        expect(listPrice).toBe(30.6)
-        expect(currentPrice).toBe(25.6)
+        const priceData = getPriceData(mockMasterProductHitWithOneVariant)
+        expect(priceData).toEqual({
+            salePrice: 191.99,
+            listPrice: 320,
+            isOnSale: true,
+            isASet: false,
+            isMaster: true,
+            isRange: false,
+            hasRepresentedProduct: true,
+            tieredPrice: 320,
+            maxPrice: 320
+        })
     })
 
-    test('returns pick the closest tieredPrices for product currentPrice quantity', () => {
-        const data = {
-            name: 'product name',
-            price: 25.6,
-            tieredPrices: [
-                {
-                    price: 30.6,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 25.6,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                },
-                {
-                    price: 15,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 10
-                }
-            ]
-        }
-        const {listPrice, currentPrice} = getPriceData(data, {quantity: 11})
-
-        expect(listPrice).toBe(30.6)
-        expect(currentPrice).toBe(15)
+    test('returns correct priceData for product set', () => {
+        const priceData = getPriceData(mockProductSetHit)
+        expect(priceData).toEqual({
+            salePrice: 40.16,
+            listPrice: undefined,
+            isOnSale: false,
+            isASet: true,
+            isMaster: false,
+            isRange: true,
+            hasRepresentedProduct: true,
+            tieredPrice: undefined,
+            maxPrice: 71.03
+        })
     })
 
-    test('should not pick the discounted tiered when it does not reach the tierd quantity', () => {
-        const data = {
-            name: 'product name',
-            price: 25.6,
-            tieredPrices: [
-                {
-                    price: 30.6,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 25.6,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                },
-                {
-                    price: 15,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 10
-                }
-            ]
-        }
-        const {listPrice, currentPrice} = getPriceData(data, {quantity: 9})
-
-        expect(listPrice).toBe(30.6)
-        expect(currentPrice).toBe(25.6)
-    })
-
-    test('returns pick the promotional Price for product currentPrice when it is the lowest price among other sale prices', () => {
-        const data = {
-            name: 'product name',
-            price: 25.6,
-            productPromotions: [
-                {
-                    promotionalPrice: 10.99,
-                    id: 'promotional-price'
-                }
-            ],
-            tieredPrices: [
-                {
-                    price: 30.6,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 25.6,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                },
-                {
-                    price: 15,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 10
-                }
-            ]
-        }
-        const {listPrice, currentPrice} = getPriceData(data, {quantity: 11})
-
-        expect(listPrice).toBe(30.6)
-        expect(currentPrice).toBe(10.99)
+    test('returns correct priceData for standard product', () => {
+        const priceData = getPriceData(mockStandardProductHit)
+        expect(priceData).toEqual({
+            salePrice: 63.99,
+            listPrice: 67.99,
+            isOnSale: true,
+            isASet: false,
+            isMaster: false,
+            isRange: false,
+            hasRepresentedProduct: true,
+            tieredPrice: 67.99,
+            maxPrice: 67.99
+        })
     })
 })

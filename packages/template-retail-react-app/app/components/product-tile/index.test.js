@@ -7,12 +7,12 @@
 import React from 'react'
 import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components/product-tile/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {fireEvent, screen, within} from '@testing-library/react'
+import {fireEvent, within} from '@testing-library/react'
 import {
+    mockMasterProductHitWithOneVariant,
     mockProductSearchItem,
     mockProductSetHit,
-    mockStandardProductHit,
-    mockVariantProductHit
+    mockStandardProductHit
 } from '@salesforce/retail-react-app/app/mocks/product-search-hit-data'
 
 test('Renders links and images', () => {
@@ -50,9 +50,25 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
 })
 
-test('renders strike through price with variants product', () => {
+test('renders exact price with strikethrough price for master product can be filtered down to one variant ', () => {
     const {getByText, container} = renderWithProviders(
         <ProductTile product={mockVariantProductHit} />
+    )
+    expect(getByText(/black flat front wool suit/i)).toBeInTheDocument()
+    expect(getByText(/£191\.99/i)).toBeInTheDocument()
+    expect(getByText(/£320\.00/i)).toBeInTheDocument()
+
+    const salePriceTag = container.querySelectorAll('b')
+    const strikethroughPriceTag = container.querySelectorAll('s')
+    expect(within(salePriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
+    expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
+    expect(salePriceTag).toHaveLength(1)
+    expect(strikethroughPriceTag).toHaveLength(1)
+})
+
+test('renders exact price with strikethrough price for master product can be filtered down to one variant ', () => {
+    const {getByText, container} = renderWithProviders(
+        <ProductTile product={mockMasterProductHitWithOneVariant} />
     )
     expect(getByText(/black flat front wool suit/i)).toBeInTheDocument()
     expect(getByText(/£191\.99/i)).toBeInTheDocument()

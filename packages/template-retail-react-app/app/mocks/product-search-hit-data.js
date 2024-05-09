@@ -87,7 +87,7 @@ const mockStandardProductHit = {
         }
     ]
 }
-const mockVariantProductHit = {
+const mockMasterProductHitWithOneVariant = {
     currency: 'GBP',
     hitType: 'master',
     image: {
@@ -213,5 +213,532 @@ const mockVariantProductHit = {
         }
     ]
 }
-
-export {mockProductSetHit, mockStandardProductHit, mockVariantProductHit, mockProductSearchItem}
+const mockMasterProductHitWithMultipleVariants = {
+    currency: 'GBP',
+    hitType: 'master',
+    image: {
+        alt: 'Black Single Pleat Athletic Fit Wool Suit - Edit, , large',
+        disBaseLink:
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5d64302b/images/large/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
+        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5d64302b/images/large/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
+        title: 'Black Single Pleat Athletic Fit Wool Suit - Edit, '
+    },
+    orderable: true,
+    price: 191.99,
+    pricePerUnit: 191.99,
+    priceRanges: [
+        {
+            maxPrice: 320,
+            minPrice: 191.99,
+            pricebook: 'gbp-m-list-prices'
+        },
+        {
+            maxPrice: 191.99,
+            minPrice: 191.99,
+            pricebook: 'gbp-m-sale-prices'
+        }
+    ],
+    productId: '25604524M',
+    productName: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
+    productType: {
+        master: true
+    },
+    representedProduct: {
+        id: '750518699660M'
+    },
+    variants: [
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699660M',
+            tieredPrices: [
+                {
+                    price: 223.99,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '050',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699585M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '039',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699653M',
+            tieredPrices: [
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '048',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699615M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '042',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699608M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '041',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699646M',
+            tieredPrices: [
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '046',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699592M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '040',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699622M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '043',
+                width: 'V'
+            }
+        },
+        {
+            orderable: false,
+            price: 191.99,
+            productId: '750518699578M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '038',
+                width: 'V'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699875M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '046',
+                width: 'L'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699868M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '044',
+                width: 'L'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699820M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '040',
+                width: 'L'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699882M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '048',
+                width: 'L'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699851M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '043',
+                width: 'L'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699844M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '042',
+                width: 'L'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699769M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '044',
+                width: 'S'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699721M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '040',
+                width: 'S'
+            }
+        },
+        {
+            orderable: true,
+            price: 191.99,
+            productId: '750518699745M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'BLACKFB',
+                size: '042',
+                width: 'S'
+            }
+        }
+    ],
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Colour',
+            values: [
+                {
+                    name: 'Black',
+                    orderable: true,
+                    value: 'BLACKFB'
+                }
+            ]
+        },
+        {
+            id: 'size',
+            name: 'Size',
+            values: [
+                {
+                    name: '38',
+                    orderable: false,
+                    value: '038'
+                },
+                {
+                    name: '39',
+                    orderable: true,
+                    value: '039'
+                },
+                {
+                    name: '40',
+                    orderable: true,
+                    value: '040'
+                },
+                {
+                    name: '41',
+                    orderable: true,
+                    value: '041'
+                },
+                {
+                    name: '42',
+                    orderable: true,
+                    value: '042'
+                },
+                {
+                    name: '43',
+                    orderable: true,
+                    value: '043'
+                },
+                {
+                    name: '44',
+                    orderable: true,
+                    value: '044'
+                },
+                {
+                    name: '46',
+                    orderable: true,
+                    value: '046'
+                },
+                {
+                    name: '48',
+                    orderable: true,
+                    value: '048'
+                },
+                {
+                    name: '50',
+                    orderable: true,
+                    value: '050'
+                }
+            ]
+        },
+        {
+            id: 'width',
+            name: 'Width',
+            values: [
+                {
+                    name: 'Short',
+                    orderable: true,
+                    value: 'S'
+                },
+                {
+                    name: 'Regular',
+                    orderable: true,
+                    value: 'V'
+                },
+                {
+                    name: 'Long',
+                    orderable: true,
+                    value: 'L'
+                }
+            ]
+        }
+    ]
+}
+export {
+    mockProductSetHit,
+    mockStandardProductHit,
+    mockMasterProductHitWithOneVariant,
+    mockProductSearchItem,
+    mockMasterProductHitWithMultipleVariants
+}
