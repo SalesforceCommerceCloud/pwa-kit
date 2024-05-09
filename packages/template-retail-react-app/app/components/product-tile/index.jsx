@@ -184,7 +184,6 @@ const ProductTile = (props) => {
                                     return (
                                         <Swatch
                                             key={value}
-                                            href={href}
                                             value={value}
                                             name={name}
                                             variant={'circle'}
