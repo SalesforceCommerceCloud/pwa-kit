@@ -157,7 +157,13 @@ const ProductTile = (props) => {
                     ?.map(({id, values}) => {
                         const attributeId = id
                         return (
-                            <SwatchGroup key={id}>
+                            <SwatchGroup
+                                key={id}
+                                value={selectableAttributeValue}
+                                handleChange={(value) => {
+                                    setSelectableAttributeValue(value)
+                                }}
+                            >
                                 {values?.map(({href, name, swatch, value}) => {
                                     const content = swatch ? (
                                         <Box
@@ -179,13 +185,10 @@ const ProductTile = (props) => {
                                         <Swatch
                                             key={value}
                                             href={href}
-                                            handleChange={(value) => {
-                                                setSelectableAttributeValue(value)
-                                            }}
                                             value={value}
                                             name={name}
                                             variant={'circle'}
-                                            selected={value === selectableAttributeValue}
+                                            isFocusable={true}
                                         >
                                             {content}
                                         </Swatch>

@@ -29,53 +29,30 @@ const Swatch = ({
     selected,
     isFocusable,
     value,
-    handleChange,
+    handleSelect,
     variant = 'square'
 }) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
     const isDesktop = useBreakpointValue({base: false, lg: true})
-    const [changeHandlers, setChangeHandlers] = useState({})
+    const [selectHandlers, setSelectHandlers] = useState({})
 
-    const onKeyDown = useCallback((evt) => {
-        let sibling
-        // This is not a very react-y way implementation... ¯\_(ツ)_/¯
-        switch (evt.key) {
-            case 'ArrowUp':
-            case 'ArrowLeft':
-                evt.preventDefault()
-                sibling =
-                    evt.target.previousElementSibling || evt.target.parentElement.lastElementChild
-                break
-            case 'ArrowDown':
-            case 'ArrowRight':
-                evt.preventDefault()
-                sibling =
-                    evt.target.nextElementSibling || evt.target.parentElement.firstElementChild
-                break
-            default:
-                break
-        }
-        sibling?.click()
-        sibling?.focus()
-    }, [])
-
-    const onChange = useCallback(
+    const onSelect = useCallback(
         (e) => {
             e.preventDefault()
-            handleChange(value)
+            handleSelect(value)
         },
-        [handleChange]
+        [handleSelect]
     )
 
     useEffect(() => {
-        if (!handleChange) {
+        if (!handleSelect) {
             return
         }
 
-        setChangeHandlers({
-            [isDesktop ? 'onMouseEnter' : 'onClick']: onChange
+        setSelectHandlers({
+            [isDesktop ? 'onMouseEnter' : 'onClick']: onSelect
         })
-    }, [onChange, isDesktop])
+    }, [onSelect, isDesktop])
 
     return (
         <Button
@@ -84,13 +61,12 @@ const Swatch = ({
             to={href}
             aria-label={name}
             aria-checked={selected}
-            onKeyDown={onKeyDown}
             variant="outline"
             role="radio"
             // To mimic the behavior of native radio inputs, only one input should be focusable.
             // (The rest are selectable via arrow keys.)
             tabIndex={isFocusable ? 0 : -1}
-            {...changeHandlers}
+            {...selectHandlers}
         >
             <Center {...styles.swatchButton}>
                 {children}
@@ -144,7 +120,7 @@ Swatch.propTypes = {
      * This function is called whenever the mouse enters the swatch on desktop or when clicked on mobile.
      * The values is passed as the first argument.
      */
-    handleChange: PropTypes.func
+    handleSelect: PropTypes.func
 }
 
 export default Swatch
