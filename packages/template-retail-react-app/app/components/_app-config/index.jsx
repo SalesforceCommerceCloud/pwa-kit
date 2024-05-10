@@ -67,7 +67,7 @@ const AppConfig = ({children, locals = {}}) => {
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            // enablePWAKitPrivateClient={true}
+            enablePWAKitPrivateClient={true}
             OCAPISessionsURL={`${appOrigin}${getProxyPathBase()}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
