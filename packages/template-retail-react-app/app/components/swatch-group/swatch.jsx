@@ -57,7 +57,7 @@ const Swatch = ({
     return (
         <Button
             {...styles.swatch}
-            as={href ? RouteLink : "button"}
+            as={href ? RouteLink : 'button'}
             to={href}
             aria-label={name}
             aria-checked={selected}
