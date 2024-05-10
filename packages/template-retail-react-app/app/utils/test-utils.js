@@ -26,7 +26,6 @@ import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import {getSiteByReference} from '@salesforce/retail-react-app/app/utils/site-utils'
 import jwt from 'jsonwebtoken'
 import userEvent from '@testing-library/user-event'
-import {Text} from '@chakra-ui/react'
 // This JWT's payload is special
 // it includes 3 fields that commerce-sdk-react cares:
 // exp, isb and sub

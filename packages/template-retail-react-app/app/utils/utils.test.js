@@ -198,7 +198,7 @@ describe('getSmallestValByKey', function () {
             }
         ]
         const val = getSmallestValByProperty(data, 'price')
-        expect(val).toEqual(9)
+        expect(val).toBe(9)
     })
     test('should undefined if array is not passed in', () => {
         const data = {

@@ -5627,8 +5627,14 @@
             {
               "children": [
                 {
-                  "type": 1,
-                  "value": "salePrice"
+                  "children": [
+                    {
+                      "type": 1,
+                      "value": "salePrice"
+                    }
+                  ],
+                  "type": 8,
+                  "value": "price"
                 }
               ],
               "type": 8,

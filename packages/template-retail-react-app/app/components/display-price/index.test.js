@@ -29,9 +29,10 @@ describe('DisplayPrice', function () {
         const {container} = renderWithProviders(<DisplayPrice currency="GBP" priceData={data} />)
         const currentPriceTag = container.querySelectorAll('b')
         const strikethroughPriceTag = container.querySelectorAll('s')
-        expect(within(currentPriceTag[0]).getByText(/£90\.00/i)).toBeDefined()
+        // From and salePrice are in two separate b tags
+        expect(within(currentPriceTag[1]).getByText(/£90\.00/i)).toBeDefined()
         expect(within(strikethroughPriceTag[0]).getByText(/£100\.00/i)).toBeDefined()
-        expect(currentPriceTag).toHaveLength(1)
+        expect(currentPriceTag).toHaveLength(2)
         expect(strikethroughPriceTag).toHaveLength(1)
     })
 

@@ -9,6 +9,7 @@ import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {fireEvent, within} from '@testing-library/react'
 import {
+    mockMasterProductHitWithMultipleVariants,
     mockMasterProductHitWithOneVariant,
     mockProductSearchItem,
     mockProductSetHit,
@@ -50,29 +51,30 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
 })
 
-test('renders exact price with strikethrough price for master product can be filtered down to one variant ', () => {
-    const {getByText, container} = renderWithProviders(
-        <ProductTile product={mockVariantProductHit} />
+test('renders exact price with strikethrough price for master product can be has various variants', () => {
+    const {queryByText, getByText, container} = renderWithProviders(
+        <ProductTile product={mockMasterProductHitWithMultipleVariants} />
     )
-    expect(getByText(/black flat front wool suit/i)).toBeInTheDocument()
-    expect(getByText(/£191\.99/i)).toBeInTheDocument()
-    expect(getByText(/£320\.00/i)).toBeInTheDocument()
+    expect(getByText(/Black Single Pleat Athletic Fit Wool Suit - Edit/i)).toBeInTheDocument()
+    expect(queryByText(/from/i)).toBeInTheDocument()
 
     const salePriceTag = container.querySelectorAll('b')
     const strikethroughPriceTag = container.querySelectorAll('s')
-    expect(within(salePriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
-    expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
-    expect(salePriceTag).toHaveLength(1)
+    expect(within(salePriceTag[1]).getByText(/£191\.99/i)).toBeDefined()
+    expect(within(strikethroughPriceTag[0]).getByText(/£223\.99/i)).toBeDefined()
+    // From and price are in separate b tag
+    expect(salePriceTag).toHaveLength(2)
     expect(strikethroughPriceTag).toHaveLength(1)
 })
 
-test('renders exact price with strikethrough price for master product can be filtered down to one variant ', () => {
-    const {getByText, container} = renderWithProviders(
+test('renders exact price with strikethrough price for master product can be filtered down to one variant', () => {
+    const {getByText, queryByText, container} = renderWithProviders(
         <ProductTile product={mockMasterProductHitWithOneVariant} />
     )
     expect(getByText(/black flat front wool suit/i)).toBeInTheDocument()
     expect(getByText(/£191\.99/i)).toBeInTheDocument()
     expect(getByText(/£320\.00/i)).toBeInTheDocument()
+    expect(queryByText(/from/i)).not.toBeInTheDocument()
 
     const salePriceTag = container.querySelectorAll('b')
     const strikethroughPriceTag = container.querySelectorAll('s')
@@ -82,13 +84,13 @@ test('renders exact price with strikethrough price for master product can be fil
     expect(strikethroughPriceTag).toHaveLength(1)
 })
 
-test('Product set - does not render strike through price', () => {
-    const {getByText, queryByText, container} = renderWithProviders(
+test('Product set - shows range From X where X is the lowest price child', () => {
+    const {getByText, queryByText} = renderWithProviders(
         <ProductTile product={mockProductSetHit} />
     )
     expect(getByText(/Winter Look/i)).toBeInTheDocument()
-    expect(queryByText(/from/i)).not.toBeInTheDocument()
-    expect(queryByText(/£40\.16/i)).not.toBeInTheDocument()
+    expect(queryByText(/from/i)).toBeInTheDocument()
+    expect(queryByText(/£40\.16/i)).toBeInTheDocument()
     expect(queryByText(/£44\.16/i)).not.toBeInTheDocument()
 })
 

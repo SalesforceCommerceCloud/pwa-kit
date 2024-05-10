@@ -66,7 +66,7 @@ const DisplayPrice = ({priceData, currency}) => {
                         other {}
                       }
                    {isASet, select,
-                        true {From <span>{salePrice}</span>}
+                        true {From <span><price>{salePrice}</price></span>}
                         false
                             {
                                 {

@@ -174,8 +174,9 @@ test('renders a product set properly - child item', () => {
     expect(variationAttributes).toHaveLength(2)
     expect(quantityPicker).toBeInTheDocument()
 
-    // What should _not_ exist:
-    expect(fromLabels).toHaveLength(0)
+    // since setProducts are master products, as pricing now display From X (cross) Y where X Y are sale and lis price respectively
+    // of the variant that has lowest price (including promotional price)
+    expect(fromLabels).toHaveLength(2)
 })
 
 test('validateOrderability callback is called when adding a set to cart', async () => {

@@ -57,7 +57,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
 
 // Localization
-import {FormattedNumber, IntlProvider} from 'react-intl'
+import {IntlProvider} from 'react-intl'
 
 // Others
 import {watchOnlineStatus, flatten, isServer} from '@salesforce/retail-react-app/app/utils/utils'

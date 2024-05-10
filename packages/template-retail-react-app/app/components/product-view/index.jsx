@@ -63,7 +63,8 @@ const ProductViewHeader = ({name, currency, priceData, category}) => {
 ProductViewHeader.propTypes = {
     name: PropTypes.string,
     currency: PropTypes.string,
-    category: PropTypes.array
+    category: PropTypes.array,
+    priceData: PropTypes.object
 }
 
 const ButtonWithRegistration = withRegistration(Button)

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useMemo, useRef} from 'react'
+import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
@@ -26,12 +26,11 @@ import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-im
 import {useIntl} from 'react-intl'
 
 // Other
-import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
+import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {PRICE_DISPLAY_FORMAT} from '@salesforce/retail-react-app/app/constants'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
