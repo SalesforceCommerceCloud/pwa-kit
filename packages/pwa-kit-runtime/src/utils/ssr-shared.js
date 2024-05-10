@@ -89,6 +89,10 @@ export const getHealtCheckPathBase = () => {
     return '/mobify/ping'
 }
 
+export const getSLASPrivateProxyPath = () => {
+    return '/mobify/slas/private'
+}
+
 /**
  * Updates the value of _packageMobify and dependent values.
  *

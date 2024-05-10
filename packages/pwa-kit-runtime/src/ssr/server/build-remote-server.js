@@ -11,8 +11,7 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE,
-    SLAS_CUSTOM_PROXY_PATH
+    NO_CACHE
 } from './constants'
 import {
     catchAndLog,
@@ -39,7 +38,7 @@ import fs from 'fs'
 import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
-import {proxyConfigs, updatePackageMobify, startsWithMobify, getProxyPathBase, getHealtCheckPathBase} from '../../utils/ssr-shared'
+import {proxyConfigs, updatePackageMobify, startsWithMobify, getProxyPathBase, getHealtCheckPathBase, getSLASPrivateProxyPath} from '../../utils/ssr-shared'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
@@ -627,7 +626,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _handleMissingSlasPrivateEnvVar(app) {
-        app.use(SLAS_CUSTOM_PROXY_PATH, (_, res) => {
+        app.use(getSLASPrivateProxyPath(), (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
@@ -642,7 +641,7 @@ export const RemoteServerFactory = {
         if (!options.useSLASPrivateClient) {
             return
         }
-        localDevLog(`Proxying ${SLAS_CUSTOM_PROXY_PATH} to ${options.slasTarget}`)
+        localDevLog(`Proxying ${getSLASPrivateProxyPath()} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
@@ -654,16 +653,16 @@ export const RemoteServerFactory = {
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
         app.use(
-            SLAS_CUSTOM_PROXY_PATH,
+            getSLASPrivateProxyPath(),
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[SLAS_CUSTOM_PROXY_PATH]: ''},
+                pathRewrite: {[getSLASPrivateProxyPath()]: ''},
                 onProxyReq: (proxyRequest, incomingRequest) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
-                        proxyPath: SLAS_CUSTOM_PROXY_PATH,
+                        proxyPath: getSLASPrivateProxyPath(),
                         targetHost: options.slasHostName,
                         targetProtocol: 'https'
                     })
