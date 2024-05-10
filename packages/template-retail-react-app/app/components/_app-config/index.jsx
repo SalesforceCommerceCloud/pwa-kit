@@ -27,6 +27,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -67,7 +68,7 @@ const AppConfig = ({children, locals = {}}) => {
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             // enablePWAKitPrivateClient={true}
-            OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
+            OCAPISessionsURL={`${appOrigin}${getProxyPathBase()}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>

@@ -69,6 +69,26 @@ export let ssrFiles = []
  */
 const proxyOverrideRE = /^(http(s)?):\/\/([^/]+)(\/)?([^/]+)?(\/caching)?/
 
+export const startsWithMobify = (url) => {
+    return url.startsWith('/mobify/')
+}
+
+export const getProxyPathBase = () => {
+    return '/mobify/proxy'
+}
+
+export const getBundlePathBase = () => {
+    return '/mobify/bundle'
+}
+
+export const getCachingPathBase = () => {
+    return '/mobify/caching'
+}
+
+export const getHealtCheckPathBase = () => {
+    return '/mobify/ping'
+}
+
 /**
  * Updates the value of _packageMobify and dependent values.
  *
@@ -166,8 +186,8 @@ export const updatePackageMobify = (newValue) => {
         }
 
         // Generate paths
-        config.proxyPath = `/mobify/proxy/${config.path}`
-        config.cachingPath = `/mobify/caching/${config.path}`
+        config.proxyPath = `${getProxyPathBase()}/${config.path}`
+        config.cachingPath = `${getCachingPathBase()}/${config.path}`
 
         proxyConfigs.push(config)
     }

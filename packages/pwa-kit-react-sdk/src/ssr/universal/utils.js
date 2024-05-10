@@ -7,7 +7,7 @@
 /**
  * @module progressive-web-sdk/ssr/universal/utils
  */
-import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
+import {proxyConfigs, getBundlePathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 
 const onClient = typeof window !== 'undefined'
 
@@ -22,7 +22,7 @@ export const getAssetUrl = (path) => {
     /* istanbul ignore next */
     const publicPath = onClient
         ? `${window.Progressive.buildOrigin}`
-        : `/mobify/bundle/${process.env.BUNDLE_ID || 'development'}/`
+        : `${getBundlePathBase()}/${process.env.BUNDLE_ID || 'development'}/`
     return path ? `${publicPath}${path}` : publicPath
 }
 

@@ -18,7 +18,7 @@ import webpackHotMiddleware from 'webpack-hot-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
-import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
+import {proxyConfigs, getBundlePathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {
     SERVER,
     CLIENT,
@@ -166,7 +166,7 @@ export const DevServerMixin = {
             app.__hotServerMiddleware = webpackHotServerMiddleware(app.__compiler)
         }
 
-        app.use('/mobify/bundle/development', app.__devMiddleware)
+        app.use(`${getBundlePathBase()}/development`, app.__devMiddleware)
 
         app.__hmrMiddleware = (_, res) => res.status(501).send('Hot Module Reloading is disabled.')
         const clientCompiler = app.__compiler.compilers.find((compiler) => compiler.name === CLIENT)
@@ -209,7 +209,7 @@ export const DevServerMixin = {
         // Proxy bundle asset requests to the local
         // build directory.
         app.use(
-            '/mobify/bundle/development',
+            `${getBundlePathBase}/development`,
             express.static(path.resolve(process.cwd(), 'src'), {
                 dotFiles: 'deny',
                 setHeaders: setLocalAssetHeaders,
