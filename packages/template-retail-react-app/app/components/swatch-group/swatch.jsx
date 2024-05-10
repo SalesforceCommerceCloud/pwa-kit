@@ -66,7 +66,7 @@ const Swatch = ({
             // To mimic the behavior of native radio inputs, only one input should be focusable.
             // (The rest are selectable via arrow keys.)
             tabIndex={isFocusable ? 0 : -1}
-            {...selectHandlers}
+            {...(href ? {} : selectHandlers)}
         >
             <Center {...styles.swatchButton}>
                 {children}
