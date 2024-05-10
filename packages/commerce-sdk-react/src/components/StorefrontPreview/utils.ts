@@ -6,7 +6,7 @@
  */
 
 import {ApiClients} from '../../hooks/types'
-import {DEVELOPMENT_ORIGIN, getParentOrigin, isOriginTrusted} from '../../utils'
+import {DEVELOPMENT_ORIGIN, getParentOrigin, isOriginTrusted, getDevelopBundlePath} from '../../utils'
 
 /** Detects whether the storefront is running in an iframe as part of Storefront Preview.
  * @private
@@ -22,7 +22,7 @@ export const detectStorefrontPreview = () => {
 export const getClientScript = () => {
     const parentOrigin = getParentOrigin() ?? 'https://runtime.commercecloud.com'
     return parentOrigin === DEVELOPMENT_ORIGIN
-        ? `${parentOrigin}/mobify/bundle/development/static/storefront-preview.js`
+        ? `${parentOrigin}${getDevelopBundlePath()}/static/storefront-preview.js`
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }
 

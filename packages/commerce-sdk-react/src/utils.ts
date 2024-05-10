@@ -47,6 +47,18 @@ export const isOriginTrusted = (origin: string | undefined) => {
     )
 }
 
+export const getProxyPath = () => {
+    return '/mobify/proxy/api'
+}
+
+export const getDevelopBundlePath = () => {
+    return '/mobify/bundle/development'
+}
+
+export const getSLASPath = () => {
+    return '/mobify/slas/private'
+}
+
 /**
  * Gets the value to use for the `sameSite` cookie attribute.
  * @returns `undefined` if running on the server, `"none"` if running as an iframe on a trusted site
