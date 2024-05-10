@@ -52,6 +52,30 @@ export const Skeleton = () => {
     )
 }
 
+const findPromoWithLowestPrice = (promotions) => {
+    return promotions
+        .filter((promo) => promo.promotionalPrice)
+        .sort((a, b) => a.promotionalPrice - b.promotionalPrice)[0]
+}
+
+// TODO: move into a separate file
+const _renderPromoCallout = (product) => {
+    // TODO: also test with other product types
+    // TODO: find a variant that matches the representedProduct
+    const variant = product.variants[0]
+
+    if (!variant.productPromotions) {
+        return
+    }
+
+    const promo =
+        findPromoWithLowestPrice(variant.productPromotions) ??
+        variant.productPromotions.find((promo) => promo.calloutMsg)
+
+    // calloutMsg can be html string or just plain text
+    return promo.calloutMsg && <div dangerouslySetInnerHTML={{__html: promo.calloutMsg}} />
+}
+
 /**
  * The ProductTile is a simple visual representation of a
  * product object. It will show it's default image, name and price.
@@ -65,6 +89,7 @@ const ProductTile = (props) => {
         isFavourite,
         onFavouriteToggle,
         dynamicImageProps,
+        renderPromoCallout = _renderPromoCallout,
         ...rest
     } = props
     const {currency} = useCurrency()
@@ -83,6 +108,8 @@ const ProductTile = (props) => {
     const variants = product?.variants
 
     const priceData = getPriceData({...product, variants})
+
+    const promoCallout = renderPromoCallout(product)
 
     return (
         <Box {...styles.container}>
@@ -112,6 +139,9 @@ const ProductTile = (props) => {
 
                 {/* Price */}
                 <DisplayPrice priceData={priceData} currency={currency} />
+
+                {/* Promotion call-out message */}
+                {promoCallout && <Text>{promoCallout}</Text>}
             </Link>
             {enableFavourite && (
                 <Box
