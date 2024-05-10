@@ -153,7 +153,7 @@ const ProductTile = (props) => {
 
                 {/* Swatches */}
                 {variationAttributes
-                    ?.filter(({id}) => selectableAttributeId == id)
+                    ?.filter(({id}) => selectableAttributeId === id)
                     ?.map(({id, values}) => {
                         const attributeId = id
                         return (
