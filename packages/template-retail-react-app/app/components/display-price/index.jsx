@@ -13,8 +13,9 @@ import {FormattedMessage, FormattedNumber} from 'react-intl'
 /**
  * @param priceData - price info extracted from a product
  * // If a product is a set,
- *      on PLP, don't show price at all
- *      on PDP, the set children will have it own price as From X (cross) Y
+ *      on PLP, Show From X where X is the lowest of its children
+ *      on PDP, Show From X where X is the lowest of its children and
+ *          the set children will have it own price as From X (cross) Y
  * // if a product is a master
  *      on PLP and PDP, show From X (cross) Y , the X and Y are
  *          sale and list price of variant that has the lowest price (including promotionalPrice)
@@ -42,7 +43,21 @@ const DisplayPrice = ({priceData, currency}) => {
                             {
                                 {
                                     isRange, select,
-                                        true {From}
+                                        true {
+                                            {
+                                                isOnSale, select,
+                                                    true {<b>From</b>}
+                                                    fales {
+                                                        {
+                                                            hasRepresentedProduct, select,
+                                                                true {<b>From</b>}
+                                                                false {<span>From</span>}
+                                                                other {}
+                                                        }
+                                                    }
+                                                    other {<span>From</span>}
+                                            }
+                                        }
                                         false {}
                                         other {}
                                 }
@@ -51,7 +66,7 @@ const DisplayPrice = ({priceData, currency}) => {
                         other {}
                       }
                    {isASet, select,
-                        true {}
+                        true {From <span>{salePrice}</span>}
                         false
                             {
                                 {
