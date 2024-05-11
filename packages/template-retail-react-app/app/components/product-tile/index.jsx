@@ -31,6 +31,7 @@ import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {renderPromoCallout as _renderPromoCallout} from '@salesforce/retail-react-app/app/components/product-tile/utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -50,30 +51,6 @@ export const Skeleton = () => {
             </Stack>
         </Box>
     )
-}
-
-const findPromoWithLowestPrice = (promotions) => {
-    return promotions
-        .filter((promo) => promo.promotionalPrice)
-        .sort((a, b) => a.promotionalPrice - b.promotionalPrice)[0]
-}
-
-// TODO: move into a separate file
-const _renderPromoCallout = (product) => {
-    // TODO: also test with other product types
-    // TODO: find a variant that matches the representedProduct
-    const variant = product.variants[0]
-
-    if (!variant.productPromotions) {
-        return
-    }
-
-    const promo =
-        findPromoWithLowestPrice(variant.productPromotions) ??
-        variant.productPromotions.find((promo) => promo.calloutMsg)
-
-    // calloutMsg can be html string or just plain text
-    return promo.calloutMsg && <div dangerouslySetInnerHTML={{__html: promo.calloutMsg}} />
 }
 
 /**
@@ -241,7 +218,8 @@ ProductTile.propTypes = {
      * interacts with favourite icon/button.
      */
     onFavouriteToggle: PropTypes.func,
-    dynamicImageProps: PropTypes.object
+    dynamicImageProps: PropTypes.object,
+    renderPromoCallout: PropTypes.func
 }
 
 export default ProductTile
