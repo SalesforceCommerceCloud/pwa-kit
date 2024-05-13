@@ -2293,7 +2293,7 @@
       "value": "This is a secure SSL encrypted payment."
     }
   ],
-  "price_display.text.from": [
+  "price_display.label.from": [
     {
       "type": 0,
       "value": "From"

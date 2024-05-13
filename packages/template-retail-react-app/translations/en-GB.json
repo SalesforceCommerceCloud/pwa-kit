@@ -996,7 +996,7 @@
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "This is a secure SSL encrypted payment."
   },
-  "price_display.text.from": {
+  "price_display.label.from": {
     "defaultMessage": "From"
   },
   "price_per_item.label.each": {

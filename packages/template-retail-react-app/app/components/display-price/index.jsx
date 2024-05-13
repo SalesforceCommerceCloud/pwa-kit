@@ -39,7 +39,7 @@ const DisplayPrice = ({priceData, currency}) => {
         })
 
     const prefixText = intl.formatMessage({
-        id: 'price_display.text.from',
+        id: 'price_display.label.from',
         defaultMessage: 'From '
     })
 
