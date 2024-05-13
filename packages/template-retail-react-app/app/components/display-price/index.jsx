@@ -237,7 +237,7 @@ DisplayPrice.propTypes = {
         maxPrice: PropTypes.number,
         tieredPrice: PropTypes.number
     }),
-    currency: PropTypes.string
+    currency: PropTypes.string.isRequired
 }
 
 export default DisplayPrice
