@@ -51,7 +51,7 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
 })
 
-test('renders exact price with strikethrough price for master product can be has various variants', () => {
+test('renders exact price with strikethrough price for master product with multiple variants', () => {
     const {queryByText, getByText, container} = renderWithProviders(
         <ProductTile product={mockMasterProductHitWithMultipleVariants} />
     )
@@ -67,7 +67,7 @@ test('renders exact price with strikethrough price for master product can be has
     expect(strikethroughPriceTag).toHaveLength(1)
 })
 
-test('renders exact price with strikethrough price for master product can be filtered down to one variant', () => {
+test('renders exact price with strikethrough price for master product with one variant', () => {
     const {getByText, queryByText, container} = renderWithProviders(
         <ProductTile product={mockMasterProductHitWithOneVariant} />
     )
