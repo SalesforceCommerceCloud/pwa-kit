@@ -30,9 +30,9 @@ describe('DisplayPrice', function () {
         const currentPriceTag = container.querySelectorAll('b')
         const strikethroughPriceTag = container.querySelectorAll('s')
         // From and salePrice are in two separate b tags
-        expect(within(currentPriceTag[1]).getByText(/£90\.00/i)).toBeDefined()
+        expect(within(currentPriceTag[0]).getByText(/£90\.00/i)).toBeDefined()
         expect(within(strikethroughPriceTag[0]).getByText(/£100\.00/i)).toBeDefined()
-        expect(currentPriceTag).toHaveLength(2)
+        expect(currentPriceTag).toHaveLength(1)
         expect(strikethroughPriceTag).toHaveLength(1)
     })
 

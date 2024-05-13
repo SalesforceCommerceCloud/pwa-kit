@@ -408,6 +408,12 @@
   "credit_card_fields.tool_tip.security_code_aria_label": {
     "defaultMessage": "Security code info"
   },
+  "display_price.assistive_msg.current_price": {
+    "defaultMessage": "current price {price}"
+  },
+  "display_price.assistive_msg.strikethrough_price": {
+    "defaultMessage": "old price {price}"
+  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"
   },
@@ -990,6 +996,9 @@
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "This is a secure SSL encrypted payment."
   },
+  "price_display.text.from": {
+    "defaultMessage": "From"
+  },
   "price_per_item.label.each": {
     "defaultMessage": "ea",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
@@ -1065,9 +1074,6 @@
   },
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
-  },
-  "product_tile.price_display": {
-    "defaultMessage": "{isMaster, select, true { { isRange, select, true { { isOnSale, select, true {<b>From</b>} fales { { hasRepresentedProduct, select, true {<b>From</b>} false {<span>From</span>} other {} } } other {<span>From</span>} } } false {} other {} } } false {} other {} } {isASet, select, true {From <span><price>{salePrice}</price></span>} false { { isOnSale, select, true { <b><price>{salePrice}</price></b> <s><price>{listPrice}</price></s> } false { { hasRepresentedProduct, select, true {<span><price>{salePrice}</price></span>} false {<b><price>{salePrice}</price></b>} other {<b><price>{salePrice}</price></b>} } } other {<b><price>{salePrice}</price></b>} } } other {} }"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"

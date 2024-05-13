@@ -72,9 +72,6 @@ export const getPriceData = (product, opts = {}) => {
             },
             {minPrice: Infinity, variant: null}
         )
-    }
-
-    if (isMaster) {
         salePrice = variantWithLowestPrice?.minPrice
     } else {
         const promotionalPrice = getSmallestValByProperty(
@@ -86,6 +83,7 @@ export const getPriceData = (product, opts = {}) => {
                 ? promotionalPrice
                 : product?.price
     }
+
     // since the price is the lowest value among price books, each product will have at lease a single item tiered price at quantity 1
     // the highest value of tieredPrices is presumptively the list price
     const tieredPrices =

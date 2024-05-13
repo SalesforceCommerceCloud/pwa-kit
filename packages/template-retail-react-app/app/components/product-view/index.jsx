@@ -64,7 +64,17 @@ ProductViewHeader.propTypes = {
     name: PropTypes.string,
     currency: PropTypes.string,
     category: PropTypes.array,
-    priceData: PropTypes.object
+    priceData: PropTypes.shape({
+        salePrice: PropTypes.number.isRequired,
+        isOnSale: PropTypes.bool.isRequired,
+        listPrice: PropTypes.number,
+        isASet: PropTypes.bool,
+        isMaster: PropTypes.bool,
+        isRange: PropTypes.bool,
+        hasRepresentedProduct: PropTypes.bool,
+        maxPrice: PropTypes.number,
+        tieredPrice: PropTypes.number
+    })
 }
 
 const ButtonWithRegistration = withRegistration(Button)

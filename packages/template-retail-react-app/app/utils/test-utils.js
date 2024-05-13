@@ -79,17 +79,7 @@ export const DEFAULT_SITE = 'global'
 
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
-        <IntlProvider
-            defaultRichTextElements={{
-                b: (chunks) => <b>{chunks}</b>,
-                br: () => <br />,
-                p: (chunks) => <p>{chunks}</p>,
-                s: (chunks) => <s>{chunks}</s>,
-                span: (chunks) => <span>{chunks}</span>
-            }}
-            locale={locale}
-            defaultLocale={locale}
-        >
+        <IntlProvider locale={locale} defaultLocale={locale}>
             {node}
         </IntlProvider>
     )
@@ -132,18 +122,7 @@ export const TestProviders = ({
 
     return (
         <ServerContext.Provider value={{}}>
-            <IntlProvider
-                defaultRichTextElements={{
-                    b: (chunks) => <b>{chunks}</b>,
-                    br: () => <br />,
-                    p: (chunks) => <p>{chunks}</p>,
-                    s: (chunks) => <s>{chunks}</s>,
-                    span: (chunks) => <span>{chunks}</span>
-                }}
-                locale={locale.id}
-                defaultLocale={DEFAULT_LOCALE}
-                messages={messages}
-            >
+            <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
                     <CommerceApiProvider
                         shortCode={commerceApiConfig.parameters.shortCode}

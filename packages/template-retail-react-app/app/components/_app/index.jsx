@@ -280,15 +280,6 @@ const App = (props) => {
                     )}
                 </Helmet>
                 <IntlProvider
-                    // provide global common html tags to intl object
-                    // https://formatjs.io/docs/react-intl/components/#defaultrichtextelements
-                    defaultRichTextElements={{
-                        b: (chunks) => <Text as="b">{chunks}</Text>,
-                        br: () => <br />,
-                        p: (chunks) => <Text as="p">{chunks}</Text>,
-                        s: (chunks) => <Text as="s">{chunks}</Text>,
-                        span: (chunks) => <Text as="span">{chunks}</Text>
-                    }}
                     onError={(err) => {
                         if (!messages) {
                             // During the ssr prepass phase the messages object has not loaded, so we can suppress

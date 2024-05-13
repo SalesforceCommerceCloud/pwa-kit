@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {FormattedMessage, FormattedNumber} from 'react-intl'
+import {useIntl} from 'react-intl'
 
 /**
  * @param priceData - price info extracted from a product
@@ -24,76 +24,126 @@ import {FormattedMessage, FormattedNumber} from 'react-intl'
  * @param currency - currency
  */
 const DisplayPrice = ({priceData, currency}) => {
-    const PRICE_DATA_CUSTOM_TAGS = {
-        // we re-defined here since they are specific for this component
-        s: (chunks) => (
-            <Text as="s" color="gray.600">
-                {chunks}
+    const intl = useIntl()
+    const {listPrice, salePrice, isASet, isMaster, isOnSale, isRange, hasRepresentedProduct} =
+        priceData
+    const salePriceText = intl.formatNumber(salePrice, {
+        style: 'currency',
+        currency: currency
+    })
+    const listPriceText =
+        listPrice &&
+        intl.formatNumber(listPrice, {
+            style: 'currency',
+            currency: currency
+        })
+
+    const prefixText = intl.formatMessage({
+        id: 'price_display.text.from',
+        defaultMessage: 'From '
+    })
+
+    const ariaLabelSalePrice = intl.formatMessage(
+        {
+            id: 'display_price.assistive_msg.current_price',
+            defaultMessage: `current price {price}`
+        },
+        {
+            price: intl.formatNumber(salePrice || 0, {style: 'currency', currency})
+        }
+    )
+    const ariaLabelListPrice = intl.formatMessage(
+        {
+            id: 'display_price.assistive_msg.strikethrough_price',
+            defaultMessage: `old price {price}`
+        },
+        {
+            price: intl.formatNumber(listPrice || 0, {style: 'currency', currency})
+        }
+    )
+    if (isASet) {
+        return hasRepresentedProduct ? (
+            <Text as="span" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
+                {prefixText} {salePriceText}
             </Text>
-        ),
-        price: (chunks) => <FormattedNumber style="currency" currency={currency} value={chunks} />
+        ) : (
+            <Text as="b" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
+                {prefixText} {salePriceText}
+            </Text>
+        )
+    }
+    if (isMaster) {
+        if (isRange) {
+            if (isOnSale) {
+                return (
+                    <>
+                        <Text as="b" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
+                            {prefixText} {salePriceText}
+                        </Text>{' '}
+                        <Text
+                            as="s"
+                            aria-label={`${prefixText} ${ariaLabelListPrice}`}
+                            color="gray.600"
+                        >
+                            {listPriceText}
+                        </Text>
+                    </>
+                )
+            } else {
+                // bold front on PDP, normal font on PLP
+                return hasRepresentedProduct ? (
+                    <Text as="span" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
+                        {prefixText} {salePriceText}
+                    </Text>
+                ) : (
+                    <Text as="b" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
+                        {prefixText} {salePriceText}
+                    </Text>
+                )
+            }
+        } else {
+            if (isOnSale) {
+                return (
+                    <>
+                        <Text as="b" aria-label={ariaLabelSalePrice}>
+                            {salePriceText}
+                        </Text>{' '}
+                        <Text as="s" aria-label={ariaLabelListPrice} color="gray.600">
+                            {listPriceText}
+                        </Text>
+                    </>
+                )
+            } else {
+                return hasRepresentedProduct ? (
+                    <Text as="span" aria-label={ariaLabelSalePrice}>
+                        {salePriceText}
+                    </Text>
+                ) : (
+                    <Text as="b" aria-label={ariaLabelSalePrice}>
+                        {salePriceText}
+                    </Text>
+                )
+            }
+        }
     }
     return (
         <Box>
-            <FormattedMessage
-                id="product_tile.price_display"
-                defaultMessage="
-                   {isMaster, select,
-                        true
-                            {
-                                {
-                                    isRange, select,
-                                        true {
-                                            {
-                                                isOnSale, select,
-                                                    true {<b>From</b>}
-                                                    fales {
-                                                        {
-                                                            hasRepresentedProduct, select,
-                                                                true {<b>From</b>}
-                                                                false {<span>From</span>}
-                                                                other {}
-                                                        }
-                                                    }
-                                                    other {<span>From</span>}
-                                            }
-                                        }
-                                        false {}
-                                        other {}
-                                }
-                            }
-                        false {}
-                        other {}
-                      }
-                   {isASet, select,
-                        true {From <span><price>{salePrice}</price></span>}
-                        false
-                            {
-                                {
-                                    isOnSale, select,
-                                         true {
-                                            <b><price>{salePrice}</price></b> <s><price>{listPrice}</price></s>
-                                         }
-                                         false {
-                                            {
-                                                hasRepresentedProduct, select,
-                                                    true  {<span><price>{salePrice}</price></span>}
-                                                    false {<b><price>{salePrice}</price></b>}
-                                                    other {<b><price>{salePrice}</price></b>}
-                                            }
-                                         }
-                                         other {<b><price>{salePrice}</price></b>}
-                                }
-
-                            }
-                        other {}
-                   }
-                "
-                values={{
-                    ...priceData,
-                    ...PRICE_DATA_CUSTOM_TAGS
-                }}
-            />
+            {isOnSale ? (
+                <>
+                    <Text as="b" aria-label={ariaLabelSalePrice}>
+                        {salePriceText}
+                    </Text>{' '}
+                    {listPriceText && (
+                        <Text as="s" aria-label={ariaLabelListPrice}>
+                            {listPriceText}
+                        </Text>
+                    )}
+                </>
+            ) : (
+                <Text as="span" aria-label={ariaLabelSalePrice}>
+                    {salePriceText}
+                </Text>
+            )}
         </Box>
     )
 }

@@ -60,10 +60,10 @@ test('renders exact price with strikethrough price for master product can be has
 
     const salePriceTag = container.querySelectorAll('b')
     const strikethroughPriceTag = container.querySelectorAll('s')
-    expect(within(salePriceTag[1]).getByText(/£191\.99/i)).toBeDefined()
+    expect(within(salePriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
     expect(within(strikethroughPriceTag[0]).getByText(/£223\.99/i)).toBeDefined()
     // From and price are in separate b tag
-    expect(salePriceTag).toHaveLength(2)
+    expect(salePriceTag).toHaveLength(1)
     expect(strikethroughPriceTag).toHaveLength(1)
 })
 
