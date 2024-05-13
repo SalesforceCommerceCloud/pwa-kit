@@ -65,7 +65,7 @@ describe('getPriceData', function () {
     test('returns price data for master product that has more than one variant', () => {
         const priceData = getPriceData(mockMasterProductHitWithMultipleVariants)
         expect(priceData).toEqual({
-            salePrice: 191.99,
+            currentPrice: 191.99,
             listPrice: 223.99,
             isOnSale: true,
             isASet: false,
@@ -80,7 +80,7 @@ describe('getPriceData', function () {
     test('returns price data for master product that has ONLY one variant', () => {
         const priceData = getPriceData(mockMasterProductHitWithOneVariant)
         expect(priceData).toEqual({
-            salePrice: 191.99,
+            currentPrice: 191.99,
             listPrice: 320,
             isOnSale: true,
             isASet: false,
@@ -95,7 +95,7 @@ describe('getPriceData', function () {
     test('returns correct priceData for product set', () => {
         const priceData = getPriceData(mockProductSetHit)
         expect(priceData).toEqual({
-            salePrice: 40.16,
+            currentPrice: 40.16,
             listPrice: undefined,
             isOnSale: false,
             isASet: true,
@@ -110,7 +110,7 @@ describe('getPriceData', function () {
     test('returns correct priceData for standard product', () => {
         const priceData = getPriceData(mockStandardProductHit)
         expect(priceData).toEqual({
-            salePrice: 63.99,
+            currentPrice: 63.99,
             listPrice: 67.99,
             isOnSale: true,
             isASet: false,

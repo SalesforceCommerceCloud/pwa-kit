@@ -39,7 +39,7 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
 /**
  * This function extract the price information of a given product
  * If a product is a master,
- *  salePrice: get the lowest price (including promotional prices) among variants
+ *  currentPrice: get the lowest price (including promotional prices) among variants
  *  listPrice: get the list price of the variant that has lowest price (including promotional price)
  *  maxPrice: the max price in tieredPrices of variant that has lowest price
  * @param {object} product - product detail object
@@ -50,7 +50,7 @@ export const getPriceData = (product, opts = {}) => {
     const isASet = product?.hitType === 'set' || !!product?.type?.set
     const isMaster = product?.hitType === 'master' || !!product?.type?.master
     const hasRepresentedProduct = !!product?.representedProduct?.id
-    let salePrice
+    let currentPrice
     let variantWithLowestPrice
     // grab the variant that has the lowest price (including promotional price)
     if (isMaster) {
@@ -72,13 +72,13 @@ export const getPriceData = (product, opts = {}) => {
             },
             {minPrice: Infinity, variant: null}
         )
-        salePrice = variantWithLowestPrice?.minPrice
+        currentPrice = variantWithLowestPrice?.minPrice
     } else {
         const promotionalPrice = getSmallestValByProperty(
             product?.productPromotions,
             'promotionalPrice'
         )
-        salePrice =
+        currentPrice =
             promotionalPrice && promotionalPrice < product?.price
                 ? promotionalPrice
                 : product?.price
@@ -104,9 +104,9 @@ export const getPriceData = (product, opts = {}) => {
                 : prev
         })
     return {
-        salePrice,
+        currentPrice,
         listPrice,
-        isOnSale: salePrice < listPrice,
+        isOnSale: currentPrice < listPrice,
         isASet,
         isMaster,
         // For a product, set price is the lowest price of its children, so the price should be considered a range

@@ -53,7 +53,7 @@ const ProductViewHeader = ({name, currency, priceData, category}) => {
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            <Skeleton isLoaded={priceData?.salePrice}>
+            <Skeleton isLoaded={priceData?.currentPrice}>
                 <DisplayPrice priceData={priceData} currency={currency} />
             </Skeleton>
         </VStack>
@@ -65,7 +65,7 @@ ProductViewHeader.propTypes = {
     currency: PropTypes.string,
     category: PropTypes.array,
     priceData: PropTypes.shape({
-        salePrice: PropTypes.number.isRequired,
+        currentPrice: PropTypes.number.isRequired,
         isOnSale: PropTypes.bool.isRequired,
         listPrice: PropTypes.number,
         isASet: PropTypes.bool,
@@ -132,6 +132,7 @@ const ProductView = forwardRef(
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
         }, [product, quantity])
+        console.log('priceData', priceData)
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)

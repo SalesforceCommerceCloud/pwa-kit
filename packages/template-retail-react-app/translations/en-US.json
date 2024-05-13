@@ -409,10 +409,25 @@
     "defaultMessage": "Security code info"
   },
   "display_price.assistive_msg.current_price": {
-    "defaultMessage": "current price {price}"
+    "defaultMessage": "current price {currentPrice}"
+  },
+  "display_price.assistive_msg.current_price_with_range": {
+    "defaultMessage": "From current price {currentPrice}"
   },
   "display_price.assistive_msg.strikethrough_price": {
-    "defaultMessage": "old price {price}"
+    "defaultMessage": "original price {listPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price_with_range": {
+    "defaultMessage": "From original price {listPrice}"
+  },
+  "display_price.label.current_price": {
+    "defaultMessage": "{currentPrice}"
+  },
+  "display_price.label.current_price_with_range": {
+    "defaultMessage": "From {currentPrice}"
+  },
+  "display_price.label.list_price": {
+    "defaultMessage": "{listPrice}"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"
@@ -995,9 +1010,6 @@
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "This is a secure SSL encrypted payment."
-  },
-  "price_display.label.from": {
-    "defaultMessage": "From"
   },
   "price_per_item.label.each": {
     "defaultMessage": "ea",

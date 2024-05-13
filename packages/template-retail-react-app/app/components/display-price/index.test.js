@@ -11,7 +11,7 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 
 describe('DisplayPrice', function () {
     const data = {
-        salePrice: 90,
+        currentPrice: 90,
         listPrice: 100,
         isASet: false,
         isOnSale: true,
@@ -38,7 +38,10 @@ describe('DisplayPrice', function () {
 
     test('should not render list price when price is not on sale', () => {
         renderWithProviders(
-            <DisplayPrice currency="GBP" priceData={{...data, salePrice: 100, isOnSale: false}} />
+            <DisplayPrice
+                currency="GBP"
+                priceData={{...data, currentPrice: 100, isOnSale: false}}
+            />
         )
         expect(screen.queryByText(/£90\.`00/i)).not.toBeInTheDocument()
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()

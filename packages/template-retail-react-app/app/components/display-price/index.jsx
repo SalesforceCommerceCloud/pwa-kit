@@ -8,7 +8,40 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useIntl} from 'react-intl'
+import {defineMessages, useIntl} from 'react-intl'
+
+const msg = defineMessages({
+    // price display
+    currentPrice: {
+        id: 'display_price.label.current_price',
+        defaultMessage: '{currentPrice}'
+    },
+    currentPriceWithRange: {
+        id: 'display_price.label.current_price_with_range',
+        defaultMessage: 'From {currentPrice}'
+    },
+    listPrice: {
+        id: 'display_price.label.list_price',
+        defaultMessage: '{listPrice}'
+    },
+    // aria-label
+    ariaLabelCurrentPrice: {
+        id: 'display_price.assistive_msg.current_price',
+        defaultMessage: `current price {currentPrice}`
+    },
+    ariaLabelCurrentPriceWithRange: {
+        id: 'display_price.assistive_msg.current_price_with_range',
+        defaultMessage: `From current price {currentPrice}`
+    },
+    ariaLabelListPrice: {
+        id: 'display_price.assistive_msg.strikethrough_price',
+        defaultMessage: `original price {listPrice}`
+    },
+    ariaLabelListPriceWithRange: {
+        id: 'display_price.assistive_msg.strikethrough_price_with_range',
+        defaultMessage: `From original price {listPrice}`
+    }
+})
 
 /**
  * @param priceData - price info extracted from a product
@@ -18,58 +51,20 @@ import {useIntl} from 'react-intl'
  *          the set children will have it own price as From X (cross) Y
  * // if a product is a master
  *      on PLP and PDP, show From X (cross) Y , the X and Y are
- *          sale and list price of variant that has the lowest price (including promotionalPrice)
+ *          current and list price of variant that has the lowest price (including promotionalPrice)
  * // if a standard/bundle
  *      show exact price on PLP and PDP as X (cross) Y
  * @param currency - currency
  */
 const DisplayPrice = ({priceData, currency}) => {
-    const intl = useIntl()
-    const {listPrice, salePrice, isASet, isMaster, isOnSale, isRange, hasRepresentedProduct} =
+    const {listPrice, currentPrice, isASet, isMaster, isOnSale, isRange, hasRepresentedProduct} =
         priceData
-    const salePriceText = intl.formatNumber(salePrice, {
-        style: 'currency',
-        currency: currency
-    })
-    const listPriceText =
-        listPrice &&
-        intl.formatNumber(listPrice, {
-            style: 'currency',
-            currency: currency
-        })
 
-    const prefixText = intl.formatMessage({
-        id: 'price_display.label.from',
-        defaultMessage: 'From '
-    })
-
-    const ariaLabelSalePrice = intl.formatMessage(
-        {
-            id: 'display_price.assistive_msg.current_price',
-            defaultMessage: `current price {price}`
-        },
-        {
-            price: intl.formatNumber(salePrice || 0, {style: 'currency', currency})
-        }
-    )
-    const ariaLabelListPrice = intl.formatMessage(
-        {
-            id: 'display_price.assistive_msg.strikethrough_price',
-            defaultMessage: `old price {price}`
-        },
-        {
-            price: intl.formatNumber(listPrice || 0, {style: 'currency', currency})
-        }
-    )
     if (isASet) {
         return hasRepresentedProduct ? (
-            <Text as="span" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
-                {prefixText} {salePriceText}
-            </Text>
+            <CurrentPrice price={currentPrice} as="span" currency={currency} isRange={true} />
         ) : (
-            <Text as="b" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
-                {prefixText} {salePriceText}
-            </Text>
+            <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={true} />
         )
     }
     if (isMaster) {
@@ -77,51 +72,43 @@ const DisplayPrice = ({priceData, currency}) => {
             if (isOnSale) {
                 return (
                     <>
-                        <Text as="b" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
-                            {prefixText} {salePriceText}
-                        </Text>{' '}
-                        <Text
-                            as="s"
-                            aria-label={`${prefixText} ${ariaLabelListPrice}`}
-                            color="gray.600"
-                        >
-                            {listPriceText}
-                        </Text>
+                        <CurrentPrice
+                            price={currentPrice}
+                            as="b"
+                            currency={currency}
+                            isRange={true}
+                        />{' '}
+                        {listPrice && (
+                            <ListPrice currency={currency} price={listPrice} isRange={true} />
+                        )}
                     </>
                 )
             } else {
                 // bold front on PDP, normal font on PLP
                 return hasRepresentedProduct ? (
-                    <Text as="span" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
-                        {prefixText} {salePriceText}
-                    </Text>
+                    <CurrentPrice
+                        price={currentPrice}
+                        as="span"
+                        currency={currency}
+                        isRange={true}
+                    />
                 ) : (
-                    <Text as="b" aria-label={`${prefixText} ${ariaLabelSalePrice}`}>
-                        {prefixText} {salePriceText}
-                    </Text>
+                    <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={true} />
                 )
             }
         } else {
             if (isOnSale) {
                 return (
                     <>
-                        <Text as="b" aria-label={ariaLabelSalePrice}>
-                            {salePriceText}
-                        </Text>{' '}
-                        <Text as="s" aria-label={ariaLabelListPrice} color="gray.600">
-                            {listPriceText}
-                        </Text>
+                        <CurrentPrice price={currentPrice} as="b" currency={currency} />{' '}
+                        <ListPrice currency={currency} price={listPrice} />
                     </>
                 )
             } else {
                 return hasRepresentedProduct ? (
-                    <Text as="span" aria-label={ariaLabelSalePrice}>
-                        {salePriceText}
-                    </Text>
+                    <CurrentPrice price={currentPrice} as="span" currency={currency} />
                 ) : (
-                    <Text as="b" aria-label={ariaLabelSalePrice}>
-                        {salePriceText}
-                    </Text>
+                    <CurrentPrice price={currentPrice} as="b" currency={currency} />
                 )
             }
         }
@@ -130,27 +117,117 @@ const DisplayPrice = ({priceData, currency}) => {
         <Box>
             {isOnSale ? (
                 <>
-                    <Text as="b" aria-label={ariaLabelSalePrice}>
-                        {salePriceText}
-                    </Text>{' '}
-                    {listPriceText && (
-                        <Text as="s" aria-label={ariaLabelListPrice}>
-                            {listPriceText}
-                        </Text>
-                    )}
+                    <CurrentPrice price={currentPrice} as="b" currency={currency} />{' '}
+                    {listPrice && <ListPrice currency={currency} price={listPrice} />}
                 </>
             ) : (
-                <Text as="span" aria-label={ariaLabelSalePrice}>
-                    {salePriceText}
-                </Text>
+                <CurrentPrice price={currentPrice} as="span" currency={currency} />
             )}
         </Box>
     )
 }
+/**
+ * @private
+ * Component that displays current price of a product with a11y
+ * @param price - price of the product
+ * @param as - an HTML tag or component to be rendered as
+ * @param isRange - show price as range or not
+ * @param currency - currency to show the price in
+ * @param extraProps - extra props to be passed into Text Component
+ * @returns {JSX.Element}
+ */
+const CurrentPrice = ({price, as, isRange = false, currency, ...extraProps}) => {
+    const intl = useIntl()
+    const currentPriceText = intl.formatNumber(price, {
+        style: 'currency',
+        currency
+    })
+    return isRange ? (
+        <Text
+            as={as}
+            {...extraProps}
+            aria-label={intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
+                currentPrice: currentPriceText
+            })}
+        >
+            {intl.formatMessage(msg.currentPriceWithRange, {
+                currentPrice: currentPriceText
+            })}
+        </Text>
+    ) : (
+        <Text
+            as={as}
+            aria-label={intl.formatMessage(msg.ariaLabelCurrentPrice, {
+                currentPrice: currentPriceText
+            })}
+        >
+            {intl.formatMessage(msg.currentPrice, {
+                currentPrice: currentPriceText
+            })}
+        </Text>
+    )
+}
+CurrentPrice.propTypes = {
+    price: PropTypes.number.isRequired,
+    currency: PropTypes.string.isRequired,
+    as: PropTypes.string,
+    isRange: PropTypes.bool,
+    extraProps: PropTypes.object
+}
 
+/**
+ * Component that displays list price of a product with a11y
+ * @param price - price of the product
+ * @param as - an HTML tag or component to be rendered as
+ * @param isRange - show price as range or not
+ * @param props - extra props to be passed into Text Component
+ * @param extraProps - extra props to be passed into Text Component
+ * @returns {JSX.Element}
+ */
+const ListPrice = ({price, isRange = false, as = 's', currency, ...extraProps}) => {
+    const intl = useIntl()
+    const listPriceText = intl.formatNumber(price, {
+        style: 'currency',
+        currency
+    })
+
+    return isRange ? (
+        <Text
+            as={as}
+            {...extraProps}
+            aria-label={intl.formatMessage(msg.ariaLabelListPriceWithRange, {
+                listPrice: listPriceText || ''
+            })}
+            color="gray.600"
+        >
+            {intl.formatMessage(msg.listPrice, {
+                listPrice: listPriceText
+            })}
+        </Text>
+    ) : (
+        <Text
+            as={as}
+            aria-label={intl.formatMessage(msg.ariaLabelListPrice, {
+                listPrice: listPriceText || ''
+            })}
+            color="gray.600"
+        >
+            {intl.formatMessage(msg.listPrice, {
+                listPrice: listPriceText
+            })}
+        </Text>
+    )
+}
+ListPrice.propTypes = {
+    price: PropTypes.number.isRequired,
+    currency: PropTypes.string.isRequired,
+    as: PropTypes.string,
+    isRange: PropTypes.bool,
+    extraProps: PropTypes.object
+}
 DisplayPrice.propTypes = {
     priceData: PropTypes.shape({
-        salePrice: PropTypes.number.isRequired,
+        currentPrice: PropTypes.number.isRequired,
         isOnSale: PropTypes.bool.isRequired,
         listPrice: PropTypes.number,
         isASet: PropTypes.bool,

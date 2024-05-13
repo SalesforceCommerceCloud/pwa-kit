@@ -1012,17 +1012,59 @@
     },
     {
       "type": 1,
-      "value": "price"
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "From current price "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
     }
   ],
   "display_price.assistive_msg.strikethrough_price": [
     {
       "type": 0,
-      "value": "old price "
+      "value": "original price "
     },
     {
       "type": 1,
-      "value": "price"
+      "value": "listPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price_with_range": [
+    {
+      "type": 0,
+      "value": "From original price "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.label.current_price": [
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.label.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "From "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.label.list_price": [
+    {
+      "type": 1,
+      "value": "listPrice"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -2291,12 +2333,6 @@
     {
       "type": 0,
       "value": "This is a secure SSL encrypted payment."
-    }
-  ],
-  "price_display.label.from": [
-    {
-      "type": 0,
-      "value": "From"
     }
   ],
   "price_per_item.label.each": [
