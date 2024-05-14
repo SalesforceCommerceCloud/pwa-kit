@@ -420,14 +420,8 @@
   "display_price.assistive_msg.strikethrough_price_with_range": {
     "defaultMessage": "From original price {listPrice}"
   },
-  "display_price.label.current_price": {
-    "defaultMessage": "{currentPrice}"
-  },
   "display_price.label.current_price_with_range": {
     "defaultMessage": "From {currentPrice}"
-  },
-  "display_price.label.list_price": {
-    "defaultMessage": "{listPrice}"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"

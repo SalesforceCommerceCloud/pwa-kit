@@ -1045,12 +1045,6 @@
       "value": "listPrice"
     }
   ],
-  "display_price.label.current_price": [
-    {
-      "type": 1,
-      "value": "currentPrice"
-    }
-  ],
   "display_price.label.current_price_with_range": [
     {
       "type": 0,
@@ -1059,12 +1053,6 @@
     {
       "type": 1,
       "value": "currentPrice"
-    }
-  ],
-  "display_price.label.list_price": [
-    {
-      "type": 1,
-      "value": "listPrice"
     }
   ],
   "drawer_menu.button.account_details": [
