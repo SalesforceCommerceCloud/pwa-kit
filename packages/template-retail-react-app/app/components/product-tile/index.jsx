@@ -86,8 +86,7 @@ const ProductTile = (props) => {
 
     const priceData = getPriceData({...product, variants})
 
-    // TODO: initially pass in the representedProduct as the activeVariants
-    const promoCallout = renderPromoCallout({activeVariants: [product.variants[0]]})
+    const promoCallout = renderPromoCallout(priceData.variantWithLowestPrice)
 
     return (
         <Box {...styles.container}>

@@ -114,7 +114,8 @@ export const getPriceData = (product, opts = {}) => {
         hasRepresentedProduct,
         // priceMax is for product set
         tieredPrice: closestTieredPrice?.price,
-        maxPrice: product?.priceMax || maxTieredPrice
+        maxPrice: product?.priceMax || maxTieredPrice,
+        variantWithLowestPrice
     }
 }
 
