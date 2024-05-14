@@ -61,11 +61,7 @@ const DisplayPrice = ({priceData, currency}) => {
         priceData
 
     if (isASet) {
-        return hasRepresentedProduct ? (
-            <CurrentPrice price={currentPrice} as="span" currency={currency} isRange={true} />
-        ) : (
-            <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={true} />
-        )
+        return <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={true} />
     }
     if (isMaster) {
         if (isRange) {
@@ -84,15 +80,7 @@ const DisplayPrice = ({priceData, currency}) => {
                     </>
                 )
             } else {
-                // bold front on PDP, normal font on PLP
-                return hasRepresentedProduct ? (
-                    <CurrentPrice
-                        price={currentPrice}
-                        as="span"
-                        currency={currency}
-                        isRange={true}
-                    />
-                ) : (
+                return (
                     <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={true} />
                 )
             }
@@ -105,11 +93,7 @@ const DisplayPrice = ({priceData, currency}) => {
                     </>
                 )
             } else {
-                return hasRepresentedProduct ? (
-                    <CurrentPrice price={currentPrice} as="span" currency={currency} />
-                ) : (
-                    <CurrentPrice price={currentPrice} as="b" currency={currency} />
-                )
+                return <CurrentPrice price={currentPrice} as="b" currency={currency} />
             }
         }
     }
@@ -121,7 +105,7 @@ const DisplayPrice = ({priceData, currency}) => {
                     {listPrice && <ListPrice currency={currency} price={listPrice} />}
                 </>
             ) : (
-                <CurrentPrice price={currentPrice} as="span" currency={currency} />
+                <CurrentPrice price={currentPrice} as="b" currency={currency} />
             )}
         </Box>
     )
