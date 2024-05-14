@@ -145,6 +145,7 @@ const ProductTile = (props) => {
                                 // since it is the same as product name
                                 // which can cause confusion for individuals who uses screen readers
                                 alt: '',
+                                loading: 'lazy',
                                 ...dynamicImageProps?.imageProps
                             }}
                         />
