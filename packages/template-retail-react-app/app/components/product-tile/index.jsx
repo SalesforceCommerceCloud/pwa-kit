@@ -86,7 +86,8 @@ const ProductTile = (props) => {
 
     const priceData = getPriceData({...product, variants})
 
-    const promoCallout = renderPromoCallout(product)
+    // TODO: initially pass in the representedProduct as the activeVariants
+    const promoCallout = renderPromoCallout({activeVariants: [product.variants[0]]})
 
     return (
         <Box {...styles.container}>
@@ -118,6 +119,7 @@ const ProductTile = (props) => {
                 <DisplayPrice priceData={priceData} currency={currency} />
 
                 {/* Promotion call-out message */}
+                {/* TODO: bring Text into renderPromoCallout */}
                 {promoCallout && <Text>{promoCallout}</Text>}
             </Link>
             {enableFavourite && (

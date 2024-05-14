@@ -105,6 +105,7 @@ const ProductScroller = forwardRef(
                                   )
                               })
                             : products.map((product, idx) => {
+                                  // TODO: add prop `renderPromoCallout`
                                   return (
                                       <Box
                                           key={product?.id || idx}
