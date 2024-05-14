@@ -67,7 +67,8 @@ export let ssrFiles = []
  */
 
 // TODO - make this available from config file & client side
-const namespace = getConfig().ssrNamespace
+// const namespace = getConfig().ssrNamespace
+const namespace = 'abc'
 
 /**
  * RegExp that matches a proxy override string
@@ -79,16 +80,6 @@ const namespace = getConfig().ssrNamespace
  * @type {RegExp}
  */
 const proxyOverrideRE = /^(http(s)?):\/\/([^/]+)(\/)?([^/]+)?(\/caching)?/
-
-/**
- * This path matching RE matches on /mobify/proxy and then skips one path
- * element. For example, /mobify/proxy/heffalump/woozle would be converted to
- * /woozle on whatever host /mobify/proxy/heffalump maps to.
- * Group 2 is the full path on the proxied host.
- * @private
- * @type {RegExp}
- */
-export const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
 
 export const startsWithMobify = (url) => {
     const mobifyPath = namespace ? `/${namespace}/mobify` : `/mobify`
