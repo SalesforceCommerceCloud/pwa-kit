@@ -1,11 +1,9 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2024, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-import {getSmallestValByProperty} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
  * Get the human-friendly version of the variation values that users have selected.
@@ -39,7 +37,7 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
 /**
  * This function extract the price information of a given product
  * If a product is a master,
- *  salePrice: get the lowest price (including promotional prices) among variants
+ *  currentPrice: get the lowest price (including promotional prices) among variants
  *  listPrice: get the list price of the variant that has lowest price (including promotional price)
  *  maxPrice: the max price in tieredPrices of variant that has lowest price
  * @param {object} product - product detail object
@@ -50,7 +48,7 @@ export const getPriceData = (product, opts = {}) => {
     const isASet = product?.hitType === 'set' || !!product?.type?.set
     const isMaster = product?.hitType === 'master' || !!product?.type?.master
     const hasRepresentedProduct = !!product?.representedProduct?.id
-    let salePrice
+    let currentPrice
     let variantWithLowestPrice
     // grab the variant that has the lowest price (including promotional price)
     if (isMaster) {
@@ -72,20 +70,18 @@ export const getPriceData = (product, opts = {}) => {
             },
             {minPrice: Infinity, variant: null}
         )
-    }
-
-    if (isMaster) {
-        salePrice = variantWithLowestPrice?.minPrice
+        currentPrice = variantWithLowestPrice?.minPrice
     } else {
         const promotionalPrice = getSmallestValByProperty(
             product?.productPromotions,
             'promotionalPrice'
         )
-        salePrice =
+        currentPrice =
             promotionalPrice && promotionalPrice < product?.price
                 ? promotionalPrice
                 : product?.price
     }
+
     // since the price is the lowest value among price books, each product will have at lease a single item tiered price at quantity 1
     // the highest value of tieredPrices is presumptively the list price
     const tieredPrices =
@@ -106,9 +102,9 @@ export const getPriceData = (product, opts = {}) => {
                 : prev
         })
     return {
-        salePrice,
+        currentPrice,
         listPrice,
-        isOnSale: salePrice < listPrice,
+        isOnSale: currentPrice < listPrice,
         isASet,
         isMaster,
         // For a product, set price is the lowest price of its children, so the price should be considered a range
@@ -120,4 +116,22 @@ export const getPriceData = (product, opts = {}) => {
         tieredPrice: closestTieredPrice?.price,
         maxPrice: product?.priceMax || maxTieredPrice
     }
+}
+
+/**
+ * @private
+ * Find the smallest value by key from a given array
+ * @param arr
+ * @param key
+ */
+const getSmallestValByProperty = (arr, key) => {
+    if (!arr || !arr.length) return undefined
+    if (!key) {
+        throw new Error('Please specify a key.')
+    }
+    const vals = arr
+        .map((item) => item[key])
+        .filter(Boolean)
+        .filter(Number)
+    return vals.length ? Math.min(...vals) : undefined
 }

@@ -11,7 +11,7 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 
 describe('DisplayPrice', function () {
     const data = {
-        salePrice: 90,
+        currentPrice: 90,
         listPrice: 100,
         isASet: false,
         isOnSale: true,
@@ -30,15 +30,18 @@ describe('DisplayPrice', function () {
         const currentPriceTag = container.querySelectorAll('b')
         const strikethroughPriceTag = container.querySelectorAll('s')
         // From and salePrice are in two separate b tags
-        expect(within(currentPriceTag[1]).getByText(/£90\.00/i)).toBeDefined()
+        expect(within(currentPriceTag[0]).getByText(/£90\.00/i)).toBeDefined()
         expect(within(strikethroughPriceTag[0]).getByText(/£100\.00/i)).toBeDefined()
-        expect(currentPriceTag).toHaveLength(2)
+        expect(currentPriceTag).toHaveLength(1)
         expect(strikethroughPriceTag).toHaveLength(1)
     })
 
     test('should not render list price when price is not on sale', () => {
         renderWithProviders(
-            <DisplayPrice currency="GBP" priceData={{...data, salePrice: 100, isOnSale: false}} />
+            <DisplayPrice
+                currency="GBP"
+                priceData={{...data, currentPrice: 100, isOnSale: false}}
+            />
         )
         expect(screen.queryByText(/£90\.`00/i)).not.toBeInTheDocument()
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()

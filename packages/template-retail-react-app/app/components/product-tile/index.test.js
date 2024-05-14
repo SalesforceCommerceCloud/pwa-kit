@@ -51,23 +51,23 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
 })
 
-test('renders exact price with strikethrough price for master product can be has various variants', () => {
+test('renders exact price with strikethrough price for master product with multiple variants', () => {
     const {queryByText, getByText, container} = renderWithProviders(
         <ProductTile product={mockMasterProductHitWithMultipleVariants} />
     )
     expect(getByText(/Black Single Pleat Athletic Fit Wool Suit - Edit/i)).toBeInTheDocument()
     expect(queryByText(/from/i)).toBeInTheDocument()
 
-    const salePriceTag = container.querySelectorAll('b')
+    const currentPriceTag = container.querySelectorAll('b')
     const strikethroughPriceTag = container.querySelectorAll('s')
-    expect(within(salePriceTag[1]).getByText(/£191\.99/i)).toBeDefined()
+    expect(within(currentPriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
     expect(within(strikethroughPriceTag[0]).getByText(/£223\.99/i)).toBeDefined()
     // From and price are in separate b tag
-    expect(salePriceTag).toHaveLength(2)
+    expect(currentPriceTag).toHaveLength(1)
     expect(strikethroughPriceTag).toHaveLength(1)
 })
 
-test('renders exact price with strikethrough price for master product can be filtered down to one variant', () => {
+test('renders exact price with strikethrough price for master product with one variant', () => {
     const {getByText, queryByText, container} = renderWithProviders(
         <ProductTile product={mockMasterProductHitWithOneVariant} />
     )
@@ -76,11 +76,11 @@ test('renders exact price with strikethrough price for master product can be fil
     expect(getByText(/£320\.00/i)).toBeInTheDocument()
     expect(queryByText(/from/i)).not.toBeInTheDocument()
 
-    const salePriceTag = container.querySelectorAll('b')
+    const currentPriceTag = container.querySelectorAll('b')
     const strikethroughPriceTag = container.querySelectorAll('s')
-    expect(within(salePriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
+    expect(within(currentPriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
     expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
-    expect(salePriceTag).toHaveLength(1)
+    expect(currentPriceTag).toHaveLength(1)
     expect(strikethroughPriceTag).toHaveLength(1)
 })
 
@@ -100,10 +100,10 @@ test('renders strike through price with standard product', () => {
     )
     expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
     expect(getByText(/£63\.99/i)).toBeInTheDocument()
-    const salePriceTag = container.querySelectorAll('b')
+    const currentPriceTag = container.querySelectorAll('b')
     const strikethroughPriceTag = container.querySelectorAll('s')
-    expect(within(salePriceTag[0]).getByText(/£63\.99/i)).toBeDefined()
+    expect(within(currentPriceTag[0]).getByText(/£63\.99/i)).toBeDefined()
     expect(within(strikethroughPriceTag[0]).getByText(/£67\.99/i)).toBeDefined()
-    expect(salePriceTag).toHaveLength(1)
+    expect(currentPriceTag).toHaveLength(1)
     expect(strikethroughPriceTag).toHaveLength(1)
 })

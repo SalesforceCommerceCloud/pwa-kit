@@ -114,7 +114,7 @@ export const AddToCartModal = () => {
                                     viewType: 'small',
                                     selectedVariationAttributes: variant.variationValues
                                 })?.images?.[0]
-                                const priceData = getPriceData(product)
+                                const priceData = getPriceData(product, {quantity})
                                 const variationAttributeValues = getDisplayVariationValues(
                                     product.variationAttributes,
                                     variant.variationValues
