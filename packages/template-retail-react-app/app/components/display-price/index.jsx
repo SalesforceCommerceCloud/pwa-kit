@@ -59,56 +59,28 @@ const msg = defineMessages({
 const DisplayPrice = ({priceData, currency}) => {
     const {listPrice, currentPrice, isASet, isMaster, isOnSale, isRange, hasRepresentedProduct} =
         priceData
+    const renderCurrentPrice = (isRange) => (
+        <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={isRange} />
+    )
+
+    const renderListPrice = (isRange) =>
+        listPrice && <ListPrice currency={currency} price={listPrice} isRange={isRange} />
+
+    const renderPriceSet = (isRange) => (
+        <>
+            {renderCurrentPrice(isRange)} {isOnSale && renderListPrice(isRange)}
+        </>
+    )
 
     if (isASet) {
-        return <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={true} />
+        return renderCurrentPrice(true)
     }
+
     if (isMaster) {
-        if (isRange) {
-            if (isOnSale) {
-                return (
-                    <>
-                        <CurrentPrice
-                            price={currentPrice}
-                            as="b"
-                            currency={currency}
-                            isRange={true}
-                        />{' '}
-                        {listPrice && (
-                            <ListPrice currency={currency} price={listPrice} isRange={true} />
-                        )}
-                    </>
-                )
-            } else {
-                return (
-                    <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={true} />
-                )
-            }
-        } else {
-            if (isOnSale) {
-                return (
-                    <>
-                        <CurrentPrice price={currentPrice} as="b" currency={currency} />{' '}
-                        <ListPrice currency={currency} price={listPrice} />
-                    </>
-                )
-            } else {
-                return <CurrentPrice price={currentPrice} as="b" currency={currency} />
-            }
-        }
+        return renderPriceSet(isRange)
     }
-    return (
-        <Box>
-            {isOnSale ? (
-                <>
-                    <CurrentPrice price={currentPrice} as="b" currency={currency} />{' '}
-                    {listPrice && <ListPrice currency={currency} price={listPrice} />}
-                </>
-            ) : (
-                <CurrentPrice price={currentPrice} as="b" currency={currency} />
-            )}
-        </Box>
-    )
+
+    return <Box>{renderPriceSet(false)}</Box>
 }
 /**
  * @private
