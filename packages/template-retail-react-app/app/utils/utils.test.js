@@ -6,11 +6,7 @@
  */
 import * as utils from '@salesforce/retail-react-app/app/utils/utils'
 import EventEmitter from 'events'
-import {
-    flatten,
-    getSmallestValByProperty,
-    shallowEquals
-} from '@salesforce/retail-react-app/app/utils/utils'
+import {flatten, shallowEquals} from '@salesforce/retail-react-app/app/utils/utils'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -182,42 +178,5 @@ describe('keysToCamel', () => {
                 sub3: [{subSub_3: 'changed', sub3Sub4: 'unchanged'}]
             }
         })
-    })
-})
-
-describe('getSmallestValByKey', function () {
-    test('should return the smallest value by key', () => {
-        const data = [
-            {
-                name: 'Product 1',
-                price: 10
-            },
-            {
-                name: 'Product 2',
-                price: 9
-            }
-        ]
-        const val = getSmallestValByProperty(data, 'price')
-        expect(val).toBe(9)
-    })
-    test('should undefined if array is not passed in', () => {
-        const data = {
-            name: 'Cowl neck top'
-        }
-        const val = getSmallestValByProperty(data, 'price')
-        expect(val).toBeUndefined()
-    })
-    test('should throw an error if key name is undefined', () => {
-        const data = [
-            {
-                name: 'Product 1',
-                price: 10
-            },
-            {
-                name: 'Product 2',
-                price: 9
-            }
-        ]
-        expect(() => getSmallestValByProperty(data)).toThrow()
     })
 })
