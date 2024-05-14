@@ -12,17 +12,9 @@ import {defineMessages, useIntl} from 'react-intl'
 
 const msg = defineMessages({
     // price display
-    currentPrice: {
-        id: 'display_price.label.current_price',
-        defaultMessage: '{currentPrice}'
-    },
     currentPriceWithRange: {
         id: 'display_price.label.current_price_with_range',
         defaultMessage: 'From {currentPrice}'
-    },
-    listPrice: {
-        id: 'display_price.label.list_price',
-        defaultMessage: '{listPrice}'
     },
     // aria-label
     ariaLabelCurrentPrice: {
@@ -112,13 +104,12 @@ const CurrentPrice = ({price, as, isRange = false, currency, ...extraProps}) => 
     ) : (
         <Text
             as={as}
+            {...extraProps}
             aria-label={intl.formatMessage(msg.ariaLabelCurrentPrice, {
                 currentPrice: currentPriceText
             })}
         >
-            {intl.formatMessage(msg.currentPrice, {
-                currentPrice: currentPriceText
-            })}
+            {currentPriceText}
         </Text>
     )
 }
@@ -155,24 +146,22 @@ const ListPrice = ({price, isRange = false, as = 's', currency, ...extraProps}) 
             })}
             color="gray.600"
         >
-            {intl.formatMessage(msg.listPrice, {
-                listPrice: listPriceText
-            })}
+            {listPriceText}
         </Text>
     ) : (
         <Text
             as={as}
+            {...extraProps}
             aria-label={intl.formatMessage(msg.ariaLabelListPrice, {
                 listPrice: listPriceText || ''
             })}
             color="gray.600"
         >
-            {intl.formatMessage(msg.listPrice, {
-                listPrice: listPriceText
-            })}
+            {listPriceText}
         </Text>
     )
 }
+
 ListPrice.propTypes = {
     price: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
@@ -180,6 +169,7 @@ ListPrice.propTypes = {
     isRange: PropTypes.bool,
     extraProps: PropTypes.object
 }
+
 DisplayPrice.propTypes = {
     priceData: PropTypes.shape({
         currentPrice: PropTypes.number.isRequired,

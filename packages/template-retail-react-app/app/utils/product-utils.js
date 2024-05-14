@@ -1,11 +1,9 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2024, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-import {getSmallestValByProperty} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
  * Get the human-friendly version of the variation values that users have selected.
@@ -118,4 +116,22 @@ export const getPriceData = (product, opts = {}) => {
         tieredPrice: closestTieredPrice?.price,
         maxPrice: product?.priceMax || maxTieredPrice
     }
+}
+
+/**
+ * @private
+ * Find the smallest value by key from a given array
+ * @param arr
+ * @param key
+ */
+const getSmallestValByProperty = (arr, key) => {
+    if (!arr || !arr.length) return undefined
+    if (!key) {
+        throw new Error('Please specify a key.')
+    }
+    const vals = arr
+        .map((item) => item[key])
+        .filter(Boolean)
+        .filter(Number)
+    return vals.length ? Math.min(...vals) : undefined
 }

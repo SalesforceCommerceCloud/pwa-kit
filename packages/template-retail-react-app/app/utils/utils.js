@@ -199,20 +199,3 @@ export const mergeMatchedItems = (arr1 = [], arr2 = []) => {
  * @return {boolean}
  */
 export const isHydrated = () => typeof window !== 'undefined' && !window.__HYDRATING__
-
-/**
- * Find the smallest value by key from a given array
- * @param arr
- * @param key
- */
-export const getSmallestValByProperty = (arr, key) => {
-    if (!arr || !arr.length) return undefined
-    if (!key) {
-        throw new Error('Please specify a key.')
-    }
-    const vals = arr
-        .map((item) => item[key])
-        .filter(Boolean)
-        .filter(Number)
-    return vals.length ? Math.min(...vals) : undefined
-}
