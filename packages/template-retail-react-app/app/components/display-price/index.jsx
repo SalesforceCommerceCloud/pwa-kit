@@ -49,8 +49,7 @@ const msg = defineMessages({
  * @param currency - currency
  */
 const DisplayPrice = ({priceData, currency}) => {
-    const {listPrice, currentPrice, isASet, isMaster, isOnSale, isRange, hasRepresentedProduct} =
-        priceData
+    const {listPrice, currentPrice, isASet, isMaster, isOnSale, isRange} = priceData
     const renderCurrentPrice = (isRange) => (
         <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={isRange} />
     )

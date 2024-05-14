@@ -74,7 +74,6 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
-import {Text} from '@chakra-ui/react'
 
 const PlaceholderComponent = () => (
     <Center p="2">
