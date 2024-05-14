@@ -31,7 +31,7 @@ import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {renderPromoCallout as _renderPromoCallout} from '@salesforce/retail-react-app/app/components/product-tile/utils'
+import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -66,7 +66,6 @@ const ProductTile = (props) => {
         isFavourite,
         onFavouriteToggle,
         dynamicImageProps,
-        renderPromoCallout = _renderPromoCallout,
         ...rest
     } = props
     const {currency} = useCurrency()
@@ -85,8 +84,6 @@ const ProductTile = (props) => {
     const variants = product?.variants
 
     const priceData = getPriceData({...product, variants})
-
-    const promoCallout = renderPromoCallout(priceData.variantWithLowestPrice)
 
     return (
         <Box {...styles.container}>
@@ -118,8 +115,7 @@ const ProductTile = (props) => {
                 <DisplayPrice priceData={priceData} currency={currency} />
 
                 {/* Promotion call-out message */}
-                {/* TODO: bring Text into renderPromoCallout */}
-                {promoCallout && <Text>{promoCallout}</Text>}
+                <PromoCallout priceData={priceData} />
             </Link>
             {enableFavourite && (
                 <Box
@@ -219,8 +215,7 @@ ProductTile.propTypes = {
      * interacts with favourite icon/button.
      */
     onFavouriteToggle: PropTypes.func,
-    dynamicImageProps: PropTypes.object,
-    renderPromoCallout: PropTypes.func
+    dynamicImageProps: PropTypes.object
 }
 
 export default ProductTile

@@ -88,7 +88,6 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
-import {renderPromoCallout} from '@salesforce/retail-react-app/app/pages/product-list/utils'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -573,7 +572,6 @@ const ProductList = (props) => {
                                                           '25vw'
                                                       ]
                                                   }}
-                                                  renderPromoCallout={renderPromoCallout}
                                               />
                                           )
                                       })}

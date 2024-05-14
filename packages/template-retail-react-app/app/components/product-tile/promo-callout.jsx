@@ -5,12 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 
-// TODO: should this be a component `PromoCallout` instead?
-// - partial component
-// - customizable only at the component level -> global
-export const renderPromoCallout = (variantWithLowestPrice = {}) => {
-    const {minPrice, variant} = variantWithLowestPrice
+const PromoCallout = ({priceData}) => {
+    const {variantWithLowestPrice} = priceData
+    const {minPrice, variant} = variantWithLowestPrice ?? {}
     if (!variant?.productPromotions) {
         return
     }
@@ -21,3 +20,14 @@ export const renderPromoCallout = (variantWithLowestPrice = {}) => {
     // calloutMsg can be html string or just plain text
     return promo.calloutMsg && <div dangerouslySetInnerHTML={{__html: promo.calloutMsg}} />
 }
+
+PromoCallout.propTypes = {
+    priceData: PropTypes.shape({
+        variantWithLowestPrice: PropTypes.shape({
+            minPrice: PropTypes.number,
+            variant: PropTypes.object
+        })
+    })
+}
+
+export default PromoCallout
