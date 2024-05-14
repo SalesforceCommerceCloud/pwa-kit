@@ -77,10 +77,7 @@ const METRIC_DIMENSIONS = {
     Target: process.env.DEPLOY_TARGET
 }
 
-const shouldSkipLogging = () => {
-    const skipLogging = process.env.MRT_SKIP_LOGGING
-    return skipLogging && skipLogging.toLowerCase() === 'true'
-}
+const mrtLogLevel = process.env.MRT_LOG_LEVEL || 'info'
 
 /**
  * @private
@@ -248,12 +245,19 @@ export const RemoteServerFactory = {
                 },
                 {
                     stream: morganStream,
-                    skip: function(req, res) {
-                       // if (shouldSkipLogging()) {
-                        if (true) {
-                            return res.statusCode < 400
+                    skip: function (req, res) {
+                        const levels = ['debug', 'info', 'warn', 'error']
+
+                        const responseLogLevel = () => {
+                            if (res.statusCode >= 500) {
+                                return 'error'
+                            } else if (res.statusCode >= 400) {
+                                return 'warn'
+                            }
+                            return 'info'
                         }
-                        return false
+
+                        return levels.indexOf(mrtLogLevel) > levels.indexOf(responseLogLevel())
                     }
                 }
             )
@@ -459,7 +463,9 @@ export const RemoteServerFactory = {
                 // x-edge-request-id value. The resulting line in the logs
                 // will automatically include the lambda RequestId, so
                 // one line links all ids.
-                console.log(`TESTLOGSLCLOUDFRONTID  Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
+                console.log(
+                    `TESTLOGSLCLOUDFRONTID  Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`
+                )
             }
 
             // Apply the request processor
