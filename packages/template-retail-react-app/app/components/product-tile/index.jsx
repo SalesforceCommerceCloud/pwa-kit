@@ -161,8 +161,9 @@ const ProductTile = (props) => {
                 {/* Swatches */}
                 {variationAttributes
                     ?.filter(({id}) => selectableAttributeId === id)
-                    ?.map(({id, values}) => (
+                    ?.map(({id, name, values}) => (
                         <SwatchGroup
+                            ariaLabel={name}
                             key={id}
                             value={selectableAttributeValue}
                             handleChange={(value) => {

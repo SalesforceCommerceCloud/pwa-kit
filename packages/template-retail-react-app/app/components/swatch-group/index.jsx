@@ -26,7 +26,7 @@ const DIRECTIONS = {
  * Each Swatch is a link with will direct to a href passed to them
  */
 const SwatchGroup = (props) => {
-    const {displayName, children, label = '', value, handleChange = noop} = props
+    const {ariaLabel, displayName, children, label = '', value, handleChange = noop} = props
 
     const styles = useStyleConfig('SwatchGroup')
     const [selectedIndex, setSelectedIndex] = useState(0)
@@ -90,7 +90,7 @@ const SwatchGroup = (props) => {
 
     return (
         <Box onKeyDown={onKeyDown}>
-            <Flex {...styles.swatchGroup} role="radiogroup" aria-label={label}>
+            <Flex {...styles.swatchGroup} role="radiogroup" aria-label={ariaLabel || label}>
                 {label && (
                     <HStack {...styles.swatchLabel}>
                         <Box fontWeight="semibold">
@@ -121,6 +121,11 @@ const SwatchGroup = (props) => {
 SwatchGroup.displayName = 'SwatchGroup'
 
 SwatchGroup.propTypes = {
+    /**
+     * The aria label to be used on the group. If none is provided we will
+     * use the label prop.
+     */
+    ariaLabel: PropTypes.string,
     /**
      * The attribute name of the swatch group. E.g color, size
      */
