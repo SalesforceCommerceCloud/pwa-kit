@@ -83,7 +83,6 @@ const DisplayPrice = ({priceData, currency}) => {
     return <Box>{renderPriceSet(false)}</Box>
 }
 /**
- * @private
  * Component that displays current price of a product with a11y
  * @param price - price of the product
  * @param as - an HTML tag or component to be rendered as
