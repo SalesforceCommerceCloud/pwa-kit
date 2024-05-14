@@ -86,10 +86,12 @@ const ProductTile = (props) => {
     const styles = useMultiStyleConfig('ProductTile')
 
     const isMasterVariant = ['master', 'variant'].includes(hitType)
-    const initialVariationValue = isMasterVariant
-        ? product?.variants?.find((variant) => variant.productId == product.representedProduct.id)
-              ?.variationValues?.[selectableAttributeId]
-        : undefined
+    const initialVariationValue =
+        isMasterVariant && !!product.representedProduct
+            ? product?.variants?.find(
+                  (variant) => variant.productId == product.representedProduct.id
+              )?.variationValues?.[selectableAttributeId]
+            : undefined
 
     const [selectableAttributeValue, setSelectableAttributeValue] = useState(initialVariationValue)
 
@@ -136,6 +138,7 @@ const ProductTile = (props) => {
                 <Box {...styles.imageWrapper}>
                     <AspectRatio {...styles.image}>
                         <DynamicImage
+                            data-testid="product-tile-image"
                             src={`${
                                 image?.disBaseLink ||
                                 image?.link ||
