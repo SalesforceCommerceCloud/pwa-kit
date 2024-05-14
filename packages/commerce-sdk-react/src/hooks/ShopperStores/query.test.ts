@@ -20,7 +20,7 @@ jest.mock('../../auth/index.ts', () => {
 })
 
 type Queries = typeof queries
-const searchEndpoint = '/search/shopper-search/'
+const searchEndpoint = '/store/shopper-stores/'
 // Not all endpoints use all parameters, but unused parameters are safely discarded
 const OPTIONS = {parameters: {q: 'something'}}
 
@@ -30,12 +30,11 @@ type TestMap = {[K in keyof Queries]: DataType<K>}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
     // Type assertion so we don't need to use the full type
-    useProductSearch: {query: 'pants'} as DataType<'useProductSearch'>,
-    useSearchSuggestions: {searchPhrase: 'search phrase'}
+    useSearchStores: {} as DataType<'useSearchStores'>
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>
-describe('Shopper Search query hooks', () => {
+describe('Shopper Stores query hooks', () => {
     beforeEach(() => nock.cleanAll())
     afterEach(() => {
         expect(nock.pendingMocks()).toHaveLength(0)

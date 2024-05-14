@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperSearch} from 'commerce-sdk-isomorphic'
+import type {ShopperStores} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
 import {getCustomKeys, pick} from '../utils'
 import paramKeysMap from './paramKeys'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
-type Client = ShopperSearch<{shortCode: string}>
+type Client = ShopperStores<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     searchStores: [
