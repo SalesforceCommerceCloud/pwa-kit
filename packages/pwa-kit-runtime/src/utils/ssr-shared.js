@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+import { getConfig } from './ssr-config'
+
 /**
  * @module progressive-web-sdk/utils/ssr-shared
  * @private
  */
-
-import {getConfig} from './ssr-config'
-
 /*
  The ssr-shared-utils module is used in the PWA and in the Express app. It
  should contain ONLY the code that is required in both, to avoid adding
@@ -66,10 +66,8 @@ export let ssrFiles = []
  * @private
  */
 
-const config = getConfig()
-
 // TODO - make this available from config file & client side
-export let namespace = config.ssrNamespace
+const namespace = getConfig().ssrNamespace
 
 /**
  * RegExp that matches a proxy override string
@@ -93,7 +91,8 @@ const proxyOverrideRE = /^(http(s)?):\/\/([^/]+)(\/)?([^/]+)?(\/caching)?/
 export const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
 
 export const startsWithMobify = (url) => {
-    return url.startsWith('/mobify/')
+    const mobifyPath = namespace ? `/${namespace}/mobify` : `/mobify`
+    return url.startsWith(mobifyPath)
 }
 
 export const getProxyPathBase = () => {
