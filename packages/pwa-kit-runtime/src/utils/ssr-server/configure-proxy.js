@@ -6,21 +6,11 @@
  */
 import {createProxyMiddleware} from 'http-proxy-middleware'
 import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from '../ssr-proxying'
-import {proxyConfigs} from '../ssr-shared'
+import {proxyConfigs, generalProxyPathRE} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
-
-/**
- * This path matching RE matches on /mobify/proxy and then skips one path
- * element. For example, /mobify/proxy/heffalump/woozle would be converted to
- * /woozle on whatever host /mobify/proxy/heffalump maps to.
- * Group 2 is the full path on the proxied host.
- * @private
- * @type {RegExp}
- */
-const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
 
 /**
  * Apply proxy headers to a request that is being proxied.

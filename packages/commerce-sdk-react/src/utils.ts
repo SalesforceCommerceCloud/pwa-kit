@@ -47,16 +47,12 @@ export const isOriginTrusted = (origin: string | undefined) => {
     )
 }
 
-export const getProxyPath = () => {
-    return '/mobify/proxy/api'
+export const getNamespace = () => {
+    return 'abc'
 }
 
 export const getDevelopBundlePath = () => {
-    return '/mobify/bundle/development'
-}
-
-export const getSLASPath = () => {
-    return '/mobify/slas/private'
+    return getNamespace() ? `/${getNamespace()}/mobify/bundle/development` :'/mobify/bundle/development'
 }
 
 /**

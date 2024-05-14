@@ -8,6 +8,9 @@
  * @module progressive-web-sdk/utils/ssr-shared
  * @private
  */
+
+import {getConfig} from './ssr-config'
+
 /*
  The ssr-shared-utils module is used in the PWA and in the Express app. It
  should contain ONLY the code that is required in both, to avoid adding
@@ -59,6 +62,16 @@ export let proxyConfigs = []
 export let ssrFiles = []
 
 /**
+ * A string that can be defined in the namespace property inside the config file.
+ * @private
+ */
+
+const config = getConfig()
+
+// TODO - make this available from config file & client side
+export let namespace = config.ssrNamespace
+
+/**
  * RegExp that matches a proxy override string
  * match[1] is the protocol
  * match[3] is the host
@@ -69,28 +82,39 @@ export let ssrFiles = []
  */
 const proxyOverrideRE = /^(http(s)?):\/\/([^/]+)(\/)?([^/]+)?(\/caching)?/
 
+/**
+ * This path matching RE matches on /mobify/proxy and then skips one path
+ * element. For example, /mobify/proxy/heffalump/woozle would be converted to
+ * /woozle on whatever host /mobify/proxy/heffalump maps to.
+ * Group 2 is the full path on the proxied host.
+ * @private
+ * @type {RegExp}
+ */
+export const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
+
 export const startsWithMobify = (url) => {
     return url.startsWith('/mobify/')
 }
 
 export const getProxyPathBase = () => {
-    return '/mobify/proxy'
+    return namespace ? `/${namespace}/mobify/proxy` : '/mobify/proxy'
 }
 
 export const getBundlePathBase = () => {
-    return '/mobify/bundle'
+    console.log(`Bundle Path Namespace: ${namespace}`)
+    return namespace ? `/${namespace}/mobify/bundle` : '/mobify/bundle'
 }
 
 export const getCachingPathBase = () => {
-    return '/mobify/caching'
+    return namespace ? `/${namespace}/mobify/caching` : '/mobify/caching'
 }
 
 export const getHealtCheckPathBase = () => {
-    return '/mobify/ping'
+    return namespace ? `/${namespace}/mobify/ping` : '/mobify/ping'
 }
 
 export const getSLASPrivateProxyPath = () => {
-    return '/mobify/slas/private'
+    return namespace ? `/${namespace}/mobify/slas/private` : '/mobify/slas/private'
 }
 
 /**
@@ -101,6 +125,9 @@ export const getSLASPrivateProxyPath = () => {
  */
 export const updatePackageMobify = (newValue) => {
     _packageMobify = newValue || _packageMobify || {}
+
+    // Read namespace from config if it exists
+    // namespace = _packageMobify.ssrNamespace || ''
 
     // Clear and update the proxyConfigs array
     proxyConfigs = []

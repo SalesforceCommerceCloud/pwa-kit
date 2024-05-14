@@ -50,9 +50,13 @@ const AppConfig = ({children, locals = {}}) => {
         'correlation-id': correlationId
     }
 
+    const appOrigin = getAppOrigin()
+
     const commerceApiConfig = locals.appConfig.commerceAPI
 
-    const appOrigin = getAppOrigin()
+    const proxy = locals.ssrNamespace
+        ? `${appOrigin}/${locals.ssrNamespace}${commerceApiConfig.proxyPath}`
+        : `${appOrigin}${commerceApiConfig.proxyPath}`
 
     return (
         <CommerceApiProvider
@@ -63,7 +67,7 @@ const AppConfig = ({children, locals = {}}) => {
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
-            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            proxy={proxy}
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
@@ -85,8 +89,7 @@ AppConfig.restore = (locals = {}) => {
             : `${window.location.pathname}${window.location.search}`
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
-
-    const {app: appConfig} = getConfig()
+    const {app: appConfig, ssrNamespace} = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI
@@ -95,6 +98,7 @@ AppConfig.restore = (locals = {}) => {
     apiConfig.parameters.siteId = site.id
 
     locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
+    locals.ssrNamespace = ssrNamespace
     locals.site = site
     locals.locale = locale
     locals.appConfig = appConfig
