@@ -37,7 +37,10 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {filterImageGroups, getDecoratedVariationAttributes} from '../../utils/product-utils'
+import {
+    filterImageGroups,
+    getDecoratedVariationAttributes
+} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
