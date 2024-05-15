@@ -42,7 +42,8 @@
     "morgan": "^1.10.0",
     "semver": "^7.5.2",
     "set-cookie-parser": "^2.6.0",
-    "whatwg-encoding": "^1.0.5"
+    "whatwg-encoding": "^1.0.5",
+    "winston": "^3.13.0"
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
