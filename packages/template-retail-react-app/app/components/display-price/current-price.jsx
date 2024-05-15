@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl} from 'react-intl'
-import msg from './messages'
+import msg from '@salesforce/retail-react-app/app/components/display-price/messages'
 
 /**
  * Component that displays current price of a product with a11y

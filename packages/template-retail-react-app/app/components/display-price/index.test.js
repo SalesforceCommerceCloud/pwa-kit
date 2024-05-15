@@ -50,7 +50,7 @@ describe('DisplayPrice', function () {
 
 describe('CurrentPrice', function () {
     test('should render exact price with correct aria-label', () => {
-        const {container} = renderWithProviders(<CurrentPrice price={100} currency="GBP" />)
+        renderWithProviders(<CurrentPrice price={100} currency="GBP" />)
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
         expect(screen.getByLabelText(/current price £100\.00/i)).toBeInTheDocument()
     })
