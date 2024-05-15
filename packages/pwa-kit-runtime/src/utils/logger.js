@@ -13,8 +13,8 @@ const logger = createLogger({
     format: format.combine(
         format.colorize(),
         format.timestamp(),
-        format.printf(({timestamp, level, message}) => {
-            return `${timestamp} [${level}]: ${message}`
+        format.printf(({level, message}) => {
+            return `[${level}]: ${message}`
         })
     ),
     transports: [new transports.Console()]
