@@ -12,7 +12,6 @@ const logger = createLogger({
     level: logLevel,
     format: format.combine(
         format.colorize(),
-        format.timestamp(),
         format.printf(({level, message}) => {
             return `[${level}]: ${message}`
         })
