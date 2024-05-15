@@ -68,7 +68,7 @@ export let ssrFiles = []
 
 // TODO - make this available from config file & client side
 // const namespace = getConfig().ssrNamespace
-const namespace = 'abc'
+// const namespace = 'abc'
 
 /**
  * RegExp that matches a proxy override string
@@ -82,28 +82,33 @@ const namespace = 'abc'
 const proxyOverrideRE = /^(http(s)?):\/\/([^/]+)(\/)?([^/]+)?(\/caching)?/
 
 export const startsWithMobify = (url) => {
+    const namespace = getConfig().ssrNamespace
     const mobifyPath = namespace ? `/${namespace}/mobify` : `/mobify`
     return url.startsWith(mobifyPath)
 }
 
 export const getProxyPathBase = () => {
+    const namespace = getConfig().ssrNamespace
     return namespace ? `/${namespace}/mobify/proxy` : '/mobify/proxy'
 }
 
 export const getBundlePathBase = () => {
-    console.log(`Bundle Path Namespace: ${namespace}`)
+    const namespace = getConfig().ssrNamespace
     return namespace ? `/${namespace}/mobify/bundle` : '/mobify/bundle'
 }
 
 export const getCachingPathBase = () => {
+    const namespace = getConfig().ssrNamespace
     return namespace ? `/${namespace}/mobify/caching` : '/mobify/caching'
 }
 
 export const getHealtCheckPathBase = () => {
+    const namespace = getConfig().ssrNamespace
     return namespace ? `/${namespace}/mobify/ping` : '/mobify/ping'
 }
 
 export const getSLASPrivateProxyPath = () => {
+    const namespace = getConfig().ssrNamespace
     return namespace ? `/${namespace}/mobify/slas/private` : '/mobify/slas/private'
 }
 
