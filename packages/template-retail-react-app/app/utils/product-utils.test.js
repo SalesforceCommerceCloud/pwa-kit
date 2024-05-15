@@ -71,7 +71,6 @@ describe('getPriceData', function () {
             isASet: false,
             isMaster: true,
             isRange: true,
-            hasRepresentedProduct: true,
             tieredPrice: 223.99,
             maxPrice: 223.99
         })
@@ -86,7 +85,6 @@ describe('getPriceData', function () {
             isASet: false,
             isMaster: true,
             isRange: false,
-            hasRepresentedProduct: true,
             tieredPrice: 320,
             maxPrice: 320
         })
@@ -101,7 +99,6 @@ describe('getPriceData', function () {
             isASet: true,
             isMaster: false,
             isRange: true,
-            hasRepresentedProduct: true,
             tieredPrice: undefined,
             maxPrice: 71.03
         })
@@ -116,7 +113,6 @@ describe('getPriceData', function () {
             isASet: false,
             isMaster: false,
             isRange: false,
-            hasRepresentedProduct: true,
             tieredPrice: 67.99,
             maxPrice: 67.99
         })

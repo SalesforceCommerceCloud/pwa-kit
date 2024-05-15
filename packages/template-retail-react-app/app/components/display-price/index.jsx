@@ -177,7 +177,6 @@ DisplayPrice.propTypes = {
         isASet: PropTypes.bool,
         isMaster: PropTypes.bool,
         isRange: PropTypes.bool,
-        hasRepresentedProduct: PropTypes.bool,
         maxPrice: PropTypes.number,
         tieredPrice: PropTypes.number
     }),
@@ -185,3 +184,4 @@ DisplayPrice.propTypes = {
 }
 
 export default DisplayPrice
+export {ListPrice, CurrentPrice, msg}

@@ -47,7 +47,6 @@ export const getPriceData = (product, opts = {}) => {
     const {quantity = 1} = opts
     const isASet = product?.hitType === 'set' || !!product?.type?.set
     const isMaster = product?.hitType === 'master' || !!product?.type?.master
-    const hasRepresentedProduct = !!product?.representedProduct?.id
     let currentPrice
     let variantWithLowestPrice
     // grab the variant that has the lowest price (including promotional price)
@@ -111,7 +110,6 @@ export const getPriceData = (product, opts = {}) => {
         // For a master product, when it has more than 2 variants, we use the lowest priced variant, so it is  considered a range price
         //      but for master that has one variant, it is not considered range
         isRange: (isMaster && product?.variants?.length > 1) || isASet || false,
-        hasRepresentedProduct,
         // priceMax is for product set
         tieredPrice: closestTieredPrice?.price,
         maxPrice: product?.priceMax || maxTieredPrice

@@ -16,8 +16,7 @@ describe('DisplayPrice', function () {
         isASet: false,
         isOnSale: true,
         isMaster: true,
-        isRange: true,
-        hasRepresentedProduct: false
+        isRange: true
     }
     test('should render without error', () => {
         renderWithProviders(<DisplayPrice currency="GBP" priceData={data} />)
