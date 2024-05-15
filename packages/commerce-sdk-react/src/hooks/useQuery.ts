@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useQuery as useReactQuery} from '@tanstack/react-query'
+import {useQuery as useReactQuery, QueryKey, UseQueryOptions} from '@tanstack/react-query'
+import {helpers} from 'commerce-sdk-isomorphic'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
+import useAuthContext from './useAuthContext'
 import {
     ApiClient,
     ApiMethod,
@@ -65,4 +67,35 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
             ? {retryOnMount: onClient() ? queryOptions?.retryOnMount : false}
             : {})
     })
+}
+
+type CallCustomEndpointArgs = Parameters<typeof helpers.callCustomEndpoint>[0]
+
+/**
+ * A hook for custom API queries.
+ * @param apiOptions - Options passed through to commerce-sdk-isomorphic
+ * @param queryOptions - Options passed through to @tanstack/react-query
+ * @returns A TanStack Query query hook with data from the custom API endpoint.
+ */
+export const useCustomQuery = (
+    apiOptions: CallCustomEndpointArgs,
+    queryOptions: UseQueryOptions<unknown, unknown, unknown, string[]>
+) => {
+    const authenticatedMethod = async (options: CallCustomEndpointArgs) => {
+        const auth = useAuthContext()
+        const {access_token} = await auth.ready()
+        return await helpers.callCustomEndpoint({
+            ...options,
+            options: {
+                ...options.options,
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                    ...options.options?.headers
+                }
+            }
+        })
+    }
+
+    const queryKey = ['1']
+    return useReactQuery(queryKey, () => authenticatedMethod(apiOptions), queryOptions)
 }
