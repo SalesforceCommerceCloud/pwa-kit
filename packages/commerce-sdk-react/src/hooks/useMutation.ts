@@ -8,7 +8,7 @@ import {useMutation as useReactQueryMutation, useQueryClient} from '@tanstack/re
 import {CacheUpdateGetter, ApiOptions, ApiMethod, ApiClient, MergedOptions} from './types'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useCustomerId from './useCustomerId'
-import {mergeOptions, updateCache} from './utils'
+import {mergeOptions, updateCache, handleApiError} from './utils'
 
 /**
  * Helper for mutation hooks, contains most of the logic in order to keep individual hooks small.
@@ -27,8 +27,11 @@ export const useMutation = <
     const queryClient = useQueryClient()
     const customerId = useCustomerId()
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
+    const wrappedMethod: ApiMethod<Options, Data> = (...args) => {
+        return handleApiError(() => authenticatedMethod(...args))
+    }
 
-    return useReactQueryMutation(authenticatedMethod, {
+    return useReactQueryMutation(wrappedMethod, {
         onSuccess(data, options) {
             // commerce-sdk-isomorphic merges `clientConfig` and `options` under the hood,
             // so we also need to do that to get the "net" options that are actually sent to SCAPI.

@@ -220,9 +220,7 @@ describe('ShopperBaskets mutations', () => {
         expect(result.current.error).toBeNull()
         act(() => result.current.mutate(options))
         await waitAndExpectError(() => result.current)
-        // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
-        // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
-        expect(result.current.error).toHaveProperty('response')
+        expect(result.current.error).toStrictEqual({error: true})
     })
     test.each(nonEmptyResponseTestCases)(
         '`%s` updates the cache on success',
@@ -249,7 +247,8 @@ describe('ShopperBaskets mutations', () => {
         async (mutationName, options) => {
             mockQueryEndpoint(basketsEndpoint, oldBasket) // getBasket
             mockQueryEndpoint(customersEndpoint, oldCustomerBaskets) // getCustomerBaskets
-            mockMutationEndpoints(basketsEndpoint, {error: true}, 400) // this mutation
+            const mutationResponse = {error: true}
+            mockMutationEndpoints(basketsEndpoint, mutationResponse, 400) // this mutation
             const {result} = renderHookWithProviders(() => ({
                 basket: queries.useBasket(getBasketOptions),
                 customerBaskets: useCustomerBaskets(getCustomerBasketsOptions),
@@ -261,9 +260,7 @@ describe('ShopperBaskets mutations', () => {
             expect(result.current.mutation.error).toBeNull()
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectError(() => result.current.mutation)
-            // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
-            // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
-            expect(result.current.mutation.error).toHaveProperty('response')
+            expect(result.current.mutation.error).toStrictEqual(mutationResponse)
             assertUpdateQuery(result.current.basket, oldBasket)
             assertUpdateQuery(result.current.customerBaskets, oldCustomerBaskets)
         }

@@ -51,8 +51,24 @@ function UseShopperBaskets() {
                     >
                         Change Basket Currency to GBP
                     </button>
+                    <button
+                        onClick={() => {
+                            updateBasket.mutate({
+                                parameters: {basketId: 'wrong id'},
+                                body: {currency: 'GBP'}
+                            })
+                        }}
+                    >
+                        Test mutation error
+                    </button>
                     <hr />
                 </>
+            )}
+            {updateBasket && updateBasket.error && (
+                <div>
+                    <h2>Error</h2>
+                    <pre>{JSON.stringify(updateBasket.error, null, 2)}</pre>
+                </div>
             )}
         </>
     )
