@@ -232,7 +232,7 @@ export const RemoteServerFactory = {
                 function (tokens, req, res) {
                     const contentLength = tokens.res(req, res, 'content-length')
                     const logMessage = [
-                        `TESTLOGS (${res.locals.requestId})`,
+                        `(${res.locals.requestId})`,
                         tokens.method(req, res),
                         tokens.url(req, res),
                         tokens.status(req, res),
@@ -241,8 +241,8 @@ export const RemoteServerFactory = {
                         contentLength && `- ${contentLength}`
                     ].join(' ')
 
-                    // Use winston custom logger and prevent morgan from logging
-                    // to the default stream
+                    // Use winston custom logger and prevent morgan
+                    // from logging to the default stream
                     logger.info(logMessage)
                     return null
                 },
@@ -452,9 +452,7 @@ export const RemoteServerFactory = {
                 // x-edge-request-id value. The resulting line in the logs
                 // will automatically include the lambda RequestId, so
                 // one line links all ids.
-                console.log(
-                    `TESTLOGSLCLOUDFRONTID  Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`
-                )
+                console.log(`Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
             }
 
             // Apply the request processor
