@@ -8,6 +8,8 @@ import React from 'react'
 import {screen, within} from '@testing-library/react'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import CurrentPrice from '@salesforce/retail-react-app/app/components/display-price/current-price'
+import ListPrice from '@salesforce/retail-react-app/app/components/display-price/list-price'
 
 describe('DisplayPrice', function () {
     const data = {
@@ -28,7 +30,6 @@ describe('DisplayPrice', function () {
         const {container} = renderWithProviders(<DisplayPrice currency="GBP" priceData={data} />)
         const currentPriceTag = container.querySelectorAll('b')
         const strikethroughPriceTag = container.querySelectorAll('s')
-        // From and salePrice are in two separate b tags
         expect(within(currentPriceTag[0]).getByText(/£90\.00/i)).toBeDefined()
         expect(within(strikethroughPriceTag[0]).getByText(/£100\.00/i)).toBeDefined()
         expect(currentPriceTag).toHaveLength(1)
@@ -44,5 +45,38 @@ describe('DisplayPrice', function () {
         )
         expect(screen.queryByText(/£90\.`00/i)).not.toBeInTheDocument()
         expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
+    })
+})
+
+describe('CurrentPrice', function () {
+    test('should render exact price with correct aria-label', () => {
+        const {container} = renderWithProviders(<CurrentPrice price={100} currency="GBP" />)
+        expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/current price £100\.00/i)).toBeInTheDocument()
+    })
+
+    test('should render range price', () => {
+        renderWithProviders(<CurrentPrice price={100} currency="GBP" isRange={true} />)
+        expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
+        expect(screen.getByText(/from/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/from current price £100\.00/i)).toBeInTheDocument()
+    })
+})
+
+describe('ListPrice', function () {
+    test('should render strikethrough price with exact price in aria-label', () => {
+        const {container} = renderWithProviders(<ListPrice price={100} currency="GBP" />)
+        const strikethroughPriceTag = container.querySelectorAll('s')
+        expect(screen.getByLabelText(/original price £100\.00/i)).toBeInTheDocument()
+        expect(within(strikethroughPriceTag[0]).getByText(/£100\.00/i)).toBeDefined()
+    })
+
+    test('should render strikethrough price with range price in aria-label', () => {
+        const {container} = renderWithProviders(
+            <ListPrice price={100} currency="GBP" isRange={true} />
+        )
+        const strikethroughPriceTag = container.querySelectorAll('s')
+        expect(screen.getByLabelText(/from original price £100\.00/i)).toBeInTheDocument()
+        expect(within(strikethroughPriceTag[0]).getByText(/£100\.00/i)).toBeDefined()
     })
 })

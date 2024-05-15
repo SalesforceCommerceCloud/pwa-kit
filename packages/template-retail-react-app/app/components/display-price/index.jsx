@@ -7,33 +7,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {defineMessages, useIntl} from 'react-intl'
-
-const msg = defineMessages({
-    // price display
-    currentPriceWithRange: {
-        id: 'display_price.label.current_price_with_range',
-        defaultMessage: 'From {currentPrice}'
-    },
-    // aria-label
-    ariaLabelCurrentPrice: {
-        id: 'display_price.assistive_msg.current_price',
-        defaultMessage: `current price {currentPrice}`
-    },
-    ariaLabelCurrentPriceWithRange: {
-        id: 'display_price.assistive_msg.current_price_with_range',
-        defaultMessage: `From current price {currentPrice}`
-    },
-    ariaLabelListPrice: {
-        id: 'display_price.assistive_msg.strikethrough_price',
-        defaultMessage: `original price {listPrice}`
-    },
-    ariaLabelListPriceWithRange: {
-        id: 'display_price.assistive_msg.strikethrough_price_with_range',
-        defaultMessage: `From original price {listPrice}`
-    }
-})
+import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import CurrentPrice from '@salesforce/retail-react-app/app/components/display-price/current-price'
+import ListPrice from '@salesforce/retail-react-app/app/components/display-price/list-price'
 
 /**
  * @param priceData - price info extracted from a product
@@ -73,101 +49,6 @@ const DisplayPrice = ({priceData, currency}) => {
 
     return <Box>{renderPriceSet(false)}</Box>
 }
-/**
- * Component that displays current price of a product with a11y
- * @param price - price of the product
- * @param as - an HTML tag or component to be rendered as
- * @param isRange - show price as range or not
- * @param currency - currency to show the price in
- * @param extraProps - extra props to be passed into Text Component
- * @returns {JSX.Element}
- */
-const CurrentPrice = ({price, as, isRange = false, currency, ...extraProps}) => {
-    const intl = useIntl()
-    const currentPriceText = intl.formatNumber(price, {
-        style: 'currency',
-        currency
-    })
-    return isRange ? (
-        <Text
-            as={as}
-            {...extraProps}
-            aria-label={intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
-                currentPrice: currentPriceText
-            })}
-        >
-            {intl.formatMessage(msg.currentPriceWithRange, {
-                currentPrice: currentPriceText
-            })}
-        </Text>
-    ) : (
-        <Text
-            as={as}
-            {...extraProps}
-            aria-label={intl.formatMessage(msg.ariaLabelCurrentPrice, {
-                currentPrice: currentPriceText
-            })}
-        >
-            {currentPriceText}
-        </Text>
-    )
-}
-CurrentPrice.propTypes = {
-    price: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
-    as: PropTypes.string,
-    isRange: PropTypes.bool,
-    extraProps: PropTypes.object
-}
-
-/**
- * Component that displays list price of a product with a11y
- * @param price - price of the product
- * @param as - an HTML tag or component to be rendered as
- * @param isRange - show price as range or not
- * @param props - extra props to be passed into Text Component
- * @param extraProps - extra props to be passed into Text Component
- * @returns {JSX.Element}
- */
-const ListPrice = ({price, isRange = false, as = 's', currency, ...extraProps}) => {
-    const intl = useIntl()
-    const listPriceText = intl.formatNumber(price, {
-        style: 'currency',
-        currency
-    })
-
-    return isRange ? (
-        <Text
-            as={as}
-            {...extraProps}
-            aria-label={intl.formatMessage(msg.ariaLabelListPriceWithRange, {
-                listPrice: listPriceText || ''
-            })}
-            color="gray.600"
-        >
-            {listPriceText}
-        </Text>
-    ) : (
-        <Text
-            as={as}
-            {...extraProps}
-            aria-label={intl.formatMessage(msg.ariaLabelListPrice, {
-                listPrice: listPriceText || ''
-            })}
-            color="gray.600"
-        >
-            {listPriceText}
-        </Text>
-    )
-}
-
-ListPrice.propTypes = {
-    price: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
-    as: PropTypes.string,
-    isRange: PropTypes.bool,
-    extraProps: PropTypes.object
-}
 
 DisplayPrice.propTypes = {
     priceData: PropTypes.shape({
@@ -184,4 +65,3 @@ DisplayPrice.propTypes = {
 }
 
 export default DisplayPrice
-export {ListPrice, CurrentPrice, msg}
