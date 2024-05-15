@@ -259,7 +259,7 @@ export const RemoteServerFactory = {
                 next()
                 return
             }
-            const {requestId} = req.headers['x-correlation-id']
+            const requestId = req.headers['x-correlation-id']
             res.locals.requestId = requestId
             next()
         })
@@ -445,6 +445,7 @@ export const RemoteServerFactory = {
                 // will automatically include the lambda RequestId, so
                 // one line links all ids.
                 console.log(`Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
+                console.log(`CorrelationId: ${res.locals.requestId}`)
             }
 
             // Apply the request processor
