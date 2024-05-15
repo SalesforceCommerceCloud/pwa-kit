@@ -77,7 +77,14 @@ const METRIC_DIMENSIONS = {
     Target: process.env.DEPLOY_TARGET
 }
 
-const mrtLogLevel = process.env.MRT_LOG_LEVEL || 'info'
+const MRT_LOG_DEBUG = 'debug'
+const MRT_LOG_INFO = 'info'
+const MRT_LOG_WARN = 'warn'
+const MRT_LOG_ERROR = 'error'
+
+const MRT_LOG_LEVELS = [MRT_LOG_DEBUG, MRT_LOG_INFO, MRT_LOG_WARN, MRT_LOG_ERROR]
+
+const mrtLogLevel = process.env.TESTMRT_LOG_LEVEL || MRT_LOG_INFO
 
 /**
  * @private
@@ -246,8 +253,6 @@ export const RemoteServerFactory = {
                 {
                     stream: morganStream,
                     skip: function (req, res) {
-                        const levels = ['debug', 'info', 'warn', 'error']
-
                         const responseLogLevel = () => {
                             if (res.statusCode >= 500) {
                                 return 'error'
@@ -257,7 +262,7 @@ export const RemoteServerFactory = {
                             return 'info'
                         }
 
-                        return levels.indexOf(mrtLogLevel) > levels.indexOf(responseLogLevel())
+                        return MRT_LOG_LEVELS.indexOf(mrtLogLevel) > MRT_LOG_LEVELS.indexOf(responseLogLevel())
                     }
                 }
             )
@@ -458,7 +463,7 @@ export const RemoteServerFactory = {
             // because it increases the volume of log data, but this
             // is important for log analysis.
             const cloudfrontId = req.headers['x-amz-cf-id']
-            if (cloudfrontId) {
+            if (cloudfrontId && MRT_LOG_LEVELS.indexOf(MRT_LOG_INFO) >= MRT_LOG_LEVELS.indexOf(mrtLogLevel)) {
                 // Log the Express app request id plus the cloudfront
                 // x-edge-request-id value. The resulting line in the logs
                 // will automatically include the lambda RequestId, so
