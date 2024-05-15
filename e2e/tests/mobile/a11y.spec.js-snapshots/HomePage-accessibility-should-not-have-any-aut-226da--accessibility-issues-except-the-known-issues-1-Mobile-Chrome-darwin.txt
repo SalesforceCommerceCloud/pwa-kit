@@ -1,0 +1,18 @@
+[
+  {
+    "rule": "aria-allowed-attr",
+    "targets": [
+      [
+        "#popover-trigger-\\:R395aqaqlbpH1\\:"
+      ]
+    ]
+  },
+  {
+    "rule": "region",
+    "targets": [
+      [
+        "#search-input"
+      ]
+    ]
+  }
+]

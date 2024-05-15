@@ -1,0 +1,34 @@
+[
+  {
+    "rule": "aria-allowed-attr",
+    "targets": [
+      [
+        "#popover-trigger-\\:R395aqaqlbpH1\\:"
+      ]
+    ]
+  },
+  {
+    "rule": "page-has-heading-one",
+    "targets": [
+      [
+        "html"
+      ]
+    ]
+  },
+  {
+    "rule": "region",
+    "targets": [
+      [
+        "#search-input"
+      ]
+    ]
+  },
+  {
+    "rule": "select-name",
+    "targets": [
+      [
+        "#pagination"
+      ]
+    ]
+  }
+]

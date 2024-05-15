@@ -1,0 +1,32 @@
+[
+  {
+    "rule": "aria-allowed-attr",
+    "targets": [
+      [
+        "#popover-trigger-\\:R395aqaqlbpH1\\:"
+      ]
+    ]
+  },
+  {
+    "rule": "listitem",
+    "targets": [
+      [
+        ".css-427wse:nth-child(1)"
+      ],
+      [
+        ".css-427wse:nth-child(2)"
+      ],
+      [
+        ".css-427wse:nth-child(3)"
+      ]
+    ]
+  },
+  {
+    "rule": "region",
+    "targets": [
+      [
+        "#search-input"
+      ]
+    ]
+  }
+]

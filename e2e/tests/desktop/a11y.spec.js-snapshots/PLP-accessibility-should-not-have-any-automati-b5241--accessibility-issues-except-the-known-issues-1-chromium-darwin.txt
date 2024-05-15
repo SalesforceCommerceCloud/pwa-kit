@@ -1,0 +1,134 @@
+[
+  {
+    "rule": "aria-allowed-attr",
+    "targets": [
+      [
+        "#popover-trigger-\\:R395aqaqlbpH1\\:"
+      ],
+      [
+        "button[aria-label=\"Add filter: Beige (3)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Black (69)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Blue (49)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Brown (30)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Green (24)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Grey (25)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Orange (6)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Pink (31)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Purple (13)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Red (12)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: White (79)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Yellow (7)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: Miscellaneous (33)\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: 4\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: 6\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: 8\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: 10\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: 12\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: 14\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: 16\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: XS\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: S\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: M\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: L\"]"
+      ],
+      [
+        "button[aria-label=\"Add filter: XL\"]"
+      ]
+    ]
+  },
+  {
+    "rule": "aria-dialog-name",
+    "targets": [
+      [
+        "#popover-content-\\:Rmal8taqaqlbpH1\\:"
+      ]
+    ]
+  },
+  {
+    "rule": "listitem",
+    "targets": [
+      [
+        ".css-427wse:nth-child(1)"
+      ],
+      [
+        ".css-427wse:nth-child(2)"
+      ],
+      [
+        ".css-427wse:nth-child(3)"
+      ]
+    ]
+  },
+  {
+    "rule": "page-has-heading-one",
+    "targets": [
+      [
+        "html"
+      ]
+    ]
+  },
+  {
+    "rule": "region",
+    "targets": [
+      [
+        "#search-input"
+      ]
+    ]
+  },
+  {
+    "rule": "select-name",
+    "targets": [
+      [
+        "#page_sort"
+      ],
+      [
+        "#pagination"
+      ]
+    ]
+  }
+]

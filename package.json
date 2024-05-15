@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.36.0",
+    "@axe-core/playwright": "^4.9.0",
     "commander": "^9.5.0",
     "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-no-relative-import-paths": "^1.5.3",
