@@ -43,7 +43,6 @@ import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
-import {morganStream} from '../../utils/morgan-stream'
 import logger from '../../utils/logger'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 
@@ -77,15 +76,6 @@ const METRIC_DIMENSIONS = {
     Project: process.env.MOBIFY_PROPERTY_ID,
     Target: process.env.DEPLOY_TARGET
 }
-
-const MRT_LOG_DEBUG = 'debug'
-const MRT_LOG_INFO = 'info'
-const MRT_LOG_WARN = 'warn'
-const MRT_LOG_ERROR = 'error'
-
-const MRT_LOG_LEVELS = [MRT_LOG_DEBUG, MRT_LOG_INFO, MRT_LOG_WARN, MRT_LOG_ERROR]
-
-const mrtLogLevel = process.env.TESTMRT_LOG_LEVEL || MRT_LOG_INFO
 
 /**
  * @private
@@ -251,7 +241,7 @@ export const RemoteServerFactory = {
                         contentLength && `- ${contentLength}`
                     ].join(' ')
 
-                    // Use winston custom logger and prevent Morgan from logging
+                    // Use winston custom logger and prevent morgan from logging
                     // to the default stream
                     logger.info(logMessage)
                     return null
@@ -457,10 +447,7 @@ export const RemoteServerFactory = {
             // because it increases the volume of log data, but this
             // is important for log analysis.
             const cloudfrontId = req.headers['x-amz-cf-id']
-            if (
-                cloudfrontId &&
-                MRT_LOG_LEVELS.indexOf(MRT_LOG_INFO) >= MRT_LOG_LEVELS.indexOf(mrtLogLevel)
-            ) {
+            if (cloudfrontId) {
                 // Log the Express app request id plus the cloudfront
                 // x-edge-request-id value. The resulting line in the logs
                 // will automatically include the lambda RequestId, so
