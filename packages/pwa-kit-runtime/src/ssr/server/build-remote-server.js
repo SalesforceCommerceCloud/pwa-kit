@@ -241,10 +241,7 @@ export const RemoteServerFactory = {
                         contentLength && `- ${contentLength}`
                     ].join(' ')
 
-                    // Use winston custom logger and prevent morgan
-                    // from logging to the default stream
-                    logger.info(logMessage)
-                    return null
+                    return logMessage
                 },
                 {
                     stream: {write: (message) => logger.info(message.trim())}
