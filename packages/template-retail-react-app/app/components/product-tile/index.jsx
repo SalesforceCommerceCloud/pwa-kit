@@ -203,8 +203,7 @@ ProductTile.propTypes = {
 
             bundle: PropTypes.bool,
             item: PropTypes.bool
-        }),
-        representedProduct: PropTypes.object
+        })
     }),
     /**
      * Enable adding/removing product as a favourite.
