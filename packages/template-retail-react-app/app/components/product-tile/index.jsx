@@ -90,9 +90,8 @@ const ProductTile = (props) => {
     const isMasterVariant = !!variants
     const initialVariationValue =
         isMasterVariant && !!representedProduct
-            ? variants?.find(
-                  (variant) => variant.productId == product.representedProduct.id
-              )?.variationValues?.[selectableAttributeId]
+            ? variants?.find((variant) => variant.productId == product.representedProduct.id)
+                  ?.variationValues?.[selectableAttributeId]
             : undefined
 
     const [selectableAttributeValue, setSelectableAttributeValue] = useState(initialVariationValue)
