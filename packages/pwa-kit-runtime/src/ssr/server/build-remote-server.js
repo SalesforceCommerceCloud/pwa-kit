@@ -231,7 +231,7 @@ export const RemoteServerFactory = {
             expressLogging(
                 function (tokens, req, res) {
                     const contentLength = tokens.res(req, res, 'content-length')
-                    const logMessage = [
+                    return [
                         `(${res.locals.requestId})`,
                         tokens.method(req, res),
                         tokens.url(req, res),
@@ -240,8 +240,6 @@ export const RemoteServerFactory = {
                         'ms',
                         contentLength && `- ${contentLength}`
                     ].join(' ')
-
-                    return logMessage
                 },
                 {
                     stream: {write: (message) => logger.info(message.trim())}
