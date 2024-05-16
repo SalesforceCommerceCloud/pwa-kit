@@ -6,21 +6,15 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {getVariantWithLowestPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {findLowestPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
-// TODO: support other product types (other than master/variants)
-// - variant.productPromotions
-// - product.productPromotions
 const PromoCallout = ({product}) => {
-    const {variants} = product
-    const {minPrice, variant} = getVariantWithLowestPrice(variants) ?? {}
-    if (!variant?.productPromotions) {
-        return
-    }
+    const {minPrice, data} = findLowestPrice(product)
+    console.log('--- findLowestPrice', minPrice, data, product)
+    // NOTE: inconsistency - with ShopperProduct API, a variant does not have productPromotions
+    const promos = data.productPromotions ?? product.productPromotions
+    const promo = promos.find((promo) => promo.promotionalPrice === minPrice) ?? promos[0]
 
-    const promo =
-        variant.productPromotions.find((promo) => promo.promotionalPrice === minPrice) ??
-        variant.productPromotions[0]
     // calloutMsg can be html string or just plain text
     return promo.calloutMsg && <div dangerouslySetInnerHTML={{__html: promo.calloutMsg}} />
 }
