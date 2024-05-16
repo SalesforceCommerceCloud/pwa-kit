@@ -25,6 +25,7 @@ const UsePaymentMethods = loadable(() => import('./pages/use-payment-methods'))
 const UseShopperOrders = loadable(() => import('./pages/use-shopper-orders'))
 const UseCustomerId = loadable(() => import('./pages/use-customer-id'))
 const UseShopperContext = loadable(() => import('./pages/use-shopper-context'))
+const UseCustomEndpoint = loadable(() => import('./pages/use-custom-endpoint'))
 
 const routes = [
     {
@@ -103,6 +104,10 @@ const routes = [
     {
         path: '/context',
         component: UseShopperContext
+    },
+    {
+        path: '/custom-endpoint',
+        component: UseCustomEndpoint
     }
 ]
 

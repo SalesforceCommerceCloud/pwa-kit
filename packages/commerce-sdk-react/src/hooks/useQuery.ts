@@ -69,33 +69,47 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     })
 }
 
-type CallCustomEndpointArgs = Parameters<typeof helpers.callCustomEndpoint>[0]
-
 /**
- * A hook for custom API queries.
+ * A hook for SCAPI custom endpoint queries.
  * @param apiOptions - Options passed through to commerce-sdk-isomorphic
  * @param queryOptions - Options passed through to @tanstack/react-query
  * @returns A TanStack Query query hook with data from the custom API endpoint.
  */
 export const useCustomQuery = (
-    apiOptions: CallCustomEndpointArgs,
-    queryOptions: UseQueryOptions<unknown, unknown, unknown, string[]>
+    apiOptions: Parameters<typeof helpers.callCustomEndpoint>[0],
+    queryOptions?: UseQueryOptions<unknown, unknown, unknown, any>
 ) => {
-    const authenticatedMethod = async (options: CallCustomEndpointArgs) => {
+    const callCustomEndpointWithAuth = (
+        options: Parameters<typeof helpers.callCustomEndpoint>[0]
+    ) => {
         const auth = useAuthContext()
-        const {access_token} = await auth.ready()
-        return await helpers.callCustomEndpoint({
-            ...options,
-            options: {
-                ...options.options,
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                    ...options.options?.headers
+        return async () => {
+            const {access_token} = await auth.ready()
+            return await helpers.callCustomEndpoint({
+                ...options,
+                options: {
+                    ...options.options,
+                    method: options.options.method || 'GET',
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                        ...options.options?.headers
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
-    const queryKey = ['1']
-    return useReactQuery(queryKey, () => authenticatedMethod(apiOptions), queryOptions)
+    // Following the query key convention in this repo, the first element of the query key is a static prefix
+    // the following elements are the path components of the endpoint
+    const queryKey = [
+        '/commerce-sdk-react',
+        '/custom',
+        `/${apiOptions.options.customApiPathParameters?.apiName}`,
+        `/${apiOptions.options.customApiPathParameters?.apiVersion}`,
+        `/organizations`,
+        `/${apiOptions.options.customApiPathParameters?.organizationId}`,
+        `/${apiOptions.options.customApiPathParameters?.endpointPath}`,
+        {...apiOptions.options.parameters}
+    ]
+    return useReactQuery(queryKey, callCustomEndpointWithAuth(apiOptions), queryOptions)
 }
