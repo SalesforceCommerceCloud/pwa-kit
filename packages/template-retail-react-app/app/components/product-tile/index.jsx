@@ -80,17 +80,17 @@ const ProductTile = (props) => {
         selectableAttributeId = PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID,
         ...rest
     } = props
-    const {imageGroups, productId, hitType} = product
+    const {imageGroups, productId, representedProduct, variants} = product
 
     const intl = useIntl()
     const {currency} = useCurrency()
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
 
-    const isMasterVariant = ['master', 'variant'].includes(hitType)
+    const isMasterVariant = !!variants
     const initialVariationValue =
-        isMasterVariant && !!product.representedProduct
-            ? product?.variants?.find(
+        isMasterVariant && !!representedProduct
+            ? variants?.find(
                   (variant) => variant.productId == product.representedProduct.id
               )?.variationValues?.[selectableAttributeId]
             : undefined
