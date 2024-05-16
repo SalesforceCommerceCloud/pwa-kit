@@ -122,11 +122,11 @@ export const useCustomQuery = (
     const queryKey = [
         '/commerce-sdk-react',
         '/custom',
-        `/${apiOptions.options.customApiPathParameters?.apiName}`,
-        `/${apiOptions.options.customApiPathParameters?.apiVersion}`,
+        `/${apiOptions.options.customApiPathParameters?.apiName || 'apiName'}`,
+        `/${apiOptions.options.customApiPathParameters?.apiVersion || 'apiVersion'}`,
         `/organizations`,
-        `/${apiOptions.options.customApiPathParameters?.organizationId}`,
-        `/${apiOptions.options.customApiPathParameters?.endpointPath}`,
+        `/${apiOptions.options.customApiPathParameters?.organizationId || 'organizationId'}`,
+        `/${apiOptions.options.customApiPathParameters?.endpointPath || 'endpointPath'}`,
         {...apiOptions.options.parameters}
     ]
     return useReactQuery(queryKey, callCustomEndpointWithAuth(apiOptions), queryOptions)
