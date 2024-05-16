@@ -137,9 +137,10 @@ const ProductTile = (props) => {
     // Pricing is dynamic! Ensure we are showing the right price for the selected variation attribute
     // value.
     const priceData = useMemo(() => {
-        const variants = product?.variants.filter(({variationValues}) => {
-            return variationValues[selectableAttributeId] === selectableAttributeValue
-        })
+        const variants = product?.variants?.filter(
+            ({variationValues}) =>
+                variationValues[selectableAttributeId] === selectableAttributeValue
+        )
 
         return getPriceData({
             ...product,
