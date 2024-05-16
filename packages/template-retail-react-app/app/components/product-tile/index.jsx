@@ -115,7 +115,7 @@ const ProductTile = (props) => {
                 <DisplayPrice priceData={priceData} currency={currency} />
 
                 {/* Promotion call-out message */}
-                <PromoCallout priceData={priceData} />
+                {product.productPromotions && <PromoCallout product={{...product, variants}} />}
             </Link>
             {enableFavourite && (
                 <Box
@@ -199,7 +199,8 @@ ProductTile.propTypes = {
 
             bundle: PropTypes.bool,
             item: PropTypes.bool
-        })
+        }),
+        productPromotions: PropTypes.array
     }),
     /**
      * Enable adding/removing product as a favourite.

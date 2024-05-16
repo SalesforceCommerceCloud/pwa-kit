@@ -6,10 +6,14 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
+import {getVariantWithLowestPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
-const PromoCallout = ({priceData}) => {
-    const {variantWithLowestPrice} = priceData
-    const {minPrice, variant} = variantWithLowestPrice ?? {}
+// TODO: support other product types (other than master/variants)
+// - variant.productPromotions
+// - product.productPromotions
+const PromoCallout = ({product}) => {
+    const {variants} = product
+    const {minPrice, variant} = getVariantWithLowestPrice(variants) ?? {}
     if (!variant?.productPromotions) {
         return
     }
@@ -22,12 +26,7 @@ const PromoCallout = ({priceData}) => {
 }
 
 PromoCallout.propTypes = {
-    priceData: PropTypes.shape({
-        variantWithLowestPrice: PropTypes.shape({
-            minPrice: PropTypes.number,
-            variant: PropTypes.object
-        })
-    })
+    product: PropTypes.object
 }
 
 export default PromoCallout

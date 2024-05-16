@@ -52,23 +52,7 @@ export const getPriceData = (product, opts = {}) => {
     // grab the variant that has the lowest price (including promotional price)
     if (isMaster) {
         const variants = product?.variants || []
-        variantWithLowestPrice = variants.reduce(
-            (minVariant, variant) => {
-                const promotions = variant.productPromotions || []
-                const smallestPromotionalPrice = getSmallestValByProperty(
-                    promotions,
-                    'promotionalPrice'
-                )
-                const variantSalePrice =
-                    smallestPromotionalPrice && smallestPromotionalPrice < variant.price
-                        ? smallestPromotionalPrice
-                        : variant.price
-                return variantSalePrice < minVariant.minPrice
-                    ? {minPrice: variantSalePrice, variant}
-                    : minVariant
-            },
-            {minPrice: Infinity, variant: null}
-        )
+        variantWithLowestPrice = getVariantWithLowestPrice(variants)
         currentPrice = variantWithLowestPrice?.minPrice
     } else {
         const promotionalPrice = getSmallestValByProperty(
@@ -112,10 +96,40 @@ export const getPriceData = (product, opts = {}) => {
         isRange: (isMaster && product?.variants?.length > 1) || isASet || false,
         // priceMax is for product set
         tieredPrice: closestTieredPrice?.price,
-        maxPrice: product?.priceMax || maxTieredPrice,
-        variantWithLowestPrice
+        maxPrice: product?.priceMax || maxTieredPrice
     }
 }
+
+export const getVariantWithLowestPrice = (variants) => {
+    if (!variants || variants.length === 0) return
+
+    return variants.reduce(
+        (minVariant, variant) => {
+            const promotions = variant.productPromotions || []
+            const smallestPromotionalPrice = getSmallestValByProperty(
+                promotions,
+                'promotionalPrice'
+            )
+            const variantSalePrice =
+                smallestPromotionalPrice && smallestPromotionalPrice < variant.price
+                    ? smallestPromotionalPrice
+                    : variant.price
+            return variantSalePrice < minVariant.minPrice
+                ? {minPrice: variantSalePrice, variant}
+                : minVariant
+        },
+        {minPrice: Infinity, variant: null}
+    )
+}
+
+// export const getPromoData = (product) => {
+
+//     return {
+//         variantWithLowestPrice,
+//         isPromoPrice,
+//         getCurrentPrice
+//     }
+// }
 
 /**
  * @private
