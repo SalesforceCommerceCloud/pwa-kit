@@ -16,8 +16,10 @@ import {
     ApiQueryOptions,
     MergedOptions,
     NullableParameters,
-    OmitNullableParameters
+    OmitNullableParameters,
+    CustomEndpointArgClientConfigOptional
 } from './types'
+import useConfig from './useConfig'
 import {hasAllKeys} from './utils'
 import {onClient} from '../utils'
 
@@ -71,18 +73,22 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
 
 /**
  * A hook for SCAPI custom endpoint queries.
+ *
+ * Besides calling custom endpoint, this hook does a few things for better DX.
+ * 1. inject access token
+ * 2. merge SCAPI client configurations from the CommerceApiProvider
  * @param apiOptions - Options passed through to commerce-sdk-isomorphic
  * @param queryOptions - Options passed through to @tanstack/react-query
  * @returns A TanStack Query query hook with data from the custom API endpoint.
  */
 export const useCustomQuery = (
-    apiOptions: Parameters<typeof helpers.callCustomEndpoint>[0],
+    apiOptions: CustomEndpointArgClientConfigOptional,
     queryOptions?: UseQueryOptions<unknown, unknown, unknown, any>
 ) => {
-    const callCustomEndpointWithAuth = (
-        options: Parameters<typeof helpers.callCustomEndpoint>[0]
-    ) => {
-        const auth = useAuthContext()
+    const config = useConfig()
+    const auth = useAuthContext()
+    const callCustomEndpointWithAuth = (options: CustomEndpointArgClientConfigOptional) => {
+        const clientConfig = options.clientConfig || {}
         return async () => {
             const {access_token} = await auth.ready()
             return await helpers.callCustomEndpoint({
@@ -94,6 +100,15 @@ export const useCustomQuery = (
                         Authorization: `Bearer ${access_token}`,
                         ...options.options?.headers
                     }
+                },
+                clientConfig: {
+                    parameters: {
+                        clientId: config.clientId,
+                        siteId: config.siteId,
+                        organizationId: config.organizationId,
+                        shortCode: config.organizationId
+                    },
+                    ...clientConfig
                 }
             })
         }

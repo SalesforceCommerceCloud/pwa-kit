@@ -11,7 +11,15 @@ import {
 } from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
-import {CacheUpdateGetter, ApiOptions, ApiMethod, ApiClient, MergedOptions} from './types'
+import useConfig from './useConfig'
+import {
+    CacheUpdateGetter,
+    ApiOptions,
+    ApiMethod,
+    ApiClient,
+    MergedOptions,
+    CustomEndpointArgClientConfigOptional
+} from './types'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useCustomerId from './useCustomerId'
 import {mergeOptions, updateCache} from './utils'
@@ -47,19 +55,23 @@ export const useMutation = <
 
 /**
  * A hook for SCAPI custom endpoint mutations.
+ *
+ * Besides calling custom endpoint, this hook does a few things for better DX.
+ * 1. inject access token
+ * 2. merge SCAPI client configurations from the CommerceApiProvider
  * @param apiOptions - Options passed through to commerce-sdk-isomorphic
  * @param mutationOptions - Options passed through to @tanstack/react-query
  * @returns A TanStack Query mutation hook with data from the custom API endpoint.
  */
 export const useCustomMutation = (
-    apiOptions: Parameters<typeof helpers.callCustomEndpoint>[0],
+    apiOptions: CustomEndpointArgClientConfigOptional,
     mutationOptions?: UseMutationOptions
 ) => {
-    const callCustomEndpointWithAuth = (
-        options: Parameters<typeof helpers.callCustomEndpoint>[0]
-    ) => {
-        const auth = useAuthContext()
+    const config = useConfig()
+    const auth = useAuthContext()
+    const callCustomEndpointWithAuth = (options: CustomEndpointArgClientConfigOptional) => {
         return async () => {
+            const clientConfig = options.clientConfig || {}
             const {access_token} = await auth.ready()
             return await helpers.callCustomEndpoint({
                 ...options,
@@ -69,6 +81,15 @@ export const useCustomMutation = (
                         Authorization: `Bearer ${access_token}`,
                         ...options.options?.headers
                     }
+                },
+                clientConfig: {
+                    parameters: {
+                        clientId: config.clientId,
+                        siteId: config.siteId,
+                        organizationId: config.organizationId,
+                        shortCode: config.organizationId
+                    },
+                    ...clientConfig
                 }
             })
         }
