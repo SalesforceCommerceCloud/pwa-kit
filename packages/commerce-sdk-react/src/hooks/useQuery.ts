@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useQuery as useReactQuery, QueryKey, UseQueryOptions} from '@tanstack/react-query'
+import {useQuery as useReactQuery, UseQueryOptions} from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useAuthContext from './useAuthContext'

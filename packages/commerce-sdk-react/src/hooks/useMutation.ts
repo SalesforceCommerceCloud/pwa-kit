@@ -4,7 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useMutation as useReactQueryMutation, useQueryClient} from '@tanstack/react-query'
+import {
+    useMutation as useReactQueryMutation,
+    useQueryClient,
+    UseMutationOptions
+} from '@tanstack/react-query'
+import {helpers} from 'commerce-sdk-isomorphic'
+import useAuthContext from './useAuthContext'
 import {CacheUpdateGetter, ApiOptions, ApiMethod, ApiClient, MergedOptions} from './types'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useCustomerId from './useCustomerId'
@@ -37,4 +43,36 @@ export const useMutation = <
             updateCache(queryClient, cacheUpdates, data)
         }
     })
+}
+
+/**
+ * A hook for SCAPI custom endpoint mutations.
+ * @param apiOptions - Options passed through to commerce-sdk-isomorphic
+ * @param mutationOptions - Options passed through to @tanstack/react-query
+ * @returns A TanStack Query mutation hook with data from the custom API endpoint.
+ */
+export const useCustomMutation = (
+    apiOptions: Parameters<typeof helpers.callCustomEndpoint>[0],
+    mutationOptions?: UseMutationOptions
+) => {
+    const callCustomEndpointWithAuth = (
+        options: Parameters<typeof helpers.callCustomEndpoint>[0]
+    ) => {
+        const auth = useAuthContext()
+        return async () => {
+            const {access_token} = await auth.ready()
+            return await helpers.callCustomEndpoint({
+                ...options,
+                options: {
+                    ...options.options,
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                        ...options.options?.headers
+                    }
+                }
+            })
+        }
+    }
+
+    return useReactQueryMutation(callCustomEndpointWithAuth(apiOptions), mutationOptions)
 }
