@@ -16,7 +16,6 @@ const SHORT_CODE = 'kv7kzm78'
 const SITE_ID = 'RefArch'
 
 const UseCustomEndpoint = () => {
-    console.log('123')
     const clientConfig = {
         parameters: {
             clientId: CLIENT_ID,
@@ -31,7 +30,6 @@ const UseCustomEndpoint = () => {
             options: {
                 method: 'GET',
                 customApiPathParameters: {
-                    // apiVersion: 'v1',
                     endpointPath: 'test-hello-world',
                     apiName: 'hello-world'
                 }
@@ -41,7 +39,6 @@ const UseCustomEndpoint = () => {
         },
         {}
     )
-    console.log(query)
     return <Json data={query.data} />
 }
 
