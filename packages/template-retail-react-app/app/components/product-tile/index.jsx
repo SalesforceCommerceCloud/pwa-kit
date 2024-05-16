@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef} from 'react'
+import React, {useMemo, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
@@ -83,7 +83,7 @@ const ProductTile = (props) => {
     //TODO variants needs to be filter according to selectedAttribute value
     const variants = product?.variants
 
-    const priceData = getPriceData({...product, variants})
+    const priceData = useMemo(() => getPriceData({...product, variants}), [product, variants])
 
     return (
         <Box {...styles.container}>
