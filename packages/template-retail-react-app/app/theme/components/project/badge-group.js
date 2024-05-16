@@ -12,7 +12,7 @@ export default {
             top: 2,
             left: 2
         },
-        badge :{
+        badge: {
             ml: 1,
             variant: 'subtle'
         }

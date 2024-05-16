@@ -205,7 +205,8 @@ ProductTile.propTypes = {
         // Note: useEinstein() transforms snake_case property names from the API response to camelCase
         productName: PropTypes.string,
         productId: PropTypes.string,
-        hitType: PropTypes.string
+        hitType: PropTypes.string,
+        representedProduct: PropTypes.object
     }),
     /**
      * Enable adding/removing product as a favourite.
