@@ -7,7 +7,12 @@
 
 import nock from 'nock'
 import {act} from '@testing-library/react'
-import {mockMutationEndpoints, renderHookWithProviders, waitAndExpectSuccess} from '../test-utils'
+import {
+    mockMutationEndpoints,
+    renderHookWithProviders,
+    waitAndExpectSuccess,
+    DEFAULT_TEST_CONFIG
+} from '../test-utils'
 import {useCustomMutation} from './useMutation'
 
 jest.mock('../auth/index.ts', () => {
@@ -42,6 +47,32 @@ describe('useCustomMutation', () => {
                     body: {test: '123'}
                 },
                 clientConfig,
+                rawResponse: false
+            })
+        })
+        expect(result.current.data).toBeUndefined()
+        act(() => result.current.mutate())
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(mockRes)
+    })
+    test('clientConfig is optional, default to CommerceApiProvider configs', async () => {
+        const mockRes = {data: '123'}
+        const apiName = 'hello-world'
+        const endpointPath = 'test-hello-world'
+        mockMutationEndpoints(
+            `${apiName}/v1/organizations/${DEFAULT_TEST_CONFIG.organizationId}/${endpointPath}`,
+            mockRes
+        )
+        const {result} = renderHookWithProviders(() => {
+            return useCustomMutation({
+                options: {
+                    method: 'POST',
+                    customApiPathParameters: {
+                        endpointPath: 'test-hello-world',
+                        apiName
+                    },
+                    body: {test: '123'}
+                },
                 rawResponse: false
             })
         })

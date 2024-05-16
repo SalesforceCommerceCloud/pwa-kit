@@ -6,7 +6,12 @@
  */
 
 import nock from 'nock'
-import {mockQueryEndpoint, renderHookWithProviders, waitAndExpectSuccess} from '../test-utils'
+import {
+    mockQueryEndpoint,
+    renderHookWithProviders,
+    waitAndExpectSuccess,
+    DEFAULT_TEST_CONFIG
+} from '../test-utils'
 import {useCustomQuery} from './useQuery'
 
 jest.mock('../auth/index.ts', () => {
@@ -43,6 +48,51 @@ describe('useCustomQuery', () => {
                     }
                 },
                 clientConfig,
+                rawResponse: false
+            })
+        })
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(mockRes)
+    })
+    test('clientConfig is optional, default to CommerceApiProvider configs', async () => {
+        const mockRes = {data: '123'}
+        const apiName = 'hello-world'
+        const endpointPath = 'test-hello-world'
+        mockQueryEndpoint(
+            `${apiName}/v1/organizations/${DEFAULT_TEST_CONFIG.organizationId}/${endpointPath}`,
+            mockRes
+        )
+        const {result} = renderHookWithProviders(() => {
+            return useCustomQuery({
+                options: {
+                    method: 'GET',
+                    customApiPathParameters: {
+                        endpointPath,
+                        apiName
+                    }
+                },
+                rawResponse: false
+            })
+        })
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(mockRes)
+    })
+    test('query defaults to GET request', async () => {
+        const mockRes = {data: '123'}
+        const apiName = 'hello-world'
+        const endpointPath = 'test-hello-world'
+        mockQueryEndpoint(
+            `${apiName}/v1/organizations/${DEFAULT_TEST_CONFIG.organizationId}/${endpointPath}`,
+            mockRes
+        )
+        const {result} = renderHookWithProviders(() => {
+            return useCustomQuery({
+                options: {
+                    customApiPathParameters: {
+                        endpointPath,
+                        apiName
+                    }
+                },
                 rawResponse: false
             })
         })
