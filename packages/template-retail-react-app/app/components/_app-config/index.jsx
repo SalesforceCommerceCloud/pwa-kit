@@ -27,7 +27,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
+import {getNamespace, getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -54,8 +54,8 @@ const AppConfig = ({children, locals = {}}) => {
 
     const commerceApiConfig = locals.appConfig.commerceAPI
 
-    const proxy = locals.ssrNamespace
-        ? `${appOrigin}/${locals.ssrNamespace}${commerceApiConfig.proxyPath}`
+    const proxy = getNamespace()
+        ? `${appOrigin}/${getNamespace()}${commerceApiConfig.proxyPath}`
         : `${appOrigin}${commerceApiConfig.proxyPath}`
 
     return (
@@ -89,7 +89,7 @@ AppConfig.restore = (locals = {}) => {
             : `${window.location.pathname}${window.location.search}`
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
-    const {app: appConfig, ssrNamespace} = getConfig()
+    const {app: appConfig} = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI
@@ -98,7 +98,6 @@ AppConfig.restore = (locals = {}) => {
     apiConfig.parameters.siteId = site.id
 
     locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
-    locals.ssrNamespace = ssrNamespace
     locals.site = site
     locals.locale = locale
     locals.appConfig = appConfig

@@ -70,6 +70,16 @@ export let ssrFiles = []
 // const namespace = getConfig().ssrNamespace
 // const namespace = 'abc'
 
+export const getNamespace = () => {
+    const config = getConfig()
+    const defaultSiteId = config.app.defaultSite
+    const siteAliases = config.app.siteAliases
+
+    const alias = siteAliases[defaultSiteId]
+
+    return alias ? alias : defaultSiteId
+}
+
 /**
  * RegExp that matches a proxy override string
  * match[1] is the protocol
@@ -82,33 +92,33 @@ export let ssrFiles = []
 const proxyOverrideRE = /^(http(s)?):\/\/([^/]+)(\/)?([^/]+)?(\/caching)?/
 
 export const startsWithMobify = (url) => {
-    const namespace = getConfig().ssrNamespace
+    const namespace = getNamespace()
     const mobifyPath = namespace ? `/${namespace}/mobify` : `/mobify`
     return url.startsWith(mobifyPath)
 }
 
 export const getProxyPathBase = () => {
-    const namespace = getConfig().ssrNamespace
+    const namespace = getNamespace()
     return namespace ? `/${namespace}/mobify/proxy` : '/mobify/proxy'
 }
 
 export const getBundlePathBase = () => {
-    const namespace = getConfig().ssrNamespace
+    const namespace = getNamespace()
     return namespace ? `/${namespace}/mobify/bundle` : '/mobify/bundle'
 }
 
 export const getCachingPathBase = () => {
-    const namespace = getConfig().ssrNamespace
+    const namespace = getNamespace()
     return namespace ? `/${namespace}/mobify/caching` : '/mobify/caching'
 }
 
 export const getHealtCheckPathBase = () => {
-    const namespace = getConfig().ssrNamespace
+    const namespace = getNamespace()
     return namespace ? `/${namespace}/mobify/ping` : '/mobify/ping'
 }
 
 export const getSLASPrivateProxyPath = () => {
-    const namespace = getConfig().ssrNamespace
+    const namespace = getNamespace()
     return namespace ? `/${namespace}/mobify/slas/private` : '/mobify/slas/private'
 }
 
