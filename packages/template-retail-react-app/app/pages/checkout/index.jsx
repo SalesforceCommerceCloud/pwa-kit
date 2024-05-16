@@ -29,11 +29,7 @@ import OrderSummary from '@salesforce/retail-react-app/app/components/order-summ
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-skeleton'
-import {
-    useUsid,
-    useShopperOrdersMutation,
-    useShopperBasketsMutation
-} from '@salesforce/commerce-sdk-react'
+import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {
     API_ERROR_MESSAGE,
@@ -45,7 +41,6 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {usid} = useUsid()
     const {step} = useCheckout()
     const [error, setError] = useState()
     const {data: basket} = useCurrentBasket()

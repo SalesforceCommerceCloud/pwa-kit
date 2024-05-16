@@ -8,6 +8,7 @@
 import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 
 // Components
 import {
@@ -28,6 +29,7 @@ import {useIntl} from 'react-intl'
 import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
+import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
@@ -65,18 +67,22 @@ const ProductTile = (props) => {
         dynamicImageProps,
         ...rest
     } = props
+    const {currency} = useCurrency()
 
-    const {currency, image, price, productId, hitType} = product
-
+    const {image, productId} = product
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
 
-    const {currency: activeCurrency} = useCurrency()
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
+
+    //TODO variants needs to be filter according to selectedAttribute value
+    const variants = product?.variants
+
+    const priceData = getPriceData({...product, variants})
 
     return (
         <Box {...styles.container}>
@@ -108,25 +114,7 @@ const ProductTile = (props) => {
                 <Text {...styles.title}>{localizedProductName}</Text>
 
                 {/* Price */}
-                <Text {...styles.price} data-testid="product-tile-price">
-                    {hitType === 'set'
-                        ? intl.formatMessage(
-                              {
-                                  id: 'product_tile.label.starting_at_price',
-                                  defaultMessage: 'Starting at {price}'
-                              },
-                              {
-                                  price: intl.formatNumber(price, {
-                                      style: 'currency',
-                                      currency: currency || activeCurrency
-                                  })
-                              }
-                          )
-                        : intl.formatNumber(price, {
-                              style: 'currency',
-                              currency: currency || activeCurrency
-                          })}
-                </Text>
+                <DisplayPrice priceData={priceData} currency={currency} />
             </Link>
             {enableFavourite && (
                 <Box
@@ -181,12 +169,15 @@ ProductTile.propTypes = {
      */
     product: PropTypes.shape({
         currency: PropTypes.string,
+        representedProduct: PropTypes.object,
         image: PropTypes.shape({
             alt: PropTypes.string,
             disBaseLink: PropTypes.string,
             link: PropTypes.string
         }),
         price: PropTypes.number,
+        priceRanges: PropTypes.array,
+        tieredPrices: PropTypes.array,
         // `name` is present and localized when `product` is provided by a RecommendedProducts component
         // (from Shopper Products `getProducts` endpoint), but is not present when `product` is
         // provided by a ProductList component.
@@ -200,7 +191,14 @@ ProductTile.propTypes = {
         // Note: useEinstein() transforms snake_case property names from the API response to camelCase
         productName: PropTypes.string,
         productId: PropTypes.string,
-        hitType: PropTypes.string
+        hitType: PropTypes.string,
+        variants: PropTypes.array,
+        type: PropTypes.shape({
+            set: PropTypes.bool,
+
+            bundle: PropTypes.bool,
+            item: PropTypes.bool
+        })
     }),
     /**
      * Enable adding/removing product as a favourite.
