@@ -6,6 +6,8 @@
  */
 import path from 'path'
 
+const LOCAL_ENV_NAMESPACE = process.env.LOCAL_ENV_NAMESPACE ? `/${process.env.LOCAL_ENV_NAMESPACE}` : ''
+
 module.exports = {
     testURL: 'http://localhost/',
     verbose: true,
@@ -26,7 +28,7 @@ module.exports = {
         DEBUG: true,
         NODE_ENV: 'test',
         Progressive: {
-            buildOrigin: '/mobify/bundle/development/'
+            buildOrigin: `${LOCAL_ENV_NAMESPACE}/mobify/bundle/development/`
         }
     },
     transform: {

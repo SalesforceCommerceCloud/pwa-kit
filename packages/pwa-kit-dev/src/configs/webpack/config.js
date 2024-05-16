@@ -38,6 +38,8 @@ const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
 
+const LOCAL_ENV_NAMESPACE = process.env.LOCAL_ENV_NAMESPACE ? `/${process.env.LOCAL_ENV_NAMESPACE}` : ''
+
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
@@ -407,7 +409,7 @@ const enableReactRefresh = (config) => {
         output: {
             ...config.output,
             // Setting this so that *.hot-update.json requests are resolving
-            publicPath: '/mobify/bundle/development/'
+            publicPath: `${LOCAL_ENV_NAMESPACE}/mobify/bundle/development/`
         }
     }
 }
