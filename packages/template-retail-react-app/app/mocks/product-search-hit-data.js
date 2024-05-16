@@ -7,6 +7,7 @@
 
 const mockProductSearchItem = {
     currency: 'USD',
+    hitType: 'master',
     image: {
         alt: 'Charcoal Single Pleat Wool Suit, , large',
         disBaseLink:
@@ -347,7 +348,134 @@ const mockProductSearchItem = {
         }
     ],
     price: 299.99,
-    productName: 'Charcoal Single Pleat Wool Suit'
+    productName: 'Charcoal Single Pleat Wool Suit',
+    representedProduct: {
+        id: '750518894461M'
+    },
+    variants: [
+        {
+            price: 191.99,
+            productId: '750518894461M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'CHARCWL',
+                size: '040',
+                width: 'V'
+            }
+        },
+        {
+            price: 191.99,
+            productId: '750518548272M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'NAVYWL',
+                size: '050',
+                width: 'V'
+            }
+        }
+    ],
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Colour',
+            values: [
+                {
+                    name: 'Navy',
+                    value: 'NAVYWL'
+                },
+                {
+                    name: 'Charcoal',
+                    value: 'CHARCWL'
+                }
+            ]
+        },
+        {
+            id: 'size',
+            name: 'Size',
+            values: [
+                {
+                    name: '36',
+                    value: '036'
+                },
+                {
+                    name: '38',
+                    value: '038'
+                },
+                {
+                    name: '39',
+                    value: '039'
+                },
+                {
+                    name: '40',
+                    value: '040'
+                },
+                {
+                    name: '42',
+                    value: '042'
+                },
+                {
+                    name: '43',
+                    value: '043'
+                },
+                {
+                    name: '44',
+                    value: '044'
+                },
+                {
+                    name: '46',
+                    value: '046'
+                },
+                {
+                    name: '48',
+                    value: '048'
+                },
+                {
+                    name: '50',
+                    value: '050'
+                }
+            ]
+        },
+        {
+            id: 'width',
+            name: 'Width',
+            values: [
+                {
+                    name: 'Short',
+                    value: 'S'
+                },
+                {
+                    name: 'Regular',
+                    value: 'V'
+                },
+                {
+                    name: 'Long',
+                    value: 'L'
+                }
+            ]
+        }
+    ]
 }
 const mockProductSetHit = {
     currency: 'GBP',
