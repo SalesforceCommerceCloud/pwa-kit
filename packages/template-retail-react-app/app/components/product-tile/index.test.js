@@ -7,69 +7,14 @@
 import React from 'react'
 import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components/product-tile/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {fireEvent} from '@testing-library/react'
-
-const mockProductSearchItem = {
-    currency: 'USD',
-    image: {
-        alt: 'Charcoal Single Pleat Wool Suit, , large',
-        disBaseLink:
-            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4de8166b/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg'
-    },
-    price: 299.99,
-    productName: 'Charcoal Single Pleat Wool Suit'
-}
-
-const mockProductSet = {
-    currency: 'GBP',
-    hitType: 'set',
-    image: {
-        alt: 'Winter Look, , large',
-        disBaseLink:
-            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1c4cd52/images/large/PG.10205921.JJ5FUXX.PZ.jpg',
-        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1c4cd52/images/large/PG.10205921.JJ5FUXX.PZ.jpg',
-        title: 'Winter Look, '
-    },
-    orderable: true,
-    price: 44.16,
-    priceMax: 71.03,
-    pricePerUnit: 44.16,
-    pricePerUnitMax: 71.03,
-    productId: 'winter-lookM',
-    productName: 'Winter Look',
-    productType: {
-        set: true
-    },
-    representedProduct: {
-        id: '701642853695M'
-    },
-    representedProducts: [
-        {id: '701642853695M'},
-        {id: '701642853718M'},
-        {id: '701642853725M'},
-        {id: '701642853701M'},
-        {id: '740357357531M'},
-        {id: '740357358095M'},
-        {id: '740357357623M'},
-        {id: '740357357609M'},
-        {id: '740357358156M'},
-        {id: '740357358132M'},
-        {id: '740357358101M'},
-        {id: '740357357562M'},
-        {id: '740357357548M'},
-        {id: '740357358187M'},
-        {id: '740357357593M'},
-        {id: '740357357555M'},
-        {id: '740357357524M'},
-        {id: '740357358149M'},
-        {id: '740357358088M'},
-        {id: '701642867098M'},
-        {id: '701642867111M'},
-        {id: '701642867104M'},
-        {id: '701642867128M'},
-        {id: '701642867135M'}
-    ]
-}
+import {fireEvent, within} from '@testing-library/react'
+import {
+    mockMasterProductHitWithMultipleVariants,
+    mockMasterProductHitWithOneVariant,
+    mockProductSearchItem,
+    mockProductSetHit,
+    mockStandardProductHit
+} from '@salesforce/retail-react-app/app/mocks/product-search-hit-data'
 
 test('Renders links and images', () => {
     const {getAllByRole} = renderWithProviders(<ProductTile product={mockProductSearchItem} />)
@@ -89,22 +34,76 @@ test('Renders Skeleton', () => {
     expect(skeleton).toBeDefined()
 })
 
-test('Product set - renders the appropriate price label', async () => {
-    const {getByTestId} = renderWithProviders(<ProductTile product={mockProductSet} />)
-
-    const container = getByTestId('product-tile-price')
-    expect(container).toHaveTextContent(/starting at/i)
-})
-
 test('Remove from wishlist cannot be muti-clicked', () => {
     const onClick = jest.fn()
 
     const {getByTestId} = renderWithProviders(
-        <ProductTile product={mockProductSet} enableFavourite={true} onFavouriteToggle={onClick} />
+        <ProductTile
+            product={mockProductSearchItem}
+            enableFavourite={true}
+            onFavouriteToggle={onClick}
+        />
     )
     const wishlistButton = getByTestId('wishlist-button')
 
     fireEvent.click(wishlistButton)
     fireEvent.click(wishlistButton)
     expect(onClick).toHaveBeenCalledTimes(1)
+})
+
+test('renders exact price with strikethrough price for master product with multiple variants', () => {
+    const {queryByText, getByText, container} = renderWithProviders(
+        <ProductTile product={mockMasterProductHitWithMultipleVariants} />
+    )
+    expect(getByText(/Black Single Pleat Athletic Fit Wool Suit - Edit/i)).toBeInTheDocument()
+    expect(queryByText(/from/i)).toBeInTheDocument()
+
+    const currentPriceTag = container.querySelectorAll('b')
+    const strikethroughPriceTag = container.querySelectorAll('s')
+    expect(within(currentPriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
+    expect(within(strikethroughPriceTag[0]).getByText(/£223\.99/i)).toBeDefined()
+    // From and price are in separate b tag
+    expect(currentPriceTag).toHaveLength(1)
+    expect(strikethroughPriceTag).toHaveLength(1)
+})
+
+test('renders exact price with strikethrough price for master product with one variant', () => {
+    const {getByText, queryByText, container} = renderWithProviders(
+        <ProductTile product={mockMasterProductHitWithOneVariant} />
+    )
+    expect(getByText(/black flat front wool suit/i)).toBeInTheDocument()
+    expect(getByText(/£191\.99/i)).toBeInTheDocument()
+    expect(getByText(/£320\.00/i)).toBeInTheDocument()
+    expect(queryByText(/from/i)).not.toBeInTheDocument()
+
+    const currentPriceTag = container.querySelectorAll('b')
+    const strikethroughPriceTag = container.querySelectorAll('s')
+    expect(within(currentPriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
+    expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
+    expect(currentPriceTag).toHaveLength(1)
+    expect(strikethroughPriceTag).toHaveLength(1)
+})
+
+test('Product set - shows range From X where X is the lowest price child', () => {
+    const {getByText, queryByText} = renderWithProviders(
+        <ProductTile product={mockProductSetHit} />
+    )
+    expect(getByText(/Winter Look/i)).toBeInTheDocument()
+    expect(queryByText(/from/i)).toBeInTheDocument()
+    expect(queryByText(/£40\.16/i)).toBeInTheDocument()
+    expect(queryByText(/£44\.16/i)).not.toBeInTheDocument()
+})
+
+test('renders strike through price with standard product', () => {
+    const {getByText, container} = renderWithProviders(
+        <ProductTile product={mockStandardProductHit} />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    expect(getByText(/£63\.99/i)).toBeInTheDocument()
+    const currentPriceTag = container.querySelectorAll('b')
+    const strikethroughPriceTag = container.querySelectorAll('s')
+    expect(within(currentPriceTag[0]).getByText(/£63\.99/i)).toBeDefined()
+    expect(within(strikethroughPriceTag[0]).getByText(/£67\.99/i)).toBeDefined()
+    expect(currentPriceTag).toHaveLength(1)
+    expect(strikethroughPriceTag).toHaveLength(1)
 })

@@ -6,14 +6,11 @@
  */
 
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useCustomerBaskets} from '@salesforce/commerce-sdk-react'
-import {
-    mockCustomerBaskets,
-    mockEmptyBasket
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
 
 const MOCK_USE_QUERY_RESULT = {
     data: undefined,
