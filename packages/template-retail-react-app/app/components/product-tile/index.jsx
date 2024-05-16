@@ -20,6 +20,7 @@ import {
     IconButton
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
+import BadgeGroup from '@salesforce/retail-react-app/app/components/badge-group'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -29,6 +30,8 @@ import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+
+import {PRODUCT_TILE_BADGE_LABELS} from '@salesforce/retail-react-app/app/constants'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -63,6 +66,7 @@ const ProductTile = (props) => {
         isFavourite,
         onFavouriteToggle,
         dynamicImageProps,
+        badgeLabels = PRODUCT_TILE_BADGE_LABELS,
         ...rest
     } = props
 
@@ -168,6 +172,7 @@ const ProductTile = (props) => {
                     />
                 </Box>
             )}
+            <BadgeGroup badgeLabels={badgeLabels} product={product?.representedProduct} />
         </Box>
     )
 }
@@ -216,7 +221,11 @@ ProductTile.propTypes = {
      * interacts with favourite icon/button.
      */
     onFavouriteToggle: PropTypes.func,
-    dynamicImageProps: PropTypes.object
+    dynamicImageProps: PropTypes.object,
+    /**
+     * Badge lables to display on the tile.
+     */
+    badgeLabels: PropTypes.array
 }
 
 export default ProductTile

@@ -34,6 +34,9 @@ export const HOME_SHOP_PRODUCTS_LIMIT = 10
 export const CAT_MENU_DEFAULT_NAV_SSR_DEPTH = 1
 export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
 
+// TBD: Is there a better way to pass the color scheme
+export const PRODUCT_TILE_BADGE_LABELS =  [{label:'New', color:'green'}, {label:'Sale', color:'yellow'}];
+
 export const cssColorGroups = {
     beige: '#d3bca9',
     black: '#000000',
