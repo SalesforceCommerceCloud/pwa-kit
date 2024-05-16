@@ -1,5 +1,10 @@
 ## v3.0.0-dev (Jan 22, 2024)
 
+### Improvement
+
+- Product Tile Revamp
+  - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760) 
+
 ### Performance improvements
 
 - Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656)
