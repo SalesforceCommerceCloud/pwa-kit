@@ -7,6 +7,7 @@
 
 import React, {useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 
 // Components
 import {
@@ -36,6 +37,7 @@ import {
     PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID
 } from '@salesforce/retail-react-app/app/constants'
 import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
+import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {
     filterImageGroups,
@@ -78,10 +80,10 @@ const ProductTile = (props) => {
         selectableAttributeId = PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID,
         ...rest
     } = props
-    const {currency, imageGroups, price, productId, hitType} = product
+    const {imageGroups, productId, hitType} = product
 
     const intl = useIntl()
-    const {currency: activeCurrency} = useCurrency()
+    const {currency} = useCurrency()
     const isFavouriteLoading = useRef(false)
     const styles = useMultiStyleConfig('ProductTile')
 
@@ -131,6 +133,19 @@ const ProductTile = (props) => {
     // name as `productName`. ProductList provides a localized name as `productName` and does not
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
+
+    // Pricing is dynamic! Ensure we are showing the right price for the selected variation attribute
+    // value.
+    const priceData = useMemo(() => {
+        const variants = product?.variants.filter(({variationValues}) => {
+            return variationValues[selectableAttributeId] === selectableAttributeValue
+        })
+
+        return getPriceData({
+            ...product,
+            variants
+        })
+    }, [product, selectableAttributeId, selectableAttributeValue])
 
     return (
         <Box {...styles.container}>
@@ -206,25 +221,7 @@ const ProductTile = (props) => {
                 <Text {...styles.title}>{localizedProductName}</Text>
 
                 {/* Price */}
-                <Text {...styles.price} data-testid="product-tile-price">
-                    {hitType === 'set'
-                        ? intl.formatMessage(
-                              {
-                                  id: 'product_tile.label.starting_at_price',
-                                  defaultMessage: 'Starting at {price}'
-                              },
-                              {
-                                  price: intl.formatNumber(price, {
-                                      style: 'currency',
-                                      currency: currency || activeCurrency
-                                  })
-                              }
-                          )
-                        : intl.formatNumber(price, {
-                              style: 'currency',
-                              currency: currency || activeCurrency
-                          })}
-                </Text>
+                <DisplayPrice priceData={priceData} currency={currency} />
             </Link>
             {enableFavourite && (
                 <Box
@@ -286,6 +283,8 @@ ProductTile.propTypes = {
         }),
         imageGroups: PropTypes.array,
         price: PropTypes.number,
+        priceRanges: PropTypes.array,
+        tieredPrices: PropTypes.array,
         // `name` is present and localized when `product` is provided by a RecommendedProducts component
         // (from Shopper Products `getProducts` endpoint), but is not present when `product` is
         // provided by a ProductList component.
@@ -302,7 +301,13 @@ ProductTile.propTypes = {
         representedProduct: PropTypes.object,
         hitType: PropTypes.string,
         variationAttributes: PropTypes.array,
-        variants: PropTypes.array
+        variants: PropTypes.array,
+        type: PropTypes.shape({
+            set: PropTypes.bool,
+
+            bundle: PropTypes.bool,
+            item: PropTypes.bool
+        })
     }),
     /**
      * Enable adding/removing product as a favourite.

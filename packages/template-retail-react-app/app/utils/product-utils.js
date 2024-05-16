@@ -1,9 +1,11 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2024, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 
 /**
  * Get the human-friendly version of the variation values that users have selected.
@@ -35,20 +37,84 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
 }
 
 /**
- * This function extract the promotional price from a product. If there are more than one price, the smallest price will be picked
+ * This function extract the price information of a given product
+ * If a product is a master,
+ *  currentPrice: get the lowest price (including promotional prices) among variants
+ *  listPrice: get the list price of the variant that has lowest price (including promotional price)
+ *  maxPrice: the max price in tieredPrices of variant that has lowest price
  * @param {object} product - product detail object
- * @returns {{discountPrice: number, basePrice: number | string}}
+ * @param {object} opts - options to pass into the function like intl, quantity, and currency
  */
-export const getDisplayPrice = (product) => {
-    const basePrice = product?.pricePerUnit || product?.price
-    const promotionalPriceList = product?.productPromotions
-        ?.map((promo) => promo.promotionalPrice)
-        .filter((i) => i !== null && i !== undefined)
-    // choose the smallest price among the promotionalPrice
-    const discountPrice = promotionalPriceList?.length ? Math.min(...promotionalPriceList) : null
+export const getPriceData = (product, opts = {}) => {
+    const {quantity = 1} = opts
+    const isASet = product?.hitType === 'set' || !!product?.type?.set
+    const isMaster = product?.hitType === 'master' || !!product?.type?.master
+    let currentPrice
+    let variantWithLowestPrice
+    // grab the variant that has the lowest price (including promotional price)
+    if (isMaster) {
+        const variants = product?.variants || []
+        variantWithLowestPrice = variants.reduce(
+            (minVariant, variant) => {
+                const promotions = variant.productPromotions || []
+                const smallestPromotionalPrice = getSmallestValByProperty(
+                    promotions,
+                    'promotionalPrice'
+                )
+                const variantSalePrice =
+                    smallestPromotionalPrice && smallestPromotionalPrice < variant.price
+                        ? smallestPromotionalPrice
+                        : variant.price
+                return variantSalePrice < minVariant.minPrice
+                    ? {minPrice: variantSalePrice, variant}
+                    : minVariant
+            },
+            {minPrice: Infinity, variant: null}
+        )
+        currentPrice = variantWithLowestPrice?.minPrice
+    } else {
+        const promotionalPrice = getSmallestValByProperty(
+            product?.productPromotions,
+            'promotionalPrice'
+        )
+        currentPrice =
+            promotionalPrice && promotionalPrice < product?.price
+                ? promotionalPrice
+                : product?.price
+    }
+
+    // since the price is the lowest value among price books, each product will have at lease a single item tiered price at quantity 1
+    // the highest value of tieredPrices is presumptively the list price
+    const tieredPrices =
+        variantWithLowestPrice?.variant?.tieredPrices || product?.tieredPrices || []
+    const maxTieredPrice = tieredPrices?.length
+        ? Math.max(...tieredPrices.map((item) => item.price))
+        : undefined
+    const highestTieredPrice = tieredPrices.find((tier) => tier.price === maxTieredPrice)
+    const listPrice = highestTieredPrice?.price
+
+    // if a product has tieredPrices, get the tiered that has the higher closest quantity to current quantity
+    const filteredTiered = tieredPrices.filter((tiered) => tiered.quantity <= quantity)
+    const closestTieredPrice =
+        filteredTiered.length &&
+        filteredTiered.reduce((prev, curr) => {
+            return Math.abs(curr.quantity - quantity) < Math.abs(prev.quantity - quantity)
+                ? curr
+                : prev
+        })
     return {
-        basePrice,
-        discountPrice
+        currentPrice,
+        listPrice,
+        isOnSale: currentPrice < listPrice,
+        isASet,
+        isMaster,
+        // For a product, set price is the lowest price of its children, so the price should be considered a range
+        // For a master product, when it has more than 2 variants, we use the lowest priced variant, so it is  considered a range price
+        //      but for master that has one variant, it is not considered range
+        isRange: (isMaster && product?.variants?.length > 1) || isASet || false,
+        // priceMax is for product set
+        tieredPrice: closestTieredPrice?.price,
+        maxPrice: product?.priceMax || maxTieredPrice
     }
 }
 
@@ -87,8 +153,6 @@ export const filterImageGroups = (imageGroups = [], filters) => {
     return imageGroups?.filter(typeFilter)?.filter(attributeFilter)
 }
 
-import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
-
 /**
  * Provided a product this function will return the variation attibutes decorated with
  * `href` and `swatch` image for the given attribute values. This allows easier access
@@ -121,4 +185,23 @@ export const getDecoratedVariationAttributes = (product, opts = {}) => {
             }
         })
     }))
+}
+
+/**
+     
+ * @private
+ * Find the smallest value by key from a given array
+ * @param arr
+ * @param key
+ */
+const getSmallestValByProperty = (arr, key) => {
+    if (!arr || !arr.length) return undefined
+    if (!key) {
+        throw new Error('Please specify a key.')
+    }
+    const vals = arr
+        .map((item) => item[key])
+        .filter(Boolean)
+        .filter(Number)
+    return vals.length ? Math.min(...vals) : undefined
 }

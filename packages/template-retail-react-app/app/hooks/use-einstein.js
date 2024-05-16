@@ -407,7 +407,17 @@ const useEinstein = () => {
             const products = await api.shopperProducts.getProducts({
                 parameters: {
                     ids: ids.join(','),
-                    allImages: true
+                    allImages: true,
+                    perPricebook: true,
+                    expand: [
+                        'availability',
+                        'links',
+                        'promotions',
+                        'options',
+                        'images',
+                        'prices',
+                        'variations'
+                    ]
                 },
                 headers: {
                     Authorization: `Bearer ${token}`

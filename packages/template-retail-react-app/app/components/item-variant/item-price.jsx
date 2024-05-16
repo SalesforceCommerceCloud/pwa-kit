@@ -73,8 +73,8 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
             <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
                 {isProductASet &&
                     `${intl.formatMessage({
-                        defaultMessage: 'Starting at',
-                        id: 'item_price.label.starting_at'
+                        defaultMessage: 'From',
+                        id: 'item_price.label.from'
                     })} `}
 
                 <FormattedNumber
