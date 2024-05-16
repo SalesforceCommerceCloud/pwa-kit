@@ -55,7 +55,7 @@ const AppConfig = ({children, locals = {}}) => {
     const commerceApiConfig = locals.appConfig.commerceAPI
 
     const proxy = getNamespace()
-        ? `${appOrigin}/${getNamespace()}${commerceApiConfig.proxyPath}`
+        ? `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
         : `${appOrigin}${commerceApiConfig.proxyPath}`
 
     return (
