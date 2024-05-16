@@ -1,4 +1,6 @@
 ## v1.5.0-dev (Apr 17, 2024)
+- Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
+
 ## v1.4.2 (Apr 17, 2024)
 - Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
 
