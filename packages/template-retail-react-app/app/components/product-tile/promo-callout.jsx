@@ -10,13 +10,13 @@ import {findLowestPrice} from '@salesforce/retail-react-app/app/utils/product-ut
 
 const PromoCallout = ({product}) => {
     const {minPrice, data} = findLowestPrice(product)
-    console.log('--- findLowestPrice', minPrice, data, product)
+
     // NOTE: inconsistency - with ShopperProduct API, a variant does not have productPromotions
     const promos = data.productPromotions ?? product.productPromotions
     const promo = promos.find((promo) => promo.promotionalPrice === minPrice) ?? promos[0]
 
     // calloutMsg can be html string or just plain text
-    return promo.calloutMsg && <div dangerouslySetInnerHTML={{__html: promo.calloutMsg}} />
+    return <div dangerouslySetInnerHTML={{__html: promo.calloutMsg}} />
 }
 
 PromoCallout.propTypes = {
