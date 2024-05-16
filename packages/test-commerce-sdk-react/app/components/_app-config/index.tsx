@@ -18,7 +18,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     const headers = {
         'correlation-id': correlationId
     }
-    const defaultSiteId = 'RefArchGlobal'
+    const defaultSiteId = 'RefArch'
     const defaultLocale = 'en-US'
     const [siteId, setSiteId] = useState(defaultSiteId)
     const [locale, setLocale] = useState(defaultLocale)

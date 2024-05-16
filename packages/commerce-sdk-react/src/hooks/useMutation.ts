@@ -72,6 +72,7 @@ export const useCustomMutation = (
     const callCustomEndpointWithAuth = (options: CustomEndpointArgClientConfigOptional) => {
         return async () => {
             const clientConfig = options.clientConfig || {}
+            const clientHeaders = config.headers || {}
             const {access_token} = await auth.ready()
             return await helpers.callCustomEndpoint({
                 ...options,
@@ -79,6 +80,7 @@ export const useCustomMutation = (
                     ...options.options,
                     headers: {
                         Authorization: `Bearer ${access_token}`,
+                        ...clientHeaders,
                         ...options.options?.headers
                     }
                 },
@@ -89,6 +91,7 @@ export const useCustomMutation = (
                         organizationId: config.organizationId,
                         shortCode: config.organizationId
                     },
+                    proxy: config.proxy,
                     ...clientConfig
                 }
             })

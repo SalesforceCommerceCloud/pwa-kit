@@ -89,6 +89,7 @@ export const useCustomQuery = (
     const auth = useAuthContext()
     const callCustomEndpointWithAuth = (options: CustomEndpointArgClientConfigOptional) => {
         const clientConfig = options.clientConfig || {}
+        const clientHeaders = config.headers || {}
         return async () => {
             const {access_token} = await auth.ready()
             return await helpers.callCustomEndpoint({
@@ -98,6 +99,7 @@ export const useCustomQuery = (
                     method: options.options.method || 'GET',
                     headers: {
                         Authorization: `Bearer ${access_token}`,
+                        ...clientHeaders,
                         ...options.options?.headers
                     }
                 },
@@ -108,6 +110,7 @@ export const useCustomQuery = (
                         organizationId: config.organizationId,
                         shortCode: config.organizationId
                     },
+                    proxy: config.proxy,
                     ...clientConfig
                 }
             })
