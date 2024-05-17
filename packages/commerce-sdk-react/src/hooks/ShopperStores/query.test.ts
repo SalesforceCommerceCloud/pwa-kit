@@ -22,7 +22,7 @@ jest.mock('../../auth/index.ts', () => {
 type Queries = typeof queries
 const searchEndpoint = '/store/shopper-stores/'
 // Not all endpoints use all parameters, but unused parameters are safely discarded
-const OPTIONS = {parameters: {q: 'something'}}
+const OPTIONS = {parameters: {ids: '12345'}}
 
 /** Map of query name to returned data type */
 type DataType<K extends keyof Queries> = NonNullable<ReturnType<Queries[K]>['data']>
@@ -30,7 +30,8 @@ type TestMap = {[K in keyof Queries]: DataType<K>}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
     // Type assertion so we don't need to use the full type
-    useSearchStores: {} as DataType<'useSearchStores'>
+    useSearchStores: {} as DataType<'useSearchStores'>,
+    useStores: {} as DataType<'useStores'>
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>

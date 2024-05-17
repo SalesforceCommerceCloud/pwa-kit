@@ -18,6 +18,13 @@ const searchStores = [
     'limit'
 ] as const
 
+const getStores = [
+    'siteId',
+    'locale',
+    'ids'
+] as const
+
+
 export default {
-    searchStores
+    searchStores, getStores
 }

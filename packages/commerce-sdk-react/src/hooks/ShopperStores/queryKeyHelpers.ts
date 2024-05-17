@@ -19,6 +19,13 @@ export type QueryKeys = {
         string | undefined,
         '/store-search',
         Params<'searchStores'>
+    ],
+    getStores: [
+        '/commerce-sdk-react',
+        '/organizations/',
+        string | undefined,
+        '/stores',
+        Params<'getStores'>
     ]
 }
 
@@ -41,5 +48,18 @@ export const searchStores: QueryKeyHelper<'searchStores'> = {
     queryKey: (params: Params<'searchStores'>) => {
         const paramKeys = [...paramKeysMap['searchStores'], ...getCustomKeys(params)]
         return [...searchStores.path(params), pick(params, paramKeys)]
+    }
+}
+
+export const getStores: QueryKeyHelper<'getStores'> = {
+    path: (params) => [
+        '/commerce-sdk-react',
+        '/organizations/',
+        params.organizationId,
+        '/stores'
+    ],
+    queryKey: (params: Params<'getStores'>) => {
+        const paramKeys = [...paramKeysMap['getStores'], ...getCustomKeys(params)]
+        return [...getStores.path(params), pick(params, paramKeys)]
     }
 }

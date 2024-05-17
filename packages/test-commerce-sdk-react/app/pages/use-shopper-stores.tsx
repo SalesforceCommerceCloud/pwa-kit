@@ -5,27 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useSearchStores} from '@salesforce/commerce-sdk-react'
+import {useSearchStores, useStores} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
-import {Link} from 'react-router-dom'
 
-const UseShopperStores = () => {
-    const {
-        isLoading,
-        error,
-        data: result
-    } = useSearchStores({
-        parameters: {
-            countryCode: "US",
-            postalCode: "94086",
-            locale: "en-US",
-            maxDistance: 20012
-        }
-    }, {})
+const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any, index: number) => {
     if (isLoading) {
         return (
-            <div>
-                <h1>Stores</h1>
+            <div key={`${name}_${index}_loading`}>
+                <h1 id={name}>{name}</h1>
+                <hr />
                 <h2 style={{background: 'aqua'}}>Loading...</h2>
             </div>
         )
@@ -34,13 +22,68 @@ const UseShopperStores = () => {
     if (error) {
         return <h1 style={{color: 'red'}}>Something is wrong</h1>
     }
+
+    const pages = name === 'usePage' ? [data] : data.data
+
+    return (
+        <div key={`${name}_${index}`}>
+            <h2 id={name}>{name}</h2>
+            <h3>{data?.name}</h3>
+            <h3>
+                <Json data={{arg}} />
+            </h3>
+            <hr />
+            <h3>Returning data</h3>
+            <Json data={{isLoading, error, data}} />
+        </div>
+    )
+}
+
+const UseShopperStores = () => {
+
+    const queryHooks = [
+        {
+            name: 'useSearchStores',
+            arg: {
+                parameters: {
+                    countryCode: "US",
+                    postalCode: "94086",
+                    locale: "en-US",
+                    maxDistance: 20012
+                }
+            },
+            get hook() {
+                // TODO: Address the lint error instead of ignoring it
+                // eslint-disable-next-line react-hooks/rules-of-hooks
+                return useSearchStores(this.arg)
+            }
+        },
+        {
+            name: 'useStores',
+            arg: {
+                parameters: {
+                    ids: "10178,12345,12346"
+                }
+            },
+            get hook() {
+                // TODO: Address the lint error instead of ignoring it
+                // eslint-disable-next-line react-hooks/rules-of-hooks
+                return useStores(this.arg)
+            }
+        }
+    ]
     return (
         <>
-            <h1>Stores</h1>
-            <div>
-                <div>Returning data</div>
-                <Json data={{isLoading, error, result}} />
-            </div>
+            <h1>ShopperStores page</h1>
+
+            <>
+                <div>
+                    <h1>Query hooks</h1>
+                    {queryHooks.map(({name, arg, hook}, index) => {
+                        return renderQueryHook(name, arg, {...hook}, index)
+                    })}
+                </div>
+            </>
         </>
     )
 }
