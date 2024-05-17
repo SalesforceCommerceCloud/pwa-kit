@@ -11,7 +11,7 @@ import {findLowestPrice} from '@salesforce/retail-react-app/app/utils/product-ut
 const PromoCallout = ({product}) => {
     const {minPrice, data} = findLowestPrice(product)
 
-    // NOTE: inconsistency - with ShopperProduct API, a variant does not have productPromotions
+    // NOTE: API inconsistency - with getProduct call, a variant does not have productPromotions
     const promos = data.productPromotions ?? product.productPromotions ?? []
     const promo = promos.find((promo) => promo.promotionalPrice === minPrice) ?? promos[0]
 

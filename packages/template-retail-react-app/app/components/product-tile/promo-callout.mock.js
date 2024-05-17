@@ -741,3 +741,389 @@ export const productSearch = {
         ]
     }
 }
+
+export const getProduct = {
+    floralPonchoBlouse: {
+        currency: 'GBP',
+        id: '25565106M',
+        imageGroups: [
+            {
+                images: [
+                    {
+                        alt: 'Floral Poncho Blouse, , large',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7dbe2012/images/large/PG.10229049.JJ1TOA0.PZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7dbe2012/images/large/PG.10229049.JJ1TOA0.PZ.jpg',
+                        title: 'Floral Poncho Blouse, '
+                    },
+                    {
+                        alt: 'Floral Poncho Blouse, , large',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda25eaa4/images/large/PG.10229049.JJ1TOA0.BZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda25eaa4/images/large/PG.10229049.JJ1TOA0.BZ.jpg',
+                        title: 'Floral Poncho Blouse, '
+                    }
+                ],
+                viewType: 'large'
+            },
+            {
+                images: [
+                    {
+                        alt: 'Floral Poncho Blouse, meadow rose combo, large',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7dbe2012/images/large/PG.10229049.JJ1TOA0.PZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7dbe2012/images/large/PG.10229049.JJ1TOA0.PZ.jpg',
+                        title: 'Floral Poncho Blouse, meadow rose combo'
+                    },
+                    {
+                        alt: 'Floral Poncho Blouse, meadow rose combo, large',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda25eaa4/images/large/PG.10229049.JJ1TOA0.BZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwda25eaa4/images/large/PG.10229049.JJ1TOA0.BZ.jpg',
+                        title: 'Floral Poncho Blouse, meadow rose combo'
+                    }
+                ],
+                variationAttributes: [
+                    {
+                        id: 'color',
+                        values: [
+                            {
+                                value: 'JJ1TOA0'
+                            }
+                        ]
+                    }
+                ],
+                viewType: 'large'
+            },
+            {
+                images: [
+                    {
+                        alt: 'Floral Poncho Blouse, , medium',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fa05330/images/medium/PG.10229049.JJ1TOA0.PZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fa05330/images/medium/PG.10229049.JJ1TOA0.PZ.jpg',
+                        title: 'Floral Poncho Blouse, '
+                    },
+                    {
+                        alt: 'Floral Poncho Blouse, , medium',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfe7e4d3f/images/medium/PG.10229049.JJ1TOA0.BZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfe7e4d3f/images/medium/PG.10229049.JJ1TOA0.BZ.jpg',
+                        title: 'Floral Poncho Blouse, '
+                    }
+                ],
+                viewType: 'medium'
+            },
+            {
+                images: [
+                    {
+                        alt: 'Floral Poncho Blouse, meadow rose combo, medium',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fa05330/images/medium/PG.10229049.JJ1TOA0.PZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4fa05330/images/medium/PG.10229049.JJ1TOA0.PZ.jpg',
+                        title: 'Floral Poncho Blouse, meadow rose combo'
+                    },
+                    {
+                        alt: 'Floral Poncho Blouse, meadow rose combo, medium',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfe7e4d3f/images/medium/PG.10229049.JJ1TOA0.BZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfe7e4d3f/images/medium/PG.10229049.JJ1TOA0.BZ.jpg',
+                        title: 'Floral Poncho Blouse, meadow rose combo'
+                    }
+                ],
+                variationAttributes: [
+                    {
+                        id: 'color',
+                        values: [
+                            {
+                                value: 'JJ1TOA0'
+                            }
+                        ]
+                    }
+                ],
+                viewType: 'medium'
+            },
+            {
+                images: [
+                    {
+                        alt: 'Floral Poncho Blouse, , small',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw483ff4ac/images/small/PG.10229049.JJ1TOA0.PZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw483ff4ac/images/small/PG.10229049.JJ1TOA0.PZ.jpg',
+                        title: 'Floral Poncho Blouse, '
+                    },
+                    {
+                        alt: 'Floral Poncho Blouse, , small',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb27454dd/images/small/PG.10229049.JJ1TOA0.BZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb27454dd/images/small/PG.10229049.JJ1TOA0.BZ.jpg',
+                        title: 'Floral Poncho Blouse, '
+                    }
+                ],
+                viewType: 'small'
+            },
+            {
+                images: [
+                    {
+                        alt: 'Floral Poncho Blouse, meadow rose combo, small',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw483ff4ac/images/small/PG.10229049.JJ1TOA0.PZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw483ff4ac/images/small/PG.10229049.JJ1TOA0.PZ.jpg',
+                        title: 'Floral Poncho Blouse, meadow rose combo'
+                    },
+                    {
+                        alt: 'Floral Poncho Blouse, meadow rose combo, small',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb27454dd/images/small/PG.10229049.JJ1TOA0.BZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb27454dd/images/small/PG.10229049.JJ1TOA0.BZ.jpg',
+                        title: 'Floral Poncho Blouse, meadow rose combo'
+                    }
+                ],
+                variationAttributes: [
+                    {
+                        id: 'color',
+                        values: [
+                            {
+                                value: 'JJ1TOA0'
+                            }
+                        ]
+                    }
+                ],
+                viewType: 'small'
+            },
+            {
+                images: [
+                    {
+                        alt: 'Floral Poncho Blouse, meadow rose combo, swatch',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw35f8dcb8/images/swatch/PG.10229049.JJ1TOA0.CP.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw35f8dcb8/images/swatch/PG.10229049.JJ1TOA0.CP.jpg',
+                        title: 'Floral Poncho Blouse, meadow rose combo'
+                    }
+                ],
+                variationAttributes: [
+                    {
+                        id: 'color',
+                        values: [
+                            {
+                                value: 'JJ1TOA0'
+                            }
+                        ]
+                    }
+                ],
+                viewType: 'swatch'
+            }
+        ],
+        inventory: {
+            ats: 500,
+            backorderable: false,
+            id: 'inventory_m',
+            orderable: true,
+            preorderable: false,
+            stockLevel: 500
+        },
+        longDescription:
+            "A new way to update the poncho! We've trend a poncho into a vibrant floral print blouse. This is a great look  for every occasion!",
+        master: {
+            masterId: '25565106M',
+            orderable: true,
+            price: 50.56
+        },
+        minOrderQuantity: 1,
+        name: 'Floral Poncho Blouse',
+        pageDescription:
+            "A new way to update the poncho! We've trend a poncho into a vibrant floral print blouse. This is a great look  for every occasion!",
+        pageTitle: 'Floral Poncho Blouse',
+        price: 50.56,
+        pricePerUnit: 50.56,
+        priceRanges: [
+            {
+                maxPrice: 50.56,
+                minPrice: 50.56,
+                pricebook: 'gbp-m-list-prices'
+            },
+            {
+                maxPrice: 50.56,
+                minPrice: 50.56,
+                pricebook: 'gbp-m-sale-prices'
+            }
+        ],
+        primaryCategoryId: 'womens-clothing-tops',
+        productPromotions: [
+            {
+                calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+            },
+            {
+                calloutMsg: '$50 Fixed Products Amount Above 100',
+                promotionId: '$50FixedProductsAmountAbove100'
+            },
+            {
+                calloutMsg: 'Bonus Product for Order Amounts Above 250',
+                promotionId: 'BonusProductOnOrderOfAmountABove250'
+            }
+        ],
+        shortDescription:
+            "A new way to update the poncho! We've trend a poncho into a vibrant floral print blouse. This is a great look  for every occasion!",
+        slugUrl:
+            'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/floral-poncho-blouse/25565106M.html?lang=en_GB',
+        stepQuantity: 1,
+        type: {
+            master: true
+        },
+        validFrom: {
+            default: '2010-12-29T05:00:00.000Z'
+        },
+        variants: [
+            {
+                orderable: true,
+                price: 50.56,
+                productId: '701643461196M',
+                tieredPrices: [
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-list-prices',
+                        quantity: 1
+                    },
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-sale-prices',
+                        quantity: 1
+                    }
+                ],
+                variationValues: {
+                    color: 'JJ1TOA0',
+                    size: '9LG'
+                }
+            },
+            {
+                orderable: true,
+                price: 50.56,
+                productId: '701643461202M',
+                tieredPrices: [
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-list-prices',
+                        quantity: 1
+                    },
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-sale-prices',
+                        quantity: 1
+                    }
+                ],
+                variationValues: {
+                    color: 'JJ1TOA0',
+                    size: '9MD'
+                }
+            },
+            {
+                orderable: true,
+                price: 50.56,
+                productId: '701643461226M',
+                tieredPrices: [
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-list-prices',
+                        quantity: 1
+                    },
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-sale-prices',
+                        quantity: 1
+                    }
+                ],
+                variationValues: {
+                    color: 'JJ1TOA0',
+                    size: '9XL'
+                }
+            },
+            {
+                orderable: true,
+                price: 50.56,
+                productId: '701643461219M',
+                tieredPrices: [
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-list-prices',
+                        quantity: 1
+                    },
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-sale-prices',
+                        quantity: 1
+                    }
+                ],
+                variationValues: {
+                    color: 'JJ1TOA0',
+                    size: '9SM'
+                }
+            },
+            {
+                orderable: true,
+                price: 50.56,
+                productId: '701643461233M',
+                tieredPrices: [
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-list-prices',
+                        quantity: 1
+                    },
+                    {
+                        price: 50.56,
+                        pricebook: 'gbp-m-sale-prices',
+                        quantity: 1
+                    }
+                ],
+                variationValues: {
+                    color: 'JJ1TOA0',
+                    size: '9XS'
+                }
+            }
+        ],
+        variationAttributes: [
+            {
+                id: 'color',
+                name: 'Colour',
+                values: [
+                    {
+                        name: 'meadow rose combo',
+                        orderable: true,
+                        value: 'JJ1TOA0'
+                    }
+                ]
+            },
+            {
+                id: 'size',
+                name: 'Size',
+                values: [
+                    {
+                        name: 'XS',
+                        orderable: true,
+                        value: '9XS'
+                    },
+                    {
+                        name: 'S',
+                        orderable: true,
+                        value: '9SM'
+                    },
+                    {
+                        name: 'M',
+                        orderable: true,
+                        value: '9MD'
+                    },
+                    {
+                        name: 'L',
+                        orderable: true,
+                        value: '9LG'
+                    },
+                    {
+                        name: 'XL',
+                        orderable: true,
+                        value: '9XL'
+                    }
+                ]
+            }
+        ]
+    }
+}
