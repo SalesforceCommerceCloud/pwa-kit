@@ -40,15 +40,14 @@ const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any, 
 }
 
 const UseShopperStores = () => {
-
     const queryHooks = [
         {
             name: 'useSearchStores',
             arg: {
                 parameters: {
-                    countryCode: "US",
-                    postalCode: "94086",
-                    locale: "en-US",
+                    countryCode: 'US',
+                    postalCode: '94086',
+                    locale: 'en-US',
                     maxDistance: 20012
                 }
             },
@@ -62,7 +61,7 @@ const UseShopperStores = () => {
             name: 'useStores',
             arg: {
                 parameters: {
-                    ids: "10178,12345,12346"
+                    ids: '00001,00002,00004'
                 }
             },
             get hook() {
