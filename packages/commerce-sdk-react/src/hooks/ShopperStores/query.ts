@@ -14,12 +14,12 @@ import * as queryKeyHelpers from './queryKeyHelpers'
 type Client = ApiClients['shopperStores']
 
 /**
- * This resource retrieves a list of stores for the given site that are within a configured distance of a geolocation. 
- * 
+ * This resource retrieves a list of stores for the given site that are within a configured distance of a geolocation.
+ *
  * The distance is interpreted either in miles or kilometers, depending on the distanceUnit input parameter. The location is
- * specified either by directly providing a latitude and longitude coordinate pair, or by providing a country and a postal code. 
- * If a postal code is passed, the resource looks in the system's geolocation mappings to find the coordinates for this postal code. 
- * If no matching geolocation is found, the resource returns an empty list of stores. 
+ * specified either by directly providing a latitude and longitude coordinate pair, or by providing a country and a postal code.
+ * If a postal code is passed, the resource looks in the system's geolocation mappings to find the coordinates for this postal code.
+ * If no matching geolocation is found, the resource returns an empty list of stores.
  * If coordinates are passed, the values for country and postal code are ignored.
  * @group SearchStores
  * @category Query

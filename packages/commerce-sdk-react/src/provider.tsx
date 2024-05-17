@@ -140,7 +140,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),
             shopperSeo: new ShopperSeo(config),
-            shopperStores: new ShopperStores(config),
+            shopperStores: new ShopperStores(config)
         }
     }, [
         clientId,
