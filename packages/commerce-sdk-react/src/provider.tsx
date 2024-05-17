@@ -31,6 +31,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     fetchOptions?: ShopperBasketsTypes.FetchOptions
     headers?: Record<string, string>
     fetchedToken?: string
+    envNamespace?: string
     OCAPISessionsURL?: string
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
@@ -107,6 +108,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         locale,
         currency,
         fetchedToken,
+        envNamespace,
         OCAPISessionsURL,
         enablePWAKitPrivateClient,
         clientSecret,
@@ -162,6 +164,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             redirectURI,
             fetchOptions,
             fetchedToken,
+            envNamespace,
             OCAPISessionsURL,
             enablePWAKitPrivateClient,
             clientSecret,
@@ -176,6 +179,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         redirectURI,
         fetchOptions,
         fetchedToken,
+        envNamespace,
         OCAPISessionsURL,
         enablePWAKitPrivateClient,
         clientSecret,
@@ -194,6 +198,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 proxy,
                 redirectURI,
                 fetchOptions,
+                envNamespace,
                 siteId,
                 shortCode,
                 locale,

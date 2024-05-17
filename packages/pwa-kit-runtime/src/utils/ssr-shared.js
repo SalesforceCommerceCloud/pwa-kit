@@ -78,14 +78,12 @@ export const getNamespace = () => {
     if (!isSSRNamespace) {
         return ''
     }
-    console.log(isSSRNamespace)
 
     const defaultSiteId = config.app.defaultSite
     const siteAliases = config.app.siteAliases
-
     const alias = siteAliases[defaultSiteId]
 
-    return alias ? `/${alias}` : `/${defaultSiteId}`
+    return alias ? `${alias}` : `${defaultSiteId}`
 }
 
 /**
@@ -101,33 +99,33 @@ const proxyOverrideRE = /^(http(s)?):\/\/([^/]+)(\/)?([^/]+)?(\/caching)?/
 
 export const startsWithMobify = (url) => {
     const namespace = getNamespace()
-    const mobifyPath = namespace ? `${namespace}/mobify` : `/mobify`
+    const mobifyPath = namespace ? `/${namespace}/mobify` : `/mobify`
     return url.startsWith(mobifyPath)
 }
 
 export const getProxyPathBase = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}/mobify/proxy` : '/mobify/proxy'
+    return namespace ? `/${namespace}/mobify/proxy` : '/mobify/proxy'
 }
 
 export const getBundlePathBase = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}/mobify/bundle` : '/mobify/bundle'
+    return namespace ? `/${namespace}/mobify/bundle` : '/mobify/bundle'
 }
 
 export const getCachingPathBase = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}/mobify/caching` : '/mobify/caching'
+    return namespace ? `/${namespace}/mobify/caching` : '/mobify/caching'
 }
 
 export const getHealtCheckPathBase = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}/mobify/ping` : '/mobify/ping'
+    return namespace ? `/${namespace}/mobify/ping` : '/mobify/ping'
 }
 
 export const getSLASPrivateProxyPath = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}/mobify/slas/private` : '/mobify/slas/private'
+    return namespace ? `/${namespace}/mobify/slas/private` : '/mobify/slas/private'
 }
 
 /**

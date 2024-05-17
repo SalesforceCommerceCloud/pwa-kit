@@ -40,7 +40,7 @@ module.exports = {
     },
     externals: [],
     pageNotFoundURL: '/page-not-found',
-    enableSSRNamespace: false,
+    enableSSRNamespace: true,
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
     ssrShared: [

@@ -29,6 +29,7 @@ interface AuthConfig extends ApiClientConfigParams {
     proxy: string
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
+    envNamespace?: string
     OCAPISessionsURL?: string
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
@@ -202,7 +203,7 @@ class Auth {
         })
 
         const options = {
-            keySuffix: config.siteId,
+            keySuffix: config.envNamespace ? `${config.envNamespace}_${config.siteId}` : config.siteId,
             // Setting this to true on the server allows us to reuse guest auth tokens across lambda runs
             sharedContext: !onClient()
         }

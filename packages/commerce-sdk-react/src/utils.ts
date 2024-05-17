@@ -8,6 +8,13 @@
 import Cookies, {CookieAttributes} from 'js-cookie'
 import {IFRAME_HOST_ALLOW_LIST} from './constant'
 
+declare global {
+    interface Window {
+        __CONFIG__: any;
+    }
+}
+
+
 /** Utility to determine if you are on the browser (client) or not. */
 export const onClient = (): boolean => typeof window !== 'undefined'
 
@@ -34,6 +41,26 @@ export const getParentOrigin = () => {
     }
 }
 
+export const getNamespace = () => {
+    /* tslint:disable-next-line */
+
+    if (!onClient()) {
+        return ''
+    }
+    const config = window.__CONFIG__
+    const isSSRNamespace = config.enableSSRNamespace
+
+    if (!isSSRNamespace) {
+        return ''
+    }
+
+    const defaultSiteId = config.app.defaultSite
+    const siteAliases = config.app.siteAliases
+    const alias = siteAliases[defaultSiteId]
+
+    return alias ? `/${alias}` : `/${defaultSiteId}`
+}
+
 /**
  * Determines whether the given origin is trusted to host the storefront in an iframe.
  * @private
@@ -45,14 +72,6 @@ export const isOriginTrusted = (origin: string | undefined) => {
                 ? origin === DEVELOPMENT_ORIGIN // Development
                 : IFRAME_HOST_ALLOW_LIST.includes(origin)) // Production
     )
-}
-
-export const getNamespace = () => {
-    return 'abc'
-}
-
-export const getDevelopBundlePath = () => {
-    return getNamespace() ? `/${getNamespace()}/mobify/bundle/development` :'/mobify/bundle/development'
 }
 
 /**
