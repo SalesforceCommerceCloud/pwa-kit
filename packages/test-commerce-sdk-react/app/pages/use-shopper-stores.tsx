@@ -61,7 +61,7 @@ const UseShopperStores = () => {
             name: 'useStores',
             arg: {
                 parameters: {
-                    ids: '00001,00002,00004'
+                    ids: '00001,00002,00003'
                 }
             },
             get hook() {
