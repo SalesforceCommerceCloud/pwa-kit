@@ -167,6 +167,14 @@ const App = (props) => {
         enabled: isServer
     })
 
+    if (isServer) {
+        console.debug('PWAKITLOG >>> _app: console.debug')
+        console.info('PWAKITLOG >>> _app: console.info')
+        console.log('PWAKITLOG >>> _app: console.log')
+        console.warn('PWAKITLOG >>> _app: console.warn')
+        console.error('PWAKITLOG >>> _app: console.error')
+    }
+
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 

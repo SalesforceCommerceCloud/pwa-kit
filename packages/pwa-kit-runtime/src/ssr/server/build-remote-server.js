@@ -43,7 +43,7 @@ import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
-import {morganStream} from '../../utils/morgan-stream'
+import logger from '../../utils/logger'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
@@ -242,7 +242,7 @@ export const RemoteServerFactory = {
                     ].join(' ')
                 },
                 {
-                    stream: morganStream
+                    stream: {write: (message) => logger.info(message.trim())}
                 }
             )
         )

@@ -31,6 +31,7 @@ import * as errors from '../universal/errors'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import '@salesforce/pwa-kit-runtime/utils/logger'
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import PropTypes from 'prop-types'
 
