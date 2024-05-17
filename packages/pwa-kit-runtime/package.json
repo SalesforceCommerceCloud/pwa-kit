@@ -40,6 +40,7 @@
     "http-proxy-middleware": "^2.0.6",
     "merge-descriptors": "^1.0.1",
     "morgan": "^1.10.0",
+    "pino": "^9.1.0",
     "semver": "^7.5.2",
     "set-cookie-parser": "^2.6.0",
     "whatwg-encoding": "^1.0.5"

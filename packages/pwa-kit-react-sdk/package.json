@@ -42,6 +42,7 @@
     "cross-env": "^5.2.1",
     "event-emitter": "^0.3.5",
     "hoist-non-react-statics": "^3.3.2",
+    "pino": "^9.1.0",
     "prop-types": "^15.8.1",
     "react-ssr-prepass": "^1.5.0",
     "react-uid": "^2.3.2",
