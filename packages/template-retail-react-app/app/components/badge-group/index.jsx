@@ -7,24 +7,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useStyleConfig, Box, Badge} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {PRODUCT_TILE_BADGE_LABELS} from '@salesforce/retail-react-app/app/constants'
 
 const BadgeGroup = (props) => {
+    const {badgeLabels = PRODUCT_TILE_BADGE_LABELS, product} = props
     const styles = useStyleConfig('BadgeGroup')
 
-    if (!props.badgeLabels) {
-        return
-    }
     //TODO: check for duplicate labels
     // If product is not provided/undefined then render the provided badge labels. This is useful if user already has the logic to get the badge labels outside the badge group
-    let filteredLabels = props.badgeLabels
-    if (props.product) {
+    let filteredLabels = badgeLabels
+    if (product) {
         // validate the provided badge labels against the product custom properties. This will allow users to use any boolean custom properties as badges
-        filteredLabels = props.badgeLabels.filter((item) => {
+        filteredLabels = badgeLabels.filter((item) => {
             const propertyName = `c_is${item.label}`
-            return (
-                typeof props.product[propertyName] === 'boolean' &&
-                props.product[propertyName] === true
-            )
+            return typeof product[propertyName] === 'boolean' && product[propertyName] === true
         })
     }
     return (

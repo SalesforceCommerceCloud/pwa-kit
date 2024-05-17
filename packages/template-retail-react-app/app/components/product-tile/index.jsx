@@ -33,8 +33,6 @@ import withRegistration from '@salesforce/retail-react-app/app/components/with-r
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
-import {PRODUCT_TILE_BADGE_LABELS} from '@salesforce/retail-react-app/app/constants'
-
 const IconButtonWithRegistration = withRegistration(IconButton)
 
 // Component Skeleton
@@ -68,7 +66,6 @@ const ProductTile = (props) => {
         isFavourite,
         onFavouriteToggle,
         dynamicImageProps,
-        badgeLabels = PRODUCT_TILE_BADGE_LABELS,
         ...rest
     } = props
     const {currency} = useCurrency()
@@ -160,7 +157,7 @@ const ProductTile = (props) => {
                     />
                 </Box>
             )}
-            <BadgeGroup badgeLabels={badgeLabels} product={product?.representedProduct} />
+            <BadgeGroup product={product?.representedProduct} />
         </Box>
     )
 }
