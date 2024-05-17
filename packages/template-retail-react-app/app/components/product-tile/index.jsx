@@ -13,6 +13,7 @@ import DisplayPrice from '@salesforce/retail-react-app/app/components/display-pr
 // Components
 import {
     AspectRatio,
+    Badge,
     Box,
     Skeleton as ChakraSkeleton,
     Text,
@@ -21,7 +22,6 @@ import {
     IconButton
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
-import BadgeGroup from '@salesforce/retail-react-app/app/components/badge-group'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -32,6 +32,7 @@ import Link from '@salesforce/retail-react-app/app/components/link'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {PRODUCT_TILE_BADGE_LABELS} from '@salesforce/retail-react-app/app/constants'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -66,6 +67,7 @@ const ProductTile = (props) => {
         isFavourite,
         onFavouriteToggle,
         dynamicImageProps,
+        badgeLabels = PRODUCT_TILE_BADGE_LABELS,
         ...rest
     } = props
     const {currency} = useCurrency()
@@ -84,6 +86,21 @@ const ProductTile = (props) => {
     const variants = product?.variants
 
     const priceData = getPriceData({...product, variants})
+
+    let filteredLabels
+    if (product?.representedProduct) {
+        // validate the provided badge labels against the product custom properties. This will allow users to use any boolean custom properties as badges
+        filteredLabels = badgeLabels.reduce((map, item) => {
+            if (
+                item.propertyName &&
+                typeof product.representedProduct[item.propertyName] === 'boolean' &&
+                product.representedProduct[item.propertyName] === true
+            ) {
+                map.set(item.label, item.color)
+            }
+            return map
+        }, new Map()) // Map is used to avoid duplicate labels
+    }
 
     return (
         <Box {...styles.container}>
@@ -157,7 +174,15 @@ const ProductTile = (props) => {
                     />
                 </Box>
             )}
-            <BadgeGroup product={product?.representedProduct} />
+            {filteredLabels?.size > 0 && (
+                <Box {...styles.badgeGroup}>
+                    {Array.from(filteredLabels.entries()).map(([label, colorScheme]) => (
+                        <Badge key={label} colorScheme={colorScheme}>
+                            {label}
+                        </Badge>
+                    ))}
+                </Box>
+            )}
         </Box>
     )
 }
