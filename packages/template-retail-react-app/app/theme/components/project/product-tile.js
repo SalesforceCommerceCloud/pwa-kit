@@ -34,14 +34,18 @@ export default {
         variations: {},
         badgeGroup: {
             position: 'absolute',
-            variant: 'unstyled',
             top: 2,
             left: 2
-        },
-        badge: {
-            ml: 1,
-            variant: 'subtle'
         }
     }),
-    parts: ['container', 'imageWrapper', 'image', 'price', 'title', 'rating', 'variations', 'badgeGroup', 'badge']
+    parts: [
+        'container',
+        'imageWrapper',
+        'image',
+        'price',
+        'title',
+        'rating',
+        'variations',
+        'badgeGroup'
+    ]
 }

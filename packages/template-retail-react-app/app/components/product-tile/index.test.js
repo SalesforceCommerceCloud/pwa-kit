@@ -107,3 +107,47 @@ test('renders strike through price with standard product', () => {
     expect(currentPriceTag).toHaveLength(1)
     expect(strikethroughPriceTag).toHaveLength(1)
 })
+
+test('renders badges for standard product', () => {
+    const {getByText, container} = renderWithProviders(
+        <ProductTile product={mockStandardProductHit} />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = container.querySelectorAll('span')
+    expect(badges).toHaveLength(3)
+    expect(within(badges[0]).getByText(/New/i)).toBeDefined()
+    expect(within(badges[1]).getByText(/Sale/i)).toBeDefined()
+})
+
+test('renders badges with custom labels', () => {
+    const {getByText, container} = renderWithProviders(
+        <ProductTile
+            product={mockStandardProductHit}
+            badgeLabels={[
+                {propertyName: 'c_isSpecial', label: 'Special', color: 'green'},
+                {propertyName: 'c_isCloseout', label: 'Closeout', color: 'yellow'}
+            ]}
+        />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = container.querySelectorAll('span')
+    expect(badges).toHaveLength(2)
+    expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
+})
+
+test('renders only unique badges for standard product', () => {
+    const {getByText, container} = renderWithProviders(
+        <ProductTile
+            product={mockStandardProductHit}
+            badgeLabels={[
+                {propertyName: 'c_isSpecial', label: 'Special', color: 'green'},
+                {propertyName: 'c_isSpecial', label: 'Special', color: 'yellow'},
+                {propertyName: 'c_isSpecial', label: 'Special', color: 'red'}
+            ]}
+        />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = container.querySelectorAll('span')
+    expect(badges).toHaveLength(2)
+    expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
+})

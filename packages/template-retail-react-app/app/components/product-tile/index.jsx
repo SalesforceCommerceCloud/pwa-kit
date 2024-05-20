@@ -19,7 +19,8 @@ import {
     Text,
     Stack,
     useMultiStyleConfig,
-    IconButton
+    IconButton,
+    HStack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 
@@ -87,7 +88,7 @@ const ProductTile = (props) => {
 
     const priceData = getPriceData({...product, variants})
 
-    let filteredLabels
+    let filteredLabels = new Map()
     if (product?.representedProduct) {
         // validate the provided badge labels against the product custom properties. This will allow users to use any boolean custom properties as badges
         filteredLabels = badgeLabels.reduce((map, item) => {
@@ -99,7 +100,7 @@ const ProductTile = (props) => {
                 map.set(item.label, item.color)
             }
             return map
-        }, new Map()) // Map is used to avoid duplicate labels
+        }, filteredLabels)
     }
 
     return (
@@ -174,14 +175,14 @@ const ProductTile = (props) => {
                     />
                 </Box>
             )}
-            {filteredLabels?.size > 0 && (
-                <Box {...styles.badgeGroup}>
+            {filteredLabels.size > 0 && (
+                <HStack {...styles.badgeGroup}>
                     {Array.from(filteredLabels.entries()).map(([label, colorScheme]) => (
                         <Badge key={label} colorScheme={colorScheme}>
                             {label}
                         </Badge>
                     ))}
-                </Box>
+                </HStack>
             )}
         </Box>
     )
