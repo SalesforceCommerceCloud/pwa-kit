@@ -34,10 +34,24 @@ export const HOME_SHOP_PRODUCTS_LIMIT = 10
 export const CAT_MENU_DEFAULT_NAV_SSR_DEPTH = 1
 export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
 
-// TBD: Is there a better way to pass the color scheme
+//Constants for default product badges
 export const PRODUCT_TILE_BADGE_LABELS = [
-    {propertyName: 'c_isNew', label: 'New', color: 'green'},
-    {propertyName: 'c_isSale', label: 'Sale', color: 'yellow'}
+    {
+        propertyName: 'c_isNew',
+        label: {
+            id: 'product_tile.badge.label.New',
+            defaultMessage: 'New'
+        },
+        color: 'green'
+    },
+    {
+        propertyName: 'c_isSale',
+        label: {
+            id: 'product_tile.badge.label.Sale',
+            defaultMessage: 'Sale'
+        },
+        color: 'yellow'
+    }
 ]
 
 export const cssColorGroups = {
