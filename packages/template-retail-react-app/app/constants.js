@@ -38,18 +38,18 @@ export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
 export const PRODUCT_TILE_BADGE_LABELS = [
     {
         propertyName: 'c_isNew',
-        label: {
+        label: defineMessage({
             id: 'product_tile.badge.label.new',
             defaultMessage: 'New'
-        },
+        }),
         color: 'green'
     },
     {
         propertyName: 'c_isSale',
-        label: {
+        label: defineMessage({
             id: 'product_tile.badge.label.sale',
             defaultMessage: 'Sale'
-        },
+        }),
         color: 'yellow'
     }
 ]
