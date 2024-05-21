@@ -17,7 +17,7 @@ class PWAKITLogger {
 
     log(level, message) {
         if (this.shouldLog(level)) {
-            const logMessage = `[${level.toUpperCase()}]: ${message}`
+            const logMessage = `${message}`
 
             if (level === 'error') {
                 originalConsole.error(logMessage)
