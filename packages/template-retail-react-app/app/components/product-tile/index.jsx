@@ -154,17 +154,15 @@ const ProductTile = (props) => {
     // Retrive product badges
     let filteredLabels = new Map()
     if (product?.representedProduct) {
-        // validate the provided badge labels against the product custom properties. This will allow users to use any boolean custom properties as badges
-        filteredLabels = badgeLabels.reduce((map, item) => {
+        badgeLabels.forEach((item) => {
             if (
                 item.propertyName &&
                 typeof product.representedProduct[item.propertyName] === 'boolean' &&
                 product.representedProduct[item.propertyName] === true
             ) {
-                map.set(intl.formatMessage(item.label), item.color)
+                filteredLabels.set(intl.formatMessage(item.label), item.color)
             }
-            return map
-        }, filteredLabels)
+        })
     }
 
     return (
