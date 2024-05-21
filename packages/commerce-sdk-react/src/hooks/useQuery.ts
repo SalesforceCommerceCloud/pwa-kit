@@ -95,7 +95,7 @@ export const useCustomQuery = (
             return await helpers.callCustomEndpoint({
                 ...options,
                 options: {
-                    method: options.options.method || 'GET',
+                    method: options.options?.method || 'GET',
                     headers: {
                         Authorization: `Bearer ${access_token}`,
                         ...clientHeaders,
