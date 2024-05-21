@@ -158,7 +158,7 @@ const ProductTile = (props) => {
                                 image?.disBaseLink ||
                                 image?.link ||
                                 product?.image?.disBaseLink ||
-                                product?.image?.disBaseLink
+                                product?.image?.link
                             }[?sw={width}&q=60]`}
                             widths={dynamicImageProps?.widths}
                             imageProps={{
