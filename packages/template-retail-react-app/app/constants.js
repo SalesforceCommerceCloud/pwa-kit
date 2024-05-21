@@ -26,6 +26,14 @@ export const RECENT_SEARCH_LIMIT = 5
 export const RECENT_SEARCH_KEY = 'recent-search-key'
 export const RECENT_SEARCH_MIN_LENGTH = 3
 
+// Constants for product list page
+export const PRODUCT_LIST_IMAGE_VIEW_TYPE = 'large'
+export const PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID = 'color'
+
+// Constants for product tile page
+export const PRODUCT_TILE_IMAGE_VIEW_TYPE = 'large'
+export const PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID = 'color'
+
 // Constants for the Homepage's Shop Products section.
 export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
 export const HOME_SHOP_PRODUCTS_LIMIT = 10

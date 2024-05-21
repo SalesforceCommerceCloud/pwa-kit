@@ -7,13 +7,475 @@
 
 const mockProductSearchItem = {
     currency: 'USD',
+    hitType: 'master',
     image: {
         alt: 'Charcoal Single Pleat Wool Suit, , large',
         disBaseLink:
             'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4de8166b/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg'
     },
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, '
+                },
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe4e0c49b/images/large/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe4e0c49b/images/large/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, '
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, Charcoal, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, Charcoal'
+                },
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, Charcoal, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe4e0c49b/images/large/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe4e0c49b/images/large/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, Charcoal'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'CHARCWL'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23283a20/images/medium/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23283a20/images/medium/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, '
+                },
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc406b7a1/images/medium/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc406b7a1/images/medium/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, '
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, Charcoal, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23283a20/images/medium/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw23283a20/images/medium/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, Charcoal'
+                },
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, Charcoal, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc406b7a1/images/medium/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc406b7a1/images/medium/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, Charcoal'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'CHARCWL'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a6e0e2a/images/small/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a6e0e2a/images/small/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, '
+                },
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbb1d94d6/images/small/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbb1d94d6/images/small/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, '
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, Charcoal, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a6e0e2a/images/small/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1a6e0e2a/images/small/PG.33698RUBN4Q.CHARCWL.PZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, Charcoal'
+                },
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, Charcoal, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbb1d94d6/images/small/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwbb1d94d6/images/small/PG.33698RUBN4Q.CHARCWL.BZ.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, Charcoal'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'CHARCWL'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Charcoal Single Pleat Wool Suit, Charcoal, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5cb61ec2/images/swatch/PG.33698RUBN4Q.CHARCWL.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5cb61ec2/images/swatch/PG.33698RUBN4Q.CHARCWL.CP.jpg',
+                    title: 'Charcoal Single Pleat Wool Suit, Charcoal'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'CHARCWL'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        },
+        {
+            images: [
+                {
+                    alt: 'Navy Single Pleat Wool Suit, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, '
+                },
+                {
+                    alt: 'Navy Single Pleat Wool Suit, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw001dbd2d/images/large/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw001dbd2d/images/large/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, '
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Navy Single Pleat Wool Suit, Navy, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, Navy'
+                },
+                {
+                    alt: 'Navy Single Pleat Wool Suit, Navy, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw001dbd2d/images/large/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw001dbd2d/images/large/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYWL'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Navy Single Pleat Wool Suit, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed78c6fc/images/medium/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed78c6fc/images/medium/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, '
+                },
+                {
+                    alt: 'Navy Single Pleat Wool Suit, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dweb695753/images/medium/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dweb695753/images/medium/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, '
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Navy Single Pleat Wool Suit, Navy, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed78c6fc/images/medium/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed78c6fc/images/medium/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, Navy'
+                },
+                {
+                    alt: 'Navy Single Pleat Wool Suit, Navy, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dweb695753/images/medium/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dweb695753/images/medium/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYWL'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Navy Single Pleat Wool Suit, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4ab8674a/images/small/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4ab8674a/images/small/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, '
+                },
+                {
+                    alt: 'Navy Single Pleat Wool Suit, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfa650119/images/small/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfa650119/images/small/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, '
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Navy Single Pleat Wool Suit, Navy, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4ab8674a/images/small/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw4ab8674a/images/small/PG.52002RUBN4Q.NAVYWL.PZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, Navy'
+                },
+                {
+                    alt: 'Navy Single Pleat Wool Suit, Navy, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfa650119/images/small/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwfa650119/images/small/PG.52002RUBN4Q.NAVYWL.BZ.jpg',
+                    title: 'Navy Single Pleat Wool Suit, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYWL'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Navy Single Pleat Wool Suit, Navy, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7fabf1ff/images/swatch/PG.52002RUBN4Q.NAVYWL.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7fabf1ff/images/swatch/PG.52002RUBN4Q.NAVYWL.CP.jpg',
+                    title: 'Navy Single Pleat Wool Suit, Navy'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'NAVYWL'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        }
+    ],
     price: 299.99,
-    productName: 'Charcoal Single Pleat Wool Suit'
+    productName: 'Charcoal Single Pleat Wool Suit',
+    representedProduct: {
+        id: '750518894461M'
+    },
+    variants: [
+        {
+            price: 191.99,
+            productId: '750518894461M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'CHARCWL',
+                size: '040',
+                width: 'V'
+            }
+        },
+        {
+            price: 191.99,
+            productId: '750518548272M',
+            tieredPrices: [
+                {
+                    price: 320,
+                    pricebook: 'gbp-m-list-prices',
+                    quantity: 1
+                },
+                {
+                    price: 191.99,
+                    pricebook: 'gbp-m-sale-prices',
+                    quantity: 1
+                }
+            ],
+            variationValues: {
+                color: 'NAVYWL',
+                size: '050',
+                width: 'V'
+            }
+        }
+    ],
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Colour',
+            values: [
+                {
+                    name: 'Navy',
+                    value: 'NAVYWL'
+                },
+                {
+                    name: 'Charcoal',
+                    value: 'CHARCWL'
+                }
+            ]
+        },
+        {
+            id: 'size',
+            name: 'Size',
+            values: [
+                {
+                    name: '36',
+                    value: '036'
+                },
+                {
+                    name: '38',
+                    value: '038'
+                },
+                {
+                    name: '39',
+                    value: '039'
+                },
+                {
+                    name: '40',
+                    value: '040'
+                },
+                {
+                    name: '42',
+                    value: '042'
+                },
+                {
+                    name: '43',
+                    value: '043'
+                },
+                {
+                    name: '44',
+                    value: '044'
+                },
+                {
+                    name: '46',
+                    value: '046'
+                },
+                {
+                    name: '48',
+                    value: '048'
+                },
+                {
+                    name: '50',
+                    value: '050'
+                }
+            ]
+        },
+        {
+            id: 'width',
+            name: 'Width',
+            values: [
+                {
+                    name: 'Short',
+                    value: 'S'
+                },
+                {
+                    name: 'Regular',
+                    value: 'V'
+                },
+                {
+                    name: 'Long',
+                    value: 'L'
+                }
+            ]
+        }
+    ]
 }
 const mockProductSetHit = {
     currency: 'GBP',

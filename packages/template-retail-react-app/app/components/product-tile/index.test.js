@@ -7,7 +7,7 @@
 import React from 'react'
 import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components/product-tile/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {fireEvent, within} from '@testing-library/react'
+import {fireEvent, waitFor, within} from '@testing-library/react'
 import {
     mockMasterProductHitWithMultipleVariants,
     mockMasterProductHitWithOneVariant,
@@ -49,6 +49,28 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     fireEvent.click(wishlistButton)
     fireEvent.click(wishlistButton)
     expect(onClick).toHaveBeenCalledTimes(1)
+})
+
+test('Renders variation selection swatches', () => {
+    const {getAllByRole, getByTestId} = renderWithProviders(
+        <ProductTile product={mockProductSearchItem} />
+    )
+    const swatches = getAllByRole('radio')
+    const productImage = getByTestId('product-tile-image')
+
+    // Initial render will show swatched and the image will be the represented product variation
+    expect(swatches).toHaveLength(2)
+    expect(productImage.firstChild.getAttribute('src')).toBe(
+        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg'
+    )
+
+    // Hovering over color swatch changes the image.
+    fireEvent.mouseEnter(swatches[1])
+    waitFor(() => {
+        expect(productImage.firstChild.getAttribute('src')).toBe(
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg'
+        )
+    })
 })
 
 test('renders exact price with strikethrough price for master product with multiple variants', () => {
