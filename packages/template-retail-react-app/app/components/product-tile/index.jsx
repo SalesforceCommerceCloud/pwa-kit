@@ -88,7 +88,7 @@ const ProductTile = (props) => {
 
     const priceData = getPriceData({...product, variants})
 
-    let filteredLabels = new Map() //Map
+    let filteredLabels = new Map()
     if (product?.representedProduct) {
         // validate the provided badge labels against the product custom properties. This will allow users to use any boolean custom properties as badges
         filteredLabels = badgeLabels.reduce((map, item) => {
