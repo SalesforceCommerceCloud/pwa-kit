@@ -14,6 +14,11 @@ import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-grou
 import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
+const arrowLeft = {key: 'ArrowLeft', code: 'ArrowRight', charCode: 37}
+const arrowUp = {key: 'ArrowUp', code: 'ArrowRight', charCode: 38}
+const arrowRight = {key: 'ArrowRight', code: 'ArrowRight', charCode: 39}
+const arrowDown = {key: 'ArrowDown', code: 'ArrowDown', charCode: 40}
+
 const data = {
     id: 'color',
     name: 'Color',
@@ -133,6 +138,60 @@ describe('Swatch Component', () => {
         fireEvent.click(firstSwatch)
         waitFor(() => {
             expect(history.search).toBe('?color=BLACKFB')
+        })
+    })
+
+    test('swatch can be changed with arrow keys', () => {
+        const history = createMemoryHistory()
+        history.push('/en-GB/swatch-example?color=JJ2XNXX')
+
+        renderWithProviders(
+            <Router history={history}>
+                <Page />
+            </Router>
+        )
+
+        expect(screen.getAllByRole('radio')).toHaveLength(data.values.length)
+
+        const swatchGroup = screen.getByRole('radiogroup').parentNode
+        const keyDownEvents = [
+            {
+                keyEvent: arrowRight,
+                expectedValue: 'JJ2XNXX'
+            },
+            {
+                keyEvent: arrowDown,
+                expectedValue: 'JJ3HDXX'
+            },
+            {
+                keyEvent: arrowRight,
+                expectedValue: 'BLACKFB'
+            },
+            {
+                keyEvent: arrowLeft,
+                expectedValue: 'JJ3HDXX'
+            },
+            {
+                keyEvent: arrowUp,
+                expectedValue: 'JJ2XNXX'
+            },
+            {
+                keyEvent: arrowLeft,
+                expectedValue: 'BLACKFB'
+            }
+        ]
+
+        // Test initial state
+        waitFor(() => {
+            expect(history.search).toBe('?color=BLACKFB')
+        })
+
+        // Navigate according to the event array. This also tests that looping over the end or front works.
+        keyDownEvents.forEach(({keyEvent, expectedValue}) => {
+            fireEvent.keyDown(swatchGroup, keyEvent)
+            waitFor(() => {
+                expect(history.search).toBe(`?color=${expectedValue}`)
+            })
         })
     })
 })

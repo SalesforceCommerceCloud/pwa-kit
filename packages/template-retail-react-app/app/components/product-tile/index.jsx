@@ -5,9 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef} from 'react'
+import React, {useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 
 // Components
@@ -22,15 +21,28 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 
+// Project Components
+import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
+import Link from '@salesforce/retail-react-app/app/components/link'
+import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
+import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
+import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
+
 // Hooks
 import {useIntl} from 'react-intl'
 
 // Other
-import {productUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
+import {
+    PRODUCT_TILE_IMAGE_VIEW_TYPE,
+    PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID
+} from '@salesforce/retail-react-app/app/constants'
+import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {
+    filterImageGroups,
+    getDecoratedVariationAttributes
+} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -58,57 +70,152 @@ export const Skeleton = () => {
  * It also supports favourite products, controlled by a heart icon.
  */
 const ProductTile = (props) => {
-    const intl = useIntl()
     const {
-        product,
+        dynamicImageProps,
         enableFavourite = false,
+        imageViewType = PRODUCT_TILE_IMAGE_VIEW_TYPE,
         isFavourite,
         onFavouriteToggle,
-        dynamicImageProps,
+        product,
+        selectableAttributeId = PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID,
         ...rest
     } = props
-    const {currency} = useCurrency()
+    const {imageGroups, productId, representedProduct, variants} = product
 
-    const {image, productId} = product
+    const intl = useIntl()
+    const {currency} = useCurrency()
+    const isFavouriteLoading = useRef(false)
+    const styles = useMultiStyleConfig('ProductTile')
+
+    const isMasterVariant = !!variants
+    const initialVariationValue =
+        isMasterVariant && !!representedProduct
+            ? variants?.find((variant) => variant.productId == product.representedProduct.id)
+                  ?.variationValues?.[selectableAttributeId]
+            : undefined
+
+    const [selectableAttributeValue, setSelectableAttributeValue] = useState(initialVariationValue)
+
+    // Primary image for the tile, the image is determined from the product and selected variation attributes.
+    const image = useMemo(() => {
+        // NOTE: If the selectable variation attribute doesn't exist in the products variation attributes
+        // array, lets not filter the image groups on it. This ensures we always return an image for non-variant
+        // type products.
+        const hasSelectableAttribute = product?.variationAttributes?.find(
+            ({id}) => id === selectableAttributeId
+        )
+
+        const variationValues = {[selectableAttributeId]: selectableAttributeValue}
+        const filteredImageGroups = filterImageGroups(imageGroups, {
+            viewType: imageViewType,
+            variationValues: hasSelectableAttribute ? variationValues : {}
+        })
+
+        // Return the first image of the first group.
+        return filteredImageGroups?.[0]?.images[0]
+    }, [product, selectableAttributeId, selectableAttributeValue, imageViewType])
+
+    // Primary URL user to wrap the ProduceTile.
+    const productUrl = useMemo(
+        () =>
+            rebuildPathWithParams(productUrlBuilder({id: productId}), {
+                [selectableAttributeId]: selectableAttributeValue
+            }),
+        [product, selectableAttributeId, selectableAttributeValue]
+    )
+
+    // NOTE: variationAttributes are only defined for master/variant type products.
+    const variationAttributes = useMemo(() => getDecoratedVariationAttributes(product), [product])
+
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
 
-    const isFavouriteLoading = useRef(false)
-    const styles = useMultiStyleConfig('ProductTile')
+    // Pricing is dynamic! Ensure we are showing the right price for the selected variation attribute
+    // value.
+    const priceData = useMemo(() => {
+        const variants = product?.variants?.filter(
+            ({variationValues}) =>
+                variationValues[selectableAttributeId] === selectableAttributeValue
+        )
 
-    //TODO variants needs to be filter according to selectedAttribute value
-    const variants = product?.variants
-
-    const priceData = getPriceData({...product, variants})
+        return getPriceData({
+            ...product,
+            variants
+        })
+    }, [product, selectableAttributeId, selectableAttributeValue])
 
     return (
         <Box {...styles.container}>
-            <Link
-                data-testid="product-tile"
-                to={productUrlBuilder({id: productId}, intl.local)}
-                {...styles.link}
-                {...rest}
-            >
+            <Link data-testid="product-tile" to={productUrl} {...styles.link} {...rest}>
                 <Box {...styles.imageWrapper}>
-                    {image && (
-                        <AspectRatio {...styles.image}>
-                            <DynamicImage
-                                src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
-                                widths={dynamicImageProps?.widths}
-                                imageProps={{
-                                    // treat img as a decorative item, we don't need to pass `image.alt`
-                                    // since it is the same as product name
-                                    // which can cause confusion for individuals who uses screen readers
-                                    alt: '',
-                                    ...dynamicImageProps?.imageProps
-                                }}
-                            />
-                        </AspectRatio>
-                    )}
+                    <AspectRatio {...styles.image}>
+                        <DynamicImage
+                            data-testid="product-tile-image"
+                            src={`${
+                                image?.disBaseLink ||
+                                image?.link ||
+                                product?.image?.disBaseLink ||
+                                product?.image?.link
+                            }[?sw={width}&q=60]`}
+                            widths={dynamicImageProps?.widths}
+                            imageProps={{
+                                // treat img as a decorative item, we don't need to pass `image.alt`
+                                // since it is the same as product name
+                                // which can cause confusion for individuals who uses screen readers
+                                alt: '',
+                                loading: 'lazy',
+                                ...dynamicImageProps?.imageProps
+                            }}
+                        />
+                    </AspectRatio>
                 </Box>
+
+                {/* Swatches */}
+                {variationAttributes
+                    ?.filter(({id}) => selectableAttributeId === id)
+                    ?.map(({id, name, values}) => (
+                        <SwatchGroup
+                            ariaLabel={name}
+                            key={id}
+                            value={selectableAttributeValue}
+                            handleChange={(value) => {
+                                setSelectableAttributeValue(value)
+                            }}
+                        >
+                            {values?.map(({name, swatch, value}) => {
+                                const content = swatch ? (
+                                    <Box
+                                        height="100%"
+                                        width="100%"
+                                        minWidth="32px"
+                                        backgroundRepeat="no-repeat"
+                                        backgroundSize="cover"
+                                        backgroundColor={name.toLowerCase()}
+                                        backgroundImage={`url(${
+                                            swatch?.disBaseLink || swatch.link
+                                        })`}
+                                    />
+                                ) : (
+                                    name
+                                )
+
+                                return (
+                                    <Swatch
+                                        key={value}
+                                        value={value}
+                                        name={name}
+                                        variant={'circle'}
+                                        isFocusable={true}
+                                    >
+                                        {content}
+                                    </Swatch>
+                                )
+                            })}
+                        </SwatchGroup>
+                    ))}
 
                 {/* Title */}
                 <Text {...styles.title}>{localizedProductName}</Text>
@@ -169,12 +276,12 @@ ProductTile.propTypes = {
      */
     product: PropTypes.shape({
         currency: PropTypes.string,
-        representedProduct: PropTypes.object,
         image: PropTypes.shape({
             alt: PropTypes.string,
             disBaseLink: PropTypes.string,
             link: PropTypes.string
         }),
+        imageGroups: PropTypes.array,
         price: PropTypes.number,
         priceRanges: PropTypes.array,
         tieredPrices: PropTypes.array,
@@ -191,7 +298,9 @@ ProductTile.propTypes = {
         // Note: useEinstein() transforms snake_case property names from the API response to camelCase
         productName: PropTypes.string,
         productId: PropTypes.string,
+        representedProduct: PropTypes.object,
         hitType: PropTypes.string,
+        variationAttributes: PropTypes.array,
         variants: PropTypes.array,
         type: PropTypes.shape({
             set: PropTypes.bool,
@@ -214,6 +323,15 @@ ProductTile.propTypes = {
      * interacts with favourite icon/button.
      */
     onFavouriteToggle: PropTypes.func,
+    /**
+     * The `viewType` of the image component. This defaults to 'large'.
+     */
+    imageViewType: PropTypes.string,
+    /**
+     * When displaying a master/variant product, this value represents the variation attribute that is displayed
+     * as a swatch below the main image. The default for this property is `color`.
+     */
+    selectableAttributeId: PropTypes.string,
     dynamicImageProps: PropTypes.object
 }
 
