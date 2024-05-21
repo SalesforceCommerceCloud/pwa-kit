@@ -17,7 +17,7 @@ import {
     MergedOptions,
     NullableParameters,
     OmitNullableParameters,
-    CustomEndpointArgClientConfigOptional
+    OptionalCustomEndpointClientConfig
 } from './types'
 import useConfig from './useConfig'
 import {hasAllKeys} from './utils'
@@ -82,12 +82,12 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
  * @returns A TanStack Query query hook with data from the custom API endpoint.
  */
 export const useCustomQuery = (
-    apiOptions: CustomEndpointArgClientConfigOptional,
+    apiOptions: OptionalCustomEndpointClientConfig,
     queryOptions?: UseQueryOptions<unknown, unknown, unknown, any>
 ) => {
     const config = useConfig()
     const auth = useAuthContext()
-    const callCustomEndpointWithAuth = (options: CustomEndpointArgClientConfigOptional) => {
+    const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
         const clientConfig = options.clientConfig || {}
         const clientHeaders = config.headers || {}
         return async () => {

@@ -18,7 +18,7 @@ import {
     ApiMethod,
     ApiClient,
     MergedOptions,
-    CustomEndpointArgClientConfigOptional
+    OptionalCustomEndpointClientConfig
 } from './types'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useCustomerId from './useCustomerId'
@@ -64,12 +64,12 @@ export const useMutation = <
  * @returns A TanStack Query mutation hook with data from the custom API endpoint.
  */
 export const useCustomMutation = (
-    apiOptions: CustomEndpointArgClientConfigOptional,
+    apiOptions: OptionalCustomEndpointClientConfig,
     mutationOptions?: UseMutationOptions
 ) => {
     const config = useConfig()
     const auth = useAuthContext()
-    const callCustomEndpointWithAuth = (options: CustomEndpointArgClientConfigOptional) => {
+    const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
         return async () => {
             const clientConfig = options.clientConfig || {}
             const clientHeaders = config.headers || {}

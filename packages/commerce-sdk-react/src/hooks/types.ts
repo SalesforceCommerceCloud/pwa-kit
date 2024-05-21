@@ -217,6 +217,6 @@ type CustomEndpointArgClientConfig = Parameters<
 // The commerce-sdk-isomorphic custom endpoint helper REQUIRES clientConfig as mandatory argument
 // But we inject the configs for users from the provider, so this custom type is created
 // to make clientConfig optional when calling useCustomQuery/useCustomMutation
-export type CustomEndpointArgClientConfigOptional = Omit<CustomEndpointArg, 'clientConfig'> & {
+export type OptionalCustomEndpointClientConfig = Omit<CustomEndpointArg, 'clientConfig'> & {
     clientConfig?: CustomEndpointArgClientConfig
 }
