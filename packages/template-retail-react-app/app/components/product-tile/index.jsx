@@ -151,19 +151,22 @@ const ProductTile = (props) => {
         })
     }, [product, selectableAttributeId, selectableAttributeValue])
 
-    // Retrive product badges
-    let filteredLabels = new Map()
-    if (product?.representedProduct) {
-        badgeLabels.forEach((item) => {
-            if (
-                item.propertyName &&
-                typeof product.representedProduct[item.propertyName] === 'boolean' &&
-                product.representedProduct[item.propertyName] === true
-            ) {
-                filteredLabels.set(intl.formatMessage(item.label), item.color)
-            }
-        })
-    }
+    // Retrieve product badges
+    const filteredLabels = useMemo(() => {
+        const labelsMap = new Map()
+        if (product?.representedProduct) {
+            badgeLabels.forEach((item) => {
+                if (
+                    item.propertyName &&
+                    typeof product.representedProduct[item.propertyName] === 'boolean' &&
+                    product.representedProduct[item.propertyName] === true
+                ) {
+                    labelsMap.set(intl.formatMessage(item.label), item.color)
+                }
+            })
+        }
+        return labelsMap
+    }, [product, badgeLabels])
 
     return (
         <Box {...styles.container}>
@@ -284,7 +287,7 @@ const ProductTile = (props) => {
             {filteredLabels.size > 0 && (
                 <HStack {...styles.badgeGroup}>
                     {Array.from(filteredLabels.entries()).map(([label, colorScheme]) => (
-                        <Badge key={label} colorScheme={colorScheme}>
+                        <Badge key={label} data-testid="product-badge" colorScheme={colorScheme}>
                             {label}
                         </Badge>
                     ))}
@@ -361,7 +364,7 @@ ProductTile.propTypes = {
     selectableAttributeId: PropTypes.string,
     dynamicImageProps: PropTypes.object,
     /**
-     * Badge lables to display on the tile.
+     * Badge labels to display on the tile.
      */
     badgeLabels: PropTypes.array
 }
