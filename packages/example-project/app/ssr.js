@@ -8,7 +8,7 @@
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import pkg from '../package.json'
-import handlers from '*/app/handlers'
+import handlers from './handlers'
 
 const options = {
     // The build directory (an absolute path)

@@ -63,7 +63,7 @@ class ExtensionsResolverPlugin {
     }
 
     getExtensions(request) {
-        let {extensions} = this.pkg.mobify
+        let {extensions = []} = this.pkg.mobify
         const moduleName = this.parseModuleName(request.context.issuer)
         const isBaseProject = moduleName === this.pkg.name
         const isExtension = extensions.includes(moduleName.replace('extension-', ''))
@@ -108,7 +108,7 @@ class ExtensionsResolverPlugin {
         const target = resolver.ensureHook('resolve')
         const packages = this.getExtensions(request)
         const moduleName = this.parseModuleName(request.context.issuer)
-
+        // console.log('packages: ', packages)
         // If we aren't importing the routes file, add the `.` to the packages so we include the 
         // base project as the highest priority override location.
         

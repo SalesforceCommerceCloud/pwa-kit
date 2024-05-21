@@ -8,6 +8,9 @@
       "@salesforce/retail-react-app"
     ]
   },
+  "mobify": {
+    "extensions": []
+  },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "npm run build-translations && pwa-kit-dev build",

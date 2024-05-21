@@ -255,9 +255,9 @@ const main = async () => {
                 process.exit(1)
             }
 
-            console.log('Running: ', `${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`)
-            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
+            execSync(`${babelNode} ${inspect ? '--inspect' : ''} -i [\"/(?:\\/.*)?\\/node_modules\\//(?!@salesforce\/extension)\\//i\"] ${babelArgs} ${entrypoint}`, {
                 env: {
+                    ['BABEL_SHOW_CONFIG_FOR']: '/Users/bchypak/Projects/pwa-kit/packages/extension-retail-react-app-storefinder/app/handlers.ts',
                     ...process.env,
                     ...(noHMR ? {HMR: 'false'} : {})
                 }

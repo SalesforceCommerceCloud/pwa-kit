@@ -1,8 +1,8 @@
-import handlers from '*/app/handlers'
+import handlers from '*/app/handlers1'
 
 export default {
     ...handlers,
-    '/callback?*': (req, res) => {
+    '/from-base-project?*': (req, res) => {
         res.send()
     }
 }

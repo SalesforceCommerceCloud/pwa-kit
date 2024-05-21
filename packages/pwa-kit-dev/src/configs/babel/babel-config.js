@@ -24,11 +24,9 @@ const config = {
             require('babel-plugin-module-resolver'),
             {
                 alias: {
-                    "*/app/handlers": "@salesforce/extension-retail-react-app-storefinder/app/handlers"
-                    // "*/app/handlers": () => {
-                    //     console.log('BABEL PLUGIN ARGS: ')
-                    //     return "@salesforce/extension-retail-react-app-storefinder/app/handlers"
-                    // }
+                    // We are going to emulate the wildcard imports by using aliases 
+                    "*/app/handlers1": "./node_modules/@salesforce/extension-retail-react-app-storefinder/app/handlers",
+                    "*/app/handlers2": "./node_modules/@salesforce/extension-retail-react-app-core/app/handlers"
                 },
                 loglevel: 'silly'
             }
