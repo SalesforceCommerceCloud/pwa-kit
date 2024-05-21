@@ -104,7 +104,7 @@ class ExtensionsResolverPlugin {
             callback()
             return
         }
-
+        debugger
         const target = resolver.ensureHook('resolve')
         const packages = this.getExtensions(request)
         const moduleName = this.parseModuleName(request.context.issuer)
@@ -145,7 +145,7 @@ class ExtensionsResolverPlugin {
                     path: this.projectDir,
                     // NOTE: Here we are just adjusting the file path because we are not including "app". This logic will be handled properly
                     // in the final version.
-                    request: request.request.replace('*', featureModule + `${!!request.request.match(/\/(home|product-list|product-detail)/) ? '/app' : ''}`),
+                    request: request.request.replace('*', featureModule + `${!!request.request.match(/\/(welcome|home|product-list|product-detail)/) ? '/app' : ''}`),
                     stack: undefined
                 }
                 

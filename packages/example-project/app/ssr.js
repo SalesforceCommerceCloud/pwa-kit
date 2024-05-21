@@ -31,16 +31,21 @@ const options = {
 const runtime = getRuntime()
 
 const {handler} = runtime.createHandler(options, (app) => {
-    // // Handle the redirect from SLAS as to avoid error
-    // app.get('/callback?*', (req, res) => {
-    //     res.send()
-    // })
-
+    
     // app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
     console.log('HANDLERS: ', handlers)
     Object.keys(handlers).forEach((key) => {
         app.get(key, handlers[key])
     })
+
+    // // app, handkers, locals
+    // applyExpressHandlers(
+    //     app, 
+    //     handlers, 
+    //     {
+    //         runtime
+    //     }
+    // )
 
     app.get('*', runtime.render)
 })
@@ -48,3 +53,18 @@ const {handler} = runtime.createHandler(options, (app) => {
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
 export const get = handler
+
+
+// const applyExpressHandlers = (app, handlers = [], locals = {}) => {
+//     const {runtime} = locals
+
+//     handlers.forEach((handler) => {
+//         handler = typeof handler === 'function' ? handler(runtime) : handler
+
+//         app.get(key, handlers[key])
+//     })
+
+//     Object.keys(handlers).forEach((key) => {
+//         app.get(key, handlers[key])
+//     })
+// }

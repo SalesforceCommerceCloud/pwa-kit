@@ -1,6 +1,6 @@
-import handlers from '*/app/handlers2'
+import handlers from '*/app/handlers'
 
-const stores = {
+const data = {
     'store_1': {
         name: 'Coquitlam Central',
         lat: '',
@@ -12,7 +12,7 @@ export default {
     ...handlers,
     '/get-stores': (req, res) => {
         res.setHeader('Content-Type', 'application/json')
-        res.end(JSON.stringify(stores))
+        res.end(JSON.stringify(data))
     }
 }
 
@@ -29,7 +29,7 @@ export default {
 //     handlers({runtime, app})
 
 //     return [{
-//         mothod: 'GET',
+//         method: 'GET',
 //         path: '/test',
 //         handler: runtime.serveStaticFile('static/favicon.ico')
 //     }]

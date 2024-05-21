@@ -12,14 +12,14 @@ import loadable, {LoadableComponent} from '@loadable/component'
 const Welcome = loadable(() => import('./pages/welcome'))
 
 const routes = [
-    ..._routes,
     {
-        path: '/',
+        path: '/welcome',
         exact: true,
         // Type assertion because otherwise we encounter this error:
         // Exported variable 'routes' has or is using name 'Props' from external module "./app/pages/home" but cannot be named.
         component: Welcome as LoadableComponent<unknown>
-    }
+    },
+    ..._routes
 ]
 
 export default routes

@@ -19,18 +19,7 @@ const config = {
         require('@babel/preset-react')
     ],
     plugins: [
-        [
-            // NOTE: Once working create a pr to the repo so get mentioned in their README.
-            require('babel-plugin-module-resolver'),
-            {
-                alias: {
-                    // We are going to emulate the wildcard imports by using aliases 
-                    "*/app/handlers1": "./node_modules/@salesforce/extension-retail-react-app-storefinder/app/handlers",
-                    "*/app/handlers2": "./node_modules/@salesforce/extension-retail-react-app-core/app/handlers"
-                },
-                loglevel: 'silly'
-            }
-        ],
+        require('./extension-resolver'),
         require('@babel/plugin-transform-async-to-generator'),
         require('@babel/plugin-proposal-object-rest-spread'),
         require('@babel/plugin-transform-object-assign'),

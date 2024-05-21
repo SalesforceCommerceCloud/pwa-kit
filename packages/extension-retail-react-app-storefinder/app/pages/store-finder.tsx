@@ -8,7 +8,7 @@ import React from 'react'
 import {useQuery} from '@tanstack/react-query'
 
 const getStores = async () => {
-    const response = await fetch('/get-stores')
+    const response = await fetch('http://localhost:3000/get-stores')
     return response.json()
 }
 
@@ -22,7 +22,7 @@ const StoreFinder = () => {
         <div>
             <h1>Store Finder</h1>
             <p>This page was provided by the `extension-retail-react-app-storefinder` package.</p>
-            {data && <code>{JSON.stringify(data)}</code>}
+            {data ? <code>{JSON.stringify(data)}</code> : <span>Loading Stores...</span>}
         </div>
     )
 }

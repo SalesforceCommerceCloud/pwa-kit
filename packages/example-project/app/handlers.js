@@ -1,4 +1,4 @@
-import handlers from '*/app/handlers1'
+import handlers from '*/app/handlers'
 
 export default {
     ...handlers,
