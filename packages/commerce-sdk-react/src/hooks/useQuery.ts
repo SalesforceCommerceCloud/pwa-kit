@@ -95,13 +95,13 @@ export const useCustomQuery = (
             return await helpers.callCustomEndpoint({
                 ...options,
                 options: {
-                    ...options.options,
                     method: options.options.method || 'GET',
                     headers: {
                         Authorization: `Bearer ${access_token}`,
                         ...clientHeaders,
                         ...options.options?.headers
-                    }
+                    },
+                    ...options.options
                 },
                 clientConfig: {
                     parameters: {
