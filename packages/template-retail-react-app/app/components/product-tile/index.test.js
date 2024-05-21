@@ -108,7 +108,7 @@ test('renders strike through price with standard product', () => {
     expect(strikethroughPriceTag).toHaveLength(1)
 })
 
-test('renders badges for standard product', () => {
+test('renders badges corresponding to the default custom properties', () => {
     const {getByText, container} = renderWithProviders(
         <ProductTile product={mockStandardProductHit} />
     )
@@ -119,7 +119,7 @@ test('renders badges for standard product', () => {
     expect(within(badges[1]).getByText(/Sale/i)).toBeDefined()
 })
 
-test('renders badges with custom labels', () => {
+test('renders badges corresponding to the overridden custom properties', () => {
     const {getByText, container} = renderWithProviders(
         <ProductTile
             product={mockStandardProductHit}
@@ -135,7 +135,7 @@ test('renders badges with custom labels', () => {
     expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
 })
 
-test('renders only unique badges for standard product', () => {
+test('renders only unique badges', () => {
     const {getByText, container} = renderWithProviders(
         <ProductTile
             product={mockStandardProductHit}
