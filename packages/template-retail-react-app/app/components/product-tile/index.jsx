@@ -97,7 +97,6 @@ const ProductTile = (props) => {
                 typeof product.representedProduct[item.propertyName] === 'boolean' &&
                 product.representedProduct[item.propertyName] === true
             ) {
-                console.log('************', item.label)
                 map.set(intl.formatMessage(item.label), item.color)
             }
             return map
