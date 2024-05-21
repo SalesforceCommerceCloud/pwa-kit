@@ -13,10 +13,10 @@ import {helpers} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
 import useConfig from './useConfig'
 import {
-    CacheUpdateGetter,
-    ApiOptions,
-    ApiMethod,
     ApiClient,
+    ApiMethod,
+    ApiOptions,
+    CacheUpdateGetter,
     MergedOptions,
     OptionalCustomEndpointClientConfig
 } from './types'
