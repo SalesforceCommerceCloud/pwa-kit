@@ -117,16 +117,20 @@ export const useCustomQuery = (
         }
     }
 
+    if (!apiOptions.options.customApiPathParameters) {
+        throw new Error('options.customApiPathParameters are required for useCustomQuery')
+    }
+
     // Following the query key convention in this repo, the first element of the query key is a static prefix
     // the following elements are the path components of the endpoint
     const queryKey = [
         '/commerce-sdk-react',
         '/custom',
-        `/${apiOptions.options.customApiPathParameters?.apiName || 'apiName'}`,
-        `/${apiOptions.options.customApiPathParameters?.apiVersion || 'apiVersion'}`,
+        `/${apiOptions.options.customApiPathParameters.apiName}`,
+        `/${apiOptions.options.customApiPathParameters.apiVersion}`,
         `/organizations`,
-        `/${apiOptions.options.customApiPathParameters?.organizationId || 'organizationId'}`,
-        `/${apiOptions.options.customApiPathParameters?.endpointPath || 'endpointPath'}`,
+        `/${apiOptions.options.customApiPathParameters.organizationId}`,
+        `/${apiOptions.options.customApiPathParameters.endpointPath}`,
         {...apiOptions.options.parameters}
     ]
     return useReactQuery(queryKey, callCustomEndpointWithAuth(apiOptions), queryOptions)
