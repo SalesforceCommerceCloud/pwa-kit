@@ -39,7 +39,7 @@ export const PRODUCT_TILE_BADGE_LABELS = [
     {
         propertyName: 'c_isNew',
         label: {
-            id: 'product_tile.badge.label.New',
+            id: 'product_tile.badge.label.new',
             defaultMessage: 'New'
         },
         color: 'green'
@@ -47,7 +47,7 @@ export const PRODUCT_TILE_BADGE_LABELS = [
     {
         propertyName: 'c_isSale',
         label: {
-            id: 'product_tile.badge.label.Sale',
+            id: 'product_tile.badge.label.sale',
             defaultMessage: 'Sale'
         },
         color: 'yellow'

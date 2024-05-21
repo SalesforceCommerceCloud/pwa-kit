@@ -124,8 +124,16 @@ test('renders badges corresponding to the overridden custom properties', () => {
         <ProductTile
             product={mockStandardProductHit}
             badgeLabels={[
-                {propertyName: 'c_isSpecial', label: 'Special', color: 'green'},
-                {propertyName: 'c_isCloseout', label: 'Closeout', color: 'yellow'}
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'green'
+                },
+                {
+                    propertyName: 'c_isCloseout',
+                    label: {id: 'product_tile.badge.label.closeout', defaultMessage: 'Closeout'},
+                    color: 'yellow'
+                }
             ]}
         />
     )
@@ -140,9 +148,79 @@ test('renders only unique badges', () => {
         <ProductTile
             product={mockStandardProductHit}
             badgeLabels={[
-                {propertyName: 'c_isSpecial', label: 'Special', color: 'green'},
-                {propertyName: 'c_isSpecial', label: 'Special', color: 'yellow'},
-                {propertyName: 'c_isSpecial', label: 'Special', color: 'red'}
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'green'
+                },
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {
+                        id: 'product_tile.badge.label.special',
+                        defaultMessage: 'Extra Special'
+                    },
+                    color: 'yellow'
+                },
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'red'
+                }
+            ]}
+        />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = container.querySelectorAll('span')
+    expect(badges).toHaveLength(3)
+    expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
+    expect(within(badges[1]).getByText(/Extra Special/i)).toBeDefined()
+})
+
+test('Ignores the badges that are NOT defined as custom properties', () => {
+    const {getByText, container} = renderWithProviders(
+        <ProductTile
+            product={mockStandardProductHit}
+            badgeLabels={[
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'green'
+                },
+                {
+                    propertyName: 'c_isNotAvailable',
+                    label: {
+                        id: 'product_tile.badge.label.test',
+                        defaultMessage: 'Test'
+                    },
+                    color: 'yellow'
+                }
+            ]}
+        />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = container.querySelectorAll('span')
+    expect(badges).toHaveLength(2)
+    expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
+})
+
+test('Ignores the badges that are NOT defined as boolean custom properties', () => {
+    const {getByText, container} = renderWithProviders(
+        <ProductTile
+            product={mockStandardProductHit}
+            badgeLabels={[
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'green'
+                },
+                {
+                    propertyName: 'c_styleNumber',
+                    label: {
+                        id: 'product_tile.badge.label.test',
+                        defaultMessage: 'Test'
+                    },
+                    color: 'yellow'
+                }
             ]}
         />
     )
