@@ -43,6 +43,7 @@ describe('useCustomQuery', () => {
                 options: {
                     method: 'GET',
                     customApiPathParameters: {
+                        apiVersion: 'v1',
                         endpointPath: 'test-hello-world',
                         apiName
                     }
@@ -67,6 +68,7 @@ describe('useCustomQuery', () => {
                 options: {
                     method: 'GET',
                     customApiPathParameters: {
+                        apiVersion: 'v1',
                         endpointPath,
                         apiName
                     }
@@ -89,6 +91,7 @@ describe('useCustomQuery', () => {
             return useCustomQuery({
                 options: {
                     customApiPathParameters: {
+                        apiVersion: 'v1',
                         endpointPath,
                         apiName
                     }

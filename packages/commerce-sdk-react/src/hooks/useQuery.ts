@@ -121,7 +121,6 @@ export const useCustomQuery = (
         !apiOptions.options.customApiPathParameters ||
         !apiOptions.options.customApiPathParameters.apiName ||
         !apiOptions.options.customApiPathParameters.apiVersion ||
-        !apiOptions.options.customApiPathParameters.organizationId ||
         !apiOptions.options.customApiPathParameters.endpointPath
     ) {
         throw new Error('options.customApiPathParameters are required for useCustomQuery')
@@ -135,7 +134,7 @@ export const useCustomQuery = (
         `/${apiOptions.options.customApiPathParameters.apiName}`,
         `/${apiOptions.options.customApiPathParameters.apiVersion}`,
         `/organizations`,
-        `/${apiOptions.options.customApiPathParameters.organizationId}`,
+        `/${apiOptions.options.customApiPathParameters.organizationId || config.organizationId}`,
         `/${apiOptions.options.customApiPathParameters.endpointPath}`,
         {...apiOptions.options.parameters}
     ]
