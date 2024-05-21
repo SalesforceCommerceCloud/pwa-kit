@@ -117,7 +117,13 @@ export const useCustomQuery = (
         }
     }
 
-    if (!apiOptions.options.customApiPathParameters) {
+    if (
+        !apiOptions.options.customApiPathParameters ||
+        !apiOptions.options.customApiPathParameters.apiName ||
+        !apiOptions.options.customApiPathParameters.apiVersion ||
+        !apiOptions.options.customApiPathParameters.organizationId ||
+        !apiOptions.options.customApiPathParameters.endpointPath
+    ) {
         throw new Error('options.customApiPathParameters are required for useCustomQuery')
     }
 
