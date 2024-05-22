@@ -26,6 +26,7 @@ const UseShopperOrders = loadable(() => import('./pages/use-shopper-orders'))
 const UseCustomerId = loadable(() => import('./pages/use-customer-id'))
 const UseShopperContext = loadable(() => import('./pages/use-shopper-context'))
 const UseCustomEndpoint = loadable(() => import('./pages/use-custom-endpoint'))
+const UseShopperStores = loadable(() => import('./pages/use-shopper-stores'))
 
 const routes = [
     {
@@ -108,6 +109,10 @@ const routes = [
     {
         path: '/custom-endpoint',
         component: UseCustomEndpoint
+    },
+    {
+        path: '/stores',
+        component: UseShopperStores
     }
 ]
 
