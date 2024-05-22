@@ -12,12 +12,14 @@ import DisplayPrice from '@salesforce/retail-react-app/app/components/display-pr
 // Components
 import {
     AspectRatio,
+    Badge,
     Box,
     Skeleton as ChakraSkeleton,
     Text,
     Stack,
     useMultiStyleConfig,
-    IconButton
+    IconButton,
+    HStack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 
@@ -43,6 +45,7 @@ import {
     filterImageGroups,
     getDecoratedVariationAttributes
 } from '@salesforce/retail-react-app/app/utils/product-utils'
+import {PRODUCT_BADGE_DETAILS} from '@salesforce/retail-react-app/app/constants'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -78,6 +81,7 @@ const ProductTile = (props) => {
         onFavouriteToggle,
         product,
         selectableAttributeId = PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID,
+        badgeDetails = PRODUCT_BADGE_DETAILS,
         ...rest
     } = props
     const {imageGroups, productId, representedProduct, variants} = product
@@ -146,6 +150,23 @@ const ProductTile = (props) => {
             variants
         })
     }, [product, selectableAttributeId, selectableAttributeValue])
+
+    // Retrieve product badges
+    const filteredLabels = useMemo(() => {
+        const labelsMap = new Map()
+        if (product?.representedProduct) {
+            badgeDetails.forEach((item) => {
+                if (
+                    item.propertyName &&
+                    typeof product.representedProduct[item.propertyName] === 'boolean' &&
+                    product.representedProduct[item.propertyName] === true
+                ) {
+                    labelsMap.set(intl.formatMessage(item.label), item.color)
+                }
+            })
+        }
+        return labelsMap
+    }, [product, badgeDetails])
 
     return (
         <Box {...styles.container}>
@@ -263,6 +284,15 @@ const ProductTile = (props) => {
                     />
                 </Box>
             )}
+            {filteredLabels.size > 0 && (
+                <HStack {...styles.badgeGroup}>
+                    {Array.from(filteredLabels.entries()).map(([label, colorScheme]) => (
+                        <Badge key={label} data-testid="product-badge" colorScheme={colorScheme}>
+                            {label}
+                        </Badge>
+                    ))}
+                </HStack>
+            )}
         </Box>
     )
 }
@@ -332,7 +362,11 @@ ProductTile.propTypes = {
      * as a swatch below the main image. The default for this property is `color`.
      */
     selectableAttributeId: PropTypes.string,
-    dynamicImageProps: PropTypes.object
+    dynamicImageProps: PropTypes.object,
+    /**
+     * Details of badge labels and the corresponding product custom properties that enable badges.
+     */
+    badgeDetails: PropTypes.array
 }
 
 export default ProductTile
