@@ -91,7 +91,11 @@ export const getPriceData = (product, opts = {}) => {
     }
 }
 
-// TODO: add jsdoc comment
+/**
+ * Find the lowest price of a product, across all of its price books and promotions
+ * @param {Object} product - product data from the API
+ * @returns {Object|undefined} the lowest price for the given product. If it's a promotional price, the promotion will also be returned.
+ */
 export const findLowestPrice = (product) => {
     if (!product) return
     const array = product.variants ?? [product]
@@ -123,6 +127,8 @@ export const findLowestPrice = (product) => {
  * @private
  * Find the smallest value by key from a given array
  * @returns {Array} an array of such smallest value and the item containing this value
+ * @example
+ * const [value, itemContainingValue] = getSmallestValByProperty(array, key)
  */
 const getSmallestValByProperty = (arr, key) => {
     if (!arr || !arr.length) return []
