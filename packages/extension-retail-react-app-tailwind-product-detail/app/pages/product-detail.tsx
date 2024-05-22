@@ -6,7 +6,7 @@ import {Helmet} from 'react-helmet'
 import {
   useProduct
 } from '@salesforce/commerce-sdk-react'
-import {useLocation, useParams} from 'react-router-dom'
+import {useLocation, useParams, Link} from 'react-router-dom'
 
 const reviews = { href: '#', average: 4, totalCount: 117 }
 
@@ -259,12 +259,12 @@ const ProductDetail = () => {
                 Add to bag
               </button>
 
-              <a
+              <Link 
                 className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white indigo:bg-green-700 focus:outline-none focus:ring-2 indigo:ring-green-500 focus:ring-offset-2"
-                href="/store-finder"
-              >
-                Find in store
-              </a>
+                to="/store-finder">
+                  Find in store
+              </Link>
+              
             </form>
           </div>
 

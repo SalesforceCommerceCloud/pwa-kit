@@ -15,7 +15,8 @@ const getStores = async () => {
 const StoreFinder = () => {
     const {data} = useQuery({
         queryKey: ['app', 'stores'],
-        queryFn: getStores
+        queryFn: getStores,
+        cacheTime: 0.5 * 60 * 1000
     })
 
     return (
