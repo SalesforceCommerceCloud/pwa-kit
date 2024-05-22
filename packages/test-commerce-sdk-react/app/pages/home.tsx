@@ -70,6 +70,9 @@ const Home = () => {
                 <li>
                     <Link to="/customerId">useCustomerId</Link>
                 </li>
+                <li>
+                    <Link to="/custom-endpoint">useCustomQuery</Link>
+                </li>
             </ul>
         </>
     )

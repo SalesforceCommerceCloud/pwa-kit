@@ -19,6 +19,7 @@ import {
     ShopperSeo,
     ShopperStores
 } from 'commerce-sdk-isomorphic'
+import {helpers} from 'commerce-sdk-isomorphic'
 
 // --- GENERAL UTILITIES --- //
 
@@ -209,4 +210,13 @@ export type CacheUpdateMatrix<Client extends ApiClient> = {
     [Method in keyof Client]?: Client[Method] extends ApiMethod<any, Response | infer Data>
         ? CacheUpdateGetter<MergedOptions<Client, Argument<Client[Method]>>, Data>
         : never
+}
+
+type CustomEndpointArg = Parameters<typeof helpers.callCustomEndpoint>[0]
+type CustomEndpointArgClientConfig = CustomEndpointArg['clientConfig']
+// The commerce-sdk-isomorphic custom endpoint helper REQUIRES clientConfig as mandatory argument
+// But we inject the configs for users from the provider, so this custom type is created
+// to make clientConfig optional when calling useCustomQuery/useCustomMutation
+export type OptionalCustomEndpointClientConfig = Omit<CustomEndpointArg, 'clientConfig'> & {
+    clientConfig?: CustomEndpointArgClientConfig
 }
