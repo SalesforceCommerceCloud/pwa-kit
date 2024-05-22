@@ -45,7 +45,7 @@ import {
     filterImageGroups,
     getDecoratedVariationAttributes
 } from '@salesforce/retail-react-app/app/utils/product-utils'
-import {PRODUCT_TILE_BADGE_LABELS} from '@salesforce/retail-react-app/app/constants'
+import {PRODUCT_BADGE_DETAILS} from '@salesforce/retail-react-app/app/constants'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -81,7 +81,7 @@ const ProductTile = (props) => {
         onFavouriteToggle,
         product,
         selectableAttributeId = PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID,
-        badgeLabels = PRODUCT_TILE_BADGE_LABELS,
+        badgeDetails = PRODUCT_BADGE_DETAILS,
         ...rest
     } = props
     const {imageGroups, productId, representedProduct, variants} = product
@@ -155,7 +155,7 @@ const ProductTile = (props) => {
     const filteredLabels = useMemo(() => {
         const labelsMap = new Map()
         if (product?.representedProduct) {
-            badgeLabels.forEach((item) => {
+            badgeDetails.forEach((item) => {
                 if (
                     item.propertyName &&
                     typeof product.representedProduct[item.propertyName] === 'boolean' &&
@@ -166,7 +166,7 @@ const ProductTile = (props) => {
             })
         }
         return labelsMap
-    }, [product, badgeLabels])
+    }, [product, badgeDetails])
 
     return (
         <Box {...styles.container}>
@@ -364,9 +364,9 @@ ProductTile.propTypes = {
     selectableAttributeId: PropTypes.string,
     dynamicImageProps: PropTypes.object,
     /**
-     * Badge labels to display on the tile.
+     * Details of badge labels and the corresponding product custom properties that enable badges.
      */
-    badgeLabels: PropTypes.array
+    badgeDetails: PropTypes.array
 }
 
 export default ProductTile

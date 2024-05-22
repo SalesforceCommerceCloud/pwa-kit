@@ -145,7 +145,7 @@ test('renders badges corresponding to the overridden custom properties', () => {
     const {getByText, getAllByTestId} = renderWithProviders(
         <ProductTile
             product={mockStandardProductHit}
-            badgeLabels={[
+            badgeDetails={[
                 {
                     propertyName: 'c_isSpecial',
                     label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
@@ -169,7 +169,7 @@ test('renders only unique badges', () => {
     const {getByText, getAllByTestId} = renderWithProviders(
         <ProductTile
             product={mockStandardProductHit}
-            badgeLabels={[
+            badgeDetails={[
                 {
                     propertyName: 'c_isSpecial',
                     label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
@@ -202,7 +202,7 @@ test('Ignores the badges that are NOT defined as custom properties', () => {
     const {getByText, getAllByTestId} = renderWithProviders(
         <ProductTile
             product={mockStandardProductHit}
-            badgeLabels={[
+            badgeDetails={[
                 {
                     propertyName: 'c_isSpecial',
                     label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
@@ -229,7 +229,7 @@ test('Ignores the badges that are NOT defined as boolean custom properties', () 
     const {getByText, getAllByTestId} = renderWithProviders(
         <ProductTile
             product={mockStandardProductHit}
-            badgeLabels={[
+            badgeDetails={[
                 {
                     propertyName: 'c_isSpecial',
                     label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
