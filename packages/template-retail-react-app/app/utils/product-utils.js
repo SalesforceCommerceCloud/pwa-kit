@@ -91,6 +91,7 @@ export const getPriceData = (product, opts = {}) => {
     }
 }
 
+// TODO: add jsdoc comment
 export const findLowestPrice = (product) => {
     if (!product) return
     const array = product.variants ?? [product]
@@ -98,35 +99,45 @@ export const findLowestPrice = (product) => {
     return array.reduce(
         (prev, data) => {
             const promotions = data.productPromotions || []
-            const smallestPromotionalPrice = getSmallestValByProperty(
+            const [smallestPromotionalPrice, promo] = getSmallestValByProperty(
                 promotions,
                 'promotionalPrice'
             )
-            const salePrice =
-                smallestPromotionalPrice && smallestPromotionalPrice < data.price
-                    ? smallestPromotionalPrice
-                    : data.price
 
-            return salePrice < prev.minPrice ? {minPrice: salePrice, data} : prev
+            let salePrice, promotion
+            if (smallestPromotionalPrice && smallestPromotionalPrice < data.price) {
+                salePrice = smallestPromotionalPrice
+                promotion = promo
+            } else {
+                salePrice = data.price
+                promotion = null
+            }
+
+            return salePrice < prev.minPrice ? {minPrice: salePrice, promotion, data} : prev
         },
-        {minPrice: Infinity, data: null}
+        {minPrice: Infinity, promotion: null, data: null}
     )
 }
 
 /**
  * @private
  * Find the smallest value by key from a given array
- * @param arr
- * @param key
+ * @returns {Array} an array of such smallest value and the item containing this value
  */
 const getSmallestValByProperty = (arr, key) => {
-    if (!arr || !arr.length) return undefined
+    if (!arr || !arr.length) return []
     if (!key) {
         throw new Error('Please specify a key.')
     }
-    const vals = arr
-        .map((item) => item[key])
-        .filter(Boolean)
-        .filter(Number)
-    return vals.length ? Math.min(...vals) : undefined
+    const filtered = arr.filter((item) => Boolean(item[key])).filter((item) => Number(item[key]))
+    if (filtered.length === 0) return []
+
+    return filtered.reduce(
+        (prev, item) => {
+            const value = item[key]
+            const [prevValue] = prev
+            return value < prevValue ? [value, item] : prev
+        },
+        [Infinity, null]
+    )
 }

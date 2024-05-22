@@ -118,3 +118,5 @@ describe('getPriceData', function () {
         })
     })
 })
+
+// TODO: tests for findLowestPrice
