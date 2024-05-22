@@ -211,9 +211,7 @@ export type CacheUpdateMatrix<Client extends ApiClient> = {
 }
 
 type CustomEndpointArg = Parameters<typeof helpers.callCustomEndpoint>[0]
-type CustomEndpointArgClientConfig = Parameters<
-    typeof helpers.callCustomEndpoint
->[0]['clientConfig']
+type CustomEndpointArgClientConfig = CustomEndpointArg['clientConfig']
 // The commerce-sdk-isomorphic custom endpoint helper REQUIRES clientConfig as mandatory argument
 // But we inject the configs for users from the provider, so this custom type is created
 // to make clientConfig optional when calling useCustomQuery/useCustomMutation
