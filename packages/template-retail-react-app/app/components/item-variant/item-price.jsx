@@ -12,6 +12,8 @@ import {useItemVariant} from '.'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 
 const PricePerItem = ({currency, basket, basePrice}) => {
     const {currency: activeCurrency} = useCurrency()
@@ -44,24 +46,35 @@ PricePerItem.propTypes = {
 const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
     const variant = useItemVariant()
     const {data: basket} = useCurrentBasket()
-    const {currency: activeCurrency} = useCurrency()
-    const intl = useIntl()
-
     const {price, basePrice, priceAfterItemDiscount} = variant
-    const isProductASet = variant?.type?.set
-
-    const displayPrice =
-        typeof priceAfterItemDiscount === 'number' ? Math.min(price, priceAfterItemDiscount) : price
-
-    const hasDiscount = displayPrice !== price
+    const isSet = variant?.type?.set
+    const isMaster = variant?.type?.master
+    let priceData
+    // this indicates the variant is on cart page
+    // variant on cart page will have price info that takes quantity into the account
+    // we should prioritize use these val instead of having to re-calculate them again
+    if (variant?.itemId) {
+        priceData = {
+            currentPrice: priceAfterItemDiscount,
+            listPrice: price,
+            isSet,
+            isMaster,
+            isRange: isSet || isMaster || false,
+            isOnSale: price > priceAfterItemDiscount
+        }
+    } else {
+        // for wishlist page
+        priceData = getPriceData(variant)
+    }
+    const isOnSale = price > priceAfterItemDiscount || priceData?.isOnSale
 
     return (
         <Stack
             textAlign={align}
-            direction={hasDiscount ? 'column' : {base: baseDirection, lg: 'row'}}
+            direction={isOnSale ? 'column' : {base: baseDirection, lg: 'row'}}
             justifyContent={align === 'left' ? 'flex-start' : 'flex-end'}
             alignItems="baseline"
-            spacing={hasDiscount ? 0 : 1}
+            spacing={isOnSale ? 0 : 1}
             wrap="nowrap"
             {...props}
         >
@@ -70,35 +83,11 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                     <PricePerItem currency={currency} basePrice={basePrice} basket={basket} />
                 </HideOnDesktop>
             )}
-            <Text fontWeight="bold" lineHeight={{base: '0.5', lg: '24px'}}>
-                {isProductASet &&
-                    `${intl.formatMessage({
-                        defaultMessage: 'From',
-                        id: 'item_price.label.from'
-                    })} `}
-
-                <FormattedNumber
-                    style="currency"
-                    currency={currency || basket?.currency || activeCurrency}
-                    value={displayPrice}
-                />
-                {hasDiscount && (
-                    <Text
-                        as="span"
-                        fontSize="sm"
-                        fontWeight="normal"
-                        textDecoration="line-through"
-                        color="gray.500"
-                        marginLeft={1}
-                    >
-                        <FormattedNumber
-                            style="currency"
-                            currency={currency || basket?.currency || activeCurrency}
-                            value={price}
-                        />
-                    </Text>
-                )}
-            </Text>
+            <DisplayPrice
+                currency={currency}
+                priceData={priceData}
+                listPriceProps={{fontSize: 'sm'}}
+            />
 
             {basePrice && price !== basePrice && (
                 <HideOnMobile>

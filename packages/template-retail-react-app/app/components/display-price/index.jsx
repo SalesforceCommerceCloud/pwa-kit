@@ -23,15 +23,37 @@ import ListPrice from '@salesforce/retail-react-app/app/components/display-price
  * // if a standard/bundle
  *      show exact price on PLP and PDP as X (cross) Y
  * @param currency - currency
+ * @param quantity - quantity to take into the account for price display
+ * @param currentPriceProps - extra props to be passing to CurrentPrice component
+ * @param listPriceProps - extra props to be passing to ListPrice component
  */
-const DisplayPrice = ({priceData, currency}) => {
+const DisplayPrice = ({
+    priceData,
+    currency,
+    quantity = 1,
+    currentPriceProps = {},
+    listPriceProps = {}
+}) => {
     const {listPrice, currentPrice, isASet, isMaster, isOnSale, isRange} = priceData
     const renderCurrentPrice = (isRange) => (
-        <CurrentPrice price={currentPrice} as="b" currency={currency} isRange={isRange} />
+        <CurrentPrice
+            {...currentPriceProps}
+            price={currentPrice * quantity}
+            as="b"
+            currency={currency}
+            isRange={isRange}
+        />
     )
 
     const renderListPrice = (isRange) =>
-        listPrice && <ListPrice currency={currency} price={listPrice} isRange={isRange} />
+        listPrice && (
+            <ListPrice
+                {...listPriceProps}
+                currency={currency}
+                price={listPrice * quantity}
+                isRange={isRange}
+            />
+        )
 
     const renderPriceSet = (isRange) => (
         <>
@@ -61,7 +83,10 @@ DisplayPrice.propTypes = {
         maxPrice: PropTypes.number,
         tieredPrice: PropTypes.number
     }),
-    currency: PropTypes.string.isRequired
+    currentPriceProps: PropTypes.object,
+    listPriceProps: PropTypes.object,
+    currency: PropTypes.string.isRequired,
+    quantity: PropTypes.number
 }
 
 export default DisplayPrice
