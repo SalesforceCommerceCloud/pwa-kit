@@ -9,6 +9,7 @@ import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import pkg from '../package.json'
 import handlers from './handlers'
+// import customizeApp from './customize-app'
 
 const options = {
     // The build directory (an absolute path)
@@ -38,33 +39,10 @@ const {handler} = runtime.createHandler(options, (app) => {
         app.get(key, handlers[key])
     })
 
-    // // app, handkers, locals
-    // applyExpressHandlers(
-    //     app, 
-    //     handlers, 
-    //     {
-    //         runtime
-    //     }
-    // )
-
     app.get('*', runtime.render)
 })
+// const {handler} = runtime.createHandler(options, customizeApp)
 
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
 export const get = handler
-
-
-// const applyExpressHandlers = (app, handlers = [], locals = {}) => {
-//     const {runtime} = locals
-
-//     handlers.forEach((handler) => {
-//         handler = typeof handler === 'function' ? handler(runtime) : handler
-
-//         app.get(key, handlers[key])
-//     })
-
-//     Object.keys(handlers).forEach((key) => {
-//         app.get(key, handlers[key])
-//     })
-// }
