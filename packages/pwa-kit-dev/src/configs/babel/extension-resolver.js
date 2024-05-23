@@ -19,10 +19,7 @@ function transformImport(nodePath, state) {
     
     const sourcePath = nodePath.node.value;
     const currentFile = state.file.opts.filename;
-    // const resolvePath = state.normalizedOpts.customResolvePath || defaultResolvePath;
     
-    // const modulePath = resolvePath(sourcePath, currentFile, state.opts);
-    debugger
     // "extensions" is the currently configured extensions for the base project. This will eventually come from the applications
     // configuration file.
     const extensions = [
@@ -36,39 +33,33 @@ function transformImport(nodePath, state) {
 
     const importSource = currentFile.includes('extension-') ? 'extension' : 'base'
     const isSelfReference = currentFile.includes(sourcePath.replace('*/', ''))
-    debugger
+    
 
     const modulePath = resolve(sourcePath, {
         basedir: '/Users/bchypak/Projects/pwa-kit/packages/example-project',
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'], // make this configurable
         packageIterator: (request, start, opts) => {
             const paths = extensions.map((extension) => `./node_modules/@salesforce/extension-${extension}/${sourcePath.replace('*/', '')}`)
-            debugger
-            if (importSource === 'base') {
-                // Import source is the base project
-                if (isSelfReference) {
-                    return paths
-                } else {
-                    return paths
-                }
-            } else {
-                // Import source is an extension
-                if (isSelfReference) {
-                    debugger
-                    const currentExtension = currentFile.match(/extension-([^/]+)/)[1]
-                    const index = extensions.indexOf(currentExtension)
-                    // Find the index of the extension and chop the list.
-                   
-                    return paths.slice(index + 1)
-                } else {
-                    return [`/Users/bchypak/Projects/pwa-kit/packages/example-project/${sourcePath.replace('*/', '')}`, ...paths]
-                }
-            }
             
+            if (importSource === 'extension') {
+               // Import source is an extension
+              if (isSelfReference) {
+                // Find the index of the extension and chop the list.
+                const currentExtension = currentFile.match(/extension-([^/]+)/)[1]
+                const index = extensions.indexOf(currentExtension)
+                  
+                return paths.slice(index + 1)
+              } else {
+                return [`/Users/bchypak/Projects/pwa-kit/packages/example-project/${sourcePath.replace('*/', '')}`, ...paths]
+              }
+              
+            } else {
+               return paths
+            }
         },
         preserveSymlinks: false
     })
-    debugger
+
     if (modulePath) {
         if (nodePath.node.pathResolved) {
           return;

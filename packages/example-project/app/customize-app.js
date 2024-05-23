@@ -29,9 +29,7 @@ const customizeApp = ({app, runtime}) => {
     })
 
     // DO NOT REMOVE THIS. YOUR APP WILL BREAK IF YOU DO.
-    app.get('*', runtime.render)
-
-    
+    app.get('*', runtime.render)    
 }
 
 
