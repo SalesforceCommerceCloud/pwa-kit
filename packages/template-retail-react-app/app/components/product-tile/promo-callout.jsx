@@ -12,7 +12,7 @@ const PromoCallout = ({product}) => {
     const {promotion, data} = findLowestPrice(product)
 
     // NOTE: API inconsistency - with getProduct call, a variant does not have productPromotions
-    const promos = data.productPromotions ?? product.productPromotions ?? []
+    const promos = data?.productPromotions ?? product?.productPromotions ?? []
     const promo = promotion ?? promos[0]
 
     // calloutMsg can be html string or just plain text
