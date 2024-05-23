@@ -1,4 +1,5 @@
 const resolve = require('resolve/sync')
+const getConfig = require('@salesforce/pwa-kit-runtime/utils/ssr-config').getConfig
 
 function transformImport(nodePath, state) {
     if (!nodePath?.node?.source?.value?.startsWith('*') || !nodePath?.node?.source?.value?.includes('customize-app')) {
@@ -20,17 +21,8 @@ function transformImport(nodePath, state) {
     const sourcePath = nodePath.node.value;
     const currentFile = state.file.opts.filename;
     
-    // "extensions" is the currently configured extensions for the base project. This will eventually come from the applications
-    // configuration file.
-    const extensions = [
-        'retail-react-app-account',
-        'retail-react-app-tailwind-product-detail',
-        'retail-react-app-storefinder',
-        'retail-react-app-empty-extension',
-        'retail-react-app-custom-home',
-        'retail-react-app-core'
-    ]
-
+    
+    const extensions = [...(getConfig()?.app?.extensions || [])].reverse()
     const importSource = currentFile.includes('extension-') ? 'extension' : 'base'
     const isSelfReference = currentFile.includes(sourcePath.replace('*/', ''))
     

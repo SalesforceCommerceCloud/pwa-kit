@@ -9,6 +9,14 @@ const sites = require('./sites.js')
 
 module.exports = {
     app: {
+        extensions: [
+            'retail-react-app-core', 
+            'retail-react-app-custom-home', 
+            'retail-react-app-empty-extension', 
+            'retail-react-app-storefinder',
+            'retail-react-app-tailwind-product-detail',
+            'retail-react-app-account'
+        ],
         url: {
             site: 'none',
             locale: 'none',
