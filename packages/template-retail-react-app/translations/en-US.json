@@ -1081,6 +1081,12 @@
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
   },
+  "product_tile.badge.label.new": {
+    "defaultMessage": "New"
+  },
+  "product_tile.badge.label.sale": {
+    "defaultMessage": "Sale"
+  },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
   },
@@ -1272,7 +1278,8 @@
     "defaultMessage": "Please enter your phone number."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "Please enter your {postalOrZip}."
+    "defaultMessage": "Please enter your zip code.",
+    "description": "Error message for a blank zip code (US-specific checkout)"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "Please enter your address."
@@ -1284,7 +1291,8 @@
     "defaultMessage": "Please select your country."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "Please select your {stateOrProvince}."
+    "defaultMessage": "Please select your state.",
+    "description": "Error message for a blank state (US-specific checkout)"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "Required"

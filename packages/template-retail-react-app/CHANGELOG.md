@@ -1,8 +1,16 @@
 ## v3.0.0-dev (Jan 22, 2024)
 
+### Improvement
+
+- Product Tile Revamp
+  - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760) 
+
 ### Performance improvements
 
 - Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656)
+
+## v2.5.0-dev (Apr 17, 2024)
+- Use `stale-while-revalidate` cache control directive [#1744](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1744)
 
 ## v2.4.1 (Apr 17, 2024)
 - Update dependency commerce-sdk-react to 1.4.1 to have access to all params keys for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)

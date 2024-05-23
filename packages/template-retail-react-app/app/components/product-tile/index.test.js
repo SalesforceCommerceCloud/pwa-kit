@@ -7,7 +7,7 @@
 import React from 'react'
 import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components/product-tile/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {fireEvent, within} from '@testing-library/react'
+import {fireEvent, waitFor, within} from '@testing-library/react'
 import {
     mockMasterProductHitWithMultipleVariants,
     mockMasterProductHitWithOneVariant,
@@ -49,6 +49,28 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     fireEvent.click(wishlistButton)
     fireEvent.click(wishlistButton)
     expect(onClick).toHaveBeenCalledTimes(1)
+})
+
+test('Renders variation selection swatches', () => {
+    const {getAllByRole, getByTestId} = renderWithProviders(
+        <ProductTile product={mockProductSearchItem} />
+    )
+    const swatches = getAllByRole('radio')
+    const productImage = getByTestId('product-tile-image')
+
+    // Initial render will show swatched and the image will be the represented product variation
+    expect(swatches).toHaveLength(2)
+    expect(productImage.firstChild.getAttribute('src')).toBe(
+        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg'
+    )
+
+    // Hovering over color swatch changes the image.
+    fireEvent.mouseEnter(swatches[1])
+    waitFor(() => {
+        expect(productImage.firstChild.getAttribute('src')).toBe(
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg'
+        )
+    })
 })
 
 test('renders exact price with strikethrough price for master product with multiple variants', () => {
@@ -106,4 +128,126 @@ test('renders strike through price with standard product', () => {
     expect(within(strikethroughPriceTag[0]).getByText(/£67\.99/i)).toBeDefined()
     expect(currentPriceTag).toHaveLength(1)
     expect(strikethroughPriceTag).toHaveLength(1)
+})
+
+test('renders badges corresponding to the default custom properties', () => {
+    const {getByText, getAllByTestId} = renderWithProviders(
+        <ProductTile product={mockStandardProductHit} />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = getAllByTestId('product-badge')
+    expect(badges).toHaveLength(2)
+    expect(within(badges[0]).getByText(/New/i)).toBeDefined()
+    expect(within(badges[1]).getByText(/Sale/i)).toBeDefined()
+})
+
+test('renders badges corresponding to the overridden custom properties', () => {
+    const {getByText, getAllByTestId} = renderWithProviders(
+        <ProductTile
+            product={mockStandardProductHit}
+            badgeDetails={[
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'green'
+                },
+                {
+                    propertyName: 'c_isCloseout',
+                    label: {id: 'product_tile.badge.label.closeout', defaultMessage: 'Closeout'},
+                    color: 'yellow'
+                }
+            ]}
+        />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = getAllByTestId('product-badge')
+    expect(badges).toHaveLength(1)
+    expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
+})
+
+test('renders only unique badges', () => {
+    const {getByText, getAllByTestId} = renderWithProviders(
+        <ProductTile
+            product={mockStandardProductHit}
+            badgeDetails={[
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'green'
+                },
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {
+                        id: 'product_tile.badge.label.special',
+                        defaultMessage: 'Extra Special'
+                    },
+                    color: 'yellow'
+                },
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'red'
+                }
+            ]}
+        />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = getAllByTestId('product-badge')
+    expect(badges).toHaveLength(2)
+    expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
+    expect(within(badges[1]).getByText(/Extra Special/i)).toBeDefined()
+})
+
+test('Ignores the badges that are NOT defined as custom properties', () => {
+    const {getByText, getAllByTestId} = renderWithProviders(
+        <ProductTile
+            product={mockStandardProductHit}
+            badgeDetails={[
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'green'
+                },
+                {
+                    propertyName: 'c_isNotAvailable',
+                    label: {
+                        id: 'product_tile.badge.label.test',
+                        defaultMessage: 'Test'
+                    },
+                    color: 'yellow'
+                }
+            ]}
+        />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = getAllByTestId('product-badge')
+    expect(badges).toHaveLength(1)
+    expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
+})
+
+test('Ignores the badges that are NOT defined as boolean custom properties', () => {
+    const {getByText, getAllByTestId} = renderWithProviders(
+        <ProductTile
+            product={mockStandardProductHit}
+            badgeDetails={[
+                {
+                    propertyName: 'c_isSpecial',
+                    label: {id: 'product_tile.badge.label.special', defaultMessage: 'Special'},
+                    color: 'green'
+                },
+                {
+                    propertyName: 'c_styleNumber',
+                    label: {
+                        id: 'product_tile.badge.label.test',
+                        defaultMessage: 'Test'
+                    },
+                    color: 'yellow'
+                }
+            ]}
+        />
+    )
+    expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
+    const badges = getAllByTestId('product-badge')
+    expect(badges).toHaveLength(1)
+    expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
 })

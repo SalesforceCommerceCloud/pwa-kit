@@ -82,7 +82,10 @@ import {
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
+    TOAST_MESSAGE_REMOVED_FROM_WISHLIST,
+    STALE_WHILE_REVALIDATE,
+    PRODUCT_LIST_IMAGE_VIEW_TYPE,
+    PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -151,7 +154,15 @@ const ProductList = (props) => {
                 ...restOfParams,
                 perPricebook: true,
                 allVariationProperties: true,
-                expand: ['promotions', 'variations', 'prices', 'images', 'availability'],
+                allImages: true,
+                expand: [
+                    'promotions',
+                    'variations',
+                    'prices',
+                    'images',
+                    'availability',
+                    'custom_properties'
+                ],
                 refine: _refine
             }
         },
@@ -192,7 +203,10 @@ const ProductList = (props) => {
 
     /**************** Response Handling ****************/
     if (res) {
-        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
+        res.set(
+            'Cache-Control',
+            `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
+        )
     }
 
     // Reset scroll position when `isRefetching` becomes `true`.
@@ -544,6 +558,10 @@ const ProductList = (props) => {
                                                   product={productSearchItem}
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
+                                                  imageViewType={PRODUCT_LIST_IMAGE_VIEW_TYPE}
+                                                  selectableAttributeId={
+                                                      PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
+                                                  }
                                                   onClick={() => {
                                                       if (searchQuery) {
                                                           einstein.sendClickSearch(

@@ -106,7 +106,7 @@ test('pagination is rendered', async () => {
 test('should display Selected refinements as there are some in the response', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
-    const countOfRefinements = await screen.findAllByText('Black')
+    const countOfRefinements = await screen.findAllByLabelText(`Remove filter: Black`)
     expect(countOfRefinements).toHaveLength(2)
 })
 

@@ -5393,6 +5393,34 @@
       "value": "]"
     }
   ],
+  "product_tile.badge.label.new": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞḗḗẇ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_tile.badge.label.sale": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şȧȧŀḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "product_view.button.add_set_to_cart": [
     {
       "type": 0,
@@ -6324,15 +6352,7 @@
     },
     {
       "type": 0,
-      "value": "Ƥŀḗḗȧȧşḗḗ ḗḗƞŧḗḗř ẏǿǿŭŭř "
-    },
-    {
-      "type": 1,
-      "value": "postalOrZip"
-    },
-    {
-      "type": 0,
-      "value": "."
+      "value": "Ƥŀḗḗȧȧşḗḗ ḗḗƞŧḗḗř ẏǿǿŭŭř ẑīƥ ƈǿǿḓḗḗ."
     },
     {
       "type": 0,
@@ -6388,15 +6408,7 @@
     },
     {
       "type": 0,
-      "value": "Ƥŀḗḗȧȧşḗḗ şḗḗŀḗḗƈŧ ẏǿǿŭŭř "
-    },
-    {
-      "type": 1,
-      "value": "stateOrProvince"
-    },
-    {
-      "type": 0,
-      "value": "."
+      "value": "Ƥŀḗḗȧȧşḗḗ şḗḗŀḗḗƈŧ ẏǿǿŭŭř şŧȧȧŧḗḗ."
     },
     {
       "type": 0,
