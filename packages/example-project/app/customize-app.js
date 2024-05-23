@@ -1,4 +1,3 @@
-// customize-app.js
 /*
  * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
@@ -13,11 +12,13 @@ import _customizeApp from '*/app/customize-app'
  * @param options 
  * @param options.app
  */
-const customize = ({app, runtime}) => {
+const customizeApp = ({app, runtime}) => {
     // NOTE: This will be created via the create-app generator.
     // DO NOT REMOVE THIS. YOUR EXTENSIONS WILL NOT WORK IF YOU DO.
     // NOTE: We should havesome conditional logic here to only run this line of code if we are using extensibility, this will 
     // reinforce the idea of only extensions requiring customizing of the app here. 
+    // NOTE: Another thought would be to use a loader to "wrap" this enheritance funcitonality, but that is stetchy at best.
+    // NOTE: We can also handle this with a custom linter
     _customizeApp({app, runtime})
 
     // Start customization.
@@ -29,6 +30,8 @@ const customize = ({app, runtime}) => {
 
     // DO NOT REMOVE THIS. YOUR APP WILL BREAK IF YOU DO.
     app.get('*', runtime.render)
+
+    
 }
 
 
@@ -37,4 +40,4 @@ const customize = ({app, runtime}) => {
 // ANSWER: No, I don't think so.. but they might want to know the current runtimes configuration in order to 
 // check compatibility. E.g. an extension might only want to work for `https` 🤷🏻‍♂️
 
-export default customize
+export default customizeApp

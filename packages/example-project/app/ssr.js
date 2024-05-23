@@ -8,8 +8,7 @@
 import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import pkg from '../package.json'
-import handlers from './handlers'
-// import customizeApp from './customize-app'
+import customizeApp from './customize-app'
 
 const options = {
     // The build directory (an absolute path)
@@ -29,19 +28,13 @@ const options = {
     mobify: pkg.mobify
 }
 
+
+// QUESTION! Aside from the "options", why do we want to have this code in user-space? Can
+// it not live in the proper SDK lib?
+
 const runtime = getRuntime()
 
-const {handler} = runtime.createHandler(options, (app) => {
-    
-    // app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
-    console.log('HANDLERS: ', handlers)
-    Object.keys(handlers).forEach((key) => {
-        app.get(key, handlers[key])
-    })
-
-    app.get('*', runtime.render)
-})
-// const {handler} = runtime.createHandler(options, customizeApp)
+const {handler} = runtime.createHandler(options, (app) => customizeApp({app, runtime}))
 
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.

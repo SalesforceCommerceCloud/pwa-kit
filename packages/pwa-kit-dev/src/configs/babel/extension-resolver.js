@@ -1,7 +1,7 @@
 const resolve = require('resolve/sync')
 
 function transformImport(nodePath, state) {
-    if (!nodePath?.node?.source?.value?.startsWith('*') || !nodePath?.node?.source?.value?.includes('handlers')) {
+    if (!nodePath?.node?.source?.value?.startsWith('*') || !nodePath?.node?.source?.value?.includes('customize-app')) {
         return
     }
 
