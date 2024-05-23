@@ -172,6 +172,12 @@ const ProductTile = (props) => {
         return labelsMap
     }, [product, badgeDetails])
 
+    const shouldShowPromoCallout = (product) => {
+        return product.variants
+            ? Boolean(product.variants.find((variant) => variant.productPromotions))
+            : Boolean(product.productPromotions)
+    }
+
     return (
         <Box {...styles.container}>
             <Link data-testid="product-tile" to={productUrl} {...styles.link} {...rest}>
@@ -249,8 +255,7 @@ const ProductTile = (props) => {
                 <DisplayPrice priceData={priceData} currency={currency} />
 
                 {/* Promotion call-out message */}
-                {/* TODO: filter variants according to selectableAttributeValue */}
-                {product.productPromotions && (
+                {shouldShowPromoCallout(productWithFilteredVariants) && (
                     <PromoCallout product={productWithFilteredVariants} />
                 )}
             </Link>
