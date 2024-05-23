@@ -53,40 +53,15 @@ export const getPriceData = (product, opts = {}) => {
     let variantWithLowestPrice
     // grab the variant that has the lowest price (including promotional price)
     if (isMaster) {
-        const variants = product?.variants || []
-        variantWithLowestPrice = variants.reduce(
-            (minVariant, variant) => {
-                const promotions = variant.productPromotions || []
-                const smallestPromotionalPrice = getSmallestValByProperty(
-                    promotions,
-                    'promotionalPrice'
-                )
-                const variantSalePrice =
-                    smallestPromotionalPrice && smallestPromotionalPrice < variant.price
-                        ? smallestPromotionalPrice
-                        : variant.price
-                return variantSalePrice < minVariant.minPrice
-                    ? {minPrice: variantSalePrice, variant}
-                    : minVariant
-            },
-            {minPrice: Infinity, variant: null}
-        )
+        variantWithLowestPrice = findLowestPrice(product)
         currentPrice = variantWithLowestPrice?.minPrice
     } else {
-        const promotionalPrice = getSmallestValByProperty(
-            product?.productPromotions,
-            'promotionalPrice'
-        )
-        currentPrice =
-            promotionalPrice && promotionalPrice < product?.price
-                ? promotionalPrice
-                : product?.price
+        currentPrice = findLowestPrice(product)?.minPrice
     }
 
     // since the price is the lowest value among price books, each product will have at lease a single item tiered price at quantity 1
     // the highest value of tieredPrices is presumptively the list price
-    const tieredPrices =
-        variantWithLowestPrice?.variant?.tieredPrices || product?.tieredPrices || []
+    const tieredPrices = variantWithLowestPrice?.data?.tieredPrices || product?.tieredPrices || []
     const maxTieredPrice = tieredPrices?.length
         ? Math.max(...tieredPrices.map((item) => item.price))
         : undefined
@@ -188,20 +163,59 @@ export const getDecoratedVariationAttributes = (product, opts = {}) => {
 }
 
 /**
-     
+ * Find the lowest price of a product, across all of its price books and promotions
+ * @param {Object} product - product data from the API
+ * @returns {Object|undefined} the lowest price for the given product. If it's a promotional price, the promotion will also be returned.
+ */
+export const findLowestPrice = (product) => {
+    if (!product) return
+    const array = product.variants ?? [product]
+
+    return array.reduce(
+        (prev, data) => {
+            const promotions = data.productPromotions || []
+            const [smallestPromotionalPrice, promo] = getSmallestValByProperty(
+                promotions,
+                'promotionalPrice'
+            )
+
+            let salePrice = data.price
+            let promotion = null
+            if (smallestPromotionalPrice && smallestPromotionalPrice < data.price) {
+                salePrice = smallestPromotionalPrice
+                promotion = promo
+            }
+
+            return salePrice < prev.minPrice ? {minPrice: salePrice, promotion, data} : prev
+        },
+        {minPrice: Infinity, promotion: null, data: null}
+    )
+}
+
+/**
  * @private
  * Find the smallest value by key from a given array
- * @param arr
- * @param key
+ * @returns {Array} an array of such smallest value and the item containing this value
+ * @example
+ * const [value, itemContainingValue] = getSmallestValByProperty(array, key)
  */
 const getSmallestValByProperty = (arr, key) => {
-    if (!arr || !arr.length) return undefined
+    if (!arr || !arr.length) return []
     if (!key) {
         throw new Error('Please specify a key.')
     }
-    const vals = arr
-        .map((item) => item[key])
-        .filter(Boolean)
-        .filter(Number)
-    return vals.length ? Math.min(...vals) : undefined
+    const filtered = arr.filter((item) => {
+        const value = item[key]
+        return value === 0 || value === '0' ? true : Number(value)
+    })
+    if (filtered.length === 0) return []
+
+    return filtered.reduce(
+        (prev, item) => {
+            const value = item[key]
+            const [prevValue] = prev
+            return value < prevValue ? [value, item] : prev
+        },
+        [Infinity, null]
+    )
 }

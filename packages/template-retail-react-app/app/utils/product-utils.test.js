@@ -7,6 +7,7 @@
 
 import {
     getPriceData,
+    findLowestPrice,
     getDecoratedVariationAttributes,
     getDisplayVariationValues,
     filterImageGroups
@@ -17,6 +18,7 @@ import {
     mockProductSetHit,
     mockStandardProductHit
 } from '@salesforce/retail-react-app/app/mocks/product-search-hit-data'
+import {productSearch} from '@salesforce/retail-react-app/app/components/product-tile/promo-callout.mock'
 
 const imageGroups = [
     {
@@ -836,4 +838,25 @@ describe('getPriceData', function () {
             maxPrice: 67.99
         })
     })
+})
+
+describe('findLowestPrice', function () {
+    test('without passing in a product', () => {
+        const result = findLowestPrice()
+        expect(result).toBeUndefined()
+    })
+
+    test('lowest price is a promotional price', () => {
+        const result = findLowestPrice(productSearch.rollSleeveBlouse)
+        expect(result.promotion).toBeDefined()
+    })
+    test('lowest price is NOT a promotional price', () => {
+        const result = findLowestPrice(productSearch.sleevelessBlouse)
+        expect(result.promotion).toBeNull()
+    })
+    test('returned `data` is either a single variant or a product', () => {
+        const result = findLowestPrice(productSearch.rollSleeveBlouse)
+        expect(Array.isArray(result.data)).toBe(false)
+    })
+    // NOTE: we won't test the returned `minPrice`, since the price is already covered indirectly via testing of getPriceData
 })

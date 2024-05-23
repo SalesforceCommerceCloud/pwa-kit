@@ -29,6 +29,7 @@ import Link from '@salesforce/retail-react-app/app/components/link'
 import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
+import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -137,19 +138,22 @@ const ProductTile = (props) => {
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
 
-    // Pricing is dynamic! Ensure we are showing the right price for the selected variation attribute
-    // value.
-    const priceData = useMemo(() => {
+    const productWithFilteredVariants = useMemo(() => {
         const variants = product?.variants?.filter(
             ({variationValues}) =>
                 variationValues[selectableAttributeId] === selectableAttributeValue
         )
-
-        return getPriceData({
+        return {
             ...product,
             variants
-        })
+        }
     }, [product, selectableAttributeId, selectableAttributeValue])
+
+    // Pricing is dynamic! Ensure we are showing the right price for the selected variation attribute
+    // value.
+    const priceData = useMemo(() => {
+        return getPriceData(productWithFilteredVariants)
+    }, [productWithFilteredVariants])
 
     // Retrieve product badges
     const filteredLabels = useMemo(() => {
@@ -243,6 +247,11 @@ const ProductTile = (props) => {
 
                 {/* Price */}
                 <DisplayPrice priceData={priceData} currency={currency} />
+
+                {/* Promotion call-out message */}
+                {shouldShowPromoCallout(productWithFilteredVariants) && (
+                    <PromoCallout product={productWithFilteredVariants} />
+                )}
             </Link>
             {enableFavourite && (
                 <Box
@@ -328,6 +337,7 @@ ProductTile.propTypes = {
         // Note: useEinstein() transforms snake_case property names from the API response to camelCase
         productName: PropTypes.string,
         productId: PropTypes.string,
+        productPromotions: PropTypes.array,
         representedProduct: PropTypes.object,
         hitType: PropTypes.string,
         variationAttributes: PropTypes.array,
@@ -370,3 +380,9 @@ ProductTile.propTypes = {
 }
 
 export default ProductTile
+
+const shouldShowPromoCallout = (productWithFilteredVariants) => {
+    return productWithFilteredVariants.variants
+        ? Boolean(productWithFilteredVariants.variants.find((variant) => variant.productPromotions))
+        : Boolean(productWithFilteredVariants.productPromotions)
+}
