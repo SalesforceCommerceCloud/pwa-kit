@@ -105,8 +105,6 @@ const NestedAccordion = (props) => {
                                 </h2>
 
                                 {/* Child Items */}
-                                {/* NOTE: Once the API is updated we'll modify this condition to only show if expanded and 
-                                the item has children */}
                                 {isExpanded && (
                                     <AccordionPanel {...styles.panel}>
                                         <ItemComponent
