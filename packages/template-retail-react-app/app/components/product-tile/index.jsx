@@ -172,12 +172,6 @@ const ProductTile = (props) => {
         return labelsMap
     }, [product, badgeDetails])
 
-    const shouldShowPromoCallout = (product) => {
-        return product.variants
-            ? Boolean(product.variants.find((variant) => variant.productPromotions))
-            : Boolean(product.productPromotions)
-    }
-
     return (
         <Box {...styles.container}>
             <Link data-testid="product-tile" to={productUrl} {...styles.link} {...rest}>
@@ -386,3 +380,9 @@ ProductTile.propTypes = {
 }
 
 export default ProductTile
+
+const shouldShowPromoCallout = (productWithFilteredVariants) => {
+    return productWithFilteredVariants.variants
+        ? Boolean(productWithFilteredVariants.variants.find((variant) => variant.productPromotions))
+        : Boolean(productWithFilteredVariants.productPromotions)
+}
