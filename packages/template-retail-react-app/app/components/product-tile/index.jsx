@@ -138,19 +138,22 @@ const ProductTile = (props) => {
     // use the `name` property.
     const localizedProductName = product.name ?? product.productName
 
-    // Pricing is dynamic! Ensure we are showing the right price for the selected variation attribute
-    // value.
-    const priceData = useMemo(() => {
+    const productWithFilteredVariants = useMemo(() => {
         const variants = product?.variants?.filter(
             ({variationValues}) =>
                 variationValues[selectableAttributeId] === selectableAttributeValue
         )
-
-        return getPriceData({
+        return {
             ...product,
             variants
-        })
+        }
     }, [product, selectableAttributeId, selectableAttributeValue])
+
+    // Pricing is dynamic! Ensure we are showing the right price for the selected variation attribute
+    // value.
+    const priceData = useMemo(() => {
+        return getPriceData(productWithFilteredVariants)
+    }, [productWithFilteredVariants])
 
     // Retrieve product badges
     const filteredLabels = useMemo(() => {
@@ -247,7 +250,9 @@ const ProductTile = (props) => {
 
                 {/* Promotion call-out message */}
                 {/* TODO: filter variants according to selectableAttributeValue */}
-                {product.productPromotions && <PromoCallout product={{...product, variants}} />}
+                {product.productPromotions && (
+                    <PromoCallout product={productWithFilteredVariants} />
+                )}
             </Link>
             {enableFavourite && (
                 <Box
