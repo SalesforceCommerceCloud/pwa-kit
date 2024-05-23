@@ -59,13 +59,11 @@ export function useShopperBasketsMutationHelper() {
                 const data = await createBasket.mutateAsync({
                     body: {}
                 })
-                if (!data) {
+                if (!data || !data.basketId) {
                     throw Error('Something is wrong. Please try again')
                 } else {
                     return await addItemToBasketMutation.mutateAsync({
-                        // we know that data is always available here
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        parameters: {basketId: data.basketId!},
+                        parameters: {basketId: data.basketId},
                         body: productItem
                     })
                 }
