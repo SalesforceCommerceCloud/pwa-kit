@@ -179,13 +179,11 @@ export const findLowestPrice = (product) => {
                 'promotionalPrice'
             )
 
-            let salePrice, promotion
+            let salePrice = data.price
+            let promotion = null
             if (smallestPromotionalPrice && smallestPromotionalPrice < data.price) {
                 salePrice = smallestPromotionalPrice
                 promotion = promo
-            } else {
-                salePrice = data.price
-                promotion = null
             }
 
             return salePrice < prev.minPrice ? {minPrice: salePrice, promotion, data} : prev
