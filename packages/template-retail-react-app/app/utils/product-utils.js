@@ -204,7 +204,10 @@ const getSmallestValByProperty = (arr, key) => {
     if (!key) {
         throw new Error('Please specify a key.')
     }
-    const filtered = arr.filter((item) => Boolean(item[key])).filter((item) => Number(item[key]))
+    const filtered = arr.filter((item) => {
+        const value = item[key]
+        return value === 0 || value === '0' ? true : Number(value)
+    })
     if (filtered.length === 0) return []
 
     return filtered.reduce(
