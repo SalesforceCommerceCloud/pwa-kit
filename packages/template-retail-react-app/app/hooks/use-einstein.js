@@ -423,11 +423,12 @@ const useEinstein = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
-
-            // Merge the product detail into the recommendations response
-            return {
-                ...reco,
-                recs: reco.recs.map((rec) => {
+            // einstein is not aware of a product has become unavailable in BM
+            // when it does, getProducts will not return any data regard to that product
+            // we have to make sure to filter out any product in einstein recos that has become unavailable
+            const recs = reco.recs
+                .filter((rec) => products?.data?.find((product) => product.id === rec.id))
+                .map((rec) => {
                     const product = products?.data?.find((product) => product.id === rec.id)
                     return {
                         ...rec,
@@ -436,6 +437,12 @@ const useEinstein = () => {
                         image: {disBaseLink: rec.imageUrl, alt: rec.productName}
                     }
                 })
+
+            // Merge the product detail into the recommendations response
+            return {
+                ...reco,
+
+                recs
             }
         }
         return reco
