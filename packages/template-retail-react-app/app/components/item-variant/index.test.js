@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
+
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant/index'
 import ItemPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
@@ -30,6 +32,9 @@ const MockedComponent = ({variant}) => {
             <ItemPrice currency="GBP" />
         </ItemVariantProvider>
     )
+}
+MockedComponent.propTypes = {
+    variant: PropTypes.object
 }
 
 describe('ItemPrice', function () {

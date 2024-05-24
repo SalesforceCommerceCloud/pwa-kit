@@ -64,6 +64,7 @@ ProductViewHeader.propTypes = {
     name: PropTypes.string,
     currency: PropTypes.string,
     category: PropTypes.array,
+    product: PropTypes.object,
     priceData: PropTypes.shape({
         currentPrice: PropTypes.number.isRequired,
         isOnSale: PropTypes.bool,
