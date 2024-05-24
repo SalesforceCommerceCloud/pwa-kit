@@ -39,7 +39,7 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 
-const ProductViewHeader = ({name, currency, priceData, category}) => {
+const ProductViewHeader = ({name, currency, priceData, category, product}) => {
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -53,7 +53,7 @@ const ProductViewHeader = ({name, currency, priceData, category}) => {
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            <Skeleton isLoaded={priceData?.currentPrice}>
+            <Skeleton isLoaded={product && priceData?.currentPrice}>
                 <DisplayPrice priceData={priceData} currency={currency} />
             </Skeleton>
         </VStack>
@@ -66,8 +66,9 @@ ProductViewHeader.propTypes = {
     category: PropTypes.array,
     priceData: PropTypes.shape({
         currentPrice: PropTypes.number.isRequired,
-        isOnSale: PropTypes.bool.isRequired,
+        isOnSale: PropTypes.bool,
         listPrice: PropTypes.number,
+        pricePerUnit: PropTypes.number,
         isASet: PropTypes.bool,
         isMaster: PropTypes.bool,
         isRange: PropTypes.bool,
@@ -296,6 +297,7 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
+                        product={product}
                         priceData={priceData}
                         currency={product?.currency || activeCurrency}
                         category={category}
@@ -335,6 +337,7 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
+                                product={product}
                                 priceData={priceData}
                                 currency={product?.currency || activeCurrency}
                                 category={category}

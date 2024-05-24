@@ -77,6 +77,7 @@ DisplayPrice.propTypes = {
         currentPrice: PropTypes.number.isRequired,
         isOnSale: PropTypes.bool.isRequired,
         listPrice: PropTypes.number,
+        pricePerUnit: PropTypes.number,
         isASet: PropTypes.bool,
         isMaster: PropTypes.bool,
         isRange: PropTypes.bool,

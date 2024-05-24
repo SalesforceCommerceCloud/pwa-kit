@@ -717,9 +717,6 @@
     "defaultMessage": "Unavailable",
     "description": "A unavailable badge placed on top of a product image"
   },
-  "item_price.label.from": {
-    "defaultMessage": "From"
-  },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
   },

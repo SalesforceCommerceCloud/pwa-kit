@@ -786,6 +786,7 @@ describe('getPriceData', function () {
         expect(priceData).toEqual({
             currentPrice: 191.99,
             listPrice: 223.99,
+            pricePerUnit: 191.99,
             isOnSale: true,
             isASet: false,
             isMaster: true,
@@ -797,15 +798,17 @@ describe('getPriceData', function () {
 
     test('returns price data for master product that has ONLY one variant', () => {
         const priceData = getPriceData(mockMasterProductHitWithOneVariant)
+
         expect(priceData).toEqual({
             currentPrice: 191.99,
             listPrice: 320,
+            pricePerUnit: 191.99,
             isOnSale: true,
             isASet: false,
             isMaster: true,
             isRange: false,
-            tieredPrice: 320,
-            maxPrice: 320
+            maxPrice: 320,
+            tieredPrice: 320
         })
     })
 
@@ -814,6 +817,7 @@ describe('getPriceData', function () {
         expect(priceData).toEqual({
             currentPrice: 40.16,
             listPrice: undefined,
+            pricePerUnit: 44.16,
             isOnSale: false,
             isASet: true,
             isMaster: false,
@@ -828,12 +832,13 @@ describe('getPriceData', function () {
         expect(priceData).toEqual({
             currentPrice: 63.99,
             listPrice: 67.99,
+            pricePerUnit: 63.99,
             isOnSale: true,
             isASet: false,
             isMaster: false,
             isRange: false,
-            tieredPrice: 67.99,
-            maxPrice: 67.99
+            maxPrice: 67.99,
+            tieredPrice: 67.99
         })
     })
 })
