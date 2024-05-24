@@ -69,7 +69,6 @@ ProductViewHeader.propTypes = {
     name: PropTypes.string,
     currency: PropTypes.string,
     category: PropTypes.array,
-    product: PropTypes.array,
     priceData: PropTypes.shape({
         currentPrice: PropTypes.number.isRequired,
         isOnSale: PropTypes.bool,
@@ -308,7 +307,6 @@ const ProductView = forwardRef(
                         priceData={priceData}
                         currency={product?.currency || activeCurrency}
                         category={category}
-                        product={product}
                     />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
@@ -349,7 +347,6 @@ const ProductView = forwardRef(
                                 priceData={priceData}
                                 currency={product?.currency || activeCurrency}
                                 category={category}
-                                product={product}
                             />
                         </Box>
                         <VStack align="stretch" spacing={4}>
