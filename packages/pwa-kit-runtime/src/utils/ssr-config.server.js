@@ -10,7 +10,13 @@ const SUPPORTED_FILE_TYPES = ['js', 'yml', 'yaml', 'json']
 
 const IS_REMOTE = Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
 
-let targetConfig
+/**
+ * The implementation of getConfig below is expensive as it performs a file lookup.
+ *
+ * Since the environment config will not change unless the bundle is redeployed,
+ * this global variable helps prevent unnecessary file lookups when the server calls getConfig multiple times.
+ */
+let memoizedConfig
 
 /**
  * Returns the express app configuration file in object form. The file will be resolved in the
@@ -38,7 +44,7 @@ let targetConfig
  */
 /* istanbul ignore next */
 export const getConfig = (opts = {}) => {
-    if (targetConfig) return targetConfig
+    if (memoizedConfig) return memoizedConfig
 
     const {buildDirectory} = opts
     const configDirBase = IS_REMOTE ? 'build' : ''
@@ -88,6 +94,6 @@ export const getConfig = (opts = {}) => {
         )
     }
 
-    targetConfig = config
+    memoizedConfig = config
     return config
 }
