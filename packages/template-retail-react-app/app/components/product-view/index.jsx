@@ -38,6 +38,7 @@ import DisplayPrice from '@salesforce/retail-react-app/app/components/display-pr
 import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
+import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
 
 const ProductViewHeader = ({name, currency, priceData, category, product}) => {
     return (
@@ -55,6 +56,10 @@ const ProductViewHeader = ({name, currency, priceData, category, product}) => {
 
             <Skeleton isLoaded={product && priceData?.currentPrice}>
                 <DisplayPrice priceData={priceData} currency={currency} />
+            </Skeleton>
+
+            <Skeleton isLoaded={product}>
+                {product?.productPromotions && <PromoCallout product={product} />}
             </Skeleton>
         </VStack>
     )
@@ -75,7 +80,8 @@ ProductViewHeader.propTypes = {
         isRange: PropTypes.bool,
         maxPrice: PropTypes.number,
         tieredPrice: PropTypes.number
-    })
+    }),
+    product: PropTypes.object
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -302,6 +308,7 @@ const ProductView = forwardRef(
                         priceData={priceData}
                         currency={product?.currency || activeCurrency}
                         category={category}
+                        product={product}
                     />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
@@ -342,6 +349,7 @@ const ProductView = forwardRef(
                                 priceData={priceData}
                                 currency={product?.currency || activeCurrency}
                                 category={category}
+                                product={product}
                             />
                         </Box>
                         <VStack align="stretch" spacing={4}>

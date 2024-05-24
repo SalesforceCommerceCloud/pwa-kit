@@ -2539,6 +2539,18 @@
       "value": " from wishlist"
     }
   ],
+  "product_tile.badge.label.new": [
+    {
+      "type": 0,
+      "value": "New"
+    }
+  ],
+  "product_tile.badge.label.sale": [
+    {
+      "type": 0,
+      "value": "Sale"
+    }
+  ],
   "product_view.button.add_set_to_cart": [
     {
       "type": 0,
