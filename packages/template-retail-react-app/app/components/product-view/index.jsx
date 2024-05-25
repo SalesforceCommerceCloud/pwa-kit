@@ -54,8 +54,10 @@ const ProductViewHeader = ({name, currency, priceData, category, product}) => {
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            <Skeleton isLoaded={product && priceData?.currentPrice}>
-                <DisplayPrice priceData={priceData} currency={currency} />
+            <Skeleton isLoaded={priceData?.currentPrice}>
+                {priceData?.currentPrice && (
+                    <DisplayPrice priceData={priceData} currency={currency} />
+                )}
             </Skeleton>
 
             <Skeleton isLoaded={product}>
@@ -69,17 +71,7 @@ ProductViewHeader.propTypes = {
     name: PropTypes.string,
     currency: PropTypes.string,
     category: PropTypes.array,
-    priceData: PropTypes.shape({
-        currentPrice: PropTypes.number.isRequired,
-        isOnSale: PropTypes.bool,
-        listPrice: PropTypes.number,
-        pricePerUnit: PropTypes.number,
-        isASet: PropTypes.bool,
-        isMaster: PropTypes.bool,
-        isRange: PropTypes.bool,
-        maxPrice: PropTypes.number,
-        tieredPrice: PropTypes.number
-    }),
+    priceData: PropTypes.object,
     product: PropTypes.object
 }
 
