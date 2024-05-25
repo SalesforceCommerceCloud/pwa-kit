@@ -169,7 +169,8 @@ export const getDecoratedVariationAttributes = (product, opts = {}) => {
  */
 export const findLowestPrice = (product) => {
     if (!product) return
-    const array = product.variants ?? [product]
+    const isMaster = product.productType?.master || product.type?.master
+    const array = isMaster ? product.variants : [product]
 
     return array.reduce(
         (prev, data) => {
