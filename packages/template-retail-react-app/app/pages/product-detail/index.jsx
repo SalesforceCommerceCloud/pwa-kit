@@ -105,7 +105,7 @@ const ProductDetail = () => {
     )
 
     // A workaround for API inconsistency (with getProduct call, a variant does not have productPromotions)
-    const {data: promotionData} = useProductSearch(
+    const {data: promotionData, isLoading: isPromotionDataLoading} = useProductSearch(
         {
             parameters: {
                 q: urlParams.get('pid') || productId,
@@ -119,7 +119,9 @@ const ProductDetail = () => {
             enabled: !urlParams.get('pid')
         }
     )
-    updatePromotions(product, promotionData)
+    if (!isProductLoading && !isPromotionDataLoading) {
+        updatePromotions(product, promotionData)
+    }
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
