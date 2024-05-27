@@ -169,6 +169,9 @@ export const getDecoratedVariationAttributes = (product, opts = {}) => {
  */
 export const findLowestPrice = (product) => {
     if (!product) return
+
+    // Look at all of the variants, only if it's a master product.
+    // i.e. when a shopper has narrowed down to a variant, do not look into other variants
     const isMaster = product.productType?.master || product.type?.master
     const array = isMaster ? product.variants : [product]
 
