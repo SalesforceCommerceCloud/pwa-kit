@@ -17,7 +17,8 @@ import {
     useCategory,
     useShopperCustomersMutation,
     useCustomerId,
-    useShopperBasketsMutationHelper
+    useShopperBasketsMutationHelper,
+    useProductSearch
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -102,6 +103,23 @@ const ProductDetail = () => {
             keepPreviousData: true
         }
     )
+
+    // A workaround for API inconsistency (with getProduct call, a variant does not have productPromotions)
+    const {data: promotionData} = useProductSearch(
+        {
+            parameters: {
+                q: urlParams.get('pid') || productId,
+                allVariationProperties: true,
+                expand: ['promotions', 'variations', 'prices'],
+                select: '(hits[0].(productPromotions,variants.(**)))'
+            }
+        },
+        {
+            // Enabled only when shopper has not narrowed down to a variant yet
+            enabled: !urlParams.get('pid')
+        }
+    )
+    updatePromotions(product, promotionData)
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
@@ -477,3 +495,19 @@ ProductDetail.propTypes = {
 }
 
 export default ProductDetail
+
+/**
+ * Make sure that the product's variants have promotions, if they're supposed to
+ */
+const updatePromotions = (product, promotionData) => {
+    if (!product || !promotionData) return
+
+    const data = promotionData.hits[0]
+    if (product.productPromotions && product.variants && data.variants) {
+        product.variants.forEach((variant, i) => {
+            if (variant.productId === data.variants[i].productId) {
+                variant.productPromotions = data.variants[i].productPromotions
+            }
+        })
+    }
+}
