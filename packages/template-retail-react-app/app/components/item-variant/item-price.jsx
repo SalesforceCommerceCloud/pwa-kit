@@ -71,7 +71,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
             wrap="nowrap"
             {...props}
         >
-            {!isASet && priceData?.pricePerUnit && !isDesktop && (
+            {variant?.quantity > 1 && !isASet && priceData?.pricePerUnit && !isDesktop && (
                 <PricePerItem currency={currency} basePrice={priceData.pricePerUnit} />
             )}
             {variant?.itemId ? (
@@ -89,7 +89,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                 />
             )}
 
-            {!isASet && priceData?.pricePerUnit && isDesktop && (
+            {variant?.quantity > 1 && !isASet && priceData?.pricePerUnit && isDesktop && (
                 <PricePerItem currency={currency} basePrice={priceData.pricePerUnit} />
             )}
         </Stack>
