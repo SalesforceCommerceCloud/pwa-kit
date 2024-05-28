@@ -49,10 +49,10 @@ describe('ItemPrice', function () {
         const strikethroughPriceTag = container.querySelector('s')
         expect(within(strikethroughPriceTag).getByText(/£48\.00/i)).toBeInTheDocument()
         // price per item
-        const pricePerItemEls = getAllByText(/£48\.00ea/i)
+        const pricePerItemEls = getAllByText(/£24\.00ea/i)
         // make sure that only one price per item is shown on mobile
         expect(pricePerItemEls).toHaveLength(1)
-        expect(getByText(/£48\.00ea/i)).toBeInTheDocument()
+        expect(getByText(/£24\.00ea/i)).toBeInTheDocument()
     })
 
     test('should display basket prices if variant is for cart page on desktop', () => {
@@ -61,8 +61,8 @@ describe('ItemPrice', function () {
             <MockedComponent variant={cartVariant} />
         )
         // price per item
-        expect(getByText(/£48\.00ea/i)).toBeInTheDocument()
-        const pricePerItemEls = getAllByText(/£48\.00ea/i)
+        expect(getByText(/£24\.00ea/i)).toBeInTheDocument()
+        const pricePerItemEls = getAllByText(/£24\.00ea/i)
         // make sure that only one price per item is shown on mobile
         expect(pricePerItemEls).toHaveLength(1)
 
