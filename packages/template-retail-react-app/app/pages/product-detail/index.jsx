@@ -17,8 +17,7 @@ import {
     useCategory,
     useShopperCustomersMutation,
     useCustomerId,
-    useShopperBasketsMutationHelper,
-    useProductSearch
+    useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -103,25 +102,6 @@ const ProductDetail = () => {
             keepPreviousData: true
         }
     )
-
-    // A workaround for API inconsistency (with getProduct call, a variant does not have productPromotions)
-    const {data: promotionData, isLoading: isPromotionDataLoading} = useProductSearch(
-        {
-            parameters: {
-                q: productId,
-                allVariationProperties: true,
-                expand: ['promotions', 'variations', 'prices'],
-                select: '(hits[0].(productPromotions,variants.(**)))'
-            }
-        },
-        {
-            // Enabled only when shopper has not narrowed down to a variant yet
-            enabled: !urlParams.get('pid')
-        }
-    )
-    if (!isProductLoading && !isPromotionDataLoading) {
-        insertMissingPromotions(product, promotionData)
-    }
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
@@ -497,22 +477,3 @@ ProductDetail.propTypes = {
 }
 
 export default ProductDetail
-
-/**
- * Make sure that the product's variants have promotions, if they're supposed to
- */
-const insertMissingPromotions = (product, promotionData) => {
-    if (!product || !promotionData) return
-
-    const data = promotionData.hits[0]
-    if (product.productPromotions && product.variants && data.variants) {
-        product.variants.forEach((variant, i) => {
-            const matching = variant.productId === data.variants[i].productId
-            const promosDoNotExistYet = !variant.productPromotions
-
-            if (matching && promosDoNotExistYet) {
-                variant.productPromotions = data.variants[i].productPromotions
-            }
-        })
-    }
-}
