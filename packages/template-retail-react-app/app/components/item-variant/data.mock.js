@@ -32,7 +32,7 @@ export const cartVariant = {
     priceAfterOrderDiscount: 0,
     productId: '008884304108M',
     productName: 'Platinum Red Stripes Easy Care Fitted Shirt',
-    quantity: 1,
+    quantity: 2,
     shipmentId: 'me',
     tax: 2.29,
     taxBasis: 48,
@@ -228,7 +228,7 @@ export const cartVariant = {
     pageDescription:
         "Like our solid easy care shirts? Then you'll love our stripes too! This shirt also has built-in stretch for your comfort!",
     pageTitle: 'Platinum Red Stripes Easy Care Fitted Shirt',
-    pricePerUnit: 48,
+    pricePerUnit: 24,
     productPromotions: [
         {
             calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',

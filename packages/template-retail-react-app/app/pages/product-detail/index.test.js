@@ -213,7 +213,6 @@ describe('product set', () => {
         await waitFor(
             () => {
                 const modal = screen.getByTestId('add-to-cart-modal')
-                screen.logTestingPlaygroundURL()
                 expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
                 expect(within(modal).getByText(/Quilted Jacket/i)).toBeInTheDocument()
                 expect(within(modal).getByText(/Pull On Pant/i)).toBeInTheDocument()
