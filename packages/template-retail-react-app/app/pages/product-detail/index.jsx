@@ -108,7 +108,7 @@ const ProductDetail = () => {
     const {data: promotionData, isLoading: isPromotionDataLoading} = useProductSearch(
         {
             parameters: {
-                q: urlParams.get('pid') || productId,
+                q: productId,
                 allVariationProperties: true,
                 expand: ['promotions', 'variations', 'prices'],
                 select: '(hits[0].(productPromotions,variants.(**)))'
@@ -120,7 +120,7 @@ const ProductDetail = () => {
         }
     )
     if (!isProductLoading && !isPromotionDataLoading) {
-        updatePromotions(product, promotionData)
+        insertMissingPromotions(product, promotionData)
     }
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
@@ -501,13 +501,16 @@ export default ProductDetail
 /**
  * Make sure that the product's variants have promotions, if they're supposed to
  */
-const updatePromotions = (product, promotionData) => {
+const insertMissingPromotions = (product, promotionData) => {
     if (!product || !promotionData) return
 
     const data = promotionData.hits[0]
     if (product.productPromotions && product.variants && data.variants) {
         product.variants.forEach((variant, i) => {
-            if (variant.productId === data.variants[i].productId) {
+            const matching = variant.productId === data.variants[i].productId
+            const promosDoNotExistYet = !variant.productPromotions
+
+            if (matching && promosDoNotExistYet) {
                 variant.productPromotions = data.variants[i].productPromotions
             }
         })
