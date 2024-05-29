@@ -7,11 +7,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import {Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Stack,
+    Text,
+    useBreakpointValue
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useItemVariant} from '.'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
-import {useMediaQuery} from '@salesforce/retail-react-app/app/components/shared/ui'
+
 const PricePerItem = ({currency, basePrice}) => {
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>
@@ -40,11 +44,9 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
     const isASet = variant?.type?.set
     const isMaster = variant?.type?.master
     let priceData
-    // this indicates the variant is on cart page
-    // when on cart page, the variant data is merged with basket item info,
-    // it will have price info that takes quantity and different promotions into the account
-    // we should prioritize use these values for display price
-    // and should NOT attempt to re-calculate at all cost here
+    // When variant has basket pricing, we should prioritize these prices for displaying
+    // since they may have take promotion/discount into account
+    // NOTE: try NOT to re-calculate these values since basket-level discount is complicated
     if (variant?.itemId) {
         priceData = {
             currentPrice: priceAfterItemDiscount,
@@ -59,7 +61,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
         // for wishlist page we extract price info from variant/product obj
         priceData = getPriceData(variant)
     }
-    const [isDesktop] = useMediaQuery('(min-width: 992px)')
+    const isDesktop = useBreakpointValue({base: false, lg: true})
     const isOnSale = price > priceAfterItemDiscount || priceData?.isOnSale
     return (
         <Stack
