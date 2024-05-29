@@ -1,9 +1,15 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
-  workflow_dispatch:
-  schedule:
-    # Run every day at 12am (PST) - cron uses UTC times
-    - cron: "0 8 * * *"
+  # PRs from forks trigger `pull_request`, but do NOT have access to secrets.
+  # More info:
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflows-in-forked-repositories-1
+  # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+  # https://docs.github.com/en/actions/managing-workflow-runs/approving-workflow-runs-from-public-forks
+  pull_request: # Default: opened, reopened, synchronize (head branch updated)
+  merge_group: # Trigger GA workflow when a pull request is added to a merge queue.
+  push:
+    branches:
+      - develop
 
 jobs:
   run-generator-demo:
@@ -118,35 +124,8 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
-  notify-slack-pwa-no-ext:
-    needs: [run-generator-retail-app-no-ext]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit no-ext E2E tests passed!"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit no-ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  run-generator-retail-app-ext:
+run-generator-retail-app-ext:
     # Run after the previous job completes irrespective of its result
     if: ${{ always() }}
     needs: [run-generator-retail-app-no-ext]
@@ -216,35 +195,11 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
 
-  notify-slack-pwa-ext:
     needs: [run-generator-retail-app-ext]
     if: ${{ always() }}
     runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit ext E2E tests passed!"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  run-generator-private-client:
+run-generator-private-client:
     strategy:
       fail-fast: false
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
@@ -308,32 +263,3 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
-
-  notify-slack-pwa-private-client:
-    needs: [run-generator-private-client]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit Private Client E2E tests passed!"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit Private Client E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
