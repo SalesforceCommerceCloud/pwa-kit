@@ -124,8 +124,7 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
-
-run-generator-retail-app-ext:
+  run-generator-retail-app-ext:
     # Run after the previous job completes irrespective of its result
     if: ${{ always() }}
     needs: [run-generator-retail-app-no-ext]
@@ -198,8 +197,7 @@ run-generator-retail-app-ext:
     needs: [run-generator-retail-app-ext]
     if: ${{ always() }}
     runs-on: ubuntu-latest
-
-run-generator-private-client:
+  run-generator-private-client:
     strategy:
       fail-fast: false
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
