@@ -194,9 +194,6 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
 
-    needs: [run-generator-retail-app-ext]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
   run-generator-private-client:
     strategy:
       fail-fast: false
