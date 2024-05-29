@@ -50,7 +50,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
     if (variant?.itemId) {
         priceData = {
             currentPrice: priceAfterItemDiscount,
-            listPrice: price,
+            listPrice: undefined,
             pricePerUnit: variant?.pricePerUnit,
             isASet,
             isMaster,
@@ -66,7 +66,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
     return (
         <Stack
             textAlign={align}
-            direction={isOnSale ? 'column' : {base: baseDirection, lg: 'row'}}
+            direction="column"
             justifyContent={align === 'left' ? 'flex-start' : 'flex-end'}
             alignItems="baseline"
             spacing={isOnSale ? 0 : 1}
