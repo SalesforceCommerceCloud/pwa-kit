@@ -47,4 +47,11 @@ describe('on product detail page', () => {
         const promoCallout = screen.getByTestId('promo-callout')
         expect(promoCallout).toHaveTextContent('Buy one Long Center Seam Skirt and get 2 tops')
     })
+
+    test('API inconsistency: a product that should have a promotional price in its variants, but it does not', () => {
+        renderWithProviders(<PromoCallout product={getProduct.rollSleeveBlouseMaster} />)
+        const promoCallout = screen.getByTestId('promo-callout')
+        expect(promoCallout).toHaveTextContent('Buy one Long Center Seam Skirt and get 2 tops') // unexpectedly render the first promo's callout
+        // Once fixed, the API should return a promotional price, along with the callout "10$ Off roll sleeve blouse"
+    })
 })
