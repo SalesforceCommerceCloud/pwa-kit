@@ -9,8 +9,10 @@ const { exec } = require("child_process");
 const { isPrompt } = require("./utils.js");
 
 const runGeneratorWithResponses = (cmd, cliResponses = []) => {
+  console.log("runGeneratorWithResponses");
   const child = exec(cmd);
   return new Promise((resolve, reject) => {
+    console.log("promise");
     let expectedPrompt, response;
     if (cliResponses && cliResponses.length) {
       ({ expectedPrompt, response } = cliResponses.shift());
@@ -18,6 +20,7 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
     let isGenratorRunning = false;
 
     child.stdout.on("data", (data) => {
+      console.log("data");
       console.log(data);
       if (isPrompt(data, /Running the generator/i)) {
         isGenratorRunning = true;
@@ -32,6 +35,8 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
     });
 
     child.stderr.on("data", (err) => {
+      console.log("error");
+      console.log(err);
       // Lerna warnings are also seen as errors but we want to continue in those cases
       // We exit the process if something breaks after the generator is actually running.
       if (isGenratorRunning) {
