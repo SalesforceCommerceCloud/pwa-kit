@@ -8,8 +8,7 @@ import React from 'react'
 import {fireEvent, screen, waitFor, within} from '@testing-library/react'
 import {
     mockCustomerBaskets,
-    mockedCustomerProductLists,
-    productsResponse
+    mockedCustomerProductLists
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
