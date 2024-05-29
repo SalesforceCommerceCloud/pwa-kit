@@ -18,6 +18,7 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
     let isGenratorRunning = false;
 
     child.stdout.on("data", (data) => {
+      console.log(data);
       if (isPrompt(data, /Running the generator/i)) {
         isGenratorRunning = true;
         return;
