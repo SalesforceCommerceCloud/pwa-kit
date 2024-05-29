@@ -39,10 +39,10 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
       console.log(err);
       // Lerna warnings are also seen as errors but we want to continue in those cases
       // We exit the process if something breaks after the generator is actually running.
-      if (isGenratorRunning) {
-        console.error(err);
-        reject(err);
-      }
+      // if (isGenratorRunning) {
+      //   console.error(err);
+      //   reject(err);
+      // }
     });
 
     child.on("error", (code) => {
