@@ -739,6 +739,87 @@ export const productSearch = {
                 ]
             }
         ]
+    },
+
+    winterLook: {
+        currency: 'GBP',
+        hitType: 'set',
+        image: {
+            alt: 'Winter Look, , large',
+            disBaseLink:
+                'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1c4cd52/images/large/PG.10205921.JJ5FUXX.PZ.jpg',
+            link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1c4cd52/images/large/PG.10205921.JJ5FUXX.PZ.jpg',
+            title: 'Winter Look, '
+        },
+        imageGroups: [
+            {
+                images: [
+                    {
+                        alt: 'Winter Look, , large',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1c4cd52/images/large/PG.10205921.JJ5FUXX.PZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1c4cd52/images/large/PG.10205921.JJ5FUXX.PZ.jpg',
+                        title: 'Winter Look, '
+                    }
+                ],
+                viewType: 'large'
+            },
+            {
+                images: [
+                    {
+                        alt: 'Winter Look, , medium',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07f25517/images/medium/PG.10205921.JJ5FUXX.PZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw07f25517/images/medium/PG.10205921.JJ5FUXX.PZ.jpg',
+                        title: 'Winter Look, '
+                    }
+                ],
+                viewType: 'medium'
+            },
+            {
+                images: [
+                    {
+                        alt: 'Winter Look, , small',
+                        disBaseLink:
+                            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwab300645/images/small/PG.10205921.JJ5FUXX.PZ.jpg',
+                        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwab300645/images/small/PG.10205921.JJ5FUXX.PZ.jpg',
+                        title: 'Winter Look, '
+                    }
+                ],
+                viewType: 'small'
+            }
+        ],
+        orderable: true,
+        price: 44.16,
+        priceMax: 71.03,
+        pricePerUnit: 44.16,
+        pricePerUnitMax: 71.03,
+        priceRanges: [
+            {
+                maxPrice: 101.76,
+                minPrice: 44.16,
+                pricebook: 'gbp-m-list-prices'
+            },
+            {
+                maxPrice: 71.03,
+                minPrice: 44.16,
+                pricebook: 'gbp-m-sale-prices'
+            }
+        ],
+        productId: 'winter-lookM',
+        productName: 'Winter Look',
+        productType: {
+            set: true
+        },
+        representedProduct: {
+            id: '701642853695M',
+            c_color: 'JJ5FUXX',
+            c_isNewtest: true,
+            c_isSale: true,
+            c_refinementColor: 'blue',
+            c_size: '9LG',
+            c_width: 'Z'
+        }
     }
 }
 
