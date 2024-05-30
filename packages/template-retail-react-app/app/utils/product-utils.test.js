@@ -23,6 +23,7 @@ import {
     getProduct
 } from '@salesforce/retail-react-app/app/components/product-tile/promo-callout.mock'
 import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+import {mockProductSearch} from '@salesforce/retail-react-app/app/mocks/mock-data'
 
 const imageGroups = [
     {
@@ -861,6 +862,14 @@ describe('findLowestPrice', function () {
     test('returned `data` is either a single variant or a product', () => {
         const result = findLowestPrice(productSearch.rollSleeveBlouse)
         expect(Array.isArray(result.data)).toBe(false)
+    })
+    test('master product that does not have variants', () => {
+        // It's possible that the API data for this master product to not have variants.
+        // The API request needs to include allVariationProperties=true
+        const product = mockProductSearch.hits[0]
+        const result = findLowestPrice(product)
+        expect(result.minPrice).toBe(product.price)
+        expect(result.data).toBe(product)
     })
     // NOTE: we won't test the returned `minPrice`, since the price is already covered indirectly via testing of getPriceData
 })
