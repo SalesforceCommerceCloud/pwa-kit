@@ -15,6 +15,7 @@ const {
 const GUEST_USER_CREDENTIALS = generateUserCredentials();
 
 test("Guest shopper can checkout items as guest", async ({ page }) => {
+  // Home page
   await page.goto(config.RETAIL_APP_HOME);
 
   await page.getByLabel("Menu", { exact: true }).click();
@@ -37,8 +38,10 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
 
+  // PLP
   await page.getByRole("link", { name: /Stripe Shell/i }).click();
 
+  // PDP
   await expect(
     page.getByRole("heading", { name: /Stripe Shell/i })
   ).toBeVisible();
@@ -62,12 +65,14 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await page.getByLabel("Close").click();
 
+  // Cart
   await page.getByLabel(/My cart/i).click();
 
   await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
 
+  // Check out
   await expect(
     page.getByRole("heading", { name: /Contact Info/i })
   ).toBeVisible();
@@ -141,6 +146,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     .first()
     .click();
 
+  // Order confirmation
   const orderConfirmationHeading = page.getByRole("heading", {
     name: /Thank you for your order!/i,
   });

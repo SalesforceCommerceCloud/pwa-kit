@@ -15,31 +15,40 @@ const {
 const GUEST_USER_CREDENTIALS = generateUserCredentials();
 
 test("Guest shopper can checkout items as guest", async ({ page }) => {
+  // home page
   await page.goto(config.RETAIL_APP_HOME);
 
   await page.getByRole("link", { name: "Womens" }).hover();
+  const topsNav = await page.getByRole("link", { name: "Tops", exact: true });
+  await expect(topsNav).toBeVisible();
 
-  await page.getByRole("link", { name: "Tops" }).click();
-
-  await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
-
-  await page.getByRole("link", { name: /Stripe Shell/i }).click();
-
+  await topsNav.click();
+  // PLP
+  const cableKnitShell = await page.getByRole("link", {
+    name: /Cable Knit Shell/i,
+  });
+  // selecting swatch
+  const initialImgEl = await cableKnitShell.locator("img");
+  const initialSrc = await initialImgEl.getAttribute("src");
+  await cableKnitShell.getByLabel(/Ivory/, { exact: true }).hover();
+  const changedImgEl = await cableKnitShell.locator("img");
+  const changeImgSrc = await changedImgEl.getAttribute("src");
+  expect(changeImgSrc).not.toBe(initialSrc);
+  await cableKnitShell.click();
+  // PDP
   await expect(
-    page.getByRole("heading", { name: /Stripe Shell/i })
+    page.getByRole("heading", { name: /Cable Knit Shell/i })
   ).toBeVisible();
-
   await page.getByRole("radio", { name: "L", exact: true }).click();
 
   await page.locator("button[data-testid='quantity-increment']").click();
 
-  // Selected Size and Color texts are broken into multiple elements on the page.
-  // So we need to look at the page URL to verify selected variants
+  // // Selected Size and Color texts are broken into multiple elements on the page.
+  // // So we need to look at the page URL to verify selected variants
   const updatedPageURL = await page.url();
   const params = updatedPageURL.split("?")[1];
   expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ5YPA7/i);
-
+  expect(params).toMatch(/color=JJ5AAXX/i);
   await page.getByRole("button", { name: /Add to Cart/i }).click();
 
   const addedToCartModal = page.getByText(/2 items added to cart/i);
@@ -47,13 +56,16 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   await addedToCartModal.waitFor();
 
   await page.getByLabel("Close").click();
-
+  // cart
   await page.getByLabel(/My cart/i).click();
 
-  await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Cable Knit Shell/i })
+  ).toBeVisible();
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
 
+  // checkout
   await expect(
     page.getByRole("heading", { name: /Contact Info/i })
   ).toBeVisible();
@@ -123,6 +135,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     .first()
     .click();
 
+  // order confirmation
   const orderConfirmationHeading = page.getByRole("heading", {
     name: /Thank you for your order!/i,
   });
@@ -132,5 +145,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     page.getByRole("heading", { name: /Order Summary/i })
   ).toBeVisible();
   await expect(page.getByText(/2 Items/i)).toBeVisible();
-  await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Cable Knit Shell/i })
+  ).toBeVisible();
 });
