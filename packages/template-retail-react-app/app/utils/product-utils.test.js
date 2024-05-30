@@ -22,6 +22,7 @@ import {
     productSearch,
     getProduct
 } from '@salesforce/retail-react-app/app/components/product-tile/promo-callout.mock'
+import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 
 const imageGroups = [
     {
@@ -889,5 +890,14 @@ describe('findLowestPrice - confirm API inconsistency', () => {
         expect(result.promotion).toBeNull()
         // The API response does not include the promotional price.. only the callout message.
         // Once fixed, it's supposed to return the promo price of 43.99
+    })
+
+    test("product set's children do not have promotional price", () => {
+        const childItem = productSetWinterLookM.setProducts[0]
+        const result = findLowestPrice(childItem)
+        expect(result.minPrice).toBe(71.03) // unexpected
+        expect(result.promotion).toBeNull()
+        // The API response does not include the promotional price.. only the callout message.
+        // Once fixed, it's supposed to return the promo price of 61.03
     })
 })
