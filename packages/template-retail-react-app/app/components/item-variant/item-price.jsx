@@ -50,7 +50,8 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
     if (variant?.itemId) {
         priceData = {
             currentPrice: priceAfterItemDiscount,
-            listPrice: undefined,
+            // we don't want to show strikethrough price for cart since listPrice is not available via basket pricing
+            listPrice: null,
             pricePerUnit: variant?.pricePerUnit,
             isASet,
             isMaster,
@@ -62,20 +63,20 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
         priceData = getPriceData(variant)
     }
     const isDesktop = useBreakpointValue({base: false, lg: true})
-    const isOnSale = price > priceAfterItemDiscount || priceData?.isOnSale
     return (
         <Stack
             textAlign={align}
-            direction="column"
+            direction={baseDirection}
             justifyContent={align === 'left' ? 'flex-start' : 'flex-end'}
             alignItems="baseline"
-            spacing={isOnSale ? 0 : 1}
+            spacing={priceData?.isOnSale ? 0 : 1}
             wrap="nowrap"
             {...props}
         >
-            {variant?.quantity > 1 && !isASet && priceData?.pricePerUnit && !isDesktop && (
+            {!isDesktop && variant?.quantity > 1 && !isASet && priceData?.pricePerUnit && (
                 <PricePerItem currency={currency} basePrice={priceData.pricePerUnit} />
             )}
+
             {variant?.itemId ? (
                 <DisplayPrice
                     currency={currency}
@@ -91,7 +92,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                 />
             )}
 
-            {variant?.quantity > 1 && !isASet && priceData?.pricePerUnit && isDesktop && (
+            {isDesktop && variant?.quantity > 1 && !isASet && priceData?.pricePerUnit && (
                 <PricePerItem currency={currency} basePrice={priceData.pricePerUnit} />
             )}
         </Stack>
