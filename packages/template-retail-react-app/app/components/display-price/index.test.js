@@ -15,6 +15,7 @@ describe('DisplayPrice', function () {
     const data = {
         currentPrice: 90,
         listPrice: 100,
+        pricePerUnit: 90,
         isASet: false,
         isOnSale: true,
         isMaster: true,
@@ -32,6 +33,18 @@ describe('DisplayPrice', function () {
         const strikethroughPriceTag = container.querySelectorAll('s')
         expect(within(currentPriceTag[0]).getByText(/£90\.00/i)).toBeDefined()
         expect(within(strikethroughPriceTag[0]).getByText(/£100\.00/i)).toBeDefined()
+        expect(currentPriceTag).toHaveLength(1)
+        expect(strikethroughPriceTag).toHaveLength(1)
+    })
+
+    test('should display price according to quantity', () => {
+        const {container} = renderWithProviders(
+            <DisplayPrice currency="GBP" priceData={data} quantity={2} />
+        )
+        const currentPriceTag = container.querySelectorAll('b')
+        const strikethroughPriceTag = container.querySelectorAll('s')
+        expect(within(currentPriceTag[0]).getByText(/£180\.00/i)).toBeDefined()
+        expect(within(strikethroughPriceTag[0]).getByText(/£200\.00/i)).toBeDefined()
         expect(currentPriceTag).toHaveLength(1)
         expect(strikethroughPriceTag).toHaveLength(1)
     })

@@ -80,6 +80,7 @@ export const getPriceData = (product, opts = {}) => {
     return {
         currentPrice,
         listPrice,
+        pricePerUnit: product?.pricePerUnit,
         isOnSale: currentPrice < listPrice,
         isASet,
         isMaster,
