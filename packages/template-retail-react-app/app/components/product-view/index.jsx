@@ -55,7 +55,9 @@ const ProductViewHeader = ({name, currency, priceData, category, product}) => {
             </Skeleton>
 
             <Skeleton isLoaded={priceData?.currentPrice}>
-                <DisplayPrice priceData={priceData} currency={currency} />
+                {priceData?.currentPrice && (
+                    <DisplayPrice priceData={priceData} currency={currency} />
+                )}
             </Skeleton>
 
             <Skeleton isLoaded={product}>
@@ -69,16 +71,7 @@ ProductViewHeader.propTypes = {
     name: PropTypes.string,
     currency: PropTypes.string,
     category: PropTypes.array,
-    priceData: PropTypes.shape({
-        currentPrice: PropTypes.number.isRequired,
-        isOnSale: PropTypes.bool.isRequired,
-        listPrice: PropTypes.number,
-        isASet: PropTypes.bool,
-        isMaster: PropTypes.bool,
-        isRange: PropTypes.bool,
-        maxPrice: PropTypes.number,
-        tieredPrice: PropTypes.number
-    }),
+    priceData: PropTypes.object,
     product: PropTypes.object
 }
 
@@ -302,10 +295,10 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
+                        product={product}
                         priceData={priceData}
                         currency={product?.currency || activeCurrency}
                         category={category}
-                        product={product}
                     />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
@@ -342,10 +335,10 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
+                                product={product}
                                 priceData={priceData}
                                 currency={product?.currency || activeCurrency}
                                 category={category}
-                                product={product}
                             />
                         </Box>
                         <VStack align="stretch" spacing={4}>

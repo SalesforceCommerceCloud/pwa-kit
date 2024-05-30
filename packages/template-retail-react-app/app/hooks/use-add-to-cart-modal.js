@@ -168,6 +168,7 @@ export const AddToCartModal = () => {
                                         <Box flex="none" alignSelf="flex-end" fontWeight="600">
                                             <DisplayPrice
                                                 priceData={priceData}
+                                                quantity={quantity}
                                                 currency={currency}
                                             />
                                         </Box>

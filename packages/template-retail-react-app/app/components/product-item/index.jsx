@@ -25,7 +25,7 @@ import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Hooks
-import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -45,6 +45,8 @@ const ProductItem = ({
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
+    const {currency: activeCurrency} = useCurrency()
+
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>
@@ -58,7 +60,10 @@ const ProductItem = ({
                                 <CartItemVariantAttributes />
                                 <HideOnDesktop>
                                     <Box marginTop={2}>
-                                        <CartItemVariantPrice align="left" />
+                                        <CartItemVariantPrice
+                                            align="left"
+                                            currency={activeCurrency}
+                                        />
                                     </Box>
                                 </HideOnDesktop>
                             </Stack>
@@ -102,7 +107,7 @@ const ProductItem = ({
                                 </Stack>
                                 <Stack>
                                     <HideOnMobile>
-                                        <CartItemVariantPrice />
+                                        <CartItemVariantPrice currency={activeCurrency} />
                                     </HideOnMobile>
                                     <Box display={['none', 'block', 'block', 'block']}>
                                         {primaryAction}

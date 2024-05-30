@@ -89,7 +89,10 @@ const CartItems = ({basket}) => {
                                         <Stack width="full" spacing={1} marginTop="-3px">
                                             <CartItemVariantName />
                                             <CartItemVariantAttributes includeQuantity />
-                                            <CartItemVariantPrice baseDirection="row" />
+                                            <CartItemVariantPrice
+                                                baseDirection="row"
+                                                currency={basket?.currency}
+                                            />
                                         </Stack>
                                     </Flex>
                                 </ItemVariantProvider>
