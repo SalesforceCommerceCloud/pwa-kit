@@ -4,6 +4,7 @@
 
 - Product Tile Revamp
   - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760) 
+  - Display pricing for cart, checkout and wishlist page [#1796](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1796) 
 
 ### Performance improvements
 
