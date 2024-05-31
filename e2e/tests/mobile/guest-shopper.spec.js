@@ -45,9 +45,12 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   // selecting swatch
   const initialImgEl = await cableKnitShell.locator("img");
   const initialSrc = await initialImgEl.getAttribute("src");
+  await expect(cableKnitShell.getByText(/From £44\.16/i)).toBeVisible();
+
   await cableKnitShell.getByLabel(/Ivory/, { exact: true }).click();
   const changedImgEl = await cableKnitShell.locator("img");
   const changeImgSrc = await changedImgEl.getAttribute("src");
+  await expect(cableKnitShell.getByText(/From £44\.16/i)).toBeVisible();
   expect(changeImgSrc).not.toBe(initialSrc);
   await cableKnitShell.click();
 
