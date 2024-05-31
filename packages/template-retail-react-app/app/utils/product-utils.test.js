@@ -18,7 +18,12 @@ import {
     mockProductSetHit,
     mockStandardProductHit
 } from '@salesforce/retail-react-app/app/mocks/product-search-hit-data'
-import {productSearch} from '@salesforce/retail-react-app/app/components/product-tile/promo-callout.mock'
+import {
+    productSearch,
+    getProduct
+} from '@salesforce/retail-react-app/app/components/product-tile/promo-callout.mock'
+import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+import {mockProductSearch} from '@salesforce/retail-react-app/app/mocks/mock-data'
 
 const imageGroups = [
     {
@@ -863,5 +868,50 @@ describe('findLowestPrice', function () {
         const result = findLowestPrice(productSearch.rollSleeveBlouse)
         expect(Array.isArray(result.data)).toBe(false)
     })
+    test('master product that does not have variants', () => {
+        // It's possible that the API data for this master product to not have variants.
+        // The API request needs to include allVariationProperties=true
+        const product = mockProductSearch.hits[0]
+        const result = findLowestPrice(product)
+        expect(result.minPrice).toBe(product.price)
+        expect(result.data).toBe(product)
+    })
     // NOTE: we won't test the returned `minPrice`, since the price is already covered indirectly via testing of getPriceData
+})
+
+describe('findLowestPrice - confirm API inconsistency', () => {
+    test('getProduct call for a master type', () => {
+        const result = findLowestPrice(getProduct.rollSleeveBlouseMaster)
+        expect(result.minPrice).toBe(44.16) // unexpected
+        expect(result.promotion).toBeNull()
+        // The API response does not include productPromotions in the variants.
+        // Once fixed, the API is supposed to return 34.16, which is a promotional price.
+    })
+    test('getProduct call for a variant type', () => {
+        const result = findLowestPrice(getProduct.rollSleeveBlouseVariant)
+        expect(result.minPrice).toBe(34.16)
+        expect(result.promotion).toBeDefined()
+    })
+
+    test('standard product with getProduct call', () => {
+        const result = findLowestPrice(getProduct.uprightCase)
+        expect(result.minPrice).toBe(43.99)
+        expect(result.promotion).toBeDefined()
+    })
+    test('standard product with productSearch call', () => {
+        const result = findLowestPrice(productSearch.uprightCase)
+        expect(result.minPrice).toBe(63.99) // unexpected
+        expect(result.promotion).toBeNull()
+        // The API response does not include the promotional price.. only the callout message.
+        // Once fixed, it's supposed to return the promo price of 43.99
+    })
+
+    test("product set's children do not have promotional price", () => {
+        const childItem = productSetWinterLookM.setProducts[0]
+        const result = findLowestPrice(childItem)
+        expect(result.minPrice).toBe(71.03) // unexpected
+        expect(result.promotion).toBeNull()
+        // The API response does not include the promotional price.. only the callout message.
+        // Once fixed, it's supposed to return the promo price of 61.03
+    })
 })

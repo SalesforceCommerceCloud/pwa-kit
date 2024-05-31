@@ -53,6 +53,18 @@ export default {
     priceMax: 71.03,
     pricePerUnit: 44.16,
     pricePerUnitMax: 71.03,
+    priceRanges: [
+        {
+            maxPrice: 101.76,
+            minPrice: 44.16,
+            pricebook: 'gbp-m-list-prices'
+        },
+        {
+            maxPrice: 71.03,
+            minPrice: 44.16,
+            pricebook: 'gbp-m-sale-prices'
+        }
+    ],
     primaryCategoryId: 'womens-outfits',
     setProducts: [
         {
@@ -227,12 +239,12 @@ export default {
                 }
             ],
             inventory: {
-                ats: 400,
+                ats: 365,
                 backorderable: false,
                 id: 'inventory_m',
                 orderable: true,
                 preorderable: false,
-                stockLevel: 400
+                stockLevel: 365
             },
             longDescription:
                 'A classic quilted car coat looks new again.  Add a great Commerce Cloud Store top for a perfect look.',
@@ -248,21 +260,23 @@ export default {
             pageTitle: 'Quilted Jacket',
             price: 71.03,
             pricePerUnit: 71.03,
-            primaryCategoryId: 'womens-clothing-jackets',
-            recommendations: [
+            priceRanges: [
                 {
-                    recommendationType: {
-                        displayValue: 'Product Detail Page - Cross Sell',
-                        value: 1
-                    },
-                    recommendedItemId: '22951021M'
+                    maxPrice: 101.76,
+                    minPrice: 101.76,
+                    pricebook: 'gbp-m-list-prices'
                 },
                 {
-                    recommendationType: {
-                        displayValue: 'Product Detail Page - Cross Sell',
-                        value: 1
-                    },
-                    recommendedItemId: '25518397M'
+                    maxPrice: 71.03,
+                    minPrice: 71.03,
+                    pricebook: 'gbp-m-sale-prices'
+                }
+            ],
+            primaryCategoryId: 'womens-clothing-jackets',
+            productPromotions: [
+                {
+                    calloutMsg: '$10 off product set',
+                    promotionId: '$10 off product set'
                 }
             ],
             shortDescription:
@@ -279,6 +293,18 @@ export default {
                     orderable: true,
                     price: 71.03,
                     productId: '701642853695M',
+                    tieredPrices: [
+                        {
+                            price: 101.76,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 71.03,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'JJ5FUXX',
                         size: '9LG'
@@ -288,6 +314,18 @@ export default {
                     orderable: true,
                     price: 71.03,
                     productId: '701642853718M',
+                    tieredPrices: [
+                        {
+                            price: 101.76,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 71.03,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'JJ5FUXX',
                         size: '9SM'
@@ -297,6 +335,18 @@ export default {
                     orderable: true,
                     price: 71.03,
                     productId: '701642853725M',
+                    tieredPrices: [
+                        {
+                            price: 101.76,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 71.03,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'JJ5FUXX',
                         size: '9XL'
@@ -306,6 +356,18 @@ export default {
                     orderable: true,
                     price: 71.03,
                     productId: '701642853701M',
+                    tieredPrices: [
+                        {
+                            price: 101.76,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 71.03,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'JJ5FUXX',
                         size: '9MD'
@@ -526,12 +588,12 @@ export default {
                 }
             ],
             inventory: {
-                ats: 500,
+                ats: 480,
                 backorderable: false,
                 id: 'inventory_m',
                 orderable: true,
                 preorderable: false,
-                stockLevel: 500
+                stockLevel: 480
             },
             longDescription:
                 'Meet a Commerce Cloud Store new wardrobe favorite - a knit pant that works perfectly 12 months a year!',
@@ -547,7 +609,25 @@ export default {
             pageTitle: 'Pull On Pant',
             price: 44.16,
             pricePerUnit: 44.16,
+            priceRanges: [
+                {
+                    maxPrice: 44.16,
+                    minPrice: 44.16,
+                    pricebook: 'gbp-m-list-prices'
+                },
+                {
+                    maxPrice: 44.16,
+                    minPrice: 44.16,
+                    pricebook: 'gbp-m-sale-prices'
+                }
+            ],
             primaryCategoryId: 'womens-clothing-bottoms',
+            productPromotions: [
+                {
+                    calloutMsg: '$10 off product set',
+                    promotionId: '$10 off product set'
+                }
+            ],
             shortDescription:
                 'Meet a Commerce Cloud Store new wardrobe favorite - a knit pant that works perfectly 12 months a year!',
             stepQuantity: 1,
@@ -562,6 +642,18 @@ export default {
                     orderable: true,
                     price: 44.16,
                     productId: '701642867098M',
+                    tieredPrices: [
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'JJ2XNXX',
                         size: '9LG'
@@ -571,6 +663,18 @@ export default {
                     orderable: true,
                     price: 44.16,
                     productId: '701642867111M',
+                    tieredPrices: [
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'JJ2XNXX',
                         size: '9SM'
@@ -580,6 +684,18 @@ export default {
                     orderable: true,
                     price: 44.16,
                     productId: '701642867104M',
+                    tieredPrices: [
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'JJ2XNXX',
                         size: '9MD'
@@ -589,6 +705,18 @@ export default {
                     orderable: true,
                     price: 44.16,
                     productId: '701642867128M',
+                    tieredPrices: [
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'JJ2XNXX',
                         size: '9XL'
@@ -598,6 +726,18 @@ export default {
                     orderable: true,
                     price: 44.16,
                     productId: '701642867135M',
+                    tieredPrices: [
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 44.16,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'JJ2XNXX',
                         size: '9XS'
@@ -931,12 +1071,12 @@ export default {
                 }
             ],
             inventory: {
-                ats: 1498,
+                ats: 1438,
                 backorderable: false,
                 id: 'inventory_m',
                 orderable: true,
                 preorderable: false,
-                stockLevel: 1498
+                stockLevel: 1438
             },
             longDescription: 'The perfect pump for any outfit!',
             master: {
@@ -950,21 +1090,23 @@ export default {
             pageTitle: 'Zerrick',
             price: 63.36,
             pricePerUnit: 63.36,
-            primaryCategoryId: 'womens-accessories-shoes',
-            recommendations: [
+            priceRanges: [
                 {
-                    recommendationType: {
-                        displayValue: 'Product Detail Page - Cross Sell',
-                        value: 1
-                    },
-                    recommendedItemId: '25593254M'
+                    maxPrice: 63.36,
+                    minPrice: 63.36,
+                    pricebook: 'gbp-m-list-prices'
                 },
                 {
-                    recommendationType: {
-                        displayValue: 'Product Detail Page - Cross Sell',
-                        value: 1
-                    },
-                    recommendedItemId: '25720050M'
+                    maxPrice: 63.36,
+                    minPrice: 63.36,
+                    pricebook: 'gbp-m-sale-prices'
+                }
+            ],
+            primaryCategoryId: 'womens-accessories-shoes',
+            productPromotions: [
+                {
+                    calloutMsg: '$10 off product set',
+                    promotionId: '$10 off product set'
                 }
             ],
             shortDescription: 'The perfect pump for any outfit!',
@@ -980,6 +1122,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357357531M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'BLACKLE',
                         size: '065',
@@ -990,6 +1144,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357358095M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'TAUPETX',
                         size: '065',
@@ -1000,6 +1166,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357357623M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'BLACKLE',
                         size: '110',
@@ -1010,6 +1188,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357357609M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'BLACKLE',
                         size: '100',
@@ -1020,6 +1210,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357358156M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'TAUPETX',
                         size: '095',
@@ -1030,6 +1232,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357358132M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'TAUPETX',
                         size: '085',
@@ -1040,6 +1254,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357358101M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'TAUPETX',
                         size: '070',
@@ -1050,6 +1276,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357357562M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'BLACKLE',
                         size: '080',
@@ -1060,6 +1298,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357357548M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'BLACKLE',
                         size: '070',
@@ -1070,6 +1320,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357358187M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'TAUPETX',
                         size: '110',
@@ -1080,6 +1342,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357357593M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'BLACKLE',
                         size: '095',
@@ -1090,6 +1364,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357357555M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'BLACKLE',
                         size: '075',
@@ -1100,6 +1386,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357357524M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'BLACKLE',
                         size: '060',
@@ -1110,6 +1408,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357358149M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'TAUPETX',
                         size: '090',
@@ -1120,6 +1430,18 @@ export default {
                     orderable: true,
                     price: 63.36,
                     productId: '740357358088M',
+                    tieredPrices: [
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-list-prices',
+                            quantity: 1
+                        },
+                        {
+                            price: 63.36,
+                            pricebook: 'gbp-m-sale-prices',
+                            quantity: 1
+                        }
+                    ],
                     variationValues: {
                         color: 'TAUPETX',
                         size: '060',
