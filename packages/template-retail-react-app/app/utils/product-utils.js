@@ -176,7 +176,7 @@ export const findLowestPrice = (product) => {
     const isMaster = product.productType?.master || product.type?.master
     if (isMaster && !product.variants) {
         console.warn(
-            'Expecting `product.variants` to exist. For more accuracy, please tweak your API request to include allVariationProperties=true'
+            'Expecting `product.variants` to exist. For more accuracy, please tweak your API request to ask for the variants details.'
         )
     }
     const array = isMaster && product.variants ? product.variants : [product]
