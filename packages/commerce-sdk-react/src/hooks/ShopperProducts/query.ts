@@ -33,7 +33,7 @@ export const useProducts = (
     type Data = DataType<Client['getProducts']>
     const {shopperProducts: client} = useCommerceApi()
     const methodName = 'getProducts'
-    const requiredParameters = ['organizationId', 'ids', 'siteId'] as const
+    const requiredParameters = paramKeysMap[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
@@ -72,7 +72,7 @@ export const useProduct = (
     type Data = DataType<Client['getProduct']>
     const {shopperProducts: client} = useCommerceApi()
     const methodName = 'getProduct'
-    const requiredParameters = ['organizationId', 'id', 'siteId'] as const
+    const requiredParameters = paramKeysMap[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
@@ -111,7 +111,7 @@ export const useCategories = (
     type Data = DataType<Client['getCategories']>
     const {shopperProducts: client} = useCommerceApi()
     const methodName = 'getCategories'
-    const requiredParameters = ['organizationId', 'ids', 'siteId'] as const
+    const requiredParameters = paramKeysMap[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
@@ -152,7 +152,7 @@ export const useCategory = (
     type Data = DataType<Client['getCategory']>
     const {shopperProducts: client} = useCommerceApi()
     const methodName = 'getCategory'
-    const requiredParameters = ['organizationId', 'id', 'siteId'] as const
+    const requiredParameters = paramKeysMap[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
