@@ -57,6 +57,9 @@ const Home = () => {
                 <li>
                     <Link to="/context">useShopperContext & useShopperContextsMutation</Link>
                 </li>
+                <li>
+                    <Link to="/stores">useShopperStores</Link>
+                </li>
             </ul>
 
             <h2>Miscellaneous</h2>
@@ -66,6 +69,9 @@ const Home = () => {
                 </li>
                 <li>
                     <Link to="/customerId">useCustomerId</Link>
+                </li>
+                <li>
+                    <Link to="/custom-endpoint">useCustomQuery</Link>
                 </li>
             </ul>
         </>
