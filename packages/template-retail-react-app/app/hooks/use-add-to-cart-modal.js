@@ -85,7 +85,7 @@ export const AddToCartModal = () => {
                 containerProps={{'data-testid': 'add-to-cart-modal'}}
             >
                 <ModalHeader paddingY="8" bgColor="white">
-                    <Heading as="h1" fontSize="24px">
+                    <Heading as="h1" fontSize="2xl">
                         {intl.formatMessage(
                             {
                                 defaultMessage:
@@ -147,8 +147,9 @@ export const AddToCartModal = () => {
                                             <Box>
                                                 <Heading
                                                     as="h2"
-                                                    fontSize="16px"
-                                                    fontWeight="semibold"
+                                                    fontSize="md"
+                                                    fontFamily="body"
+                                                    fontWeight="700"
                                                 >
                                                     {product.name}
                                                 </Heading>
