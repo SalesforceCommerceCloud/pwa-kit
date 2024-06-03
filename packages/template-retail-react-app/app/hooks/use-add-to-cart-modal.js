@@ -145,7 +145,13 @@ export const AddToCartModal = () => {
                                             </Box>
 
                                             <Box>
-                                                <Heading as="h2" fontSize="16px" fontWeight="semibold">{product.name}</Heading>
+                                                <Heading
+                                                    as="h2"
+                                                    fontSize="16px"
+                                                    fontWeight="semibold"
+                                                >
+                                                    {product.name}
+                                                </Heading>
                                                 <Box
                                                     color="gray.600"
                                                     fontSize="sm"
