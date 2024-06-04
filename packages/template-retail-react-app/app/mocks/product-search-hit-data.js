@@ -348,7 +348,14 @@ const mockProductSearchItem = {
         }
     ],
     price: 299.99,
+    productId: '25686571M',
     productName: 'Charcoal Single Pleat Wool Suit',
+    productPromotions: [
+        {
+            calloutMsg: '25% off.',
+            promotionId: 'PromotionTest'
+        }
+    ],
     representedProduct: {
         id: '750518894461M'
     },
@@ -377,6 +384,13 @@ const mockProductSearchItem = {
         {
             price: 191.99,
             productId: '750518548272M',
+            productPromotions: [
+                {
+                    calloutMsg: '25% off.',
+                    promotionalPrice: 143.99,
+                    promotionId: 'PromotionTest'
+                }
+            ],
             tieredPrices: [
                 {
                     price: 320,
@@ -690,430 +704,631 @@ const mockMasterProductHitWithMultipleVariants = {
     currency: 'GBP',
     hitType: 'master',
     image: {
-        alt: 'Black Single Pleat Athletic Fit Wool Suit - Edit, , large',
+        alt: 'Long Sleeve Embellished Boat Neck Top, , large',
         disBaseLink:
-            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5d64302b/images/large/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
-        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5d64302b/images/large/PG.52001RUBN4Q.BLACKFB.PZ.jpg',
-        title: 'Black Single Pleat Athletic Fit Wool Suit - Edit, '
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
+        link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
+        title: 'Long Sleeve Embellished Boat Neck Top, '
     },
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, '
+                },
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, , large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb2647cff/images/large/PG.10217069.JJ5QZXX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb2647cff/images/large/PG.10217069.JJ5QZXX.BZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, '
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink'
+                },
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb2647cff/images/large/PG.10217069.JJ5QZXX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwb2647cff/images/large/PG.10217069.JJ5QZXX.BZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ5QZXX'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Grey Heather, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3255ea4c/images/large/PG.10217069.JJ908XX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3255ea4c/images/large/PG.10217069.JJ908XX.PZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Grey Heather'
+                },
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Grey Heather, large',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw92f1b900/images/large/PG.10217069.JJ908XX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw92f1b900/images/large/PG.10217069.JJ908XX.BZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Grey Heather'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ908XX'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'large'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed56b2da/images/medium/PG.10217069.JJ5QZXX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed56b2da/images/medium/PG.10217069.JJ5QZXX.PZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, '
+                },
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, , medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwead6d554/images/medium/PG.10217069.JJ5QZXX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwead6d554/images/medium/PG.10217069.JJ5QZXX.BZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, '
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed56b2da/images/medium/PG.10217069.JJ5QZXX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwed56b2da/images/medium/PG.10217069.JJ5QZXX.PZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink'
+                },
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwead6d554/images/medium/PG.10217069.JJ5QZXX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwead6d554/images/medium/PG.10217069.JJ5QZXX.BZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ5QZXX'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Grey Heather, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc9ce7da9/images/medium/PG.10217069.JJ908XX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc9ce7da9/images/medium/PG.10217069.JJ908XX.PZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Grey Heather'
+                },
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Grey Heather, medium',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6b734040/images/medium/PG.10217069.JJ908XX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw6b734040/images/medium/PG.10217069.JJ908XX.BZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Grey Heather'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ908XX'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'medium'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd4b35477/images/small/PG.10217069.JJ5QZXX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd4b35477/images/small/PG.10217069.JJ5QZXX.PZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, '
+                },
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, , small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc6e78825/images/small/PG.10217069.JJ5QZXX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc6e78825/images/small/PG.10217069.JJ5QZXX.BZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, '
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd4b35477/images/small/PG.10217069.JJ5QZXX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwd4b35477/images/small/PG.10217069.JJ5QZXX.PZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink'
+                },
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc6e78825/images/small/PG.10217069.JJ5QZXX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwc6e78825/images/small/PG.10217069.JJ5QZXX.BZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ5QZXX'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Grey Heather, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1d27b20/images/small/PG.10217069.JJ908XX.PZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe1d27b20/images/small/PG.10217069.JJ908XX.PZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Grey Heather'
+                },
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Grey Heather, small',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe6f3f097/images/small/PG.10217069.JJ908XX.BZ.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dwe6f3f097/images/small/PG.10217069.JJ908XX.BZ.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Grey Heather'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ908XX'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'small'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2b23d065/images/swatch/PG.10217069.JJ5QZXX.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2b23d065/images/swatch/PG.10217069.JJ5QZXX.CP.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Begonia Pink'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ5QZXX'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        },
+        {
+            images: [
+                {
+                    alt: 'Long Sleeve Embellished Boat Neck Top, Grey Heather, swatch',
+                    disBaseLink:
+                        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw747c5f3e/images/swatch/PG.10217069.JJ908XX.CP.jpg',
+                    link: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-apparel-m-catalog/default/dw747c5f3e/images/swatch/PG.10217069.JJ908XX.CP.jpg',
+                    title: 'Long Sleeve Embellished Boat Neck Top, Grey Heather'
+                }
+            ],
+            variationAttributes: [
+                {
+                    id: 'color',
+                    values: [
+                        {
+                            value: 'JJ908XX'
+                        }
+                    ]
+                }
+            ],
+            viewType: 'swatch'
+        }
+    ],
     orderable: true,
-    price: 191.99,
-    pricePerUnit: 191.99,
+    price: 18.55,
+    pricePerUnit: 18.55,
     priceRanges: [
         {
-            maxPrice: 320,
-            minPrice: 191.99,
+            maxPrice: 31.36,
+            minPrice: 31.36,
             pricebook: 'gbp-m-list-prices'
         },
         {
-            maxPrice: 191.99,
-            minPrice: 191.99,
+            maxPrice: 18.55,
+            minPrice: 18.55,
             pricebook: 'gbp-m-sale-prices'
         }
     ],
-    productId: '25604524M',
-    productName: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
+    productId: '25518101M',
+    productName: 'Long Sleeve Embellished Boat Neck Top',
+    productPromotions: [
+        {
+            calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+            promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+        },
+        {
+            calloutMsg: '$50 Fixed Products Amount Above 100',
+            promotionId: '$50FixedProductsAmountAbove100'
+        },
+        {
+            calloutMsg: 'Bonus Product for Order Amounts Above 250',
+            promotionId: 'BonusProductOnOrderOfAmountABove250'
+        }
+    ],
     productType: {
         master: true
     },
     representedProduct: {
-        id: '750518699660M'
+        id: '701642823919M'
     },
+    representedProducts: [
+        {
+            id: '701642823919M'
+        },
+        {
+            id: '701642823872M'
+        },
+        {
+            id: '701642823926M'
+        },
+        {
+            id: '701642823940M'
+        },
+        {
+            id: '701642823902M'
+        },
+        {
+            id: '701642823933M'
+        },
+        {
+            id: '701642823889M'
+        },
+        {
+            id: '701642823896M'
+        }
+    ],
     variants: [
         {
             orderable: true,
-            price: 191.99,
-            productId: '750518699660M',
+            price: 18.55,
+            productId: '701642823919M',
+            productPromotions: [
+                {
+                    calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                },
+                {
+                    calloutMsg: '$50 Fixed Products Amount Above 100',
+                    promotionId: '$50FixedProductsAmountAbove100'
+                },
+                {
+                    calloutMsg: 'Bonus Product for Order Amounts Above 250',
+                    promotionId: 'BonusProductOnOrderOfAmountABove250'
+                }
+            ],
             tieredPrices: [
                 {
-                    price: 223.99,
+                    price: 31.36,
                     pricebook: 'gbp-m-list-prices',
                     quantity: 1
                 },
                 {
-                    price: 191.99,
+                    price: 18.55,
                     pricebook: 'gbp-m-sale-prices',
                     quantity: 1
                 }
             ],
             variationValues: {
-                color: 'BLACKFB',
-                size: '050',
-                width: 'V'
+                color: 'JJ908XX',
+                size: '9LG'
             }
         },
         {
             orderable: true,
-            price: 191.99,
-            productId: '750518699585M',
+            price: 18.55,
+            productId: '701642823872M',
+            productPromotions: [
+                {
+                    calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                },
+                {
+                    calloutMsg: '$50 Fixed Products Amount Above 100',
+                    promotionId: '$50FixedProductsAmountAbove100'
+                },
+                {
+                    calloutMsg: 'Bonus Product for Order Amounts Above 250',
+                    promotionId: 'BonusProductOnOrderOfAmountABove250'
+                }
+            ],
             tieredPrices: [
                 {
-                    price: 320,
+                    price: 31.36,
                     pricebook: 'gbp-m-list-prices',
                     quantity: 1
                 },
                 {
-                    price: 191.99,
+                    price: 18.55,
                     pricebook: 'gbp-m-sale-prices',
                     quantity: 1
                 }
             ],
             variationValues: {
-                color: 'BLACKFB',
-                size: '039',
-                width: 'V'
+                color: 'JJ5QZXX',
+                size: '9LG'
             }
         },
         {
             orderable: true,
-            price: 191.99,
-            productId: '750518699653M',
+            price: 18.55,
+            productId: '701642823926M',
+            productPromotions: [
+                {
+                    calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                },
+                {
+                    calloutMsg: '$50 Fixed Products Amount Above 100',
+                    promotionId: '$50FixedProductsAmountAbove100'
+                },
+                {
+                    calloutMsg: 'Bonus Product for Order Amounts Above 250',
+                    promotionId: 'BonusProductOnOrderOfAmountABove250'
+                }
+            ],
             tieredPrices: [
                 {
-                    price: 191.99,
+                    price: 31.36,
                     pricebook: 'gbp-m-list-prices',
                     quantity: 1
                 },
                 {
-                    price: 191.99,
+                    price: 18.55,
                     pricebook: 'gbp-m-sale-prices',
                     quantity: 1
                 }
             ],
             variationValues: {
-                color: 'BLACKFB',
-                size: '048',
-                width: 'V'
+                color: 'JJ908XX',
+                size: '9MD'
             }
         },
         {
             orderable: true,
-            price: 191.99,
-            productId: '750518699615M',
+            price: 18.55,
+            productId: '701642823940M',
+            productPromotions: [
+                {
+                    calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                },
+                {
+                    calloutMsg: '$50 Fixed Products Amount Above 100',
+                    promotionId: '$50FixedProductsAmountAbove100'
+                },
+                {
+                    calloutMsg: 'Bonus Product for Order Amounts Above 250',
+                    promotionId: 'BonusProductOnOrderOfAmountABove250'
+                }
+            ],
             tieredPrices: [
                 {
-                    price: 320,
+                    price: 31.36,
                     pricebook: 'gbp-m-list-prices',
                     quantity: 1
                 },
                 {
-                    price: 191.99,
+                    price: 18.55,
                     pricebook: 'gbp-m-sale-prices',
                     quantity: 1
                 }
             ],
             variationValues: {
-                color: 'BLACKFB',
-                size: '042',
-                width: 'V'
+                color: 'JJ908XX',
+                size: '9XL'
             }
         },
         {
             orderable: true,
-            price: 191.99,
-            productId: '750518699608M',
+            price: 18.55,
+            productId: '701642823902M',
+            productPromotions: [
+                {
+                    calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                },
+                {
+                    calloutMsg: '$50 Fixed Products Amount Above 100',
+                    promotionId: '$50FixedProductsAmountAbove100'
+                },
+                {
+                    calloutMsg: 'Bonus Product for Order Amounts Above 250',
+                    promotionId: 'BonusProductOnOrderOfAmountABove250'
+                }
+            ],
             tieredPrices: [
                 {
-                    price: 320,
+                    price: 31.36,
                     pricebook: 'gbp-m-list-prices',
                     quantity: 1
                 },
                 {
-                    price: 191.99,
+                    price: 18.55,
                     pricebook: 'gbp-m-sale-prices',
                     quantity: 1
                 }
             ],
             variationValues: {
-                color: 'BLACKFB',
-                size: '041',
-                width: 'V'
+                color: 'JJ5QZXX',
+                size: '9XL'
             }
         },
         {
             orderable: true,
-            price: 191.99,
-            productId: '750518699646M',
+            price: 18.55,
+            productId: '701642823933M',
+            productPromotions: [
+                {
+                    calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                },
+                {
+                    calloutMsg: '$50 Fixed Products Amount Above 100',
+                    promotionId: '$50FixedProductsAmountAbove100'
+                },
+                {
+                    calloutMsg: 'Bonus Product for Order Amounts Above 250',
+                    promotionId: 'BonusProductOnOrderOfAmountABove250'
+                }
+            ],
             tieredPrices: [
                 {
-                    price: 191.99,
+                    price: 31.36,
                     pricebook: 'gbp-m-list-prices',
                     quantity: 1
                 },
                 {
-                    price: 191.99,
+                    price: 18.55,
                     pricebook: 'gbp-m-sale-prices',
                     quantity: 1
                 }
             ],
             variationValues: {
-                color: 'BLACKFB',
-                size: '046',
-                width: 'V'
+                color: 'JJ908XX',
+                size: '9SM'
             }
         },
         {
             orderable: true,
-            price: 191.99,
-            productId: '750518699592M',
+            price: 18.55,
+            productId: '701642823889M',
+            productPromotions: [
+                {
+                    calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                },
+                {
+                    calloutMsg: '$50 Fixed Products Amount Above 100',
+                    promotionId: '$50FixedProductsAmountAbove100'
+                },
+                {
+                    calloutMsg: 'Bonus Product for Order Amounts Above 250',
+                    promotionId: 'BonusProductOnOrderOfAmountABove250'
+                }
+            ],
             tieredPrices: [
                 {
-                    price: 320,
+                    price: 31.36,
                     pricebook: 'gbp-m-list-prices',
                     quantity: 1
                 },
                 {
-                    price: 191.99,
+                    price: 18.55,
                     pricebook: 'gbp-m-sale-prices',
                     quantity: 1
                 }
             ],
             variationValues: {
-                color: 'BLACKFB',
-                size: '040',
-                width: 'V'
+                color: 'JJ5QZXX',
+                size: '9MD'
             }
         },
         {
             orderable: true,
-            price: 191.99,
-            productId: '750518699622M',
+            price: 18.55,
+            productId: '701642823896M',
+            productPromotions: [
+                {
+                    calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                    promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+                },
+                {
+                    calloutMsg: '$50 Fixed Products Amount Above 100',
+                    promotionId: '$50FixedProductsAmountAbove100'
+                },
+                {
+                    calloutMsg: 'Bonus Product for Order Amounts Above 250',
+                    promotionId: 'BonusProductOnOrderOfAmountABove250'
+                }
+            ],
             tieredPrices: [
                 {
-                    price: 320,
+                    price: 31.36,
                     pricebook: 'gbp-m-list-prices',
                     quantity: 1
                 },
                 {
-                    price: 191.99,
+                    price: 18.55,
                     pricebook: 'gbp-m-sale-prices',
                     quantity: 1
                 }
             ],
             variationValues: {
-                color: 'BLACKFB',
-                size: '043',
-                width: 'V'
-            }
-        },
-        {
-            orderable: false,
-            price: 191.99,
-            productId: '750518699578M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '038',
-                width: 'V'
-            }
-        },
-        {
-            orderable: true,
-            price: 191.99,
-            productId: '750518699875M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '046',
-                width: 'L'
-            }
-        },
-        {
-            orderable: true,
-            price: 191.99,
-            productId: '750518699868M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '044',
-                width: 'L'
-            }
-        },
-        {
-            orderable: true,
-            price: 191.99,
-            productId: '750518699820M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '040',
-                width: 'L'
-            }
-        },
-        {
-            orderable: true,
-            price: 191.99,
-            productId: '750518699882M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '048',
-                width: 'L'
-            }
-        },
-        {
-            orderable: true,
-            price: 191.99,
-            productId: '750518699851M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '043',
-                width: 'L'
-            }
-        },
-        {
-            orderable: true,
-            price: 191.99,
-            productId: '750518699844M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '042',
-                width: 'L'
-            }
-        },
-        {
-            orderable: true,
-            price: 191.99,
-            productId: '750518699769M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '044',
-                width: 'S'
-            }
-        },
-        {
-            orderable: true,
-            price: 191.99,
-            productId: '750518699721M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '040',
-                width: 'S'
-            }
-        },
-        {
-            orderable: true,
-            price: 191.99,
-            productId: '750518699745M',
-            tieredPrices: [
-                {
-                    price: 320,
-                    pricebook: 'gbp-m-list-prices',
-                    quantity: 1
-                },
-                {
-                    price: 191.99,
-                    pricebook: 'gbp-m-sale-prices',
-                    quantity: 1
-                }
-            ],
-            variationValues: {
-                color: 'BLACKFB',
-                size: '042',
-                width: 'S'
+                color: 'JJ5QZXX',
+                size: '9SM'
             }
         }
     ],
@@ -1123,9 +1338,14 @@ const mockMasterProductHitWithMultipleVariants = {
             name: 'Colour',
             values: [
                 {
-                    name: 'Black',
+                    name: 'Begonia Pink',
                     orderable: true,
-                    value: 'BLACKFB'
+                    value: 'JJ5QZXX'
+                },
+                {
+                    name: 'Grey Heather',
+                    orderable: true,
+                    value: 'JJ908XX'
                 }
             ]
         },
@@ -1134,75 +1354,24 @@ const mockMasterProductHitWithMultipleVariants = {
             name: 'Size',
             values: [
                 {
-                    name: '38',
-                    orderable: false,
-                    value: '038'
+                    name: 'S',
+                    orderable: true,
+                    value: '9SM'
                 },
                 {
-                    name: '39',
+                    name: 'M',
                     orderable: true,
-                    value: '039'
+                    value: '9MD'
                 },
                 {
-                    name: '40',
+                    name: 'L',
                     orderable: true,
-                    value: '040'
+                    value: '9LG'
                 },
                 {
-                    name: '41',
+                    name: 'XL',
                     orderable: true,
-                    value: '041'
-                },
-                {
-                    name: '42',
-                    orderable: true,
-                    value: '042'
-                },
-                {
-                    name: '43',
-                    orderable: true,
-                    value: '043'
-                },
-                {
-                    name: '44',
-                    orderable: true,
-                    value: '044'
-                },
-                {
-                    name: '46',
-                    orderable: true,
-                    value: '046'
-                },
-                {
-                    name: '48',
-                    orderable: true,
-                    value: '048'
-                },
-                {
-                    name: '50',
-                    orderable: true,
-                    value: '050'
-                }
-            ]
-        },
-        {
-            id: 'width',
-            name: 'Width',
-            values: [
-                {
-                    name: 'Short',
-                    orderable: true,
-                    value: 'S'
-                },
-                {
-                    name: 'Regular',
-                    orderable: true,
-                    value: 'V'
-                },
-                {
-                    name: 'Long',
-                    orderable: true,
-                    value: 'L'
+                    value: '9XL'
                 }
             ]
         }

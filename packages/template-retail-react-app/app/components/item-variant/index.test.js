@@ -40,7 +40,7 @@ MockedComponent.propTypes = {
 describe('ItemPrice', function () {
     test('should display basket prices if variant is for cart page on mobile', () => {
         useMediaQuery.mockReturnValue([false])
-        const {getByText, container, getAllByText} = renderWithProviders(
+        const {getByText, getAllByText} = renderWithProviders(
             <MockedComponent variant={cartVariant} />
         )
         // current price
@@ -54,7 +54,7 @@ describe('ItemPrice', function () {
 
     test('should display basket prices if variant is for cart page on desktop', () => {
         useMediaQuery.mockReturnValue([true])
-        const {getByText, container, getAllByText} = renderWithProviders(
+        const {getByText, getAllByText} = renderWithProviders(
             <MockedComponent variant={cartVariant} />
         )
         // price per item

@@ -7,7 +7,7 @@
 import React from 'react'
 import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components/product-tile/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {fireEvent, waitFor, within} from '@testing-library/react'
+import {fireEvent, waitFor, within, screen} from '@testing-library/react'
 import {
     mockMasterProductHitWithMultipleVariants,
     mockMasterProductHitWithOneVariant,
@@ -51,42 +51,71 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
 })
 
-test('Renders variation selection swatches', () => {
+test('Renders variant details based on the selected swatch', async () => {
     const {getAllByRole, getByTestId} = renderWithProviders(
         <ProductTile product={mockProductSearchItem} />
     )
     const swatches = getAllByRole('radio')
     const productImage = getByTestId('product-tile-image')
+    let productTile = getByTestId('product-tile')
 
     // Initial render will show swatched and the image will be the represented product variation
     expect(swatches).toHaveLength(2)
     expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg'
     )
+    let currentPriceTag = productTile.querySelectorAll('b')
+    let strikethroughPriceTag = productTile.querySelectorAll('s')
+    expect(currentPriceTag).toHaveLength(1)
+    expect(within(currentPriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
+    expect(strikethroughPriceTag).toHaveLength(1)
+    expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
 
-    // Hovering over color swatch changes the image.
-    fireEvent.mouseEnter(swatches[1])
-    waitFor(() => {
-        expect(productImage.firstChild.getAttribute('src')).toBe(
-            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg'
-        )
-    })
+    // Navigating to different color swatch changes the image & price.
+    const swatchGroup = screen.getByRole('radiogroup').parentNode
+    fireEvent.keyDown(swatchGroup, {key: 'ArrowLeft', code: 'ArrowRight', charCode: 37})
+    await waitFor(() => screen.getByTestId('product-tile-image'))
+    expect(screen.getByTestId('product-tile-image').firstChild.getAttribute('src')).toBe(
+        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg'
+    )
+    productTile = screen.getByTestId('product-tile')
+    currentPriceTag = productTile.querySelectorAll('b')
+    strikethroughPriceTag = productTile.querySelectorAll('s')
+    expect(currentPriceTag).toHaveLength(1)
+    expect(within(currentPriceTag[0]).getByText(/£143\.99/i)).toBeDefined()
+    expect(strikethroughPriceTag).toHaveLength(1)
+    expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
+    expect(screen.getByTestId('promo-callout')).toBeInTheDocument()
 })
 
-test('renders exact price with strikethrough price for master product with multiple variants', () => {
-    const {queryByText, getByText, container} = renderWithProviders(
+test('Renders price range with starting price and strikethrough price for master product with multiple variants', async () => {
+    const {getByText, getByTestId, container} = renderWithProviders(
         <ProductTile product={mockMasterProductHitWithMultipleVariants} />
     )
-    expect(getByText(/Black Single Pleat Athletic Fit Wool Suit - Edit/i)).toBeInTheDocument()
-    expect(queryByText(/from/i)).toBeInTheDocument()
+    expect(getByText(/Long Sleeve Embellished Boat Neck Top/i)).toBeInTheDocument()
+    expect(getByTestId('product-tile-image').firstChild.getAttribute('src')).toBe(
+        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3255ea4c/images/large/PG.10217069.JJ908XX.PZ.jpg'
+    )
 
     const currentPriceTag = container.querySelectorAll('b')
     const strikethroughPriceTag = container.querySelectorAll('s')
-    expect(within(currentPriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
-    expect(within(strikethroughPriceTag[0]).getByText(/£223\.99/i)).toBeDefined()
-    // From and price are in separate b tag
+
     expect(currentPriceTag).toHaveLength(1)
+    expect(within(currentPriceTag[0]).getByText(/From £18\.55/i)).toBeDefined()
     expect(strikethroughPriceTag).toHaveLength(1)
+    expect(within(strikethroughPriceTag[0]).getByText(/£31\.36/i)).toBeDefined()
+
+    // Navigating to different color swatch changes the image but keeps the same price range.
+    const swatchGroup = screen.getByRole('radiogroup').parentNode
+    fireEvent.keyDown(swatchGroup, {key: 'ArrowLeft', code: 'ArrowRight', charCode: 37})
+    await waitFor(() => screen.getByTestId('product-tile-image'))
+    expect(screen.getByTestId('product-tile-image').firstChild.getAttribute('src')).toBe(
+        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg'
+    )
+    expect(currentPriceTag).toHaveLength(1)
+    expect(within(currentPriceTag[0]).getByText(/From £18\.55/i)).toBeDefined()
+    expect(strikethroughPriceTag).toHaveLength(1)
+    expect(within(strikethroughPriceTag[0]).getByText(/£31\.36/i)).toBeDefined()
 })
 
 test('renders exact price with strikethrough price for master product with one variant', () => {
