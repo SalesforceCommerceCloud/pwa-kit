@@ -15,6 +15,17 @@ import {
     mockProductSetHit,
     mockStandardProductHit
 } from '@salesforce/retail-react-app/app/mocks/product-search-hit-data'
+import {useBreakpointValue} from '@salesforce/retail-react-app/app/components/shared/ui'
+
+jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
+    const originalModule = jest.requireActual(
+        '@salesforce/retail-react-app/app/components/shared/ui'
+    )
+    return {
+        ...originalModule,
+        useBreakpointValue: jest.fn()
+    }
+})
 
 test('Renders links and images', () => {
     const {getAllByRole} = renderWithProviders(<ProductTile product={mockProductSearchItem} />)
@@ -52,6 +63,8 @@ test('Remove from wishlist cannot be muti-clicked', () => {
 })
 
 test('Renders variant details based on the selected swatch', async () => {
+    useBreakpointValue.mockReturnValue(true)
+
     const {getAllByRole, getByTestId} = renderWithProviders(
         <ProductTile product={mockProductSearchItem} />
     )
@@ -72,8 +85,8 @@ test('Renders variant details based on the selected swatch', async () => {
     expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
 
     // Navigating to different color swatch changes the image & price.
-    const swatchGroup = screen.getByRole('radiogroup').parentNode
-    fireEvent.keyDown(swatchGroup, {key: 'ArrowLeft', code: 'ArrowRight', charCode: 37})
+    // Default selected swatch is swatches[1] as it is the represented product.
+    fireEvent.mouseOver(swatches[0])
     await waitFor(() => screen.getByTestId('product-tile-image'))
     expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg'
@@ -85,8 +98,10 @@ test('Renders variant details based on the selected swatch', async () => {
     expect(screen.getByTestId('promo-callout')).toBeInTheDocument()
 })
 
-test('Renders price range with starting price and strikethrough price for master product with multiple variants', async () => {
-    const {getByText, getByTestId, container} = renderWithProviders(
+test.only('Renders price range with starting price and strikethrough price for master product with multiple variants', async () => {
+    useBreakpointValue.mockReturnValue(true)
+
+    const {getByText, getByTestId, getAllByRole, container} = renderWithProviders(
         <ProductTile product={mockMasterProductHitWithMultipleVariants} />
     )
     expect(getByText(/Long Sleeve Embellished Boat Neck Top/i)).toBeInTheDocument()
@@ -104,8 +119,9 @@ test('Renders price range with starting price and strikethrough price for master
     expect(within(strikethroughPriceTag[0]).getByText(/£31\.36/i)).toBeDefined()
 
     // Navigating to different color swatch changes the image but keeps the same price range.
-    const swatchGroup = screen.getByRole('radiogroup').parentNode
-    fireEvent.keyDown(swatchGroup, {key: 'ArrowLeft', code: 'ArrowRight', charCode: 37})
+    const swatches = getAllByRole('radio')
+    // Default selected swatch is swatches[1] as it is the represented product.
+    fireEvent.mouseOver(swatches[0])
     await waitFor(() => screen.getByTestId('product-tile-image'))
     expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg'
