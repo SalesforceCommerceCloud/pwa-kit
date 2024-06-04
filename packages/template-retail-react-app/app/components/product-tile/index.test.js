@@ -57,15 +57,15 @@ test('Renders variant details based on the selected swatch', async () => {
     )
     const swatches = getAllByRole('radio')
     const productImage = getByTestId('product-tile-image')
-    let productTile = getByTestId('product-tile')
+    const productTile = getByTestId('product-tile')
 
     // Initial render will show swatched and the image will be the represented product variation
     expect(swatches).toHaveLength(2)
     expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg'
     )
-    let currentPriceTag = productTile.querySelectorAll('b')
-    let strikethroughPriceTag = productTile.querySelectorAll('s')
+    const currentPriceTag = productTile.querySelectorAll('b')
+    const strikethroughPriceTag = productTile.querySelectorAll('s')
     expect(currentPriceTag).toHaveLength(1)
     expect(within(currentPriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
     expect(strikethroughPriceTag).toHaveLength(1)
@@ -75,12 +75,9 @@ test('Renders variant details based on the selected swatch', async () => {
     const swatchGroup = screen.getByRole('radiogroup').parentNode
     fireEvent.keyDown(swatchGroup, {key: 'ArrowLeft', code: 'ArrowRight', charCode: 37})
     await waitFor(() => screen.getByTestId('product-tile-image'))
-    expect(screen.getByTestId('product-tile-image').firstChild.getAttribute('src')).toBe(
+    expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg'
     )
-    productTile = screen.getByTestId('product-tile')
-    currentPriceTag = productTile.querySelectorAll('b')
-    strikethroughPriceTag = productTile.querySelectorAll('s')
     expect(currentPriceTag).toHaveLength(1)
     expect(within(currentPriceTag[0]).getByText(/£143\.99/i)).toBeDefined()
     expect(strikethroughPriceTag).toHaveLength(1)
@@ -93,7 +90,8 @@ test('Renders price range with starting price and strikethrough price for master
         <ProductTile product={mockMasterProductHitWithMultipleVariants} />
     )
     expect(getByText(/Long Sleeve Embellished Boat Neck Top/i)).toBeInTheDocument()
-    expect(getByTestId('product-tile-image').firstChild.getAttribute('src')).toBe(
+    const productImage = getByTestId('product-tile-image')
+    expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw3255ea4c/images/large/PG.10217069.JJ908XX.PZ.jpg'
     )
 
@@ -109,7 +107,7 @@ test('Renders price range with starting price and strikethrough price for master
     const swatchGroup = screen.getByRole('radiogroup').parentNode
     fireEvent.keyDown(swatchGroup, {key: 'ArrowLeft', code: 'ArrowRight', charCode: 37})
     await waitFor(() => screen.getByTestId('product-tile-image'))
-    expect(screen.getByTestId('product-tile-image').firstChild.getAttribute('src')).toBe(
+    expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg'
     )
     expect(currentPriceTag).toHaveLength(1)
