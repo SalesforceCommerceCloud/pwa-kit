@@ -98,6 +98,42 @@ test('Renders variant details based on the selected swatch', async () => {
     expect(screen.getByTestId('promo-callout')).toBeInTheDocument()
 })
 
+test('Renders variant details based on the selected swatch on mobile', async () => {
+    useBreakpointValue.mockReturnValue(false)
+
+    const {getAllByRole, getByTestId} = renderWithProviders(
+        <ProductTile product={mockProductSearchItem} />
+    )
+    const swatches = getAllByRole('radio')
+    const productImage = getByTestId('product-tile-image')
+    const productTile = getByTestId('product-tile')
+
+    // Initial render will show swatched and the image will be the represented product variation
+    expect(swatches).toHaveLength(2)
+    expect(productImage.firstChild.getAttribute('src')).toBe(
+        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw175c1a89/images/large/PG.33698RUBN4Q.CHARCWL.PZ.jpg'
+    )
+    const currentPriceTag = productTile.querySelectorAll('b')
+    const strikethroughPriceTag = productTile.querySelectorAll('s')
+    expect(currentPriceTag).toHaveLength(1)
+    expect(within(currentPriceTag[0]).getByText(/£191\.99/i)).toBeDefined()
+    expect(strikethroughPriceTag).toHaveLength(1)
+    expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
+
+    // Navigating to different color swatch changes the image & price.
+    // Default selected swatch is swatches[1] as it is the represented product.
+    fireEvent.click(swatches[0])
+    await waitFor(() => screen.getByTestId('product-tile-image'))
+    expect(productImage.firstChild.getAttribute('src')).toBe(
+        'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg'
+    )
+    expect(currentPriceTag).toHaveLength(1)
+    expect(within(currentPriceTag[0]).getByText(/£143\.99/i)).toBeDefined()
+    expect(strikethroughPriceTag).toHaveLength(1)
+    expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
+    expect(screen.getByTestId('promo-callout')).toBeInTheDocument()
+})
+
 test('Renders price range with starting price and strikethrough price for master product with multiple variants', async () => {
     useBreakpointValue.mockReturnValue(true)
 
