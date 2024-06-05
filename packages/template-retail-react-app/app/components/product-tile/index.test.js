@@ -98,7 +98,7 @@ test('Renders variant details based on the selected swatch', async () => {
     expect(screen.getByTestId('promo-callout')).toBeInTheDocument()
 })
 
-test.only('Renders price range with starting price and strikethrough price for master product with multiple variants', async () => {
+test('Renders price range with starting price and strikethrough price for master product with multiple variants', async () => {
     useBreakpointValue.mockReturnValue(true)
 
     const {getByText, getByTestId, getAllByRole, container} = renderWithProviders(
