@@ -5,18 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {ShopperProducts} from 'commerce-sdk-isomorphic'
+import {ShopperProductsParamKeys as paramKeys} from 'commerce-sdk-isomorphic'
 
 export default {
-    getProducts: ShopperProducts.getProductsParamKeys,
-    getProductsRequired: ShopperProducts.getProductsParamKeysRequired,
+    getProducts: paramKeys.getProducts,
+    getProductsRequired: paramKeys.getProductsRequired,
 
-    getProduct: ShopperProducts.getProductParamKeys,
-    getProductRequired: ShopperProducts.getProductParamKeysRequired,
+    getProduct: paramKeys.getProduct,
+    getProductRequired: paramKeys.getProductRequired,
 
-    getCategories: ShopperProducts.getCategoriesParamKeys,
-    getCategoriesRequired: ShopperProducts.getCategoriesParamKeysRequired,
+    getCategories: paramKeys.getCategories,
+    getCategoriesRequired: paramKeys.getCategoriesRequired,
 
-    getCategory: ShopperProducts.getCategoryParamKeys,
-    getCategoryRequired: ShopperProducts.getCategoryParamKeysRequired
+    getCategory: paramKeys.getCategory,
+    getCategoryRequired: paramKeys.getCategoryRequired
 }
