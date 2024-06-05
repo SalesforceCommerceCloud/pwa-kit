@@ -124,6 +124,7 @@ export const Component = ({component}: ComponentProps) => {
     const {code} = data || {}
     const isEinsteinAssistedComponent = typeId === 'headless.einsteinAssisted'
     const products = custom?.products || []
+    const categories = custom?.categories || []
     let instance = <ComponentNotFound typeId={typeId} />
     useEffect(() => {
         if (isEinsteinAssistedComponent) {
@@ -156,7 +157,8 @@ export const Component = ({component}: ComponentProps) => {
                 jsx={code.code.react}
                 {...component}
                 bindings={{
-                    products
+                    products,
+                    categories
                 }}
             />
         )
