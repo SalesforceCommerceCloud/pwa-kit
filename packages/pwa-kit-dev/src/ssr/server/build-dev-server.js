@@ -28,6 +28,12 @@ import {
 
 import {randomUUID} from 'crypto'
 import chalk from 'chalk'
+import esm from 'esm'
+
+// This allows us to dynamically import a module in both CommonJS and ESM format
+// Note: the package babel-node we are using for `npm start` doesn't work for dynamic imports
+// TODO: replace babel-node with esm for command `npm start`
+const esmImport = esm(module)
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -124,6 +130,21 @@ export const DevServerMixin = {
             app.use(config.proxyPath, config.proxy)
             app.use(config.cachingPath, config.cachingProxy)
         })
+    },
+
+    _setupExtensionMiddlewares(app, options) {
+        // app.use('/test', extension)
+        console.log('_setupExtensionMiddlewares')
+        console.log(options)
+        // const a = require('my-extension/middleware.js')
+        const middlewarePath = path.join(
+            options.projectDir,
+            'node_modules/my-extension/middleware.js'
+        )
+
+        const a = esmImport(middlewarePath)
+        console.log(a.default)
+        app.use('/test', a.default)
     },
 
     /**

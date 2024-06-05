@@ -331,10 +331,15 @@ export const RemoteServerFactory = {
         // and not a bundle request, so we can apply specific
         // processing.
         this._setupCommonMiddleware(app, options)
+        this._setupExtensionMiddlewares(app, options)
 
         this._addStaticAssetServing(app)
         this._addDevServerGarbageCollection(app)
         return app
+    },
+
+    _setupExtensionMiddlewares(app, options) {
+        // app.use('/test', extension)
     },
 
     /**
