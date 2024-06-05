@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/retail-react-app",
-  "version": "2.5.0-dev",
+  "version": "2.5.0-nightly-20240605080149",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
@@ -45,10 +45,10 @@
     "@lhci/cli": "^0.11.0",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
-    "@salesforce/commerce-sdk-react": "2.0.0-dev",
-    "@salesforce/pwa-kit-dev": "3.6.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.6.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.6.0-dev",
+    "@salesforce/commerce-sdk-react": "2.0.0-nightly-20240605080149",
+    "@salesforce/pwa-kit-dev": "3.6.0-nightly-20240605080149",
+    "@salesforce/pwa-kit-react-sdk": "3.6.0-nightly-20240605080149",
+    "@salesforce/pwa-kit-runtime": "3.6.0-nightly-20240605080149",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",
