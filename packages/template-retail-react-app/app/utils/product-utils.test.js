@@ -791,15 +791,15 @@ describe('getPriceData', function () {
     test('returns price data for master product that has more than one variant', () => {
         const priceData = getPriceData(mockMasterProductHitWithMultipleVariants)
         expect(priceData).toEqual({
-            currentPrice: 191.99,
-            listPrice: 223.99,
-            pricePerUnit: 191.99,
+            currentPrice: 18.55,
+            listPrice: 31.36,
+            pricePerUnit: 18.55,
             isOnSale: true,
             isASet: false,
             isMaster: true,
             isRange: true,
-            tieredPrice: 223.99,
-            maxPrice: 223.99
+            tieredPrice: 31.36,
+            maxPrice: 31.36
         })
     })
 

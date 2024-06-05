@@ -173,7 +173,7 @@ export const findLowestPrice = (product) => {
 
     // Look at all of the variants, only if it's a master product.
     // i.e. when a shopper has narrowed down to a variant, do not look into other variants
-    const isMaster = product.productType?.master || product.type?.master
+    const isMaster = product.hitType === 'master' || !!product.type?.master
     if (isMaster && !product.variants) {
         console.warn(
             'Expecting `product.variants` to exist. For more accuracy, please tweak your API request to ask for the variants details.'
