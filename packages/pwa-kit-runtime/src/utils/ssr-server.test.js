@@ -567,14 +567,14 @@ describe('processLambdaResponse', () => {
 
     const testCases = [
         {
-            name: "valid correlation id header in event object",
-            event: {headers: {'x-correlation-id': "e46cd109-39b7-4173-963e-2c5de78ba087"}},
+            name: 'valid correlation id header in event object',
+            event: {headers: {'x-correlation-id': 'e46cd109-39b7-4173-963e-2c5de78ba087'}},
             validate: (headers) => {
-                expect(headers['x-correlation-id']).toBe("e46cd109-39b7-4173-963e-2c5de78ba087")
+                expect(headers['x-correlation-id']).toBe('e46cd109-39b7-4173-963e-2c5de78ba087')
             }
         },
         {
-            name: "no correlation id header in event object",
+            name: 'no correlation id header in event object',
             event: {headers: {}},
             validate: (headers) => {
                 expect(headers['x-correlation-id']).toBeFalsy()
