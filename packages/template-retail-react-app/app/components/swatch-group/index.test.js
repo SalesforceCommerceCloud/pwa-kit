@@ -123,7 +123,7 @@ describe('Swatch Component', () => {
         expect(screen.getAllByRole('radio')).toHaveLength(data.values.length)
     })
 
-    test('swatch can be selected', () => {
+    test('swatch can be selected', async () => {
         const history = createMemoryHistory()
         history.push('/en-GB/swatch-example')
 
@@ -136,12 +136,12 @@ describe('Swatch Component', () => {
         expect(screen.getAllByRole('radio')).toHaveLength(data.values.length)
         const firstSwatch = screen.getAllByRole('radio')[0]
         fireEvent.click(firstSwatch)
-        waitFor(() => {
-            expect(history.search).toBe('?color=BLACKFB')
+        await waitFor(() => {
+            expect(history.location.search).toBe('?color=BLACKFB')
         })
     })
 
-    test('swatch can be changed with arrow keys', () => {
+    test('swatch can be changed with arrow keys', async () => {
         const history = createMemoryHistory()
         history.push('/en-GB/swatch-example?color=JJ2XNXX')
 
@@ -182,15 +182,15 @@ describe('Swatch Component', () => {
         ]
 
         // Test initial state
-        waitFor(() => {
-            expect(history.search).toBe('?color=BLACKFB')
+        await waitFor(() => {
+            expect(history.location.search).toBe('?color=JJ2XNXX')
         })
 
         // Navigate according to the event array. This also tests that looping over the end or front works.
-        keyDownEvents.forEach(({keyEvent, expectedValue}) => {
+        keyDownEvents.forEach(async ({keyEvent, expectedValue}) => {
             fireEvent.keyDown(swatchGroup, keyEvent)
-            waitFor(() => {
-                expect(history.search).toBe(`?color=${expectedValue}`)
+            await waitFor(() => {
+                expect(history.location.search).toBe(`?color=${expectedValue}`)
             })
         })
     })
