@@ -254,12 +254,13 @@ export const RemoteServerFactory = {
      */
     _setRequestId(app) {
         app.use((req, res, next) => {
-            if (!req.headers['x-correlation-id']) {
-                console.error('Missing x-correlation-id')
+            const correlationId = req.headers['x-correlation-id']
+            const requestId = correlationId ? correlationId : req.headers['x-apigateway-event']
+            if (!requestId) {
+                console.error('Both x-correlation-id and x-apigateway-event headers are missing')
                 next()
                 return
             }
-            const requestId = req.headers['x-correlation-id']
             res.locals.requestId = requestId
             next()
         })

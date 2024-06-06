@@ -559,9 +559,35 @@ describe('MetricsSender', () => {
     })
 })
 
-test('processLambdaResponse with no parameter', () => {
-    expect(processLambdaResponse()).toBeUndefined()
-    expect(processLambdaResponse(null)).toBeNull()
+describe('processLambdaResponse', () => {
+    test('processLambdaResponse with no parameter', () => {
+        expect(processLambdaResponse()).toBeUndefined()
+        expect(processLambdaResponse(null)).toBeNull()
+    })
+
+    const testCases = [
+        {
+            name: "valid correlation id header in event object",
+            event: {headers: {'x-correlation-id': "e46cd109-39b7-4173-963e-2c5de78ba087"}},
+            validate: (headers) => {
+                expect(headers['x-correlation-id']).toBe("e46cd109-39b7-4173-963e-2c5de78ba087")
+            }
+        },
+        {
+            name: "no correlation id header in event object",
+            event: {headers: {}},
+            validate: (headers) => {
+                expect(headers['x-correlation-id']).toBeFalsy()
+            }
+        }
+    ]
+    testCases.forEach((testCase) => {
+        test(`${testCase.name}`, () => {
+            const response = {}
+            const res = processLambdaResponse(response, testCase.event)
+            testCase.validate(res.headers)
+        })
+    })
 })
 
 describe('processExpressResponse', () => {
