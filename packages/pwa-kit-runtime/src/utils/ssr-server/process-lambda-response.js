@@ -11,7 +11,7 @@ export const processLambdaResponse = (response, event) => {
     if (!response) return response
 
     // Retrieve the correlation ID from the event headers
-    const correlationId = event.headers['x-correlation-id']
+    const correlationId = event.headers?.['x-correlation-id']
 
     const responseHeaders = {
         ...response.headers

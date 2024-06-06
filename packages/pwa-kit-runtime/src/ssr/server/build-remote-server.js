@@ -433,20 +433,6 @@ export const RemoteServerFactory = {
                 return
             }
 
-            // If the request has an X-Amz-Cf-Id header, log it now
-            // to make it easier to associated CloudFront requests
-            // with Lambda log entries. Generally we avoid logging
-            // because it increases the volume of log data, but this
-            // is important for log analysis.
-            const cloudfrontId = req.headers['x-amz-cf-id']
-            if (cloudfrontId) {
-                // Log the Express app request id plus the cloudfront
-                // x-edge-request-id value. The resulting line in the logs
-                // will automatically include the lambda RequestId, so
-                // one line links all ids.
-                console.log(`Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
-            }
-
             // Apply the request processor
             // `this` is bound to the calling context, usually RemoteServerFactory
             const requestProcessor = this._getRequestProcessor(req)
