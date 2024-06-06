@@ -17,7 +17,8 @@ import {
     ShopperGiftCertificates,
     ShopperSearch,
     ShopperSeo,
-    ShopperBasketsTypes
+    ShopperBasketsTypes,
+    ShopperStores
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
@@ -138,7 +139,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),
-            shopperSeo: new ShopperSeo(config)
+            shopperSeo: new ShopperSeo(config),
+            shopperStores: new ShopperStores(config)
         }
     }, [
         clientId,
