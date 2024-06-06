@@ -7,16 +7,24 @@
 
 import {ShopperProducts} from 'commerce-sdk-isomorphic'
 
+const {
+    getProducts,
+    getProductsRequired,
+    getProduct,
+    getProductRequired,
+    getCategories,
+    getCategoriesRequired,
+    getCategory,
+    getCategoryRequired
+} = ShopperProducts.paramKeys
+
 export default {
-    getProducts: ShopperProducts.getProductsParamKeys,
-    getProductsRequired: ShopperProducts.getProductsParamKeysRequired,
-
-    getProduct: ShopperProducts.getProductParamKeys,
-    getProductRequired: ShopperProducts.getProductParamKeysRequired,
-
-    getCategories: ShopperProducts.getCategoriesParamKeys,
-    getCategoriesRequired: ShopperProducts.getCategoriesParamKeysRequired,
-
-    getCategory: ShopperProducts.getCategoryParamKeys,
-    getCategoryRequired: ShopperProducts.getCategoryParamKeysRequired
+    getProducts,
+    getProductsRequired,
+    getProduct,
+    getProductRequired,
+    getCategories,
+    getCategoriesRequired,
+    getCategory,
+    getCategoryRequired
 }
