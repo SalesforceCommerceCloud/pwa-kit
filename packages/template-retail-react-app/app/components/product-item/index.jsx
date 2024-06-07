@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
 import {Box, Fade, Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -26,6 +26,7 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Hooks
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import {VisuallyHidden} from '@chakra-ui/react'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -45,6 +46,8 @@ const ProductItem = ({
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
+    const intl = useIntl()
+
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>
@@ -100,6 +103,18 @@ const ProductItem = ({
                                         }}
                                     />
                                 </Stack>
+                                <VisuallyHidden aria-live="polite">
+                                    {product?.name}
+                                    {intl.formatMessage(
+                                        {
+                                            id: 'item_variant.assistive_msg.quantity',
+                                            defaultMessage: 'Quantity {quantity}'
+                                        },
+                                        {
+                                            quantity: product?.quantity
+                                        }
+                                    )}
+                                </VisuallyHidden>
                                 <Stack>
                                     <HideOnMobile>
                                         <CartItemVariantPrice />

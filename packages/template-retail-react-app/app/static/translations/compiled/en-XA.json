@@ -3509,6 +3509,42 @@
       "value": "]"
     }
   ],
+  "item_price.assistive_msg.discount_price": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŭŭřřḗḗƞŧ Ƥřīƈḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "displayPrice"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "item_price.assistive_msg.list_price": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿřīɠīƞȧȧŀ Ƥřīƈḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "item_price.label.starting_at": [
     {
       "type": 0,
@@ -3517,6 +3553,24 @@
     {
       "type": 0,
       "value": "Şŧȧȧřŧīƞɠ ȧȧŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "item_variant.assistive_msg.quantity": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɋŭŭȧȧƞŧīŧẏ "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
     },
     {
       "type": 0,

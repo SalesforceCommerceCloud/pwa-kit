@@ -12,12 +12,14 @@ import {useItemVariant} from '.'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {VisuallyHidden} from '@chakra-ui/react'
 
 const PricePerItem = ({currency, basket, basePrice}) => {
     const {currency: activeCurrency} = useCurrency()
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>
             <FormattedNumber
+                aria-label={'test'}
                 style="currency"
                 currency={currency || basket?.currency || activeCurrency}
                 value={basePrice}
@@ -54,7 +56,15 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
         typeof priceAfterItemDiscount === 'number' ? Math.min(price, priceAfterItemDiscount) : price
 
     const hasDiscount = displayPrice !== price
+    const listPriceText = intl.formatNumber(price, {
+        style: 'currency',
+        currency: currency || basket?.currency || activeCurrency
+    })
 
+    const displayPriceText = intl.formatNumber(displayPrice, {
+        style: 'currency',
+        currency: currency || basket?.currency || activeCurrency
+    })
     return (
         <Stack
             textAlign={align}
@@ -77,11 +87,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                         id: 'item_price.label.starting_at'
                     })} `}
 
-                <FormattedNumber
-                    style="currency"
-                    currency={currency || basket?.currency || activeCurrency}
-                    value={displayPrice}
-                />
+                <Text as="span">{displayPriceText}</Text>
                 {hasDiscount && (
                     <Text
                         as="span"
@@ -91,11 +97,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                         color="gray.500"
                         marginLeft={1}
                     >
-                        <FormattedNumber
-                            style="currency"
-                            currency={currency || basket?.currency || activeCurrency}
-                            value={price}
-                        />
+                        {listPriceText}
                     </Text>
                 )}
             </Text>
@@ -105,6 +107,30 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                     <PricePerItem currency={currency} basePrice={basePrice} basket={basket} />
                 </HideOnMobile>
             )}
+
+            {/*This area is purely for screen reader*/}
+            <VisuallyHidden aria-live="polite" aria-atomic={true}>
+                {variant?.name}
+                {intl.formatMessage(
+                    {
+                        id: 'item_price.assistive_msg.discount_price',
+                        defaultMessage: 'Current Price {displayPrice}'
+                    },
+                    {
+                        displayPrice: displayPriceText || ''
+                    }
+                )}
+                {hasDiscount &&
+                    intl.formatMessage(
+                        {
+                            id: 'item_price.assistive_msg.list_price',
+                            defaultMessage: 'Original Price {listPrice}'
+                        },
+                        {
+                            listPrice: listPriceText || ''
+                        }
+                    )}
+            </VisuallyHidden>
         </Stack>
     )
 }

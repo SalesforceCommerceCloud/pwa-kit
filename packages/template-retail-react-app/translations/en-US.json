@@ -699,8 +699,17 @@
     "defaultMessage": "Unavailable",
     "description": "A unavailable badge placed on top of a product image"
   },
+  "item_price.assistive_msg.discount_price": {
+    "defaultMessage": "Current Price {displayPrice}"
+  },
+  "item_price.assistive_msg.list_price": {
+    "defaultMessage": "Original Price {listPrice}"
+  },
   "item_price.label.starting_at": {
     "defaultMessage": "Starting at"
+  },
+  "item_variant.assistive_msg.quantity": {
+    "defaultMessage": "Quantity {quantity}"
   },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"

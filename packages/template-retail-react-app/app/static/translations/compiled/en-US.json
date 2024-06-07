@@ -1661,10 +1661,40 @@
       "value": "Unavailable"
     }
   ],
+  "item_price.assistive_msg.discount_price": [
+    {
+      "type": 0,
+      "value": "Current Price "
+    },
+    {
+      "type": 1,
+      "value": "displayPrice"
+    }
+  ],
+  "item_price.assistive_msg.list_price": [
+    {
+      "type": 0,
+      "value": "Original Price "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
   "item_price.label.starting_at": [
     {
       "type": 0,
       "value": "Starting at"
+    }
+  ],
+  "item_variant.assistive_msg.quantity": [
+    {
+      "type": 0,
+      "value": "Quantity "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
     }
   ],
   "lCPCxk": [
