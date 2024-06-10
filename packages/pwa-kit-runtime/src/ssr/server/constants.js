@@ -7,7 +7,6 @@
 export const APPLICATION_OCTET_STREAM = 'application/octet-stream'
 export const BUILD = 'build'
 export const STATIC_ASSETS = 'static_assets'
-export const PROXY_PATH_PREFIX = '/mobify/proxy'
 // All these values MUST be lower case
 export const CONTENT_TYPE = 'content-type'
 export const CONTENT_ENCODING = 'content-encoding'
@@ -19,4 +18,3 @@ export const CACHE_CONTROL = 'cache-control'
 export const NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
 export const CONTENT_SECURITY_POLICY = 'content-security-policy'
 export const STRICT_TRANSPORT_SECURITY = 'strict-transport-security'
-export const SLAS_CUSTOM_PROXY_PATH = '/mobify/slas/private'
