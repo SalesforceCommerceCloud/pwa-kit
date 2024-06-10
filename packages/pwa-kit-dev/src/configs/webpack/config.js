@@ -403,12 +403,7 @@ const enableReactRefresh = (config) => {
             new ReactRefreshWebpackPlugin({
                 overlay: false
             })
-        ],
-        output: {
-            ...config.output,
-            // Setting this so that *.hot-update.json requests are resolving
-            publicPath: '/mobify/bundle/development/'
-        }
+        ]
     }
 }
 
