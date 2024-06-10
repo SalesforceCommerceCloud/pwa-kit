@@ -8,7 +8,6 @@ const LOG_LEVELS = ['debug', 'info', 'warn', 'error']
 const DEFAULT_LOG_LEVEL = 'info'
 
 const LOG_LEVEL = process.env.TESTMRT_LOG_LEVEL || DEFAULT_LOG_LEVEL
-
 class PWAKITLogger {
     constructor(logLevel = LOG_LEVEL) {
         this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
@@ -18,9 +17,11 @@ class PWAKITLogger {
         return LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(this.logLevel)
     }
 
-    log(level, moduleName, fileName, action, message) {
+    printLog(level, message, messageDetail = '') {
         if (this.shouldLog(level)) {
-            const logMessage = `[${moduleName}][${fileName}][${action}] - ${message}`
+            const logMessage = `[PWAKITLOG][${level.toUpperCase()}]${
+                messageDetail ? `[${messageDetail}]` : ''
+            } - ${message}`
 
             switch (level) {
                 case 'error':
@@ -36,23 +37,26 @@ class PWAKITLogger {
         }
     }
 
-    debug(moduleName, fileName, action, message) {
-        this.log('debug', moduleName, fileName, action, message)
+    debug(message, messageDetail ='') {
+        this.printLog('debug', message, messageDetail)
     }
 
-    info(moduleName, fileName, action, message) {
-        this.log('info', moduleName, fileName, action, message)
+    log(message, messageDetail ='') {
+        this.printLog('info', message, messageDetail)
     }
 
-    warn(moduleName, fileName, action, message) {
-        this.log('warn', moduleName, fileName, action, message)
+    info(message, messageDetail ='') {
+        this.printLog('info', message, messageDetail)
     }
 
-    error(moduleName, fileName, action, message) {
-        this.log('error', moduleName, fileName, action, message)
+    warn(message, messageDetail ='') {
+        this.printLog('warn', message, messageDetail)
+    }
+
+    error(message, messageDetail ='') {
+        this.printLog('error', message, messageDetail)
     }
 }
 
-const logger = new PWAKITLogger(LOG_LEVEL)
-
-export default logger
+const logger = new PWAKITLogger()
+module.exports = logger
