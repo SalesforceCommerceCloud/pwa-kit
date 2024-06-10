@@ -43,7 +43,7 @@ import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
-import {morganStream} from '../../utils/morgan-stream'
+import logger from '../../utils/logger'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
@@ -242,7 +242,7 @@ export const RemoteServerFactory = {
                     ].join(' ')
                 },
                 {
-                    stream: morganStream
+                    stream: {write: (message) => logger.info(message.trim())}
                 }
             )
         )
@@ -434,20 +434,6 @@ export const RemoteServerFactory = {
             // If the request is for a proxy or bundle path, do nothing
             if (req.originalUrl.startsWith('/mobify/')) {
                 return
-            }
-
-            // If the request has an X-Amz-Cf-Id header, log it now
-            // to make it easier to associated CloudFront requests
-            // with Lambda log entries. Generally we avoid logging
-            // because it increases the volume of log data, but this
-            // is important for log analysis.
-            const cloudfrontId = req.headers['x-amz-cf-id']
-            if (cloudfrontId) {
-                // Log the Express app request id plus the cloudfront
-                // x-edge-request-id value. The resulting line in the logs
-                // will automatically include the lambda RequestId, so
-                // one line links all ids.
-                console.log(`Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
             }
 
             // Apply the request processor
