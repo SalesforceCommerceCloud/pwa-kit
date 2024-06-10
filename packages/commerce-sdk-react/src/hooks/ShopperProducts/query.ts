@@ -10,7 +10,7 @@ import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {getCustomKeys, mergeOptions, omitNullableParameters, pick} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-import paramKeysMap from './paramKeys'
+import {ShopperProducts} from 'commerce-sdk-isomorphic'
 
 type Client = ApiClients['shopperProducts']
 
@@ -33,13 +33,16 @@ export const useProducts = (
     type Data = DataType<Client['getProducts']>
     const {shopperProducts: client} = useCommerceApi()
     const methodName = 'getProducts'
-    const requiredParameters = paramKeysMap[`${methodName}Required`]
+    const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const paramKeys = [
+        ...ShopperProducts.paramKeys[methodName],
+        ...getCustomKeys(netOptions.parameters)
+    ]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
@@ -72,13 +75,16 @@ export const useProduct = (
     type Data = DataType<Client['getProduct']>
     const {shopperProducts: client} = useCommerceApi()
     const methodName = 'getProduct'
-    const requiredParameters = paramKeysMap[`${methodName}Required`]
+    const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const paramKeys = [
+        ...ShopperProducts.paramKeys[methodName],
+        ...getCustomKeys(netOptions.parameters)
+    ]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
@@ -111,13 +117,16 @@ export const useCategories = (
     type Data = DataType<Client['getCategories']>
     const {shopperProducts: client} = useCommerceApi()
     const methodName = 'getCategories'
-    const requiredParameters = paramKeysMap[`${methodName}Required`]
+    const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const paramKeys = [
+        ...ShopperProducts.paramKeys[methodName],
+        ...getCustomKeys(netOptions.parameters)
+    ]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
@@ -152,13 +161,16 @@ export const useCategory = (
     type Data = DataType<Client['getCategory']>
     const {shopperProducts: client} = useCommerceApi()
     const methodName = 'getCategory'
-    const requiredParameters = paramKeysMap[`${methodName}Required`]
+    const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
     // get param keys for the api from netOptions
-    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const paramKeys = [
+        ...ShopperProducts.paramKeys[methodName],
+        ...getCustomKeys(netOptions.parameters)
+    ]
     const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
