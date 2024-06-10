@@ -155,9 +155,9 @@ const App = (props) => {
     )
 
     // TODO: Remove test logs before merging
-    if (isServer){
+    if (isServer) {
         logger.log('log test message')
-        logger.info('info test message', 'retail-react-app.App',)
+        logger.info('info test message', 'retail-react-app.App')
         logger.warn('warn test message', 'retail-react-app.App')
         logger.error('error test message', 'retail-react-app.App')
         logger.debug('debug test message', 'retail-react-app.App')

@@ -227,24 +227,45 @@ export const RemoteServerFactory = {
      */
 
     _setupLogging(app) {
+        const loggerFormat = function (tokens, req, res) {
+            const contentLength = tokens.res(req, res, 'content-length')
+            return [
+                `(${res.locals.requestId})`,
+                tokens.method(req, res),
+                tokens.url(req, res),
+                tokens.status(req, res),
+                tokens['response-time'](req, res),
+                'ms',
+                contentLength && `- ${contentLength}`
+            ].join(' ')
+        }
+
+        // Morgan stream for logging status codes less than 400
         app.use(
-            expressLogging(
-                function (tokens, req, res) {
-                    const contentLength = tokens.res(req, res, 'content-length')
-                    return [
-                        `(${res.locals.requestId})`,
-                        tokens.method(req, res),
-                        tokens.url(req, res),
-                        tokens.status(req, res),
-                        tokens['response-time'](req, res),
-                        'ms',
-                        contentLength && `- ${contentLength}`
-                    ].join(' ')
+            expressLogging(loggerFormat, {
+                skip: function (req, res) {
+                    return res.statusCode >= 400
                 },
-                {
-                    stream: {write: (message) => logger.info(message.trim(), 'pwa-kit-runtime.RemoteServerFactory')}
+                stream: {
+                    write: (message) => {
+                        logger.info(message.trim(), 'pwa-kit-runtime.RemoteServerFactory')
+                    }
                 }
-            )
+            })
+        )
+
+        // Morgan stream for logging status codes 400 and above
+        app.use(
+            expressLogging(loggerFormat, {
+                skip: function (req, res) {
+                    return res.statusCode < 400
+                },
+                stream: {
+                    write: (message) => {
+                        logger.error(message.trim(), 'pwa-kit-runtime.RemoteServerFactory')
+                    }
+                }
+            })
         )
     },
 

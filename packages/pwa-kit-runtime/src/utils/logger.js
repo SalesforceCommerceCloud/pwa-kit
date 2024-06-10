@@ -37,23 +37,23 @@ class PWAKITLogger {
         }
     }
 
-    debug(message, messageDetail ='') {
+    debug(message, messageDetail = '') {
         this.printLog('debug', message, messageDetail)
     }
 
-    log(message, messageDetail ='') {
+    log(message, messageDetail = '') {
         this.printLog('info', message, messageDetail)
     }
 
-    info(message, messageDetail ='') {
+    info(message, messageDetail = '') {
         this.printLog('info', message, messageDetail)
     }
 
-    warn(message, messageDetail ='') {
+    warn(message, messageDetail = '') {
         this.printLog('warn', message, messageDetail)
     }
 
-    error(message, messageDetail ='') {
+    error(message, messageDetail = '') {
         this.printLog('error', message, messageDetail)
     }
 }
