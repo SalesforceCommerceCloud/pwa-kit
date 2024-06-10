@@ -24,10 +24,7 @@ module.exports = {
     },
     globals: {
         DEBUG: true,
-        NODE_ENV: 'test',
-        Progressive: {
-            buildOrigin: '/mobify/bundle/development/'
-        }
+        NODE_ENV: 'test'
     },
     transform: {
         '^.+\\.(js|jsx|ts|tsx)$': path.join(__dirname, 'jest-babel-transform.js')
