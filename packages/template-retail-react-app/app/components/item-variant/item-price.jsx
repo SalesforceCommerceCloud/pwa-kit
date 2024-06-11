@@ -46,6 +46,8 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
     const isASet = variant?.type?.set
     const isMaster = variant?.type?.master
     let priceData
+    let currentPriceText
+    let listPriceText
     // When variant has basket pricing, we should prioritize these prices for displaying
     // since they may have take promotion/discount into account
     // NOTE: try NOT to re-calculate these values since basket-level discount is complicated
@@ -60,24 +62,34 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
             isRange: isASet || isMaster || false,
             isOnSale: price > priceAfterItemDiscount
         }
-    } else {
-        // for wishlist page we extract price info from variant/product obj
-        priceData = getPriceData(variant)
-    }
-    const isDesktop = useBreakpointValue({base: false, lg: true})
-
-    // for a11y
-    const currentPriceText = intl.formatNumber(priceData.currentPrice * variant?.quantity, {
-        currency,
-        style: 'currency'
-    })
-
-    const listPriceText =
-        priceData.listPrice &&
-        intl.formatNumber(priceData.listPrice * variant?.quantity, {
+        // for a11y
+        currentPriceText = intl.formatNumber(priceData.currentPrice, {
             currency,
             style: 'currency'
         })
+        listPriceText =
+            priceData.listPrice &&
+            intl.formatNumber(priceData.listPrice, {
+                currency,
+                style: 'currency'
+            })
+    } else {
+        // for wishlist page we extract price info from variant/product obj
+        priceData = getPriceData(variant)
+        // for a11y
+        currentPriceText = intl.formatNumber(priceData.currentPrice * variant?.quantity, {
+            currency,
+            style: 'currency'
+        })
+        listPriceText =
+            priceData.listPrice &&
+            intl.formatNumber(priceData.listPrice * variant?.quantity, {
+                currency,
+                style: 'currency'
+            })
+    }
+    const isDesktop = useBreakpointValue({base: false, lg: true})
+
     return (
         <Stack
             textAlign={align}

@@ -44,7 +44,7 @@ describe('ItemPrice', function () {
             <MockedComponent variant={cartVariant} />
         )
         // current price
-        expect(getByText(/£0\.00/i)).toBeInTheDocument()
+        expect(getByText(/^£0\.00$/i)).toBeInTheDocument()
         // price per item
         const pricePerItemEls = getAllByText(/£24\.00ea/i)
         // make sure that only one price per item is shown on mobile
@@ -64,7 +64,7 @@ describe('ItemPrice', function () {
         expect(pricePerItemEls).toHaveLength(1)
 
         // current price
-        expect(getByText(/£0\.00/i)).toBeInTheDocument()
+        expect(getByText(/^£0\.00$/i)).toBeInTheDocument()
     })
 
     test('should display product prices if variant is for wishlist page on desktop', () => {
@@ -74,7 +74,7 @@ describe('ItemPrice', function () {
         )
 
         // current price
-        expect(getByText(/£355\.15/i)).toBeInTheDocument()
+        expect(getByText(/^£355\.15$/i)).toBeInTheDocument()
         // strikethrough price
         const strikethroughPriceTag = container.querySelector('s')
         expect(within(strikethroughPriceTag).getByText(/£476\.80/i)).toBeInTheDocument()
@@ -95,7 +95,7 @@ describe('ItemPrice', function () {
         expect(pricePerItemEls).toHaveLength(1)
 
         // current price
-        expect(getByText(/£355\.15/i)).toBeInTheDocument()
+        expect(getByText(/^£355\.15$/i)).toBeInTheDocument()
         // strikethrough price
         const strikethroughPriceTag = container.querySelector('s')
         expect(within(strikethroughPriceTag).getByText(/£476\.80/i)).toBeInTheDocument()
