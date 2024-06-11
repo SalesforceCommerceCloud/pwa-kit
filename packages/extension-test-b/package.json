@@ -1,0 +1,12 @@
+{
+    "name": "@salesforce/extension-test-b",
+    "version": "1.0.0-dev",
+    "private": true,
+    "devDependencies": {
+    },
+    "engines": {
+      "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
+      "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
+    }
+}
+  
