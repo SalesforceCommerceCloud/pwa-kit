@@ -11,9 +11,9 @@ const isServerSide = typeof window === 'undefined'
 
 const LOG_LEVEL = isServerSide
     ? process.env.PWAKIT_LOG_LEVEL || DEFAULT_LOG_LEVEL
-    : window.PWAKIT_LOG_LEVEL || DEFAULT_LOG_LEVEL
+    : DEFAULT_LOG_LEVEL
 
-class PWAKITLogger {
+export class PWAKITLogger {
     constructor(logLevel = LOG_LEVEL) {
         this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
     }
@@ -64,4 +64,5 @@ class PWAKITLogger {
 }
 
 const logger = new PWAKITLogger()
-module.exports = logger
+
+export default logger
