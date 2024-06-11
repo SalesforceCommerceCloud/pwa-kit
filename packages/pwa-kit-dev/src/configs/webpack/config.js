@@ -121,6 +121,10 @@ const getAppEntryPoint = () => {
     return resolve('./', EXT_OVERRIDES_DIR_NO_SLASH, 'app', 'main')
 }
 
+const getPublicPathEntryPoint = () => {
+    return resolve(projectDir, 'node_modules', '@salesforce', 'pwa-kit-react-sdk', 'ssr', 'universal', 'public-path')
+}
+
 const findDepInStack = (pkg) => {
     // Look for the SDK node_modules in two places because in CI,
     // pwa-kit-dev is published under a 'dist' directory, which
@@ -394,7 +398,7 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getAppEntryPoint()]
+            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getPublicPathEntryPoint(), getAppEntryPoint()]
         },
         plugins: [
             ...config.plugins,
