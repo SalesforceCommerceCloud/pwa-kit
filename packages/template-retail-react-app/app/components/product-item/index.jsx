@@ -9,7 +9,14 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
-import {Box, Fade, Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Box,
+    Fade,
+    Flex,
+    Stack,
+    Text,
+    VisuallyHidden
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
@@ -26,7 +33,6 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Hooks
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
-import {VisuallyHidden} from '@chakra-ui/react'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
