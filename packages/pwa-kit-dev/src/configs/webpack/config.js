@@ -122,7 +122,15 @@ const getAppEntryPoint = () => {
 }
 
 const getPublicPathEntryPoint = () => {
-    return resolve(projectDir, 'node_modules', '@salesforce', 'pwa-kit-react-sdk', 'ssr', 'universal', 'public-path')
+    return resolve(
+        projectDir,
+        'node_modules',
+        '@salesforce',
+        'pwa-kit-react-sdk',
+        'ssr',
+        'universal',
+        'public-path'
+    )
 }
 
 const findDepInStack = (pkg) => {
@@ -398,7 +406,11 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getPublicPathEntryPoint(), getAppEntryPoint()]
+            main: [
+                'webpack-hot-middleware/client?path=/__mrt/hmr',
+                getPublicPathEntryPoint(),
+                getAppEntryPoint()
+            ]
         },
         plugins: [
             ...config.plugins,
