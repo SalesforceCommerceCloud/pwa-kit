@@ -19,7 +19,6 @@ const PricePerItem = ({currency, basket, basePrice}) => {
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>
             <FormattedNumber
-                aria-label={'test'}
                 style="currency"
                 currency={currency || basket?.currency || activeCurrency}
                 value={basePrice}
