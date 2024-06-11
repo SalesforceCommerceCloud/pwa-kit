@@ -14,6 +14,9 @@ export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
     'https://runtime-admin-preview.mobify-storefront.com'
 ])
 
+// We hard code /mobify/proxy here as we don't want commerce-sdk-react to have a dependency on pwa-kit-runtime
+export const PROXY_PATH = '/mobify/proxy'
+
 // We hard code /mobify/bundle/development here as we don't want commerce-sdk-react to have a dependency on pwa-kit-runtime
 export const LOCAL_BUNDLE_PATH = '/mobify/bundle/development'
 
