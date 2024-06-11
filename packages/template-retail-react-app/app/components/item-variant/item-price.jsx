@@ -6,11 +6,12 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, FormattedNumber} from 'react-intl'
+import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {
     Stack,
     Text,
-    useBreakpointValue
+    useBreakpointValue,
+    VisuallyHidden
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useItemVariant} from '.'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
@@ -40,6 +41,7 @@ PricePerItem.propTypes = {
  */
 const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...props}) => {
     const variant = useItemVariant()
+    const intl = useIntl()
     const {price, priceAfterItemDiscount} = variant
     const isASet = variant?.type?.set
     const isMaster = variant?.type?.master
@@ -63,6 +65,19 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
         priceData = getPriceData(variant)
     }
     const isDesktop = useBreakpointValue({base: false, lg: true})
+
+    // for a11y
+    const currentPriceText = intl.formatNumber(priceData.currentPrice * variant?.quantity, {
+        currency,
+        style: 'currency'
+    })
+
+    const listPriceText =
+        priceData.listPrice &&
+        intl.formatNumber(priceData.listPrice * variant?.quantity, {
+            currency,
+            style: 'currency'
+        })
     return (
         <Stack
             textAlign={align}
@@ -95,6 +110,30 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
             {isDesktop && variant?.quantity > 1 && !isASet && priceData?.pricePerUnit && (
                 <PricePerItem currency={currency} basePrice={priceData.pricePerUnit} />
             )}
+
+            {/*For screen reader, we want to make sure the product name is announceed*/}
+            <VisuallyHidden role="status">
+                {variant?.name}
+                {intl.formatMessage(
+                    {
+                        id: 'item_price.assistive_msg.current_price',
+                        defaultMessage: 'Current Price {currentPrice}'
+                    },
+                    {
+                        currentPrice: currentPriceText || ''
+                    }
+                )}
+                {priceData.listPrice &&
+                    intl.formatMessage(
+                        {
+                            id: 'item_price.assistive_msg.list_price',
+                            defaultMessage: 'Original Price {listPrice}'
+                        },
+                        {
+                            listPrice: listPriceText || ''
+                        }
+                    )}
+            </VisuallyHidden>
         </Stack>
     )
 }

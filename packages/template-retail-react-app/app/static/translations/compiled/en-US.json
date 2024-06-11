@@ -1717,6 +1717,36 @@
       "value": "Unavailable"
     }
   ],
+  "item_price.assistive_msg.current_price": [
+    {
+      "type": 0,
+      "value": "Current Price "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "item_price.assistive_msg.list_price": [
+    {
+      "type": 0,
+      "value": "Original Price "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "item_variant.assistive_msg.quantity": [
+    {
+      "type": 0,
+      "value": "Quantity "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,
