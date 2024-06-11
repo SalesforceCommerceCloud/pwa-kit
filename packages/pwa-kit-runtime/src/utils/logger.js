@@ -13,57 +13,118 @@ const LOG_LEVEL = isServerSide
     ? process.env.PWAKIT_LOG_LEVEL || DEFAULT_LOG_LEVEL
     : DEFAULT_LOG_LEVEL
 
+/**
+ * The PWAKITLogger provides structured logging with different log levels.
+ */
 export class PWAKITLogger {
+    /**
+     * Creates an instance of PWAKITLogger.
+     * @param {string} logLevel - The log level to set for the logger.
+     */
     constructor(logLevel = LOG_LEVEL) {
         this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
     }
 
+    /**
+     * Determines if the message should be logged based on the PWAKIT_LOG_LEVEL value.
+     * @param {string} level - The log level of the message.
+     * @returns {boolean} - Returns true if the message should be logged, otherwise false.
+     */
     shouldLog(level) {
         return LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(this.logLevel)
     }
 
-    printLog(level, message, {details, key} = {}) {
-        if (this.shouldLog(level)) {
-            const detailsStr = details ? `[${details.join('][')}]` : ''
-            const logMessage = `[PWAKITLOG][${level.toUpperCase()}]${
-                key ? `[${key}]` : ''
-            }${detailsStr} - ${message}`
+    /**
+     * Prints a log message with the namespace using the console object method set in the message log level.
+     * @param {string} message - The log message.
+     * @param {string} level - The log level of the message.
+     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string[]} [options.details] - Additional details to generate the log message namespace.
+     */
+    printLog(message, level, {key, details}) {
+        if (!this.shouldLog(level)) {
+            return
+        }
 
-            switch (level) {
-                case 'error':
-                    console.error(logMessage)
-                    break
-                case 'warn':
-                    console.warn(logMessage)
-                    break
-                default:
-                    console.log(logMessage)
-                    break
-            }
+        const detailsStr = details ? `[${details.join('][')}]` : ''
+        const logMessage = `[PWAKITLOG][${level.toUpperCase()}]${
+            key ? `[${key}]` : ''
+        }${detailsStr} - ${message.trim()}`
+
+        switch (level) {
+            case 'error':
+                console.error(logMessage)
+                break
+            case 'warn':
+                console.warn(logMessage)
+                break
+            default:
+                console.log(logMessage)
+                break
         }
     }
 
+    /**
+     * Logs a debug message.
+     * @param {string} message - The debug message.
+     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string[]} [options.details] - Additional details to generate the log message namespace.
+     */
     debug(message, options = {}) {
-        this.printLog('debug', message, options)
+        this.printLog(message, 'debug', options)
     }
 
+    /**
+     * Logs an info message.
+     * @param {string} message - The info message.
+     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string[]} [options.details] - Additional details to generate the log message namespace.
+     */
     log(message, options = {}) {
-        this.printLog('info', message, options)
+        this.printLog(message, 'info', options)
     }
 
+    /**
+     * Logs an info message.
+     * @param {string} message - The info message.
+     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string[]} [options.details] - Additional details to generate the log message namespace.
+     */
     info(message, options = {}) {
-        this.printLog('info', message, options)
+        this.printLog(message, 'info', options)
     }
 
+    /**
+     * Logs a warning message.
+     * @param {string} message - The warning message.
+     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string[]} [options.details] - Additional details to generate the log message namespace.
+     */
     warn(message, options = {}) {
-        this.printLog('warn', message, options)
+        this.printLog(message, 'warn', options)
     }
 
+    /**
+     * Logs an error message.
+     * @param {string} message - The error message.
+     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string[]} [options.details] - Additional details to generate the log message namespace.
+     */
     error(message, options = {}) {
-        this.printLog('error', message, options)
+        this.printLog(message, 'error', options)
     }
 }
 
+/**
+ * The default logger instance.
+ * @type {PWAKITLogger}
+ */
 const logger = new PWAKITLogger()
 
 export default logger

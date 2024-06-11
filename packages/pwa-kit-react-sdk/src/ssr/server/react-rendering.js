@@ -67,7 +67,7 @@ const logAndFormatError = (err) => {
         return {message: err.message, status: err.status, stack: err.stack}
     } else {
         const cause = err.stack || err.toString()
-        logger.error(cause, {key:'pwa-kit-react-sdk', details:['render']})
+        logger.error(cause, {key: 'pwa-kit-react-sdk', details: ['render']})
         const safeMessage = 'Internal Server Error'
         return {message: safeMessage, status: 500, stack: err.stack}
     }
