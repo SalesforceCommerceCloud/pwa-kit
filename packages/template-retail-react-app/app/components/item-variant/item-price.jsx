@@ -107,7 +107,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
             )}
 
             {/*This area is purely for screen reader*/}
-            <VisuallyHidden aria-live="polite" aria-atomic={true}>
+            <VisuallyHidden role={status}>
                 {variant?.name}
                 {intl.formatMessage(
                     {
