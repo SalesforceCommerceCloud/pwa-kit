@@ -109,7 +109,7 @@ const ProductItem = ({
                                         }}
                                     />
                                 </Stack>
-                                <VisuallyHidden aria-live="polite">
+                                <VisuallyHidden role="status">
                                     {product?.name}
                                     {intl.formatMessage(
                                         {
