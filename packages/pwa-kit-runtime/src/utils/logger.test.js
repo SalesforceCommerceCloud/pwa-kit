@@ -28,12 +28,6 @@ describe('PWAKITLogger', () => {
         expect(console.log).toHaveBeenCalledWith('[PWAKITLOG][DEBUG] - This is a debug message')
     })
 
-    test('should not log debug message if log level is info', () => {
-        const infoLogger = new PWAKITLogger('info')
-        infoLogger.debug('This debug message should not be logged')
-        expect(console.log).not.toHaveBeenCalled()
-    })
-
     test('should log a warn message', () => {
         logger.warn('This is a warn message')
         expect(console.warn).toHaveBeenCalledWith('[PWAKITLOG][WARN] - This is a warn message')
@@ -56,14 +50,34 @@ describe('PWAKITLogger', () => {
     })
 
     test('should log with message details', () => {
-        logger.info('This is an info message', 'Detail')
+        logger.info('This is an info message', {details: ['Detail1', 'Detail2']})
         expect(console.log).toHaveBeenCalledWith(
-            '[PWAKITLOG][INFO][Detail] - This is an info message'
+            '[PWAKITLOG][INFO][Detail1][Detail2] - This is an info message'
+        )
+    })
+
+    test('should log with key', () => {
+        logger.info('This is an info message', {key: 'Key1'})
+        expect(console.log).toHaveBeenCalledWith(
+            '[PWAKITLOG][INFO][Key1] - This is an info message'
+        )
+    })
+
+    test('should log with key and details', () => {
+        logger.info('This is an info message', {key: 'Key1', details: ['Detail1', 'Detail2']})
+        expect(console.log).toHaveBeenCalledWith(
+            '[PWAKITLOG][INFO][Key1][Detail1][Detail2] - This is an info message'
         )
     })
 
     test('should default to info log level if invalid log level is given', () => {
         const customLogger = new PWAKITLogger('invalid')
         expect(customLogger.logLevel).toBe('info')
+    })
+
+    test('should not log debug message if log level is info', () => {
+        const infoLogger = new PWAKITLogger('info')
+        infoLogger.debug('This debug message should not be logged')
+        expect(console.log).not.toHaveBeenCalled()
     })
 })

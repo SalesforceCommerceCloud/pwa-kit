@@ -157,10 +157,10 @@ const App = (props) => {
     // TODO: Remove test logs before merging
     if (isServer) {
         logger.log('log test message')
-        logger.info('info test message', 'retail-react-app.App')
-        logger.warn('warn test message', 'retail-react-app.App')
-        logger.error('error test message', 'retail-react-app.App')
-        logger.debug('debug test message', 'retail-react-app.App')
+        logger.info('info test message', {key:'retail-react-app', details:['App']})
+        logger.warn('warn test message', {key:'retail-react-app', details:['App']})
+        logger.error('error test message', {key:'retail-react-app', details:['App']})
+        logger.debug('debug test message', {key:'retail-react-app', details:['App']})
     }
 
     // Fetch the translation message data using the target locale.

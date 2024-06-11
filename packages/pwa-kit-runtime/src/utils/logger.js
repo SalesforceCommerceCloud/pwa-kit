@@ -22,11 +22,12 @@ export class PWAKITLogger {
         return LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(this.logLevel)
     }
 
-    printLog(level, message, messageDetail = '') {
+    printLog(level, message, {details, key} = {}) {
         if (this.shouldLog(level)) {
+            const detailsStr = details ? `[${details.join('][')}]` : ''
             const logMessage = `[PWAKITLOG][${level.toUpperCase()}]${
-                messageDetail ? `[${messageDetail}]` : ''
-            } - ${message}`
+                key ? `[${key}]` : ''
+            }${detailsStr} - ${message}`
 
             switch (level) {
                 case 'error':
@@ -42,24 +43,24 @@ export class PWAKITLogger {
         }
     }
 
-    debug(message, messageDetail = '') {
-        this.printLog('debug', message, messageDetail)
+    debug(message, options = {}) {
+        this.printLog('debug', message, options)
     }
 
-    log(message, messageDetail = '') {
-        this.printLog('info', message, messageDetail)
+    log(message, options = {}) {
+        this.printLog('info', message, options)
     }
 
-    info(message, messageDetail = '') {
-        this.printLog('info', message, messageDetail)
+    info(message, options = {}) {
+        this.printLog('info', message, options)
     }
 
-    warn(message, messageDetail = '') {
-        this.printLog('warn', message, messageDetail)
+    warn(message, options = {}) {
+        this.printLog('warn', message, options)
     }
 
-    error(message, messageDetail = '') {
-        this.printLog('error', message, messageDetail)
+    error(message, options = {}) {
+        this.printLog('error', message, options)
     }
 }
 
