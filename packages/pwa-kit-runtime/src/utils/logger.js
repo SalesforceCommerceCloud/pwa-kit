@@ -37,12 +37,12 @@ export class PWAKITLogger {
     /**
      * Prints a log message with the namespace using the console object method set in the message log level.
      * @param {string} message - The log message.
-     * @param {string} level - The log level of the message.
-     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {Object} [options={}] - Optional message parameters.
      * @param {string} [options.key] - A key associated to the log message package name.
-     * @param {string[]} [options.details] - Additional details to generate the log message namespace.
+     * @param {string} level - The log level of the message.
+     * @param {string[]} [options.details] - Additional details to generate the log message namespace following  the pattern module..
      */
-    printLog(message, level, {key, details}) {
+    printLog(message, {key, level, details}) {
         if (!this.shouldLog(level)) {
             return
         }
@@ -68,56 +68,61 @@ export class PWAKITLogger {
     /**
      * Logs a debug message.
      * @param {string} message - The debug message.
-     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {Object} [options={}] - Optional message parameters.
      * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string} level - The log level of the message.
      * @param {string[]} [options.details] - Additional details to generate the log message namespace.
      */
     debug(message, options = {}) {
-        this.printLog(message, 'debug', options)
+        this.printLog(message, {...options, level: 'debug'})
     }
 
     /**
      * Logs an info message.
      * @param {string} message - The info message.
-     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {Object} [options={}] - Optional message parameters.
      * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string} level - The log level of the message.
      * @param {string[]} [options.details] - Additional details to generate the log message namespace.
      */
     log(message, options = {}) {
-        this.printLog(message, 'info', options)
+        this.printLog(message, {...options, level: 'info'})
     }
 
     /**
      * Logs an info message.
      * @param {string} message - The info message.
-     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {Object} [options={}] - Optional message parameters.
      * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string} level - The log level of the message.
      * @param {string[]} [options.details] - Additional details to generate the log message namespace.
      */
     info(message, options = {}) {
-        this.printLog(message, 'info', options)
+        this.printLog(message, {...options, level: 'info'})
     }
 
     /**
      * Logs a warning message.
      * @param {string} message - The warning message.
-     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {Object} [options={}] - Optional message parameters.
      * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string} level - The log level of the message.
      * @param {string[]} [options.details] - Additional details to generate the log message namespace.
      */
     warn(message, options = {}) {
-        this.printLog(message, 'warn', options)
+        this.printLog(message, {...options, level: 'warn'})
     }
 
     /**
      * Logs an error message.
      * @param {string} message - The error message.
-     * @param {Object} [options={}] - Optional parameters to define the log message namespace.
+     * @param {Object} [options={}] - Optional message parameters.
      * @param {string} [options.key] - A key associated to the log message package name.
+     * @param {string} level - The log level of the message.
      * @param {string[]} [options.details] - Additional details to generate the log message namespace.
      */
     error(message, options = {}) {
-        this.printLog(message, 'error', options)
+        this.printLog(message, {...options, level: 'error'})
     }
 }
 

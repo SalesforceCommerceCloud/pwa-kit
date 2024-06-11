@@ -248,7 +248,7 @@ export const RemoteServerFactory = {
                 },
                 stream: {
                     write: (message) => {
-                        logger.info(message.trim(), {
+                        logger.info(message, {
                             key: 'pwa-kit-runtime',
                             details: ['RemoteServerFactory']
                         })
@@ -265,7 +265,7 @@ export const RemoteServerFactory = {
                 },
                 stream: {
                     write: (message) => {
-                        logger.error(message.trim(), {
+                        logger.error(message, {
                             key: 'pwa-kit-runtime',
                             details: ['RemoteServerFactory']
                         })
