@@ -45,8 +45,8 @@ import Link from '@salesforce/retail-react-app/app/components/link'
 // Icons
 import {
     BrandLogo,
-    LocationIcon,
     SignoutIcon,
+    StoreIcon,
     UserIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 
@@ -261,7 +261,7 @@ const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop}) => {
                             <Box {...styles.actionsItem}>
                                 <Link to={STORE_LOCATOR_HREF}>
                                     <HStack>
-                                        <LocationIcon {...styles.icon} />{' '}
+                                        <StoreIcon {...styles.icon} />{' '}
                                         <Text>
                                             {intl.formatMessage({
                                                 id: 'drawer_menu.link.store_locator',

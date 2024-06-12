@@ -48,9 +48,7 @@ const UseShopperStores = () => {
                     countryCode: 'US',
                     postalCode: '94086',
                     locale: 'en-US',
-                    maxDistance: 20012,
-                    offset: 100,
-                    limit: 200
+                    maxDistance: 20012
                 }
             },
             get hook() {

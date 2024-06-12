@@ -15,8 +15,8 @@ const StoreLocator = () => {
             <Seo title="Store Locator" description="Find a Store" />
             <Container
                 overflowY="scroll"
-                paddingTop={16}
-                width={['70%']}
+                paddingTop={8}
+                width={['90%']}
                 bg="white"
                 paddingBottom={14}
                 marginTop={8}
