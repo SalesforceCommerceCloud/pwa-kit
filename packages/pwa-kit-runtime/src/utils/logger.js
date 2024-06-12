@@ -57,7 +57,7 @@ export class PWAKITLogger {
         const logMessage = {
             namespace: `${this.packageName}.${namespace}`,
             message: message.trim(),
-            additionalProperties: additionalProperties
+            ...(additionalProperties && {additionalProperties})
         }
 
         if (this.format === 'TEXT') {
