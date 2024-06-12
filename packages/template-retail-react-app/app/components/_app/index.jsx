@@ -29,7 +29,7 @@ import {
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
-import logger from '@salesforce/pwa-kit-runtime/utils/logger'
+import createLogger from '@salesforce/pwa-kit-runtime/utils/logger'
 
 // Contexts
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
@@ -155,11 +155,17 @@ const App = (props) => {
     )
 
     // TODO: Remove test logs before merging
+    const logger = createLogger('retail-react-app')
+
+    const loggerDetails = {
+        namespace: 'app.APP.render'
+    }
+
     logger.log('log test message')
-    logger.info('info test message', {key: 'retail-react-app', details: ['App']})
-    logger.warn('warn test message', {key: 'retail-react-app', details: ['App']})
-    logger.error('error test message', {key: 'retail-react-app', details: ['App']})
-    logger.debug('debug test message', {key: 'retail-react-app', details: ['App']})
+    logger.info('info test message', loggerDetails)
+    logger.warn('warn test message', loggerDetails)
+    logger.error('error test message', loggerDetails)
+    logger.debug('debug test message', loggerDetails)
 
     // Fetch the translation message data using the target locale.
     const {data: messages} = useQuery({

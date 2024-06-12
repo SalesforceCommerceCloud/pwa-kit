@@ -43,7 +43,7 @@ import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
-import logger from '../../utils/logger'
+import createLogger from '../../utils/logger'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
@@ -76,6 +76,8 @@ const METRIC_DIMENSIONS = {
     Project: process.env.MOBIFY_PROPERTY_ID,
     Target: process.env.DEPLOY_TARGET
 }
+
+const logger = createLogger('pwa-kit-runtime')
 
 /**
  * @private
@@ -227,7 +229,7 @@ export const RemoteServerFactory = {
      */
 
     _setupLogging(app) {
-        const loggerFormat = function (tokens, req, res) {
+        const morganLoggerFormat = function (tokens, req, res) {
             const contentLength = tokens.res(req, res, 'content-length')
             return [
                 `(${res.locals.requestId})`,
@@ -240,18 +242,25 @@ export const RemoteServerFactory = {
             ].join(' ')
         }
 
+        const loggerDetails = {
+            namespace: 'http.request.RemoteServerFactory.request'
+            // TODO: Add additional morgan request props
+            // additionalProperties: {
+            //     method: req.method,
+            //     url: req.originalUrl,
+            //     statusCode: res.statusCode
+            // }
+        }
+
         // Morgan stream for logging status codes less than 400
         app.use(
-            expressLogging(loggerFormat, {
+            expressLogging(morganLoggerFormat, {
                 skip: function (req, res) {
                     return res.statusCode >= 400
                 },
                 stream: {
                     write: (message) => {
-                        logger.info(message, {
-                            key: 'pwa-kit-runtime',
-                            details: ['RemoteServerFactory']
-                        })
+                        logger.info(message, loggerDetails)
                     }
                 }
             })
@@ -259,16 +268,13 @@ export const RemoteServerFactory = {
 
         // Morgan stream for logging status codes 400 and above
         app.use(
-            expressLogging(loggerFormat, {
+            expressLogging(morganLoggerFormat, {
                 skip: function (req, res) {
                     return res.statusCode < 400
                 },
                 stream: {
                     write: (message) => {
-                        logger.error(message, {
-                            key: 'pwa-kit-runtime',
-                            details: ['RemoteServerFactory']
-                        })
+                        logger.error(message, loggerDetails)
                     }
                 }
             })

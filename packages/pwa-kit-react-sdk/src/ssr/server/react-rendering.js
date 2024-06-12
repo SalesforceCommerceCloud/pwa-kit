@@ -31,7 +31,7 @@ import * as errors from '../universal/errors'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import logger from '@salesforce/pwa-kit-runtime/utils/logger'
+import createLogger from '@salesforce/pwa-kit-runtime/utils/logger'
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import PropTypes from 'prop-types'
 
@@ -51,6 +51,8 @@ const VALID_TAG_NAMES = [
     'title'
 ]
 
+const logger = createLogger('pwa-kit-react-sdk')
+
 export const ALLOWLISTED_INLINE_SCRIPTS = []
 
 /**
@@ -67,7 +69,7 @@ const logAndFormatError = (err) => {
         return {message: err.message, status: err.status, stack: err.stack}
     } else {
         const cause = err.stack || err.toString()
-        logger.error(cause, {key: 'pwa-kit-react-sdk', details: ['render']})
+        logger.error(cause, {namespace: 'ssr.server.react-rendering.render'})
         const safeMessage = 'Internal Server Error'
         return {message: safeMessage, status: 500, stack: err.stack}
     }
