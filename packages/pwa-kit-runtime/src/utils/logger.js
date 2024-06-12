@@ -88,6 +88,12 @@ export class PWAKITLogger {
             case 'warn':
                 console.warn(formattedMessage)
                 break
+            case 'info':
+                console.info(formattedMessage)
+                break
+            case 'debug':
+                console.debug(formattedMessage)
+                break
             default:
                 console.log(formattedMessage)
                 break
