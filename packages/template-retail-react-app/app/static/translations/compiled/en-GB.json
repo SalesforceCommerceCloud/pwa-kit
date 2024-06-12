@@ -1439,6 +1439,12 @@
       "value": "numItems"
     }
   ],
+  "header.button.assistive_msg.store_locator": [
+    {
+      "type": 0,
+      "value": "Store Locator"
+    }
+  ],
   "header.button.assistive_msg.wishlist": [
     {
       "type": 0,
@@ -2883,6 +2889,66 @@
     {
       "type": 0,
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+    }
+  ],
+  "store_locator.action.find": [
+    {
+      "type": 0,
+      "value": "Find"
+    }
+  ],
+  "store_locator.action.use_my_location": [
+    {
+      "type": 0,
+      "value": "Use My Location"
+    }
+  ],
+  "store_locator.action.viewMore": [
+    {
+      "type": 0,
+      "value": "View More"
+    }
+  ],
+  "store_locator.description.away": [
+    {
+      "type": 0,
+      "value": "away"
+    }
+  ],
+  "store_locator.description.or": [
+    {
+      "type": 0,
+      "value": "Or"
+    }
+  ],
+  "store_locator.description.phone": [
+    {
+      "type": 0,
+      "value": "Phone:"
+    }
+  ],
+  "store_locator.description.viewing_within": [
+    {
+      "type": 0,
+      "value": "Viewing stores within 100 miles"
+    }
+  ],
+  "store_locator.dropdown.germany": [
+    {
+      "type": 0,
+      "value": "Germany"
+    }
+  ],
+  "store_locator.dropdown.united_states": [
+    {
+      "type": 0,
+      "value": "United States"
+    }
+  ],
+  "store_locator.title": [
+    {
+      "type": 0,
+      "value": "Find a Store"
     }
   ],
   "swatch_group.selected.label": [

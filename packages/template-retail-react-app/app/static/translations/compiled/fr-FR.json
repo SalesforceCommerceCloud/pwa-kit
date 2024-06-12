@@ -2889,6 +2889,66 @@
       "value": "Voulez-vous vraiment vous déconnecter ? Vous devrez vous reconnecter pour poursuivre votre commande en cours."
     }
   ],
+  "store_locator.action.find": [
+    {
+      "type": 0,
+      "value": "Trouver"
+    }
+  ],
+  "store_locator.action.use_my_location": [
+    {
+      "type": 0,
+      "value": "Utilise ma location"
+    }
+  ],
+  "store_locator.action.viewMore": [
+    {
+      "type": 0,
+      "value": "Voir plus"
+    }
+  ],
+  "store_locator.description.away": [
+    {
+      "type": 0,
+      "value": "loin"
+    }
+  ],
+  "store_locator.description.or": [
+    {
+      "type": 0,
+      "value": "Ou"
+    }
+  ],
+  "store_locator.description.phone": [
+    {
+      "type": 0,
+      "value": "Téléphone:"
+    }
+  ],
+  "store_locator.description.viewing_within": [
+    {
+      "type": 0,
+      "value": "Affichage des magasins dans un rayon de 100 miles"
+    }
+  ],
+  "store_locator.dropdown.germany": [
+    {
+      "type": 0,
+      "value": "Allemagne"
+    }
+  ],
+  "store_locator.dropdown.united_states": [
+    {
+      "type": 0,
+      "value": "États-Unis"
+    }
+  ],
+  "store_locator.title": [
+    {
+      "type": 0,
+      "value": "Trouver un magasin"
+    }
+  ],
   "swatch_group.selected.label": [
     {
       "type": 1,

@@ -1241,6 +1241,36 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "サインアウトしますか?現在のご注文を処理するには、再度サインインする必要があります。"
   },
+  "store_locator.action.find": {
+    "defaultMessage": "探す"
+  },
+  "store_locator.action.use_my_location": {
+    "defaultMessage": "現在地を使用する"
+  },
+  "store_locator.action.viewMore": {
+    "defaultMessage": "もっと見る"
+  },
+  "store_locator.description.away": {
+    "defaultMessage": "離れたところ"
+  },
+  "store_locator.description.or": {
+    "defaultMessage": "または"
+  },
+  "store_locator.description.phone": {
+    "defaultMessage": "電話："
+  },
+  "store_locator.description.viewing_within": {
+    "defaultMessage": "160マイル以内の店舗を表示"
+  },
+  "store_locator.dropdown.germany": {
+    "defaultMessage": "ドイツ"
+  },
+  "store_locator.dropdown.united_states": {
+    "defaultMessage": "アメリカ"
+  },
+  "store_locator.title": {
+    "defaultMessage": "お店を探す"
+  },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}: "
   },

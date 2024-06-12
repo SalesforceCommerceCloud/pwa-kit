@@ -45,7 +45,7 @@ import DrawerMenu from '@salesforce/retail-react-app/app/components/drawer-menu'
 import ListMenu from '@salesforce/retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
-
+import StoreLocator from '@salesforce/retail-react-app/app/components/store-locator'
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
@@ -61,7 +61,8 @@ import {
     watchOnlineStatus,
     flatten,
     mergeMatchedItems,
-    isServer
+    isServer,
+    setSessionJSONItem
 } from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
@@ -125,6 +126,7 @@ const App = (props) => {
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
+    const [storeLocatorIsOpen, setStoreLocatorIsOpen] = useState(false)
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -266,6 +268,11 @@ const App = (props) => {
         history.push(path)
     }
 
+    const onStoreLocatorClick = () => {
+        // Link to wishlist page if registered; Header component will show auth modal for guest users
+        setStoreLocatorIsOpen(true)
+    }
+
     const trackPage = () => {
         activeData.trackPage(site.id, locale.id, currency)
     }
@@ -275,160 +282,172 @@ const App = (props) => {
     }, [location])
 
     return (
-        <Box className="sf-app" {...styles.container}>
-            <StorefrontPreview getToken={getTokenWhenReady}>
-                <Helmet>
-                    {ACTIVE_DATA_ENABLED && (
-                        <script
-                            src={getAssetUrl('static/head-active_data.js')}
-                            id="headActiveData"
-                            type="text/javascript"
-                        ></script>
-                    )}
-                </Helmet>
-                <IntlProvider
-                    onError={(err) => {
-                        if (!messages) {
-                            // During the ssr prepass phase the messages object has not loaded, so we can suppress
-                            // errors during this time.
-                            return
-                        }
-                        if (err.code === 'MISSING_TRANSLATION') {
-                            // NOTE: Remove the console error for missing translations during development,
-                            // as we knew translations would be added later.
-                            console.warn('Missing translation', err.message)
-                            return
-                        }
-                        throw err
-                    }}
-                    locale={targetLocale}
-                    messages={messages}
-                    // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
-                    // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
-                    // - "extract-default-translations"
-                    // - "compile-translations:pseudo"
-                    defaultLocale={DEFAULT_LOCALE}
-                >
-                    <CurrencyProvider currency={currency}>
-                        <Seo>
-                            <meta name="theme-color" content={THEME_COLOR} />
-                            <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
-                            <link
-                                rel="apple-touch-icon"
-                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                            />
-                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+        <>
+            <Box className="sf-app" {...styles.container}>
+                <StorefrontPreview getToken={getTokenWhenReady}>
+                    <Helmet>
+                        {ACTIVE_DATA_ENABLED && (
+                            <script
+                                src={getAssetUrl('static/head-active_data.js')}
+                                id="headActiveData"
+                                type="text/javascript"
+                            ></script>
+                        )}
+                    </Helmet>
+                    <IntlProvider
+                        onError={(err) => {
+                            if (!messages) {
+                                // During the ssr prepass phase the messages object has not loaded, so we can suppress
+                                // errors during this time.
+                                return
+                            }
+                            if (err.code === 'MISSING_TRANSLATION') {
+                                // NOTE: Remove the console error for missing translations during development,
+                                // as we knew translations would be added later.
+                                console.warn('Missing translation', err.message)
+                                return
+                            }
+                            throw err
+                        }}
+                        locale={targetLocale}
+                        messages={messages}
+                        // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
+                        // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
+                        // - "extract-default-translations"
+                        // - "compile-translations:pseudo"
+                        defaultLocale={DEFAULT_LOCALE}
+                    >
+                        <CurrencyProvider currency={currency}>
+                            <Seo>
+                                <meta name="theme-color" content={THEME_COLOR} />
+                                <meta
+                                    name="apple-mobile-web-app-title"
+                                    content={DEFAULT_SITE_TITLE}
+                                />
+                                <link
+                                    rel="apple-touch-icon"
+                                    href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                                />
+                                <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
-                            {/* Urls for all localized versions of this page (including current page)
+                                {/* Urls for all localized versions of this page (including current page)
                                 For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                            {site.l10n?.supportedLocales.map((locale) => (
+                                {site.l10n?.supportedLocales.map((locale) => (
+                                    <link
+                                        rel="alternate"
+                                        hrefLang={locale.id.toLowerCase()}
+                                        href={`${appOrigin}${buildUrl(location.pathname)}`}
+                                        key={locale.id}
+                                    />
+                                ))}
+                                {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
                                 <link
                                     rel="alternate"
-                                    hrefLang={locale.id.toLowerCase()}
+                                    hrefLang={site.l10n.defaultLocale.slice(0, 2)}
                                     href={`${appOrigin}${buildUrl(location.pathname)}`}
-                                    key={locale.id}
                                 />
-                            ))}
-                            {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
-                            <link
-                                rel="alternate"
-                                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                                href={`${appOrigin}${buildUrl(location.pathname)}`}
-                            />
-                            {/* A wider fallback for user locales that the app does not support */}
-                            <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
-                        </Seo>
+                                {/* A wider fallback for user locales that the app does not support */}
+                                <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
+                            </Seo>
 
-                        <ScrollToTop />
+                            <ScrollToTop />
 
-                        <Box id="app" display="flex" flexDirection="column" flex={1}>
-                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                            <Box id="app" display="flex" flexDirection="column" flex={1}>
+                                <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                                <StoreLocator
+                                    isOpen={storeLocatorIsOpen}
+                                    setIsOpen={setStoreLocatorIsOpen}
+                                />
+                                <Box {...styles.headerWrapper}>
+                                    {!isCheckout ? (
+                                        <>
+                                            <AboveHeader />
+                                            <Header
+                                                onMenuClick={onOpen}
+                                                onLogoClick={onLogoClick}
+                                                onMyCartClick={onCartClick}
+                                                onMyAccountClick={onAccountClick}
+                                                onWishlistClick={onWishlistClick}
+                                                onStoreLocatorClick={onStoreLocatorClick}
+                                            >
+                                                <HideOnDesktop>
+                                                    <DrawerMenu
+                                                        isOpen={isOpen}
+                                                        onClose={onClose}
+                                                        onLogoClick={onLogoClick}
+                                                        root={
+                                                            categories?.[
+                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
+                                                            ]
+                                                        }
+                                                    />
+                                                </HideOnDesktop>
 
-                            <Box {...styles.headerWrapper}>
-                                {!isCheckout ? (
-                                    <>
-                                        <AboveHeader />
-                                        <Header
-                                            onMenuClick={onOpen}
-                                            onLogoClick={onLogoClick}
-                                            onMyCartClick={onCartClick}
-                                            onMyAccountClick={onAccountClick}
-                                            onWishlistClick={onWishlistClick}
-                                        >
-                                            <HideOnDesktop>
-                                                <DrawerMenu
-                                                    isOpen={isOpen}
-                                                    onClose={onClose}
-                                                    onLogoClick={onLogoClick}
-                                                    root={
-                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                    }
-                                                />
-                                            </HideOnDesktop>
-
-                                            <HideOnMobile>
-                                                <ListMenu
-                                                    root={
-                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                    }
-                                                />
-                                            </HideOnMobile>
-                                        </Header>
-                                    </>
-                                ) : (
-                                    <CheckoutHeader />
-                                )}
-                            </Box>
-                            {!isOnline && <OfflineBanner />}
-                            <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
+                                                <HideOnMobile>
+                                                    <ListMenu
+                                                        root={
+                                                            categories?.[
+                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
+                                                            ]
+                                                        }
+                                                    />
+                                                </HideOnMobile>
+                                            </Header>
+                                        </>
+                                    ) : (
+                                        <CheckoutHeader />
+                                    )}
+                                </Box>
+                                {!isOnline && <OfflineBanner />}
+                                <AddToCartModalProvider>
+                                    <SkipNavContent
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            flex: 1,
+                                            outline: 0
+                                        }}
                                     >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
-                                    </Box>
-                                </SkipNavContent>
+                                        <Box
+                                            as="main"
+                                            id="app-main"
+                                            role="main"
+                                            display="flex"
+                                            flexDirection="column"
+                                            flex="1"
+                                        >
+                                            <OfflineBoundary isOnline={false}>
+                                                {children}
+                                            </OfflineBoundary>
+                                        </Box>
+                                    </SkipNavContent>
 
-                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
-
-                                <AuthModal {...authModal} />
-                            </AddToCartModalProvider>
-                        </Box>
-                    </CurrencyProvider>
-                </IntlProvider>
-                {ACTIVE_DATA_ENABLED && (
-                    <script
-                        type="text/javascript"
-                        src={getAssetUrl('static/dwanalytics-22.2.js')}
-                        id="dwanalytics"
-                        async="async"
-                        onLoad={trackPage}
-                    ></script>
-                )}
-                {ACTIVE_DATA_ENABLED && (
-                    <script
-                        src={getAssetUrl('static/dwac-21.7.js')}
-                        type="text/javascript"
-                        id="dwac"
-                        async="async"
-                    ></script>
-                )}
-            </StorefrontPreview>
-        </Box>
+                                    {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                    <AuthModal {...authModal} />
+                                </AddToCartModalProvider>
+                            </Box>
+                        </CurrencyProvider>
+                    </IntlProvider>
+                    {ACTIVE_DATA_ENABLED && (
+                        <script
+                            type="text/javascript"
+                            src={getAssetUrl('static/dwanalytics-22.2.js')}
+                            id="dwanalytics"
+                            async="async"
+                            onLoad={trackPage}
+                        ></script>
+                    )}
+                    {ACTIVE_DATA_ENABLED && (
+                        <script
+                            src={getAssetUrl('static/dwac-21.7.js')}
+                            type="text/javascript"
+                            id="dwac"
+                            async="async"
+                        ></script>
+                    )}
+                </StorefrontPreview>
+            </Box>
+        </>
     )
 }
 

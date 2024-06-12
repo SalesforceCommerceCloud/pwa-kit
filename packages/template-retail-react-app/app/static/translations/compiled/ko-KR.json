@@ -2861,6 +2861,66 @@
       "value": "로그아웃하시겠습니까? 현재 주문을 처리하려면 다시 로그인해야 합니다."
     }
   ],
+  "store_locator.action.find": [
+    {
+      "type": 0,
+      "value": "찾기"
+    }
+  ],
+  "store_locator.action.use_my_location": [
+    {
+      "type": 0,
+      "value": "내 위치 사용"
+    }
+  ],
+  "store_locator.action.viewMore": [
+    {
+      "type": 0,
+      "value": "더보기"
+    }
+  ],
+  "store_locator.description.away": [
+    {
+      "type": 0,
+      "value": "떨어진 곳"
+    }
+  ],
+  "store_locator.description.or": [
+    {
+      "type": 0,
+      "value": "또는"
+    }
+  ],
+  "store_locator.description.phone": [
+    {
+      "type": 0,
+      "value": "전화:"
+    }
+  ],
+  "store_locator.description.viewing_within": [
+    {
+      "type": 0,
+      "value": "100마일 이내 매장 보기"
+    }
+  ],
+  "store_locator.dropdown.germany": [
+    {
+      "type": 0,
+      "value": "독일"
+    }
+  ],
+  "store_locator.dropdown.united_states": [
+    {
+      "type": 0,
+      "value": "미국"
+    }
+  ],
+  "store_locator.title": [
+    {
+      "type": 0,
+      "value": "매장 찾기"
+    }
+  ],
   "swatch_group.selected.label": [
     {
       "type": 1,
