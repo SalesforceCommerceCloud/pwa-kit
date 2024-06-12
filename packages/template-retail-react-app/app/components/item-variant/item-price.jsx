@@ -6,12 +6,11 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
+import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {
     Stack,
     Text,
-    useBreakpointValue,
-    VisuallyHidden
+    useBreakpointValue
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useItemVariant} from '.'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'

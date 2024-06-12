@@ -77,6 +77,8 @@ const ListPrice = ({
 ListPrice.propTypes = {
     price: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
+    name: PropTypes.string,
+    isLiveRegion: PropTypes.bool,
     as: PropTypes.string,
     isRange: PropTypes.bool,
     extraProps: PropTypes.object
