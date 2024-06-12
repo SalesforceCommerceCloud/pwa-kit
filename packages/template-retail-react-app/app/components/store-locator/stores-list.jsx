@@ -16,9 +16,7 @@ import {
     Box
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
-/**
- * A Modal that contains Product View
- */
+
 const StoresList = (props) => {
     const {searchStoresParams} = props
     const intl = useIntl()
@@ -32,7 +30,6 @@ const StoresList = (props) => {
     })
     var storesInfo = (searchStoresData?.data?.data || []).sort((a, b) => a.distance - b.distance)
     return storesInfo?.map((store, index) => {
-        console.log("(JEREMY) store: ", store)
         return (
             <AccordionItem key={index}>
                 <Box margin="10px">
@@ -43,17 +40,21 @@ const StoresList = (props) => {
                     <Box fontSize="md" color="gray.600">
                         {store.city}, {store.stateCode ? store.stateCode : ''} {store.postalCode}
                     </Box>
-                    {store.distance !== undefined ? <>
-                        <br />
-                        <Box fontSize="md" color="gray.600">
-                            {store.distance} {store.distanceUnit}{' '}
-                            {intl.formatMessage({
-                                id: 'store_locator.description.away',
-                                defaultMessage: 'away'
-                            })}
-                        </Box>
-                    </> : ''}
-                    {store.phone !== undefined? (
+                    {store.distance !== undefined ? (
+                        <>
+                            <br />
+                            <Box fontSize="md" color="gray.600">
+                                {store.distance} {store.distanceUnit}{' '}
+                                {intl.formatMessage({
+                                    id: 'store_locator.description.away',
+                                    defaultMessage: 'away'
+                                })}
+                            </Box>
+                        </>
+                    ) : (
+                        ''
+                    )}
+                    {store.phone !== undefined ? (
                         <>
                             <br />
                             <Box fontSize="md" color="gray.600">
@@ -67,23 +68,29 @@ const StoresList = (props) => {
                     ) : (
                         ''
                     )}
-                    {store?.storeHours ? (<> <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
-                        <Box fontSize="lg">
-                            {intl.formatMessage({
-                                id: 'store_locator.action.viewMore',
-                                defaultMessage: 'View More'
-                            })}
-                        </Box>
-                        <AccordionIcon />
-                    </AccordionButton>
-                    <AccordionPanel mb={6} mt={4}>
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: store?.storeHours
-                            }}
-                        />
-                    </AccordionPanel> </>) : ''
-                    }
+                    {store?.storeHours ? (
+                        <>
+                            {' '}
+                            <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
+                                <Box fontSize="lg">
+                                    {intl.formatMessage({
+                                        id: 'store_locator.action.viewMore',
+                                        defaultMessage: 'View More'
+                                    })}
+                                </Box>
+                                <AccordionIcon />
+                            </AccordionButton>
+                            <AccordionPanel mb={6} mt={4}>
+                                <div
+                                    dangerouslySetInnerHTML={{
+                                        __html: store?.storeHours
+                                    }}
+                                />
+                            </AccordionPanel>{' '}
+                        </>
+                    ) : (
+                        ''
+                    )}
                 </Box>
             </AccordionItem>
         )

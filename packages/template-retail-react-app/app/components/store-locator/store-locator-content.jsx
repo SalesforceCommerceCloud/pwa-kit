@@ -25,9 +25,7 @@ import {
     DEFAULT_STORE_LOCATORY_COUNTRY,
     DEFAULT_STORE_LOCATORY_POSTAL_CODE
 } from '@salesforce/retail-react-app/app/constants'
-/**
- * A Modal that contains Product View
- */
+
 const StoreLocatorContent = () => {
     const [searchStoresParams, setSearchStoresParams] = useState({})
     const intl = useIntl()

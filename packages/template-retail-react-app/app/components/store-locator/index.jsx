@@ -15,9 +15,7 @@ import {
     useBreakpointValue
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
-/**
- * A Modal that contains Product View
- */
+
 const StoreLocatorModal = (props) => {
     const {isOpen, setIsOpen} = props
 
