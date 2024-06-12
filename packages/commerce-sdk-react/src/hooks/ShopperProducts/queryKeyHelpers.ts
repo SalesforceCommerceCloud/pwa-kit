@@ -6,7 +6,7 @@
  */
 import {ShopperProducts} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {getCustomKeys, pick} from '../utils'
+import {pickValidParams} from '../utils'
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperProducts<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
@@ -60,8 +60,10 @@ export const getProducts: QueryKeyHelper<'getProducts'> = {
         '/products'
     ],
     queryKey: (params: Params<'getProducts'>) => {
-        const paramKeys = [...ShopperProducts.paramKeys['getProducts'], ...getCustomKeys(params)]
-        return [...getProducts.path(params), pick(params, paramKeys)]
+        return [
+            ...getProducts.path(params),
+            pickValidParams(params, ShopperProducts.paramKeys['getProducts'])
+        ]
     }
 }
 
@@ -74,8 +76,10 @@ export const getProduct: QueryKeyHelper<'getProduct'> = {
         params.id
     ],
     queryKey: (params: Params<'getProduct'>) => {
-        const paramKeys = [...ShopperProducts.paramKeys['getProduct'], ...getCustomKeys(params)]
-        return [...getProduct.path(params), pick(params, paramKeys)]
+        return [
+            ...getProduct.path(params),
+            pickValidParams(params, ShopperProducts.paramKeys['getProduct'])
+        ]
     }
 }
 
@@ -87,8 +91,10 @@ export const getCategories: QueryKeyHelper<'getCategories'> = {
         '/categories'
     ],
     queryKey: (params: Params<'getCategories'>) => {
-        const paramKeys = [...ShopperProducts.paramKeys['getCategories'], ...getCustomKeys(params)]
-        return [...getCategories.path(params), pick(params, paramKeys)]
+        return [
+            ...getCategories.path(params),
+            pickValidParams(params, ShopperProducts.paramKeys['getCategories'])
+        ]
     }
 }
 
@@ -101,7 +107,9 @@ export const getCategory: QueryKeyHelper<'getCategory'> = {
         params.id
     ],
     queryKey: (params: Params<'getCategory'>) => {
-        const paramKeys = [...ShopperProducts.paramKeys['getCategory'], ...getCustomKeys(params)]
-        return [...getCategory.path(params), pick(params, paramKeys)]
+        return [
+            ...getCategory.path(params),
+            pickValidParams(params, ShopperProducts.paramKeys['getCategory'])
+        ]
     }
 }
