@@ -24,7 +24,13 @@ module.exports = {
     },
     globals: {
         DEBUG: true,
-        NODE_ENV: 'test'
+        NODE_ENV: 'test',
+        Progressive: {
+            // BuildOrigin can be any non-empty string. It does not have to be /mobify/xyz
+            // This is used by tests that call getAssetUrl in pwa-kit-react-sdk to simulate
+            // asset urls.
+            buildOrigin: '/mobify/bundle/development/'
+        }
     },
     transform: {
         '^.+\\.(js|jsx|ts|tsx)$': path.join(__dirname, 'jest-babel-transform.js')
