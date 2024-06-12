@@ -717,12 +717,6 @@
     "defaultMessage": "Unavailable",
     "description": "A unavailable badge placed on top of a product image"
   },
-  "item_price.assistive_msg.current_price": {
-    "defaultMessage": "Current Price {currentPrice}"
-  },
-  "item_price.assistive_msg.list_price": {
-    "defaultMessage": "Original Price {listPrice}"
-  },
   "item_variant.assistive_msg.quantity": {
     "defaultMessage": "Quantity {quantity}"
   },
