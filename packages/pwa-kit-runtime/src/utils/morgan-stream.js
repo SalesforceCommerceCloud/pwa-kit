@@ -14,7 +14,7 @@ import logger from './logger'
  */
 class ConsoleLogStream extends Writable {
     write(line) {
-        logger.info(line.trim())
+        logger.info(line)
     }
 }
 // create new stream to be used in morgan stream

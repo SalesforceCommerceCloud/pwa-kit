@@ -102,4 +102,25 @@ describe('PWAKITLogger', () => {
         infoLogger.debug('This debug message should not be logged')
         expect(console.log).not.toHaveBeenCalled()
     })
+
+    test('should not include additionalProperties if it is not provided', () => {
+        const logger = createLogger('test-package')
+        logger.info('This is an info message', {
+            namespace: 'testNamespace'
+        })
+        expect(console.log).toHaveBeenCalledWith(
+            expect.not.objectContaining({
+                additionalProperties: expect.anything()
+            })
+        )
+    })
+
+    test('should not log message if the level is below the logger level', () => {
+        const customLogger = new PWAKITLogger('warn', 'JSON', 'test-package')
+        customLogger.info('This info message should not be logged')
+        customLogger.debug('This debug message should not be logged')
+        expect(console.log).not.toHaveBeenCalled()
+        expect(console.warn).not.toHaveBeenCalled()
+        expect(console.error).not.toHaveBeenCalled()
+    })
 })

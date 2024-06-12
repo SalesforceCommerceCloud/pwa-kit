@@ -69,7 +69,7 @@ const logAndFormatError = (err) => {
         return {message: err.message, status: err.status, stack: err.stack}
     } else {
         const cause = err.stack || err.toString()
-        logger.error(cause, {namespace: 'ssr.server.react-rendering.render'})
+        logger.error(cause, {namespace: 'react-rendering.render'})
         const safeMessage = 'Internal Server Error'
         return {message: safeMessage, status: 500, stack: err.stack}
     }

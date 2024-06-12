@@ -158,7 +158,7 @@ const App = (props) => {
     const logger = createLogger('retail-react-app')
 
     const loggerDetails = {
-        namespace: 'app.APP.render'
+        namespace: 'App.render'
     }
 
     logger.log('log test message')

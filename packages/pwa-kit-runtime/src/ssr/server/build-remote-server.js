@@ -243,7 +243,7 @@ export const RemoteServerFactory = {
         }
 
         const loggerDetails = {
-            namespace: 'http.request.RemoteServerFactory.request'
+            namespace: 'RemoteServerFactory.httprequest'
             // TODO: Add additional morgan request props
             // additionalProperties: {
             //     method: req.method,
