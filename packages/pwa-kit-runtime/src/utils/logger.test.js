@@ -8,27 +8,38 @@ import createLogger, {PWAKITLogger} from './logger'
 
 describe('PWAKITLogger', () => {
     beforeEach(() => {
+        console.debug = jest.fn()
         console.log = jest.fn()
+        console.info = jest.fn()
         console.warn = jest.fn()
         console.error = jest.fn()
+        jest.resetModules()
     })
 
     afterEach(() => {
         jest.clearAllMocks()
     })
 
+    test('should log using the log method', () => {
+        const logger = createLogger('test-package')
+        logger.log('This is a log message')
+        expect(console.log).toHaveBeenCalledWith(
+            expect.objectContaining({message: 'This is a log message'})
+        )
+    })
+
     test('should log an info message', () => {
         const logger = createLogger('test-package')
         logger.info('This is an info message')
-        expect(console.log).toHaveBeenCalledWith(
+        expect(console.info).toHaveBeenCalledWith(
             expect.objectContaining({message: 'This is an info message'})
         )
     })
 
     test('should log a debug message', () => {
-        const debugLogger = new PWAKITLogger('debug', 'JSON', 'test-package')
+        const debugLogger = new PWAKITLogger('test-package', 'debug', 'JSON')
         debugLogger.debug('This is a debug message')
-        expect(console.log).toHaveBeenCalledWith(
+        expect(console.debug).toHaveBeenCalledWith(
             expect.objectContaining({message: 'This is a debug message'})
         )
     })
@@ -50,12 +61,12 @@ describe('PWAKITLogger', () => {
     })
 
     test('should respect log level setting', () => {
-        const customLogger = new PWAKITLogger('warn', 'JSON', 'test-package')
+        const customLogger = new PWAKITLogger('test-package', 'warn', 'JSON')
         customLogger.info('This message should not be logged')
         customLogger.warn('This is a warn message')
         customLogger.error('This is an error message')
 
-        expect(console.log).not.toHaveBeenCalled()
+        expect(console.info).not.toHaveBeenCalled()
         expect(console.warn).toHaveBeenCalledWith(
             expect.objectContaining({message: 'This is a warn message'})
         )
@@ -69,7 +80,7 @@ describe('PWAKITLogger', () => {
         logger.info('This is an info message', {
             namespace: 'testNamespace'
         })
-        expect(console.log).toHaveBeenCalledWith(
+        expect(console.info).toHaveBeenCalledWith(
             expect.objectContaining({
                 namespace: 'test-package.testNamespace',
                 message: 'This is an info message'
@@ -83,7 +94,7 @@ describe('PWAKITLogger', () => {
             namespace: 'testNamespace',
             additionalProperties: {key: 'value'}
         })
-        expect(console.log).toHaveBeenCalledWith(
+        expect(console.info).toHaveBeenCalledWith(
             expect.objectContaining({
                 namespace: 'test-package.testNamespace',
                 message: 'This is an info message',
@@ -93,14 +104,14 @@ describe('PWAKITLogger', () => {
     })
 
     test('should default to info log level if invalid log level is given', () => {
-        const customLogger = new PWAKITLogger('invalid', 'JSON', 'test-package')
+        const customLogger = new PWAKITLogger('test-package', 'invalid', 'JSON')
         expect(customLogger.logLevel).toBe('info')
     })
 
     test('should not log debug message if log level is info', () => {
-        const infoLogger = new PWAKITLogger('info', 'JSON', 'test-package')
+        const infoLogger = new PWAKITLogger('test-package', 'info', 'JSON')
         infoLogger.debug('This debug message should not be logged')
-        expect(console.log).not.toHaveBeenCalled()
+        expect(console.debug).not.toHaveBeenCalled()
     })
 
     test('should not include additionalProperties if it is not provided', () => {
@@ -108,19 +119,70 @@ describe('PWAKITLogger', () => {
         logger.info('This is an info message', {
             namespace: 'testNamespace'
         })
-        expect(console.log).toHaveBeenCalledWith(
+        expect(console.info).toHaveBeenCalledWith(
             expect.not.objectContaining({
                 additionalProperties: expect.anything()
             })
         )
     })
 
-    test('should not log message if the level is below the logger level', () => {
-        const customLogger = new PWAKITLogger('warn', 'JSON', 'test-package')
-        customLogger.info('This info message should not be logged')
-        customLogger.debug('This debug message should not be logged')
-        expect(console.log).not.toHaveBeenCalled()
-        expect(console.warn).not.toHaveBeenCalled()
-        expect(console.error).not.toHaveBeenCalled()
+    test('should log message using TEXT format', () => {
+        const logger = new PWAKITLogger('test-package', 'info', 'TEXT')
+        logger.info('This is an info message')
+        expect(console.info).toHaveBeenCalledWith(
+            expect.stringContaining('test-package INFO This is an info message')
+        )
+    })
+
+    test('should format log message correctly in TEXT format without packageName', () => {
+        const logger = new PWAKITLogger('', 'info', 'TEXT')
+        logger.info('This is an info message', {
+            namespace: 'testNamespace'
+        })
+
+        expect(console.info).toHaveBeenCalledWith(
+            expect.stringContaining('testNamespace INFO This is an info message')
+        )
+    })
+
+    test('should format log message correctly in TEXT format with additional properties', () => {
+        const logger = new PWAKITLogger('test-package', 'info', 'TEXT')
+        logger.info('This is an info message with additional properties', {
+            additionalProperties: {key: 'value'}
+        })
+
+        expect(console.info).toHaveBeenCalledWith(
+            expect.stringContaining(
+                'test-package INFO This is an info message with additional properties {"key":"value"}'
+            )
+        )
+    })
+
+    test('should format log message correctly in JSON format', () => {
+        const logger = new PWAKITLogger('test-package', 'info', 'JSON')
+        const formattedMessage = logger.formatLogMessage('This is a test message', {
+            level: 'info',
+            namespace: 'testNamespace',
+            additionalProperties: {key: 'value'}
+        })
+
+        expect(formattedMessage).toEqual({
+            namespace: 'test-package.testNamespace',
+            message: 'This is a test message',
+            additionalProperties: {key: 'value'}
+        })
+    })
+
+    test('should handle missing namespace gracefully in JSON format', () => {
+        const logger = new PWAKITLogger('', 'info', 'JSON')
+        const formattedMessage = logger.formatLogMessage('This is a test message', {
+            level: 'info',
+            additionalProperties: {key: 'value'}
+        })
+
+        expect(formattedMessage).toEqual({
+            message: 'This is a test message',
+            additionalProperties: {key: 'value'}
+        })
     })
 })

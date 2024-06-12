@@ -4,9 +4,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+/**
+ * Array defining the order of log levels from lowest to highest severity.
+ * The order of log levels is important. It determines the logging threshold.
+ * @type {string[]}
+ */
 const LOG_LEVELS = ['debug', 'info', 'warn', 'error']
+
+// Default log level for the logging threshold. It can be any of the LOG_LEVELS values.
 const DEFAULT_LOG_LEVEL = 'info'
-const DEFAULT_LOG_FORMAT = 'JSON'
+
+// Default log format to use if not explicitly provided. It can be 'JSON' or 'TEXT'.
+const DEFAULT_LOG_FORMAT = 'TEXT'
 
 const isServerSide = typeof window === 'undefined'
 
@@ -20,7 +30,6 @@ const LOG_FORMAT = isServerSide
 
 /**
  * The PWAKITLogger provides structured logging with different log levels.
- *
  */
 export class PWAKITLogger {
     /**
@@ -29,10 +38,10 @@ export class PWAKITLogger {
      * @param {string} [format=DEFAULT_LOG_FORMAT] - The format in which to print log messages. Can be 'JSON' or 'TEXT'.
      * @param {string} packageName - The name of the package where the logger is used.
      */
-    constructor(logLevel = LOG_LEVEL, format = DEFAULT_LOG_FORMAT, packageName = '') {
+    constructor(packageName = '', logLevel = LOG_LEVEL, format = LOG_FORMAT) {
+        this.packageName = packageName
         this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
         this.format = format.toUpperCase()
-        this.packageName = packageName
     }
 
     /**
@@ -41,7 +50,8 @@ export class PWAKITLogger {
      * @returns {boolean} - Returns true if the message should be logged, otherwise false.
      */
     shouldLog(level) {
-        return LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(this.logLevel)
+        const messageLogLevel = LOG_LEVELS.includes(level) ? level : DEFAULT_LOG_LEVEL
+        return LOG_LEVELS.indexOf(messageLogLevel) >= LOG_LEVELS.indexOf(this.logLevel)
     }
 
     /**
@@ -53,15 +63,24 @@ export class PWAKITLogger {
      * @param {Object} details.additionalProperties - Additional properties to include in the log message.
      * @returns {Object|string} - The formatted log message, either as a JSON object or a string.
      */
-    formatLogMessage(message, {namespace, additionalProperties}) {
-        const logMessage = {
-            namespace: `${this.packageName}.${namespace}`,
-            message: message.trim(),
-            ...(additionalProperties && {additionalProperties})
+    formatLogMessage(message, {level, namespace, additionalProperties}) {
+        let finalNamespace = this.packageName
+        if (namespace && this.packageName) {
+            finalNamespace += `.${namespace}`
+        } else if (namespace) {
+            finalNamespace = namespace
         }
 
         if (this.format === 'TEXT') {
-            return JSON.stringify(logMessage)
+            return `${finalNamespace} ${level.toUpperCase()} ${message} ${
+                additionalProperties ? JSON.stringify(additionalProperties) : ''
+            }`
+        }
+
+        const logMessage = {
+            ...(finalNamespace && {namespace: finalNamespace}),
+            message: message.trim(),
+            ...(additionalProperties && {additionalProperties})
         }
 
         return logMessage
@@ -73,13 +92,13 @@ export class PWAKITLogger {
      * @param {LogOptions} [options={}] - Optional message details.
      */
     printLog(message, options = {}) {
-        const {level, ...messageDetails} = options
+        const {level, ...details} = options
 
         if (!this.shouldLog(level)) {
             return
         }
 
-        const formattedMessage = this.formatLogMessage(message, messageDetails)
+        const formattedMessage = this.formatLogMessage(message, options)
 
         switch (level) {
             case 'error':
@@ -115,7 +134,7 @@ export class PWAKITLogger {
      * @param {LogDetails} [details={}] - Optional message details.
      */
     log(message, details = {}) {
-        this.printLog(message, {level: 'info', ...details})
+        this.printLog(message, {level: 'log', ...details})
     }
 
     /**
@@ -149,7 +168,8 @@ export class PWAKITLogger {
 /**
  * Create a logger instances for each package
  * @param {string} packageName - The name of the package where the logger is used.
+ * @returns {PWAKITLogger} - An instance of PWAKITLogger configured for the specified package.
  */
-export const createLogger = (packageName) => new PWAKITLogger(LOG_LEVEL, LOG_FORMAT, packageName)
+const createLogger = (packageName) => new PWAKITLogger(packageName, LOG_LEVEL, LOG_FORMAT)
 
 export default createLogger
