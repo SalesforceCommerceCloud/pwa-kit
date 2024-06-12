@@ -6,7 +6,7 @@
  */
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {getCustomKeys, pick} from '../utils'
+import {pickValidParams} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperBaskets<{shortCode: string}>
@@ -78,8 +78,10 @@ export const getBasket: QueryKeyHelper<'getBasket'> = {
         params.basketId
     ],
     queryKey: (params: Params<'getBasket'>) => {
-        const paramKeys = [...ShopperBaskets.paramKeys['getBasket'], ...getCustomKeys(params)]
-        return [...getBasket.path(params), pick(params, paramKeys)]
+        return [
+            ...getBasket.path(params),
+            pickValidParams(params, ShopperBaskets.paramKeys['getBasket'])
+        ]
     }
 }
 
@@ -93,11 +95,10 @@ export const getPaymentMethodsForBasket: QueryKeyHelper<'getPaymentMethodsForBas
         '/payment-methods'
     ],
     queryKey: (params: Params<'getPaymentMethodsForBasket'>) => {
-        const paramKeys = [
-            ...ShopperBaskets.paramKeys['getPaymentMethodsForBasket'],
-            ...getCustomKeys(params)
+        return [
+            ...getPaymentMethodsForBasket.path(params),
+            pickValidParams(params, ShopperBaskets.paramKeys['getPaymentMethodsForBasket'])
         ]
-        return [...getPaymentMethodsForBasket.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -111,12 +112,10 @@ export const getPriceBooksForBasket: QueryKeyHelper<'getPriceBooksForBasket'> = 
         '/price-books'
     ],
     queryKey: (params: Params<'getPriceBooksForBasket'>) => {
-        const paramKeys = [
-            ...ShopperBaskets.paramKeys['getPriceBooksForBasket'],
-            ...getCustomKeys(params)
+        return [
+            ...getPriceBooksForBasket.path(params),
+            pickValidParams(params, ShopperBaskets.paramKeys['getPriceBooksForBasket'])
         ]
-
-        return [...getPriceBooksForBasket.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -132,12 +131,10 @@ export const getShippingMethodsForShipment: QueryKeyHelper<'getShippingMethodsFo
         '/shipping-methods'
     ],
     queryKey: (params: Params<'getShippingMethodsForShipment'>) => {
-        const paramKeys = [
-            ...ShopperBaskets.paramKeys['getShippingMethodsForShipment'],
-            ...getCustomKeys(params)
+        return [
+            ...getShippingMethodsForShipment.path(params),
+            pickValidParams(params, ShopperBaskets.paramKeys['getShippingMethodsForShipment'])
         ]
-
-        return [...getShippingMethodsForShipment.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -151,10 +148,9 @@ export const getTaxesFromBasket: QueryKeyHelper<'getTaxesFromBasket'> = {
         '/taxes'
     ],
     queryKey: (params: Params<'getTaxesFromBasket'>) => {
-        const paramKeys = [
-            ...ShopperBaskets.paramKeys['getTaxesFromBasket'],
-            ...getCustomKeys(params)
+        return [
+            ...getTaxesFromBasket.path(params),
+            pickValidParams(params, ShopperBaskets.paramKeys['getTaxesFromBasket'])
         ]
-        return [...getTaxesFromBasket.path(params), pick(params, paramKeys)]
     }
 }
