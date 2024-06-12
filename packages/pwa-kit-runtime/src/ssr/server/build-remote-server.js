@@ -282,20 +282,18 @@ export const RemoteServerFactory = {
     },
 
     /**
-     * Passing the requestId from apiGateway event to locals
+     * Passing the correlation Id from MRT to locals
      * @private
      */
     _setRequestId(app) {
         app.use((req, res, next) => {
-            if (!req.headers['x-apigateway-event']) {
-                console.error('Missing x-apigateway-event')
+            const correlationId = req.headers['x-correlation-id']
+            const requestId = correlationId ? correlationId : req.headers['x-apigateway-event']
+            if (!requestId) {
+                console.error('Both x-correlation-id and x-apigateway-event headers are missing')
                 next()
                 return
             }
-            const apiGatewayEvent = JSON.parse(
-                decodeURIComponent(req.headers['x-apigateway-event'])
-            )
-            const {requestId} = apiGatewayEvent.requestContext
             res.locals.requestId = requestId
             next()
         })
@@ -1000,7 +998,7 @@ export const RemoteServerFactory = {
                             ._waitForResponses()
                             .then(() => app.metrics.flush())
                             // Now call the Lambda callback to complete the response
-                            .then(() => callback(err, processLambdaResponse(response)))
+                            .then(() => callback(err, processLambdaResponse(response, event)))
                         // DON'T add any then() handlers here, after the callback.
                         // They won't be called after the response is sent, but they
                         // *might* be called if the Lambda container running this code
