@@ -64,7 +64,7 @@ const StoresList = (props) => {
                     ) : (
                         ''
                     )}
-                    <AccordionButton color="blue.700">
+                    <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
                         <Box fontSize="lg">
                             {intl.formatMessage({
                                 id: 'store_locator.action.viewMore',
