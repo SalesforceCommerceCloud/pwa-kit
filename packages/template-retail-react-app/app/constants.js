@@ -161,4 +161,4 @@ export const DEFAULT_STORE_LOCATORY_COUNTRY = defineMessage({
     defaultMessage: 'Germany',
     id: 'store_locator.dropdown.germany'
 })
-export const DEFAULT_STORE_LOCATORY_POSTAL_CODE = '65185'
+export const DEFAULT_STORE_LOCATORY_POSTAL_CODE = '10178'

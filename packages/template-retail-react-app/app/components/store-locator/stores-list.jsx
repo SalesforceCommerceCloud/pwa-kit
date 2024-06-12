@@ -32,27 +32,30 @@ const StoresList = (props) => {
     })
     var storesInfo = (searchStoresData?.data?.data || []).sort((a, b) => a.distance - b.distance)
     return storesInfo?.map((store, index) => {
+        console.log("(JEREMY) store: ", store)
         return (
             <AccordionItem key={index}>
                 <Box margin="10px">
-                    <Box fontSize="lg">{store.name}</Box>
+                    {store.name ? <Box fontSize="lg">{store.name}</Box> : ''}
                     <Box fontSize="md" color="gray.600">
                         {store.address1}
                     </Box>
                     <Box fontSize="md" color="gray.600">
                         {store.city}, {store.stateCode ? store.stateCode : ''} {store.postalCode}
                     </Box>
-                    <br />
-                    <Box fontSize="md" color="gray.600">
-                        {store.distance} {store.distanceUnit}{' '}
-                        {intl.formatMessage({
-                            id: 'store_locator.description.away',
-                            defaultMessage: 'away'
-                        })}
-                    </Box>
-                    <br />
-                    {store.phone ? (
+                    {store.distance !== undefined ? <>
+                        <br />
+                        <Box fontSize="md" color="gray.600">
+                            {store.distance} {store.distanceUnit}{' '}
+                            {intl.formatMessage({
+                                id: 'store_locator.description.away',
+                                defaultMessage: 'away'
+                            })}
+                        </Box>
+                    </> : ''}
+                    {store.phone !== undefined? (
                         <>
+                            <br />
                             <Box fontSize="md" color="gray.600">
                                 {intl.formatMessage({
                                     id: 'store_locator.description.phone',
@@ -64,7 +67,7 @@ const StoresList = (props) => {
                     ) : (
                         ''
                     )}
-                    <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
+                    {store?.storeHours ? (<> <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
                         <Box fontSize="lg">
                             {intl.formatMessage({
                                 id: 'store_locator.action.viewMore',
@@ -79,7 +82,8 @@ const StoresList = (props) => {
                                 __html: store?.storeHours
                             }}
                         />
-                    </AccordionPanel>
+                    </AccordionPanel> </>) : ''
+                    }
                 </Box>
             </AccordionItem>
         )
