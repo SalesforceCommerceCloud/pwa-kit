@@ -49,7 +49,7 @@ export class PWAKITLogger {
      *
      * @param {string} message - The log message.
      * @param {Object} details - The context for the log message.
-     * @param {string} details.namespace - The namespace of the log message.
+     * @param {string} details.namespace - The namespace 'packageName.component.action' of the log message.
      * @param {Object} details.additionalProperties - Additional properties to include in the log message.
      * @returns {Object|string} - The formatted log message, either as a JSON object or a string.
      */
