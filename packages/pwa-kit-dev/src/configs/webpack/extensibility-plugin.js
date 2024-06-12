@@ -36,7 +36,7 @@ class ExtensionsResolverPlugin {
         const modulePath = resolve(importPath, {
             basedir: this.projectDir,
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-            packageIterator: () => buildCandidatePathArray(importPath, {sourcePath}) // NOTE: Should I be used the passed in "request" object?
+            packageIterator: () => buildCandidatePathArray(importPath, sourcePath) // NOTE: Should I be used the passed in "request" object?
         })
 
         if (modulePath) {

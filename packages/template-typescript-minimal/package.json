@@ -43,7 +43,8 @@
         "test-a",
         ["test-b", {
           "greeting": "hello"
-        }]
+        }],
+        "./app/extensions/extension-test-c"
       ]
     },
     "ssrEnabled": true,

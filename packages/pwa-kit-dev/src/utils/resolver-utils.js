@@ -11,38 +11,48 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const EXTENSION_NAMESPACE = '@salesforce'
 const EXTENSION_PREFIX = 'extension'
 const NODE_MODULES = 'node_modules'
+const SDK_COMPONENT_MAP = {
+    'app/routes': '/ssr/universal/components/routes'
+}
 
 // Returns an extension tupal given a extension reference.
 // @private
 const parseExtensionRef = (ref) => (Array.isArray(ref) ? ref : [ref, {}])
 
 /**
- * Given an array of PWA-Kit Extension "short names", returns an array of extension module names.
- * @param {} shortNames
+ * Normalize and expand the extension configuration array so that it is easier to process.
+ * @param {{String, Object}[]} extensions - The extensions configuration value as defined in the PWA-Kit config.
+ * @returns {Object[]} extensions - The extensions array in object form.
+ *
+ * @example
+ * const result = expand(["store-finder", ["account-pages", {singlePage: true}], './extensions/local-extension']);
+ * console.log(result)
+ * // [["@salesforce/extension-store-finder", {}], ["@salesforce/extension-account-pages", {singlePage: true}], ["/home/project/extensions/local-extension", {}]]
  */
-export const expand = (extensionRefs = []) => {
-    // NOTE: We are going to want to have special consideration for "local" referenced extensions.
-    return extensionRefs
-        .filter((extensionRef) => Boolean(extensionRef))
-        .map((extensionRef) => {
-            const [shortName, config] = parseExtensionRef(extensionRef)
-            const isLocalExtension = shortName.startsWith('.')
+export const expand = (extensions = []) =>
+    extensions
+        .filter((extension) => Boolean(extension))
+        .map((extension) => {
+            const [shortName, config] = parseExtensionRef(extension)
+            const isRelativePath = shortName.startsWith('.')
+            const isAbsolutePath = shortName.startsWith(path.sep)
 
             return [
-                isLocalExtension
-                    ? shortName
+                isRelativePath || isAbsolutePath
+                    ? isRelativePath
+                        ? path.join(process.cwd(), shortName.replace('.', ''))
+                        : shortName
                     : `${EXTENSION_NAMESPACE}/${EXTENSION_PREFIX}-${shortName}`,
                 config
             ]
         })
-}
 
 /**
  * Based on the current extensibility configuration, return an array of candiate file paths to be used
  * in the wild-card import module resolution.
  */
-export const buildCandidatePathArray = (importPath, opts = {}) => {
-    const {extensions = getConfig()?.app?.extensions, sourcePath} = opts
+export const buildCandidatePathArray = (importPath, sourcePath, opts = {}) => {
+    const {extensions = getConfig()?.app?.extensions} = opts
 
     // Replace wildcard character as it has done its job getting us to this point.
     importPath = importPath.replace('*/', '')
@@ -52,17 +62,22 @@ export const buildCandidatePathArray = (importPath, opts = {}) => {
     const cwd = process.cwd()
     let paths = []
 
-    // TODO: Finalize how this works.
-    const sdkComponentPaths = {
-        'app/routes': '/src/ssr/universal/components/app/routes'
-    }
-
     // The inital candidate paths include the "base" project, all the extensions, and the PWA-Kit SDK.
     paths = expand(extensions)
         .reverse()
-        .map(([extension]) => path.join(cwd, NODE_MODULES, extension, importPath))
+        .map((extension) => {
+            // The reference can be a module/package or an absolute path to a file.
+            const [extensionRef] = extension
+            const isLocalExtension = extensionRef.startsWith(path.sep)
 
-    // Add non-extension serach locations locations. The base project and the sdk as the final callback.
+            return path.join(
+                ...(isLocalExtension
+                    ? [extensionRef, importPath]
+                    : [cwd, NODE_MODULES, extensionRef, importPath])
+            )
+        })
+
+    // Add non-extension search locations locations. The base project and the sdk as the final callback.
     paths = [
         // Base Project
         path.join(cwd, importPath),
@@ -72,9 +87,9 @@ export const buildCandidatePathArray = (importPath, opts = {}) => {
         path.join(
             cwd,
             NODE_MODULES,
-            '@salesforce',
+            EXTENSION_NAMESPACE,
             'pwa-kit-react-sdk',
-            sdkComponentPaths[importPath]
+            SDK_COMPONENT_MAP[importPath]
         )
     ]
 
@@ -82,10 +97,9 @@ export const buildCandidatePathArray = (importPath, opts = {}) => {
     // In particular, we only want to include extensions up to, but not including, the importing extension source if it is
     // a self-named import (e.g. importing routes from an overridden file names routes)
     if (isSelfReference) {
-        // Find the index of the extension and chop the list.
-        // const currentExtension = sourcePath.match(new RegExp(`${EXTENSION_PREFIX}-([^/]+)`))[1]
+        // NOTE: Overriding files requires that you use the exact file name, you cannot replace a non-index file with one that
+        // is an index file.
         const index = paths.indexOf(sourcePath.split('.')[0])
-        // TODO: This logic needs to be hardends up a little.
         paths = paths.slice(index + 1)
     }
 
