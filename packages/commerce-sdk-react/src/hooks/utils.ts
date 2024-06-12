@@ -101,7 +101,6 @@ export const pick = <T extends object, K extends keyof T>(
     return picked
 }
 
-// TODO: add test for this?
 /** Get a subset of the given parameters that has the given keys and may contain a custom parameter. */
 export const pickValidParams = <T extends object, K extends keyof T>(
     parameters: T,
