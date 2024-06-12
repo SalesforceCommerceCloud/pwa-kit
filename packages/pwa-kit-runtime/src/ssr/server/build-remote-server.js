@@ -254,20 +254,18 @@ export const RemoteServerFactory = {
     },
 
     /**
-     * Passing the requestId from apiGateway event to locals
+     * Passing the correlation Id from MRT to locals
      * @private
      */
     _setRequestId(app) {
         app.use((req, res, next) => {
-            if (!req.headers['x-apigateway-event']) {
-                console.error('Missing x-apigateway-event')
+            const correlationId = req.headers['x-correlation-id']
+            const requestId = correlationId ? correlationId : req.headers['x-apigateway-event']
+            if (!requestId) {
+                console.error('Both x-correlation-id and x-apigateway-event headers are missing')
                 next()
                 return
             }
-            const apiGatewayEvent = JSON.parse(
-                decodeURIComponent(req.headers['x-apigateway-event'])
-            )
-            const {requestId} = apiGatewayEvent.requestContext
             res.locals.requestId = requestId
             next()
         })
@@ -439,20 +437,6 @@ export const RemoteServerFactory = {
             // If the request is for a proxy or bundle path, do nothing
             if (startsWithMobify(req.originalUrl)) {
                 return
-            }
-
-            // If the request has an X-Amz-Cf-Id header, log it now
-            // to make it easier to associated CloudFront requests
-            // with Lambda log entries. Generally we avoid logging
-            // because it increases the volume of log data, but this
-            // is important for log analysis.
-            const cloudfrontId = req.headers['x-amz-cf-id']
-            if (cloudfrontId) {
-                // Log the Express app request id plus the cloudfront
-                // x-edge-request-id value. The resulting line in the logs
-                // will automatically include the lambda RequestId, so
-                // one line links all ids.
-                console.log(`Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
             }
 
             // Apply the request processor
@@ -986,7 +970,7 @@ export const RemoteServerFactory = {
                             ._waitForResponses()
                             .then(() => app.metrics.flush())
                             // Now call the Lambda callback to complete the response
-                            .then(() => callback(err, processLambdaResponse(response)))
+                            .then(() => callback(err, processLambdaResponse(response, event)))
                         // DON'T add any then() handlers here, after the callback.
                         // They won't be called after the response is sent, but they
                         // *might* be called if the Lambda container running this code
