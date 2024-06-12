@@ -49,33 +49,33 @@ export const expand = (extensions = []) =>
 
 /**
  * Based on the current extensibility configuration, return an array of candiate file paths to be used
- * in the wild-card import module resolution.
+ * in the wild-card import module resolution for the given import path..
+ *
+ * @param {String} importPath - The import module-name.
+ * @param {String} sourcePath - The path the the file of the source import.
+ * @returns {String[]} paths - The potential paths to find the module import.
  */
 export const buildCandidatePathArray = (importPath, sourcePath, opts = {}) => {
-    const {extensions = getConfig()?.app?.extensions} = opts
-
     // Replace wildcard character as it has done its job getting us to this point.
     importPath = importPath.replace('*/', '')
 
-    // const isExtension = sourcePath.includes(`${EXTENSION_PREFIX}-`)
+    const {extensions = getConfig()?.app?.extensions} = opts
     const isSelfReference = sourcePath.includes(importPath)
     const cwd = process.cwd()
-    let paths = []
+    let paths = expand(extensions).reverse()
 
-    // The inital candidate paths include the "base" project, all the extensions, and the PWA-Kit SDK.
-    paths = expand(extensions)
-        .reverse()
-        .map((extension) => {
-            // The reference can be a module/package or an absolute path to a file.
-            const [extensionRef] = extension
-            const isLocalExtension = extensionRef.startsWith(path.sep)
+    // Map all the extensions and resolve the module names to absolute paths.
+    paths = paths.map((extension) => {
+        // The reference can be a module/package or an absolute path to a file.
+        const [extensionRef] = extension
+        const isLocalExtension = extensionRef.startsWith(path.sep)
 
-            return path.join(
-                ...(isLocalExtension
-                    ? [extensionRef, importPath]
-                    : [cwd, NODE_MODULES, extensionRef, importPath])
-            )
-        })
+        return path.join(
+            ...(isLocalExtension
+                ? [extensionRef, importPath]
+                : [cwd, NODE_MODULES, extensionRef, importPath])
+        )
+    })
 
     // Add non-extension search locations locations. The base project and the sdk as the final callback.
     paths = [
