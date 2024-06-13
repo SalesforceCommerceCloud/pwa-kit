@@ -17,11 +17,18 @@ import msg from '@salesforce/retail-react-app/app/components/display-price/messa
  * @param as - an HTML tag or component to be rendered as
  * @param isRange - show price as range or not
  * @param currency - currency to show the price in
- * @param name - product name
+ * @param productLabelForA11y - product name used for a11y
  * @param extraProps - extra props to be passed into Text Component
  * @returns {JSX.Element}
  */
-const CurrentPrice = ({name, price, as, isRange = false, currency, ...extraProps}) => {
+const CurrentPrice = ({
+    productLabelForA11y,
+    price,
+    as,
+    isRange = false,
+    currency,
+    ...extraProps
+}) => {
     const intl = useIntl()
     const currentPriceText = intl.formatNumber(price, {
         style: 'currency',
@@ -54,7 +61,7 @@ const CurrentPrice = ({name, price, as, isRange = false, currency, ...extraProps
             )}
             {/*For screen reader, we want to make sure the product name is announced before the price to avoid confusion*/}
             <VisuallyHidden aria-live="polite" aria-atomic={true}>
-                {name}
+                {productLabelForA11y}
                 {isRange
                     ? intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
                           currentPrice: currentPriceText
@@ -69,7 +76,7 @@ const CurrentPrice = ({name, price, as, isRange = false, currency, ...extraProps
 CurrentPrice.propTypes = {
     price: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
-    name: PropTypes.string,
+    productLabelForA11y: PropTypes.string,
     as: PropTypes.string,
     isRange: PropTypes.bool,
     extraProps: PropTypes.object
