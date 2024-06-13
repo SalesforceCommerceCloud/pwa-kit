@@ -43,7 +43,7 @@ import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
-import createLogger from '../../utils/logger'
+import logger from '../../utils/logger'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
@@ -76,8 +76,6 @@ const METRIC_DIMENSIONS = {
     Project: process.env.MOBIFY_PROPERTY_ID,
     Target: process.env.DEPLOY_TARGET
 }
-
-const logger = createLogger('pwa-kit-runtime')
 
 /**
  * @private
