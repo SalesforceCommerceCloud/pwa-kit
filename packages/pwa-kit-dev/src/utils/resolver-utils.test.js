@@ -8,6 +8,59 @@
 import * as resolverUtils from './resolver-utils'
 
 describe('resolverUtils', () => {
+    describe('"isSelfReference" util returns whether or not a wildcard import is for the same module it is coming from.', () => {
+        ;[
+            {
+                name: 'Importing the wildcard routes from the routes file',
+                importPath: 'app/routes',
+                sourcePath: `${process.cwd()}/node_modules/@salesforce/extension-module-extension-b/app/routes.jsx`,
+                expected: true
+            },
+            ,
+            {
+                name: 'Importing a page component from the routes file',
+                importPath: 'app/pages/new-home',
+                sourcePath: `${process.cwd()}/node_modules/@salesforce/extension-module-extension-b/app/routes.jsx`,
+                expected: false
+            }
+        ].forEach((testCase) => {
+            test(`${testCase.name}`, () => {
+                const result = resolverUtils.isSelfReference(
+                    testCase.importPath,
+                    testCase.sourcePath
+                )
+
+                expect(result).toEqual(testCase.expected)
+            })
+        })
+    })
+    describe('"isSelfReference" util returns whether or not a wildcard import is for the same module it is coming from.', () => {
+        ;[
+            {
+                name: 'Importing the wildcard routes from the routes file',
+                importPath: 'app/routes',
+                sourcePath: `${process.cwd()}/node_modules/@salesforce/extension-module-extension-b/app/routes.jsx`,
+                expected: true
+            },
+            ,
+            {
+                name: 'Importing a page component from the routes file',
+                importPath: 'app/pages/new-home',
+                sourcePath: `${process.cwd()}/node_modules/@salesforce/extension-module-extension-b/app/routes.jsx`,
+                expected: false
+            }
+        ].forEach((testCase) => {
+            test(`${testCase.name}`, () => {
+                const result = resolverUtils.isSelfReference(
+                    testCase.importPath,
+                    testCase.sourcePath
+                )
+
+                expect(result).toEqual(testCase.expected)
+            })
+        })
+    })
+
     describe('"expand" util returns correct return value when', () => {
         ;[
             {

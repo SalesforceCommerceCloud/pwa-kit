@@ -14,10 +14,25 @@ const NODE_MODULES = 'node_modules'
 const SDK_COMPONENT_MAP = {
     'app/routes': '/ssr/universal/components/routes'
 }
+const INDEX_FILE = 'index'
 
-// Returns an extension tupal given a extension reference.
+// Returns true/false indicating if the importPath resolves to a same named file as the sourcePath.
 // @private
-const parseExtensionRef = (ref) => (Array.isArray(ref) ? ref : [ref, {}])
+export const isSelfReference = (importPath, sourcePath) => {
+    const indexRegExp = new RegExp(`(\/${INDEX_FILE})$`)
+
+    // Sanitize the input. Here we want to remove the file extension and index file if it exists.
+    sourcePath = sourcePath.split('.')[0]
+    sourcePath = sourcePath.split(path.sep).join('/')
+    sourcePath = sourcePath.replace(indexRegExp, '')
+
+    // Do the same for the import path even thought it's not common to use /index and file extensions in your module
+    // imports.
+    importPath = importPath.split('.')[0]
+    importPath = importPath.replace(indexRegExp, '')
+
+    return sourcePath.endsWith(importPath)
+}
 
 /**
  * Normalize and expand the extension configuration array so that it is easier to process.
@@ -33,7 +48,7 @@ export const expand = (extensions = []) =>
     extensions
         .filter((extension) => Boolean(extension))
         .map((extension) => {
-            const [shortName, config] = parseExtensionRef(extension)
+            const [shortName, config = {}] = Array.isArray(extension) ? extension : [extension, {}]
             const isRelativePath = shortName.startsWith('.')
             const isAbsolutePath = shortName.startsWith(path.sep)
 
@@ -60,7 +75,7 @@ export const buildCandidatePathArray = (importPath, sourcePath, opts = {}) => {
     importPath = importPath.replace('*/', '')
 
     const {extensions = getConfig()?.app?.extensions} = opts
-    const isSelfReference = sourcePath.includes(importPath)
+    const isSelfReferenceImport = isSelfReference(importPath, sourcePath)
     const cwd = process.cwd()
     let paths = expand(extensions).reverse()
 
@@ -96,7 +111,7 @@ export const buildCandidatePathArray = (importPath, sourcePath, opts = {}) => {
     // Under certain circumstances we want to truncate the cadidate path array to prevent circular dependancies.
     // In particular, we only want to include extensions up to, but not including, the importing extension source if it is
     // a self-named import (e.g. importing routes from an overridden file names routes)
-    if (isSelfReference) {
+    if (isSelfReferenceImport) {
         // NOTE: Overriding files requires that you use the exact file name, you cannot replace a non-index file with one that
         // is an index file.
         const index = paths.indexOf(sourcePath.split('.')[0])
