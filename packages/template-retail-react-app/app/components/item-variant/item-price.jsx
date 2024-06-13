@@ -80,14 +80,14 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
 
             {variant?.itemId ? (
                 <DisplayPrice
-                    name={variant?.name}
+                    productLabelForA11y={variant?.name}
                     currency={currency}
                     priceData={priceData}
                     listPriceProps={{fontSize: 'sm'}}
                 />
             ) : (
                 <DisplayPrice
-                    name={variant?.name}
+                    productLabelForA11y={variant?.name}
                     currency={currency}
                     priceData={priceData}
                     quantity={variant?.quantity}
