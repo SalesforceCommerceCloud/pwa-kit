@@ -7,23 +7,32 @@
 
 import {CONTENT_TYPE, X_ORIGINAL_CONTENT_TYPE} from '../../ssr/server/constants'
 
-export const processLambdaResponse = (response) => {
+export const processLambdaResponse = (response, event) => {
     if (!response) return response
+
+    // Retrieve the correlation ID from the event headers
+    const correlationId = event.headers?.['x-correlation-id']
+
+    const responseHeaders = {
+        ...response.headers
+    }
+
+    // Add the correlation ID to the response headers if it exists
+    if (correlationId) {
+        responseHeaders['x-correlation-id'] = correlationId
+    }
 
     // If the response contains an X_ORIGINAL_CONTENT_TYPE header,
     // then replace the current CONTENT_TYPE header with it.
     const originalContentType = response.headers?.[X_ORIGINAL_CONTENT_TYPE]
-
-    // Nothing to modify, can return original
-    if (!originalContentType) return response
+    if (originalContentType) {
+        responseHeaders[CONTENT_TYPE] = originalContentType
+        delete responseHeaders[X_ORIGINAL_CONTENT_TYPE]
+    }
 
     const result = {
         ...response,
-        headers: {
-            ...response.headers,
-            [CONTENT_TYPE]: originalContentType
-        }
+        headers: responseHeaders
     }
-    delete result.headers[X_ORIGINAL_CONTENT_TYPE]
     return result
 }
