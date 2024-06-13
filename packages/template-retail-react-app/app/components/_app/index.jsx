@@ -61,8 +61,7 @@ import {
     watchOnlineStatus,
     flatten,
     mergeMatchedItems,
-    isServer,
-    setSessionJSONItem
+    isServer
 } from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
@@ -269,7 +268,6 @@ const App = (props) => {
     }
 
     const onStoreLocatorClick = () => {
-        // Link to wishlist page if registered; Header component will show auth modal for guest users
         setStoreLocatorIsOpen(true)
     }
 
@@ -415,6 +413,7 @@ const App = (props) => {
                                 </SkipNavContent>
 
                                 {!isCheckout ? <Footer /> : <CheckoutFooter />}
+
                                 <AuthModal {...authModal} />
                             </AddToCartModalProvider>
                         </Box>
