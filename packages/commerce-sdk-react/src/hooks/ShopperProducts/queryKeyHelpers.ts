@@ -62,7 +62,7 @@ export const getProducts: QueryKeyHelper<'getProducts'> = {
     queryKey: (params: Params<'getProducts'>) => {
         return [
             ...getProducts.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys['getProducts'])
+            pickValidParams(params, ShopperProducts.paramKeys.getProducts)
         ]
     }
 }
@@ -78,7 +78,7 @@ export const getProduct: QueryKeyHelper<'getProduct'> = {
     queryKey: (params: Params<'getProduct'>) => {
         return [
             ...getProduct.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys['getProduct'])
+            pickValidParams(params, ShopperProducts.paramKeys.getProduct)
         ]
     }
 }
@@ -93,7 +93,7 @@ export const getCategories: QueryKeyHelper<'getCategories'> = {
     queryKey: (params: Params<'getCategories'>) => {
         return [
             ...getCategories.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys['getCategories'])
+            pickValidParams(params, ShopperProducts.paramKeys.getCategories)
         ]
     }
 }
@@ -109,7 +109,7 @@ export const getCategory: QueryKeyHelper<'getCategory'> = {
     queryKey: (params: Params<'getCategory'>) => {
         return [
             ...getCategory.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys['getCategory'])
+            pickValidParams(params, ShopperProducts.paramKeys.getCategory)
         ]
     }
 }
