@@ -16,7 +16,7 @@ const LOG_LEVELS = ['debug', 'info', 'warn', 'error']
 const DEFAULT_LOG_LEVEL = 'info'
 
 // Default log format to use if not explicitly provided. It can be 'JSON' or 'TEXT'.
-const DEFAULT_LOG_FORMAT = 'TEXT'
+const DEFAULT_LOG_FORMAT = 'JSON'
 
 const isServerSide = typeof window === 'undefined'
 
@@ -72,18 +72,16 @@ export class PWAKITLogger {
         }
 
         if (this.format === 'TEXT') {
-            return `${finalNamespace} ${level.toUpperCase()} ${message} ${
-                additionalProperties ? JSON.stringify(additionalProperties) : ''
+            return `${finalNamespace} ${level.toUpperCase()} ${message}${
+                additionalProperties ? ` ${JSON.stringify(additionalProperties)}` : ''
             }`
         }
 
-        const logMessage = {
+        return {
             ...(finalNamespace && {namespace: finalNamespace}),
             message: message.trim(),
             ...(additionalProperties && {additionalProperties})
         }
-
-        return logMessage
     }
 
     /**
@@ -92,7 +90,7 @@ export class PWAKITLogger {
      * @param {LogOptions} [options={}] - Optional message details.
      */
     printLog(message, options = {}) {
-        const {level, ...details} = options
+        const {level} = options
 
         if (!this.shouldLog(level)) {
             return

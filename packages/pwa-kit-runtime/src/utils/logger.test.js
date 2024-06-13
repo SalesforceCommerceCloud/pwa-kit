@@ -185,4 +185,14 @@ describe('PWAKITLogger', () => {
             additionalProperties: {key: 'value'}
         })
     })
+
+    test('should use default values in constructor', () => {
+        const defaultLogger = new PWAKITLogger()
+        defaultLogger.info('This is an info message with default values')
+        expect(defaultLogger.logLevel).toBe('info')
+        expect(defaultLogger.format).toBe('JSON')
+        expect(console.info).toHaveBeenCalledWith(
+            expect.objectContaining({message: 'This is an info message with default values'})
+        )
+    })
 })
