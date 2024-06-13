@@ -80,7 +80,6 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
 
             {variant?.itemId ? (
                 <DisplayPrice
-                    isLiveRegion={true}
                     name={variant?.name}
                     currency={currency}
                     priceData={priceData}
@@ -88,7 +87,6 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
                 />
             ) : (
                 <DisplayPrice
-                    isLiveRegion={true}
                     name={variant?.name}
                     currency={currency}
                     priceData={priceData}

@@ -16,20 +16,11 @@ import msg from '@salesforce/retail-react-app/app/components/display-price/messa
  * @param price - price of the product
  * @param as - an HTML tag or component to be rendered as
  * @param isRange - show price as range or not
- * @param isLiveRegion - for a11y, a prop to indicate if this is a dynamical content
  * @param name - product name
  * @param extraProps - extra props to be passed into Text Component
  * @returns {JSX.Element}
  */
-const ListPrice = ({
-    name,
-    isLiveRegion,
-    price,
-    isRange = false,
-    as = 's',
-    currency,
-    ...extraProps
-}) => {
+const ListPrice = ({name, price, isRange = false, as = 's', currency, ...extraProps}) => {
     const intl = useIntl()
     const listPriceText = intl.formatNumber(price, {
         style: 'currency',
@@ -62,13 +53,11 @@ const ListPrice = ({
                 </Text>
             )}
 
-            <VisuallyHidden aria-live="polite">
-                {isLiveRegion
-                    ? `${name}
-                ${intl.formatMessage(msg.ariaLabelListPrice, {
+            <VisuallyHidden aria-live="polite" key={listPriceText}>
+                {name}
+                {intl.formatMessage(msg.ariaLabelListPrice, {
                     listPrice: listPriceText || ''
-                })}`
-                    : ''}
+                })}
             </VisuallyHidden>
         </Box>
     )
@@ -78,7 +67,6 @@ ListPrice.propTypes = {
     price: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
     name: PropTypes.string,
-    isLiveRegion: PropTypes.bool,
     as: PropTypes.string,
     isRange: PropTypes.bool,
     extraProps: PropTypes.object
