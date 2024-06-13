@@ -17,6 +17,7 @@ import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} fr
 import {CustomerType} from '../hooks/useCustomerType'
 import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
 import {
+    MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
@@ -175,8 +176,8 @@ class Auth {
     private silenceWarnings: boolean
 
     constructor(config: AuthConfig) {
-        // Special endpoint for injecting SLAS private client secret
-        const baseUrl = config.proxy.split(`/mobify`)[0]
+        // Special endpoint for injecting SLAS private client secret.
+        const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
 
         this.client = new ShopperLogin({

@@ -17,7 +17,9 @@ export const detectStorefrontPreview = () => {
     return isOriginTrusted(parentOrigin)
 }
 
-/** Returns the URL to load the Storefront Preview client script from the parent origin.
+/**
+ * Returns the URL to load the Storefront Preview client script from the parent origin.
+ * The client script is served from Runtime Admin and is not a part of the PWA Retail React App bundle.
  * @private
  */
 export const getClientScript = () => {
