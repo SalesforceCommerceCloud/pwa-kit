@@ -19,7 +19,7 @@ const INDEX_FILE = 'index'
 // Returns true/false indicating if the importPath resolves to a same named file as the sourcePath.
 // @private
 export const isSelfReference = (importPath, sourcePath) => {
-    const indexRegExp = new RegExp(`(\/${INDEX_FILE})$`)
+    const indexRegExp = new RegExp(`(/${INDEX_FILE})$`)
 
     // Sanitize the input. Here we want to remove the file extension and index file if it exists.
     sourcePath = sourcePath.split('.')[0]
