@@ -12,7 +12,6 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
 import {getDefaultSearchStoresParams} from '@salesforce/retail-react-app/app/components/store-locator/index'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 const StoreLocator = () => {
     const intl = useIntl()
 
@@ -27,13 +26,6 @@ const StoreLocator = () => {
         }
     })
 
-    useEffect(() => {
-        if (!isServer)
-            window.localStorage.setItem(
-                'STORE_LOCATOR_LOCAL_STORAGE',
-                JSON.stringify(searchStoresParams)
-            )
-    }, [searchStoresParams])
     return (
         <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
             <Seo title="Store Locator" description="Find a Store" />

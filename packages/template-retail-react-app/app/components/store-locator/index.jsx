@@ -17,7 +17,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     SUPPORTED_STORE_LOCATOR_COUNTRIES,
     DEFAULT_STORE_LOCATORY_COUNTRY,
@@ -38,13 +37,6 @@ export const getDefaultSearchStoresParams = (intl) => {
         countryCode: defaultCountryCode,
         postalCode: DEFAULT_STORE_LOCATORY_POSTAL_CODE
     }
-    if (!isServer) {
-        var searchStoresParamsFromLocalStorage = JSON.parse(
-            window.localStorage.getItem('STORE_LOCATOR_LOCAL_STORAGE')
-        )
-        if (searchStoresParamsFromLocalStorage)
-            defaultSearchStoresParams = searchStoresParamsFromLocalStorage
-    }
 
     return defaultSearchStoresParams
 }
@@ -53,7 +45,9 @@ const StoreLocatorModal = (props) => {
     const {isOpen, setIsOpen} = props
     const intl = useIntl()
     var defaultSearchStoresParams = getDefaultSearchStoresParams(intl)
+
     const [searchStoresParams, setSearchStoresParams] = useState(defaultSearchStoresParams)
+
     var searchStoresData = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.countryCode,
@@ -62,14 +56,6 @@ const StoreLocatorModal = (props) => {
             maxDistance: 100
         }
     })
-
-    useEffect(() => {
-        if (!isServer)
-            window.localStorage.setItem(
-                'STORE_LOCATOR_LOCAL_STORAGE',
-                JSON.stringify(searchStoresParams)
-            )
-    }, [searchStoresParams])
 
     const isDesktopView = useBreakpointValue({base: false, lg: true})
 
@@ -98,7 +84,6 @@ const StoreLocatorModal = (props) => {
                                 searchStoresData={searchStoresData}
                                 searchStoresParams={searchStoresParams}
                                 setSearchStoresParams={setSearchStoresParams}
-                                defaultSearchStoresParams={defaultSearchStoresParams}
                             />
                         </ModalBody>
                     </ModalContent>
@@ -124,7 +109,6 @@ const StoreLocatorModal = (props) => {
                                 searchStoresData={searchStoresData}
                                 searchStoresParams={searchStoresParams}
                                 setSearchStoresParams={setSearchStoresParams}
-                                defaultSearchStoresParams={defaultSearchStoresParams}
                             />
                         </ModalBody>
                     </ModalContent>
