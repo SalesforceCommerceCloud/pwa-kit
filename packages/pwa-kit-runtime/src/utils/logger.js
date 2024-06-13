@@ -50,7 +50,7 @@ export class PWAKITLogger {
      * @param {string} level - The log level of the message.
      * @returns {boolean} - Returns true if the message should be logged, otherwise false.
      */
-    shouldLog(level) {
+    #shouldLog(level) {
         const messageLogLevel = LOG_LEVELS.includes(level) ? level : DEFAULT_LOG_LEVEL
         return LOG_LEVELS.indexOf(messageLogLevel) >= LOG_LEVELS.indexOf(this.logLevel)
     }
@@ -64,7 +64,7 @@ export class PWAKITLogger {
      * @param {Object} details.additionalProperties - Additional properties to include in the log message.
      * @returns {Object|string} - The formatted log message, either as a JSON object or a string.
      */
-    formatLogMessage(message, {level, namespace, additionalProperties}) {
+    #formatLogMessage(message, {level, namespace, additionalProperties}) {
         let finalNamespace = this.packageName
         if (namespace && this.packageName) {
             finalNamespace += `.${namespace}`
@@ -90,14 +90,14 @@ export class PWAKITLogger {
      * @param {string} message - The log message.
      * @param {LogOptions} [options={}] - Optional message details.
      */
-    printLog(message, options = {}) {
+    #printLog(message, options = {}) {
         const {level} = options
 
-        if (!this.shouldLog(level)) {
+        if (!this.#shouldLog(level)) {
             return
         }
 
-        const formattedMessage = this.formatLogMessage(message, options)
+        const formattedMessage = this.#formatLogMessage(message, options)
 
         switch (level) {
             case 'error':
@@ -124,7 +124,7 @@ export class PWAKITLogger {
      * @param {LogDetails} [details={}] - Optional message details.
      */
     debug(message, details = {}) {
-        this.printLog(message, {level: 'debug', ...details})
+        this.#printLog(message, {level: 'debug', ...details})
     }
 
     /**
@@ -133,7 +133,7 @@ export class PWAKITLogger {
      * @param {LogDetails} [details={}] - Optional message details.
      */
     log(message, details = {}) {
-        this.printLog(message, {level: 'log', ...details})
+        this.#printLog(message, {level: 'log', ...details})
     }
 
     /**
@@ -142,7 +142,7 @@ export class PWAKITLogger {
      * @param {LogDetails} [details={}] - Optional message details.
      */
     info(message, details = {}) {
-        this.printLog(message, {level: 'info', ...details})
+        this.#printLog(message, {level: 'info', ...details})
     }
 
     /**
@@ -151,7 +151,7 @@ export class PWAKITLogger {
      * @param {LogDetails} [details={}] - Optional message details.
      */
     warn(message, details = {}) {
-        this.printLog(message, {level: 'warn', ...details})
+        this.#printLog(message, {level: 'warn', ...details})
     }
 
     /**
@@ -160,7 +160,7 @@ export class PWAKITLogger {
      * @param {LogDetails} [details={}] - Optional message details.
      */
     error(message, details = {}) {
-        this.printLog(message, {level: 'error', ...details})
+        this.#printLog(message, {level: 'error', ...details})
     }
 }
 

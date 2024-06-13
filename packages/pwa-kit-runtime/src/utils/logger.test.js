@@ -182,38 +182,6 @@ describe('PWAKITLogger', () => {
         )
     })
 
-    test('should format log message correctly in JSON format', () => {
-        const logger = new PWAKITLogger({
-            packageName: 'test-package',
-            logLevel: 'info',
-            format: 'JSON'
-        })
-        const formattedMessage = logger.formatLogMessage('This is a test message', {
-            level: 'info',
-            namespace: 'testNamespace',
-            additionalProperties: {key: 'value'}
-        })
-
-        expect(formattedMessage).toEqual({
-            namespace: 'test-package.testNamespace',
-            message: 'This is a test message',
-            additionalProperties: {key: 'value'}
-        })
-    })
-
-    test('should handle missing namespace gracefully in JSON format', () => {
-        const logger = new PWAKITLogger({packageName: '', logLevel: 'info', format: 'JSON'})
-        const formattedMessage = logger.formatLogMessage('This is a test message', {
-            level: 'info',
-            additionalProperties: {key: 'value'}
-        })
-
-        expect(formattedMessage).toEqual({
-            message: 'This is a test message',
-            additionalProperties: {key: 'value'}
-        })
-    })
-
     test('should use default values in constructor', () => {
         const defaultLogger = new PWAKITLogger()
         defaultLogger.info('This is an info message with default values')
