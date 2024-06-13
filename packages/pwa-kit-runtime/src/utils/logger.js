@@ -34,11 +34,12 @@ const LOG_FORMAT = isServerSide
 export class PWAKITLogger {
     /**
      * Creates an instance of PWAKITLogger.
-     * @param {string} logLevel - The log level to set for the logger.
-     * @param {string} [format=DEFAULT_LOG_FORMAT] - The format in which to print log messages. Can be 'JSON' or 'TEXT'.
-     * @param {string} packageName - The name of the package where the logger is used.
+     * @param {Object} options - Configuration options for the logger.
+     * @param {string} options.packageName - The name of the package where the logger is used.
+     * @param {string} [options.logLevel=LOG_LEVEL] - The log level to set for the logger.
+     * @param {string} [options.format=LOG_FORMAT] - The format in which to print log messages. Can be 'JSON' or 'TEXT'.
      */
-    constructor(packageName = '', logLevel = LOG_LEVEL, format = LOG_FORMAT) {
+    constructor({packageName = '', logLevel = LOG_LEVEL, format = LOG_FORMAT} = {}) {
         this.packageName = packageName
         this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
         this.format = format.toUpperCase()
@@ -168,6 +169,7 @@ export class PWAKITLogger {
  * @param {string} packageName - The name of the package where the logger is used.
  * @returns {PWAKITLogger} - An instance of PWAKITLogger configured for the specified package.
  */
-const createLogger = (packageName) => new PWAKITLogger(packageName, LOG_LEVEL, LOG_FORMAT)
+const createLogger = (packageName) =>
+    new PWAKITLogger({packageName, logLevel: LOG_LEVEL, format: LOG_FORMAT})
 
 export default createLogger

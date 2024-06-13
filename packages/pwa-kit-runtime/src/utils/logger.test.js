@@ -37,7 +37,11 @@ describe('PWAKITLogger', () => {
     })
 
     test('should log a debug message', () => {
-        const debugLogger = new PWAKITLogger('test-package', 'debug', 'JSON')
+        const debugLogger = new PWAKITLogger({
+            packageName: 'test-package',
+            logLevel: 'debug',
+            format: 'JSON'
+        })
         debugLogger.debug('This is a debug message')
         expect(console.debug).toHaveBeenCalledWith(
             expect.objectContaining({message: 'This is a debug message'})
@@ -61,7 +65,11 @@ describe('PWAKITLogger', () => {
     })
 
     test('should respect log level setting', () => {
-        const customLogger = new PWAKITLogger('test-package', 'warn', 'JSON')
+        const customLogger = new PWAKITLogger({
+            packageName: 'test-package',
+            logLevel: 'warn',
+            format: 'JSON'
+        })
         customLogger.info('This message should not be logged')
         customLogger.warn('This is a warn message')
         customLogger.error('This is an error message')
@@ -104,12 +112,20 @@ describe('PWAKITLogger', () => {
     })
 
     test('should default to info log level if invalid log level is given', () => {
-        const customLogger = new PWAKITLogger('test-package', 'invalid', 'JSON')
+        const customLogger = new PWAKITLogger({
+            packageName: 'test-package',
+            logLevel: 'invalid',
+            format: 'JSON'
+        })
         expect(customLogger.logLevel).toBe('info')
     })
 
     test('should not log debug message if log level is info', () => {
-        const infoLogger = new PWAKITLogger('test-package', 'info', 'JSON')
+        const infoLogger = new PWAKITLogger({
+            packageName: 'test-package',
+            logLevel: 'info',
+            format: 'JSON'
+        })
         infoLogger.debug('This debug message should not be logged')
         expect(console.debug).not.toHaveBeenCalled()
     })
@@ -127,7 +143,11 @@ describe('PWAKITLogger', () => {
     })
 
     test('should log message using TEXT format', () => {
-        const logger = new PWAKITLogger('test-package', 'info', 'TEXT')
+        const logger = new PWAKITLogger({
+            packageName: 'test-package',
+            logLevel: 'info',
+            format: 'TEXT'
+        })
         logger.info('This is an info message')
         expect(console.info).toHaveBeenCalledWith(
             expect.stringContaining('test-package INFO This is an info message')
@@ -135,7 +155,7 @@ describe('PWAKITLogger', () => {
     })
 
     test('should format log message correctly in TEXT format without packageName', () => {
-        const logger = new PWAKITLogger('', 'info', 'TEXT')
+        const logger = new PWAKITLogger({packageName: '', logLevel: 'info', format: 'TEXT'})
         logger.info('This is an info message', {
             namespace: 'testNamespace'
         })
@@ -146,7 +166,11 @@ describe('PWAKITLogger', () => {
     })
 
     test('should format log message correctly in TEXT format with additional properties', () => {
-        const logger = new PWAKITLogger('test-package', 'info', 'TEXT')
+        const logger = new PWAKITLogger({
+            packageName: 'test-package',
+            logLevel: 'info',
+            format: 'TEXT'
+        })
         logger.info('This is an info message with additional properties', {
             additionalProperties: {key: 'value'}
         })
@@ -159,7 +183,11 @@ describe('PWAKITLogger', () => {
     })
 
     test('should format log message correctly in JSON format', () => {
-        const logger = new PWAKITLogger('test-package', 'info', 'JSON')
+        const logger = new PWAKITLogger({
+            packageName: 'test-package',
+            logLevel: 'info',
+            format: 'JSON'
+        })
         const formattedMessage = logger.formatLogMessage('This is a test message', {
             level: 'info',
             namespace: 'testNamespace',
@@ -174,7 +202,7 @@ describe('PWAKITLogger', () => {
     })
 
     test('should handle missing namespace gracefully in JSON format', () => {
-        const logger = new PWAKITLogger('', 'info', 'JSON')
+        const logger = new PWAKITLogger({packageName: '', logLevel: 'info', format: 'JSON'})
         const formattedMessage = logger.formatLogMessage('This is a test message', {
             level: 'info',
             additionalProperties: {key: 'value'}
