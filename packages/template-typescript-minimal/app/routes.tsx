@@ -5,13 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import loadable, {LoadableComponent} from '@loadable/component'
-// @ts-ignore
-import _routes from '*/app/routes'
 
 const Home = loadable(() => import('./pages/home'))
 
 const routes = [
-    ..._routes,
     {
         path: '/',
         exact: true,
