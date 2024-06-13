@@ -2893,66 +2893,6 @@
       "value": "Tem certeza de que deseja fazer logout? Será preciso fazer logon novamente para dar continuidade ao seu pedido atual."
     }
   ],
-  "store_locator.action.find": [
-    {
-      "type": 0,
-      "value": "Encontrar"
-    }
-  ],
-  "store_locator.action.use_my_location": [
-    {
-      "type": 0,
-      "value": "Use minha localização"
-    }
-  ],
-  "store_locator.action.viewMore": [
-    {
-      "type": 0,
-      "value": "Veja mais"
-    }
-  ],
-  "store_locator.description.away": [
-    {
-      "type": 0,
-      "value": "de distância"
-    }
-  ],
-  "store_locator.description.or": [
-    {
-      "type": 0,
-      "value": "ou"
-    }
-  ],
-  "store_locator.description.phone": [
-    {
-      "type": 0,
-      "value": "Telefone:"
-    }
-  ],
-  "store_locator.description.viewing_within": [
-    {
-      "type": 0,
-      "value": "Visualizando lojas em um raio de 160 quilômetros"
-    }
-  ],
-  "store_locator.dropdown.germany": [
-    {
-      "type": 0,
-      "value": "Alemanha"
-    }
-  ],
-  "store_locator.dropdown.united_states": [
-    {
-      "type": 0,
-      "value": "Estados Unidos"
-    }
-  ],
-  "store_locator.title": [
-    {
-      "type": 0,
-      "value": "Encontre uma loja"
-    }
-  ],
   "swatch_group.selected.label": [
     {
       "type": 1,

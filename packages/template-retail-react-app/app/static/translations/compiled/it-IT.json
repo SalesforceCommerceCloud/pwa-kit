@@ -2861,66 +2861,6 @@
       "value": "Uscire? Per procedere con l'ordine corrente devi eseguire di nuovo l'accesso."
     }
   ],
-  "store_locator.action.find": [
-    {
-      "type": 0,
-      "value": "Trovare"
-    }
-  ],
-  "store_locator.action.use_my_location": [
-    {
-      "type": 0,
-      "value": "Utilizza La mia posizione"
-    }
-  ],
-  "store_locator.action.viewMore": [
-    {
-      "type": 0,
-      "value": "Visualizza altro"
-    }
-  ],
-  "store_locator.description.away": [
-    {
-      "type": 0,
-      "value": "di distanza"
-    }
-  ],
-  "store_locator.description.or": [
-    {
-      "type": 0,
-      "value": "O"
-    }
-  ],
-  "store_locator.description.phone": [
-    {
-      "type": 0,
-      "value": "Telefono:"
-    }
-  ],
-  "store_locator.description.viewing_within": [
-    {
-      "type": 0,
-      "value": "Visualizzazione di negozi nel raggio di 100 miglia"
-    }
-  ],
-  "store_locator.dropdown.germany": [
-    {
-      "type": 0,
-      "value": "Germania"
-    }
-  ],
-  "store_locator.dropdown.united_states": [
-    {
-      "type": 0,
-      "value": "stati Uniti"
-    }
-  ],
-  "store_locator.title": [
-    {
-      "type": 0,
-      "value": "Trova un negozio"
-    }
-  ],
   "swatch_group.selected.label": [
     {
       "type": 1,

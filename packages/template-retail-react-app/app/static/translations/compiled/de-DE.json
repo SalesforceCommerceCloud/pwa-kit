@@ -2877,66 +2877,6 @@
       "value": "Möchten Sie sich wirklich abmelden? Sie müssen sich wieder anmelden, um mit Ihrer aktuellen Bestellung fortzufahren."
     }
   ],
-  "store_locator.action.find": [
-    {
-      "type": 0,
-      "value": "Finden"
-    }
-  ],
-  "store_locator.action.use_my_location": [
-    {
-      "type": 0,
-      "value": "Verwenden Sie „Mein Standort“."
-    }
-  ],
-  "store_locator.action.viewMore": [
-    {
-      "type": 0,
-      "value": "Mehr sehen"
-    }
-  ],
-  "store_locator.description.away": [
-    {
-      "type": 0,
-      "value": "entfernt"
-    }
-  ],
-  "store_locator.description.or": [
-    {
-      "type": 0,
-      "value": "oder"
-    }
-  ],
-  "store_locator.description.phone": [
-    {
-      "type": 0,
-      "value": "Telefon:"
-    }
-  ],
-  "store_locator.description.viewing_within": [
-    {
-      "type": 0,
-      "value": "Besichtigung von Geschäften im Umkreis von 100 Meilen"
-    }
-  ],
-  "store_locator.dropdown.germany": [
-    {
-      "type": 0,
-      "value": "Deutschland"
-    }
-  ],
-  "store_locator.dropdown.united_states": [
-    {
-      "type": 0,
-      "value": "Vereinigte Staaten"
-    }
-  ],
-  "store_locator.title": [
-    {
-      "type": 0,
-      "value": "Finde ein Geschäft"
-    }
-  ],
   "swatch_group.selected.label": [
     {
       "type": 1,

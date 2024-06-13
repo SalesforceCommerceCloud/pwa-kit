@@ -2877,66 +2877,6 @@
       "value": "確定要登出嗎？您必須重新登入，才能繼續目前的訂單流程。"
     }
   ],
-  "store_locator.action.find": [
-    {
-      "type": 0,
-      "value": "尋找"
-    }
-  ],
-  "store_locator.action.use_my_location": [
-    {
-      "type": 0,
-      "value": "使用我的位置"
-    }
-  ],
-  "store_locator.action.viewMore": [
-    {
-      "type": 0,
-      "value": "看更多"
-    }
-  ],
-  "store_locator.description.away": [
-    {
-      "type": 0,
-      "value": "外"
-    }
-  ],
-  "store_locator.description.or": [
-    {
-      "type": 0,
-      "value": "或者"
-    }
-  ],
-  "store_locator.description.phone": [
-    {
-      "type": 0,
-      "value": "電話："
-    }
-  ],
-  "store_locator.description.viewing_within": [
-    {
-      "type": 0,
-      "value": "查看 100 英里內的商店"
-    }
-  ],
-  "store_locator.dropdown.germany": [
-    {
-      "type": 0,
-      "value": "德國"
-    }
-  ],
-  "store_locator.dropdown.united_states": [
-    {
-      "type": 0,
-      "value": "美國"
-    }
-  ],
-  "store_locator.title": [
-    {
-      "type": 0,
-      "value": "尋找商店"
-    }
-  ],
   "swatch_group.selected.label": [
     {
       "type": 1,
