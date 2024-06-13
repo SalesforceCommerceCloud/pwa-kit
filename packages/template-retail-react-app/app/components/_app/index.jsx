@@ -29,7 +29,7 @@ import {
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
-import createLogger from '@salesforce/pwa-kit-runtime/utils/logger'
+import logger from '@salesforce/retail-react-app/app/logger'
 
 // Contexts
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
@@ -155,7 +155,6 @@ const App = (props) => {
     )
 
     // TODO: Remove test logs before merging
-    const logger = createLogger('retail-react-app')
 
     const loggerDetails = {
         namespace: 'App.render'

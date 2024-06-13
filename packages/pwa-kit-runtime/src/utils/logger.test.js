@@ -64,6 +64,16 @@ describe('PWAKITLogger', () => {
         )
     })
 
+    test('should use default values in constructor', () => {
+        const defaultLogger = new PWAKITLogger()
+        defaultLogger.info('This is an info message with default values')
+        expect(defaultLogger.logLevel).toBe('info')
+        expect(defaultLogger.format).toBe('JSON')
+        expect(console.info).toHaveBeenCalledWith(
+            expect.objectContaining({message: 'This is an info message with default values'})
+        )
+    })
+
     test('should respect log level setting', () => {
         const customLogger = new PWAKITLogger({
             packageName: 'test-package',
@@ -83,7 +93,7 @@ describe('PWAKITLogger', () => {
         )
     })
 
-    test('should log with additional details', () => {
+    test('should log with message details', () => {
         const logger = createLogger('test-package')
         logger.info('This is an info message', {
             namespace: 'testNamespace'
@@ -111,6 +121,18 @@ describe('PWAKITLogger', () => {
         )
     })
 
+    test('should not include additionalProperties if it is not provided', () => {
+        const logger = createLogger('test-package')
+        logger.info('This is an info message', {
+            namespace: 'testNamespace'
+        })
+        expect(console.info).toHaveBeenCalledWith(
+            expect.not.objectContaining({
+                additionalProperties: expect.anything()
+            })
+        )
+    })
+
     test('should default to info log level if invalid log level is given', () => {
         const customLogger = new PWAKITLogger({
             packageName: 'test-package',
@@ -130,65 +152,69 @@ describe('PWAKITLogger', () => {
         expect(console.debug).not.toHaveBeenCalled()
     })
 
-    test('should not include additionalProperties if it is not provided', () => {
-        const logger = createLogger('test-package')
-        logger.info('This is an info message', {
-            namespace: 'testNamespace'
-        })
-        expect(console.info).toHaveBeenCalledWith(
-            expect.not.objectContaining({
-                additionalProperties: expect.anything()
+    describe('logger with TEXT format', () => {
+        test('should log message using TEXT format', () => {
+            const logger = new PWAKITLogger({
+                packageName: 'test-package',
+                logLevel: 'info',
+                format: 'TEXT'
             })
-        )
-    })
-
-    test('should log message using TEXT format', () => {
-        const logger = new PWAKITLogger({
-            packageName: 'test-package',
-            logLevel: 'info',
-            format: 'TEXT'
-        })
-        logger.info('This is an info message')
-        expect(console.info).toHaveBeenCalledWith(
-            expect.stringContaining('test-package INFO This is an info message')
-        )
-    })
-
-    test('should format log message correctly in TEXT format without packageName', () => {
-        const logger = new PWAKITLogger({packageName: '', logLevel: 'info', format: 'TEXT'})
-        logger.info('This is an info message', {
-            namespace: 'testNamespace'
-        })
-
-        expect(console.info).toHaveBeenCalledWith(
-            expect.stringContaining('testNamespace INFO This is an info message')
-        )
-    })
-
-    test('should format log message correctly in TEXT format with additional properties', () => {
-        const logger = new PWAKITLogger({
-            packageName: 'test-package',
-            logLevel: 'info',
-            format: 'TEXT'
-        })
-        logger.info('This is an info message with additional properties', {
-            additionalProperties: {key: 'value'}
-        })
-
-        expect(console.info).toHaveBeenCalledWith(
-            expect.stringContaining(
-                'test-package INFO This is an info message with additional properties {"key":"value"}'
+            logger.info('This is an info message')
+            expect(console.info).toHaveBeenCalledWith(
+                expect.stringContaining('test-package INFO This is an info message')
             )
-        )
+        })
+
+        test('should format log message correctly in TEXT format without packageName', () => {
+            const logger = new PWAKITLogger({packageName: '', logLevel: 'info', format: 'TEXT'})
+            logger.info('This is an info message', {
+                namespace: 'testNamespace'
+            })
+
+            expect(console.info).toHaveBeenCalledWith(
+                expect.stringContaining('testNamespace INFO This is an info message')
+            )
+        })
+
+        test('should format log message correctly in TEXT format with additional properties', () => {
+            const logger = new PWAKITLogger({
+                packageName: 'test-package',
+                logLevel: 'info',
+                format: 'TEXT'
+            })
+            logger.info('This is an info message with additional properties', {
+                additionalProperties: {key: 'value'}
+            })
+
+            expect(console.info).toHaveBeenCalledWith(
+                expect.stringContaining(
+                    'test-package INFO This is an info message with additional properties {"key":"value"}'
+                )
+            )
+        })
     })
 
-    test('should use default values in constructor', () => {
-        const defaultLogger = new PWAKITLogger()
-        defaultLogger.info('This is an info message with default values')
-        expect(defaultLogger.logLevel).toBe('info')
-        expect(defaultLogger.format).toBe('JSON')
-        expect(console.info).toHaveBeenCalledWith(
-            expect.objectContaining({message: 'This is an info message with default values'})
-        )
+    describe('logger on client', () => {
+        let originalWindow
+        beforeAll(() => {
+            global.window = {env: 'client'}
+            originalWindow = global.window
+        })
+
+        afterAll(() => {
+            global.window = originalWindow
+        })
+
+        test('should use client-specific log level and format when running on client', () => {
+            const clientLogger = createLogger('test-package', {logLevel: 'debug'})
+            expect(clientLogger.logLevel).toBe('debug')
+            expect(clientLogger.format).toBe('JSON')
+        })
+
+        test('should allow overriding client-specific log level and format', () => {
+            const clientLogger = createLogger('test-package', {logLevel: 'info', format: 'TEXT'})
+            expect(clientLogger.logLevel).toBe('info')
+            expect(clientLogger.format).toBe('TEXT')
+        })
     })
 })
