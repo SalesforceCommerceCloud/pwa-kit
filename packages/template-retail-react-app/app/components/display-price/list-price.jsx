@@ -52,8 +52,8 @@ const ListPrice = ({name, price, isRange = false, as = 's', currency, ...extraPr
                     {listPriceText}
                 </Text>
             )}
-
-            <VisuallyHidden aria-live="polite" key={listPriceText}>
+            {/*For screen reader, we want to make sure the product name is announced before the price to avoid confusion*/}
+            <VisuallyHidden aria-live="polite" aria-atomic={true}>
                 {name}
                 {intl.formatMessage(msg.ariaLabelListPrice, {
                     listPrice: listPriceText || ''
