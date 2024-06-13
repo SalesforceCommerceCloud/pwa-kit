@@ -26,10 +26,10 @@ import ListPrice from '@salesforce/retail-react-app/app/components/display-price
  * @param quantity - quantity to take into the account for price display
  * @param currentPriceProps - extra props to be passing to CurrentPrice component
  * @param listPriceProps - extra props to be passing to ListPrice component
- * @param productLabelForA11y - product name for a11y
+ * @param labelForA11y - label to be used for a11y
  */
 const DisplayPrice = ({
-    productLabelForA11y,
+    labelForA11y,
     priceData,
     currency,
     quantity = 1,
@@ -39,7 +39,7 @@ const DisplayPrice = ({
     const {listPrice, currentPrice, isASet, isMaster, isOnSale, isRange} = priceData
     const renderCurrentPrice = (isRange) => (
         <CurrentPrice
-            productLabelForA11y={productLabelForA11y}
+            labelForA11y={labelForA11y}
             price={currentPrice * quantity}
             as="b"
             currency={currency}
@@ -51,7 +51,7 @@ const DisplayPrice = ({
     const renderListPrice = (isRange) =>
         listPrice && (
             <ListPrice
-                productLabelForA11y={productLabelForA11y}
+                labelForA11y={labelForA11y}
                 currency={currency}
                 price={listPrice * quantity}
                 isRange={isRange}
@@ -89,7 +89,7 @@ DisplayPrice.propTypes = {
         tieredPrice: PropTypes.number
     }),
     currency: PropTypes.string.isRequired,
-    productLabelForA11y: PropTypes.string,
+    labelForA11y: PropTypes.string,
     currentPriceProps: PropTypes.object,
     listPriceProps: PropTypes.object,
     quantity: PropTypes.number
