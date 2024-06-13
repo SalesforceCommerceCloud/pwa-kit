@@ -591,9 +591,6 @@
   "header.button.assistive_msg.my_cart_with_num_items": {
     "defaultMessage": "My cart, number of items: {numItems}"
   },
-  "header.button.assistive_msg.store_locator": {
-    "defaultMessage": "Store Locator"
-  },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "Wishlist"
   },
