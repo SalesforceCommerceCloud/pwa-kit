@@ -169,12 +169,12 @@ test('Renders price range with starting price and strikethrough price for master
 })
 
 test('renders exact price with strikethrough price for master product with one variant', () => {
-    const {getByText, queryByText, container} = renderWithProviders(
+    const {getAllByText, getByText, queryByText, container} = renderWithProviders(
         <ProductTile product={mockMasterProductHitWithOneVariant} />
     )
     expect(getByText(/black flat front wool suit/i)).toBeInTheDocument()
-    expect(getByText(/£191\.99/i)).toBeInTheDocument()
-    expect(getByText(/£320\.00/i)).toBeInTheDocument()
+    expect(getAllByText(/^£191\.99/i)).toHaveLength(1)
+    expect(getAllByText(/^£320\.00/i)).toHaveLength(1)
     expect(queryByText(/from/i)).not.toBeInTheDocument()
 
     const currentPriceTag = container.querySelectorAll('b')
@@ -190,8 +190,7 @@ test('Product set - shows range From X where X is the lowest price child', () =>
         <ProductTile product={mockProductSetHit} />
     )
     expect(getByText(/Winter Look/i)).toBeInTheDocument()
-    expect(queryByText(/from/i)).toBeInTheDocument()
-    expect(queryByText(/£40\.16/i)).toBeInTheDocument()
+    expect(queryByText(/from £40\.16/i)).toBeInTheDocument()
     expect(queryByText(/£44\.16/i)).not.toBeInTheDocument()
 })
 
@@ -200,7 +199,7 @@ test('renders strike through price with standard product', () => {
         <ProductTile product={mockStandardProductHit} />
     )
     expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
-    expect(getByText(/£63\.99/i)).toBeInTheDocument()
+    expect(getByText(/^£63\.99/i)).toBeInTheDocument()
     const currentPriceTag = container.querySelectorAll('b')
     const strikethroughPriceTag = container.querySelectorAll('s')
     expect(within(currentPriceTag[0]).getByText(/£63\.99/i)).toBeDefined()

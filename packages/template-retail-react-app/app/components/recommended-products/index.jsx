@@ -73,7 +73,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             getRecommendations(recommender, _products)
             return
         }
-    }, [zone, recommender])
+    }, [zone, recommender, _products])
 
     useEffect(() => {
         // This is an optimization that eliminates superfluous rerenders/fetching by

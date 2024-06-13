@@ -85,7 +85,7 @@ afterEach(() => {
     jest.clearAllMocks()
 })
 
-test.only('should render product details page', async () => {
+test('should render product details page', async () => {
     global.server.use(
         // Use a single product (and not a product set)
         rest.get('*/products/:productId', (req, res, ctx) => {
@@ -99,12 +99,12 @@ test.only('should render product details page', async () => {
     await waitFor(() => {
         expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
         expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(screen.getAllByText(/^from £9\.59$/i)).toHaveLength(2)
+        expect(screen.getAllByText(/from £9\.59/i)).toHaveLength(2)
         expect(screen.getAllByText(/£15\.36/i)).toHaveLength(4)
         expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
         expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
         expect(screen.getAllByTestId('product-view')).toHaveLength(1)
-        screen.logTestingPlaygroundURL()
+        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
     })
 })
 
