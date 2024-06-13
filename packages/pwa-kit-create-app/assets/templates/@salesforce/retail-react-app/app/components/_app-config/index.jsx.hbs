@@ -18,6 +18,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -44,10 +45,6 @@ const AppConfig = ({children, locals = {}}) => {
 
     const appOrigin = getAppOrigin()
 
-    // This is the proxyPath defined in commerceApiConfig and not
-    // the generally assumed /mobify/proxy path defined by pwa-kit-runtime
-    const proxy = `${appOrigin}${commerceApiConfig.proxyPath}`
-
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -57,7 +54,7 @@ const AppConfig = ({children, locals = {}}) => {
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
-            proxy={`${proxy}`}
+            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
             OCAPISessionsURL={`${appOrigin}${getProxyPathBase()}/ocapi/s/${
                 locals.site?.id

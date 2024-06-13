@@ -54,10 +54,6 @@ const AppConfig = ({children, locals = {}}) => {
 
     const appOrigin = getAppOrigin()
 
-    // This is the proxyPath defined in commerceApiConfig and not
-    // the generally assumed /mobify/proxy path defined by pwa-kit-runtime
-    const proxy = `${appOrigin}${commerceApiConfig.proxyPath}`
-
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -67,7 +63,7 @@ const AppConfig = ({children, locals = {}}) => {
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
-            proxy={`${proxy}`}
+            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
