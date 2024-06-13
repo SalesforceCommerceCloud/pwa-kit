@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -20,37 +20,21 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoresList from '@salesforce/retail-react-app/app/components/store-locator/stores-list'
 import {Controller, useForm} from 'react-hook-form'
-import {
-    SUPPORTED_STORE_LOCATOR_COUNTRIES,
-    DEFAULT_STORE_LOCATORY_COUNTRY,
-    DEFAULT_STORE_LOCATORY_POSTAL_CODE
-} from '@salesforce/retail-react-app/app/constants'
+import {SUPPORTED_STORE_LOCATOR_COUNTRIES} from '@salesforce/retail-react-app/app/constants'
 
-const StoreLocatorContent = () => {
-    const [searchStoresParams, setSearchStoresParams] = useState({})
+const StoreLocatorContent = (props) => {
+    const {searchStoresData, searchStoresParams, setSearchStoresParams} = props
+
     const intl = useIntl()
-    var formattedStoreLocatorCountries = SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
-        ({countryCode, countryName}) => {
-            return {countryCode: countryCode, countryName: intl.formatMessage(countryName)}
-        }
-    )
-    var defaultCountryCode = formattedStoreLocatorCountries.find(
-        (obj) => obj.countryName == intl.formatMessage(DEFAULT_STORE_LOCATORY_COUNTRY)
-    ).countryCode
     const formProps = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
         defaultValues: {
-            countryCode: defaultCountryCode
+            countryCode: searchStoresParams?.countryCode,
+            postalCode: searchStoresParams?.postalCode
         }
     })
     const {control, handleSubmit} = formProps
-    useEffect(() => {
-        setSearchStoresParams({
-            countryCode: defaultCountryCode,
-            postalCode: DEFAULT_STORE_LOCATORY_POSTAL_CODE
-        })
-    }, [])
 
     return (
         <>
@@ -60,13 +44,23 @@ const StoreLocatorContent = () => {
                     defaultMessage: 'Find a Store'
                 })}
             </Heading>
-            <Controller
-                name="countryCode"
-                control={control}
-                defaultValue={defaultCountryCode}
-                render={({field}) => {
-                    return (
-                        <Box style={{marginBottom: '10px'}}>
+            <InputGroup>
+                <Controller
+                    name="postalCode"
+                    control={control}
+                    defaultValue={searchStoresParams?.postalCode}
+                    render={({field}) => {
+                        return <Input {...field} marginBottom="10px" />
+                    }}
+                ></Controller>
+            </InputGroup>
+            <InputGroup>
+                <Controller
+                    name="countryCode"
+                    control={control}
+                    defaultValue={searchStoresParams?.countryCode}
+                    render={({field}) => {
+                        return (
                             <Select {...field}>
                                 {SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
                                     ({countryCode, countryName}) => {
@@ -78,21 +72,11 @@ const StoreLocatorContent = () => {
                                     }
                                 )}
                             </Select>
-                        </Box>
-                    )
-                }}
-            ></Controller>
-            <InputGroup>
-                <Controller
-                    name="postalCode"
-                    control={control}
-                    defaultValue={DEFAULT_STORE_LOCATORY_POSTAL_CODE}
-                    render={({field}) => {
-                        return <Input {...field} />
+                        )
                     }}
                 ></Controller>
                 <Button
-                    key="cart-button"
+                    key="find-button"
                     onClick={handleSubmit(async (formData) => {
                         const {postalCode, countryCode} = formData
                         setSearchStoresParams({
@@ -151,15 +135,16 @@ const StoreLocatorContent = () => {
                         })}
                     </Box>
                 </AccordionItem>
-                <StoresList searchStoresParams={searchStoresParams} />
+                <StoresList storesData={searchStoresData} />
             </Accordion>
         </>
     )
 }
 
 StoreLocatorContent.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    setIsOpen: PropTypes.func.isRequired
+    searchStoresData: PropTypes.object,
+    searchStoresParams: PropTypes.object,
+    setSearchStoresParams: PropTypes.func
 }
 
 export default StoreLocatorContent

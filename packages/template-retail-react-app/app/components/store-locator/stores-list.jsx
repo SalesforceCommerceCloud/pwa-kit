@@ -15,20 +15,12 @@ import {
     AccordionPanel,
     Box
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useSearchStores} from '@salesforce/commerce-sdk-react'
 
 const StoresList = (props) => {
-    const {searchStoresParams} = props
+    const {storesData} = props
     const intl = useIntl()
-    var searchStoresData = useSearchStores({
-        parameters: {
-            countryCode: searchStoresParams?.countryCode,
-            postalCode: searchStoresParams?.postalCode,
-            locale: intl.locale,
-            maxDistance: 100
-        }
-    })
-    var storesInfo = (searchStoresData?.data?.data || []).sort((a, b) => a.distance - b.distance)
+
+    var storesInfo = (storesData?.data?.data || []).sort((a, b) => a.distance - b.distance)
     return storesInfo?.map((store, index) => {
         return (
             <AccordionItem key={index}>
@@ -98,8 +90,7 @@ const StoresList = (props) => {
 }
 
 StoresList.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    setIsOpen: PropTypes.func.isRequired
+    storesData: PropTypes.object.isRequired
 }
 
 export default StoresList

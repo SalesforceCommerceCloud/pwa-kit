@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
+import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
 

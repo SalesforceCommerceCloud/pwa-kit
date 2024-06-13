@@ -5,11 +5,35 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useState, useEffect} from 'react'
+import {useIntl} from 'react-intl'
 import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
+import {getDefaultSearchStoresParams} from '@salesforce/retail-react-app/app/components/store-locator/index'
+import {useSearchStores} from '@salesforce/commerce-sdk-react'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 const StoreLocator = () => {
+    const intl = useIntl()
+
+    var defaultSearchStoresParams = getDefaultSearchStoresParams(intl)
+    const [searchStoresParams, setSearchStoresParams] = useState(defaultSearchStoresParams)
+    var searchStoresData = useSearchStores({
+        parameters: {
+            countryCode: searchStoresParams.countryCode,
+            postalCode: searchStoresParams.postalCode,
+            locale: intl.locale,
+            maxDistance: 100
+        }
+    })
+
+    useEffect(() => {
+        if (!isServer)
+            window.localStorage.setItem(
+                'STORE_LOCATOR_LOCAL_STORAGE',
+                JSON.stringify(searchStoresParams)
+            )
+    }, [searchStoresParams])
     return (
         <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
             <Seo title="Store Locator" description="Find a Store" />
@@ -23,7 +47,11 @@ const StoreLocator = () => {
                 marginBottom={8}
                 borderRadius="base"
             >
-                <StoreLocatorContent />
+                <StoreLocatorContent
+                    searchStoresData={searchStoresData}
+                    searchStoresParams={searchStoresParams}
+                    setSearchStoresParams={setSearchStoresParams}
+                />
             </Container>
         </Box>
     )
