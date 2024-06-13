@@ -1241,36 +1241,6 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "是否确定要注销？您需要重新登录才能继续处理当前订单。"
   },
-  "store_locator.action.find": {
-    "defaultMessage": "寻找"
-  },
-  "store_locator.action.use_my_location": {
-    "defaultMessage": "使用我的位置"
-  },
-  "store_locator.action.viewMore": {
-    "defaultMessage": "查看更多"
-  },
-  "store_locator.description.away": {
-    "defaultMessage": "外"
-  },
-  "store_locator.description.or": {
-    "defaultMessage": "或者"
-  },
-  "store_locator.description.phone": {
-    "defaultMessage": "电话："
-  },
-  "store_locator.description.viewing_within": {
-    "defaultMessage": "查看 100 英里内的商店"
-  },
-  "store_locator.dropdown.germany": {
-    "defaultMessage": "德国"
-  },
-  "store_locator.dropdown.united_states": {
-    "defaultMessage": "美国"
-  },
-  "store_locator.title": {
-    "defaultMessage": "寻找商店"
-  },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}："
   },

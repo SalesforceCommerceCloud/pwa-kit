@@ -1241,36 +1241,6 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Tem certeza de que deseja fazer logout? Será preciso fazer logon novamente para dar continuidade ao seu pedido atual."
   },
-  "store_locator.action.find": {
-    "defaultMessage": "Encontrar"
-  },
-  "store_locator.action.use_my_location": {
-    "defaultMessage": "Use minha localização"
-  },
-  "store_locator.action.viewMore": {
-    "defaultMessage": "Veja mais"
-  },
-  "store_locator.description.away": {
-    "defaultMessage": "de distância"
-  },
-  "store_locator.description.or": {
-    "defaultMessage": "ou"
-  },
-  "store_locator.description.phone": {
-    "defaultMessage": "Telefone:"
-  },
-  "store_locator.description.viewing_within": {
-    "defaultMessage": "Visualizando lojas em um raio de 160 quilômetros"
-  },
-  "store_locator.dropdown.germany": {
-    "defaultMessage": "Alemanha"
-  },
-  "store_locator.dropdown.united_states": {
-    "defaultMessage": "Estados Unidos"
-  },
-  "store_locator.title": {
-    "defaultMessage": "Encontre uma loja"
-  },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
   },

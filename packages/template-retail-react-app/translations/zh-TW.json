@@ -1241,36 +1241,6 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "確定要登出嗎？您必須重新登入，才能繼續目前的訂單流程。"
   },
-  "store_locator.action.find": {
-    "defaultMessage": "尋找"
-  },
-  "store_locator.action.use_my_location": {
-    "defaultMessage": "使用我的位置"
-  },
-  "store_locator.action.viewMore": {
-    "defaultMessage": "看更多"
-  },
-  "store_locator.description.away": {
-    "defaultMessage": "外"
-  },
-  "store_locator.description.or": {
-    "defaultMessage": "或者"
-  },
-  "store_locator.description.phone": {
-    "defaultMessage": "電話："
-  },
-  "store_locator.description.viewing_within": {
-    "defaultMessage": "查看 100 英里內的商店"
-  },
-  "store_locator.dropdown.germany": {
-    "defaultMessage": "德國"
-  },
-  "store_locator.dropdown.united_states": {
-    "defaultMessage": "美國"
-  },
-  "store_locator.title": {
-    "defaultMessage": "尋找商店"
-  },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}："
   },
