@@ -72,15 +72,15 @@ describe('resolverUtils', () => {
             },
             {
                 name: 'extensions include falsey values',
-                input: ['module-extension-a', '', './local-extension-c', false],
+                input: ['module-extension-a', '', `.${path.sep}local-extension-c`, false],
                 expected: [
                     ['@salesforce/extension-module-extension-a', {}],
-                    [`${process.cwd()}/local-extension-c`, {}]
+                    [path.join(process.cwd(), 'local-extension-c'), {}]
                 ]
             },
             {
                 name: 'extensions includes absolute values',
-                input: [`${process.cwd()}/local-extension-a`],
+                input: [path.join(process.cwd(), 'local-extension-a')],
                 expected: [[`${process.cwd()}/local-extension-a`, {}]]
             }
         ].forEach((testCase) => {
