@@ -5,18 +5,24 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import {useIntl} from 'react-intl'
 import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
-import {getDefaultSearchStoresParams} from '@salesforce/retail-react-app/app/components/store-locator/index'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
+import {
+    DEFAULT_STORE_LOCATORY_COUNTRY_CODE,
+    DEFAULT_STORE_LOCATORY_POSTAL_CODE
+} from '@salesforce/retail-react-app/app/constants'
+
 const StoreLocator = () => {
     const intl = useIntl()
 
-    var defaultSearchStoresParams = getDefaultSearchStoresParams(intl)
-    const [searchStoresParams, setSearchStoresParams] = useState(defaultSearchStoresParams)
+    const [searchStoresParams, setSearchStoresParams] = useState({
+        countryCode: DEFAULT_STORE_LOCATORY_COUNTRY_CODE,
+        postalCode: DEFAULT_STORE_LOCATORY_POSTAL_CODE
+    })
     var searchStoresData = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.countryCode,

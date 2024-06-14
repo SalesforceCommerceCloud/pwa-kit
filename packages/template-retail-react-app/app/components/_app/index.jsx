@@ -351,6 +351,7 @@ const App = (props) => {
                             <StoreLocatorModal
                                 isOpen={storeLocatorIsOpen}
                                 setIsOpen={setStoreLocatorIsOpen}
+                                onClose={onClose}
                             />
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (

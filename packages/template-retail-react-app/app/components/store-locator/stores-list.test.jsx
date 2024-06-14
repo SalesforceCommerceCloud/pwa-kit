@@ -99,7 +99,7 @@ describe('StoresList', () => {
         expect(() => {
             renderWithProviders(
                 <Accordion>
-                    <StoresList storesData={mockSearchStoresData} />
+                    <StoresList searchStoresData={mockSearchStoresData} />
                 </Accordion>
             )
         }).not.toThrow()
@@ -108,7 +108,7 @@ describe('StoresList', () => {
     test('Expected information exists', async () => {
         renderWithProviders(
             <Accordion>
-                <StoresList storesData={mockSearchStoresData} />
+                <StoresList searchStoresData={mockSearchStoresData} />
             </Accordion>
         )
 
@@ -130,7 +130,7 @@ describe('StoresList', () => {
     test('Clicking View More opens store hours', async () => {
         renderWithProviders(
             <Accordion>
-                <StoresList storesData={mockSearchStoresData} />
+                <StoresList searchStoresData={mockSearchStoresData} />
             </Accordion>
         )
 
@@ -148,7 +148,7 @@ describe('StoresList', () => {
     test('Is sorted by distance away', async () => {
         renderWithProviders(
             <Accordion>
-                <StoresList storesData={mockSearchStoresData} />
+                <StoresList searchStoresData={mockSearchStoresData} />
             </Accordion>
         )
         await waitFor(async () => {

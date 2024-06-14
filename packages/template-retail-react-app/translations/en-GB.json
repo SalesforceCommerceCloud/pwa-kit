@@ -1256,6 +1256,9 @@
   "store_locator.description.away": {
     "defaultMessage": "away"
   },
+  "store_locator.description.no_locations": {
+    "defaultMessage": "Sorry, there are no locations in this area"
+  },
   "store_locator.description.or": {
     "defaultMessage": "Or"
   },

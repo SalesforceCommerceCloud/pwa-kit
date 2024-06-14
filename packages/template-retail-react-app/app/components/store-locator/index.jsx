@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
@@ -18,36 +18,27 @@ import {
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {
-    SUPPORTED_STORE_LOCATOR_COUNTRIES,
-    DEFAULT_STORE_LOCATORY_COUNTRY,
+    DEFAULT_STORE_LOCATORY_COUNTRY_CODE,
     DEFAULT_STORE_LOCATORY_POSTAL_CODE
 } from '@salesforce/retail-react-app/app/constants'
+import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {useForm} from 'react-hook-form'
 
-export const getDefaultSearchStoresParams = (intl) => {
-    var formattedStoreLocatorCountries = SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
-        ({countryCode, countryName}) => {
-            return {countryCode: countryCode, countryName: intl.formatMessage(countryName)}
-        }
-    )
-    var defaultCountryCode = formattedStoreLocatorCountries.find(
-        (obj) => obj.countryName == intl.formatMessage(DEFAULT_STORE_LOCATORY_COUNTRY)
-    ).countryCode
-
-    var defaultSearchStoresParams = {
-        countryCode: defaultCountryCode,
-        postalCode: DEFAULT_STORE_LOCATORY_POSTAL_CODE
-    }
-
-    return defaultSearchStoresParams
-}
-
-const StoreLocatorModal = (props) => {
-    const {isOpen, setIsOpen} = props
+const StoreLocatorModal = ({isOpen, setIsOpen, onClose = noop}) => {
     const intl = useIntl()
-    var defaultSearchStoresParams = getDefaultSearchStoresParams(intl)
 
-    const [searchStoresParams, setSearchStoresParams] = useState(defaultSearchStoresParams)
-
+    const [searchStoresParams, setSearchStoresParams] = useState({
+        countryCode: DEFAULT_STORE_LOCATORY_COUNTRY_CODE,
+        postalCode: DEFAULT_STORE_LOCATORY_POSTAL_CODE
+    })
+    const form = useForm({
+        mode: 'onChange',
+        reValidateMode: 'onChange',
+        defaultValues: {
+            countryCode: searchStoresParams?.countryCode,
+            postalCode: searchStoresParams?.postalCode
+        }
+    })
     var searchStoresData = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.countryCode,
@@ -57,12 +48,19 @@ const StoreLocatorModal = (props) => {
         }
     })
 
-    const isDesktopView = useBreakpointValue({base: false, lg: true})
+    const submitForm = async (formData) => {
+        const {postalCode, countryCode} = formData
+        setSearchStoresParams({
+            postalCode: postalCode,
+            countryCode: countryCode
+        })
+    }
 
+    const isDesktopView = useBreakpointValue({base: false, lg: true})
     return (
         <>
             {isDesktopView ? (
-                <Modal size="4xl" isOpen={isOpen}>
+                <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
                     <ModalContent
                         display={{base: 'none', lg: 'block'}}
                         position="absolute"
@@ -81,15 +79,16 @@ const StoreLocatorModal = (props) => {
                         />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <StoreLocatorContent
+                                form={form}
+                                submitForm={submitForm}
                                 searchStoresData={searchStoresData}
                                 searchStoresParams={searchStoresParams}
-                                setSearchStoresParams={setSearchStoresParams}
                             />
                         </ModalBody>
                     </ModalContent>
                 </Modal>
             ) : (
-                <Modal size="4xl" isOpen={isOpen}>
+                <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
                     <ModalContent
                         position="absolute"
                         top="0"
@@ -106,9 +105,10 @@ const StoreLocatorModal = (props) => {
                         />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <StoreLocatorContent
+                                form={form}
+                                submitForm={submitForm}
                                 searchStoresData={searchStoresData}
                                 searchStoresParams={searchStoresParams}
-                                setSearchStoresParams={setSearchStoresParams}
                             />
                         </ModalBody>
                     </ModalContent>
@@ -120,7 +120,8 @@ const StoreLocatorModal = (props) => {
 
 StoreLocatorModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
-    setIsOpen: PropTypes.func.isRequired
+    setIsOpen: PropTypes.func.isRequired,
+    onClose: PropTypes.func
 }
 
 export default StoreLocatorModal

@@ -9,8 +9,7 @@ import React from 'react'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
-import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
-
+import {useForm} from 'react-hook-form'
 const mockSearchStoresData = {
     data: {
         limit: 4,
@@ -91,17 +90,34 @@ const mockSearchStoresData = {
         total: 4
     }
 }
+
+const WrapperComponent = ({searchStoresData}) => {
+    const form = useForm({
+        mode: 'onChange',
+        reValidateMode: 'onChange',
+        defaultValues: {
+            countryCode: 'DE',
+            postalCode: '10178'
+        }
+    })
+
+    return <StoreLocatorContent
+            form={form}
+            searchStoresData={searchStoresData}
+            searchStoresParams={{
+                postalCode: '10178',
+                countryCode: 'DE'
+            }}
+            setSearchStoresParams={jest.fn()}
+        />
+}
+
 describe('StoreLocatorContent', () => {
     test('renders without crashing', () => {
         expect(() => {
             renderWithProviders(
-                <StoreLocatorContent
+                <WrapperComponent
                     searchStoresData={mockSearchStoresData}
-                    searchStoresParams={{
-                        postalCode: '10178',
-                        countryCode: 'DE'
-                    }}
-                    setSearchStoresParams={jest.fn()}
                 />
             )
         }).not.toThrow()
@@ -109,13 +125,8 @@ describe('StoreLocatorContent', () => {
 
     test('Expected information exists', async () => {
         renderWithProviders(
-            <StoreLocatorContent
+            <WrapperComponent
                 searchStoresData={mockSearchStoresData}
-                searchStoresParams={{
-                    postalCode: '10178',
-                    countryCode: 'DE'
-                }}
-                setSearchStoresParams={jest.fn()}
             />
         )
 
@@ -123,10 +134,28 @@ describe('StoreLocatorContent', () => {
             const findButton = screen.getByRole('button', {name: /Find/i})
             const useMyLocationButton = screen.getByRole('button', {name: /Use My Location/i})
             const descriptionFindAStore = screen.getByText(/Find a Store/i)
+            const viewing = screen.getByText(/Viewing stores within 100 miles/i)
 
             expect(findButton).toBeInTheDocument()
             expect(useMyLocationButton).toBeInTheDocument()
             expect(descriptionFindAStore).toBeInTheDocument()
+            expect(viewing).toBeInTheDocument()
+        })
+    })
+
+    test('No stores text exists', async () => {
+        renderWithProviders(
+            <WrapperComponent
+                searchStoresData={{
+                    data: {}
+                }}
+            />
+        )
+
+        await waitFor(async () => {
+            const noLocations = screen.getByText(/Sorry, there are no locations in this area/i)
+
+            expect(noLocations).toBeInTheDocument()
         })
     })
 })

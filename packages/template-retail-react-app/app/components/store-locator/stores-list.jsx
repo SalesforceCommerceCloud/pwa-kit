@@ -17,11 +17,11 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const StoresList = (props) => {
-    const {storesData} = props
+    const {searchStoresData} = props
     const intl = useIntl()
 
-    var storesInfo = (storesData?.data?.data || []).sort((a, b) => a.distance - b.distance)
-    return storesInfo?.map((store, index) => {
+    const storesInfo = searchStoresData.data?.data ? (searchStoresData.data?.data).sort((a, b) => a.distance - b.distance) : []
+    return storesInfo.map((store, index) => {
         return (
             <AccordionItem key={index}>
                 <Box margin="10px">
@@ -90,7 +90,7 @@ const StoresList = (props) => {
 }
 
 StoresList.propTypes = {
-    storesData: PropTypes.object.isRequired
+    searchStoresData: PropTypes.object.isRequired
 }
 
 export default StoresList
