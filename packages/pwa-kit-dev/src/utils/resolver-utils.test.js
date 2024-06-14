@@ -14,14 +14,28 @@ describe('resolverUtils', () => {
             {
                 name: 'Importing the wildcard routes from the routes file',
                 importPath: 'app/routes',
-                sourcePath: path.join(process.cwd(), 'node_modules', '@salesforce', 'extension-module-extension-b', 'app', 'routes.jsx'),
+                sourcePath: path.join(
+                    process.cwd(),
+                    'node_modules',
+                    '@salesforce',
+                    'extension-module-extension-b',
+                    'app',
+                    'routes.jsx'
+                ),
 
                 expected: true
             },
             {
                 name: 'Importing a page component from the routes file',
                 importPath: 'app/pages/new-home',
-                sourcePath: path.join(process.cwd(), 'node_modules', '@salesforce', 'extension-module-extension-b', 'app', 'routes.jsx'),
+                sourcePath: path.join(
+                    process.cwd(),
+                    'node_modules',
+                    '@salesforce',
+                    'extension-module-extension-b',
+                    'app',
+                    'routes.jsx'
+                ),
                 expected: false
             }
         ].forEach((testCase) => {
@@ -83,25 +97,88 @@ describe('resolverUtils', () => {
             {
                 name: 'Correct absolute paths are returned with valid input data',
                 importPath: '*/app/routes',
-                sourcePath: path.join(process.cwd(), 'node_modules', '@salesforce', 'pwa-kit-react-sdk', 'ssr', 'universal', 'components', 'routes', 'index.jsx'),
+                sourcePath: path.join(
+                    process.cwd(),
+                    'node_modules',
+                    '@salesforce',
+                    'pwa-kit-react-sdk',
+                    'ssr',
+                    'universal',
+                    'components',
+                    'routes',
+                    'index.jsx'
+                ),
 
                 extensions: ['module-extension-a', 'module-extension-b', 'module-extension-c'],
                 expected: [
                     path.join(process.cwd(), 'app', 'routes'),
-                    path.join(process.cwd(), 'node_modules', '@salesforce', 'extension-module-extension-c', 'app', 'routes'),
-                    path.join(process.cwd(), 'node_modules', '@salesforce', 'extension-module-extension-b', 'app', 'routes'),
-                    path.join(process.cwd(), 'node_modules', '@salesforce', 'extension-module-extension-a', 'app', 'routes'),
-                    path.join(process.cwd(), 'node_modules', '@salesforce', 'pwa-kit-react-sdk', 'ssr', 'universal', 'components', 'routes'),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-c',
+                        'app',
+                        'routes'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-b',
+                        'app',
+                        'routes'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-a',
+                        'app',
+                        'routes'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'pwa-kit-react-sdk',
+                        'ssr',
+                        'universal',
+                        'components',
+                        'routes'
+                    )
                 ]
             },
             {
                 name: 'If sourcePath implies a selfreference, only the paths before its first mention is included',
                 importPath: '*/app/routes',
-                sourcePath: path.join(process.cwd(), 'node_modules', '@salesforce', 'extension-module-extension-b', 'app', 'routes.jsx'),
+                sourcePath: path.join(
+                    process.cwd(),
+                    'node_modules',
+                    '@salesforce',
+                    'extension-module-extension-b',
+                    'app',
+                    'routes.jsx'
+                ),
                 extensions: ['module-extension-a', 'module-extension-b'],
                 expected: [
-                    path.join(process.cwd(), 'node_modules', '@salesforce', 'extension-module-extension-a', 'app', 'routes'),
-                    path.join(process.cwd(), 'node_modules', '@salesforce', 'pwa-kit-react-sdk', 'ssr', 'universal', 'components', 'routes'),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-a',
+                        'app',
+                        'routes'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'pwa-kit-react-sdk',
+                        'ssr',
+                        'universal',
+                        'components',
+                        'routes'
+                    )
                 ]
             }
         ].forEach((testCase) => {
