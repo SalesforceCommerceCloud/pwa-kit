@@ -76,9 +76,7 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
                         borderColor="gray.200"
                         marginTop="0px"
                     >
-                        <ModalCloseButton
-                            onClick={onClose}
-                        />
+                        <ModalCloseButton onClick={onClose} />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <StoreLocatorContent
                                 form={form}
@@ -100,9 +98,7 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
                         borderColor="gray.200"
                         marginTop="0px"
                     >
-                        <ModalCloseButton
-                            onClick={onClose}
-                        />
+                        <ModalCloseButton onClick={onClose} />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <StoreLocatorContent
                                 form={form}

@@ -132,8 +132,8 @@ const App = (props) => {
     const {
         isOpen: isOpenStoreLocator,
         onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator,
-      } = useDisclosure();
+        onClose: onCloseStoreLocator
+    } = useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
