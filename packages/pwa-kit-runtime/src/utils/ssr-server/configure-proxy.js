@@ -9,6 +9,7 @@ import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from '../ssr-pr
 import {proxyConfigs} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging} from './utils'
+import logger from '../logger'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
@@ -57,8 +58,9 @@ export const applyProxyRequestHeaders = ({
     const headers = incomingRequest.headers
     /* istanbul ignore next */
     if (logging) {
-        console.log(
-            `Proxy: request for ${proxyPath}${url} => ${targetProtocol}://${targetHost}/${url}`
+        logger.log(
+            `Proxy: request for ${proxyPath}${url} => ${targetProtocol}://${targetHost}/${url}`,
+            {namespace: 'configureProxy.applyProxyRequestHeaders'}
         )
     }
 
@@ -151,7 +153,9 @@ export const configureProxy = ({
         onError: (err, req, res) => {
             /* istanbul ignore next */
             if (!isRemote() && verboseProxyLogging) {
-                console.log(`Proxy: error ${err} for request ${proxyPath}/${req.url}`)
+                logger.error(`Proxy: error ${err} for request ${proxyPath}/${req.url}`, {
+                    namespace: 'configureProxy.configureProxy'
+                })
             }
 
             res.writeHead(500, {
@@ -189,8 +193,9 @@ export const configureProxy = ({
         onProxyRes: (proxyResponse, req) => {
             /* istanbul ignore next */
             if (!isRemote() && verboseProxyLogging) {
-                console.log(
-                    `Proxy: ${proxyResponse.statusCode} response from ${proxyPath}${req.url}`
+                logger.log(
+                    `Proxy: ${proxyResponse.statusCode} response from ${proxyPath}${req.url}`,
+                    {namespace: 'configureProxy.onProxyRes'}
                 )
             }
 

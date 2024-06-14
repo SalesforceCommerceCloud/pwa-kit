@@ -34,6 +34,7 @@ const loggerConfig = {
 
 /**
  * The PWAKITLogger provides structured logging with different log levels.
+ * @private
  */
 export class PWAKITLogger {
     /**

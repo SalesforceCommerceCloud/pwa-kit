@@ -13,6 +13,7 @@
 import crypto from 'crypto'
 import {PROXY_PATH_PREFIX} from '../../ssr/server/constants'
 import {proxyConfigs} from '../ssr-shared'
+import logger from '../logger'
 
 // TODO: Clean this up or provide a way to toggle
 export const verboseProxyLogging = false
@@ -36,7 +37,7 @@ export const isQuiet = () => QUIET
 export const localDevLog = (...args) => {
     if (!isRemote() && !QUIET) {
         /* istanbul ignore next */
-        console.log(...args)
+        logger.log(...args)
     }
 }
 
@@ -45,7 +46,7 @@ export const infoLog = (...args) => {
     /* istanbul ignore next */
     if (!QUIET) {
         /* istanbul ignore next */
-        console.log(...args)
+        logger.log(...args)
     }
 }
 
@@ -56,10 +57,15 @@ export const infoLog = (...args) => {
 export const catchAndLog = (err, context) => {
     /* istanbul ignore next */
     const message = `${context || 'Uncaught exception'}: `
-    console.error(
+    logger.error(
         message,
         /* istanbul ignore next */
-        (err && (err.stack || err.message || err)) || '(no error)'
+        {
+            namespace: 'catchAndLog',
+            additionalParameters: {
+                error: (err && (err.stack || err.message || err)) || '(no error)'
+            }
+        }
     )
 }
 
