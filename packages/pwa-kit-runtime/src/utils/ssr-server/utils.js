@@ -62,8 +62,8 @@ export const catchAndLog = (err, context) => {
         /* istanbul ignore next */
         {
             namespace: 'catchAndLog',
-            additionalParameters: {
-                error: (err && (err.stack || err.message || err)) || '(no error)'
+            additionalProperties: {
+                stack: (err && (err.stack || err.message || err)) || '(no error)'
             }
         }
     )

@@ -82,7 +82,11 @@ export class MetricsSender {
                 (err) => {
                     if (err) {
                         logger.warn(`Metrics: error sending data: ${err}`, {
-                            namespace: 'MetricsSender'
+                            namespace: 'metrics-sender._putMetricData',
+                            additionalProperties: {
+                                metrics,
+                                error: err
+                            }
                         })
                     }
                     resolve()
@@ -115,7 +119,11 @@ export class MetricsSender {
 
         return Promise.all(promises).catch(
             /* istanbul ignore next */
-            (err) => console.warn(`Metrics: error during flush: ${err}`)
+            (err) =>
+                logger.warn(`Metrics: error during flush: ${err}`, {
+                    namespace: 'metrics-sender.flush',
+                    additionalProperties: {error: err}
+                })
         )
     }
 

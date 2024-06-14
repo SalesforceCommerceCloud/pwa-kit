@@ -58,9 +58,17 @@ export const applyProxyRequestHeaders = ({
     const headers = incomingRequest.headers
     /* istanbul ignore next */
     if (logging) {
-        logger.log(
+        logger.info(
             `Proxy: request for ${proxyPath}${url} => ${targetProtocol}://${targetHost}/${url}`,
-            {namespace: 'configureProxy.applyProxyRequestHeaders'}
+            {
+                namespace: 'configureProxy.applyProxyRequestHeaders',
+                additionalProperties: {
+                    proxyPath,
+                    targetProtocol,
+                    targetHost,
+                    url
+                }
+            }
         )
     }
 
@@ -154,7 +162,12 @@ export const configureProxy = ({
             /* istanbul ignore next */
             if (!isRemote() && verboseProxyLogging) {
                 logger.error(`Proxy: error ${err} for request ${proxyPath}/${req.url}`, {
-                    namespace: 'configureProxy.configureProxy'
+                    namespace: 'configureProxy.onError',
+                    additionalProperties: {
+                        proxyPath,
+                        url: req.url,
+                        error: err
+                    }
                 })
             }
 
@@ -193,9 +206,16 @@ export const configureProxy = ({
         onProxyRes: (proxyResponse, req) => {
             /* istanbul ignore next */
             if (!isRemote() && verboseProxyLogging) {
-                logger.log(
+                logger.info(
                     `Proxy: ${proxyResponse.statusCode} response from ${proxyPath}${req.url}`,
-                    {namespace: 'configureProxy.onProxyRes'}
+                    {
+                        namespace: 'configureProxy.onProxyRes',
+                        additionalProperties: {
+                            statusCode: proxyResponse.statusCode,
+                            proxyPath,
+                            url: req.url
+                        }
+                    }
                 )
             }
 

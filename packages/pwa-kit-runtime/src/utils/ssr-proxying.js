@@ -526,7 +526,7 @@ export const rewriteSetCookies = ({appHostname, setCookies, targetHost, logging}
 
             /* istanbul ignore next */
             if (logging) {
-                logger.log(
+                logger.info(
                     `Rewriting proxy response set-cookie header domain from "${cookie.domain}" to "${newDomain}"`,
                     {namespace: 'ssr-proxying.rewriteProxyResponseHeaders.rewriteSetCookies'}
                 )
@@ -609,9 +609,14 @@ export const rewriteProxyResponseHeaders = ({
             requestUrl.startsWith('/') ? `${targetOrigin}${requestUrl}` : requestUrl
         ).slice(0, MAX_URL_LENGTH_BYTES)
         logging &&
-            logger.log(
+            logger.info(
                 `Setting proxy response ${X_PROXY_REQUEST_URL} header to "${fullRequestUrl}"`,
-                {namespace: 'ssr-proxying.rewriteProxyResponseHeaders'}
+                {
+                    namespace: 'ssr-proxying.rewriteProxyResponseHeaders',
+                    additionalProperties: {
+                        fullRequestUrl
+                    }
+                }
             )
         workingHeaders.setHeader(X_PROXY_REQUEST_URL, fullRequestUrl)
     }
@@ -623,14 +628,22 @@ export const rewriteProxyResponseHeaders = ({
     const allowOrigin = workingHeaders.getHeader(AC_ALLOW_ORIGIN)
     logging &&
         allowOrigin &&
-        logger.log(`Header ${AC_ALLOW_ORIGIN} has value "${allowOrigin}"`, {
-            namespace: 'ssr-proxying.rewriteProxyResponseHeaders'
+        logger.info(`Header ${AC_ALLOW_ORIGIN} has value "${allowOrigin}"`, {
+            namespace: 'ssr-proxying.rewriteProxyResponseHeaders',
+            additionalProperties: {
+                allowOrigin,
+                AC_ALLOW_ORIGIN
+            }
         })
     if (allowOrigin === targetOrigin) {
         /* istanbul ignore next */
         if (logging) {
-            logger.log(`Rewriting proxy response ${AC_ALLOW_ORIGIN} header to "${appOrigin}"`, {
-                namespace: 'ssr-proxying.rewriteProxyResponseHeaders'
+            logger.info(`Rewriting proxy response ${AC_ALLOW_ORIGIN} header to "${appOrigin}"`, {
+                namespace: 'ssr-proxying.rewriteProxyResponseHeaders',
+                additionalProperties: {
+                    appOrigin,
+                    AC_ALLOW_ORIGIN
+                }
             })
         }
         workingHeaders.setHeader(AC_ALLOW_ORIGIN, appOrigin)
@@ -653,13 +666,19 @@ export const rewriteProxyResponseHeaders = ({
     // Handle any redirect
     if (statusCode >= 301 && statusCode <= 308) {
         logging &&
-            logger.log(`Status code is ${statusCode}, checking Location header`, {
-                namespace: 'ssr-proxying.rewriteProxyResponseHeaders'
+            logger.info(`Status code is ${statusCode}, checking Location header`, {
+                namespace: 'ssr-proxying.rewriteProxyResponseHeaders',
+                additionalProperties: {
+                    statusCode
+                }
             })
         const location = workingHeaders.getHeader(LOCATION)
         logging &&
-            logger.log(`Location header has value "${location}"`, {
-                namespace: 'ssr-proxying.rewriteProxyResponseHeaders'
+            logger.info(`Location header has value "${location}"`, {
+                namespace: 'ssr-proxying.rewriteProxyResponseHeaders',
+                additionalProperties: {
+                    location
+                }
             })
 
         /* istanbul ignore else */
@@ -682,9 +701,15 @@ export const rewriteProxyResponseHeaders = ({
                 workingHeaders.setHeader(LOCATION, newLocation)
                 /* istanbul ignore else */
                 if (logging) {
-                    logger.log(
+                    logger.info(
                         `Rewriting proxy response Location header from "${location}" to "${newLocation}"`,
-                        {namespace: 'ssr-proxying.rewriteProxyResponseHeaders'}
+                        {
+                            namespace: 'ssr-proxying.rewriteProxyResponseHeaders',
+                            additionalProperties: {
+                                location,
+                                newLocation
+                            }
+                        }
                     )
                 }
             }
@@ -823,9 +848,15 @@ export const rewriteProxyRequestHeaders = ({
     if (hostHeader !== targetHost) {
         /* istanbul ignore else */
         if (logging) {
-            logger.log(
+            logger.info(
                 `Rewriting proxy request Host header from "${hostHeader}" to "${targetHost}"`,
-                {namespace: 'ssr-proxying.rewriteProxyResponseHeaders'}
+                {
+                    namespace: 'ssr-proxying.rewriteProxyResponseHeaders',
+                    additionalProperties: {
+                        hostHeader,
+                        targetHost
+                    }
+                }
             )
         }
         workingHeaders.setHeader(HOST, targetHost)
@@ -839,9 +870,15 @@ export const rewriteProxyRequestHeaders = ({
     if (originHeader && originHeader !== targetOrigin) {
         /* istanbul ignore else */
         if (logging) {
-            logger.log(
+            logger.info(
                 `Rewriting proxy request Origin header from "${originHeader}" to "${targetOrigin}"`,
-                {namespace: 'ssr-proxying.rewriteProxyResponseHeaders'}
+                {
+                    namespace: 'ssr-proxying.rewriteProxyResponseHeaders',
+                    additionalProperties: {
+                        originHeader,
+                        targetOrigin
+                    }
+                }
             )
         }
         workingHeaders.setHeader(ORIGIN, targetOrigin)
@@ -857,8 +894,14 @@ export const rewriteProxyRequestHeaders = ({
     Object.entries(X_HEADERS_TO_ADD).forEach(([key, value]) => {
         /* istanbul ignore else */
         if (logging) {
-            logger.log(`Adding a proxy request ${key} header with value "${value}"`),
-                {namespace: 'ssr-proxying.rewriteProxyResponseHeaders'}
+            logger.info(`Adding a proxy request ${key} header with value "${value}"`),
+                {
+                    namespace: 'ssr-proxying.rewriteProxyResponseHeaders',
+                    additionalProperties: {
+                        key,
+                        value
+                    }
+                }
         }
         workingHeaders.setHeader(key, value)
     })
