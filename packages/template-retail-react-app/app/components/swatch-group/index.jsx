@@ -104,12 +104,12 @@ const SwatchGroup = (props) => {
                     </HStack>
                 )}
                 <Flex ref={wrapperRef} {...styles.swatchesWrapper}>
-                    {Children.toArray(children).map((child) => {
+                    {Children.toArray(children).map((child, index) => {
                         const selected = child.props.value === value
                         return React.cloneElement(child, {
                             handleSelect: handleChange,
                             selected,
-                            isFocusable: selected
+                            isFocusable: value ? selected : index === 0
                         })
                     })}
                 </Flex>
