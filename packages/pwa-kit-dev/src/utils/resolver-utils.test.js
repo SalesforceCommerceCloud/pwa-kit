@@ -91,10 +91,7 @@ describe('resolverUtils', () => {
             },
             {
                 name: 'extensions includes windows file paths',
-                input: [
-                    '.\\local-extension-a',
-                    '\\home\\local-extension-a'
-                ],
+                input: ['.\\local-extension-a', '\\home\\local-extension-a'],
                 expected: [
                     [`${process.cwd()}/local-extension-a`, {}],
                     [path.join(path.sep, 'home', 'local-extension-a'), {}]
