@@ -42,7 +42,7 @@ import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {
     startsWithMobify,
     getProxyPathBase,
-    getHealtCheckPathBase,
+    getHealthCheckPath,
     getSLASPrivateProxyPath
 } from '../../utils/ssr-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
@@ -691,7 +691,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupHealthcheck(app) {
-        app.get(`${getHealtCheckPathBase()}`, (_, res) =>
+        app.get(`${getHealthCheckPath()}`, (_, res) =>
             res.set('cache-control', NO_CACHE).sendStatus(200).end()
         )
     },
