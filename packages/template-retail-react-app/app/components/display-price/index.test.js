@@ -23,8 +23,8 @@ describe('DisplayPrice', function () {
     }
     test('should render without error', () => {
         renderWithProviders(<DisplayPrice currency="GBP" priceData={data} />)
-        expect(screen.getByText(/£90\.00/i)).toBeInTheDocument()
-        expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
+        expect(screen.getByText(/from £90\.00/i)).toBeInTheDocument()
+        expect(screen.getByText(/^£100\.00$/i)).toBeInTheDocument()
     })
 
     test('should render according html tag for prices', () => {
@@ -56,22 +56,21 @@ describe('DisplayPrice', function () {
                 priceData={{...data, currentPrice: 100, isOnSale: false}}
             />
         )
-        expect(screen.queryByText(/£90\.`00/i)).not.toBeInTheDocument()
-        expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
+        expect(screen.queryByText(/£90\.00/i)).not.toBeInTheDocument()
+        expect(screen.getByText(/From £100\.00/i)).toBeInTheDocument()
     })
 })
 
 describe('CurrentPrice', function () {
     test('should render exact price with correct aria-label', () => {
         renderWithProviders(<CurrentPrice price={100} currency="GBP" />)
-        expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
+        expect(screen.getByText(/^£100\.00$/i)).toBeInTheDocument()
         expect(screen.getByLabelText(/current price £100\.00/i)).toBeInTheDocument()
     })
 
     test('should render range price', () => {
         renderWithProviders(<CurrentPrice price={100} currency="GBP" isRange={true} />)
-        expect(screen.getByText(/£100\.00/i)).toBeInTheDocument()
-        expect(screen.getByText(/from/i)).toBeInTheDocument()
+        expect(screen.getByText(/from £100\.00$/i)).toBeInTheDocument()
         expect(screen.getByLabelText(/from current price £100\.00/i)).toBeInTheDocument()
     })
 })

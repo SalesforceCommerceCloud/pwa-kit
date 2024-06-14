@@ -133,18 +133,23 @@ const OrderSummary = ({
 
     return (
         <Stack data-testid="sf-order-summary" spacing={5}>
-            <Heading fontSize={fontSize} pt={1}>
+            <Heading fontSize={fontSize} pt={1} id="order-summary-heading">
                 <FormattedMessage
                     defaultMessage="Order Summary"
                     id="order_summary.heading.order_summary"
                 />
             </Heading>
 
-            <Stack spacing={4} align="flex-start">
+            <Stack
+                spacing={4}
+                align="flex-start"
+                role="region"
+                aria-labelledby="order-summary-heading"
+            >
                 {showCartItems && <CartItems basket={basket} />}
 
                 <Stack w="full">
-                    <Flex justify="space-between">
+                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
                         <Text fontWeight="bold" fontSize={fontSize}>
                             <FormattedMessage
                                 defaultMessage="Subtotal"
@@ -161,7 +166,12 @@ const OrderSummary = ({
                     </Flex>
 
                     {basket.orderPriceAdjustments?.map((adjustment) => (
-                        <Flex justify="space-between" key={adjustment.priceAdjustmentId}>
+                        <Flex
+                            justify="space-between"
+                            key={adjustment.priceAdjustmentId}
+                            aria-live="polite"
+                            aria-atomic="true"
+                        >
                             <Text fontSize={fontSize}>{adjustment.itemText}</Text>
                             <Text color="green.600" fontSize={fontSize}>
                                 <FormattedNumber
@@ -173,7 +183,7 @@ const OrderSummary = ({
                         </Flex>
                     ))}
 
-                    <Flex justify="space-between">
+                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
                         <Flex alignItems="center">
                             <Text lineHeight={1} fontSize={fontSize}>
                                 <FormattedMessage
@@ -229,7 +239,7 @@ const OrderSummary = ({
                         )}
                     </Flex>
 
-                    <Flex justify="space-between">
+                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
                         <Text fontSize={fontSize}>
                             <FormattedMessage defaultMessage="Tax" id="order_summary.label.tax" />
                         </Text>
@@ -258,7 +268,7 @@ const OrderSummary = ({
                 )}
 
                 <Stack spacing={4} w="full">
-                    <Flex w="full" justify="space-between">
+                    <Flex w="full" justify="space-between" aria-live="polite" aria-atomic="true">
                         {isEstimate ? (
                             <Text fontWeight="bold" fontSize={fontSize}>
                                 <FormattedMessage

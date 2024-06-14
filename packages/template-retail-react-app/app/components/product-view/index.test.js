@@ -47,10 +47,9 @@ afterEach(() => {
 
 test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
+    renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
     expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
-    expect(screen.getAllByText(/299.99/)).toHaveLength(2)
+    expect(screen.getAllByText(/299\.99/)).toHaveLength(4)
     expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
     expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
     expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
@@ -176,7 +175,7 @@ test('renders a product set properly - child item', () => {
 
     // since setProducts are master products, as pricing now display From X (cross) Y where X Y are sale and lis price respectively
     // of the variant that has lowest price (including promotional price)
-    expect(fromLabels).toHaveLength(2)
+    expect(fromLabels).toHaveLength(4)
 })
 
 test('validateOrderability callback is called when adding a set to cart', async () => {

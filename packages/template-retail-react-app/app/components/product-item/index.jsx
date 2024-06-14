@@ -6,10 +6,17 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
-import {Box, Fade, Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Box,
+    Fade,
+    Flex,
+    Stack,
+    Text,
+    VisuallyHidden
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
@@ -46,7 +53,7 @@ const ProductItem = ({
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
     const {currency: activeCurrency} = useCurrency()
-
+    const intl = useIntl()
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>
@@ -104,6 +111,18 @@ const ProductItem = ({
                                             }
                                         }}
                                     />
+                                    <VisuallyHidden role="status">
+                                        {product?.name}
+                                        {intl.formatMessage(
+                                            {
+                                                id: 'item_variant.assistive_msg.quantity',
+                                                defaultMessage: 'Quantity {quantity}'
+                                            },
+                                            {
+                                                quantity: product?.quantity
+                                            }
+                                        )}
+                                    </VisuallyHidden>
                                 </Stack>
                                 <Stack>
                                     <HideOnMobile>

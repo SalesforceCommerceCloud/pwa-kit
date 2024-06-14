@@ -1717,6 +1717,16 @@
       "value": "Unavailable"
     }
   ],
+  "item_variant.assistive_msg.quantity": [
+    {
+      "type": 0,
+      "value": "Quantity "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,
