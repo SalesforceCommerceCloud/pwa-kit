@@ -48,18 +48,33 @@ export const expand = (extensions = []) =>
     extensions
         .filter((extension) => Boolean(extension))
         .map((extension) => {
-            const [shortName, config = {}] = Array.isArray(extension) ? extension : [extension, {}]
-            const isRelativePath = shortName.startsWith('.')
-            const isAbsolutePath = shortName.startsWith(path.sep)
+            let [nameRef, config = {}] = Array.isArray(extension) ? extension : [extension, {}]
+    
+            // We determine the type of extention reference by it's first character.
+            switch (nameRef[0]) {
+                case ".":
+                    // Relative Path
+                    nameRef = nameRef.split(/\/|\\/).join(path.sep)
+                    nameRef = path.join(process.cwd(), nameRef.replace('.', ''))
+                    break
+                case "/":
+                    // Absolute Path (UNIX)
+                    nameRef = nameRef.split(/\/|\\/).join(path.sep)
+                    break
+                case "\\":
+                    // Absolute Path (Windows)
+                    nameRef = nameRef.split(/\/|\\/).join(path.sep)
+                    break
+                case "@":
+                    // Module Path
+                    // Do nothing...
+                    break
+                default:
+                    // Default is to treat the reference as a extension "short" name.
+                    nameRef = `${EXTENSION_NAMESPACE}/${EXTENSION_PREFIX}-${nameRef}`
+            }
 
-            return [
-                isRelativePath || isAbsolutePath
-                    ? isRelativePath
-                        ? path.join(process.cwd(), shortName.replace('.', ''))
-                        : shortName
-                    : `${EXTENSION_NAMESPACE}/${EXTENSION_PREFIX}-${shortName}`,
-                config
-            ]
+            return [nameRef, config]
         })
 
 /**
