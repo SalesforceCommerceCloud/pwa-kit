@@ -49,23 +49,23 @@ export const expand = (extensions = []) =>
         .filter((extension) => Boolean(extension))
         .map((extension) => {
             let [nameRef, config = {}] = Array.isArray(extension) ? extension : [extension, {}]
-    
+
             // We determine the type of extention reference by it's first character.
             switch (nameRef[0]) {
-                case ".":
+                case '.':
                     // Relative Path
                     nameRef = nameRef.split(/\/|\\/).join(path.sep)
                     nameRef = path.join(process.cwd(), nameRef.replace('.', ''))
                     break
-                case "/":
+                case '/':
                     // Absolute Path (UNIX)
                     nameRef = nameRef.split(/\/|\\/).join(path.sep)
                     break
-                case "\\":
+                case '\\':
                     // Absolute Path (Windows)
                     nameRef = nameRef.split(/\/|\\/).join(path.sep)
                     break
-                case "@":
+                case '@':
                     // Module Path
                     // Do nothing...
                     break
