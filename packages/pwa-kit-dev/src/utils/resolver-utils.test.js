@@ -67,7 +67,7 @@ describe('resolverUtils', () => {
                 expected: [
                     ['@salesforce/extension-module-extension-a', {}],
                     ['@salesforce/extension-module-extension-b', {}],
-                    [`${process.cwd()}/local-extension-c`, {}]
+                    [path.join(process.cwd(), 'local-extension-c'), {}]
                 ]
             },
             {
@@ -85,7 +85,7 @@ describe('resolverUtils', () => {
                     path.join('@salesforce', 'module-extension-a')
                 ],
                 expected: [
-                    [`${process.cwd()}/local-extension-a`, {}],
+                    [path.join(process.cwd(), 'local-extension-a'), {}],
                     [path.join('@salesforce', 'module-extension-a'), {}]
                 ]
             },
@@ -93,7 +93,7 @@ describe('resolverUtils', () => {
                 name: 'extensions includes windows file paths',
                 input: ['.\\local-extension-a', '\\home\\local-extension-a'],
                 expected: [
-                    [`${process.cwd()}/local-extension-a`, {}],
+                    [path.join(process.cwd(), 'local-extension-a'), {}],
                     [path.join(path.sep, 'home', 'local-extension-a'), {}]
                 ]
             }
