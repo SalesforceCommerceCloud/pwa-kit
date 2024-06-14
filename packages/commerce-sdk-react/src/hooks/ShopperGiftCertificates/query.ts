@@ -8,9 +8,9 @@ import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {getCustomKeys, mergeOptions, omitNullableParameters, pick} from '../utils'
+import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-import paramKeysMap from './paramKeys'
+import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
 
 type Client = ApiClients['shopperGiftCertificates']
 
@@ -33,14 +33,15 @@ export const useGiftCertificate = (
     type Data = DataType<Client['getGiftCertificate']>
     const {shopperGiftCertificates: client} = useCommerceApi()
     const methodName = 'getGiftCertificate'
-    const requiredParameters = ['organizationId', 'siteId'] as const
+    const requiredParameters = ShopperGiftCertificates.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    // get param keys for the api from netOptions
-    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
-    const parameters = pick(netOptions.parameters, paramKeys)
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperGiftCertificates.paramKeys[methodName]
+    )
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
 
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
