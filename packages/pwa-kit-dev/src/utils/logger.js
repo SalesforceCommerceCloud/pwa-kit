@@ -38,6 +38,7 @@ const loggerConfig = {
 
 /**
  * The PWAKITLogger provides structured logging with different log levels.
+ * @private
  */
 export class PWAKITLogger {
     /**
@@ -52,6 +53,7 @@ export class PWAKITLogger {
         logLevel = isServerSide ? loggerConfig.server.logLevel : loggerConfig.client.logLevel,
         format = isServerSide ? loggerConfig.server.format : loggerConfig.client.format
     } = {}) {
+        console.error('PWAKITLogger constructor logLevel:', logLevel)
         this.packageName = packageName
         this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
         this.format = format.toUpperCase()
@@ -178,6 +180,16 @@ export class PWAKITLogger {
 
 /**
  * Create a logger instance for each package.
+ *
+ * This function creates and returns a logger instance configured for the specified package name.
+ * The logging behavior differs between server-side and client-side environments.
+ *
+ * On the server side, the logging configuration can be controlled via the following environment variables:
+ * - `PWAKIT_LOG_LEVEL`: Defines the log level (e.g., 'debug', 'info', 'warn', 'error'). Default is 'info'.
+ * - `PWAKIT_LOG_FORMAT`: Defines the log format ('JSON' or 'TEXT'). Default is 'JSON'.
+ *
+ * On the client side, the logging configuration can be specified through the `clientConfig` parameter.
+ *
  * @param {string} packageName - The name of the package where the logger is used.
  * @param {Object} [clientConfig={}] - Configuration options specific to the client environment.
  * @param {string} [clientConfig.logLevel=loggerConfig.client.logLevel] - The log level for the client environment.
@@ -185,13 +197,15 @@ export class PWAKITLogger {
  * @returns {PWAKITLogger} - An instance of PWAKITLogger configured for the specified package.
  */
 const createLogger = (packageName, clientConfig = {}) => {
-    // Server configuration overrides client configuration
+    // On the server, the server configuration overrides the client configuration
     const logLevel = isServerSide
         ? loggerConfig.server.logLevel
         : clientConfig.logLevel || loggerConfig.client.logLevel
     const format = isServerSide
         ? loggerConfig.server.format
         : clientConfig.format || loggerConfig.client.format
+
+    console.error('PWAKITLogger createLogger logLevel:', logLevel)
 
     return new PWAKITLogger({
         packageName,

@@ -29,7 +29,7 @@ import {
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
-import logger from '@salesforce/retail-react-app/app/logger'
+import logger from '@salesforce/retail-react-app/app/utils/logger'
 
 // Contexts
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
@@ -161,6 +161,7 @@ const App = (props) => {
     }
 
     logger.log('log test message')
+    logger.debug('debug test message', loggerDetails)
     logger.info('info test message', loggerDetails)
     logger.warn('warn test message', loggerDetails)
     logger.error('error test message', loggerDetails)
