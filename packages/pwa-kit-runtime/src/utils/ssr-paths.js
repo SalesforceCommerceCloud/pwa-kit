@@ -33,33 +33,31 @@ const getNamespace = () => {
 
 export const startsWithMobify = (url) => {
     const namespace = getNamespace()
-    const mobifyPath = namespace ? `${namespace}${MOBIFY_PATH}` : MOBIFY_PATH
+    const mobifyPath = `${namespace}${MOBIFY_PATH}`
     return url.startsWith(mobifyPath)
 }
 
 export const getProxyPathBase = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}${PROXY_PATH_BASE}` : PROXY_PATH_BASE
+    return `${namespace}${PROXY_PATH_BASE}`
 }
 
 export const getBundlePathBase = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}${BUNDLE_PATH_BASE}` : BUNDLE_PATH_BASE
+    return `${namespace}${BUNDLE_PATH_BASE}`
 }
 
 export const getCachingPathBase = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}${CACHING_PATH_BASE}` : CACHING_PATH_BASE
+    return `${namespace}${CACHING_PATH_BASE}`
 }
 
 export const getHealthCheckPath = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}${HEALTHCHECK_PATH}` : HEALTHCHECK_PATH
+    return `${namespace}${HEALTHCHECK_PATH}`
 }
 
 export const getSLASPrivateProxyPath = () => {
     const namespace = getNamespace()
-    return namespace
-        ? `${namespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
-        : SLAS_PRIVATE_CLIENT_PROXY_PATH
+    return `${namespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
 }
