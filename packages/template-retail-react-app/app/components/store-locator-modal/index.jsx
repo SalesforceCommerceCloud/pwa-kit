@@ -25,7 +25,7 @@ import {
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {useForm} from 'react-hook-form'
 
-const StoreLocatorModal = ({isOpen, setIsOpen, onClose = noop}) => {
+const StoreLocatorModal = ({isOpen, onClose = noop}) => {
     const intl = useIntl()
 
     const [searchStoresParams, setSearchStoresParams] = useState({
@@ -77,9 +77,7 @@ const StoreLocatorModal = ({isOpen, setIsOpen, onClose = noop}) => {
                         marginTop="0px"
                     >
                         <ModalCloseButton
-                            onClick={() => {
-                                setIsOpen(false)
-                            }}
+                            onClick={onClose}
                         />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <StoreLocatorContent
@@ -103,9 +101,7 @@ const StoreLocatorModal = ({isOpen, setIsOpen, onClose = noop}) => {
                         marginTop="0px"
                     >
                         <ModalCloseButton
-                            onClick={() => {
-                                setIsOpen(false)
-                            }}
+                            onClick={onClose}
                         />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <StoreLocatorContent

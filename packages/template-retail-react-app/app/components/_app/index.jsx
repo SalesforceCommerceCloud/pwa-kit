@@ -129,6 +129,11 @@ const App = (props) => {
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const {
+        isOpen: isOpenStoreLocator,
+        onOpen: onOpenStoreLocator,
+        onClose: onCloseStoreLocator,
+      } = useDisclosure();
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -267,10 +272,6 @@ const App = (props) => {
         history.push(path)
     }
 
-    const onStoreLocatorClick = () => {
-        setStoreLocatorIsOpen(true)
-    }
-
     const trackPage = () => {
         activeData.trackPage(site.id, locale.id, currency)
     }
@@ -349,9 +350,8 @@ const App = (props) => {
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
                             <StoreLocatorModal
-                                isOpen={storeLocatorIsOpen}
-                                setIsOpen={setStoreLocatorIsOpen}
-                                onClose={onClose}
+                                isOpen={isOpenStoreLocator}
+                                onClose={onCloseStoreLocator}
                             />
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
@@ -363,7 +363,7 @@ const App = (props) => {
                                             onMyCartClick={onCartClick}
                                             onMyAccountClick={onAccountClick}
                                             onWishlistClick={onWishlistClick}
-                                            onStoreLocatorClick={onStoreLocatorClick}
+                                            onStoreLocatorClick={onOpenStoreLocator}
                                         >
                                             <HideOnDesktop>
                                                 <DrawerMenu
