@@ -16,11 +16,9 @@ import {
     Box
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-const StoresList = (props) => {
-    const {searchStoresData} = props
+const StoresList = ({storesInfo}) => {
     const intl = useIntl()
 
-    const storesInfo = searchStoresData.data?.data ? (searchStoresData.data?.data).sort((a, b) => a.distance - b.distance) : []
     return storesInfo.map((store, index) => {
         return (
             <AccordionItem key={index}>
@@ -90,7 +88,7 @@ const StoresList = (props) => {
 }
 
 StoresList.propTypes = {
-    searchStoresData: PropTypes.object.isRequired
+    storesInfo: PropTypes.object.isRequired
 }
 
 export default StoresList

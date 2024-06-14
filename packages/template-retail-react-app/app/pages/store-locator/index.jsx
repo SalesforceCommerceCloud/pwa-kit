@@ -9,28 +9,49 @@ import React, {useState} from 'react'
 import {useIntl} from 'react-intl'
 import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
+import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {
-    DEFAULT_STORE_LOCATORY_COUNTRY_CODE,
-    DEFAULT_STORE_LOCATORY_POSTAL_CODE
+    DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+    STORE_LOCATOR_DISTANCE
 } from '@salesforce/retail-react-app/app/constants'
+import {useForm} from 'react-hook-form'
 
 const StoreLocator = () => {
     const intl = useIntl()
 
     const [searchStoresParams, setSearchStoresParams] = useState({
-        countryCode: DEFAULT_STORE_LOCATORY_COUNTRY_CODE,
-        postalCode: DEFAULT_STORE_LOCATORY_POSTAL_CODE
+        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
+        postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE
+    })
+    const form = useForm({
+        mode: 'onChange',
+        reValidateMode: 'onChange',
+        defaultValues: {
+            countryCode: searchStoresParams?.countryCode,
+            postalCode: searchStoresParams?.postalCode
+        }
     })
     var searchStoresData = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.countryCode,
             postalCode: searchStoresParams.postalCode,
             locale: intl.locale,
-            maxDistance: 100
+            maxDistance: STORE_LOCATOR_DISTANCE
         }
     })
+    var storesInfo = []
+    if (searchStoresData.data !== undefined && searchStoresData.data.data !== undefined)
+        storesInfo = searchStoresData.data.data
+
+    const submitForm = async (formData) => {
+        const {postalCode, countryCode} = formData
+        setSearchStoresParams({
+            postalCode: postalCode,
+            countryCode: countryCode
+        })
+    }
 
     return (
         <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
@@ -46,9 +67,10 @@ const StoreLocator = () => {
                 borderRadius="base"
             >
                 <StoreLocatorContent
-                    searchStoresData={searchStoresData}
+                    form={form}
+                    submitForm={submitForm}
+                    storesInfo={storesInfo}
                     searchStoresParams={searchStoresParams}
-                    setSearchStoresParams={setSearchStoresParams}
                 />
             </Container>
         </Box>

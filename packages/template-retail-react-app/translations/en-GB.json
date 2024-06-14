@@ -1266,13 +1266,16 @@
     "defaultMessage": "Phone:"
   },
   "store_locator.description.viewing_within": {
-    "defaultMessage": "Viewing stores within 100 miles"
+    "defaultMessage": "Viewing stores within {distance} miles"
   },
   "store_locator.dropdown.germany": {
     "defaultMessage": "Germany"
   },
   "store_locator.dropdown.united_states": {
     "defaultMessage": "United States"
+  },
+  "store_locator.field.placeholder.enter_postal_code": {
+    "defaultMessage": "Enter postal code"
   },
   "store_locator.title": {
     "defaultMessage": "Find a Store"

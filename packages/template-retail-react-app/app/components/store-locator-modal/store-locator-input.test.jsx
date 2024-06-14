@@ -6,12 +6,11 @@
  */
 
 import React from 'react'
-import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator/store-locator-input'
+import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
-import { Wrap } from '../shared/ui/index'
-
+import {Wrap} from '../shared/ui/index'
 
 const WrapperComponent = () => {
     const form = useForm({
@@ -23,31 +22,28 @@ const WrapperComponent = () => {
         }
     })
 
-    return <StoreLocatorInput
-        searchStoresParams={{
-            postalCode: '10178',
-            countryCode: 'DE'
-        }}
-        setSearchStoresParams={jest.fn()}
-        form={form}
-        submitForm={jest.fn()}
-    />
+    return (
+        <StoreLocatorInput
+            searchStoresParams={{
+                postalCode: '10178',
+                countryCode: 'DE'
+            }}
+            setSearchStoresParams={jest.fn()}
+            form={form}
+            submitForm={jest.fn()}
+        />
+    )
 }
 
 describe('StoreLocatorInput', () => {
     test('renders without crashing', () => {
         expect(() => {
-            
-            renderWithProviders(
-                <WrapperComponent></WrapperComponent>
-            )
+            renderWithProviders(<WrapperComponent></WrapperComponent>)
         }).not.toThrow()
     })
 
     test('Expected information exists', async () => {
-        renderWithProviders(
-            <WrapperComponent></WrapperComponent>
-        )
+        renderWithProviders(<WrapperComponent></WrapperComponent>)
 
         await waitFor(async () => {
             const findButton = screen.getByRole('button', {name: /Find/i})

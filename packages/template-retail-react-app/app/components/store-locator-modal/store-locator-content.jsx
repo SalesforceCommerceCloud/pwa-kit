@@ -12,13 +12,14 @@ import {
     Heading,
     Accordion,
     AccordionItem,
-    Box,
+    Box
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import StoresList from '@salesforce/retail-react-app/app/components/store-locator/stores-list'
-import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator/store-locator-input'
-const StoreLocatorContent = ({form, submitForm, searchStoresData, searchStoresParams}) => {
+import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
+import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
+import {STORE_LOCATOR_DISTANCE} from '@salesforce/retail-react-app/app/constants'
+
+const StoreLocatorContent = ({form, submitForm, storesInfo, searchStoresParams}) => {
     const intl = useIntl()
-    const noStores = searchStoresData.data?.data === undefined
 
     return (
         <>
@@ -47,18 +48,21 @@ const StoreLocatorContent = ({form, submitForm, searchStoresData, searchStoresPa
                             margin: '20px'
                         }}
                     >
-                        {noStores === true ? 
-                            intl.formatMessage({
-                                id: 'store_locator.description.no_locations',
-                                defaultMessage: 'Sorry, there are no locations in this area'
-                            }) : intl.formatMessage({
-                                id: 'store_locator.description.viewing_within',
-                                defaultMessage: 'Viewing stores within 100 miles'
-                            })     
-                        }
+                        {storesInfo.length === 0
+                            ? intl.formatMessage({
+                                  id: 'store_locator.description.no_locations',
+                                  defaultMessage: 'Sorry, there are no locations in this area'
+                              })
+                            : intl.formatMessage(
+                                  {
+                                      id: 'store_locator.description.viewing_within',
+                                      defaultMessage: 'Viewing stores within {distance} miles'
+                                  },
+                                  {distance: STORE_LOCATOR_DISTANCE}
+                              )}
                     </Box>
                 </AccordionItem>
-                <StoresList searchStoresData={searchStoresData} />
+                <StoresList storesInfo={storesInfo} />
             </Accordion>
         </>
     )
@@ -66,7 +70,7 @@ const StoreLocatorContent = ({form, submitForm, searchStoresData, searchStoresPa
 
 StoreLocatorContent.propTypes = {
     form: PropTypes.object,
-    searchStoresData: PropTypes.object,
+    storesInfo: PropTypes.object,
     searchStoresParams: PropTypes.object,
     submitForm: PropTypes.func
 }

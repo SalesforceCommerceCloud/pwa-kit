@@ -15,11 +15,12 @@ import {
     ModalContent,
     useBreakpointValue
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator/store-locator-content'
+import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {
-    DEFAULT_STORE_LOCATORY_COUNTRY_CODE,
-    DEFAULT_STORE_LOCATORY_POSTAL_CODE
+    DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+    STORE_LOCATOR_DISTANCE
 } from '@salesforce/retail-react-app/app/constants'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {useForm} from 'react-hook-form'
@@ -28,15 +29,15 @@ const StoreLocatorModal = ({isOpen, setIsOpen, onClose = noop}) => {
     const intl = useIntl()
 
     const [searchStoresParams, setSearchStoresParams] = useState({
-        countryCode: DEFAULT_STORE_LOCATORY_COUNTRY_CODE,
-        postalCode: DEFAULT_STORE_LOCATORY_POSTAL_CODE
+        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
+        postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE
     })
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
         defaultValues: {
-            countryCode: searchStoresParams?.countryCode,
-            postalCode: searchStoresParams?.postalCode
+            countryCode: searchStoresParams.countryCode,
+            postalCode: searchStoresParams.postalCode
         }
     })
     var searchStoresData = useSearchStores({
@@ -44,9 +45,12 @@ const StoreLocatorModal = ({isOpen, setIsOpen, onClose = noop}) => {
             countryCode: searchStoresParams.countryCode,
             postalCode: searchStoresParams.postalCode,
             locale: intl.locale,
-            maxDistance: 100
+            maxDistance: STORE_LOCATOR_DISTANCE
         }
     })
+    var storesInfo = []
+    if (searchStoresData.data !== undefined && searchStoresData.data.data !== undefined)
+        storesInfo = searchStoresData.data.data
 
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
@@ -81,7 +85,7 @@ const StoreLocatorModal = ({isOpen, setIsOpen, onClose = noop}) => {
                             <StoreLocatorContent
                                 form={form}
                                 submitForm={submitForm}
-                                searchStoresData={searchStoresData}
+                                storesInfo={storesInfo}
                                 searchStoresParams={searchStoresParams}
                             />
                         </ModalBody>
@@ -107,8 +111,9 @@ const StoreLocatorModal = ({isOpen, setIsOpen, onClose = noop}) => {
                             <StoreLocatorContent
                                 form={form}
                                 submitForm={submitForm}
-                                searchStoresData={searchStoresData}
+                                storesInfo={storesInfo}
                                 searchStoresParams={searchStoresParams}
+                                distanceLocate={STORE_LOCATOR_DISTANCE}
                             />
                         </ModalBody>
                     </ModalContent>

@@ -23,7 +23,7 @@ const StoreLocatorInput = ({form, submitForm, searchStoresParams}) => {
     const intl = useIntl()
 
     return (
-        <form 
+        <form
             id="login-form"
             onSubmit={form.handleSubmit(submitForm)}
             data-testid="sf-auth-modal-form"
@@ -34,10 +34,16 @@ const StoreLocatorInput = ({form, submitForm, searchStoresParams}) => {
                     control={control}
                     defaultValue={searchStoresParams?.postalCode}
                     render={({field}) => {
-                        return <Input {...field} marginBottom="10px" placeholder={intl.formatMessage({
-                            id: 'store_locator.field.placeholder.enter_postal_code',
-                            defaultMessage: 'Enter postal code'
-                        })}/>
+                        return (
+                            <Input
+                                {...field}
+                                marginBottom="10px"
+                                placeholder={intl.formatMessage({
+                                    id: 'store_locator.field.placeholder.enter_postal_code',
+                                    defaultMessage: 'Enter postal code'
+                                })}
+                            />
+                        )
                     }}
                 ></Controller>
             </InputGroup>
@@ -103,7 +109,7 @@ const StoreLocatorInput = ({form, submitForm, searchStoresParams}) => {
 
 StoreLocatorInput.propTypes = {
     form: PropTypes.object,
-    searchStoresData: PropTypes.object,
+    storesInfo: PropTypes.object,
     searchStoresParams: PropTypes.object,
     submitForm: PropTypes.func
 }
