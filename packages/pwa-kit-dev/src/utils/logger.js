@@ -18,13 +18,17 @@ const DEFAULT_LOG_LEVEL = 'info'
 // Default log format to use if not explicitly provided. It can be 'JSON' or 'TEXT'.
 const DEFAULT_LOG_FORMAT = 'JSON'
 
-const currentEnvironment = typeof window === 'undefined' ? 'server' : 'client'
+const isServerSide = typeof window === 'undefined'
 
 // Configuration object defining logging settings for server/client environments
 const loggerConfig = {
     server: {
-        logLevel: process.env.PWAKIT_LOG_LEVEL || DEFAULT_LOG_LEVEL,
-        format: process.env.PWAKIT_LOG_FORMAT || DEFAULT_LOG_FORMAT
+        logLevel: isServerSide
+            ? process.env.PWAKIT_LOG_LEVEL || DEFAULT_LOG_LEVEL
+            : DEFAULT_LOG_LEVEL,
+        format: isServerSide
+            ? process.env.PWAKIT_LOG_FORMAT || DEFAULT_LOG_FORMAT
+            : DEFAULT_LOG_FORMAT
     },
     client: {
         logLevel: DEFAULT_LOG_LEVEL,
@@ -40,13 +44,13 @@ export class PWAKITLogger {
      * Creates an instance of PWAKITLogger.
      * @param {Object} options - Configuration options for the logger.
      * @param {string} options.packageName - The name of the package where the logger is used.
-     * @param {string} [options.logLevel=loggerConfig[currentEnvironment].logLevel] - The log level to set for the logger.
-     * @param {string} [options.format=loggerConfig[currentEnvironment].format] - The format in which to print log messages. Can be 'JSON' or 'TEXT'.
+     * @param {string} [options.logLevel] - The log level to set for the logger.
+     * @param {string} [options.format] - The format in which to print log messages. Can be 'JSON' or 'TEXT'.
      */
     constructor({
         packageName = '',
-        logLevel = loggerConfig[currentEnvironment].logLevel,
-        format = loggerConfig[currentEnvironment].format
+        logLevel = isServerSide ? loggerConfig.server.logLevel : loggerConfig.client.logLevel,
+        format = isServerSide ? loggerConfig.server.format : loggerConfig.client.format
     } = {}) {
         this.packageName = packageName
         this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
@@ -181,19 +185,18 @@ export class PWAKITLogger {
  * @returns {PWAKITLogger} - An instance of PWAKITLogger configured for the specified package.
  */
 const createLogger = (packageName, clientConfig = {}) => {
-    const loggerClientConfig = {
-        logLevel: clientConfig.logLevel || loggerConfig.client.logLevel,
-        format: clientConfig.format || loggerConfig.client.format
-    }
+    // Server configuration overrides client configuration
+    const logLevel = isServerSide
+        ? loggerConfig.server.logLevel
+        : clientConfig.logLevel || loggerConfig.client.logLevel
+    const format = isServerSide
+        ? loggerConfig.server.format
+        : clientConfig.format || loggerConfig.client.format
 
     return new PWAKITLogger({
         packageName,
-        logLevel:
-            currentEnvironment === 'server'
-                ? loggerConfig.server.logLevel
-                : loggerClientConfig.logLevel,
-        format:
-            currentEnvironment === 'server' ? loggerConfig.server.format : loggerClientConfig.format
+        logLevel,
+        format
     })
 }
 
