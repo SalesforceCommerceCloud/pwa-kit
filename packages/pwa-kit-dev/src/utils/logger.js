@@ -53,7 +53,6 @@ export class PWAKITLogger {
         logLevel = isServerSide ? loggerConfig.server.logLevel : loggerConfig.client.logLevel,
         format = isServerSide ? loggerConfig.server.format : loggerConfig.client.format
     } = {}) {
-        console.error('PWAKITLogger constructor logLevel:', logLevel)
         this.packageName = packageName
         this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
         this.format = format.toUpperCase()
@@ -204,8 +203,6 @@ const createLogger = (packageName, clientConfig = {}) => {
     const format = isServerSide
         ? loggerConfig.server.format
         : clientConfig.format || loggerConfig.client.format
-
-    console.error('PWAKITLogger createLogger logLevel:', logLevel)
 
     return new PWAKITLogger({
         packageName,
