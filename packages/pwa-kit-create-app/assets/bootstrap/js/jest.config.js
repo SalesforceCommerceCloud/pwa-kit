@@ -10,7 +10,7 @@ const base = require('@salesforce/pwa-kit-dev/configs/jest/jest.config.js')
 
 module.exports = {
     ...base,
-    // Don't ignore @salesforce/retail-react-app
+    // To support extensibility, jest needs to transform the underlying templates/extensions
     transformIgnorePatterns: ['/node_modules/(?!@salesforce/retail-react-app/.*)'],
     moduleNameMapper: {
         ...base.moduleNameMapper,
