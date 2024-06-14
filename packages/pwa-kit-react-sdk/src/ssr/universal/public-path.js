@@ -14,5 +14,7 @@
  * but we need something more dynamic to support namespaced /mobify paths.
  */
 
+import {getBundlePathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+
 /* global __webpack_public_path__: writable */
-__webpack_public_path__ = '/mobify/bundle/development/'
+__webpack_public_path__ = `${getBundlePathBase()}/development/`
