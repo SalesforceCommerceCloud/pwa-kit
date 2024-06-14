@@ -79,9 +79,26 @@ describe('resolverUtils', () => {
                 ]
             },
             {
-                name: 'extensions includes absolute values',
-                input: [path.join(process.cwd(), 'local-extension-a')],
-                expected: [[`${process.cwd()}/local-extension-a`, {}]]
+                name: 'extensions includes absolute path and module path values',
+                input: [
+                    path.join(process.cwd(), 'local-extension-a'),
+                    path.join('@salesforce', 'module-extension-a')
+                ],
+                expected: [
+                    [`${process.cwd()}/local-extension-a`, {}],
+                    [path.join('@salesforce', 'module-extension-a'), {}]
+                ]
+            },
+            {
+                name: 'extensions includes windows file paths',
+                input: [
+                    '.\\local-extension-a',
+                    '\\home\\local-extension-a'
+                ],
+                expected: [
+                    [`${process.cwd()}/local-extension-a`, {}],
+                    [path.join(path.sep, 'home', 'local-extension-a'), {}]
+                ]
             }
         ].forEach((testCase) => {
             test(`${testCase.name}`, () => {
