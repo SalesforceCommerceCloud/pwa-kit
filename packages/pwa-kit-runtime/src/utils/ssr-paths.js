@@ -28,7 +28,7 @@ const getNamespace = () => {
         namespace = typeof namespace === 'function' ? namespace() : namespace
         return namespace
     */
-   return ''
+    return ''
 }
 
 export const startsWithMobify = (url) => {
@@ -59,5 +59,7 @@ export const getHealthCheckPath = () => {
 
 export const getSLASPrivateProxyPath = () => {
     const namespace = getNamespace()
-    return namespace ? `${namespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}` : SLAS_PRIVATE_CLIENT_PROXY_PATH
+    return namespace
+        ? `${namespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
+        : SLAS_PRIVATE_CLIENT_PROXY_PATH
 }
