@@ -5,26 +5,58 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+/**
+ * This file defines the /mobify paths used to set up our Express endpoints.
+ *
+ * If a namespace for the /mobify paths is defined, the methods in here will return the
+ * namespaced path. ie. /namespace/mobify/...
+ */
+
+const MOBIFY_PATH = '/mobify'
+const PROXY_PATH_BASE = `${MOBIFY_PATH}/proxy`
+const BUNDLE_PATH_BASE = `${MOBIFY_PATH}/bundle`
+const CACHING_PATH_BASE = `${MOBIFY_PATH}/caching`
+const HEALTHCHECK_PATH_BASE = `${MOBIFY_PATH}/ping`
+const SLAS_PRIVATE_CLIENT_PROXY = `${MOBIFY_PATH}/slas/private`
+
+const getNamespace = () => {
+    // TODO - namespaces for /mobify path will be added at a later date.
+    // Returns an empty string for now
+    /*
+        let {namespace = ""} = getConfig()
+        namespace = typeof namespace === 'function' ? namespace() : namespace
+        return namespace
+    */
+   return ''
+}
+
 export const startsWithMobify = (url) => {
-    return url.startsWith(`/mobify`)
+    const namespace = getNamespace()
+    const mobifyPath = namespace ? `${namespace}${MOBIFY_PATH}` : MOBIFY_PATH
+    return url.startsWith(mobifyPath)
 }
 
 export const getProxyPathBase = () => {
-    return '/mobify/proxy'
+    const namespace = getNamespace()
+    return namespace ? `${namespace}${PROXY_PATH_BASE}` : PROXY_PATH_BASE
 }
 
 export const getBundlePathBase = () => {
-    return '/mobify/bundle'
+    const namespace = getNamespace()
+    return namespace ? `${namespace}${BUNDLE_PATH_BASE}` : BUNDLE_PATH_BASE
 }
 
 export const getCachingPathBase = () => {
-    return '/mobify/caching'
+    const namespace = getNamespace()
+    return namespace ? `${namespace}${CACHING_PATH_BASE}` : CACHING_PATH_BASE
 }
 
-export const getHealtCheckPathBase = () => {
-    return '/mobify/ping'
+export const getHealthCheckPathBase = () => {
+    const namespace = getNamespace()
+    return namespace ? `${namespace}${HEALTHCHECK_PATH_BASE}` : HEALTHCHECK_PATH_BASE
 }
 
 export const getSLASPrivateProxyPath = () => {
-    return '/mobify/slas/private'
+    const namespace = getNamespace()
+    return namespace ? `${namespace}${SLAS_PRIVATE_CLIENT_PROXY}` : SLAS_PRIVATE_CLIENT_PROXY
 }
