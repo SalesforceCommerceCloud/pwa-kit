@@ -53,7 +53,7 @@ describe('resolverUtils', () => {
     describe('"expand" util returns correct return value when', () => {
         ;[
             {
-                name: 'extensions are all module extensions',
+                name: 'extensions are all short names',
                 input: ['module-extension-a', 'module-extension-b', 'module-extension-c'],
                 expected: [
                     ['@salesforce/extension-module-extension-a', {}],

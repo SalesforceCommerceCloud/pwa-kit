@@ -50,28 +50,23 @@ export const expand = (extensions = []) =>
         .map((extension) => {
             let [nameRef, config = {}] = Array.isArray(extension) ? extension : [extension, {}]
 
-            // We determine the type of extention reference by it's first character.
-            switch (nameRef[0]) {
-                case '.':
+            switch (true) {
+                case /^\./.test(nameRef):
                     // Relative Path
                     nameRef = nameRef.split(/\/|\\/).join(path.sep)
                     nameRef = path.join(process.cwd(), nameRef.replace('.', ''))
                     break
-                case '/':
-                    // Absolute Path (UNIX)
+                case /^(\/|\\|\w:)/.test(nameRef):
+                    // Absolute Path (UNIX|Windows)
                     nameRef = nameRef.split(/\/|\\/).join(path.sep)
                     break
-                case '\\':
-                    // Absolute Path (Windows)
-                    nameRef = nameRef.split(/\/|\\/).join(path.sep)
-                    break
-                case '@':
-                    // Module Path
-                    // Do nothing...
+                case /^@/.test(nameRef):
+                    // Do nothing
                     break
                 default:
                     // Default is to treat the reference as a extension "short" name.
                     nameRef = `${EXTENSION_NAMESPACE}/${EXTENSION_PREFIX}-${nameRef}`
+                    break
             }
 
             return [nameRef, config]
