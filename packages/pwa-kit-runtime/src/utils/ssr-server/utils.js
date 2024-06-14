@@ -12,7 +12,7 @@
 
 import crypto from 'crypto'
 import {proxyConfigs} from '../ssr-shared'
-import {getProxyPathBase, getBundlePathBase} from '../ssr-paths'
+import {getProxyPathBase, getBundlePathBase} from '../ssr-namespace-paths'
 
 // TODO: Clean this up or provide a way to toggle
 export const verboseProxyLogging = false

@@ -8,7 +8,7 @@ import React, {useState, ReactElement} from 'react'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
+import {getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 interface AppConfigProps {
     children: React.ReactNode

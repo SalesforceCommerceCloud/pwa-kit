@@ -6,7 +6,7 @@
  */
 /*global dw*/
 import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
+import {getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 const useActiveData = () => {
     // Returns true when the feature flag is enabled and the tracking scripts have been executed

@@ -8,7 +8,7 @@
  * @module progressive-web-sdk/ssr/universal/utils
  */
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
-import {getBundlePathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
+import {getBundlePathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 const onClient = typeof window !== 'undefined'
 

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getProxyPathBase, getCachingPathBase} from './ssr-paths'
+import {getProxyPathBase, getCachingPathBase} from './ssr-namespace-paths'
 
 /**
  * @module progressive-web-sdk/utils/ssr-shared
