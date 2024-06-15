@@ -37,7 +37,7 @@ export const isQuiet = () => QUIET
 export const localDevLog = (...args) => {
     if (!isRemote() && !QUIET) {
         /* istanbul ignore next */
-        logger.log(...args)
+        console.log(...args)
     }
 }
 
@@ -46,7 +46,7 @@ export const infoLog = (...args) => {
     /* istanbul ignore next */
     if (!QUIET) {
         /* istanbul ignore next */
-        logger.log(...args)
+        console.log(...args)
     }
 }
 
