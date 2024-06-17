@@ -10,14 +10,13 @@ import {Controller} from 'react-hook-form'
 import {
     FormControl,
     FormLabel,
+    FormErrorMessage,
     IconButton,
     Input,
     InputGroup,
     InputRightElement,
     Select,
-    Checkbox,
-    Alert,
-    Text
+    Checkbox
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     VisibilityIcon,
@@ -136,12 +135,10 @@ const Field = ({
                         </InputGroup>
 
                         {error && type !== 'hidden' && (
-                            <Alert background="transparent" border="none" p={0}>
-                                <AlertIcon color="red.600" boxSize={4} />
-                                <Text fontSize="sm" ml={3} color="red.600">
-                                    {error.message}
-                                </Text>
-                            </Alert>
+                            <FormErrorMessage color="red.600">
+                                <AlertIcon aria-hidden="true" mr={2} />
+                                {error.message}
+                            </FormErrorMessage>
                         )}
 
                         {helpText}
