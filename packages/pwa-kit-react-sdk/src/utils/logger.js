@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import createLogger from '@salesforce/pwa-kit-dev/utils/logger'
+import createLogger from '@salesforce/pwa-kit-runtime/utils/loggerFactory'
 
 const logger = createLogger('pwa-kit-react-sdk')
 export default logger
