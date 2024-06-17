@@ -32,6 +32,7 @@ const Field = ({
     placeholder,
     inputProps,
     control,
+    autoComplete,
     defaultValue,
     helpText,
     children
@@ -75,6 +76,7 @@ const Field = ({
                                     value={value}
                                     type={inputType}
                                     placeholder={placeholder}
+                                    autoComplete={autoComplete}
                                     {..._inputProps}
                                 />
                             )}
