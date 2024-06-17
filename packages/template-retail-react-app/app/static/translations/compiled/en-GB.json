@@ -2915,6 +2915,12 @@
       "value": "away"
     }
   ],
+  "store_locator.description.loading_locations": [
+    {
+      "type": 0,
+      "value": "Loading locations..."
+    }
+  ],
   "store_locator.description.no_locations": [
     {
       "type": 0,

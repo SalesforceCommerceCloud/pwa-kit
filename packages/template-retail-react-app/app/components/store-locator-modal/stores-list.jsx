@@ -19,7 +19,8 @@ import {
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
 
-    return storesInfo.map((store, index) => {
+    return (
+        storesInfo !== undefined ? storesInfo.map((store, index) => {
         return (
             <AccordionItem key={index}>
                 <Box margin="10px">
@@ -84,7 +85,7 @@ const StoresList = ({storesInfo}) => {
                 </Box>
             </AccordionItem>
         )
-    })
+    }) : <></> )
 }
 
 StoresList.propTypes = {

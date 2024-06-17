@@ -48,18 +48,23 @@ const StoreLocatorContent = ({form, submitForm, storesInfo, searchStoresParams})
                             margin: '20px'
                         }}
                     >
-                        {storesInfo.length === 0
-                            ? intl.formatMessage({
-                                  id: 'store_locator.description.no_locations',
-                                  defaultMessage: 'Sorry, there are no locations in this area'
-                              })
-                            : intl.formatMessage(
-                                  {
-                                      id: 'store_locator.description.viewing_within',
-                                      defaultMessage: 'Viewing stores within {distance} miles'
-                                  },
-                                  {distance: STORE_LOCATOR_DISTANCE}
-                              )}
+                        {storesInfo === undefined ?
+                            intl.formatMessage({
+                                id: 'store_locator.description.loading_locations',
+                                defaultMessage: 'Loading locations...'
+                            })
+                            : storesInfo.length === 0 ? 
+                                intl.formatMessage({
+                                    id: 'store_locator.description.no_locations',
+                                    defaultMessage: 'Sorry, there are no locations in this area'
+                                })
+                                : intl.formatMessage(
+                                    {
+                                        id: 'store_locator.description.viewing_within',
+                                        defaultMessage: 'Viewing stores within {distance} miles'
+                                    },
+                                {distance: STORE_LOCATOR_DISTANCE}
+                        )}
                     </Box>
                 </AccordionItem>
                 <StoresList storesInfo={storesInfo} />

@@ -6227,6 +6227,20 @@
       "value": "]"
     }
   ],
+  "store_locator.description.loading_locations": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀǿǿȧȧḓīƞɠ ŀǿǿƈȧȧŧīǿǿƞş..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "store_locator.description.no_locations": [
     {
       "type": 0,

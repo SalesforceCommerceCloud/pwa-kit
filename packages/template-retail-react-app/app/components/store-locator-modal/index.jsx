@@ -48,9 +48,8 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
             maxDistance: STORE_LOCATOR_DISTANCE
         }
     })
-    var storesInfo = []
-    if (searchStoresData.data !== undefined && searchStoresData.data.data !== undefined)
-        storesInfo = searchStoresData.data.data
+
+    const storesInfo = searchStoresData.data !== undefined ? (searchStoresData.data.data !== undefined ? searchStoresData.data.data : []) : undefined
 
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
