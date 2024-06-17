@@ -10,7 +10,14 @@
  * The order of log levels is important. It determines the logging threshold.
  * @type {string[]}
  */
-const LOG_LEVELS = ['debug', 'info', 'warn', 'error']
+export const LOG_LEVELS = ['debug', 'info', 'warn', 'error']
+
+/**
+ * Array defining the valid format for the log message.
+ * The order is not important.
+ * @type {string[]}
+ */
+const LOG_FORMATS = ['JSON', 'TEXT']
 
 // Default log level for the logging threshold. It can be any of the LOG_LEVELS values.
 const DEFAULT_LOG_LEVEL = 'info'
@@ -21,20 +28,15 @@ const DEFAULT_LOG_FORMAT = 'JSON'
 const isServerSide = typeof window === 'undefined'
 
 // Configuration object defining logging settings for server/client environments
-const loggerConfig = {
-    server: {
-        logLevel: isServerSide
-            ? process.env.PWAKIT_LOG_LEVEL || DEFAULT_LOG_LEVEL
-            : DEFAULT_LOG_LEVEL,
-        format: isServerSide
-            ? process.env.PWAKIT_LOG_FORMAT || DEFAULT_LOG_FORMAT
-            : DEFAULT_LOG_FORMAT
-    },
-    client: {
-        logLevel: DEFAULT_LOG_LEVEL,
-        format: DEFAULT_LOG_FORMAT
-    }
-}
+const loggerConfig = isServerSide
+    ? {
+          logLevel: process.env.PWAKIT_LOG_LEVEL || DEFAULT_LOG_LEVEL,
+          format: process.env.PWAKIT_LOG_FORMAT || DEFAULT_LOG_FORMAT
+      }
+    : {
+          logLevel: DEFAULT_LOG_LEVEL,
+          format: DEFAULT_LOG_FORMAT
+      }
 
 /**
  * The PWAKITLogger provides structured logging with different log levels.
@@ -50,12 +52,14 @@ export class PWAKITLogger {
      */
     constructor({
         packageName = '',
-        logLevel = isServerSide ? loggerConfig.server.logLevel : loggerConfig.client.logLevel,
-        format = isServerSide ? loggerConfig.server.format : loggerConfig.client.format
+        logLevel = loggerConfig.logLevel,
+        format = loggerConfig.format
     } = {}) {
         this.packageName = packageName
         this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
-        this.format = format.toUpperCase()
+        this.format = LOG_FORMATS.includes(format.toUpperCase())
+            ? format.toUpperCase()
+            : DEFAULT_LOG_FORMAT
     }
 
     /**
@@ -198,11 +202,9 @@ export class PWAKITLogger {
 const createLogger = (packageName, clientConfig = {}) => {
     // On the server, the server configuration overrides the client configuration
     const logLevel = isServerSide
-        ? loggerConfig.server.logLevel
-        : clientConfig.logLevel || loggerConfig.client.logLevel
-    const format = isServerSide
-        ? loggerConfig.server.format
-        : clientConfig.format || loggerConfig.client.format
+        ? loggerConfig.logLevel
+        : clientConfig.logLevel || loggerConfig.logLevel
+    const format = isServerSide ? loggerConfig.format : clientConfig.format || loggerConfig.format
 
     return new PWAKITLogger({
         packageName,
