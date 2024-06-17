@@ -117,7 +117,6 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
 
 StoreLocatorModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
-    setIsOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func
 }
 

@@ -88,7 +88,7 @@ const StoresList = ({storesInfo}) => {
 }
 
 StoresList.propTypes = {
-    storesInfo: PropTypes.object.isRequired
+    storesInfo: PropTypes.array.isRequired
 }
 
 export default StoresList

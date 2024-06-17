@@ -109,7 +109,7 @@ const StoreLocatorInput = ({form, submitForm, searchStoresParams}) => {
 
 StoreLocatorInput.propTypes = {
     form: PropTypes.object,
-    storesInfo: PropTypes.object,
+    storesInfo: PropTypes.array,
     searchStoresParams: PropTypes.object,
     submitForm: PropTypes.func
 }

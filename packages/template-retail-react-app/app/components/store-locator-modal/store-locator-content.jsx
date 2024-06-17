@@ -70,7 +70,7 @@ const StoreLocatorContent = ({form, submitForm, storesInfo, searchStoresParams})
 
 StoreLocatorContent.propTypes = {
     form: PropTypes.object,
-    storesInfo: PropTypes.object,
+    storesInfo: PropTypes.array,
     searchStoresParams: PropTypes.object,
     submitForm: PropTypes.func
 }
