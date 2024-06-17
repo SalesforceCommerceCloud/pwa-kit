@@ -615,8 +615,8 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    _handleMissingSlasPrivateEnvVar(app) {
-        app.use(getSLASPrivateProxyPath(), (_, res) => {
+    _handleMissingSlasPrivateEnvVar(app, slasPrivateClientProxyPath) {
+        app.use(slasPrivateClientProxyPath, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
@@ -631,28 +631,31 @@ export const RemoteServerFactory = {
         if (!options.useSLASPrivateClient) {
             return
         }
-        localDevLog(`Proxying ${getSLASPrivateProxyPath()} to ${options.slasTarget}`)
+
+        const slasPrivateClientProxyPath = getSLASPrivateProxyPath()
+
+        localDevLog(`Proxying ${slasPrivateClientProxyPath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
         if (!clientSecret) {
-            this._handleMissingSlasPrivateEnvVar(app)
+            this._handleMissingSlasPrivateEnvVar(app, slasPrivateClientProxyPath)
             return
         }
 
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
         app.use(
-            getSLASPrivateProxyPath(),
+            slasPrivateClientProxyPath,
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[getSLASPrivateProxyPath()]: ''},
+                pathRewrite: {[slasPrivateClientProxyPath]: ''},
                 onProxyReq: (proxyRequest, incomingRequest) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
-                        proxyPath: getSLASPrivateProxyPath(),
+                        proxyPath: slasPrivateClientProxyPath,
                         targetHost: options.slasHostName,
                         targetProtocol: 'https'
                     })
