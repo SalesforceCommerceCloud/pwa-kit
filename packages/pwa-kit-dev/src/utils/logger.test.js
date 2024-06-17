@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import createLogger, {PWAKITLogger} from './logger'
+import createLogger, {PWAKITLogger, LOG_LEVELS} from './logger'
 
 describe('PWAKITLogger', () => {
     beforeEach(() => {
@@ -215,6 +215,33 @@ describe('PWAKITLogger', () => {
             const clientLogger = createLogger('test-package', {logLevel: 'info', format: 'TEXT'})
             expect(clientLogger.logLevel).toBe('info')
             expect(clientLogger.format).toBe('TEXT')
+        })
+    })
+
+    describe('log levels', () => {
+        LOG_LEVELS.forEach((level) => {
+            test(`should log a ${level} message`, () => {
+                const logger = new PWAKITLogger({
+                    packageName: 'test-package',
+                    logLevel: level,
+                    format: 'JSON'
+                })
+                logger[level](`This is a ${level} message`)
+                expect(console[level]).toHaveBeenCalledWith(
+                    expect.objectContaining({message: `This is a ${level} message`})
+                )
+            })
+        })
+    })
+
+    describe('invalid format handling', () => {
+        test('should default to JSON format if invalid format is given', () => {
+            const logger = new PWAKITLogger({
+                packageName: 'test-package',
+                logLevel: 'info',
+                format: 'INVALID'
+            })
+            expect(logger.format).toBe('JSON')
         })
     })
 })
