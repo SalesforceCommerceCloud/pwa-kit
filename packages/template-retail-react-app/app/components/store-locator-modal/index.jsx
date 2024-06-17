@@ -49,7 +49,12 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
         }
     })
 
-    const storesInfo = searchStoresData.data !== undefined ? (searchStoresData.data.data !== undefined ? searchStoresData.data.data : []) : undefined
+    const storesInfo =
+        searchStoresData.data !== undefined
+            ? searchStoresData.data.data !== undefined
+                ? searchStoresData.data.data
+                : []
+            : undefined
 
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
