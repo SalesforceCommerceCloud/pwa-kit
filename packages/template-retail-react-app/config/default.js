@@ -39,6 +39,13 @@ module.exports = {
         }
     },
     externals: [],
+    // NOTE: Environment variables (`PWAKIT_LOG_LEVEL` and `PWAKIT_LOG_FORMAT`) take precedence over configurations defined here.
+    //       If not set via environment variables, the default values from this configuration will be used for the log configuration.
+    logger: {
+        logLevel: 'info',
+        format: 'JSON'
+    },
+
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],

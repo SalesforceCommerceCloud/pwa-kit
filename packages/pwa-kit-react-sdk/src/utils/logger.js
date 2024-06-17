@@ -6,5 +6,5 @@
  */
 import createLogger from '@salesforce/pwa-kit-runtime/utils/loggerFactory'
 
-const logger = createLogger('pwa-kit-react-sdk')
+const logger = createLogger({packageName: 'pwa-kit-react-sdk'})
 export default logger

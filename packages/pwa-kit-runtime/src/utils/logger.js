@@ -6,5 +6,5 @@
  */
 import createLogger from './loggerFactory'
 
-const logger = createLogger('pwa-kit-runtime')
+const logger = createLogger({packageName: 'pwa-kit-runtime'})
 export default logger

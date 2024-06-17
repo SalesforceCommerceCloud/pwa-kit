@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getConfig} from './ssr-config'
+
 /**
  * Array defining the order of log levels from lowest to highest severity.
  * The order of log levels is important. It determines the logging threshold.
@@ -27,16 +29,7 @@ const DEFAULT_LOG_FORMAT = 'JSON'
 
 const isServerSide = typeof window === 'undefined'
 
-// Configuration object defining logging settings for server/client environments
-const loggerConfig = isServerSide
-    ? {
-          logLevel: process.env.PWAKIT_LOG_LEVEL || DEFAULT_LOG_LEVEL,
-          format: process.env.PWAKIT_LOG_FORMAT || DEFAULT_LOG_FORMAT
-      }
-    : {
-          logLevel: DEFAULT_LOG_LEVEL,
-          format: DEFAULT_LOG_FORMAT
-      }
+const appLoggerConfig = getConfig()?.logger || {}
 
 /**
  * The PWAKITLogger provides structured logging with different log levels.
@@ -50,15 +43,19 @@ export class PWAKITLogger {
      * @param {string} [options.logLevel] - The log level to set for the logger.
      * @param {string} [options.format] - The format in which to print log messages. Can be 'JSON' or 'TEXT'.
      */
-    constructor({
-        packageName = '',
-        logLevel = loggerConfig.logLevel,
-        format = loggerConfig.format
-    } = {}) {
-        this.packageName = packageName
-        this.logLevel = LOG_LEVELS.includes(logLevel) ? logLevel : DEFAULT_LOG_LEVEL
-        this.format = LOG_FORMATS.includes(format.toUpperCase())
-            ? format.toUpperCase()
+    constructor(options = {}) {
+        const envLogLevel = isServerSide ? process.env.PWAKIT_LOG_LEVEL : ''
+        const envLogFormat = isServerSide ? process.env.PWAKIT_LOG_FORMAT : ''
+
+        this.packageName = options.packageName || ''
+
+        this.logLevel =
+            envLogLevel || options.logLevel || appLoggerConfig.logLevel || DEFAULT_LOG_LEVEL
+        this.format = envLogFormat || options.format || appLoggerConfig.format || DEFAULT_LOG_FORMAT
+
+        this.logLevel = LOG_LEVELS.includes(this.logLevel) ? this.logLevel : DEFAULT_LOG_LEVEL
+        this.format = LOG_FORMATS.includes(this.format.toUpperCase())
+            ? this.format.toUpperCase()
             : DEFAULT_LOG_FORMAT
     }
 
@@ -184,33 +181,29 @@ export class PWAKITLogger {
 /**
  * Create a logger instance for each package.
  *
- * This function creates and returns a logger instance configured for the specified package name.
+ * This function creates and returns a logger instance configured for the specified package.
  * The logging behavior differs between server-side and client-side environments.
  *
  * On the server side, the logging configuration can be controlled via the following environment variables:
  * - `PWAKIT_LOG_LEVEL`: Defines the log level (e.g., 'debug', 'info', 'warn', 'error'). Default is 'info'.
  * - `PWAKIT_LOG_FORMAT`: Defines the log format ('JSON' or 'TEXT'). Default is 'JSON'.
  *
- * On the client side, the logging configuration can be specified through the `clientConfig` parameter.
+ * On the client side, the logging configuration can be specified through the `config` parameter.
  *
- * @param {string} packageName - The name of the package where the logger is used.
- * @param {Object} [clientConfig={}] - Configuration options specific to the client environment.
- * @param {string} [clientConfig.logLevel=loggerConfig.client.logLevel] - The log level for the client environment.
- * @param {string} [clientConfig.format=loggerConfig.client.format] - The log format for the client environment.
+ * Configuration precedence:
+ * 1. Environment variables (`PWAKIT_LOG_LEVEL` and `PWAKIT_LOG_FORMAT`) take precedence over:
+ * 2. Configuration provided in `config` object parameter (`config.logLevel` and `config.format`) which takes precedence over:
+ * 3. Application configuration retrieved via App config `getConfig()` which takes precedence over:
+ * 4. Default values ('info' for logLevel and 'JSON' for format).
+ *
+ * @param {Object} config - Configuration object for the logger.
+ * @param {string} config.packageName - The name of the package where the logger is used.
+ * @param {string} [config.logLevel] - The log level to set for the logger.
+ * @param {string} [config.format] - The format in which to print log messages. Can be 'JSON' or 'TEXT'.
  * @returns {PWAKITLogger} - An instance of PWAKITLogger configured for the specified package.
  */
-const createLogger = (packageName, clientConfig = {}) => {
-    // On the server, the server configuration overrides the client configuration
-    const logLevel = isServerSide
-        ? loggerConfig.logLevel
-        : clientConfig.logLevel || loggerConfig.logLevel
-    const format = isServerSide ? loggerConfig.format : clientConfig.format || loggerConfig.format
-
-    return new PWAKITLogger({
-        packageName,
-        logLevel,
-        format
-    })
+const createLogger = (config = {}) => {
+    return new PWAKITLogger(config)
 }
 
 export default createLogger
