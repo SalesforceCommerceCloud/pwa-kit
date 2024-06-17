@@ -147,6 +147,7 @@ const Field = ({
 Field.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
+    autoComplete: PropTypes.string,
     formLabel: PropTypes.any,
     type: PropTypes.oneOf([
         'text',
