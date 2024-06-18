@@ -331,15 +331,23 @@ export const RemoteServerFactory = {
         // and not a bundle request, so we can apply specific
         // processing.
         this._setupCommonMiddleware(app, options)
-        this._setupExtensionMiddlewares(app, options)
+        this._setupExtensions(app, options)
 
         this._addStaticAssetServing(app)
         this._addDevServerGarbageCollection(app)
         return app
     },
 
-    _setupExtensionMiddlewares(app, options) {
-        // app.use('/test', extension)
+    _setupExtensions(app, options) {
+        // TODO: get actual extensions
+        const EXTENSIONS = ['my-extension', 'my-extension-b']
+        const _r = eval('require')
+
+        EXTENSIONS.forEach((extension) => {
+            const extensionPath = path.join(options.buildDir, 'extensions', extension, 'server.js')
+            const module = _r(extensionPath)
+            module.default({app, options})
+        })
     },
 
     /**

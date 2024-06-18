@@ -32,7 +32,6 @@ import esm from 'esm'
 
 // This allows us to dynamically import a module in both CommonJS and ESM format
 // Note: the package babel-node we are using for `npm start` doesn't work for dynamic imports
-// TODO: replace babel-node with esm for command `npm start`
 const esmImport = esm(module)
 
 const CONTENT_TYPE = 'content-type'
@@ -132,19 +131,20 @@ export const DevServerMixin = {
         })
     },
 
-    _setupExtensionMiddlewares(app, options) {
-        // app.use('/test', extension)
-        console.log('_setupExtensionMiddlewares')
-        console.log(options)
-        // const a = require('my-extension/middleware.js')
-        const middlewarePath = path.join(
-            options.projectDir,
-            'node_modules/my-extension/middleware.js'
-        )
+    _setupExtensions(app, options) {
+        // TODO: Replace this with the actual extension names
+        const extensions = ['my-extension', 'my-extension-b']
 
-        const a = esmImport(middlewarePath)
-        console.log(a.default)
-        app.use('/test', a.default)
+        extensions.forEach((extension) => {
+            const customizerPath = path.join(
+                options.projectDir,
+                'node_modules',
+                extension,
+                'server.js'
+            )
+            const customizer = esmImport(customizerPath)
+            customizer.default({app, options})
+        })
     },
 
     /**

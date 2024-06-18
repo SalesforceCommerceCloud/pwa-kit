@@ -556,7 +556,26 @@ const requestProcessor =
         })
         .build()
 
-module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
+// TODO: get actual extensions from package.json
+const EXTENSIONS = ['my-extension', 'my-extension-b']
+
+const extensions = EXTENSIONS.map((extension) => {
+    return {
+        name: 'extensions',
+        target: 'node',
+        entry: `${projectDir}/node_modules/${extension}/server.js`,
+        output: {
+            path: `${buildDir}/extensions/${extension}`,
+            filename: 'server.js',
+            libraryTarget: 'commonjs2'
+        },
+        optimization: {
+            minimize: false
+        }
+    }
+})
+
+module.exports = [client, ssr, renderer, clientOptional, requestProcessor, ...extensions]
     .filter(Boolean)
     .map((config) => {
         return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)

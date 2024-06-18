@@ -1,5 +1,5 @@
 {
-  "name": "my-extension",
+  "name": "my-extension-b",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5"
+
   }
 }
