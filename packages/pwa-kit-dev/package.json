@@ -111,7 +111,7 @@
     "webpack-hot-middleware": "^2.25.3",
     "webpack-hot-server-middleware": "^0.6.1",
     "webpack-notifier": "^1.15.0",
-    "ws": "^8.13.0"
+    "ws": "^8.17.1"
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
