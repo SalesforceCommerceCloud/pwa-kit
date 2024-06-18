@@ -126,9 +126,9 @@ const getPublicPathEntryPoint = () => {
         projectDir,
         'node_modules',
         '@salesforce',
-        'pwa-kit-react-sdk',
+        'pwa-kit-dev',
         'ssr',
-        'universal',
+        'server',
         'public-path'
     )
 }
