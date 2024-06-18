@@ -13,6 +13,7 @@ import {
     Box,
     Button,
     Flex,
+    Heading,
     Text,
     Modal,
     ModalHeader,
@@ -83,15 +84,17 @@ export const AddToCartModal = () => {
                 bgColor="gray.50"
                 containerProps={{'data-testid': 'add-to-cart-modal'}}
             >
-                <ModalHeader paddingY="8" bgColor="white" fontSize="2xl" fontWeight="700">
-                    {intl.formatMessage(
-                        {
-                            defaultMessage:
-                                '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                            id: 'add_to_cart_modal.info.added_to_cart'
-                        },
-                        {quantity: numerOfItemsAdded}
-                    )}
+                <ModalHeader paddingY="8" bgColor="white">
+                    <Heading as="h1" fontSize="2xl">
+                        {intl.formatMessage(
+                            {
+                                defaultMessage:
+                                    '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                                id: 'add_to_cart_modal.info.added_to_cart'
+                            },
+                            {quantity: numerOfItemsAdded}
+                        )}
+                    </Heading>
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>
@@ -142,7 +145,14 @@ export const AddToCartModal = () => {
                                             </Box>
 
                                             <Box>
-                                                <Text fontWeight="700">{product.name}</Text>
+                                                <Heading
+                                                    as="h2"
+                                                    fontSize="md"
+                                                    fontFamily="body"
+                                                    fontWeight="700"
+                                                >
+                                                    {product.name}
+                                                </Heading>
                                                 <Box
                                                     color="gray.600"
                                                     fontSize="sm"

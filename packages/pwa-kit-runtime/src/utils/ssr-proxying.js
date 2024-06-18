@@ -683,7 +683,7 @@ export const rewriteProxyResponseHeaders = ({
  * @private
  * @type {string[]}
  */
-export const X_HEADERS_TO_REMOVE_PROXY = ['x-mobify-access-key']
+export const X_HEADERS_TO_REMOVE_PROXY = ['x-mobify-access-key', 'x-sfdc-access-control']
 
 /**
  * List of x- headers that are removed from origin requests.
@@ -694,7 +694,8 @@ export const X_HEADERS_TO_REMOVE_ORIGIN = [
     'x-api-key',
     'x-apigateway-event',
     'x-apigateway-context',
-    'x-mobify-access-key'
+    'x-mobify-access-key',
+    'x-sfdc-access-control'
 ]
 
 /**

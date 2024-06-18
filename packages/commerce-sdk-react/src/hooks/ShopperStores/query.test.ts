@@ -20,26 +20,28 @@ jest.mock('../../auth/index.ts', () => {
 })
 
 type Queries = typeof queries
-const promotionsEndpoint = '/pricing/shopper-promotions/'
+const searchEndpoint = '/store/shopper-stores/'
 // Not all endpoints use all parameters, but unused parameters are safely discarded
-const OPTIONS = {parameters: {campaignId: 'campaignId', ids: 'a,b'}}
+const OPTIONS = {parameters: {ids: '12345'}}
 
 /** Map of query name to returned data type */
-type TestMap = {[K in keyof Queries]: NonNullable<ReturnType<Queries[K]>['data']>}
+type DataType<K extends keyof Queries> = NonNullable<ReturnType<Queries[K]>['data']>
+type TestMap = {[K in keyof Queries]: DataType<K>}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
-    usePromotions: {limit: 0, data: [], total: 0},
-    usePromotionsForCampaign: {limit: 0, data: [], total: 0}
+    // Type assertion so we don't need to use the full type
+    useSearchStores: {} as DataType<'useSearchStores'>,
+    useStores: {} as DataType<'useStores'>
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>
-describe('Shopper Promotions query hooks', () => {
+describe('Shopper Stores query hooks', () => {
     beforeEach(() => nock.cleanAll())
     afterEach(() => {
         expect(nock.pendingMocks()).toHaveLength(0)
     })
     test.each(testCases)('`%s` returns data on success', async (queryName, data) => {
-        mockQueryEndpoint(promotionsEndpoint, data)
+        mockQueryEndpoint(searchEndpoint, data)
         const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })
@@ -48,7 +50,7 @@ describe('Shopper Promotions query hooks', () => {
     })
 
     test.each(testCases)('`%s` returns error on error', async (queryName) => {
-        mockQueryEndpoint(promotionsEndpoint, {}, 400)
+        mockQueryEndpoint(searchEndpoint, {}, 400)
         const {result} = renderHookWithProviders(() => {
             return queries[queryName](OPTIONS)
         })

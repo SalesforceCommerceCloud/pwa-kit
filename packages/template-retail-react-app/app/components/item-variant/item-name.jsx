@@ -7,6 +7,7 @@
 import React from 'react'
 import {useItemVariant} from '.'
 import Link from '@salesforce/retail-react-app/app/components/link'
+import {Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 /**
  * In the context of a cart product item variant, this components simply renders
@@ -19,9 +20,11 @@ const ItemName = (props) => {
     const productId = variant?.master?.masterId || variant.id
 
     return (
-        <Link fontWeight="bold" {...props} color="black.600" to={`/product/${productId}`}>
-            {variant.productName || variant.name}
-        </Link>
+        <Heading as="h2" fontSize="md">
+            <Link {...props} color="black.600" to={`/product/${productId}`}>
+                {variant.productName || variant.name}
+            </Link>
+        </Heading>
     )
 }
 
