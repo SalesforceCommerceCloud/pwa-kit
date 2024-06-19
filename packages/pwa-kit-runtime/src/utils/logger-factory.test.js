@@ -4,9 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import createLogger, {PWAKITLogger} from './loggerFactory'
+import createLogger, {PWAKitLogger} from './logger-factory'
 
-describe('PWAKITLogger', () => {
+describe('PWAKitLogger', () => {
+    const levels = ['error', 'warn', 'info', 'debug']
+
     beforeEach(() => {
         console.debug = jest.fn()
         console.log = jest.fn()
@@ -20,38 +22,18 @@ describe('PWAKITLogger', () => {
         jest.clearAllMocks()
     })
 
-    test('should log using the log method', () => {
-        const logger = createLogger({packageName: 'test-package'})
-        logger.log('This is a log message')
-        expect(console.info).toHaveBeenCalledWith('test-package INFO This is a log message')
-    })
-
-    test('should log an info message', () => {
-        const logger = createLogger({packageName: 'test-package'})
-        logger.info('This is an info message')
-        expect(console.info).toHaveBeenCalledWith('test-package INFO This is an info message')
-    })
-
-    test('should log a debug message', () => {
-        const logger = createLogger({packageName: 'test-package'})
-        logger.debug('This is a debug message')
-        expect(console.debug).toHaveBeenCalledWith('test-package DEBUG This is a debug message')
-    })
-
-    test('should log a warn message', () => {
-        const logger = createLogger({packageName: 'test-package'})
-        logger.warn('This is a warn message')
-        expect(console.warn).toHaveBeenCalledWith('test-package WARN This is a warn message')
-    })
-
-    test('should log an error message', () => {
-        const logger = createLogger({packageName: 'test-package'})
-        logger.error('This is an error message')
-        expect(console.error).toHaveBeenCalledWith('test-package ERROR This is an error message')
-    })
+    for (const level of levels) {
+        test(`should log a ${level} message`, () => {
+            const logger = createLogger({packageName: 'test-package'})
+            logger[level](`This is a ${level} message`)
+            expect(console[level]).toHaveBeenCalledWith(
+                `test-package ${level.toUpperCase()} This is a ${level} message`
+            )
+        })
+    }
 
     test('should use empty packageName if not provided', () => {
-        const logger = new PWAKITLogger()
+        const logger = new PWAKitLogger()
         logger.info('This is an info message with default packageName')
         expect(console.info).toHaveBeenCalledWith(
             ' INFO This is an info message with default packageName'
@@ -80,7 +62,7 @@ describe('PWAKITLogger', () => {
     })
 
     test('should log only namespace with an empty packageName', () => {
-        const logger = new PWAKITLogger({packageName: ''})
+        const logger = new PWAKitLogger({packageName: ''})
         logger.info('This is an info message', {
             namespace: 'testNamespace'
         })

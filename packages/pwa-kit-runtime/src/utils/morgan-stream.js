@@ -6,7 +6,7 @@
  */
 
 import {Writable} from 'stream'
-import logger from './logger'
+import logger from './logger-instance'
 
 /**
  * @private
