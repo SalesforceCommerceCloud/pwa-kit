@@ -5,12 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryResult} from '@tanstack/react-query'
+import {ShopperOrders} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {getCustomKeys, mergeOptions, omitNullableParameters, pick} from '../utils'
+import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-import paramKeysMap from './paramKeys'
 
 type Client = ApiClients['shopperOrders']
 
@@ -33,14 +33,12 @@ export const useOrder = (
     type Data = DataType<Client['getOrder']>
     const {shopperOrders: client} = useCommerceApi()
     const methodName = 'getOrder'
-    const requiredParameters = ['organizationId', 'orderNo', 'siteId'] as const
+    const requiredParameters = ShopperOrders.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    // get param keys for the api from netOptions
-    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
-    const parameters = pick(netOptions.parameters, paramKeys)
+    const parameters = pickValidParams(netOptions.parameters, ShopperOrders.paramKeys[methodName])
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -72,14 +70,12 @@ export const usePaymentMethodsForOrder = (
     type Data = DataType<Client['getPaymentMethodsForOrder']>
     const {shopperOrders: client} = useCommerceApi()
     const methodName = 'getPaymentMethodsForOrder'
-    const requiredParameters = ['organizationId', 'orderNo', 'siteId'] as const
+    const requiredParameters = ShopperOrders.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    // get param keys for the api from netOptions
-    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
-    const parameters = pick(netOptions.parameters, paramKeys)
+    const parameters = pickValidParams(netOptions.parameters, ShopperOrders.paramKeys[methodName])
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -93,11 +89,11 @@ export const usePaymentMethodsForOrder = (
     })
 }
 /**
- * This method gives you the external taxation data of the order transferred from the basket during 
-order creation. This endpoint can be called only if external taxation was used. See POST /baskets 
-for more information.     
+ * This method gives you the external taxation data of the order transferred from the basket during
+order creation. This endpoint can be called only if external taxation was used. See POST /baskets
+for more information.
  * @group ShopperOrders
- * @category Query    
+ * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
  * @returns A TanStack Query query hook with data from the Shopper Orders `getTaxesFromOrder` endpoint.
@@ -113,14 +109,12 @@ export const useTaxesFromOrder = (
     type Data = DataType<Client['getTaxesFromOrder']>
     const {shopperOrders: client} = useCommerceApi()
     const methodName = 'getTaxesFromOrder'
-    const requiredParameters = ['organizationId', 'orderNo', 'siteId'] as const
+    const requiredParameters = ShopperOrders.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    // get param keys for the api from netOptions
-    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
-    const parameters = pick(netOptions.parameters, paramKeys)
+    const parameters = pickValidParams(netOptions.parameters, ShopperOrders.paramKeys[methodName])
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
