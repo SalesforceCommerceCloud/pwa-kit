@@ -240,16 +240,6 @@ export const RemoteServerFactory = {
             ].join(' ')
         }
 
-        const loggerDetails = {
-            namespace: 'httprequest'
-            // TODO: Add additional morgan request props
-            // additionalProperties: {
-            //     method: req.method,
-            //     url: req.originalUrl,
-            //     statusCode: res.statusCode
-            // }
-        }
-
         // Morgan stream for logging status codes less than 400
         app.use(
             expressLogging(morganLoggerFormat, {
@@ -258,7 +248,9 @@ export const RemoteServerFactory = {
                 },
                 stream: {
                     write: (message) => {
-                        logger.info(message, loggerDetails)
+                        logger.info(message, {
+                            namespace: 'httprequest'
+                        })
                     }
                 }
             })
@@ -272,7 +264,9 @@ export const RemoteServerFactory = {
                 },
                 stream: {
                     write: (message) => {
-                        logger.error(message, loggerDetails)
+                        logger.error(message, {
+                            namespace: 'httprequest'
+                        })
                     }
                 }
             })

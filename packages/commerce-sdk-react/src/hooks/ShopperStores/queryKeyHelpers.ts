@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperStores} from 'commerce-sdk-isomorphic'
+import {ShopperStores} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {getCustomKeys, pick} from '../utils'
-import paramKeysMap from './paramKeys'
+import {pickValidParams} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperStores<{shortCode: string}>
@@ -46,15 +45,19 @@ export const searchStores: QueryKeyHelper<'searchStores'> = {
         '/store-search'
     ],
     queryKey: (params: Params<'searchStores'>) => {
-        const paramKeys = [...paramKeysMap['searchStores'], ...getCustomKeys(params)]
-        return [...searchStores.path(params), pick(params, paramKeys)]
+        return [
+            ...searchStores.path(params),
+            pickValidParams(params, ShopperStores.paramKeys.searchStores)
+        ]
     }
 }
 
 export const getStores: QueryKeyHelper<'getStores'> = {
     path: (params) => ['/commerce-sdk-react', '/organizations/', params.organizationId, '/stores'],
     queryKey: (params: Params<'getStores'>) => {
-        const paramKeys = [...paramKeysMap['getStores'], ...getCustomKeys(params)]
-        return [...getStores.path(params), pick(params, paramKeys)]
+        return [
+            ...getStores.path(params),
+            pickValidParams(params, ShopperStores.paramKeys.getStores)
+        ]
     }
 }
