@@ -18,7 +18,11 @@ import {
     Select,
     Checkbox
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {VisibilityIcon, VisibilityOffIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {
+    VisibilityIcon,
+    VisibilityOffIcon,
+    AlertIcon
+} from '@salesforce/retail-react-app/app/components/icons'
 import {useIntl} from 'react-intl'
 
 const Field = ({
@@ -133,7 +137,10 @@ const Field = ({
                         </InputGroup>
 
                         {error && type !== 'hidden' && (
-                            <FormErrorMessage color="red.600">{error.message}</FormErrorMessage>
+                            <FormErrorMessage color="red.600">
+                                <AlertIcon aria-hidden="true" mr={2} />
+                                {error.message}
+                            </FormErrorMessage>
                         )}
 
                         {helpText}
