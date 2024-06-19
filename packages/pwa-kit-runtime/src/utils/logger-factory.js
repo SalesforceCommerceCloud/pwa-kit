@@ -6,12 +6,12 @@
  */
 
 /**
- * The PWAKITLogger provides structured logging with different log levels.
+ * The PWAKitLogger provides structured logging with different log levels.
  * @private
  */
-export class PWAKITLogger {
+export class PWAKitLogger {
     /**
-     * Creates an instance of PWAKITLogger.
+     * Creates an instance of PWAKitLogger.
      * @param {Object} options - Configuration options for the logger.
      * @param {string} options.packageName - The name of the package where the logger is used.
      */
@@ -123,10 +123,10 @@ export class PWAKITLogger {
  *
  * @param {Object} config - Configuration object for the logger.
  * @param {string} config.packageName - The name of the package where the logger is used.
- * @returns {PWAKITLogger} - An instance of PWAKITLogger configured for the specified package.
+ * @returns {PWAKitLogger} - An instance of PWAKitLogger configured for the specified package.
  */
 const createLogger = (config = {}) => {
-    return new PWAKITLogger(config)
+    return new PWAKitLogger(config)
 }
 
 export default createLogger

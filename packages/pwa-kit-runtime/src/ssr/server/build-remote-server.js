@@ -43,7 +43,7 @@ import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
-import logger from '../../utils/logger'
+import logger from '../../utils/logger-instance'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
