@@ -88,7 +88,7 @@ const generateUserCredentials = function () {
   user.phone = "857" + generateRandomNumericString(7);
   user.email = (generateRandomString(12) + "@domain.com").toLowerCase();
   user.password = generateRandomString(15) + "Ab1!%&*$#@^+:;=?";
-  user.address = {}
+  user.address = {};
   user.address.street = generateRandomString(10);
   user.address.city = "Burlington";
   user.address.state = "MA";
@@ -97,7 +97,21 @@ const generateUserCredentials = function () {
   return user;
 };
 
+function violationFingerprints(accessibilityScanResults) {
+  const violationFingerprints = accessibilityScanResults.violations.map(
+    (violation) => ({
+      rule: violation.id,
+      // These are CSS selectors which uniquely identify each element with
+      // a violation of the rule in question.
+      targets: violation.nodes.map((node) => node.target),
+    })
+  );
+
+  return JSON.stringify(violationFingerprints, null, 2);
+}
+
 module.exports = {
+  violationFingerprints,
   isPrompt,
   mkdirIfNotExists,
   diffArrays,
