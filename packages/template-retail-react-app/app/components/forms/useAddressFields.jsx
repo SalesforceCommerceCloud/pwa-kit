@@ -56,6 +56,7 @@ export default function useAddressFields({
             label: formatMessage(messages.firstName),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'given-name',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your first name.',
@@ -70,6 +71,7 @@ export default function useAddressFields({
             label: formatMessage(messages.lastName),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'family-name',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your last name.',
@@ -84,6 +86,7 @@ export default function useAddressFields({
             label: formatMessage(messages.phone),
             defaultValue: '',
             type: 'tel',
+            autoComplete: 'tel',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your phone number.',
@@ -119,6 +122,7 @@ export default function useAddressFields({
             label: formatMessage(messages.address),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'address-line1',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your address.',
@@ -169,6 +173,7 @@ export default function useAddressFields({
             label: formatMessage(countryCode === 'CA' ? messages.postalCode : messages.zipCode),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'postal-code',
             rules: {
                 required:
                     countryCode === 'CA'
@@ -188,6 +193,7 @@ export default function useAddressFields({
             label: formatMessage(messages.preferred),
             defaultValue: false,
             type: 'checkbox',
+            autoComplete: 'honorific-prefix',
             rules: {},
             control
         }
