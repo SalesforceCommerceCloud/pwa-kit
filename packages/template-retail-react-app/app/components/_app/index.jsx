@@ -22,6 +22,7 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import * as queryKeyHelpers from '@salesforce/commerce-sdk-react/hooks/ShopperProducts/queryKeyHelpers'
+import logger from '@salesforce/retail-react-app/app/utils/logger'
 // Chakra
 import {
     Box,

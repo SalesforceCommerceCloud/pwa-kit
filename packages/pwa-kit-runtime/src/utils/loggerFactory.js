@@ -38,7 +38,7 @@ export class PWAKITLogger {
         }
 
         return `${finalNamespace} ${level.toUpperCase()} ${message}${
-            additionalProperties ? ` ${JSON.stringify(additionalProperties)}` : ''
+            additionalProperties ? `${JSON.stringify(additionalProperties)}` : ''
         }`
     }
 
