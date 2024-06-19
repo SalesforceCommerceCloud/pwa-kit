@@ -7,7 +7,7 @@
 import React, {useEffect} from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useQueryClient} from '@tanstack/react-query'
-import logger from '@salesforce/pwa-kit-react-sdk/utils/logger'
+import logger from '../../../../utils/logger'
 
 // For good UX, show loading spinner long enough for users to see
 const LOADING_SPINNER_MIN_DURATION = 500

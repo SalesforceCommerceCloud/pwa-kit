@@ -16,7 +16,7 @@ import {getRoutes, routeComponent} from '../universal/components/route-component
 import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
 import PropTypes from 'prop-types'
-import logger from '@salesforce/pwa-kit-react-sdk/utils/logger'
+import logger from '../../utils/logger'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
