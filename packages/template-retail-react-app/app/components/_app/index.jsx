@@ -29,7 +29,6 @@ import {
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
-import logger from '@salesforce/retail-react-app/app/utils/logger'
 
 // Contexts
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
@@ -153,19 +152,6 @@ const App = (props) => {
     const is404ForMissingTranslationFile = /\/static\/translations\/compiled\/[^.]+\.json$/.test(
         location?.pathname
     )
-
-    // TODO: Remove test logs before merging
-
-    const loggerDetails = {
-        namespace: 'App.render'
-    }
-
-    logger.log('log test message')
-    logger.debug('debug test message', loggerDetails)
-    logger.info('info test message', loggerDetails)
-    logger.warn('warn test message', loggerDetails)
-    logger.error('error test message', loggerDetails)
-    logger.debug('debug test message', loggerDetails)
 
     // Fetch the translation message data using the target locale.
     const {data: messages} = useQuery({
