@@ -33,7 +33,7 @@ import ProductView from '@salesforce/retail-react-app/app/components/product-vie
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
-import logger from '@salesforce/retail-react-app/app/utils/logger'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 // constant
 import {

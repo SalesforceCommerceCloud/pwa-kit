@@ -8,7 +8,7 @@
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
-import logger from '../../../utils/logger'
+import logger from '../../../utils/logger-instance'
 
 const CorrelationIdContext = React.createContext()
 const ServerContext = React.createContext()

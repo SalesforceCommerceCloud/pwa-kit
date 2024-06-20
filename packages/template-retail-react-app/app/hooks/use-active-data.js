@@ -6,7 +6,7 @@
  */
 /*global dw*/
 import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import logger from '@salesforce/retail-react-app/app/utils/logger'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 const useActiveData = () => {
     // Returns true when the feature flag is enabled and the tracking scripts have been executed

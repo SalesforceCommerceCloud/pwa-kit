@@ -9,7 +9,7 @@ import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from '../ssr-pr
 import {proxyConfigs} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging} from './utils'
-import logger from '../logger'
+import logger from '../logger-instance'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 

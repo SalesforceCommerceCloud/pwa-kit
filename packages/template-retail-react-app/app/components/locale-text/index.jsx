@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {defineMessages, useIntl} from 'react-intl'
-import logger from '@salesforce/retail-react-app/app/utils/logger'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 const LocaleText = ({shortCode}) => {
     const intl = useIntl()

@@ -13,7 +13,7 @@
 import crypto from 'crypto'
 import {PROXY_PATH_PREFIX} from '../../ssr/server/constants'
 import {proxyConfigs} from '../ssr-shared'
-import logger from '../logger'
+import logger from '../logger-instance'
 
 // TODO: Clean this up or provide a way to toggle
 export const verboseProxyLogging = false

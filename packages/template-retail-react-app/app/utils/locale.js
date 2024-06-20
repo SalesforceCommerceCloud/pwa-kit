@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import logger from '@salesforce/retail-react-app/app/utils/logger'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import fetch from 'cross-fetch'
 
 /**

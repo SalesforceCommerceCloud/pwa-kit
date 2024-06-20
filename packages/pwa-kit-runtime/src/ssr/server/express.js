@@ -22,7 +22,7 @@ import {
 import {CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import {RemoteServerFactory} from './build-remote-server'
-import logger from '../../utils/logger'
+import logger from '../../utils/logger-instance'
 
 export const RESOLVED_PROMISE = Promise.resolve()
 

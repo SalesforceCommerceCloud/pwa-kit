@@ -73,7 +73,7 @@ import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-dat
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
-import logger from '@salesforce/retail-react-app/app/utils/logger'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 // Constants
 import {

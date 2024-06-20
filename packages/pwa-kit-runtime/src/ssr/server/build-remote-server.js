@@ -282,7 +282,9 @@ export const RemoteServerFactory = {
             const correlationId = req.headers['x-correlation-id']
             const requestId = correlationId ? correlationId : req.headers['x-apigateway-event']
             if (!requestId) {
-                logger.error('Both x-correlation-id and x-apigateway-event headers are missing')
+                logger.error('Both x-correlation-id and x-apigateway-event headers are missing', {
+                    namespace: '_setRequestId'
+                })
                 next()
                 return
             }
@@ -691,15 +693,27 @@ export const RemoteServerFactory = {
                 onProxyRes: (proxyRes, req) => {
                     if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
                         logger.error(
-                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`
+                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`,
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {statusCode: proxyRes.statusCode}
+                            }
                         )
                         logger.error(
-                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`
+                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`,
+                            {namespace: '_setupSlasPrivateClientProxy'}
                         )
                         logger.error(
                             `SLAS Private Client Proxy Request URL - ${req.protocol}://${req.get(
                                 'host'
-                            )}${req.originalUrl}`
+                            )}${req.originalUrl}`,
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {
+                                    protocol: req.protocol,
+                                    originalUrl: req.originalUrl
+                                }
+                            }
                         )
                     }
                 }

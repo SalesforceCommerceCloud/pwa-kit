@@ -6,7 +6,7 @@
  */
 
 import theme from '@salesforce/retail-react-app/app/components/shared/theme'
-import logger from '@salesforce/retail-react-app/app/utils/logger'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 /**
  * @param {Object} breakpoints
