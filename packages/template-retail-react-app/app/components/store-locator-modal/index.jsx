@@ -32,6 +32,7 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
         countryCode: DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE
     })
+
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -40,7 +41,7 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
             postalCode: searchStoresParams.postalCode
         }
     })
-    var searchStoresData = useSearchStores({
+    var {data: searchStoresData, isLoading} = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.countryCode,
             postalCode: searchStoresParams.postalCode,
@@ -48,13 +49,7 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
             maxDistance: STORE_LOCATOR_DISTANCE
         }
     })
-
-    const storesInfo =
-        searchStoresData.data !== undefined
-            ? searchStoresData.data.data !== undefined
-                ? searchStoresData.data.data
-                : []
-            : undefined
+    const storesInfo = isLoading ? undefined : searchStoresData?.data || []
 
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
@@ -109,7 +104,6 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
                                 submitForm={submitForm}
                                 storesInfo={storesInfo}
                                 searchStoresParams={searchStoresParams}
-                                distanceLocate={STORE_LOCATOR_DISTANCE}
                             />
                         </ModalBody>
                     </ModalContent>

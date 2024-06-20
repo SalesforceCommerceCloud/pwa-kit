@@ -29,11 +29,11 @@ const StoreLocator = () => {
         mode: 'onChange',
         reValidateMode: 'onChange',
         defaultValues: {
-            countryCode: searchStoresParams?.countryCode,
-            postalCode: searchStoresParams?.postalCode
+            countryCode: searchStoresParams.countryCode,
+            postalCode: searchStoresParams.postalCode
         }
     })
-    var searchStoresData = useSearchStores({
+    var {data: searchStoresData, isLoading} = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.countryCode,
             postalCode: searchStoresParams.postalCode,
@@ -41,9 +41,8 @@ const StoreLocator = () => {
             maxDistance: STORE_LOCATOR_DISTANCE
         }
     })
-    var storesInfo = []
-    if (searchStoresData.data !== undefined && searchStoresData.data.data !== undefined)
-        storesInfo = searchStoresData.data.data
+
+    const storesInfo = isLoading ? undefined : searchStoresData?.data || []
 
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
