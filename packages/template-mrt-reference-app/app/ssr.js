@@ -218,18 +218,15 @@ const headerTest = async (req, res) => {
  * Logging middleware; logs request and response headers (and response status).
  */
 const loggingMiddleware = (req, res, next) => {
-    // Log request headers
-    console.log(`Request: ${req.method} ${req.originalUrl}`)
-    console.log(`Request headers: ${JSON.stringify(req.headers, null, 2)}`)
-    // Arrange to log response status and headers
-    res.on('finish', () => {
-        const statusCode = res._header ? String(res.statusCode) : String(-1)
-        console.log(`Response status: ${statusCode}`)
-        if (res.headersSent) {
-            const headers = JSON.stringify(res.getHeaders(), null, 2)
-            console.log(`Response headers: ${headers}`)
-        }
-    })
+    const generateLongString = (char, length) => {
+        return char.repeat(length)
+    }
+
+    let length = 50000
+    console.warn(`console string log that is >${length} characters: ${generateLongString('A', length)}`)
+    console.warn({"data": `console JSON log that is >${length} characters: ${generateLongString('B', length)}`})
+    logger.log('info', `Winston log that is >${length} characters: ${generateLongString('C', length)}`)
+    process.stdout.write(`process.stdout.write log that is >${length} characters: ${generateLongString('D', length)}`)
 
     return next()
 }
