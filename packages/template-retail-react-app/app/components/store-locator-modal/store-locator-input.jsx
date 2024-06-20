@@ -24,9 +24,8 @@ const StoreLocatorInput = ({form, submitForm, searchStoresParams}) => {
 
     return (
         <form
-            id="login-form"
+            id="store-locator-form"
             onSubmit={form.handleSubmit(submitForm)}
-            data-testid="sf-auth-modal-form"
         >
             <InputGroup>
                 <Controller
