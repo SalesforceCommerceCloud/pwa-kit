@@ -83,6 +83,16 @@ const ProductDetail = () => {
         {
             parameters: {
                 id: urlParams.get('pid') || productId,
+                perPricebook: true,
+                expand: [
+                    'availability',
+                    'promotions',
+                    'options',
+                    'images',
+                    'prices',
+                    'variations',
+                    'set_products'
+                ],
                 allImages: true
             }
         },
