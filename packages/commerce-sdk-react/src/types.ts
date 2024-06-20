@@ -6,34 +6,7 @@
  */
 
 /**
- * A logger interface for logging messages at various levels.
+ * Represents a logger with methods for logging messages at various levels.
+ * This type mirrors the methods available on the `console` object.
  */
-export interface Logger {
-    /**
-     * Log a debug message.
-     * @param message - The message to log.
-     * @param optionalParams - Optional parameters to log with the message.
-     */
-    debug(message: string, optionalParams?: Record<string, unknown>): void
-
-    /**
-     * Log an informational message.
-     * @param message - The message to log.
-     * @param optionalParams - Optional parameters to log with the message.
-     */
-    info(message: string, optionalParams?: Record<string, unknown>): void
-
-    /**
-     * Log a warning message.
-     * @param message - The message to log.
-     * @param optionalParams - Optional parameters to log with the message.
-     */
-    warn(message: string, optionalParams?: Record<string, unknown>): void
-
-    /**
-     * Log an error message.
-     * @param message - The message to log.
-     * @param optionalParams - Optional parameters to log with the message.
-     */
-    error(message: string, optionalParams?: Record<string, unknown>): void
-}
+export type Logger = typeof console
