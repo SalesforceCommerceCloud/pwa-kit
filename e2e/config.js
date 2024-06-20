@@ -6,11 +6,9 @@
  */
 
 module.exports = {
-  // TODO: Change back to https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com
-  // when retail-react-app v3 is officially released
   RETAIL_APP_HOME:
     process.env.RETAIL_APP_HOME ||
-    "https://scaffold-pwa-test-env-2.mobify-storefront.com",
+    "https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com",
   GENERATED_PROJECTS_DIR: "../generated-projects",
   GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
   GENERATOR_CMD:
