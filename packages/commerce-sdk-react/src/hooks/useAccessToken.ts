@@ -27,6 +27,12 @@ interface AccessToken {
  */
 const useAccessToken = (): AccessToken => {
     const config = useConfig()
+
+    // TODO: Remove test logger before merging
+    if (config.logger) {
+        config.logger.info('config.logger.info test commerce-sdk-react message')
+    }
+
     const auth = useAuthContext()
 
     const token = onClient

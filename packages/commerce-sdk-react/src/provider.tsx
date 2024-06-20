@@ -22,6 +22,7 @@ import {
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
+import {Logger} from './types'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -36,6 +37,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
+    logger?: Logger
 }
 
 /**
@@ -75,6 +77,7 @@ export const AuthContext = React.createContext({} as Auth)
                     locale="en-US"
                     enablePWAKitPrivateClient={true}
                     currency="USD"
+                    logger={logger}
                 >
                     {children}
                 </CommerceApiProvider>
@@ -111,8 +114,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         OCAPISessionsURL,
         enablePWAKitPrivateClient,
         clientSecret,
-        silenceWarnings
+        silenceWarnings,
+        logger
     } = props
+
     const config = {
         proxy,
         headers,
@@ -127,6 +132,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
         fetchOptions
     }
+
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -167,7 +173,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             OCAPISessionsURL,
             enablePWAKitPrivateClient,
             clientSecret,
-            silenceWarnings
+            silenceWarnings,
+            logger
         })
     }, [
         clientId,
@@ -181,7 +188,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         OCAPISessionsURL,
         enablePWAKitPrivateClient,
         clientSecret,
-        silenceWarnings
+        silenceWarnings,
+        logger
     ])
 
     // Initialize the session
@@ -200,7 +208,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 shortCode,
                 locale,
                 currency,
-                silenceWarnings
+                silenceWarnings,
+                logger
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>
