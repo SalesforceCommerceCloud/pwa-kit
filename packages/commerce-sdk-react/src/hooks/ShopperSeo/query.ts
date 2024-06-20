@@ -5,12 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryResult} from '@tanstack/react-query'
+import {ShopperSeo} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {getCustomKeys, mergeOptions, omitNullableParameters, pick} from '../utils'
+import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-import paramKeysMap from './paramKeys'
 
 type Client = ApiClients['shopperSeo']
 
@@ -36,13 +36,12 @@ export const useUrlMapping = (
     type Data = DataType<Client['getUrlMapping']>
     const {shopperSeo: client} = useCommerceApi()
     const methodName = 'getUrlMapping'
-    const requiredParameters = ['organizationId', 'siteId'] as const
+    const requiredParameters = ShopperSeo.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
-    const parameters = pick(netOptions.parameters, paramKeys)
+    const parameters = pickValidParams(netOptions.parameters, ShopperSeo.paramKeys[methodName])
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)

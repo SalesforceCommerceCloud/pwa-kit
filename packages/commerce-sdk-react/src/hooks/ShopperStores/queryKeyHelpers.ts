@@ -4,28 +4,27 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperPromotions} from 'commerce-sdk-isomorphic'
+import {ShopperStores} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
 import {pickValidParams} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
-type Client = ShopperPromotions<{shortCode: string}>
+type Client = ShopperStores<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
-    getPromotions: [
+    searchStores: [
         '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
-        '/promotions',
-        Params<'getPromotions'>
+        '/store-search',
+        Params<'searchStores'>
     ]
-    getPromotionsForCampaign: [
+    getStores: [
         '/commerce-sdk-react',
         '/organizations/',
         string | undefined,
-        '/promotions/campaigns/',
-        string | undefined,
-        Params<'getPromotionsForCampaign'>
+        '/stores',
+        Params<'getStores'>
     ]
 }
 
@@ -38,33 +37,27 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
     queryKey: (params: Params<T>) => QueryKeys[T]
 }
 
-export const getPromotions: QueryKeyHelper<'getPromotions'> = {
+export const searchStores: QueryKeyHelper<'searchStores'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
         params.organizationId,
-        '/promotions'
+        '/store-search'
     ],
-    queryKey: (params: Params<'getPromotions'>) => {
+    queryKey: (params: Params<'searchStores'>) => {
         return [
-            ...getPromotions.path(params),
-            pickValidParams(params, ShopperPromotions.paramKeys.getPromotions)
+            ...searchStores.path(params),
+            pickValidParams(params, ShopperStores.paramKeys.searchStores)
         ]
     }
 }
 
-export const getPromotionsForCampaign: QueryKeyHelper<'getPromotionsForCampaign'> = {
-    path: (params) => [
-        '/commerce-sdk-react',
-        '/organizations/',
-        params.organizationId,
-        '/promotions/campaigns/',
-        params.campaignId
-    ],
-    queryKey: (params: Params<'getPromotionsForCampaign'>) => {
+export const getStores: QueryKeyHelper<'getStores'> = {
+    path: (params) => ['/commerce-sdk-react', '/organizations/', params.organizationId, '/stores'],
+    queryKey: (params: Params<'getStores'>) => {
         return [
-            ...getPromotionsForCampaign.path(params),
-            pickValidParams(params, ShopperPromotions.paramKeys.getPromotionsForCampaign)
+            ...getStores.path(params),
+            pickValidParams(params, ShopperStores.paramKeys.getStores)
         ]
     }
 }
