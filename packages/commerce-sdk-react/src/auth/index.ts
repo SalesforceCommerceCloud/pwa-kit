@@ -22,7 +22,6 @@ import {
     SLAS_SECRET_OVERRIDE_MSG
 } from '../constant'
 
-import useConfig from '../hooks/useConfig'
 import {Logger} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
@@ -36,7 +35,7 @@ interface AuthConfig extends ApiClientConfigParams {
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
-    logger?: Logger
+    logger: Logger
 }
 
 interface JWTHeaders {
@@ -224,10 +223,7 @@ class Auth {
 
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
-        this.logger = config.logger || console
-
-        //TODO: Remove test logger before merging
-        this.logger.warn('>>>>>>>>>> logWarning auth')
+        this.logger = config.logger
 
         /*
          * There are 2 ways to enable SLAS private client mode.

@@ -118,6 +118,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         logger
     } = props
 
+    // Set the logger based on provided configuration, or default to the console object if no logger is provided
+    const configLogger = logger || console
+
     const config = {
         proxy,
         headers,
@@ -174,7 +177,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             enablePWAKitPrivateClient,
             clientSecret,
             silenceWarnings,
-            logger
+            logger: configLogger
         })
     }, [
         clientId,
@@ -189,7 +192,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         enablePWAKitPrivateClient,
         clientSecret,
         silenceWarnings,
-        logger
+        configLogger
     ])
 
     // Initialize the session
@@ -209,7 +212,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 locale,
                 currency,
                 silenceWarnings,
-                logger
+                logger: configLogger
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>
