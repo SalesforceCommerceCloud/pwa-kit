@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Box, VisuallyHidden} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, VisuallyHidden} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl} from 'react-intl'
 import msg from '@salesforce/retail-react-app/app/components/display-price/messages'
 /**
@@ -28,7 +28,7 @@ const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ..
     })
 
     return (
-        <Box>
+        <>
             {isRange ? (
                 <Text
                     as={as}
@@ -59,7 +59,7 @@ const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ..
                     listPrice: listPriceText || ''
                 })}
             </VisuallyHidden>
-        </Box>
+        </>
     )
 }
 
