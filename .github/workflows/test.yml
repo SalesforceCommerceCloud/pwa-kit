@@ -246,11 +246,11 @@ jobs:
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
-        if: env.IS_NOT_FORK == 'true' && env.DEVELOP == 'true' && matrix.template == 'retail-react-app-test-project'
+        if: env.IS_NOT_FORK == 'true' && env.DEVELOP == 'true' && matrix.template == 'express-minimal-test-project'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: ${{ env.PROJECT_DIR }}
-          TARGET: generated-pwa
+          TARGET: production
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack
