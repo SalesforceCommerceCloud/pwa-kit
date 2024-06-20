@@ -1,13 +1,3 @@
-:loudspeaker: Hey there, Salesforce Commerce Cloud community!
-
-We’re excited to hear your thoughts on your developer experience with PWA Kit and the Composable Storefront generally! Your feedback is incredibly valuable in helping us guide our roadmap and improve our offering.
-
-:clipboard: Take our quick survey here: [Survey](https://forms.gle/bUZNxQ3QKUcrjhV18) 
-
-Feel free to share this survey link with your colleagues, partners, or anyone who has experience with PWA Kit. Your input will help us shape the future of our development tools.
-
-Thank you for being a part of our community and for your continuous support! :raised_hands:
-
 <div align="center">
 
 <h1>The Progressive Web App (PWA) Kit</h1>

@@ -31,7 +31,7 @@ import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
 import URL from 'url'
-import {Headers, X_HEADERS_TO_REMOVE, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
+import {Headers, X_HEADERS_TO_REMOVE_ORIGIN, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import assert from 'assert'
 import semver from 'semver'
 import pkg from '../../../package.json'
@@ -249,20 +249,18 @@ export const RemoteServerFactory = {
     },
 
     /**
-     * Passing the requestId from apiGateway event to locals
+     * Passing the correlation Id from MRT to locals
      * @private
      */
     _setRequestId(app) {
         app.use((req, res, next) => {
-            if (!req.headers['x-apigateway-event']) {
-                console.error('Missing x-apigateway-event')
+            const correlationId = req.headers['x-correlation-id']
+            const requestId = correlationId ? correlationId : req.headers['x-apigateway-event']
+            if (!requestId) {
+                console.error('Both x-correlation-id and x-apigateway-event headers are missing')
                 next()
                 return
             }
-            const apiGatewayEvent = JSON.parse(
-                decodeURIComponent(req.headers['x-apigateway-event'])
-            )
-            const {requestId} = apiGatewayEvent.requestContext
             res.locals.requestId = requestId
             next()
         })
@@ -436,20 +434,6 @@ export const RemoteServerFactory = {
                 return
             }
 
-            // If the request has an X-Amz-Cf-Id header, log it now
-            // to make it easier to associated CloudFront requests
-            // with Lambda log entries. Generally we avoid logging
-            // because it increases the volume of log data, but this
-            // is important for log analysis.
-            const cloudfrontId = req.headers['x-amz-cf-id']
-            if (cloudfrontId) {
-                // Log the Express app request id plus the cloudfront
-                // x-edge-request-id value. The resulting line in the logs
-                // will automatically include the lambda RequestId, so
-                // one line links all ids.
-                console.log(`Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
-            }
-
             // Apply the request processor
             // `this` is bound to the calling context, usually RemoteServerFactory
             const requestProcessor = this._getRequestProcessor(req)
@@ -599,7 +583,7 @@ export const RemoteServerFactory = {
             // do that now so that the rest of the code don't have to deal
             // with these headers, which can be large and may be accidentally
             // forwarded to other servers.
-            X_HEADERS_TO_REMOVE.forEach((key) => {
+            X_HEADERS_TO_REMOVE_ORIGIN.forEach((key) => {
                 delete req.headers[key]
             })
 
@@ -981,7 +965,7 @@ export const RemoteServerFactory = {
                             ._waitForResponses()
                             .then(() => app.metrics.flush())
                             // Now call the Lambda callback to complete the response
-                            .then(() => callback(err, processLambdaResponse(response)))
+                            .then(() => callback(err, processLambdaResponse(response, event)))
                         // DON'T add any then() handlers here, after the callback.
                         // They won't be called after the response is sent, but they
                         // *might* be called if the Lambda container running this code

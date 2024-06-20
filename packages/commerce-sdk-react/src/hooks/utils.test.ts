@@ -6,7 +6,7 @@
  */
 
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
-import {mergeOptions, getCustomKeys} from './utils'
+import {mergeOptions, getCustomKeys, pickValidParams} from './utils'
 
 describe('Hook utils', () => {
     test('mergeOptions merges body, header, and options', () => {
@@ -44,6 +44,25 @@ describe('Hook utils', () => {
                 optionsHeader: 'optionsHeader'
             }
         })
+    })
+
+    test('pickValidParams', () => {
+        const parameters = {
+            basketId: '',
+            organizationId: '',
+            siteId: '',
+            locale: '',
+            hello: 1,
+            c_foo: 2
+        }
+        const paramKeys = ['organizationId', 'basketId', 'siteId', 'locale'] as const
+        const result = pickValidParams(parameters, paramKeys)
+
+        // @ts-expect-error: testing invalid property
+        expect(result.hello).toBeUndefined()
+
+        expect(result.basketId).toBeDefined()
+        expect(result.c_foo).toBeDefined()
     })
 })
 

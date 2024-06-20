@@ -10,7 +10,7 @@ import Helmet from 'react-helmet'
 
 import {DEFAULT_SITE_TITLE} from '@salesforce/retail-react-app/app/constants'
 
-const Seo = ({title, description, noIndex, children, ...props}) => {
+const Seo = ({title, description, noIndex, keywords, children, ...props}) => {
     const fullTitle = title ? `${title} | ${DEFAULT_SITE_TITLE}` : DEFAULT_SITE_TITLE
 
     return (
@@ -18,6 +18,7 @@ const Seo = ({title, description, noIndex, children, ...props}) => {
             <title>{fullTitle}</title>
             {description && <meta name="description" content={description} />}
             {noIndex && <meta name="robots" content="noindex" />}
+            {keywords && <meta name="keywords" content={keywords} />}
             {children}
         </Helmet>
     )
@@ -27,7 +28,8 @@ Seo.propTypes = {
     title: PropTypes.string,
     description: PropTypes.string,
     noIndex: PropTypes.bool,
-    children: PropTypes.node
+    children: PropTypes.node,
+    keywords: PropTypes.string
 }
 
 export default Seo

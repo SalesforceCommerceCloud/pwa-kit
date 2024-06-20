@@ -576,7 +576,7 @@ describe('rewriteProxyRequestHeaders tests', () => {
             }
         },
         {
-            name: 'strip out x-headers',
+            name: 'strip out x-mobify-access-key keep apig headers',
             targetHost: 'www.customer.com',
             input: {
                 'accept-encoding': 'deflate, gzip',
@@ -584,15 +584,17 @@ describe('rewriteProxyRequestHeaders tests', () => {
                 'x-api-key': '1234567890',
                 'x-mobify-access-key': 'abcdefghijk',
                 'x-apigateway-event': '{}',
-                'x-apigateway-context': '{}'
+                'x-apigateway-context': '{}',
+                'x-sfdc-access-control': '123456789'
             },
             expected: {
                 'accept-encoding': 'deflate, gzip',
                 cookie: 'abc=123',
-                'x-api-key': undefined,
+                'x-api-key': '1234567890',
                 'x-mobify-access-key': undefined,
-                'x-apigateway-event': undefined,
-                'x-apigateway-context': undefined
+                'x-apigateway-event': '{}',
+                'x-apigateway-context': '{}',
+                'x-sfdc-access-control': undefined
             }
         },
         {
