@@ -19,7 +19,10 @@ const CACHING_PATH_BASE = `${MOBIFY_PATH}/caching`
 const HEALTHCHECK_PATH = `${MOBIFY_PATH}/ping`
 const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
-const getNamespace = () => {
+/**
+ * @private
+ */
+const _getNamespace = () => {
     // TODO - namespaces for /mobify path will be implemented at a later date.
     // Returns an empty string for now.
     // Below is an example of what this implementation might look like.
@@ -31,33 +34,10 @@ const getNamespace = () => {
     return ''
 }
 
-export const startsWithMobify = (url) => {
-    const namespace = getNamespace()
-    const mobifyPath = `${namespace}${MOBIFY_PATH}`
-    return url.startsWith(mobifyPath)
-}
+export const ssrNamespace = _getNamespace()
 
-export const getProxyPathBase = () => {
-    const namespace = getNamespace()
-    return `${namespace}${PROXY_PATH_BASE}`
-}
-
-export const getBundlePathBase = () => {
-    const namespace = getNamespace()
-    return `${namespace}${BUNDLE_PATH_BASE}`
-}
-
-export const getCachingPathBase = () => {
-    const namespace = getNamespace()
-    return `${namespace}${CACHING_PATH_BASE}`
-}
-
-export const getHealthCheckPath = () => {
-    const namespace = getNamespace()
-    return `${namespace}${HEALTHCHECK_PATH}`
-}
-
-export const getSLASPrivateProxyPath = () => {
-    const namespace = getNamespace()
-    return `${namespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
-}
+export const proxyBasePath = `${ssrNamespace}${PROXY_PATH_BASE}`
+export const bundleBasePath = `${ssrNamespace}${BUNDLE_PATH_BASE}`
+export const cachingBasePath = `${ssrNamespace}${CACHING_PATH_BASE}`
+export const healthCheckPath = `${ssrNamespace}${HEALTHCHECK_PATH}`
+export const slasPrivateProxyPath = `${ssrNamespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`

@@ -18,7 +18,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -56,9 +56,7 @@ const AppConfig = ({children, locals = {}}) => {
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
-            OCAPISessionsURL={`${appOrigin}${getProxyPathBase()}/ocapi/s/${
-                locals.site?.id
-            }/dw/shop/v22_8/sessions`}
+            OCAPISessionsURL={`${appOrigin}${proxyBasePath}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
             {{#if answers.project.commerce.isSlasPrivate}}
             // Set 'enablePWAKitPrivateClient' to true use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.

@@ -40,10 +40,10 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {
-    startsWithMobify,
-    getProxyPathBase,
-    getHealthCheckPath,
-    getSLASPrivateProxyPath
+    proxyBasePath,
+    bundleBasePath,
+    healthCheckPath,
+    slasPrivateProxyPath
 } from '../../utils/ssr-namespace-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
@@ -208,6 +208,13 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _strictSSL(options) {
         return true
+    },
+
+    /**
+     * @private
+     */
+    _isBundleOrProxyPath(url) {
+        return url.startsWith(proxyBasePath) || url.startsWith(bundleBasePath)
     },
 
     /**
@@ -435,7 +442,7 @@ export const RemoteServerFactory = {
         const processIncomingRequest = (req, res) => {
             const options = req.app.options
             // If the request is for a proxy or bundle path, do nothing
-            if (startsWithMobify(req.originalUrl)) {
+            if (this._isBundleOrProxyPath(req.originalUrl)) {
                 return
             }
 
@@ -558,7 +565,7 @@ export const RemoteServerFactory = {
                     // different types of the 'req' object, and will
                     // always contain the original full path.
                     /* istanbul ignore else */
-                    if (!startsWithMobify(req.originalUrl)) {
+                    if (!this._isBundleOrProxyPath(req.originalUrl)) {
                         req.app.sendMetric(
                             'RequestTime',
                             Date.now() - locals.requestStart,
@@ -604,7 +611,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all(`${getProxyPathBase()}/*`, (_, res) => {
+        app.all(`${proxyBasePath}/*`, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
@@ -632,7 +639,7 @@ export const RemoteServerFactory = {
             return
         }
 
-        const slasPrivateClientProxyPath = getSLASPrivateProxyPath()
+        const slasPrivateClientProxyPath = slasPrivateProxyPath
 
         localDevLog(`Proxying ${slasPrivateClientProxyPath} to ${options.slasTarget}`)
 
@@ -694,7 +701,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupHealthcheck(app) {
-        app.get(`${getHealthCheckPath()}`, (_, res) =>
+        app.get(`${healthCheckPath}`, (_, res) =>
             res.set('cache-control', NO_CACHE).sendStatus(200).end()
         )
     },

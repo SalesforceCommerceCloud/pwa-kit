@@ -6,7 +6,7 @@
  */
 /*global dw*/
 import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getProxyPathBase} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 const useActiveData = () => {
     // Returns true when the feature flag is enabled and the tracking scripts have been executed
@@ -69,7 +69,7 @@ const useActiveData = () => {
             if (!canTrack()) return
             try {
                 var activeDataUrl =
-                    `${getProxyPathBase()}/ocapi/on/demandware.store/Sites-` +
+                    `${proxyBasePath}/ocapi/on/demandware.store/Sites-` +
                     siteId +
                     '-Site/' +
                     localeId +

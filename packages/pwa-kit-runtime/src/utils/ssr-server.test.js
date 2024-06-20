@@ -46,7 +46,7 @@ import {
     APPLICATION_OCTET_STREAM
 } from '../ssr/server/constants'
 
-import {getProxyPathBase} from './ssr-namespace-paths'
+import {proxyBasePath} from './ssr-namespace-paths'
 
 const baseMobify = {
     ssrEnabled: true,
@@ -118,11 +118,11 @@ describe('utils/ssr-server tests', () => {
 
         updatePackageMobify(baseMobify)
 
-        expect(getFullRequestURL(`${getProxyPathBase()}/base/somepath`)).toBe(
+        expect(getFullRequestURL(`${proxyBasePath}/base/somepath`)).toBe(
             'https://www.merlinspotions.com/somepath'
         )
 
-        expect(getFullRequestURL(`${getProxyPathBase()}/base2/somepath`)).toBe(
+        expect(getFullRequestURL(`${proxyBasePath}/base2/somepath`)).toBe(
             'https://api.merlinspotions.com/somepath'
         )
     })
