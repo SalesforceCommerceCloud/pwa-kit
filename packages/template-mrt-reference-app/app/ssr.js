@@ -225,7 +225,7 @@ const loggingMiddleware = (req, res, next) => {
     let length = 50000
     console.warn(`console string log that is >${length} characters: ${generateLongString('A', length)}`)
     console.warn({"data": `console JSON log that is >${length} characters: ${generateLongString('B', length)}`})
-    logger.log('info', `Winston log that is >${length} characters: ${generateLongString('C', length)}`)
+    logger.log('warn', `Winston log that is >${length} characters: ${generateLongString('C', length)}`)
     process.stdout.write(`process.stdout.write log that is >${length} characters: ${generateLongString('D', length)}`)
 
     return next()
