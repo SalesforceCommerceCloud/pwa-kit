@@ -89,10 +89,6 @@ module.exports = {
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],
-    logger: {
-        logLevel: 'info',
-        format: 'JSON'
-    },
     // Page not found url for your app
     pageNotFoundURL: '/page-not-found',
     // Enables or disables building the files necessary for server-side rendering.
