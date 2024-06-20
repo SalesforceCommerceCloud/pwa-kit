@@ -33,6 +33,7 @@ interface AuthConfig extends ApiClientConfigParams {
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
+    headers?: Record<string, string>
 }
 
 interface JWTHeaders {
@@ -179,6 +180,7 @@ class Auth {
         const privateClientEndpoint = `${baseUrl}/mobify/slas/private`
 
         this.client = new ShopperLogin({
+            headers: config.headers,
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
             parameters: {
                 clientId: config.clientId,
@@ -190,6 +192,7 @@ class Auth {
             fetchOptions: config.fetchOptions
         })
         this.shopperCustomersClient = new ShopperCustomers({
+            headers: config.headers,
             proxy: config.proxy,
             parameters: {
                 clientId: config.clientId,

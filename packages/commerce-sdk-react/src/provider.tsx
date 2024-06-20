@@ -167,7 +167,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             OCAPISessionsURL,
             enablePWAKitPrivateClient,
             clientSecret,
-            silenceWarnings
+            silenceWarnings,
+            headers
         })
     }, [
         clientId,
@@ -181,7 +182,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         OCAPISessionsURL,
         enablePWAKitPrivateClient,
         clientSecret,
-        silenceWarnings
+        silenceWarnings,
+        headers
     ])
 
     // Initialize the session
