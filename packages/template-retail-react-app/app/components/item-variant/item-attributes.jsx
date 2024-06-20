@@ -182,7 +182,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                             id="item_attributes.label.promotions"
                         />
                         {': '}
-                        <Text as="span" color="green.500">
+                        <Text as="span" color="green.700">
                             <FormattedNumber
                                 style="currency"
                                 currency={currency || basket?.currency || activeCurrency}

@@ -1,5 +1,37 @@
-## v1.1.0-dev (Sep 26, 2023)
+## v2.0.0-dev (May 21, 2024)
+- Upgrade to commerce-sdk-isomorphic v2.0.0 [#1794](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1794)
+- Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
+- Add Shopper Stores hooks [#1788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1788)
+
+## v1.4.2 (Apr 17, 2024)
+- Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
+
+## v1.4.1 (Apr 16, 2024)
+- Add missing params keys `allVariationProperties` and `perPricebook`  for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
+
+## v1.4.0 (Apr 15, 2024)
+
+- Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
+- Fix invalid query params warnings and allow custom query [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
+- Fix cannot read properties of undefined (reading 'unshift') [#1689](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1689)
+- Add Shopper SEO hook [#1688](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1688)
+- Update useLocalStorage implementation to be more responsive [#1703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1703)
+- Storefront Preview: avoid stale cached Commerce API responses, whenever the Shopper Context is set [#1701](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1701)
+
+## v1.3.0 (Jan 19, 2024)
+
+- Add support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+
+## v1.2.0 (Dec 08, 2023)
+
+- Add StorefrontPreview component 'onContextChange' property to prepare for future Storefront Preview release [#1527](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1527)
+- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
+
+## v1.1.0 (Nov 03, 2023)
+
+- Add StorefrontPreview component [#1508](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1508)
 - Using `login` for authentication instead of `email` in registration process [#1464](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1464)
+- Fix bug to remove cookies using the default attributes used when setting cookie [#1505](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1505)
 
 ## v1.0.2 (Sep 21, 2023)
 

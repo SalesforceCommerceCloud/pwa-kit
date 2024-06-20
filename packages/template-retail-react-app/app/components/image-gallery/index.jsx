@@ -127,24 +127,28 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                     return (
                         <ListItem
                             {...styles.thumbnailImageItem}
-                            tabIndex={0}
                             key={index}
-                            data-testid="image-gallery-thumbnails"
-                            onKeyDown={(e) => {
-                                if (e.keyCode === EnterKeyNumber) {
-                                    return setSelectedIndex(index)
-                                }
-                            }}
-                            onClick={() => setSelectedIndex(index)}
                             borderColor={`${selected ? 'black' : ''}`}
                             borderWidth={`${selected ? '1px' : 0}`}
                         >
                             <AspectRatio ratio={1}>
-                                <Img
-                                    alt={image.alt}
-                                    src={image.disBaseLink || image.link}
-                                    loading={loadingStrategy}
-                                />
+                                <Box
+                                    as="button"
+                                    aria-pressed={selected ? 'true' : 'false'}
+                                    onKeyDown={(e) => {
+                                        if (e.keyCode === EnterKeyNumber) {
+                                            return setSelectedIndex(index)
+                                        }
+                                    }}
+                                    onClick={() => setSelectedIndex(index)}
+                                    data-testid="image-gallery-thumbnails"
+                                >
+                                    <Img
+                                        alt={image.alt}
+                                        src={image.disBaseLink || image.link}
+                                        loading={loadingStrategy}
+                                    />
+                                </Box>
                             </AspectRatio>
                         </ListItem>
                     )

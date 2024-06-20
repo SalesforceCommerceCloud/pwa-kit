@@ -11,7 +11,7 @@ const statAsync = promisify(fs.stat);
 const mkdirAsync = promisify(fs.mkdir);
 
 const isPrompt = (streamData, expectedText) => {
-  if (!streamData || !expectedText) return;
+  if (!streamData || !expectedText) return false;
 
   if (types.isRegExp(expectedText)) {
     return streamData.match(expectedText);
@@ -58,7 +58,7 @@ const generateRandomString = function (length) {
  * @param {number} length Length of generated string required.
  * @returns Randomly generated numeric string.
  */
-const generateRandomPhoneNumber = function (length) {
+const generateRandomNumericString = function (length) {
   // US Phone numbers must have the format NXX NXX-XXXX
   // where N cannot be 0 or 1.
   // The area code cannot have 9 in the 2nd digit
@@ -85,9 +85,14 @@ const generateUserCredentials = function () {
   const user = {};
   user.firstName = generateRandomString(8);
   user.lastName = generateRandomString(8);
-  user.phone = "857" + generateRandomPhoneNumber(7);
+  user.phone = "857" + generateRandomNumericString(7);
   user.email = (generateRandomString(12) + "@domain.com").toLowerCase();
   user.password = generateRandomString(15) + "Ab1!%&*$#@^+:;=?";
+  user.address = {}
+  user.address.street = generateRandomString(10);
+  user.address.city = "Burlington";
+  user.address.state = "MA";
+  user.address.zipcode = "02" + generateRandomNumericString(3);
 
   return user;
 };

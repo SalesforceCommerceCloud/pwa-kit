@@ -1,6 +1,6 @@
 {
   "name": "typescript-minimal",
-  "version": "3.2.0-dev",
+  "version": "3.6.0-dev",
   "private": true,
   "scripts": {
     "build": "pwa-kit-dev build",
@@ -18,13 +18,13 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "3.2.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.2.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.2.0-dev",
+    "@salesforce/pwa-kit-dev": "3.6.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "3.6.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.6.0-dev",
     "@tanstack/react-query": "^4.28.0",
-    "@types/loadable__component": "^5.13.4",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.1",
+    "@types/loadable__component": "~5.13.4",
+    "@types/react": "~18.2.0",
+    "@types/react-dom": "~18.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
@@ -32,8 +32,8 @@
     "typescript": "4.9.5"
   },
   "engines": {
-    "node": "^16.11.0 || ^18.0.0",
-    "npm": "^8.0.0 || ^9.0.0"
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
     "ssrEnabled": true,

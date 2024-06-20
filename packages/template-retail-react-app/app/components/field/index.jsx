@@ -18,7 +18,12 @@ import {
     Select,
     Checkbox
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {VisibilityIcon, VisibilityOffIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {
+    VisibilityIcon,
+    VisibilityOffIcon,
+    AlertIcon
+} from '@salesforce/retail-react-app/app/components/icons'
+import {useIntl} from 'react-intl'
 
 const Field = ({
     name,
@@ -31,12 +36,23 @@ const Field = ({
     placeholder,
     inputProps,
     control,
+    autoComplete,
     defaultValue,
     helpText,
     children
 }) => {
+    const intl = useIntl()
     const [hidePassword, setHidePassword] = useState(true)
     const PasswordIcon = hidePassword ? VisibilityIcon : VisibilityOffIcon
+    const passwordIconLabel = hidePassword
+        ? intl.formatMessage({
+              id: 'field.password.assistive_msg.show_password',
+              defaultMessage: 'Show password'
+          })
+        : intl.formatMessage({
+              id: 'field.password.assistive_msg.hide_password',
+              defaultMessage: 'Hide password'
+          })
     const inputType =
         type === 'password' && hidePassword ? 'password' : type === 'password' ? 'text' : type
     return (
@@ -51,8 +67,7 @@ const Field = ({
 
                 return (
                     <FormControl id={name} isInvalid={error}>
-                        {!['checkbox', 'radio'].includes(type) &&
-                            type !== 'hidden' &&
+                        {!['checkbox', 'radio', 'hidden'].includes(type) &&
                             (formLabel || <FormLabel>{label}</FormLabel>)}
 
                         <InputGroup>
@@ -65,6 +80,7 @@ const Field = ({
                                     value={value}
                                     type={inputType}
                                     placeholder={placeholder}
+                                    autoComplete={autoComplete}
                                     {..._inputProps}
                                 />
                             )}
@@ -83,7 +99,7 @@ const Field = ({
                                 <InputRightElement>
                                     <IconButton
                                         variant="ghosted"
-                                        aria-label="Show password"
+                                        aria-label={passwordIconLabel}
                                         icon={<PasswordIcon color="gray.500" boxSize={6} />}
                                         onClick={() => setHidePassword(!hidePassword)}
                                     />
@@ -120,8 +136,11 @@ const Field = ({
                             {children}
                         </InputGroup>
 
-                        {error && !type !== 'hidden' && (
-                            <FormErrorMessage>{error.message}</FormErrorMessage>
+                        {error && type !== 'hidden' && (
+                            <FormErrorMessage color="red.600">
+                                <AlertIcon aria-hidden="true" mr={2} />
+                                {error.message}
+                            </FormErrorMessage>
                         )}
 
                         {helpText}
@@ -135,6 +154,7 @@ const Field = ({
 Field.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
+    autoComplete: PropTypes.string,
     formLabel: PropTypes.any,
     type: PropTypes.oneOf([
         'text',

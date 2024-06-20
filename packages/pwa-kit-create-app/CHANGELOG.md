@@ -1,4 +1,19 @@
-## v3.2.0-dev (Sep 26, 2023)
+## v3.6.0-dev (Apr 17, 2024)
+## v3.5.1 (Apr 15, 2024)
+
+- Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
+
+## v3.4.0 (Jan 19, 2024)
+
+- Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+  - Support for node 20 is not yet available on Managed Runtime
+
+## v3.3.0 (Nov 8, 2023)
+
+- Replace max-age with s-maxage to only cache shared caches [#1564](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1564)
+- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
+
+## v3.2.0 (Nov 3, 2023)
 
 ## v3.1.0 (Jul 26, 2023)
 

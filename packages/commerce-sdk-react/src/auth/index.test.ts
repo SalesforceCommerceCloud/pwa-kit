@@ -8,6 +8,7 @@ import Auth, {AuthData} from './'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
+import {SLAS_SECRET_PLACEHOLDER} from '../constant'
 
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
@@ -28,6 +29,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
         helpers: {
             refreshAccessToken: jest.fn().mockResolvedValue(''),
             loginGuestUser: jest.fn().mockResolvedValue(''),
+            loginGuestUserPrivate: jest.fn().mockResolvedValue(''),
             loginRegisteredUserB2C: jest.fn().mockResolvedValue(''),
             logout: jest.fn().mockResolvedValue('')
         }
@@ -36,7 +38,9 @@ jest.mock('commerce-sdk-isomorphic', () => {
 
 jest.mock('../utils', () => ({
     __esModule: true,
-    onClient: () => true
+    onClient: () => true,
+    getParentOrigin: jest.fn().mockResolvedValue(''),
+    isOriginTrusted: () => false
 }))
 
 /** The auth data we store has a slightly different shape than what we use. */
@@ -49,6 +53,11 @@ const config = {
     siteId: 'siteId',
     proxy: 'proxy',
     redirectURI: 'redirectURI'
+}
+
+const configSLASPrivate = {
+    ...config,
+    enablePWAKitPrivateClient: true
 }
 
 describe('Auth', () => {
@@ -99,7 +108,7 @@ describe('Auth', () => {
             token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest',
-            refresh_token_expires_in: 30 * 24 * 3600
+            refresh_token_expires_in: 'refresh_token_expires_in'
         }
         // Convert stored format to exposed format
         const result = {...sample, refresh_token: 'refresh_token_guest'}
@@ -123,60 +132,60 @@ describe('Auth', () => {
         // @ts-expect-error private method
         expect(() => auth.isTokenExpired()).toThrow()
     })
-    test('hasSFRAAuthStateChanged', () => {
-        // Should return true if refresh_token keys are different
+    test('getAccessToken from local store', () => {
         const auth = new Auth(config)
         // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
+        auth.set('access_token', 'token')
         // @ts-expect-error private method
-        auth.set('refresh_token_registered_copy', '456')
-        // @ts-expect-error private method
-        expect(auth.hasSFRAAuthStateChanged(true)).toBe(true)
-
-        // Should return true if refresh_token keys are same but values are different
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', '456')
-        // @ts-expect-error private method
-        expect(auth.hasSFRAAuthStateChanged(true)).toBe(true)
-
-        // Should return false if refresh_token keys are same
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', '123')
-        // @ts-expect-error private method
-        expect(auth.hasSFRAAuthStateChanged(true)).toBe(false)
+        expect(auth.getAccessToken()).toBe('token')
     })
-    test('isTokenValidForHybrid', () => {
+    test('use SFRA token over local store token if present', () => {
+        const customerId = 'customerId'
+        const customerType = 'guest'
+        const customerTypeUpperCase = 'Guest'
+        const usid = 'usid'
+        const sfraJWT = jwt.sign(
+            {
+                exp: Math.floor(Date.now() / 1000) + 1000,
+                isb: `uido:slas::upn:${customerTypeUpperCase}::uidn:Guest User::gcid:${customerId}::chid:siteId`,
+                sub: `cc-slas::realm::scid:scid::usid:${usid}`
+            },
+            'secret'
+        )
+
         const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token', 'token')
+        // @ts-expect-error private method
+        auth.set('access_token_sfra', sfraJWT)
+        // @ts-expect-error private method
+        expect(auth.getAccessToken()).toBe(sfraJWT)
+        expect(auth.get('access_token_sfra')).toBeFalsy()
 
-        // Return false if JWT Expired
-        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
+        // Check that local store is updated
+        expect(auth.get('access_token')).toBe(sfraJWT)
+        expect(auth.get('customer_id')).toBe(customerId)
+        expect(auth.get('customer_type')).toBe(customerType)
+        expect(auth.get('usid')).toBe(usid)
+    })
+    test('access token is cleared if SFRA sends refresh', () => {
+        const auth = new Auth(config)
         // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
+        auth.set('access_token', 'token')
         // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', '123')
+        auth.set('access_token_sfra', 'refresh')
         // @ts-expect-error private method
-        expect(auth.isTokenValidForHybrid(JWTExpired, true)).toBe(false)
+        expect(auth.getAccessToken()).toBeFalsy()
+        expect(auth.get('access_token_sfra')).toBeFalsy()
+    })
+    test('clear SFRA auth tokens', () => {
+        const auth = new Auth(config)
+        // @ts-expect-error private method
+        auth.set('access_token_sfra', '123')
+        // @ts-expect-error private method
+        auth.clearSFRAAuthToken()
 
-        // Return false if SFRA Auth state changed
-        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
-        // @ts-expect-error private method
-        auth.set('refresh_token_registered_copy', '456')
-        // @ts-expect-error private method
-        expect(auth.isTokenValidForHybrid(JWTNotExpired, true)).toBe(false)
-
-        // Return true if JWT NOT expired and SFRA Auth state NOT changed
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest', '123')
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', '123')
-        // @ts-expect-error private method
-        expect(auth.isTokenValidForHybrid(JWTNotExpired, true)).toBe(true)
+        expect(auth.get('access_token_sfra')).toBeFalsy()
     })
     test('site switch clears auth storage', () => {
         const auth = new Auth(config)
@@ -212,9 +221,6 @@ describe('Auth', () => {
         const auth = new Auth(config)
         const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
 
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', 'refresh_token_guest') // Simulates SFRA auth state has NOT changed and token is valid.
-
         const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: JWTNotExpired,
@@ -226,7 +232,7 @@ describe('Auth', () => {
             token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest',
-            refresh_token_expires_in: 30 * 24 * 3600
+            refresh_token_expires_in: 'refresh_token_expires_in'
         }
         // Convert stored format to exposed format
         const result = {...data, refresh_token: 'refresh_token_guest'}
@@ -299,9 +305,42 @@ describe('Auth', () => {
         const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
 
         // To simulate real-world scenario, let's first test with a good valid token
-        // @ts-expect-error private method
-        auth.set('refresh_token_guest_copy', 'refresh_token_guest') // Simulates SFRA auth state has NOT changed and token is valid.
+        const data: StoredAuthData = {
+            refresh_token_guest: 'refresh_token_guest',
+            access_token: JWTNotExpired,
+            customer_id: 'customer_id',
+            enc_user_id: 'enc_user_id',
+            expires_in: 1800,
+            id_token: 'id_token',
+            idp_access_token: 'idp_access_token',
+            token_type: 'token_type',
+            usid: 'usid',
+            customer_type: 'guest',
+            refresh_token_expires_in: 'refresh_token_expires_in'
+        }
 
+        Object.keys(data).forEach((key) => {
+            // @ts-expect-error private method
+            auth.set(key, data[key])
+        })
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).not.toHaveBeenCalled()
+
+        // And then now test with an _expired_ token
+        // @ts-expect-error private method
+        auth.set('access_token', JWTExpired)
+
+        await auth.ready()
+        expect(helpers.refreshAccessToken).toHaveBeenCalled()
+    })
+
+    test('ready - use refresh token when access token is expired with slas private client', async () => {
+        const auth = new Auth(configSLASPrivate)
+        const JWTNotExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) + 1000}, 'secret')
+        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
+
+        // To simulate real-world scenario, let's first test with a good valid token
         const data: StoredAuthData = {
             refresh_token_guest: 'refresh_token_guest',
             access_token: JWTNotExpired,
@@ -330,6 +369,8 @@ describe('Auth', () => {
 
         await auth.ready()
         expect(helpers.refreshAccessToken).toHaveBeenCalled()
+        const funcArg = (helpers.refreshAccessToken as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
     })
     test('ready - PKCE flow', async () => {
         const auth = new Auth(config)
@@ -337,20 +378,61 @@ describe('Auth', () => {
         await auth.ready()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
+
     test('loginGuestUser', async () => {
         const auth = new Auth(config)
         await auth.loginGuestUser()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
+
+    test('loginGuestUser with slas private', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
+        const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
+    })
+
     test('loginRegisteredUserB2C', async () => {
         const auth = new Auth(config)
         await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
         expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
+        const functionArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][1]
+        expect(functionArg).toMatchObject({username: 'test', password: 'test'})
+    })
+
+    test('loginRegisteredUserB2C with slas private', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.loginRegisteredUserB2C({
+            username: 'test',
+            password: 'test'
+        })
+        expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
+        const functionArg = (helpers.loginRegisteredUserB2C as jest.Mock).mock.calls[0][1]
+        expect(functionArg).toMatchObject({
+            username: 'test',
+            password: 'test',
+            clientSecret: SLAS_SECRET_PLACEHOLDER
+        })
     })
     test('logout', async () => {
         const auth = new Auth(config)
         await auth.logout()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
+    })
+    test('PWA private client mode takes priority', async () => {
+        const auth = new Auth({...configSLASPrivate, clientSecret: 'someSecret'})
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
+        const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
+    })
+    test('Can set a client secret', async () => {
+        const auth = new Auth({...config, clientSecret: 'someSecret'})
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
+        const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
+        expect(funcArg).toMatchObject({clientSecret: 'someSecret'})
     })
     test('running on the server uses a shared context memory store', () => {
         const refreshTokenGuest = 'guest'

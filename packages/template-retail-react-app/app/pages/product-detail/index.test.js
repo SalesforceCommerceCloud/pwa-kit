@@ -17,6 +17,8 @@ import ProductDetail from '.'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     basketWithProductSet,
+    mockProductInWishlist,
+    mockWishlistWithItem,
     einsteinRecommendation
 } from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
@@ -26,6 +28,21 @@ import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-
 jest.setTimeout(60000)
 
 jest.useFakeTimers()
+
+const mockAddToWishlist = jest.fn()
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useShopperCustomersMutation: (mutation) => {
+            if (mutation === 'createCustomerProductListItem') {
+                return {mutate: mockAddToWishlist}
+            } else {
+                return originalModule.useShopperCustomersMutation(mutation)
+            }
+        }
+    }
+})
 
 const MockedComponent = () => {
     return (
@@ -61,6 +78,7 @@ beforeEach(() => {
 
 afterEach(() => {
     jest.resetModules()
+    jest.clearAllMocks()
 })
 
 test('should render product details page', async () => {
@@ -80,6 +98,45 @@ test('should render product details page', async () => {
         expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
         expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
         expect(screen.getAllByTestId('product-view')).toHaveLength(1)
+    })
+})
+
+test('should add to wishlist', async () => {
+    global.server.use(
+        // Use a single product (and not a product set)
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.json(productsResponse.data[0]))
+        })
+    )
+
+    renderWithProviders(<MockedComponent />)
+    const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
+
+    fireEvent.click(wishlistButton)
+    await waitFor(() => {
+        expect(mockAddToWishlist).toHaveBeenCalledTimes(1)
+    })
+})
+
+test('should not add to wishlist if item is already in wishlist', async () => {
+    global.server.use(
+        // Use a product that is already in the wishlist
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.json(mockProductInWishlist.data[0]))
+        }),
+        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockWishlistWithItem))
+        })
+    )
+
+    renderWithProviders(<MockedComponent />)
+
+    // const wishlistButton = await screen.findAllByText(/Add to Wishlist/i)
+    const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
+
+    fireEvent.click(wishlistButton)
+    await waitFor(() => {
+        expect(mockAddToWishlist).toHaveBeenCalledTimes(0)
     })
 })
 

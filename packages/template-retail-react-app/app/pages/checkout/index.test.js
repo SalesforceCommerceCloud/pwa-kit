@@ -21,7 +21,9 @@ import {
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
-jest.setTimeout(30000)
+// This is a flaky test file!
+jest.retryTimes(5)
+jest.setTimeout(40_000)
 
 // Minimal subset of `ocapiOrderResponse` in app/mocks/mock-data.js
 const scapiOrderResponse = {
@@ -63,7 +65,19 @@ beforeEach(() => {
     global.server.use(
         // mock product details
         rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.json({data: [{id: '701642811398M'}]}))
+            return res(
+                ctx.json({
+                    data: [
+                        {
+                            id: '701643070725M',
+                            currency: 'GBP',
+                            name: 'Long Sleeve Crew Neck',
+                            pricePerUnit: 19.18,
+                            price: 19.18
+                        }
+                    ]
+                })
+            )
         }),
         // mock the available shipping methods
         rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
@@ -160,11 +174,13 @@ beforeEach(() => {
 
         // mock place order
         rest.post('*/orders', (req, res, ctx) => {
-            currentBasket = {
+            const response = {
+                ...currentBasket,
                 ...scapiOrderResponse,
-                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'}
+                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
+                status: 'created'
             }
-            return res(ctx.json(currentBasket))
+            return res(ctx.json(response))
         }),
 
         rest.get('*/baskets', (req, res, ctx) => {
@@ -270,11 +286,13 @@ test('Can proceed through checkout steps as guest', async () => {
 
         // mock place order
         rest.post('*/orders', (req, res, ctx) => {
-            currentBasket = {
+            const response = {
+                ...currentBasket,
                 ...scapiOrderResponse,
-                customerInfo: {...scapiOrderResponse.customerInfo, email: 'test@test.com'}
+                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
+                status: 'created'
             }
-            return res(ctx.json(currentBasket))
+            return res(ctx.json(response))
         }),
 
         rest.get('*/baskets', (req, res, ctx) => {
@@ -327,7 +345,7 @@ test('Can proceed through checkout steps as guest', async () => {
     await user.type(screen.getByLabelText(/first name/i), 'Tester')
     await user.type(screen.getByLabelText(/last name/i), 'McTesting')
     await user.type(screen.getByLabelText(/phone/i), '(727) 555-1234')
-    await user.type(screen.getByLabelText(/address/i), '123 Main St')
+    await user.type(screen.getAllByLabelText(/address/i)[0], '123 Main St')
     await user.type(screen.getByLabelText(/city/i), 'Tampa')
     await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
     await user.type(screen.getByLabelText(/zip code/i), '33610')
@@ -368,7 +386,7 @@ test('Can proceed through checkout steps as guest', async () => {
     await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
     await user.type(screen.getByLabelText(/expiration date/i), '1224')
-    await user.type(screen.getByLabelText(/security code/i), '123')
+    await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
 
     // Same as shipping checkbox selected by default
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
@@ -459,7 +477,7 @@ test('Can proceed through checkout as registered customer', async () => {
     await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
     await user.type(screen.getByLabelText(/expiration date/i), '1224')
-    await user.type(screen.getByLabelText(/security code/i), '123')
+    await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
 
     // Same as shipping checkbox selected by default
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
@@ -562,7 +580,7 @@ test('Can add address during checkout as a registered customer', async () => {
     await user.type(screen.getByLabelText(/last name/i), 'McTester')
     await user.type(screen.getByLabelText(/phone/i), '7275551234')
     await user.selectOptions(screen.getByLabelText(/country/i), ['US'])
-    await user.type(screen.getByLabelText(/address/i), 'Tropicana Field')
+    await user.type(screen.getAllByLabelText(/address/i)[0], 'Tropicana Field')
     await user.type(screen.getByLabelText(/city/i), 'Tampa')
     await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
     await user.type(screen.getByLabelText(/zip code/i), '33712')

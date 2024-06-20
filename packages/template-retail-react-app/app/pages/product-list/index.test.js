@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -137,6 +137,64 @@ test('clicking a filter will change url', async () => {
             '?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
         )
     )
+})
+
+test('clicking a filter on mobile or desktop applies changes to both', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
+    })
+    // NOTE: Look for a better wait to wait an additional render.
+    await waitFor(() => !!screen.getByText(/Beige/i))
+
+    // Only desktop filters should be present
+    // Test using two buttons since there was a bug where using only one filter would properly
+    // apply changes to both desktop and mobile, but 2 or more would cause it to fail
+    let beigeBtns = screen.getAllByLabelText('Add filter: Beige (6)')
+    let blueBtns = screen.getAllByLabelText('Add filter: Blue (27)')
+    expect(beigeBtns).toHaveLength(1)
+    expect(blueBtns).toHaveLength(1)
+
+    // click beige filter and ensure that only beige is checked
+    await user.click(beigeBtns[0])
+    expect(beigeBtns[0]).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByLabelText('Add filter: Blue (27)')).toHaveAttribute('aria-checked', 'false')
+
+    // click filter button for mobile that is hidden on desktop but present in DOM
+    // this opens the filter modal on mobile
+    await user.click(screen.getByText('Filter'))
+
+    // re-query for desktop and mobile filters
+    beigeBtns = screen.getAllByLabelText('Remove filter: Beige (6)')
+    blueBtns = screen.getAllByLabelText('Add filter: Blue (27)')
+
+    // both mobile and desktop filters are present in DOM
+    expect(beigeBtns).toHaveLength(2)
+    expect(blueBtns).toHaveLength(2)
+
+    // ensure mobile and desktop match
+    expect(beigeBtns[0]).toHaveAttribute('aria-checked', 'true')
+    expect(beigeBtns[1]).toHaveAttribute('aria-checked', 'true')
+    expect(blueBtns[0]).toHaveAttribute('aria-checked', 'false')
+    expect(blueBtns[1]).toHaveAttribute('aria-checked', 'false')
+
+    // click mobile filter for blue
+    await user.click(blueBtns[1])
+
+    // buttons for beige and blue should be checked on both desktop and mobile
+    expect(beigeBtns[0]).toHaveAttribute('aria-checked', 'true')
+    expect(beigeBtns[1]).toHaveAttribute('aria-checked', 'true')
+    expect(blueBtns[0]).toHaveAttribute('aria-checked', 'true')
+    expect(blueBtns[1]).toHaveAttribute('aria-checked', 'true')
+
+    // uncheck beige
+    await user.click(beigeBtns[1])
+
+    // beige button should be unchecked for both mobile and desktop
+    expect(beigeBtns[0]).toHaveAttribute('aria-checked', 'false')
+    expect(beigeBtns[1]).toHaveAttribute('aria-checked', 'false')
+    expect(blueBtns[0]).toHaveAttribute('aria-checked', 'true')
+    expect(blueBtns[1]).toHaveAttribute('aria-checked', 'true')
 })
 
 test('click on Clear All should clear out all the filter in search params', async () => {

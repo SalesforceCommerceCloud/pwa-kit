@@ -33,10 +33,6 @@
  * will never cache any of the responses from this test server. You therefore
  * don't need to add cachebreakers when running tests.
  *
- * The server has a proxy configured to [HTTPBin](https://httpbin.org/). To send
- * a test request to it, use the path `/mobify/proxy/httpbin/` - for example,
- * `/mobify/proxy/httpbin/get`
- *
  * A test bundle file is available at `/mobify/bundle/<BUNDLE_NUMBER>/assets/mobify.png`
  * where BUNDLE_NUMBER is the most recently published bundle number.
  */
@@ -46,6 +42,7 @@ const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
 const pkg = require('../package.json')
 const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
+const {isolationTests} = require('./isolation-actions')
 
 /**
  * Custom error class
@@ -79,14 +76,16 @@ const ENVS_TO_EXPOSE = [
     'tz'
 ]
 
-const HEADERS_TO_REDACT = ['x-api-key', 'x-apigateway-context', 'x-apigateway-event']
-
 const BADSSL_TLS1_1_URL = 'https://tls-v1-1.badssl.com:1011/'
 const BADSSL_TLS1_2_URL = 'https://tls-v1-2.badssl.com:1012/'
 
-const redactAndSortObjectKeys = (o, redactList = HEADERS_TO_REDACT) => {
-    const redact = (k) => ({[k]: redactList.includes(k) ? '*****' : o[k]})
-    return Object.assign({}, ...Object.keys(o).sort().map(redact))
+const sortObjectKeys = (o) => {
+    return Object.assign(
+        {},
+        ...Object.keys(o)
+            .sort()
+            .map((k) => ({[k]: o[k]}))
+    )
 }
 
 /**
@@ -126,13 +125,14 @@ const filterAndSortObjectKeys = (o, whitelist) =>
  */
 const jsonFromRequest = (req) => {
     return {
+        args: req.query,
         protocol: req.protocol,
         method: req.method,
         path: req.path,
         query: req.query,
         route_path: req.route.path,
         body: req.body,
-        headers: redactAndSortObjectKeys(req.headers),
+        headers: sortObjectKeys(req.headers),
         ip: req.ip,
         env: filterAndSortObjectKeys(process.env, ENVS_TO_EXPOSE),
         timestamp: new Date().toISOString()
@@ -173,7 +173,8 @@ const tlsVersionTest = async (_, res) => {
  * Express handler that enables the cache and returns a JSON response with diagnostic values.
  */
 const cacheTest = async (req, res) => {
-    res.set('Cache-Control', 's-maxage=60')
+    let duration = req.params.duration || '60'
+    res.set('Cache-Control', `s-maxage=${duration}`)
     res.json(jsonFromRequest(req))
 }
 
@@ -189,6 +190,28 @@ const cookieTest = async (req, res) => {
     }
     res.set('Cache-Control', 'private, max-age=60')
     res.json(jsonFromRequest(req))
+}
+
+/**
+ * Express handler that sets single and multi-value response headers
+ * and returns a JSON response with diagnostic values.
+ * Use ?header1=value1&header2=value2 to set two response headers.
+ * Use ?header3=value4&header3=value5 to set multi value headers
+ */
+const responseHeadersTest = async (req, res) => {
+    for (const [key, value] of Object.entries(req.query)) {
+        // If value is an array then a multi-value header will be created
+        res.set(key, value)
+    }
+    res.json(jsonFromRequest(req))
+}
+
+/**
+ * Express handler that echos back a JSON response with
+ * headers supplied in the request.
+ */
+const headerTest = async (req, res) => {
+    res.json({headers: sortObjectKeys(req.headers)})
 }
 
 /**
@@ -248,7 +271,11 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.all('/exception', exception)
     app.get('/tls', tlsVersionTest)
     app.get('/cache', cacheTest)
+    app.get('/cache/:duration(\\d+)', cacheTest)
     app.get('/cookie', cookieTest)
+    app.get('/headers', headerTest)
+    app.get('/isolation', isolationTests)
+    app.get('/set-response-headers', responseHeadersTest)
 
     // Add a /auth/logout path that will always send a 401 (to allow clearing
     // of browser credentials)

@@ -1,6 +1,39 @@
-## v3.2.0-dev (Sep 26, 2023)
+## v3.6.0-dev (Jun 11, 2024)
+- Added the `x-correlation-id` response header, which is set to the MRT correlation ID. This enhances traceability by including the correlation ID from the request in the response. [#1787](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1787)
+
+## v3.5.1 (Apr 17, 2024)
+- Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
+
+## v3.5.0 (Apr 15, 2024)
+
+## v3.4.0 (Jan 19, 2024)
+
+- Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
+- Add support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
+
+## v3.3.0 (Dec 08, 2023)
+
+- Update engine compatibility to include npm 10 [#1597](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1597)
+
+## v3.2.1 (Nov 08, 2023)
+
+- Revert mandatory enforcement of Content-Security-Policy headers. Provide middleware as an opt-in replacement. [#1528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1528)
+
+```js
+// your-project/app/ssr.js
+import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
+const {handler} = runtime.createHandler(options, (app) => {
+    app.use(defaultPwaKitSecurityHeaders)
+    // ...
+}
+```
+
+## v3.2.0 (Nov 03, 2023)
+
+- Move Content-Security-Policy logic to pwa-kit-runtime [#1457](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1457)
 
 ## v3.1.1 (Sep 21, 2023)
+
 ## v3.1.0 (Jul 26, 2023)
 
 - Allow setting cookies using the `MRT_ALLOW_COOKIES` environment variable [#1318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1318)

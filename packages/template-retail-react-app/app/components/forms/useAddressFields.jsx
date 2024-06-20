@@ -56,6 +56,7 @@ export default function useAddressFields({
             label: formatMessage(messages.firstName),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'given-name',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your first name.',
@@ -70,6 +71,7 @@ export default function useAddressFields({
             label: formatMessage(messages.lastName),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'family-name',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your last name.',
@@ -84,6 +86,7 @@ export default function useAddressFields({
             label: formatMessage(messages.phone),
             defaultValue: '',
             type: 'tel',
+            autoComplete: 'tel',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your phone number.',
@@ -119,6 +122,7 @@ export default function useAddressFields({
             label: formatMessage(messages.address),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'address-line1',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your address.',
@@ -152,13 +156,14 @@ export default function useAddressFields({
                 ...(countryCode === 'CA' ? provinceOptions : stateOptions)
             ],
             rules: {
-                required: formatMessage(
-                    {
-                        defaultMessage: 'Please select your {stateOrProvince}.',
-                        id: 'use_address_fields.error.please_select_your_state_or_province'
-                    },
-                    {stateOrProvince: countryCode === 'CA' ? 'province' : 'state'}
-                )
+                required:
+                    countryCode === 'CA'
+                        ? 'Please select your province.' // FYI we won't translate this
+                        : formatMessage({
+                              defaultMessage: 'Please select your state.',
+                              id: 'use_address_fields.error.please_select_your_state_or_province',
+                              description: 'Error message for a blank state (US-specific checkout)'
+                          })
             },
             error: errors[`${prefix}stateCode`],
             control
@@ -168,14 +173,17 @@ export default function useAddressFields({
             label: formatMessage(countryCode === 'CA' ? messages.postalCode : messages.zipCode),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'postal-code',
             rules: {
-                required: formatMessage(
-                    {
-                        defaultMessage: 'Please enter your {postalOrZip}.',
-                        id: 'use_address_fields.error.please_enter_your_postal_or_zip'
-                    },
-                    {postalOrZip: countryCode === 'CA' ? 'postal code' : 'zip code'}
-                )
+                required:
+                    countryCode === 'CA'
+                        ? 'Please enter your postal code.' // FYI we won't translate this
+                        : formatMessage({
+                              defaultMessage: 'Please enter your zip code.',
+                              id: 'use_address_fields.error.please_enter_your_postal_or_zip',
+                              description:
+                                  'Error message for a blank zip code (US-specific checkout)'
+                          })
             },
             error: errors[`${prefix}postalCode`],
             control
@@ -185,6 +193,7 @@ export default function useAddressFields({
             label: formatMessage(messages.preferred),
             defaultValue: false,
             type: 'checkbox',
+            autoComplete: 'honorific-prefix',
             rules: {},
             control
         }

@@ -40,8 +40,8 @@ const DisplayPrice = ({
                 </Text>
             )}
             <Text
-                as={discountPrice > 0 ? 's' : 'b'}
-                ml={discountPrice > 0 ? 2 : 0}
+                as={typeof discountPrice === 'number' ? 's' : 'b'}
+                ml={typeof discountPrice === 'number' ? 2 : 0}
                 fontWeight={discountPrice ? 'normal' : 'bold'}
                 {...basePriceProps}
             >

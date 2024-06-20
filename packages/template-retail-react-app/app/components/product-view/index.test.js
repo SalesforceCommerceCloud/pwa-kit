@@ -142,7 +142,7 @@ test('renders a product set properly - parent item', () => {
     const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
     const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
     const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
-    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
+    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
 
     // What should exist:
     expect(startingAtLabel).toBeInTheDocument()
@@ -166,7 +166,7 @@ test('renders a product set properly - child item', () => {
     const addToCartButton = screen.getAllByRole('button', {name: /add to cart/i})[0]
     const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
     const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
-    const quantityPicker = screen.getByRole('spinbutton', {name: /quantity:/i})
+    const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
     const startingAtLabels = screen.queryAllByText(/starting at/i)
 
     // What should exist:
