@@ -23,10 +23,7 @@ const StoreLocatorInput = ({form, submitForm, searchStoresParams}) => {
     const intl = useIntl()
 
     return (
-        <form
-            id="store-locator-form"
-            onSubmit={form.handleSubmit(submitForm)}
-        >
+        <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>
                 <Controller
                     name="postalCode"
