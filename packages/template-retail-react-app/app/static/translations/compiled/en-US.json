@@ -539,6 +539,12 @@
       "value": ")"
     }
   ],
+  "category_links.button_text": [
+    {
+      "type": 0,
+      "value": "Categories"
+    }
+  ],
   "cc_radio_group.action.remove": [
     {
       "type": 0,
@@ -997,6 +1003,56 @@
     {
       "type": 0,
       "value": "Security code info"
+    }
+  ],
+  "display_price.assistive_msg.current_price": [
+    {
+      "type": 0,
+      "value": "current price "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "From current price "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price": [
+    {
+      "type": 0,
+      "value": "original price "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price_with_range": [
+    {
+      "type": 0,
+      "value": "From original price "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.label.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "From "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1661,10 +1717,14 @@
       "value": "Unavailable"
     }
   ],
-  "item_price.label.starting_at": [
+  "item_variant.assistive_msg.quantity": [
     {
       "type": 0,
-      "value": "Starting at"
+      "value": "Quantity "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
     }
   ],
   "lCPCxk": [
@@ -2489,14 +2549,16 @@
       "value": " from wishlist"
     }
   ],
-  "product_tile.label.starting_at_price": [
+  "product_tile.badge.label.new": [
     {
       "type": 0,
-      "value": "Starting at "
-    },
+      "value": "New"
+    }
+  ],
+  "product_tile.badge.label.sale": [
     {
-      "type": 1,
-      "value": "price"
+      "type": 0,
+      "value": "Sale"
     }
   ],
   "product_view.button.add_set_to_cart": [
@@ -2557,12 +2619,6 @@
     {
       "type": 0,
       "value": "+"
-    }
-  ],
-  "product_view.label.starting_at_price": [
-    {
-      "type": 0,
-      "value": "Starting at"
     }
   ],
   "product_view.label.variant_type": [
