@@ -16,6 +16,6 @@ runs:
         project="alex-test"
         build="build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
         if [[ ${{ inputs.TARGET }} ]]; then
-          npm run push -- -s $project --message "$build" --target ${{ inputs.TARGET }} ${{ inputs.FLAGS }}
+          npm run build
         fi
       shell: bash
