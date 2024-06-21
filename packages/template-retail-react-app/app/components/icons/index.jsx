@@ -43,6 +43,7 @@ import '@salesforce/retail-react-app/app/assets/svg/social-facebook.svg'
 import '@salesforce/retail-react-app/app/assets/svg/social-instagram.svg'
 import '@salesforce/retail-react-app/app/assets/svg/social-twitter.svg'
 import '@salesforce/retail-react-app/app/assets/svg/social-youtube.svg'
+import '@salesforce/retail-react-app/app/assets/svg/store.svg'
 import '@salesforce/retail-react-app/app/assets/svg/like.svg'
 import '@salesforce/retail-react-app/app/assets/svg/lock.svg'
 import '@salesforce/retail-react-app/app/assets/svg/plug.svg'
@@ -191,6 +192,7 @@ export const SocialPinterestIcon = icon('social-pinterest', {
 })
 export const SocialTwitterIcon = icon('social-twitter')
 export const SocialYoutubeIcon = icon('social-youtube')
+export const StoreIcon = icon('store')
 export const SignoutIcon = icon('signout')
 export const UserIcon = icon('user')
 export const VisaIcon = icon('cc-visa', {viewBox: VisaSymbol.viewBox})

@@ -106,7 +106,7 @@ const Footer = ({...otherProps}) => {
                                 })}
                                 links={[
                                     {
-                                        href: '/',
+                                        href: '/store-locator',
                                         text: intl.formatMessage({
                                             id: 'footer.link.store_locator',
                                             defaultMessage: 'Store Locator'
