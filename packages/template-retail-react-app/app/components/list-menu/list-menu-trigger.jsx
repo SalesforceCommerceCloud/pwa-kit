@@ -61,7 +61,11 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
                     to={'#'}
                     onMouseOver={onOpen}
                     onKeyDown={(e) => {
-                        keyMap[e.key]?.(e)
+                        const handler = keyMap[e.key]
+                        if (handler) {
+                            e.preventDefault()
+                            handler(e)
+                        }
                     }}
                     {...baseStyle.listMenuTriggerLinkIcon}
                 >
