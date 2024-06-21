@@ -1,3 +1,5 @@
+## v2.0.0-dev (Jun 21, 2024)
+## v4.0.0-dev (Jun 21, 2024)
 ## v2.0.0-dev (May 21, 2024)
 - Upgrade to commerce-sdk-isomorphic v2.0.0 [#1794](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1794)
 - Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
