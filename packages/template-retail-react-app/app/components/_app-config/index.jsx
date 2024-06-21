@@ -28,6 +28,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
+import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
@@ -68,6 +69,7 @@ const AppConfig = ({children, locals = {}}) => {
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             // enablePWAKitPrivateClient={true}
             OCAPISessionsURL={`${appOrigin}/mobify/proxy/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
+            logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>
