@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -18,21 +18,42 @@ import {
 import {Controller} from 'react-hook-form'
 import {SUPPORTED_STORE_LOCATOR_COUNTRIES} from '@salesforce/retail-react-app/app/constants'
 
-const StoreLocatorInput = ({form, submitForm, searchStoresParams}) => {
+const StoreLocatorInput = ({form, submitForm, searchStoresParams, setSearchStoresParams, userHasSetGeolocation}) => {
     const {control} = form
     const intl = useIntl()
 
+    function error() {
+        console.log("Unable to retrieve your location");
+    }
+
+    function success(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        setSearchStoresParams({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            limit: 15
+        })
+        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+    }
+    
+    useEffect(() => {
+        if (typeof navigator !== 'undefined' && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(success, error);
+        } else {
+            console.log("Geolocation not supported");
+        }  
+    }, [])
     return (
         <form
-            id="login-form"
+            id="store-locator-form"
             onSubmit={form.handleSubmit(submitForm)}
-            data-testid="sf-auth-modal-form"
         >
             <InputGroup>
                 <Controller
                     name="postalCode"
                     control={control}
-                    defaultValue={searchStoresParams?.postalCode}
+                    defaultValue={userHasSetGeolocation ? searchStoresParams?.postalCode : ''}
                     render={({field}) => {
                         return (
                             <Input
@@ -92,7 +113,13 @@ const StoreLocatorInput = ({form, submitForm, searchStoresParams}) => {
             </Box>
             <Button
                 key="use-my-location-button"
-                onClick={() => {}}
+                onClick={() => {
+                    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(success, error);
+                    } else {
+                        console.log("Geolocation not supported");
+                    }  
+                }}
                 width="100%"
                 variant="solid"
                 fontWeight="bold"

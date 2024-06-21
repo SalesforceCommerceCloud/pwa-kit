@@ -2971,6 +2971,12 @@
       "value": "Enter postal code"
     }
   ],
+  "store_locator.pagination.load_more": [
+    {
+      "type": 0,
+      "value": "Load More"
+    }
+  ],
   "store_locator.title": [
     {
       "type": 0,

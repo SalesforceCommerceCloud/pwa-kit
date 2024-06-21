@@ -6347,6 +6347,20 @@
       "value": "]"
     }
   ],
+  "store_locator.pagination.load_more": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀǿǿȧȧḓ Ḿǿǿřḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "store_locator.title": [
     {
       "type": 0,

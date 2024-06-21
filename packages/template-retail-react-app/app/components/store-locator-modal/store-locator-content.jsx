@@ -18,7 +18,7 @@ import StoresList from '@salesforce/retail-react-app/app/components/store-locato
 import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
 import {STORE_LOCATOR_DISTANCE} from '@salesforce/retail-react-app/app/constants'
 
-const StoreLocatorContent = ({form, submitForm, storesInfo, searchStoresParams}) => {
+const StoreLocatorContent = ({form, submitForm, storesInfo, searchStoresParams, setSearchStoresParams, userHasSetGeolocation}) => {
     const intl = useIntl()
 
     return (
@@ -33,6 +33,8 @@ const StoreLocatorContent = ({form, submitForm, storesInfo, searchStoresParams})
                 form={form}
                 searchStoresParams={searchStoresParams}
                 submitForm={submitForm}
+                setSearchStoresParams={setSearchStoresParams}
+                userHasSetGeolocation={userHasSetGeolocation}
             ></StoreLocatorInput>
             <Accordion allowMultiple flex={[1, 1, 1, 5]}>
                 {/* Details */}
@@ -48,6 +50,7 @@ const StoreLocatorContent = ({form, submitForm, storesInfo, searchStoresParams})
                             margin: '20px'
                         }}
                     >
+                        {/* (JEREMY) TODO remove storesInfo === undefined case as this is no longer a possibility */}
                         {storesInfo === undefined
                             ? intl.formatMessage({
                                   id: 'store_locator.description.loading_locations',

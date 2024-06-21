@@ -1280,6 +1280,9 @@
   "store_locator.field.placeholder.enter_postal_code": {
     "defaultMessage": "Enter postal code"
   },
+  "store_locator.pagination.load_more": {
+    "defaultMessage": "Load More"
+  },
   "store_locator.title": {
     "defaultMessage": "Find a Store"
   },
