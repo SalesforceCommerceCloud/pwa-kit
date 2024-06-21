@@ -204,6 +204,9 @@
   "cart_title.title.cart_num_of_items": {
     "defaultMessage": "Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
   },
+  "category_links.button_text": {
+    "defaultMessage": "Categories"
+  },
   "cc_radio_group.action.remove": {
     "defaultMessage": "Remove"
   },
@@ -404,6 +407,21 @@
   },
   "credit_card_fields.tool_tip.security_code_aria_label": {
     "defaultMessage": "Security code info"
+  },
+  "display_price.assistive_msg.current_price": {
+    "defaultMessage": "current price {currentPrice}"
+  },
+  "display_price.assistive_msg.current_price_with_range": {
+    "defaultMessage": "From current price {currentPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price": {
+    "defaultMessage": "original price {listPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price_with_range": {
+    "defaultMessage": "From original price {listPrice}"
+  },
+  "display_price.label.current_price_with_range": {
+    "defaultMessage": "From {currentPrice}"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"
@@ -699,8 +717,8 @@
     "defaultMessage": "Unavailable",
     "description": "A unavailable badge placed on top of a product image"
   },
-  "item_price.label.starting_at": {
-    "defaultMessage": "Starting at"
+  "item_variant.assistive_msg.quantity": {
+    "defaultMessage": "Quantity {quantity}"
   },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
@@ -1063,8 +1081,11 @@
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
   },
-  "product_tile.label.starting_at_price": {
-    "defaultMessage": "Starting at {price}"
+  "product_tile.badge.label.new": {
+    "defaultMessage": "New"
+  },
+  "product_tile.badge.label.sale": {
+    "defaultMessage": "Sale"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
@@ -1095,9 +1116,6 @@
   },
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"
-  },
-  "product_view.label.starting_at_price": {
-    "defaultMessage": "Starting at"
   },
   "product_view.label.variant_type": {
     "defaultMessage": "{variantType}"

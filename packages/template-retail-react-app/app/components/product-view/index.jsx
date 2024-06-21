@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useRef, useState} from 'react'
+import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -21,7 +21,7 @@ import {
     Fade,
     useTheme
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
 // project components
@@ -37,11 +37,10 @@ import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
-import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
+import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
 
-const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, productType}) => {
-    const isProductASet = productType?.set
-
+const ProductViewHeader = ({name, currency, priceData, category, product}) => {
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -55,23 +54,25 @@ const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, 
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            <DisplayPrice
-                basePrice={basePrice}
-                discountPrice={discountPrice}
-                currency={currency}
-                isProductASet={isProductASet}
-            />
+            <Skeleton isLoaded={priceData?.currentPrice}>
+                {priceData?.currentPrice && (
+                    <DisplayPrice priceData={priceData} currency={currency} />
+                )}
+            </Skeleton>
+
+            <Skeleton isLoaded={product}>
+                {product?.productPromotions && <PromoCallout product={product} />}
+            </Skeleton>
         </VStack>
     )
 }
 
 ProductViewHeader.propTypes = {
     name: PropTypes.string,
-    basePrice: PropTypes.number,
-    discountPrice: PropTypes.number,
     currency: PropTypes.string,
     category: PropTypes.array,
-    productType: PropTypes.object
+    priceData: PropTypes.object,
+    product: PropTypes.object
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -102,6 +103,7 @@ const ProductView = forwardRef(
         },
         ref
     ) => {
+        const {currency: activeCurrency} = useCurrency()
         const showToast = useToast()
         const intl = useIntl()
         const location = useLocation()
@@ -125,7 +127,9 @@ const ProductView = forwardRef(
             stockLevel,
             stepQuantity
         } = useDerivedProduct(product, isProductPartOfSet)
-        const {basePrice, discountPrice} = getDisplayPrice(product)
+        const priceData = useMemo(() => {
+            return getPriceData(product, {quantity})
+        }, [product, quantity])
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const errorContainerRef = useRef(null)
@@ -291,10 +295,9 @@ const ProductView = forwardRef(
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
-                        basePrice={basePrice}
-                        discountPrice={discountPrice}
-                        productType={product?.type}
-                        currency={product?.currency}
+                        product={product}
+                        priceData={priceData}
+                        currency={product?.currency || activeCurrency}
                         category={category}
                     />
                 </Box>
@@ -332,10 +335,9 @@ const ProductView = forwardRef(
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
-                                basePrice={basePrice}
-                                discountPrice={discountPrice}
-                                productType={product?.type}
-                                currency={product?.currency}
+                                product={product}
+                                priceData={priceData}
+                                currency={product?.currency || activeCurrency}
                                 category={category}
                             />
                         </Box>

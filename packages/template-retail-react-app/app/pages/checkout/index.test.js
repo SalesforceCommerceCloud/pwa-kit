@@ -315,7 +315,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Verify cart products display
     await user.click(screen.getByText(/2 items in cart/i))
-    expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument()
+    expect(await screen.findByText(/Long Sleeve Crew Neck$/i)).toBeInTheDocument()
 
     // Verify password field is reset if customer toggles login form
     const loginToggleButton = screen.getByText(/Already have an account\? Log in/i)
