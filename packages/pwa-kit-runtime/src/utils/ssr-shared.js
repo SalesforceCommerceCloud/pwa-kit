@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+import {proxyBasePath, cachingBasePath} from './ssr-namespace-paths'
+
 /**
  * @module progressive-web-sdk/utils/ssr-shared
  * @private
@@ -166,8 +169,8 @@ export const updatePackageMobify = (newValue) => {
         }
 
         // Generate paths
-        config.proxyPath = `/mobify/proxy/${config.path}`
-        config.cachingPath = `/mobify/caching/${config.path}`
+        config.proxyPath = `${proxyBasePath}/${config.path}`
+        config.cachingPath = `${cachingBasePath}/${config.path}`
 
         proxyConfigs.push(config)
     }
