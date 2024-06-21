@@ -36,6 +36,15 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
+    "app":{
+      "extensions": [
+        "test-a",
+        ["test-b", {
+          "greeting": "hello"
+        }],
+        "./app/extensions/extension-test-c"
+      ]
+    },
     "ssrEnabled": true,
     "ssrOnly": [
       "ssr.js",
