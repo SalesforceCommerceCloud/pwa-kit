@@ -1,3 +1,4 @@
+## v3.6.0-nightly-20240621080232 (Jun 21, 2024)
 ## v3.6.0-dev (Jun 11, 2024)
 - Added the `x-correlation-id` response header, which is set to the MRT correlation ID. This enhances traceability by including the correlation ID from the request in the response. [#1787](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1787)
 
