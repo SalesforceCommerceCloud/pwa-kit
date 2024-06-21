@@ -29,7 +29,10 @@ test('Warns on missing shortCode message definition', () => {
 
     const el = document.querySelector('div')
 
-    expect(console.error.mock.calls[0][0]).toContain(
+    const loggedMessage = console.error.mock.calls[0][0]
+    const messageToCheck = typeof loggedMessage === 'string' ? loggedMessage : loggedMessage.message
+
+    expect(messageToCheck).toContain(
         `No locale message found for "fa-KE". Please update the list accordingly.`
     )
     expect(el.textContent).toBe('Unknown fa-KE')
