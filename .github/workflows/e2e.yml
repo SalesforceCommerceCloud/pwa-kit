@@ -117,7 +117,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        run: npm run tests:e2e
+        run: npm run test:e2e
   notify-slack-pwa-no-ext:
     needs: [run-generator-retail-app-no-ext]
     if: ${{ always() }}
