@@ -24,6 +24,7 @@ export default function useRegistrationFields({
                 id: 'use_registration_fields.label.first_name'
             }),
             type: 'text',
+            autoComplete: 'given-name',
             defaultValue: '',
             rules: {
                 required: formatMessage({
@@ -42,6 +43,7 @@ export default function useRegistrationFields({
             }),
             type: 'text',
             defaultValue: '',
+            autoComplete: 'family-name',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your last name.',
@@ -59,6 +61,7 @@ export default function useRegistrationFields({
             }),
             placeholder: 'you@email.com',
             type: 'email',
+            autoComplete: 'email',
             defaultValue: '',
             rules: {
                 required: formatMessage({
