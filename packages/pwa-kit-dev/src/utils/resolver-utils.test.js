@@ -106,7 +106,7 @@ describe('resolverUtils', () => {
         })
     })
 
-    describe('"buildCandidatePathArray" util returns array of paths used to module resolving', () => {
+    describe('"buildCandidatePaths" util returns array of paths used to module resolving', () => {
         ;[
             {
                 name: 'Correct absolute paths are returned with valid input data',
@@ -197,7 +197,7 @@ describe('resolverUtils', () => {
             }
         ].forEach((testCase) => {
             test(`${testCase.name}`, () => {
-                const result = resolverUtils.buildCandidatePathArray(
+                const result = resolverUtils.buildCandidatePaths(
                     testCase.importPath,
                     testCase.sourcePath,
                     {extensions: testCase.extensions}

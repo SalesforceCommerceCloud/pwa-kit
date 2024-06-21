@@ -6,7 +6,6 @@
  */
 
 import path from 'path'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const EXTENSION_NAMESPACE = '@salesforce'
 const EXTENSION_PREFIX = 'extension'
@@ -78,15 +77,17 @@ export const expand = (extensions = []) =>
  *
  * @param {String} importPath - The import module-name.
  * @param {String} sourcePath - The path the the file of the source import.
+ * @param {Object} opts - The path the the file of the source import.
+ * @param {Array<shortName: String, config: Array>} opts.extensions - List of extensions used by the base PWA-Kit application.
+ * @param {String>} opts.productDir - Absolute path of the base project.
  * @returns {String[]} paths - The potential paths to find the module import.
  */
-export const buildCandidatePathArray = (importPath, sourcePath, opts = {}) => {
+export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
     // Replace wildcard character as it has done its job getting us to this point.
     importPath = importPath.replace('*/', '')
 
-    const {extensions = getConfig()?.app?.extensions} = opts
+    const {extensions = [], productDir = process.cwd()} = opts
     const isSelfReferenceImport = isSelfReference(importPath, sourcePath)
-    const cwd = process.cwd()
     let paths = expand(extensions).reverse()
 
     // Map all the extensions and resolve the module names to absolute paths.
@@ -98,19 +99,19 @@ export const buildCandidatePathArray = (importPath, sourcePath, opts = {}) => {
         return path.join(
             ...(isLocalExtension
                 ? [extensionRef, importPath]
-                : [cwd, NODE_MODULES, extensionRef, importPath])
+                : [productDir, NODE_MODULES, extensionRef, importPath])
         )
     })
 
     // Add non-extension search locations locations. The base project and the sdk as the final callback.
     paths = [
         // Base Project
-        path.join(cwd, importPath),
+        path.join(productDir, importPath),
         // Extensions
         ...paths,
         // SDK
         path.join(
-            cwd,
+            productDir,
             NODE_MODULES,
             EXTENSION_NAMESPACE,
             'pwa-kit-react-sdk',
