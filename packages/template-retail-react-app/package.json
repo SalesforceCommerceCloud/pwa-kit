@@ -42,7 +42,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@formatjs/cli": "^6.0.4",
-    "@lhci/cli": "^0.11.0",
+    "@lhci/cli": "^0.14.0",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
     "@salesforce/commerce-sdk-react": "1.4.2",
