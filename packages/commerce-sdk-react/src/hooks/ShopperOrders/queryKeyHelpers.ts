@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperOrders} from 'commerce-sdk-isomorphic'
+import {ShopperOrders} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {getCustomKeys, pick} from '../utils'
-import paramKeysMap from './paramKeys'
+import {pickValidParams} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperOrders<{shortCode: string}>
@@ -59,9 +58,7 @@ export const getOrder: QueryKeyHelper<'getOrder'> = {
         params.orderNo
     ],
     queryKey: (params: Params<'getOrder'>) => {
-        const paramKeys = [...paramKeysMap['getOrder'], ...getCustomKeys(params)]
-
-        return [...getOrder.path(params), pick(params, paramKeys)]
+        return [...getOrder.path(params), pickValidParams(params, ShopperOrders.paramKeys.getOrder)]
     }
 }
 
@@ -75,9 +72,10 @@ export const getPaymentMethodsForOrder: QueryKeyHelper<'getPaymentMethodsForOrde
         '/payment-methods'
     ],
     queryKey: (params: Params<'getPaymentMethodsForOrder'>) => {
-        const paramKeys = [...paramKeysMap['getPaymentMethodsForOrder'], ...getCustomKeys(params)]
-
-        return [...getPaymentMethodsForOrder.path(params), pick(params, paramKeys)]
+        return [
+            ...getPaymentMethodsForOrder.path(params),
+            pickValidParams(params, ShopperOrders.paramKeys.getPaymentMethodsForOrder)
+        ]
     }
 }
 
@@ -91,8 +89,9 @@ export const getTaxesFromOrder: QueryKeyHelper<'getTaxesFromOrder'> = {
         '/taxes'
     ],
     queryKey: (params: Params<'getTaxesFromOrder'>) => {
-        const paramKeys = [...paramKeysMap['getTaxesFromOrder'], ...getCustomKeys(params)]
-
-        return [...getTaxesFromOrder.path(params), pick(params, paramKeys)]
+        return [
+            ...getTaxesFromOrder.path(params),
+            pickValidParams(params, ShopperOrders.paramKeys.getTaxesFromOrder)
+        ]
     }
 }

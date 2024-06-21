@@ -22,6 +22,7 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import * as queryKeyHelpers from '@salesforce/commerce-sdk-react/hooks/ShopperProducts/queryKeyHelpers'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
 import {
     Box,
@@ -296,7 +297,12 @@ const App = (props) => {
                         if (err.code === 'MISSING_TRANSLATION') {
                             // NOTE: Remove the console error for missing translations during development,
                             // as we knew translations would be added later.
-                            console.warn('Missing translation', err.message)
+                            logger.warn('Missing translation', {
+                                namespace: 'App.IntlProvider',
+                                additionalProperties: {
+                                    errorMessage: err.message
+                                }
+                            })
                             return
                         }
                         throw err

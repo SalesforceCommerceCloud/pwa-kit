@@ -22,6 +22,7 @@ import {
 import {CONTENT_ENCODING, X_MOBIFY_FROM_CACHE} from './constants'
 import {X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import {RemoteServerFactory} from './build-remote-server'
+import logger from '../../utils/logger-instance'
 
 export const RESOLVED_PROMISE = Promise.resolve()
 
@@ -161,7 +162,9 @@ const storeResponseInCache = (req, res) => {
             // If an error occurs,we don't want to prevent the
             // response being sent, so we just log.
             .catch((err) => {
-                console.warn(`Unexpected error in cache put: ${err}`)
+                logger.warn(`Unexpected error in cache put: ${err}`, {
+                    namespace: 'express.storeResponseInCache'
+                })
             })
     )
 }

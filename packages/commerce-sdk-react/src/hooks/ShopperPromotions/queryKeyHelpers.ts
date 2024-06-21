@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperPromotions} from 'commerce-sdk-isomorphic'
+import {ShopperPromotions} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {getCustomKeys, pick} from '../utils'
-import paramKeysMap from './paramKeys'
+import {pickValidParams} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperPromotions<{shortCode: string}>
@@ -47,8 +46,10 @@ export const getPromotions: QueryKeyHelper<'getPromotions'> = {
         '/promotions'
     ],
     queryKey: (params: Params<'getPromotions'>) => {
-        const paramKeys = [...paramKeysMap['getPromotions'], ...getCustomKeys(params)]
-        return [...getPromotions.path(params), pick(params, paramKeys)]
+        return [
+            ...getPromotions.path(params),
+            pickValidParams(params, ShopperPromotions.paramKeys.getPromotions)
+        ]
     }
 }
 
@@ -61,7 +62,9 @@ export const getPromotionsForCampaign: QueryKeyHelper<'getPromotionsForCampaign'
         params.campaignId
     ],
     queryKey: (params: Params<'getPromotionsForCampaign'>) => {
-        const paramKeys = [...paramKeysMap['getPromotionsForCampaign'], ...getCustomKeys(params)]
-        return [...getPromotionsForCampaign.path(params), pick(params, paramKeys)]
+        return [
+            ...getPromotionsForCampaign.path(params),
+            pickValidParams(params, ShopperPromotions.paramKeys.getPromotionsForCampaign)
+        ]
     }
 }

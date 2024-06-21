@@ -73,6 +73,7 @@ import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-dat
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 // Constants
 import {
@@ -368,14 +369,20 @@ const ProductList = (props) => {
                 try {
                     einstein.sendViewSearch(searchQuery, productSearchResult)
                 } catch (err) {
-                    console.error(err)
+                    logger.error('Einstein sendViewSearch error', {
+                        namespace: 'ProductList.useEffect',
+                        additionalProperties: {error: err, searchQuery}
+                    })
                 }
                 activeData.sendViewSearch(searchParams, productSearchResult)
             } else {
                 try {
                     einstein.sendViewCategory(category, productSearchResult)
                 } catch (err) {
-                    console.error(err)
+                    logger.error('Einstein sendViewCategory error', {
+                        namespace: 'ProductList.useEffect',
+                        additionalProperties: {error: err, category}
+                    })
                 }
                 activeData.sendViewCategory(searchParams, category, productSearchResult)
             }

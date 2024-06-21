@@ -1,3 +1,4 @@
+## v4.0.0-dev (Jun 21, 2024)
 ## v3.6.0-dev (Apr 17, 2024)
 - Implement core wildcard import logic to be used in upcoming webpack/babel plugins [#1826](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1826)
 

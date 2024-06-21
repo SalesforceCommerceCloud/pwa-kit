@@ -53,14 +53,18 @@ export const usePromoCode = () => {
                 isClosable: true
             })
         } catch (e) {
-            form.setError('code', {
-                type: 'manual',
-                message: formatMessage({
-                    defaultMessage:
-                        'Check the code and try again, it may already be applied or the promo has expired.',
-                    id: 'use_promocode.error.check_the_code'
-                })
-            })
+            form.setError(
+                'code',
+                {
+                    type: 'manual',
+                    message: formatMessage({
+                        defaultMessage:
+                            'Check the code and try again, it may already be applied or the promo has expired.',
+                        id: 'use_promocode.error.check_the_code'
+                    })
+                },
+                {shouldFocus: true}
+            )
         }
     }
 
