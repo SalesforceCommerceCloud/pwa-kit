@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        template: [retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+        template: [retail-react-app-test-project, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ubuntu-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'retail-react-app-test-project' || matrix.template == 'retail-react-app-demo' }}
@@ -72,14 +72,14 @@ jobs:
       #          snyk_token: ${{ secrets.SNYK_TOKEN }}
 
       - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true' && env.DEVELOP == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
-        if: env.IS_NOT_FORK == 'true' && matrix.template == 'express-minimal-test-project'
+        if: env.IS_NOT_FORK == 'true' && matrix.template == 'retail-react-app-test-project'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: ${{ env.PROJECT_DIR }}
