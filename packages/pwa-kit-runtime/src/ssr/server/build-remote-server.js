@@ -622,8 +622,8 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    _handleMissingSlasPrivateEnvVar(app, slasPrivateClientProxyPath) {
-        app.use(slasPrivateClientProxyPath, (_, res) => {
+    _handleMissingSlasPrivateEnvVar(app) {
+        app.use(slasPrivateProxyPath, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
@@ -639,30 +639,28 @@ export const RemoteServerFactory = {
             return
         }
 
-        const slasPrivateClientProxyPath = slasPrivateProxyPath
-
-        localDevLog(`Proxying ${slasPrivateClientProxyPath} to ${options.slasTarget}`)
+        localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
         if (!clientSecret) {
-            this._handleMissingSlasPrivateEnvVar(app, slasPrivateClientProxyPath)
+            this._handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath)
             return
         }
 
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
         app.use(
-            slasPrivateClientProxyPath,
+            slasPrivateProxyPath,
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[slasPrivateClientProxyPath]: ''},
+                pathRewrite: {[slasPrivateProxyPath]: ''},
                 onProxyReq: (proxyRequest, incomingRequest) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
-                        proxyPath: slasPrivateClientProxyPath,
+                        proxyPath: slasPrivateProxyPath,
                         targetHost: options.slasHostName,
                         targetProtocol: 'https'
                     })
