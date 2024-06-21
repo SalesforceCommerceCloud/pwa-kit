@@ -141,7 +141,7 @@ const findDepInStack = (pkg) => {
             return candidate
         }
     }
-    if (pkg === 'loader') {
+    if (pkg === 'babel-loader') {
         console.log('candidate', candidate)
     }
     return candidate
