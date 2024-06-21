@@ -322,6 +322,16 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ]
         }
     },
+    updateItemsInBasket(customerId, {parameters}, response) {
+        return {
+            update: [
+                {queryKey: getBasket.queryKey(parameters)},
+                ...(customerId
+                    ? [updateCustomerBasketsQuery(customerId, parameters, response)]
+                    : [])
+            ]
+        }
+    },
     updatePaymentInstrumentInBasket(customerId, {parameters}, response) {
         return {
             invalidate: [
