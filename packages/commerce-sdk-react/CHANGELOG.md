@@ -2,6 +2,7 @@
 - Upgrade to commerce-sdk-isomorphic v2.0.0 [#1794](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1794)
 - Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
 - Add Shopper Stores hooks [#1788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1788)
+- Add a helper method to add an item to either new or existing basket [#1677](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1677)
 
 ## v1.4.2 (Apr 17, 2024)
 - Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
