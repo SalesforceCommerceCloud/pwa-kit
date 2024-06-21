@@ -33,6 +33,7 @@ import ProductView from '@salesforce/retail-react-app/app/components/product-vie
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 // constant
 import {
@@ -301,7 +302,10 @@ const ProductDetail = () => {
                 try {
                     einstein.sendViewProduct(child)
                 } catch (err) {
-                    console.error(err)
+                    logger.error('Einstein sendViewProduct error', {
+                        namespace: 'ProductDetail.useEffect',
+                        additionalProperties: {error: err, child}
+                    })
                 }
                 activeData.sendViewProduct(category, child, 'detail')
             })
@@ -309,7 +313,10 @@ const ProductDetail = () => {
             try {
                 einstein.sendViewProduct(product)
             } catch (err) {
-                console.error(err)
+                logger.error('Einstein sendViewProduct error', {
+                    namespace: 'ProductDetail.useEffect',
+                    additionalProperties: {error: err, product}
+                })
             }
             activeData.sendViewProduct(category, product, 'detail')
         }

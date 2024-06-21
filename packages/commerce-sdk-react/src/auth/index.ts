@@ -24,6 +24,8 @@ import {
     SLAS_SECRET_OVERRIDE_MSG
 } from '../constant'
 
+import {Logger} from '../types'
+
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
@@ -35,6 +37,7 @@ interface AuthConfig extends ApiClientConfigParams {
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
+    logger: Logger
 }
 
 interface JWTHeaders {
@@ -174,6 +177,7 @@ class Auth {
     private OCAPISessionsURL: string
     private clientSecret: string
     private silenceWarnings: boolean
+    private logger: Logger
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -220,6 +224,8 @@ class Auth {
         this.fetchedToken = config.fetchedToken || ''
 
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
+
+        this.logger = config.logger
 
         /*
          * There are 2 ways to enable SLAS private client mode.
@@ -406,7 +412,7 @@ class Auth {
 
     logWarning = (msg: string) => {
         if (!this.silenceWarnings) {
-            console.warn(msg)
+            this.logger.warn(msg)
         }
     }
 

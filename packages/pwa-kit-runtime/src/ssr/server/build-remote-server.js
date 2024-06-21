@@ -48,7 +48,7 @@ import {
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
-import {morganStream} from '../../utils/morgan-stream'
+import logger from '../../utils/logger-instance'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
@@ -239,24 +239,49 @@ export const RemoteServerFactory = {
      */
 
     _setupLogging(app) {
+        const morganLoggerFormat = function (tokens, req, res) {
+            const contentLength = tokens.res(req, res, 'content-length')
+            return [
+                `(${res.locals.requestId})`,
+                tokens.method(req, res),
+                tokens.url(req, res),
+                tokens.status(req, res),
+                tokens['response-time'](req, res),
+                'ms',
+                contentLength && `- ${contentLength}`
+            ].join(' ')
+        }
+
+        // Morgan stream for logging status codes less than 400
         app.use(
-            expressLogging(
-                function (tokens, req, res) {
-                    const contentLength = tokens.res(req, res, 'content-length')
-                    return [
-                        `(${res.locals.requestId})`,
-                        tokens.method(req, res),
-                        tokens.url(req, res),
-                        tokens.status(req, res),
-                        tokens['response-time'](req, res),
-                        'ms',
-                        contentLength && `- ${contentLength}`
-                    ].join(' ')
+            expressLogging(morganLoggerFormat, {
+                skip: function (req, res) {
+                    return res.statusCode >= 400
                 },
-                {
-                    stream: morganStream
+                stream: {
+                    write: (message) => {
+                        logger.info(message, {
+                            namespace: 'httprequest'
+                        })
+                    }
                 }
-            )
+            })
+        )
+
+        // Morgan stream for logging status codes 400 and above
+        app.use(
+            expressLogging(morganLoggerFormat, {
+                skip: function (req, res) {
+                    return res.statusCode < 400
+                },
+                stream: {
+                    write: (message) => {
+                        logger.error(message, {
+                            namespace: 'httprequest'
+                        })
+                    }
+                }
+            })
         )
     },
 
@@ -269,7 +294,9 @@ export const RemoteServerFactory = {
             const correlationId = req.headers['x-correlation-id']
             const requestId = correlationId ? correlationId : req.headers['x-apigateway-event']
             if (!requestId) {
-                console.error('Both x-correlation-id and x-apigateway-event headers are missing')
+                logger.error('Both x-correlation-id and x-apigateway-event headers are missing', {
+                    namespace: '_setRequestId'
+                })
                 next()
                 return
             }
@@ -678,16 +705,28 @@ export const RemoteServerFactory = {
                 },
                 onProxyRes: (proxyRes, req) => {
                     if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
-                        console.error(
-                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`
+                        logger.error(
+                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`,
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {statusCode: proxyRes.statusCode}
+                            }
                         )
-                        console.error(
-                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`
+                        logger.error(
+                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`,
+                            {namespace: '_setupSlasPrivateClientProxy'}
                         )
-                        console.error(
+                        logger.error(
                             `SLAS Private Client Proxy Request URL - ${req.protocol}://${req.get(
                                 'host'
-                            )}${req.originalUrl}`
+                            )}${req.originalUrl}`,
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {
+                                    protocol: req.protocol,
+                                    originalUrl: req.originalUrl
+                                }
+                            }
                         )
                     }
                 }
@@ -1066,10 +1105,13 @@ const prepNonProxyRequest = (req, res, next) => {
             if (header && header.toLowerCase() !== SET_COOKIE && value) {
                 setHeader.call(this, header, value)
             } /* istanbul ignore else */ else if (!remote) {
-                console.warn(
+                logger.warn(
                     `Req ${res.locals.requestId}: ` +
                         `Cookies cannot be set on responses sent from ` +
-                        `the SSR Server. Discarding "Set-Cookie: ${value}"`
+                        `the SSR Server. Discarding "Set-Cookie: ${value}"`,
+                    {
+                        namespace: 'RemoteServerFactory.prepNonProxyRequest'
+                    }
                 )
             }
         }

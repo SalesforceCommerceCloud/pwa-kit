@@ -13,6 +13,7 @@
 import crypto from 'crypto'
 import {proxyConfigs} from '../ssr-shared'
 import {proxyBasePath, bundleBasePath} from '../ssr-namespace-paths'
+import logger from '../logger-instance'
 
 // TODO: Clean this up or provide a way to toggle
 export const verboseProxyLogging = false
@@ -56,10 +57,15 @@ export const infoLog = (...args) => {
 export const catchAndLog = (err, context) => {
     /* istanbul ignore next */
     const message = `${context || 'Uncaught exception'}: `
-    console.error(
+    logger.error(
         message,
         /* istanbul ignore next */
-        (err && (err.stack || err.message || err)) || '(no error)'
+        {
+            namespace: 'catchAndLog',
+            additionalProperties: {
+                stack: (err && (err.stack || err.message || err)) || '(no error)'
+            }
+        }
     )
 }
 
