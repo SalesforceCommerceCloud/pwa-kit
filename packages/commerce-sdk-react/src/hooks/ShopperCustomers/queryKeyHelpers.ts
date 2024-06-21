@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperCustomers} from 'commerce-sdk-isomorphic'
+import {ShopperCustomers} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {getCustomKeys, pick} from '../utils'
-import paramKeysMap from './paramKeys'
+import {pickValidParams} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperCustomers<{shortCode: string}>
@@ -136,11 +135,7 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 // TODO: Re-implement (and update description from RAML spec) when the endpoint exits closed beta.
 // export const getExternalProfile: QueryKeyHelper<'getExternalProfile'> = {
 //     queryKey: (params: Params<'getExternalProfile'>) => {
-//         const paramKeys = [
-//             ...paramKeysMap['getExternalProfile'],
-//             ...getCustomKeys(getCustomerBaskets)
-//         ]
-//         return [...getExternalProfile.path(params), pick(params, paramKeys)]
+//         return [...getExternalProfile.path(params), pickValidParams(params, ShopperCustomers.paramKeys.getExternalProfile)]
 //     }
 // }
 
@@ -153,8 +148,10 @@ export const getCustomer: QueryKeyHelper<'getCustomer'> = {
         params.customerId
     ],
     queryKey: (params: Params<'getCustomer'>) => {
-        const paramKeys = [...paramKeysMap['getCustomer'], ...getCustomKeys(params)]
-        return [...getCustomer.path(params), pick(params, paramKeys)]
+        return [
+            ...getCustomer.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomer)
+        ]
     }
 }
 
@@ -169,9 +166,10 @@ export const getCustomerAddress: QueryKeyHelper<'getCustomerAddress'> = {
         params.addressName
     ],
     queryKey: (params: Params<'getCustomerAddress'>) => {
-        const paramKeys = [...paramKeysMap['getCustomerAddress'], ...getCustomKeys(params)]
-
-        return [...getCustomerAddress.path(params), pick(params, paramKeys)]
+        return [
+            ...getCustomerAddress.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerAddress)
+        ]
     }
 }
 export const getCustomerBaskets: QueryKeyHelper<'getCustomerBaskets'> = {
@@ -184,8 +182,10 @@ export const getCustomerBaskets: QueryKeyHelper<'getCustomerBaskets'> = {
         '/baskets'
     ],
     queryKey: (params: Params<'getCustomerBaskets'>) => {
-        const paramKeys = [...paramKeysMap['getCustomerBaskets'], ...getCustomKeys(params)]
-        return [...getCustomerBaskets.path(params), pick(params, paramKeys)]
+        return [
+            ...getCustomerBaskets.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerBaskets)
+        ]
     }
 }
 
@@ -199,8 +199,10 @@ export const getCustomerOrders: QueryKeyHelper<'getCustomerOrders'> = {
         '/orders'
     ],
     queryKey: (params: Params<'getCustomerOrders'>) => {
-        const paramKeys = [...paramKeysMap['getCustomerOrders'], ...getCustomKeys(params)]
-        return [...getCustomerOrders.path(params), pick(params, paramKeys)]
+        return [
+            ...getCustomerOrders.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerOrders)
+        ]
     }
 }
 
@@ -215,11 +217,10 @@ export const getCustomerPaymentInstrument: QueryKeyHelper<'getCustomerPaymentIns
         params.paymentInstrumentId
     ],
     queryKey: (params: Params<'getCustomerPaymentInstrument'>) => {
-        const paramKeys = [
-            ...paramKeysMap['getCustomerPaymentInstrument'],
-            ...getCustomKeys(params)
+        return [
+            ...getCustomerPaymentInstrument.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerPaymentInstrument)
         ]
-        return [...getCustomerPaymentInstrument.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -233,8 +234,10 @@ export const getCustomerProductLists: QueryKeyHelper<'getCustomerProductLists'> 
         '/product-lists'
     ],
     queryKey: (params: Params<'getCustomerProductLists'>) => {
-        const paramKeys = [...paramKeysMap['getCustomerProductLists'], ...getCustomKeys(params)]
-        return [...getCustomerProductLists.path(params), pick(params, paramKeys)]
+        return [
+            ...getCustomerProductLists.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerProductLists)
+        ]
     }
 }
 
@@ -249,8 +252,10 @@ export const getCustomerProductList: QueryKeyHelper<'getCustomerProductList'> = 
         params.listId
     ],
     queryKey: (params: Params<'getCustomerProductList'>) => {
-        const paramKeys = [...paramKeysMap['getCustomerProductList'], ...getCustomKeys(params)]
-        return [...getCustomerProductList.path(params), pick(params, paramKeys)]
+        return [
+            ...getCustomerProductList.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerProductList)
+        ]
     }
 }
 
@@ -267,8 +272,10 @@ export const getCustomerProductListItem: QueryKeyHelper<'getCustomerProductListI
         params.itemId
     ],
     queryKey: (params: Params<'getCustomerProductListItem'>) => {
-        const paramKeys = [...paramKeysMap['getCustomerProductListItem'], ...getCustomKeys(params)]
-        return [...getCustomerProductListItem.path(params), pick(params, paramKeys)]
+        return [
+            ...getCustomerProductListItem.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerProductListItem)
+        ]
     }
 }
 
@@ -281,11 +288,13 @@ export const getPublicProductListsBySearchTerm: QueryKeyHelper<'getPublicProduct
             '/product-lists'
         ],
         queryKey: (params: Params<'getPublicProductListsBySearchTerm'>) => {
-            const paramKeys = [
-                ...paramKeysMap['getPublicProductListsBySearchTerm'],
-                ...getCustomKeys(params)
+            return [
+                ...getPublicProductListsBySearchTerm.path(params),
+                pickValidParams(
+                    params,
+                    ShopperCustomers.paramKeys.getPublicProductListsBySearchTerm
+                )
             ]
-            return [...getPublicProductListsBySearchTerm.path(params), pick(params, paramKeys)]
         }
     }
 
@@ -298,8 +307,10 @@ export const getPublicProductList: QueryKeyHelper<'getPublicProductList'> = {
         params.listId
     ],
     queryKey: (params: Params<'getPublicProductList'>) => {
-        const paramKeys = [...paramKeysMap['getPublicProductList'], ...getCustomKeys(params)]
-        return [...getPublicProductList.path(params), pick(params, paramKeys)]
+        return [
+            ...getPublicProductList.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getPublicProductList)
+        ]
     }
 }
 
@@ -314,7 +325,9 @@ export const getProductListItem: QueryKeyHelper<'getProductListItem'> = {
         params.itemId
     ],
     queryKey: (params: Params<'getProductListItem'>) => {
-        const paramKeys = [...paramKeysMap['getProductListItem'], ...getCustomKeys(params)]
-        return [...getProductListItem.path(params), pick(params, paramKeys)]
+        return [
+            ...getProductListItem.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getProductListItem)
+        ]
     }
 }

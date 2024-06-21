@@ -101,6 +101,16 @@ export const pick = <T extends object, K extends keyof T>(
     return picked
 }
 
+/** Get a subset of the given parameters that has the given keys and may contain a custom parameter. */
+export const pickValidParams = <T extends object, K extends keyof T>(
+    parameters: T,
+    endpointParamKeys: readonly K[]
+): Pick<T, K> & Record<`c_${string}`, any> => {
+    const customKeys = getCustomKeys(parameters)
+    const keys = [...endpointParamKeys, ...customKeys]
+    return pick(parameters, keys)
+}
+
 /** Removes keys with `null` or `undefined` values from the given object. */
 export const omitNullable = <T extends object>(obj: T): NullToOptional<T> => {
     // Assertion is not true, yet, but we make it so!
@@ -136,5 +146,5 @@ export const getCustomKeys = <T extends object>(obj: T) => {
     if (typeof obj !== 'object' || obj === null) {
         throw new Error('Invalid input. Expecting an object as an input.')
     }
-    return Object.keys(obj).filter((key: string): key is `c_${string}` => key.startsWith('c_'))
+    return Object.keys(obj).filter((key): key is keyof T & `c_${string}` => key.startsWith('c_'))
 }
