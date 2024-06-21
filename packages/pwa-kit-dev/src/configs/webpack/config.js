@@ -131,13 +131,18 @@ const findDepInStack = (pkg) => {
         resolve(__dirname, '..', '..', 'node_modules', pkg),
         resolve(__dirname, '..', '..', '..', 'node_modules', pkg)
     ]
-    console.log('candidates', candidates)
+    if (pkg === 'babel-loader') {
+        console.log('candidates', candidates)
+    }
 
     let candidate
     for (candidate of candidates) {
         if (fse.existsSync(candidate)) {
             return candidate
         }
+    }
+    if (pkg === 'loader') {
+        console.log('candidate', candidate)
     }
     return candidate
 }
