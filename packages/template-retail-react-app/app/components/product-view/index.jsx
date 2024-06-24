@@ -39,7 +39,15 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getDisplayPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
 
-const ProductViewHeader = ({name, basePrice, discountPrice, isProductPartOfBundle, currency, category, productType}) => {
+const ProductViewHeader = ({
+    name,
+    basePrice,
+    discountPrice,
+    isProductPartOfBundle,
+    currency,
+    category,
+    productType
+}) => {
     const isProductASet = productType?.set
 
     return (

@@ -306,23 +306,17 @@ const ProductDetail = () => {
         try {
             const childProductSelections = Object.values(childProductSelection)
 
-            // TODO: refactor this by inlining it into the basket call
-            const bundledProductItems = childProductSelections.map((child) => {
-                return {
-                    productId: child.variant.productId,
-                    quantity: child.quantity
-                }
-            })
-
-            console.log('### childProductSelections', childProductSelections)
-            console.log('@@@ bundledProductItems', bundledProductItems)
-
             const productItems = [
                 {
                     productId: product.id,
                     price: product.price,
                     quantity: selectedQuantity,
-                    bundledProductItems
+                    bundledProductItems: childProductSelections.map((child) => {
+                        return {
+                            productId: child.variant.productId,
+                            quantity: child.quantity
+                        }
+                    })
                 }
             ]
 
@@ -331,34 +325,28 @@ const ProductDetail = () => {
                 body: productItems
             })
 
-            console.log('RESULT:', res)
-
-            const masterIds = childProductSelections.map((child) => {
+            const bundleChildMasterIds = childProductSelections.map((child) => {
                 return child.product.id
             })
 
-            console.log('@@@ masterIds', masterIds)
-
             // since the returned data includes all products in basket
             // here we compare list of productIds in bundleProductItems of each productItem to filter out the
-            // current bundle that last added into cart
-            const bundle = res.productItems.find((productItem) => {
+            // current bundle that was last added into cart
+            const currentBundle = res.productItems.find((productItem) => {
                 if (!productItem.bundledProductItems?.length) return
-                const childIds = productItem.bundledProductItems?.map((item) => {
+                const bundleChildIds = productItem.bundledProductItems?.map((item) => {
                     // seek out the bundle child that still uses masterId as product id
                     return item.productId
                 })
-                return childIds.every((id) => masterIds.includes(id))
+                return bundleChildIds.every((id) => bundleChildMasterIds.includes(id))
             })
 
-            console.log('resulting bundle:', bundle)
-
-            if (bundle?.bundledProductItems?.length) {
+            if (currentBundle?.bundledProductItems?.length) {
                 const itemsToBeUpdated = []
 
-                bundle.bundledProductItems.forEach(bundleChild => {
+                currentBundle.bundledProductItems.forEach((bundleChild) => {
                     const childSelection = childProductSelections.find(
-                        (childProd) => childProd.product.id === bundleChild.productId
+                        (childProduct) => childProduct.product.id === bundleChild.productId
                     )
                     if (!childSelection) return
                     itemsToBeUpdated.push({
@@ -381,8 +369,6 @@ const ProductDetail = () => {
 
             return childProductSelections
         } catch (error) {
-            // TODO: remove this
-            console.log('@@@ ERROR IN PDP WITH BUNDLES', error)
             showError(error)
         }
     }
