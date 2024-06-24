@@ -3585,6 +3585,20 @@
       "value": "]"
     }
   ],
+  "item_attributes.label.selected_options": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗŀḗḗƈŧḗḗḓ Ǿƥŧīǿǿƞş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "item_image.label.sale": [
     {
       "type": 0,
@@ -5419,6 +5433,34 @@
     {
       "type": 0,
       "value": "Şȧȧŀḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.button.add_bundle_to_cart": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ Ɓŭŭƞḓŀḗḗ ŧǿǿ Ƈȧȧřŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.button.add_bundle_to_wishlist": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ Ɓŭŭƞḓŀḗḗ ŧǿǿ Ẇīşħŀīşŧ"
     },
     {
       "type": 0,

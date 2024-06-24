@@ -10,7 +10,8 @@ import {
     findLowestPrice,
     getDecoratedVariationAttributes,
     getDisplayVariationValues,
-    filterImageGroups
+    filterImageGroups,
+    normalizeSetBundleProduct
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {
     mockMasterProductHitWithMultipleVariants,
@@ -24,6 +25,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/product-tile/promo-callout.mock'
 import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 import {mockProductSearch} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle.js'
 
 const imageGroups = [
     {
@@ -913,5 +915,35 @@ describe('findLowestPrice - confirm API inconsistency', () => {
         expect(result.promotion).toBeNull()
         // The API response does not include the promotional price.. only the callout message.
         // Once fixed, it's supposed to return the promo price of 61.03
+    })
+})
+
+describe('normalizeSetBundleProduct', () => {
+    test('passing in regular product returns original product', () => {
+        const mockProduct = {
+            name: 'Striped Silk Tie',
+            id: '25752986M',
+            type: {master: true}
+        }
+
+        const normalizedProduct = normalizeSetBundleProduct(mockProduct)
+
+        expect(normalizedProduct).toStrictEqual(mockProduct)
+    })
+
+    test('passing in product set normalizes data', () => {
+        const normalizedProduct = normalizeSetBundleProduct(productSetWinterLookM)
+
+        for (let i = 0; i < productSetWinterLookM.setProducts.length; i++) {
+            expect(normalizedProduct.childProducts[i].quantity).toBeNull()
+            expect(normalizedProduct.childProducts[i].product).toStrictEqual(
+                productSetWinterLookM.setProducts[i]
+            )
+        }
+    })
+
+    test('passing in product bundle normalizes data', () => {
+        const normalizedProduct = normalizeSetBundleProduct(mockProductBundle)
+        expect(normalizedProduct.childProducts).toStrictEqual(mockProductBundle.bundledProducts)
     })
 })

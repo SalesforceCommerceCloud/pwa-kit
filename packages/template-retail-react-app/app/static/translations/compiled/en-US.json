@@ -1705,6 +1705,12 @@
       "value": "quantity"
     }
   ],
+  "item_attributes.label.selected_options": [
+    {
+      "type": 0,
+      "value": "Selected Options"
+    }
+  ],
   "item_image.label.sale": [
     {
       "type": 0,
@@ -2559,6 +2565,18 @@
     {
       "type": 0,
       "value": "Sale"
+    }
+  ],
+  "product_view.button.add_bundle_to_cart": [
+    {
+      "type": 0,
+      "value": "Add Bundle to Cart"
+    }
+  ],
+  "product_view.button.add_bundle_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Add Bundle to Wishlist"
     }
   ],
   "product_view.button.add_set_to_cart": [
