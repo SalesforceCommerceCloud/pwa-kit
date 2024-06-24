@@ -86,6 +86,7 @@ const Cart = () => {
     const {customerId, isRegistered} = customer
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
+    const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
         'updateShippingMethodForShipment'
@@ -264,29 +265,42 @@ const Cart = () => {
         try {
             setCartItemLoading(true)
 
-            const item = {
-                productId: bundle.productId,
-                quantity: bundleQuantity,
-                price: bundle.price,
+            const itemsToBeUpdated = []
 
-                bundledProductItems: bundle.bundledProductItems.map(({itemId}, i) => {
-                    const quantityPerBundle = bundle.bundledProducts[i].quantity
-                    const totalQuantity = bundleQuantity * quantityPerBundle
-
-                    return {
-                        itemId,
-                        productId: childProducts[i].variant.productId,
-                        quantity: totalQuantity
-                    }
+            // We only update the parent bundle when the quantity changes
+            // Since top level bundles don't have variants
+            if (bundle.quantity !== bundleQuantity) {
+                itemsToBeUpdated.push({
+                    itemId: bundle.itemId,
+                    productId: bundle.productId,
+                    quantity: bundleQuantity
                 })
             }
-            return await updateItemInBasketMutation.mutateAsync({
-                parameters: {
-                    basketId: basket.basketId,
-                    itemId: selectedItem.itemId
-                },
-                body: item
+
+            bundle.bundledProductItems.forEach(async (bundleChild) => {
+                const childSelection = childProducts.find(
+                    (childProd) => childProd.product.id === bundleChild.productId
+                )
+
+                // Only update the basket if the bundle child variant has been changed
+                if (bundleChild.productId !== childSelection?.variant.productId) {
+                    itemsToBeUpdated.push({
+                        itemId: bundleChild.itemId,
+                        productId: childSelection.variant.productId,
+                        quantity: bundleChild.quantity * bundleQuantity
+                    })
+                }
             })
+
+            if (itemsToBeUpdated.length) {
+                await updateItemsInBasketMutation.mutateAsync({
+                    method: 'PATCH',
+                    parameters: {
+                        basketId: basket.basketId
+                    },
+                    body: itemsToBeUpdated
+                })
+            }
         } catch {
             showError()
         } finally {
