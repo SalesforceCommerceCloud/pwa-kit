@@ -68,6 +68,7 @@ const ProductDetail = () => {
     /****************************** Basket *********************************/
     const {data: basket} = useCurrentBasket()
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
+    const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const {res} = useServerContext()
     if (res) {
         res.set(
@@ -304,12 +305,17 @@ const ProductDetail = () => {
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
+
+            // TODO: refactor this by inlining it into the basket call
             const bundledProductItems = childProductSelections.map((child) => {
                 return {
                     productId: child.variant.productId,
                     quantity: child.quantity
                 }
             })
+
+            console.log('### childProductSelections', childProductSelections)
+            console.log('@@@ bundledProductItems', bundledProductItems)
 
             const productItems = [
                 {
@@ -320,15 +326,63 @@ const ProductDetail = () => {
                 }
             ]
 
-            await addItemToBasketMutation.mutateAsync({
+            const res = await addItemToBasketMutation.mutateAsync({
                 parameters: {basketId: basket.basketId},
                 body: productItems
             })
+
+            console.log('RESULT:', res)
+
+            const masterIds = childProductSelections.map((child) => {
+                return child.product.id
+            })
+
+            console.log('@@@ masterIds', masterIds)
+
+            // since the returned data includes all products in basket
+            // here we compare list of productIds in bundleProductItems of each productItem to filter out the
+            // current bundle that last added into cart
+            const bundle = res.productItems.find((productItem) => {
+                if (!productItem.bundledProductItems?.length) return
+                const childIds = productItem.bundledProductItems?.map((item) => {
+                    // seek out the bundle child that still uses masterId as product id
+                    return item.productId
+                })
+                return childIds.every((id) => masterIds.includes(id))
+            })
+
+            console.log('resulting bundle:', bundle)
+
+            if (bundle?.bundledProductItems?.length) {
+                const itemsToBeUpdated = []
+
+                bundle.bundledProductItems.forEach(bundleChild => {
+                    const childSelection = childProductSelections.find(
+                        (childProd) => childProd.product.id === bundleChild.productId
+                    )
+                    if (!childSelection) return
+                    itemsToBeUpdated.push({
+                        itemId: bundleChild.itemId,
+                        productId: childSelection.variant.productId,
+                        quantity: bundleChild.quantity
+                    })
+                })
+
+                await updateItemsInBasketMutation.mutateAsync({
+                    method: 'PATCH',
+                    parameters: {
+                        basketId: basket.basketId
+                    },
+                    body: itemsToBeUpdated
+                })
+            }
 
             einstein.sendAddToCart(productItems)
 
             return childProductSelections
         } catch (error) {
+            // TODO: remove this
+            console.log('@@@ ERROR IN PDP WITH BUNDLES', error)
             showError(error)
         }
     }
