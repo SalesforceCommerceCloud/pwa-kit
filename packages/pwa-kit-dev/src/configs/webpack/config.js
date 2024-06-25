@@ -123,7 +123,7 @@ const getAppEntryPoint = () => {
 
 const findDepInStack = (pkg) => {
     console.log('pkg', pkg)
-    console.log('projectDir', projectDir)
+
     // Look for the SDK node_modules in two places because in CI,
     // pwa-kit-dev is published under a 'dist' directory, which
     // changes this file's location relative to the package root.
@@ -134,6 +134,8 @@ const findDepInStack = (pkg) => {
     ]
     if (pkg === 'babel-loader') {
         console.log('candidates', candidates)
+        console.log('projectDir', projectDir)
+        console.log('__dirname', __dirname)
     }
 
     let candidate
