@@ -85,7 +85,7 @@ const mockSearchStoresData = [
     }
 ]
 
-const WrapperComponent = ({storesInfo}) => {
+const WrapperComponent = ({storesInfo, searchStoresParams, userHasSetGeolocation}) => {
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -99,33 +99,52 @@ const WrapperComponent = ({storesInfo}) => {
         <StoreLocatorContent
             form={form}
             storesInfo={storesInfo}
-            searchStoresParams={{
-                postalCode: '10178',
-                countryCode: 'DE'
-            }}
+            submitForm={jest.fn()}
+            searchStoresParams={searchStoresParams}
             setSearchStoresParams={jest.fn()}
+            userHasSetGeolocation={userHasSetGeolocation}
         />
     )
 }
 WrapperComponent.propTypes = {
-    storesInfo: PropTypes.array
+    storesInfo: PropTypes.array,
+    userHasSetGeolocation: PropTypes.bool,
+    searchStoresParams: PropTypes.object
 }
 
 describe('StoreLocatorContent', () => {
     test('renders without crashing', () => {
         expect(() => {
-            renderWithProviders(<WrapperComponent storesInfo={mockSearchStoresData} />)
+            renderWithProviders(
+                <WrapperComponent
+                    searchStoresParams={{
+                        postalCode: '10178',
+                        countryCode: 'DE'
+                    }}
+                    storesInfo={mockSearchStoresData}
+                    userHasSetGeolocation={true}
+                />
+            )
         }).not.toThrow()
     })
 
     test('Expected information exists', async () => {
-        renderWithProviders(<WrapperComponent storesInfo={mockSearchStoresData} />)
+        renderWithProviders(
+            <WrapperComponent
+                storesInfo={mockSearchStoresData}
+                searchStoresParams={{
+                    postalCode: '10178',
+                    countryCode: 'DE'
+                }}
+                userHasSetGeolocation={true}
+            />
+        )
 
         await waitFor(async () => {
             const findButton = screen.getByRole('button', {name: /Find/i})
             const useMyLocationButton = screen.getByRole('button', {name: /Use My Location/i})
             const descriptionFindAStore = screen.getByText(/Find a Store/i)
-            const viewing = screen.getByText(/Viewing stores within 100 miles/i)
+            const viewing = screen.getByText(/Viewing stores near 10178/i)
 
             expect(findButton).toBeInTheDocument()
             expect(useMyLocationButton).toBeInTheDocument()
@@ -135,12 +154,40 @@ describe('StoreLocatorContent', () => {
     })
 
     test('No stores text exists', async () => {
-        renderWithProviders(<WrapperComponent storesInfo={[]} />)
+        renderWithProviders(
+            <WrapperComponent
+                storesInfo={[]}
+                searchStoresParams={{
+                    postalCode: '10178',
+                    countryCode: 'DE'
+                }}
+                userHasSetGeolocation={true}
+            />
+        )
 
         await waitFor(async () => {
             const noLocations = screen.getByText(/Sorry, there are no locations in this area/i)
 
             expect(noLocations).toBeInTheDocument()
+        })
+    })
+
+    test('Near your location text exists', async () => {
+        renderWithProviders(
+            <WrapperComponent
+                storesInfo={mockSearchStoresData}
+                searchStoresParams={{
+                    latitude: 100,
+                    longitude: 100
+                }}
+                userHasSetGeolocation={true}
+            />
+        )
+
+        await waitFor(async () => {
+            const nearYourLocation = screen.getByText(/Viewing stores near your location/i)
+
+            expect(nearYourLocation).toBeInTheDocument()
         })
     })
 })

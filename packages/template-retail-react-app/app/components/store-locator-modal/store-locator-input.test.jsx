@@ -10,9 +10,9 @@ import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
-import {Wrap} from '../shared/ui/index'
+import PropTypes from 'prop-types'
 
-const WrapperComponent = () => {
+const WrapperComponent = (userHasSetGeolocation) => {
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -28,11 +28,16 @@ const WrapperComponent = () => {
                 postalCode: '10178',
                 countryCode: 'DE'
             }}
-            setSearchStoresParams={jest.fn()}
+            getUserGeolocation={jest.fn()}
             form={form}
             submitForm={jest.fn()}
+            userHasSetGeolocation={userHasSetGeolocation}
         />
     )
+}
+WrapperComponent.propTypes = {
+    storesInfo: PropTypes.array,
+    userHasSetGeolocation: PropTypes.bool
 }
 
 describe('StoreLocatorInput', () => {

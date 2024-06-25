@@ -129,11 +129,6 @@ const App = (props) => {
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {
-        isOpen: isOpenStoreLocator,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
-    } = useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -272,6 +267,10 @@ const App = (props) => {
         history.push(path)
     }
 
+    const onStoreLocatorClick = () => {
+        setStoreLocatorIsOpen(true)
+    }
+
     const trackPage = () => {
         activeData.trackPage(site.id, locale.id, currency)
     }
@@ -279,7 +278,6 @@ const App = (props) => {
     useEffect(() => {
         trackPage()
     }, [location])
-
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
@@ -349,10 +347,13 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            <StoreLocatorModal
-                                isOpen={isOpenStoreLocator}
-                                onClose={onCloseStoreLocator}
-                            />
+                            {storeLocatorIsOpen && (
+                                <StoreLocatorModal
+                                    onClose={() => {
+                                        setStoreLocatorIsOpen(false)
+                                    }}
+                                />
+                            )}
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <>
@@ -363,7 +364,7 @@ const App = (props) => {
                                             onMyCartClick={onCartClick}
                                             onMyAccountClick={onAccountClick}
                                             onWishlistClick={onWishlistClick}
-                                            onStoreLocatorClick={onOpenStoreLocator}
+                                            onStoreLocatorClick={onStoreLocatorClick}
                                         >
                                             <HideOnDesktop>
                                                 <DrawerMenu

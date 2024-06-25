@@ -15,7 +15,7 @@ import {
     ModalContent,
     useBreakpointValue,
     Button,
-    Box,
+    Box
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
@@ -26,17 +26,34 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {useForm} from 'react-hook-form'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 
-const StoreLocatorModal = ({isOpen, onClose = noop}) => {
+const StoreLocatorModal = ({onClose = noop}) => {
     const intl = useIntl()
-    const [userHasSetGeolocation, setUserHasSetGeolocation] = useState(false)
-    const [searchStoresParams, setSearchStoresParams] = useState({
+    var defaultSearchStoresParams = {
         countryCode: DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
         limit: 10
-    })
-    const searchStoresDataRef = useRef({});
-    console.log("(JEREMY) searchStoresParams: ", searchStoresParams)
+    }
+    var defaultUserHasSetGeolocation = false
+    if (!isServer) {
+        var searchStoresParamsFromLocalStorage = JSON.parse(
+            window.localStorage.getItem('STORE_LOCATOR_SEARCH_STORES_PARAMS')
+        )
+        var userHasSetGeolocationFromLocalStorage = window.localStorage.getItem(
+            'STORE_LOCATOR_USER_HAS_SET_GEOLOCATION'
+        )
+        if (searchStoresParamsFromLocalStorage)
+            defaultSearchStoresParams = searchStoresParamsFromLocalStorage
+        if (userHasSetGeolocationFromLocalStorage)
+            defaultUserHasSetGeolocation = Boolean(userHasSetGeolocationFromLocalStorage)
+    }
+
+    const [userHasSetGeolocation, setUserHasSetGeolocation] = useState(defaultUserHasSetGeolocation)
+
+    const [searchStoresParams, setSearchStoresParams] = useState(defaultSearchStoresParams)
+    const searchStoresDataRef = useRef({})
+
     var searchStoresData = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.latitude ? undefined : searchStoresParams.countryCode,
@@ -49,8 +66,7 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
             offset: 0
         }
     })
-    if (searchStoresData.data !== undefined)
-        searchStoresDataRef.current = searchStoresData
+    if (searchStoresData.data !== undefined) searchStoresDataRef.current = searchStoresData
 
     const storesInfo =
         searchStoresDataRef.current.data !== undefined
@@ -58,12 +74,14 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
                 ? searchStoresDataRef.current.data.data
                 : []
             : undefined
-    const numStores = searchStoresDataRef.current.data !== undefined ? searchStoresDataRef.current.data.total : 0
+    const numStores =
+        searchStoresDataRef.current.data !== undefined ? searchStoresDataRef.current.data.total : 0
+
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
         defaultValues: {
-            countryCode: searchStoresParams.countryCode,
+            countryCode: userHasSetGeolocation ? searchStoresParams.countryCode : '',
             postalCode: userHasSetGeolocation ? searchStoresParams.postalCode : ''
         }
     })
@@ -79,11 +97,27 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
 
     const isDesktopView = useBreakpointValue({base: false, lg: true})
 
+    useEffect(() => {
+        console.log('(JEREMY) about to cache searchStoresParams: ', searchStoresParams)
+        if (!isServer)
+            window.localStorage.setItem(
+                'STORE_LOCATOR_SEARCH_STORES_PARAMS',
+                JSON.stringify(searchStoresParams)
+            )
+    }, [searchStoresParams])
+
+    useEffect(() => {
+        if (!isServer)
+            window.localStorage.setItem(
+                'STORE_LOCATOR_USER_HAS_SET_GEOLOCATION',
+                userHasSetGeolocation ? 1 : 0
+            )
+    }, [userHasSetGeolocation])
+    
     return (
         <>
             {isDesktopView ? (
-                <Modal size="4xl" isOpen={isOpen} onClose={onClose}
-                >
+                <Modal size="4xl" isOpen={true} onClose={onClose}>
                     <ModalContent
                         display={{base: 'none', lg: 'block'}}
                         position="absolute"
@@ -94,7 +128,11 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
                         marginTop="0px"
                     >
                         <ModalCloseButton onClick={onClose} />
-                        <ModalBody pb={8} bg="white" paddingBottom={6} paddingTop={6}
+                        <ModalBody
+                            pb={8}
+                            bg="white"
+                            paddingBottom={6}
+                            paddingTop={6}
                             borderLeft="1px solid"
                             borderColor="gray.200"
                         >
@@ -106,17 +144,18 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
                                 setSearchStoresParams={setSearchStoresParams}
                                 userHasSetGeolocation={userHasSetGeolocation}
                             />
-                            {
-                                (searchStoresParams.limit < numStores && searchStoresParams.limit < 200) ?
-                                <Box
-                                    marginTop="10px"
-                                >
+                            {searchStoresParams.limit < numStores &&
+                            searchStoresParams.limit < 200 ? (
+                                <Box marginTop="10px">
                                     <Button
                                         key="load-more-button"
                                         onClick={() => {
                                             setSearchStoresParams({
                                                 ...searchStoresParams,
-                                                limit: searchStoresParams.limit + 15 <= 200 ? searchStoresParams.limit + 15 : searchStoresParams.limit
+                                                limit:
+                                                    searchStoresParams.limit + 15 <= 200
+                                                        ? searchStoresParams.limit + 15
+                                                        : searchStoresParams.limit
                                             })
                                         }}
                                         width="100%"
@@ -128,13 +167,15 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
                                             defaultMessage: 'Load More'
                                         })}
                                     </Button>
-                                </Box> : ''
-                            }
+                                </Box>
+                            ) : (
+                                ''
+                            )}
                         </ModalBody>
                     </ModalContent>
                 </Modal>
             ) : (
-                <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
+                <Modal size="4xl" onClose={onClose}>
                     <ModalContent
                         position="absolute"
                         top="0"
@@ -163,7 +204,6 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
 }
 
 StoreLocatorModal.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func
 }
 

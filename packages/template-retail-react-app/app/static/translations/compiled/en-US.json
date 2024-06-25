@@ -2939,18 +2939,20 @@
       "value": "Phone:"
     }
   ],
-  "store_locator.description.viewing_within": [
+  "store_locator.description.viewing_near_postal_code": [
     {
       "type": 0,
-      "value": "Viewing stores within "
+      "value": "Viewing stores near "
     },
     {
       "type": 1,
-      "value": "distance"
-    },
+      "value": "postalCode"
+    }
+  ],
+  "store_locator.description.viewing_near_your_location": [
     {
       "type": 0,
-      "value": " miles"
+      "value": "Viewing stores near your location"
     }
   ],
   "store_locator.dropdown.germany": [

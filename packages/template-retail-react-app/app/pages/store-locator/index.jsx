@@ -7,11 +7,7 @@
 
 import React, {useState, useRef} from 'react'
 import {useIntl} from 'react-intl'
-import {
-    Box, 
-    Container,
-    Button
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Container, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
@@ -30,16 +26,16 @@ const StoreLocator = () => {
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
         limit: 10
     })
-    const searchStoresDataRef = useRef({});
+    const searchStoresDataRef = useRef({})
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
         defaultValues: {
-            countryCode: searchStoresParams.countryCode,
+            countryCode: userHasSetGeolocation ? searchStoresParams.countryCode : '',
             postalCode: userHasSetGeolocation ? searchStoresParams.postalCode : ''
         }
     })
-    
+
     var searchStoresData = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.latitude ? undefined : searchStoresParams.countryCode,
@@ -52,9 +48,8 @@ const StoreLocator = () => {
             offset: 0
         }
     })
-    if (searchStoresData.data !== undefined)
-        searchStoresDataRef.current = searchStoresData
-    console.log("(JEREMY) searchStoresDataRef.current: ", searchStoresDataRef.current)
+    if (searchStoresData.data !== undefined) searchStoresDataRef.current = searchStoresData
+    console.log('(JEREMY) searchStoresDataRef.current: ', searchStoresDataRef.current)
     const storesInfo =
         searchStoresDataRef.current.data !== undefined
             ? searchStoresDataRef.current.data.data !== undefined
@@ -62,7 +57,8 @@ const StoreLocator = () => {
                 : []
             : undefined
 
-    const numStores = searchStoresDataRef.current.data !== undefined ? searchStoresDataRef.current.data.total : 0
+    const numStores =
+        searchStoresDataRef.current.data !== undefined ? searchStoresDataRef.current.data.total : 0
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
         setSearchStoresParams({
@@ -93,17 +89,17 @@ const StoreLocator = () => {
                     searchStoresParams={searchStoresParams}
                     setSearchStoresParams={setSearchStoresParams}
                 />
-                {
-                    (searchStoresParams.limit < numStores && searchStoresParams.limit < 200) ?
-                    <Box
-                        marginTop="10px"
-                    >
+                {searchStoresParams.limit < numStores && searchStoresParams.limit < 200 ? (
+                    <Box marginTop="10px">
                         <Button
                             key="load-more-button"
                             onClick={() => {
                                 setSearchStoresParams({
                                     ...searchStoresParams,
-                                    limit: searchStoresParams.limit + 15 <= 200 ? searchStoresParams.limit + 15 : searchStoresParams.limit
+                                    limit:
+                                        searchStoresParams.limit + 15 <= 200
+                                            ? searchStoresParams.limit + 15
+                                            : searchStoresParams.limit
                                 })
                             }}
                             width="100%"
@@ -115,8 +111,10 @@ const StoreLocator = () => {
                                 defaultMessage: 'Load More'
                             })}
                         </Button>
-                    </Box> : ''
-                }
+                    </Box>
+                ) : (
+                    ''
+                )}
             </Container>
         </Box>
     )

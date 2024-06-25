@@ -6283,22 +6283,32 @@
       "value": "]"
     }
   ],
-  "store_locator.description.viewing_within": [
+  "store_locator.description.viewing_near_postal_code": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ṽīḗḗẇīƞɠ şŧǿǿřḗḗş ẇīŧħīƞ "
+      "value": "Ṽīḗḗẇīƞɠ şŧǿǿřḗḗş ƞḗḗȧȧř "
     },
     {
       "type": 1,
-      "value": "distance"
+      "value": "postalCode"
     },
     {
       "type": 0,
-      "value": " ḿīŀḗḗş"
+      "value": "]"
+    }
+  ],
+  "store_locator.description.viewing_near_your_location": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ṽīḗḗẇīƞɠ şŧǿǿřḗḗş ƞḗḗȧȧř ẏǿǿŭŭř ŀǿǿƈȧȧŧīǿǿƞ"
     },
     {
       "type": 0,

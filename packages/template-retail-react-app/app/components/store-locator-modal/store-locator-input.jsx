@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -18,64 +18,35 @@ import {
 import {Controller} from 'react-hook-form'
 import {SUPPORTED_STORE_LOCATOR_COUNTRIES} from '@salesforce/retail-react-app/app/constants'
 
-const StoreLocatorInput = ({form, submitForm, searchStoresParams, setSearchStoresParams, userHasSetGeolocation}) => {
+const StoreLocatorInput = ({
+    form,
+    submitForm,
+    searchStoresParams,
+    userHasSetGeolocation,
+    getUserGeolocation
+}) => {
     const {control} = form
     const intl = useIntl()
-
-    function error() {
-        console.log("Unable to retrieve your location");
-    }
-
-    function success(position) {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-        setSearchStoresParams({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            limit: 15
-        })
-        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-    }
-    
-    useEffect(() => {
-        if (typeof navigator !== 'undefined' && navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(success, error);
-        } else {
-            console.log("Geolocation not supported");
-        }  
-    }, [])
+    // console.log("(JEREMY) searchStoresParams: ", searchStoresParams)
+    // console.log("(JEREMY) userHasSetGeolocation: ", userHasSetGeolocation)
+    // console.log("(JEREMY) searchStoresParams: ", searchStoresParams)
     return (
-        <form
-            id="store-locator-form"
-            onSubmit={form.handleSubmit(submitForm)}
-        >
-            <InputGroup>
-                <Controller
-                    name="postalCode"
-                    control={control}
-                    defaultValue={userHasSetGeolocation ? searchStoresParams?.postalCode : ''}
-                    render={({field}) => {
-                        return (
-                            <Input
-                                {...field}
-                                marginBottom="10px"
-                                placeholder={intl.formatMessage({
-                                    id: 'store_locator.field.placeholder.enter_postal_code',
-                                    defaultMessage: 'Enter postal code'
-                                })}
-                            />
-                        )
-                    }}
-                ></Controller>
-            </InputGroup>
+        <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>
                 <Controller
                     name="countryCode"
                     control={control}
-                    defaultValue={searchStoresParams?.countryCode}
+                    defaultValue={userHasSetGeolocation ? searchStoresParams?.countryCode : ''}
                     render={({field}) => {
-                        return (
-                            <Select {...field}>
+                        return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
+                            <Select
+                                {...field}
+                                marginBottom="10px"
+                                placeholder={intl.formatMessage({
+                                    id: 'store_locator.action.select_a_country',
+                                    defaultMessage: 'Select a country'
+                                })}
+                            >
                                 {SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
                                     ({countryCode, countryName}) => {
                                         return (
@@ -86,6 +57,26 @@ const StoreLocatorInput = ({form, submitForm, searchStoresParams, setSearchStore
                                     }
                                 )}
                             </Select>
+                        ) : (
+                            <></>
+                        )
+                    }}
+                ></Controller>
+            </InputGroup>
+            <InputGroup>
+                <Controller
+                    name="postalCode"
+                    control={control}
+                    defaultValue={userHasSetGeolocation ? searchStoresParams?.postalCode : ''}
+                    render={({field}) => {
+                        return (
+                            <Input
+                                {...field}
+                                placeholder={intl.formatMessage({
+                                    id: 'store_locator.field.placeholder.enter_postal_code',
+                                    defaultMessage: 'Enter postal code'
+                                })}
+                            />
                         )
                     }}
                 ></Controller>
@@ -113,13 +104,7 @@ const StoreLocatorInput = ({form, submitForm, searchStoresParams, setSearchStore
             </Box>
             <Button
                 key="use-my-location-button"
-                onClick={() => {
-                    if (typeof navigator !== 'undefined' && navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(success, error);
-                    } else {
-                        console.log("Geolocation not supported");
-                    }  
-                }}
+                onClick={getUserGeolocation}
                 width="100%"
                 variant="solid"
                 fontWeight="bold"
@@ -138,7 +123,10 @@ StoreLocatorInput.propTypes = {
     form: PropTypes.object,
     storesInfo: PropTypes.array,
     searchStoresParams: PropTypes.object,
-    submitForm: PropTypes.func
+    setSearchStoresParams: PropTypes.func,
+    submitForm: PropTypes.func,
+    getUserGeolocation: PropTypes.func,
+    userHasSetGeolocation: PropTypes.bool
 }
 
 export default StoreLocatorInput

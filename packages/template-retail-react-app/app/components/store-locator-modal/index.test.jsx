@@ -102,9 +102,9 @@ describe('StoreLocatorModal', () => {
         ])
     })
     test('renders without crashing', () => {
-        const setIsOpen = jest.fn()
+        const onClose = jest.fn()
         expect(() => {
-            renderWithProviders(<StoreLocatorModal isOpen={false} setIsOpen={setIsOpen} />)
+            renderWithProviders(<StoreLocatorModal onClose={onClose} />)
         }).not.toThrow()
     })
 })
