@@ -17,10 +17,14 @@ import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} fr
 import {CustomerType} from '../hooks/useCustomerType'
 import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
 import {
+    MOBIFY_PATH,
+    SLAS_PRIVATE_PROXY_PATH,
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
     SLAS_SECRET_OVERRIDE_MSG
 } from '../constant'
+
+import {Logger} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -33,6 +37,7 @@ interface AuthConfig extends ApiClientConfigParams {
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
+    logger: Logger
 }
 
 interface JWTHeaders {
@@ -172,11 +177,12 @@ class Auth {
     private OCAPISessionsURL: string
     private clientSecret: string
     private silenceWarnings: boolean
+    private logger: Logger
 
     constructor(config: AuthConfig) {
-        // Special endpoint for injecting SLAS private client secret
-        const baseUrl = config.proxy.split(`/mobify/proxy/api`)[0]
-        const privateClientEndpoint = `${baseUrl}/mobify/slas/private`
+        // Special endpoint for injecting SLAS private client secret.
+        const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
+        const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
 
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
@@ -218,6 +224,8 @@ class Auth {
         this.fetchedToken = config.fetchedToken || ''
 
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
+
+        this.logger = config.logger
 
         /*
          * There are 2 ways to enable SLAS private client mode.
@@ -404,7 +412,7 @@ class Auth {
 
     logWarning = (msg: string) => {
         if (!this.silenceWarnings) {
-            console.warn(msg)
+            this.logger.warn(msg)
         }
     }
 

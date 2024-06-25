@@ -44,7 +44,13 @@ const AccountWishlist = () => {
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
 
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
-        {parameters: {ids: productIds?.join(','), allImages: true}},
+        {
+            parameters: {
+                ids: productIds?.join(','),
+                allImages: true,
+                perPricebook: true
+            }
+        },
         {enabled: productIds?.length > 0}
     )
 
@@ -188,33 +194,36 @@ const AccountWishlist = () => {
 
             {!isPageLoading &&
                 wishListItems &&
-                wishListItems.map((item) => (
-                    <ProductItem
-                        key={item.id}
-                        product={{
-                            ...item.product,
-                            quantity: item.quantity
-                        }}
-                        showLoading={
-                            (updateCustomerProductListItem.isLoading ||
-                                deleteCustomerProductListItem.isLoading ||
-                                isWishlistItemLoading) &&
-                            selectedItem === item.productId
-                        }
-                        primaryAction={<WishlistPrimaryAction />}
-                        onItemQuantityChange={(quantity) =>
-                            handleItemQuantityChanged(quantity, item)
-                        }
-                        secondaryActions={
-                            <WishlistSecondaryButtonGroup
-                                productListItemId={item.id}
-                                // Focus to 'Wishlist' header after remove for accessibility
-                                focusElementOnRemove={headingRef}
-                                onClick={handleSecondaryAction}
-                            />
-                        }
-                    />
-                ))}
+                Object.keys(wishListItems).map((key) => {
+                    const item = wishListItems[key]
+                    return (
+                        <ProductItem
+                            key={item.id}
+                            product={{
+                                ...item.product,
+                                quantity: item.quantity
+                            }}
+                            showLoading={
+                                (updateCustomerProductListItem.isLoading ||
+                                    deleteCustomerProductListItem.isLoading ||
+                                    isWishlistItemLoading) &&
+                                selectedItem === item.productId
+                            }
+                            primaryAction={<WishlistPrimaryAction />}
+                            onItemQuantityChange={(quantity) =>
+                                handleItemQuantityChanged(quantity, item)
+                            }
+                            secondaryActions={
+                                <WishlistSecondaryButtonGroup
+                                    productListItemId={item.id}
+                                    // Focus to 'Wishlist' header after remove for accessibility
+                                    focusElementOnRemove={headingRef}
+                                    onClick={handleSecondaryAction}
+                                />
+                            }
+                        />
+                    )
+                })}
 
             <UnavailableProductConfirmationModal
                 productIds={productIds}

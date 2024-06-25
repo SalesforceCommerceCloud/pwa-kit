@@ -12,19 +12,19 @@ import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useQuery, useQueries} from '@tanstack/react-query'
+import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
-    useCommerceApi,
-    useCustomerBaskets,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import * as queryKeyHelpers from '@salesforce/commerce-sdk-react/hooks/ShopperProducts/queryKeyHelpers'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
 import {
     Box,
+    Center,
+    Fade,
+    Spinner,
     useDisclosure,
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -41,8 +41,8 @@ import ScrollToTop from '@salesforce/retail-react-app/app/components/scroll-to-t
 import Footer from '@salesforce/retail-react-app/app/components/footer'
 import CheckoutHeader from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-header'
 import CheckoutFooter from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-footer'
-import DrawerMenu from '@salesforce/retail-react-app/app/components/drawer-menu'
-import ListMenu from '@salesforce/retail-react-app/app/components/list-menu'
+import {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-menu'
+import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
 
@@ -53,16 +53,14 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
+// HOCs
+import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
+
 // Localization
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {
-    watchOnlineStatus,
-    flatten,
-    mergeMatchedItems,
-    isServer
-} from '@salesforce/retail-react-app/app/utils/utils'
+import {watchOnlineStatus, flatten, isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -77,48 +75,56 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 
-const onClient = typeof window !== 'undefined'
+const PlaceholderComponent = () => (
+    <Center p="2">
+        <Spinner size="lg" />
+    </Center>
+)
 
-/*
-The categories tree can be really large! For performance reasons,
-we only load the level 0 categories on server side, and load the rest
-on client side to reduce SSR page size.
-*/
-const useLazyLoadCategories = () => {
-    const itemsKey = 'categories'
-
-    const levelZeroCategoriesQuery = useCategory({
-        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
-    })
-
-    const ids = levelZeroCategoriesQuery.data?.[itemsKey]?.map((category) => category.id)
-    const queries = useCategoryBulk(ids, {
-        enabled: onClient && ids?.length > 0
-    })
-    const dataArray = queries.map((query) => query.data).filter(Boolean)
-    const isLoading = queries.some((query) => query.isLoading)
-    const isError = queries.some((query) => query.isError)
-    return {
-        isLoading,
-        isError,
-        data: {
-            ...levelZeroCategoriesQuery.data,
-            [itemsKey]: mergeMatchedItems(
-                levelZeroCategoriesQuery.data?.categories || [],
-                dataArray
-            )
-        }
+const DrawerMenuItemWithData = withCommerceSdkReact(
+    ({itemComponent: ItemComponent, data, ...rest}) => (
+        <Fade in={true}>
+            <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
+        </Fade>
+    ),
+    {
+        hook: useCategory,
+        queryOptions: ({item}) => ({
+            parameters: {
+                id: item.id
+            }
+        }),
+        placeholder: PlaceholderComponent
     }
-}
+)
+
+const ListMenuContentWithData = withCommerceSdkReact(
+    ({data, ...rest}) => (
+        <Fade in={true}>
+            <ListMenuContent {...rest} item={data} />
+        </Fade>
+    ),
+    {
+        hook: useCategory,
+        queryOptions: ({item}) => ({
+            parameters: {
+                id: item.id,
+                levels: 2
+            }
+        }),
+        placeholder: PlaceholderComponent
+    }
+)
 
 const App = (props) => {
     const {children} = props
-    const {data: categoriesTree} = useLazyLoadCategories()
+    const {data: categoriesTree} = useCategory({
+        parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
+    })
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = getAppOrigin()
     const activeData = useActiveData()
-
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
@@ -177,24 +183,10 @@ const App = (props) => {
     // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
     const {data: customer} = useCurrentCustomer()
-    const {data: baskets} = useCustomerBaskets(
-        {parameters: {customerId: customer.customerId}},
-        {enabled: !!customer.customerId && !isServer}
-    )
     const {data: basket} = useCurrentBasket()
 
-    const createBasket = useShopperBasketsMutation('createBasket')
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
-
-    useEffect(() => {
-        // Create a new basket if the current customer doesn't have one.
-        if (baskets?.total === 0) {
-            createBasket.mutate({
-                body: {}
-            })
-        }
-    }, [baskets])
 
     useEffect(() => {
         // update the basket currency if it doesn't match the current locale currency
@@ -296,7 +288,12 @@ const App = (props) => {
                         if (err.code === 'MISSING_TRANSLATION') {
                             // NOTE: Remove the console error for missing translations during development,
                             // as we knew translations would be added later.
-                            console.warn('Missing translation', err.message)
+                            logger.warn('Missing translation', {
+                                namespace: 'App.IntlProvider',
+                                additionalProperties: {
+                                    errorMessage: err.message
+                                }
+                            })
                             return
                         }
                         throw err
@@ -363,6 +360,9 @@ const App = (props) => {
                                                     root={
                                                         categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
                                                     }
+                                                    itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
+                                                    itemComponent={DrawerMenuItemWithData}
                                                 />
                                             </HideOnDesktop>
 
@@ -371,6 +371,9 @@ const App = (props) => {
                                                     root={
                                                         categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
                                                     }
+                                                    itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
+                                                    contentComponent={ListMenuContentWithData}
                                                 />
                                             </HideOnMobile>
                                         </Header>
@@ -434,49 +437,6 @@ const App = (props) => {
 
 App.propTypes = {
     children: PropTypes.node
-}
-
-/**
- * a hook that parallelly and individually fetches category based on the given ids
- * @param ids - list of categories ids to fetch
- * @param queryOptions -  react query options
- * @return list of react query results
- */
-export const useCategoryBulk = (ids = [], queryOptions) => {
-    const api = useCommerceApi()
-    const {getTokenWhenReady} = useAccessToken()
-    const {
-        app: {commerceAPI}
-    } = getConfig()
-    const {
-        parameters: {organizationId}
-    } = commerceAPI
-    const {site} = useMultiSite()
-
-    const queries = ids.map((id) => {
-        return {
-            queryKey: queryKeyHelpers.getCategory.queryKey({
-                id,
-                levels: 2,
-                organizationId,
-                siteId: site.id
-            }),
-            queryFn: async () => {
-                const token = await getTokenWhenReady()
-                const res = await api.shopperProducts.getCategory({
-                    parameters: {id, levels: 2},
-                    headers: {
-                        authorization: `Bearer ${token}`
-                    }
-                })
-                return res
-            },
-            ...queryOptions,
-            enabled: queryOptions.enabled !== false && Boolean(id)
-        }
-    })
-    const res = useQueries({queries})
-    return res
 }
 
 export default App

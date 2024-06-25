@@ -16,9 +16,10 @@ import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/sh
 import {
     useProduct,
     useCategory,
-    useShopperBasketsMutation,
     useShopperCustomersMutation,
-    useCustomerId
+    useShopperBasketsMutation,
+    useCustomerId,
+    useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -34,6 +35,7 @@ import ProductView from '@salesforce/retail-react-app/app/components/product-vie
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 // constant
 import {
@@ -66,8 +68,8 @@ const ProductDetail = () => {
     const childProductRefs = React.useRef({})
 
     /****************************** Basket *********************************/
-    const {data: basket} = useCurrentBasket()
-    const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
+    const {isLoading: isBasketLoading} = useCurrentBasket()
+    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const {res} = useServerContext()
     if (res) {
@@ -76,7 +78,6 @@ const ProductDetail = () => {
             `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
         )
     }
-    const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -90,6 +91,17 @@ const ProductDetail = () => {
         {
             parameters: {
                 id: urlParams.get('pid') || productId,
+                perPricebook: true,
+                expand: [
+                    'availability',
+                    'promotions',
+                    'options',
+                    'images',
+                    'prices',
+                    'variations',
+                    'set_products',
+                    'bundled_products'
+                ],
                 allImages: true
             }
         },
@@ -245,10 +257,7 @@ const ProductDetail = () => {
                 quantity
             }))
 
-            await addItemToBasketMutation.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: productItems
-            })
+            await addItemToNewOrExistingBasket(productItems)
 
             einstein.sendAddToCart(productItems)
 
@@ -256,6 +265,7 @@ const ProductDetail = () => {
             // by the add to cart modal.
             return productSelectionValues
         } catch (error) {
+            console.log('error', error)
             showError(error)
         }
     }
@@ -320,10 +330,7 @@ const ProductDetail = () => {
                 }
             ]
 
-            const res = await addItemToBasketMutation.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: productItems
-            })
+            const res = await addItemToNewOrExistingBasket(productItems)
 
             const bundleChildMasterIds = childProductSelections.map((child) => {
                 return child.product.id
@@ -382,7 +389,10 @@ const ProductDetail = () => {
                 try {
                     einstein.sendViewProduct(child)
                 } catch (err) {
-                    console.error(err)
+                    logger.error('Einstein sendViewProduct error', {
+                        namespace: 'ProductDetail.useEffect',
+                        additionalProperties: {error: err, child}
+                    })
                 }
                 activeData.sendViewProduct(category, child, 'detail')
             })
@@ -390,7 +400,10 @@ const ProductDetail = () => {
             try {
                 einstein.sendViewProduct(product)
             } catch (err) {
-                console.error(err)
+                logger.error('Einstein sendViewProduct error', {
+                    namespace: 'ProductDetail.useEffect',
+                    additionalProperties: {error: err, product}
+                })
             }
             activeData.sendViewProduct(category, product, 'detail')
         }
