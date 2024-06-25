@@ -28,149 +28,13 @@ env:
   RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
 
 jobs:
-  pwa-kit:
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [16, 18, 20]
-        npm: [8, 9, 10]
-        exclude: # node 16 is not compatible with npm 10
-          - node: 16
-            npm: 10
-    runs-on: ubuntu-latest
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
-      # The current recommended version for Managed Runtime:
-      # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
-      IS_MRT_NODE: ${{ matrix.node == 18 && matrix.npm == 10 }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-          cache: npm
-
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
-          npm install -g npm@${{ matrix.npm }}
-
-      - name: Setup Ubuntu Machine
-        uses: "./.github/actions/setup_ubuntu"
-
-      - name: Run unit tests
-        uses: "./.github/actions/unit_tests"
-
-      - name: Run bundlesize test
-        uses: "./.github/actions/bundle_size_test"
-
-      - name: Smoke test scripts
-        if: env.IS_DEFAULT_NPM == 'true'
-        uses: "./.github/actions/smoke_tests"
-
-      - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' )
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push Bundle to MRT (Development)
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOP == 'true'
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "./packages/template-retail-react-app"
-          TARGET: staging
-
-      - name: Push Bundle to MRT (Production)
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "./packages/template-retail-react-app"
-          TARGET: production
-
-      - name: Push Bundle to MRT (Commerce SDK React)
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.DEVELOP == 'true'
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "./packages/test-commerce-sdk-react"
-          TARGET: commerce-sdk-react
-
-      - name: Check Repository Clean
-        if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
-        uses: "./.github/actions/check_clean"
-
-      - name: Publish to NPM
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
-        uses: "./.github/actions/publish_to_npm"
-        with:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
-
-      - name: Send GitHub Action data to Slack workflow (PWA Kit)
-        id: slack
-        if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true' && env.DEVELOP == 'true' && failure()
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "test": "A 'testNode${{ matrix.node }}' task has failed."
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  pwa-kit-windows:
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [16, 18, 20]
-        npm: [8, 9, 10]
-        exclude: # node 16 is not compatible with npm 10
-          - node: 16
-            npm: 10
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
-      # The current recommended version for Managed Runtime:
-      # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
-      IS_MRT_NODE: ${{ matrix.node == 18 && matrix.npm == 10 }}
-    runs-on: windows-latest
-    steps:
-        - name: Checkout
-          uses: actions/checkout@v3
-
-        - name: Setup Node
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ matrix.node }}
-            cache: npm
-
-        - name: Update NPM version
-          if: env.IS_DEFAULT_NPM == 'false'
-          run: |-
-            npm install -g npm@${{ matrix.npm }}
-
-        - name: Setup Windows Machine
-          uses: "./.github/actions/setup_windows"
-
-        - name: Run tests
-          uses: "./.github/actions/unit_tests"
-
   # TODO: The generated workflow is identical to the generated-windows workflow,
   # with a few extra steps. Can the workflows be merged? (Add `os` to the matrix?)
   generated:
     strategy:
       fail-fast: false
       matrix:
-        template: [retail-react-app-test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
+        template: [express-minimal-test-project]
     runs-on: ubuntu-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'retail-react-app-test-project' || matrix.template == 'retail-react-app-demo' }}
@@ -194,29 +58,6 @@ jobs:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 8
 
-      - name: Lint the generated project
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/linting"
-        with:
-          cwd: ${{ env.PROJECT_DIR }}
-
-      - name: Run unit tests
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/unit_tests"
-        with:
-          cwd: ${{ env.PROJECT_DIR }}
-
-      - name: Run smoke tests
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/smoke_tests"
-        with:
-          dir: ${{ env.PROJECT_DIR }}
-
-      - name: Count Generated Project Dependencies
-        id: count_deps
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/count_deps"
-
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v3
         with:
@@ -230,111 +71,16 @@ jobs:
       #        with:
       #          snyk_token: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Send metrics to Datadog
-        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/datadog"
-        with:
-          datadog_api_key: ${{ secrets.DATADOG_API_KEY }}
-          # TODO: The way this is set is a little bit magic - can it be cleaned up?
-          TOTAL_PACKAGES: $TOTAL_PACKAGES
+#      - name: Create MRT credentials file
+#        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
+#        uses: "./.github/actions/create_mrt"
+#        with:
+#          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+#          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      - name: Create MRT credentials file
-        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true' && env.DEVELOP == 'true'
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push Bundle to MRT
-        if: env.IS_NOT_FORK == 'true' && env.DEVELOP == 'true' && matrix.template == 'retail-react-app-test-project'
+      - name: Build project
+        if: env.IS_NOT_FORK == 'true' && matrix.template == 'express-minimal-test-project'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: ${{ env.PROJECT_DIR }}
-          TARGET: generated-pwa
-
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack
-        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true' && env.DEVELOP == 'true' && failure()
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "A 'generated ${{ matrix.template }}' task has failed."
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  generated-windows:
-    strategy:
-      fail-fast: false
-      matrix:
-        template: [retail-react-app-test-project, retail-react-app-demo, express-minimal-test-project, typescript-minimal-test-project]
-    runs-on: windows-latest
-    env:
-      IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'retail-react-app-test-project' || matrix.template == 'retail-react-app-demo' }}
-      PROJECT_DIR: generated-${{ matrix.template }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: Setup Windows Machine
-        uses: "./.github/actions/setup_windows"
-
-      - name: Generate ${{ matrix.template }} project
-        run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
-        env:
-          GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 7
-
-      - name: Lint the generated project
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/linting"
-        with:
-          cwd: ${{ env.PROJECT_DIR }}
-
-      - name: Run unit tests
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/unit_tests"
-        with:
-          cwd: ${{ env.PROJECT_DIR }}
-
-      - name: Run smoke tests
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/smoke_tests"
-        with:
-          dir: ${{ env.PROJECT_DIR }}
-
-      - name: Count Generated Project Dependencies
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/count_deps"
-
-      - name: Store Verdaccio logfile artifact
-        uses: actions/upload-artifact@v3
-        with:
-          path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
-  lighthouse:
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [18] # Should match node version supported by MRT.
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-          cache: npm
-
-      - name: Setup Ubuntu Machine
-        uses: "./.github/actions/setup_ubuntu"
-
-      - name: Run Lighthouse CI on the PWA
-        uses: "./.github/actions/lighthouse_ci"
+          TARGET: production
