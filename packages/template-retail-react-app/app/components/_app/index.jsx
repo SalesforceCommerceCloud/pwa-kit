@@ -123,7 +123,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const {site, locale, buildUrl} = useMultiSite()
-
+    const [storeLocatorIsOpen, setStoreLocatorIsOpen] = useState(false)
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 

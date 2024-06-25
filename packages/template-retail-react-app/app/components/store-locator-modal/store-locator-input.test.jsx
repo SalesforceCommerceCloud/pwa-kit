@@ -11,7 +11,6 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import {waitFor, screen, fireEvent} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
 import PropTypes from 'prop-types'
-import userEvent from '@testing-library/user-event'
 
 const WrapperComponent = ({userHasSetGeolocation, getUserGeolocation}) => {
     const form = useForm({
@@ -49,12 +48,22 @@ describe('StoreLocatorInput', () => {
     })
     test('Renders without crashing', () => {
         expect(() => {
-            renderWithProviders(<WrapperComponent userHasSetGeolocation={true} getUserGeolocation={jest.fn()}></WrapperComponent>)
+            renderWithProviders(
+                <WrapperComponent
+                    userHasSetGeolocation={true}
+                    getUserGeolocation={jest.fn()}
+                ></WrapperComponent>
+            )
         }).not.toThrow()
     })
 
     test('Expected information exists', async () => {
-        renderWithProviders(<WrapperComponent userHasSetGeolocation={true} getUserGeolocation={jest.fn()}></WrapperComponent>)
+        renderWithProviders(
+            <WrapperComponent
+                userHasSetGeolocation={true}
+                getUserGeolocation={jest.fn()}
+            ></WrapperComponent>
+        )
 
         await waitFor(async () => {
             const findButton = screen.getByRole('button', {name: /Find/i})
@@ -67,12 +76,17 @@ describe('StoreLocatorInput', () => {
 
     test('Prop is called when Use My Location is clicked', async () => {
         const getUserGeolocation = jest.fn()
-        renderWithProviders(<WrapperComponent userHasSetGeolocation={true} getUserGeolocation={getUserGeolocation}></WrapperComponent>)
+        renderWithProviders(
+            <WrapperComponent
+                userHasSetGeolocation={true}
+                getUserGeolocation={getUserGeolocation}
+            ></WrapperComponent>
+        )
         await waitFor(async () => {
             const useMyLocationButton = screen.getByRole('button', {name: /Use My Location/i})
-            
+
             fireEvent.click(useMyLocationButton)
-            expect(getUserGeolocation).toHaveBeenCalled();
+            expect(getUserGeolocation).toHaveBeenCalled()
         })
     })
 })

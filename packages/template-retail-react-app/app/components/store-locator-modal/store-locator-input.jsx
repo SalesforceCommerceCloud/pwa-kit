@@ -27,7 +27,7 @@ const StoreLocatorInput = ({
 }) => {
     const {control} = form
     const intl = useIntl()
-    
+
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>

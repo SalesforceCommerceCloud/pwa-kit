@@ -53,8 +53,7 @@ const StoreLocatorContent = ({
     }
 
     useEffect(() => {
-        if (!userHasSetGeolocation)
-            getUserGeolocation()
+        if (!userHasSetGeolocation) getUserGeolocation()
     }, [])
 
     return (
@@ -123,7 +122,8 @@ StoreLocatorContent.propTypes = {
     searchStoresParams: PropTypes.object,
     submitForm: PropTypes.func,
     setSearchStoresParams: PropTypes.func,
-    userHasSetGeolocation: PropTypes.bool
+    userHasSetGeolocation: PropTypes.bool,
+    setUserHasSetGeolocation: PropTypes.func
 }
 
 export default StoreLocatorContent

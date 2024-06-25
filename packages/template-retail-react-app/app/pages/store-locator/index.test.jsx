@@ -120,9 +120,12 @@ afterEach(() => {
 
 test('Allows customer to go to store locator page', async () => {
     global.server.use(
-        rest.get('*/shopper-stores/v1/organizations/v1/organizations/f_ecom_zzrf_001/store-search', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockStores))
-        })
+        rest.get(
+            '*/shopper-stores/v1/organizations/v1/organizations/f_ecom_zzrf_001/store-search',
+            (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockStores))
+            }
+        )
     )
 
     // render our test component
@@ -139,9 +142,12 @@ test('Allows customer to go to store locator page', async () => {
 
 test('Show no stores are found if there are no stores', async () => {
     global.server.use(
-        rest.get('*/shopper-stores/v1/organizations/v1/organizations/f_ecom_zzrf_001/store-search', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockNoStores))
-        })
+        rest.get(
+            '*/shopper-stores/v1/organizations/v1/organizations/f_ecom_zzrf_001/store-search',
+            (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockNoStores))
+            }
+        )
     )
 
     // render our test component
@@ -151,11 +157,12 @@ test('Show no stores are found if there are no stores', async () => {
 
     await waitFor(() => {
         const descriptionFindAStore = screen.getByText(/Find a Store/i)
-        const noLocationsInThisArea = screen.getByText(/Sorry, there are no locations in this area/i)
+        const noLocationsInThisArea = screen.getByText(
+            /Sorry, there are no locations in this area/i
+        )
         expect(descriptionFindAStore).toBeInTheDocument()
         expect(noLocationsInThisArea).toBeInTheDocument()
 
         expect(window.location.pathname).toBe('/uk/en-GB/store-locator')
     })
 })
-

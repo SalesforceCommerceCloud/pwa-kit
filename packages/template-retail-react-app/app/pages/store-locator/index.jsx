@@ -35,7 +35,11 @@ const StoreLocator = () => {
         }
     })
 
-    var {data: searchStoresData, isLoading, total} = useSearchStores({
+    var {
+        data: searchStoresData,
+        isLoading,
+        total
+    } = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.latitude ? undefined : searchStoresParams.countryCode,
             postalCode: searchStoresParams.latitude ? undefined : searchStoresParams.postalCode,

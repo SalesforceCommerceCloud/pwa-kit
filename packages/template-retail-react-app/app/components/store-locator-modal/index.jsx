@@ -65,7 +65,7 @@ const StoreLocatorModal = ({onClose = noop}) => {
             offset: 0
         }
     })
-    
+
     if (isLoading === false) searchStoresDataRef.current = searchStoresData
 
     const storesInfo =
@@ -195,31 +195,31 @@ const StoreLocatorModal = ({onClose = noop}) => {
                                 userHasSetGeolocation={userHasSetGeolocation}
                             />
                             {searchStoresParams.limit < numStores &&
-                                searchStoresParams.limit < 200 ? (
-                                    <Box marginTop="10px">
-                                        <Button
-                                            key="load-more-button"
-                                            onClick={() => {
-                                                setSearchStoresParams({
-                                                    ...searchStoresParams,
-                                                    limit:
-                                                        searchStoresParams.limit + 15 <= 200
-                                                            ? searchStoresParams.limit + 15
-                                                            : searchStoresParams.limit
-                                                })
-                                            }}
-                                            width="100%"
-                                            variant="outline"
-                                            marginBottom={4}
-                                        >
-                                            {intl.formatMessage({
-                                                id: 'store_locator.pagination.load_more',
-                                                defaultMessage: 'Load More'
-                                            })}
-                                        </Button>
-                                    </Box>
-                                ) : (
-                                    ''
+                            searchStoresParams.limit < 200 ? (
+                                <Box marginTop="10px">
+                                    <Button
+                                        key="load-more-button"
+                                        onClick={() => {
+                                            setSearchStoresParams({
+                                                ...searchStoresParams,
+                                                limit:
+                                                    searchStoresParams.limit + 15 <= 200
+                                                        ? searchStoresParams.limit + 15
+                                                        : searchStoresParams.limit
+                                            })
+                                        }}
+                                        width="100%"
+                                        variant="outline"
+                                        marginBottom={4}
+                                    >
+                                        {intl.formatMessage({
+                                            id: 'store_locator.pagination.load_more',
+                                            defaultMessage: 'Load More'
+                                        })}
+                                    </Button>
+                                </Box>
+                            ) : (
+                                ''
                             )}
                         </ModalBody>
                     </ModalContent>
