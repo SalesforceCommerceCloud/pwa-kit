@@ -125,7 +125,6 @@ const App = (props) => {
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
-    const [storeLocatorIsOpen, setStoreLocatorIsOpen] = useState(false)
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
