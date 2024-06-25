@@ -29,6 +29,7 @@
 ### Bug Fixes
 
 - Fix seo component not settings keywords meta tag [#1762](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1762)
+- Fix RecommendedProducts' toggling of the favourite icon [#1861](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1861)
 
 
 ## v2.4.1 (Apr 17, 2024)

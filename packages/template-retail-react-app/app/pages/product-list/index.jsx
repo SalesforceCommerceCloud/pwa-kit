@@ -582,8 +582,8 @@ const ProductList = (props) => {
                                                           )
                                                       }
                                                   }}
-                                                  onFavouriteToggle={(isFavourite) => {
-                                                      const action = isFavourite
+                                                  onFavouriteToggle={(toBeFavourite) => {
+                                                      const action = toBeFavourite
                                                           ? addItemToWishlist
                                                           : removeItemFromWishlist
                                                       return action(productSearchItem)
