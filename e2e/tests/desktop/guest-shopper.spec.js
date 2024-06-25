@@ -24,25 +24,24 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await topsNav.click();
   // PLP
-  const cableKnitShell = await page.getByRole("link", {
-    name: /Cable Knit Shell/i,
+  const productTile = await page.getByRole("link", {
+    name: /Cotton Turtleneck Sweater/i,
   });
   // selecting swatch
-  const initialImgEl = await cableKnitShell.locator("img");
+  const initialImgEl = await productTile.locator("img");
   const initialSrc = await initialImgEl.getAttribute("src");
+  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
 
-  await expect(cableKnitShell.getByText(/From £44\.16/i)).toBeVisible();
-
-  await cableKnitShell.getByLabel(/Ivory/, { exact: true }).hover();
-  const changedImgEl = await cableKnitShell.locator("img");
+  await productTile.getByLabel(/Black/, { exact: true }).hover();
+  const changedImgEl = await productTile.locator("img");
   const changeImgSrc = await changedImgEl.getAttribute("src");
-  await expect(cableKnitShell.getByText(/From £44\.16/i)).toBeVisible();
+  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
 
   expect(changeImgSrc).not.toBe(initialSrc);
-  await cableKnitShell.click();
+  await productTile.click();
   // PDP
   await expect(
-    page.getByRole("heading", { name: /Cable Knit Shell/i })
+    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
   await page.getByRole("radio", { name: "L", exact: true }).click();
 
@@ -53,7 +52,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   const updatedPageURL = await page.url();
   const params = updatedPageURL.split("?")[1];
   expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ5AAXX/i);
+  expect(params).toMatch(/color=JJ169XX/i);
   await page.getByRole("button", { name: /Add to Cart/i }).click();
 
   const addedToCartModal = page.getByText(/2 items added to cart/i);
@@ -65,7 +64,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   await page.getByLabel(/My cart/i).click();
 
   await expect(
-    page.getByRole("link", { name: /Cable Knit Shell/i })
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
@@ -151,6 +150,6 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText(/2 Items/i)).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Cable Knit Shell/i })
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
 });
