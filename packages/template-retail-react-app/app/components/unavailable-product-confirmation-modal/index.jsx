@@ -14,7 +14,7 @@ import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
- * This Component will responsible to determine of a given product ids has become unavailable
+ * This Component will be responsible for determining if a given product ids has become unavailable
  * and will prompt the users to remove them before proceeding any further
  *
  * @param productIds -  list of product ids to check for availability
@@ -32,10 +32,24 @@ const UnavailableProductConfirmationModal = ({
         {
             enabled: productIds?.length > 0,
             onSuccess: (result) => {
-                // when a product is unavailable, the getProducts will not return its product detail.
-                // we compare the response ids with the ones in basket to figure which product has become unavailable
-                const resProductIds = result.data?.map((i) => i.id) || []
-                const unavailableProductIds = productIds.filter((id) => !resProductIds.includes(id))
+                const resProductIds = []
+                const outOfStockProductIds = []
+
+                result.data?.forEach(({id, inventory}) => {
+                    // when a product is unavailable, the getProducts will not return its product detail.
+                    // we compare the response ids with the ones in basket to figure which product has become unavailable
+                    resProductIds.push(id)
+                    if (!inventory?.stockLevel) {
+                        // For out of stock products, baskets will have them but we want to make sure they are also removed before allowing
+                        // shoppers go to checkout
+                        outOfStockProductIds.push(id)
+                    }
+                })
+
+                const unavailableProductIds = productIds.filter(
+                    (id) => !resProductIds.includes(id) || outOfStockProductIds.includes(id)
+                )
+
                 unavailableProductIdsRef.current = unavailableProductIds
             }
         }
