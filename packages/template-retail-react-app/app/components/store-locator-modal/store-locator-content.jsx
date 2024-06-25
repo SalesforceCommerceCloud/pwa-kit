@@ -23,8 +23,8 @@ const StoreLocatorContent = ({
     storesInfo,
     searchStoresParams,
     setSearchStoresParams,
-    userHasSetGeolocation,
-    setUserHasSetGeolocation
+    userHasSetManualGeolocation,
+    setUserHasSetManualGeolocation
 }) => {
     const intl = useIntl()
 
@@ -46,14 +46,14 @@ const StoreLocatorContent = ({
     const getUserGeolocation = () => {
         if (typeof navigator !== 'undefined' && navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(getGeolocationSuccess, getGeolocationError)
-            setUserHasSetGeolocation(false)
+            setUserHasSetManualGeolocation(false)
         } else {
             console.log('Geolocation not supported')
         }
     }
 
     useEffect(() => {
-        if (!userHasSetGeolocation) getUserGeolocation()
+        if (!userHasSetManualGeolocation) getUserGeolocation()
     }, [])
 
     return (
@@ -69,7 +69,7 @@ const StoreLocatorContent = ({
                 searchStoresParams={searchStoresParams}
                 submitForm={submitForm}
                 setSearchStoresParams={setSearchStoresParams}
-                userHasSetGeolocation={userHasSetGeolocation}
+                userHasSetManualGeolocation={userHasSetManualGeolocation}
                 getUserGeolocation={getUserGeolocation}
             ></StoreLocatorInput>
             <Accordion allowMultiple flex={[1, 1, 1, 5]}>
@@ -122,8 +122,8 @@ StoreLocatorContent.propTypes = {
     searchStoresParams: PropTypes.object,
     submitForm: PropTypes.func,
     setSearchStoresParams: PropTypes.func,
-    userHasSetGeolocation: PropTypes.bool,
-    setUserHasSetGeolocation: PropTypes.func
+    userHasSetManualGeolocation: PropTypes.bool,
+    setUserHasSetManualGeolocation: PropTypes.func
 }
 
 export default StoreLocatorContent

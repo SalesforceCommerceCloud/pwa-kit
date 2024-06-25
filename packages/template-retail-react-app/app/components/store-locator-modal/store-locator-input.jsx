@@ -22,7 +22,7 @@ const StoreLocatorInput = ({
     form,
     submitForm,
     searchStoresParams,
-    userHasSetGeolocation,
+    userHasSetManualGeolocation,
     getUserGeolocation
 }) => {
     const {control} = form
@@ -34,7 +34,9 @@ const StoreLocatorInput = ({
                 <Controller
                     name="countryCode"
                     control={control}
-                    defaultValue={userHasSetGeolocation ? searchStoresParams?.countryCode : ''}
+                    defaultValue={
+                        userHasSetManualGeolocation ? searchStoresParams?.countryCode : ''
+                    }
                     render={({field}) => {
                         return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
                             <Select
@@ -65,7 +67,7 @@ const StoreLocatorInput = ({
                 <Controller
                     name="postalCode"
                     control={control}
-                    defaultValue={userHasSetGeolocation ? searchStoresParams?.postalCode : ''}
+                    defaultValue={userHasSetManualGeolocation ? searchStoresParams?.postalCode : ''}
                     render={({field}) => {
                         return (
                             <Input
@@ -124,7 +126,7 @@ StoreLocatorInput.propTypes = {
     setSearchStoresParams: PropTypes.func,
     submitForm: PropTypes.func,
     getUserGeolocation: PropTypes.func,
-    userHasSetGeolocation: PropTypes.bool
+    userHasSetManualGeolocation: PropTypes.bool
 }
 
 export default StoreLocatorInput

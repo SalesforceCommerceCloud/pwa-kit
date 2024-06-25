@@ -1247,6 +1247,9 @@
   "store_locator.action.find": {
     "defaultMessage": "Find"
   },
+  "store_locator.action.select_a_country": {
+    "defaultMessage": "Select a country"
+  },
   "store_locator.action.use_my_location": {
     "defaultMessage": "Use My Location"
   },

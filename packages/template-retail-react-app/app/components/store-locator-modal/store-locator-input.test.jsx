@@ -12,7 +12,7 @@ import {waitFor, screen, fireEvent} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
 import PropTypes from 'prop-types'
 
-const WrapperComponent = ({userHasSetGeolocation, getUserGeolocation}) => {
+const WrapperComponent = ({userHasSetManualGeolocation, getUserGeolocation}) => {
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -31,13 +31,13 @@ const WrapperComponent = ({userHasSetGeolocation, getUserGeolocation}) => {
             getUserGeolocation={getUserGeolocation}
             form={form}
             submitForm={jest.fn()}
-            userHasSetGeolocation={userHasSetGeolocation}
+            userHasSetManualGeolocation={userHasSetManualGeolocation}
         />
     )
 }
 WrapperComponent.propTypes = {
     storesInfo: PropTypes.array,
-    userHasSetGeolocation: PropTypes.bool,
+    userHasSetManualGeolocation: PropTypes.bool,
     getUserGeolocation: PropTypes.func
 }
 
@@ -50,7 +50,7 @@ describe('StoreLocatorInput', () => {
         expect(() => {
             renderWithProviders(
                 <WrapperComponent
-                    userHasSetGeolocation={true}
+                    userHasSetManualGeolocation={true}
                     getUserGeolocation={jest.fn()}
                 ></WrapperComponent>
             )
@@ -60,7 +60,7 @@ describe('StoreLocatorInput', () => {
     test('Expected information exists', async () => {
         renderWithProviders(
             <WrapperComponent
-                userHasSetGeolocation={true}
+                userHasSetManualGeolocation={true}
                 getUserGeolocation={jest.fn()}
             ></WrapperComponent>
         )
@@ -78,7 +78,7 @@ describe('StoreLocatorInput', () => {
         const getUserGeolocation = jest.fn()
         renderWithProviders(
             <WrapperComponent
-                userHasSetGeolocation={true}
+                userHasSetManualGeolocation={true}
                 getUserGeolocation={getUserGeolocation}
             ></WrapperComponent>
         )

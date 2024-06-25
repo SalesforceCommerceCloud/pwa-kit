@@ -85,7 +85,7 @@ const mockSearchStoresData = [
     }
 ]
 
-const WrapperComponent = ({storesInfo, searchStoresParams, userHasSetGeolocation}) => {
+const WrapperComponent = ({storesInfo, searchStoresParams, userHasSetManualGeolocation}) => {
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -102,14 +102,14 @@ const WrapperComponent = ({storesInfo, searchStoresParams, userHasSetGeolocation
             submitForm={jest.fn()}
             searchStoresParams={searchStoresParams}
             setSearchStoresParams={jest.fn()}
-            userHasSetGeolocation={userHasSetGeolocation}
-            setUserHasSetGeolocation={jest.fn()}
+            userHasSetManualGeolocation={userHasSetManualGeolocation}
+            setUserHasSetManualGeolocation={jest.fn()}
         />
     )
 }
 WrapperComponent.propTypes = {
     storesInfo: PropTypes.array,
-    userHasSetGeolocation: PropTypes.bool,
+    userHasSetManualGeolocation: PropTypes.bool,
     searchStoresParams: PropTypes.object
 }
 
@@ -123,7 +123,7 @@ describe('StoreLocatorContent', () => {
                         countryCode: 'DE'
                     }}
                     storesInfo={mockSearchStoresData}
-                    userHasSetGeolocation={true}
+                    userHasSetManualGeolocation={true}
                 />
             )
         }).not.toThrow()
@@ -137,7 +137,7 @@ describe('StoreLocatorContent', () => {
                     postalCode: '10178',
                     countryCode: 'DE'
                 }}
-                userHasSetGeolocation={true}
+                userHasSetManualGeolocation={true}
             />
         )
 
@@ -162,7 +162,7 @@ describe('StoreLocatorContent', () => {
                     postalCode: '10178',
                     countryCode: 'DE'
                 }}
-                userHasSetGeolocation={true}
+                userHasSetManualGeolocation={true}
             />
         )
 
@@ -181,7 +181,7 @@ describe('StoreLocatorContent', () => {
                     latitude: 100,
                     longitude: 100
                 }}
-                userHasSetGeolocation={true}
+                userHasSetManualGeolocation={true}
             />
         )
 

@@ -20,7 +20,7 @@ import {useForm} from 'react-hook-form'
 
 const StoreLocator = () => {
     const intl = useIntl()
-    const [userHasSetGeolocation, setUserHasSetGeolocation] = useState(false)
+    const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
     const [searchStoresParams, setSearchStoresParams] = useState({
         countryCode: DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
@@ -30,16 +30,14 @@ const StoreLocator = () => {
         mode: 'onChange',
         reValidateMode: 'onChange',
         defaultValues: {
-            countryCode: userHasSetGeolocation ? searchStoresParams.countryCode : '',
-            postalCode: userHasSetGeolocation ? searchStoresParams.postalCode : ''
+            countryCode: userHasSetManualGeolocation ? searchStoresParams.countryCode : '',
+            postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
         }
     })
-
-    var {
-        data: searchStoresData,
-        isLoading,
-        total
-    } = useSearchStores({
+    const searchStoresDataRef = useRef({
+        data: []
+    })
+    var {data: searchStoresData, isLoading} = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.latitude ? undefined : searchStoresParams.countryCode,
             postalCode: searchStoresParams.latitude ? undefined : searchStoresParams.postalCode,
@@ -51,7 +49,11 @@ const StoreLocator = () => {
             offset: 0
         }
     })
-    const storesInfo = isLoading ? undefined : searchStoresData?.data || []
+
+    if (isLoading === false) searchStoresDataRef.current = searchStoresData
+    const storesInfo = searchStoresDataRef.current.data ? searchStoresDataRef.current.data : []
+    const numStores = isLoading ? 0 : searchStoresData.total
+
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
         setSearchStoresParams({
@@ -59,7 +61,7 @@ const StoreLocator = () => {
             countryCode: countryCode,
             limit: 15
         })
-        setUserHasSetGeolocation(true)
+        setUserHasSetManualGeolocation(true)
     }
 
     return (
@@ -81,9 +83,9 @@ const StoreLocator = () => {
                     storesInfo={storesInfo}
                     searchStoresParams={searchStoresParams}
                     setSearchStoresParams={setSearchStoresParams}
-                    setUserHasSetGeolocation={setUserHasSetGeolocation}
+                    setUserHasSetManualGeolocation={setUserHasSetManualGeolocation}
                 />
-                {searchStoresParams.limit < total && searchStoresParams.limit < 200 ? (
+                {searchStoresParams.limit < numStores && searchStoresParams.limit < 200 ? (
                     <Box marginTop="10px">
                         <Button
                             key="load-more-button"

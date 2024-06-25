@@ -2897,6 +2897,12 @@
       "value": "Find"
     }
   ],
+  "store_locator.action.select_a_country": [
+    {
+      "type": 0,
+      "value": "Select a country"
+    }
+  ],
   "store_locator.action.use_my_location": [
     {
       "type": 0,

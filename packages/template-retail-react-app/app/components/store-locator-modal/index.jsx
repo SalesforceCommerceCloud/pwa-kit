@@ -35,23 +35,29 @@ const StoreLocatorModal = ({onClose = noop}) => {
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
         limit: 10
     }
-    var defaultUserHasSetGeolocation = false
+    var defaultUserHasSetManualGeolocation = false
     if (!isServer) {
         var searchStoresParamsFromLocalStorage = JSON.parse(
             window.localStorage.getItem('STORE_LOCATOR_SEARCH_STORES_PARAMS')
         )
-        var userHasSetGeolocationFromLocalStorage = window.localStorage.getItem(
+        var userHasSetManualGeolocationFromLocalStorage = window.localStorage.getItem(
             'STORE_LOCATOR_USER_HAS_SET_GEOLOCATION'
         )
         if (searchStoresParamsFromLocalStorage)
             defaultSearchStoresParams = searchStoresParamsFromLocalStorage
-        if (userHasSetGeolocationFromLocalStorage)
-            defaultUserHasSetGeolocation = Boolean(userHasSetGeolocationFromLocalStorage)
+        if (userHasSetManualGeolocationFromLocalStorage)
+            defaultUserHasSetManualGeolocation = Boolean(
+                userHasSetManualGeolocationFromLocalStorage
+            )
     }
-    const [userHasSetGeolocation, setUserHasSetGeolocation] = useState(defaultUserHasSetGeolocation)
+    const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(
+        defaultUserHasSetManualGeolocation
+    )
 
     const [searchStoresParams, setSearchStoresParams] = useState(defaultSearchStoresParams)
-    const searchStoresDataRef = useRef({})
+    const searchStoresDataRef = useRef({
+        data: []
+    })
 
     var {data: searchStoresData, isLoading} = useSearchStores({
         parameters: {
@@ -67,22 +73,15 @@ const StoreLocatorModal = ({onClose = noop}) => {
     })
 
     if (isLoading === false) searchStoresDataRef.current = searchStoresData
-
-    const storesInfo =
-        searchStoresDataRef.current !== undefined
-            ? searchStoresDataRef.current.data !== undefined
-                ? searchStoresDataRef.current.data
-                : []
-            : undefined
-    const numStores =
-        searchStoresDataRef.current !== undefined ? searchStoresDataRef.current.total : 0
+    const storesInfo = searchStoresDataRef.current.data ? searchStoresDataRef.current.data : []
+    const numStores = isLoading ? 0 : searchStoresData.total
 
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
         defaultValues: {
-            countryCode: userHasSetGeolocation ? searchStoresParams.countryCode : '',
-            postalCode: userHasSetGeolocation ? searchStoresParams.postalCode : ''
+            countryCode: userHasSetManualGeolocation ? searchStoresParams.countryCode : '',
+            postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
         }
     })
     const submitForm = async (formData) => {
@@ -92,7 +91,7 @@ const StoreLocatorModal = ({onClose = noop}) => {
             countryCode: countryCode,
             limit: 15
         })
-        setUserHasSetGeolocation(true)
+        setUserHasSetManualGeolocation(true)
     }
 
     const isDesktopView = useBreakpointValue({base: false, lg: true})
@@ -108,9 +107,49 @@ const StoreLocatorModal = ({onClose = noop}) => {
         if (!isServer)
             window.localStorage.setItem(
                 'STORE_LOCATOR_USER_HAS_SET_GEOLOCATION',
-                userHasSetGeolocation ? 1 : 0
+                userHasSetManualGeolocation ? 1 : 0
             )
-    }, [userHasSetGeolocation])
+    }, [userHasSetManualGeolocation])
+
+    const storeLocatorContent = (
+        <>
+            <StoreLocatorContent
+                form={form}
+                submitForm={submitForm}
+                storesInfo={storesInfo}
+                searchStoresParams={searchStoresParams}
+                setSearchStoresParams={setSearchStoresParams}
+                userHasSetManualGeolocation={userHasSetManualGeolocation}
+                setUserHasSetManualGeolocation={setUserHasSetManualGeolocation}
+            />
+            {searchStoresParams.limit < numStores && searchStoresParams.limit < 200 ? (
+                <Box marginTop="10px">
+                    <Button
+                        key="load-more-button"
+                        onClick={() => {
+                            setSearchStoresParams({
+                                ...searchStoresParams,
+                                limit:
+                                    searchStoresParams.limit + 15 <= 200
+                                        ? searchStoresParams.limit + 15
+                                        : searchStoresParams.limit
+                            })
+                        }}
+                        width="100%"
+                        variant="outline"
+                        marginBottom={4}
+                    >
+                        {intl.formatMessage({
+                            id: 'store_locator.pagination.load_more',
+                            defaultMessage: 'Load More'
+                        })}
+                    </Button>
+                </Box>
+            ) : (
+                ''
+            )}
+        </>
+    )
 
     return (
         <>
@@ -134,42 +173,7 @@ const StoreLocatorModal = ({onClose = noop}) => {
                             borderLeft="1px solid"
                             borderColor="gray.200"
                         >
-                            <StoreLocatorContent
-                                form={form}
-                                submitForm={submitForm}
-                                storesInfo={storesInfo}
-                                searchStoresParams={searchStoresParams}
-                                setSearchStoresParams={setSearchStoresParams}
-                                userHasSetGeolocation={userHasSetGeolocation}
-                                setUserHasSetGeolocation={setUserHasSetGeolocation}
-                            />
-                            {searchStoresParams.limit < numStores &&
-                            searchStoresParams.limit < 200 ? (
-                                <Box marginTop="10px">
-                                    <Button
-                                        key="load-more-button"
-                                        onClick={() => {
-                                            setSearchStoresParams({
-                                                ...searchStoresParams,
-                                                limit:
-                                                    searchStoresParams.limit + 15 <= 200
-                                                        ? searchStoresParams.limit + 15
-                                                        : searchStoresParams.limit
-                                            })
-                                        }}
-                                        width="100%"
-                                        variant="outline"
-                                        marginBottom={4}
-                                    >
-                                        {intl.formatMessage({
-                                            id: 'store_locator.pagination.load_more',
-                                            defaultMessage: 'Load More'
-                                        })}
-                                    </Button>
-                                </Box>
-                            ) : (
-                                ''
-                            )}
+                            {storeLocatorContent}
                         </ModalBody>
                     </ModalContent>
                 </Modal>
@@ -186,41 +190,7 @@ const StoreLocatorModal = ({onClose = noop}) => {
                     >
                         <ModalCloseButton onClick={onClose} />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
-                            <StoreLocatorContent
-                                form={form}
-                                submitForm={submitForm}
-                                storesInfo={storesInfo}
-                                searchStoresParams={searchStoresParams}
-                                setSearchStoresParams={setSearchStoresParams}
-                                userHasSetGeolocation={userHasSetGeolocation}
-                            />
-                            {searchStoresParams.limit < numStores &&
-                            searchStoresParams.limit < 200 ? (
-                                <Box marginTop="10px">
-                                    <Button
-                                        key="load-more-button"
-                                        onClick={() => {
-                                            setSearchStoresParams({
-                                                ...searchStoresParams,
-                                                limit:
-                                                    searchStoresParams.limit + 15 <= 200
-                                                        ? searchStoresParams.limit + 15
-                                                        : searchStoresParams.limit
-                                            })
-                                        }}
-                                        width="100%"
-                                        variant="outline"
-                                        marginBottom={4}
-                                    >
-                                        {intl.formatMessage({
-                                            id: 'store_locator.pagination.load_more',
-                                            defaultMessage: 'Load More'
-                                        })}
-                                    </Button>
-                                </Box>
-                            ) : (
-                                ''
-                            )}
+                            {storeLocatorContent}
                         </ModalBody>
                     </ModalContent>
                 </Modal>
@@ -234,18 +204,3 @@ StoreLocatorModal.propTypes = {
 }
 
 export default StoreLocatorModal
-/*
- <body
-        class="chakra-ui-light"
-      >
-        <div>
-          <div>
-            what the hell is going on
-          </div>
-          <span
-            hidden=""
-            id="__chakra_env"
-          />
-        </div>
-
-*/
