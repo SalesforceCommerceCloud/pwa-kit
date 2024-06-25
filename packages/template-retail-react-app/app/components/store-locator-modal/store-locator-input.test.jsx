@@ -8,11 +8,12 @@
 import React from 'react'
 import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {waitFor, screen} from '@testing-library/react'
+import {waitFor, screen, fireEvent} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
 import PropTypes from 'prop-types'
+import userEvent from '@testing-library/user-event'
 
-const WrapperComponent = (userHasSetGeolocation) => {
+const WrapperComponent = ({userHasSetGeolocation, getUserGeolocation}) => {
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -28,7 +29,7 @@ const WrapperComponent = (userHasSetGeolocation) => {
                 postalCode: '10178',
                 countryCode: 'DE'
             }}
-            getUserGeolocation={jest.fn()}
+            getUserGeolocation={getUserGeolocation}
             form={form}
             submitForm={jest.fn()}
             userHasSetGeolocation={userHasSetGeolocation}
@@ -37,18 +38,23 @@ const WrapperComponent = (userHasSetGeolocation) => {
 }
 WrapperComponent.propTypes = {
     storesInfo: PropTypes.array,
-    userHasSetGeolocation: PropTypes.bool
+    userHasSetGeolocation: PropTypes.bool,
+    getUserGeolocation: PropTypes.func
 }
 
 describe('StoreLocatorInput', () => {
-    test('renders without crashing', () => {
+    afterEach(() => {
+        jest.clearAllMocks()
+        jest.resetModules()
+    })
+    test('Renders without crashing', () => {
         expect(() => {
-            renderWithProviders(<WrapperComponent></WrapperComponent>)
+            renderWithProviders(<WrapperComponent userHasSetGeolocation={true} getUserGeolocation={jest.fn()}></WrapperComponent>)
         }).not.toThrow()
     })
 
     test('Expected information exists', async () => {
-        renderWithProviders(<WrapperComponent></WrapperComponent>)
+        renderWithProviders(<WrapperComponent userHasSetGeolocation={true} getUserGeolocation={jest.fn()}></WrapperComponent>)
 
         await waitFor(async () => {
             const findButton = screen.getByRole('button', {name: /Find/i})
@@ -56,6 +62,17 @@ describe('StoreLocatorInput', () => {
 
             expect(findButton).toBeInTheDocument()
             expect(useMyLocationButton).toBeInTheDocument()
+        })
+    })
+
+    test('Prop is called when Use My Location is clicked', async () => {
+        const getUserGeolocation = jest.fn()
+        renderWithProviders(<WrapperComponent userHasSetGeolocation={true} getUserGeolocation={getUserGeolocation}></WrapperComponent>)
+        await waitFor(async () => {
+            const useMyLocationButton = screen.getByRole('button', {name: /Use My Location/i})
+            
+            fireEvent.click(useMyLocationButton)
+            expect(getUserGeolocation).toHaveBeenCalled();
         })
     })
 })

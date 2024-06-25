@@ -23,7 +23,8 @@ const StoreLocatorContent = ({
     storesInfo,
     searchStoresParams,
     setSearchStoresParams,
-    userHasSetGeolocation
+    userHasSetGeolocation,
+    setUserHasSetGeolocation
 }) => {
     const intl = useIntl()
 
@@ -45,12 +46,16 @@ const StoreLocatorContent = ({
     const getUserGeolocation = () => {
         if (typeof navigator !== 'undefined' && navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(getGeolocationSuccess, getGeolocationError)
+            setUserHasSetGeolocation(false)
         } else {
             console.log('Geolocation not supported')
         }
     }
 
-    useEffect(getUserGeolocation, [])
+    useEffect(() => {
+        if (!userHasSetGeolocation)
+            getUserGeolocation()
+    }, [])
 
     return (
         <>

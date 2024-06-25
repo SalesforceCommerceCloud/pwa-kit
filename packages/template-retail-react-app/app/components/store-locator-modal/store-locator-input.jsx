@@ -27,9 +27,7 @@ const StoreLocatorInput = ({
 }) => {
     const {control} = form
     const intl = useIntl()
-    // console.log("(JEREMY) searchStoresParams: ", searchStoresParams)
-    // console.log("(JEREMY) userHasSetGeolocation: ", userHasSetGeolocation)
-    // console.log("(JEREMY) searchStoresParams: ", searchStoresParams)
+    
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>

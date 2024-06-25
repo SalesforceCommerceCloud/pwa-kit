@@ -26,7 +26,6 @@ const StoreLocator = () => {
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
         limit: 10
     })
-    const searchStoresDataRef = useRef({})
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -36,7 +35,7 @@ const StoreLocator = () => {
         }
     })
 
-    var searchStoresData = useSearchStores({
+    var {data: searchStoresData, isLoading, total} = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.latitude ? undefined : searchStoresParams.countryCode,
             postalCode: searchStoresParams.latitude ? undefined : searchStoresParams.postalCode,
@@ -48,17 +47,7 @@ const StoreLocator = () => {
             offset: 0
         }
     })
-    if (searchStoresData.data !== undefined) searchStoresDataRef.current = searchStoresData
-    console.log('(JEREMY) searchStoresDataRef.current: ', searchStoresDataRef.current)
-    const storesInfo =
-        searchStoresDataRef.current.data !== undefined
-            ? searchStoresDataRef.current.data.data !== undefined
-                ? searchStoresDataRef.current.data.data
-                : []
-            : undefined
-
-    const numStores =
-        searchStoresDataRef.current.data !== undefined ? searchStoresDataRef.current.data.total : 0
+    const storesInfo = isLoading ? undefined : searchStoresData?.data || []
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
         setSearchStoresParams({
@@ -88,8 +77,9 @@ const StoreLocator = () => {
                     storesInfo={storesInfo}
                     searchStoresParams={searchStoresParams}
                     setSearchStoresParams={setSearchStoresParams}
+                    setUserHasSetGeolocation={setUserHasSetGeolocation}
                 />
-                {searchStoresParams.limit < numStores && searchStoresParams.limit < 200 ? (
+                {searchStoresParams.limit < total && searchStoresParams.limit < 200 ? (
                     <Box marginTop="10px">
                         <Button
                             key="load-more-button"

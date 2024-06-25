@@ -103,6 +103,7 @@ const WrapperComponent = ({storesInfo, searchStoresParams, userHasSetGeolocation
             searchStoresParams={searchStoresParams}
             setSearchStoresParams={jest.fn()}
             userHasSetGeolocation={userHasSetGeolocation}
+            setUserHasSetGeolocation={jest.fn()}
         />
     )
 }
