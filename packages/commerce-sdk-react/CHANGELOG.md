@@ -1,3 +1,5 @@
+## v2.1.0-dev (Jun 25, 2024)
+
 ## v2.0.0 (Jun 25, 2024)
 - Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
 - Add Shopper Stores hooks [#1788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1788)

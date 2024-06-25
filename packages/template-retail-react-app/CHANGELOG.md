@@ -1,3 +1,5 @@
+## v3.1.0-dev (Jun 25, 2024)
+
 ## v3.0.0 (Jun 25, 2024)
 
 ### Improvements
