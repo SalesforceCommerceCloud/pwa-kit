@@ -40,8 +40,14 @@ import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-grou
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
 
-const ProductViewHeader = ({name, currency, priceData, category, product, isProductPartOfBundle}) => {
-
+const ProductViewHeader = ({
+    name,
+    currency,
+    priceData,
+    category,
+    product,
+    isProductPartOfBundle
+}) => {
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -54,7 +60,6 @@ const ProductViewHeader = ({name, currency, priceData, category, product, isProd
             <Skeleton isLoaded={name}>
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
-
 
             {!isProductPartOfBundle && (
                 <>
@@ -78,7 +83,8 @@ ProductViewHeader.propTypes = {
     currency: PropTypes.string,
     category: PropTypes.array,
     priceData: PropTypes.object,
-    product: PropTypes.object
+    product: PropTypes.object,
+    isProductPartOfBundle: PropTypes.bool
 }
 
 const ButtonWithRegistration = withRegistration(Button)

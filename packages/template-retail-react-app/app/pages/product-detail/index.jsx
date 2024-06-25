@@ -328,10 +328,7 @@ const ProductDetail = () => {
                 }
             ]
 
-            await addItemToBasketMutation.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: productItems
-            })
+            await addItemToNewOrExistingBasket(productItems)
 
             einstein.sendAddToCart(productItems)
 

@@ -100,7 +100,7 @@ export const AddToCartModal = () => {
                                     '{quantity} {quantity, plural, one {item} other {items}} added to cart',
                                 id: 'add_to_cart_modal.info.added_to_cart'
                             },
-                            {quantity: numerOfItemsAdded}
+                            {quantity: numberOfItemsAdded}
                         )}
                     </Heading>
                 </ModalHeader>
@@ -204,79 +204,80 @@ export const AddToCartModal = () => {
                                     </Box>
                                 </Flex>
                             )}
-                            {!isProductABundle && itemsAdded.map(({product, variant, quantity}, index) => {
-                                const image = findImageGroupBy(product.imageGroups, {
-                                    viewType: 'small',
-                                    selectedVariationAttributes: variant.variationValues
-                                })?.images?.[0]
-                                const priceData = getPriceData(product, {quantity})
-                                const variationAttributeValues = getDisplayVariationValues(
-                                    product.variationAttributes,
-                                    variant.variationValues
-                                )
+                            {!isProductABundle &&
+                                itemsAdded.map(({product, variant, quantity}, index) => {
+                                    const image = findImageGroupBy(product.imageGroups, {
+                                        viewType: 'small',
+                                        selectedVariationAttributes: variant.variationValues
+                                    })?.images?.[0]
+                                    const priceData = getPriceData(product, {quantity})
+                                    const variationAttributeValues = getDisplayVariationValues(
+                                        product.variationAttributes,
+                                        variant.variationValues
+                                    )
 
-                                return (
-                                    <Flex
-                                        key={variant.productId}
-                                        justifyContent="space-between"
-                                        marginBottom={index < itemsAdded - 1 ? 0 : 4}
-                                        paddingBottom={4}
-                                        borderBottomWidth={{base: '1px', lg: '0px'}}
-                                        borderColor="gray.200"
-                                        borderStyle="solid"
-                                        data-testid="product-added"
-                                    >
-                                        <Flex gridGap="4">
-                                            <Box w="24" flex="none">
-                                                <AspectRatio ratio="1">
-                                                    <img src={image.link} alt={image.alt} />
-                                                </AspectRatio>
-                                            </Box>
+                                    return (
+                                        <Flex
+                                            key={variant.productId}
+                                            justifyContent="space-between"
+                                            marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                                            paddingBottom={4}
+                                            borderBottomWidth={{base: '1px', lg: '0px'}}
+                                            borderColor="gray.200"
+                                            borderStyle="solid"
+                                            data-testid="product-added"
+                                        >
+                                            <Flex gridGap="4">
+                                                <Box w="24" flex="none">
+                                                    <AspectRatio ratio="1">
+                                                        <img src={image.link} alt={image.alt} />
+                                                    </AspectRatio>
+                                                </Box>
 
-                                            <Box>
-                                                <Heading
-                                                    as="h2"
-                                                    fontSize="md"
-                                                    fontFamily="body"
-                                                    fontWeight="700"
-                                                >
-                                                    {product.name}
-                                                </Heading>
-                                                <Box
-                                                    color="gray.600"
-                                                    fontSize="sm"
-                                                    fontWeight="400"
-                                                >
-                                                    {Object.entries(variationAttributeValues).map(
-                                                        ([name, value]) => {
+                                                <Box>
+                                                    <Heading
+                                                        as="h2"
+                                                        fontSize="md"
+                                                        fontFamily="body"
+                                                        fontWeight="700"
+                                                    >
+                                                        {product.name}
+                                                    </Heading>
+                                                    <Box
+                                                        color="gray.600"
+                                                        fontSize="sm"
+                                                        fontWeight="400"
+                                                    >
+                                                        {Object.entries(
+                                                            variationAttributeValues
+                                                        ).map(([name, value]) => {
                                                             return (
                                                                 <Text key={value}>
                                                                     {name}: {value}
                                                                 </Text>
                                                             )
-                                                        }
-                                                    )}
-                                                    <Text>
-                                                        {intl.formatMessage({
-                                                            defaultMessage: 'Qty',
-                                                            id: 'add_to_cart_modal.label.quantity'
                                                         })}
-                                                        : {quantity}
-                                                    </Text>
+                                                        <Text>
+                                                            {intl.formatMessage({
+                                                                defaultMessage: 'Qty',
+                                                                id: 'add_to_cart_modal.label.quantity'
+                                                            })}
+                                                            : {quantity}
+                                                        </Text>
+                                                    </Box>
                                                 </Box>
+                                            </Flex>
+
+                                            <Box flex="none" alignSelf="flex-end" fontWeight="600">
+                                                <DisplayPrice
+                                                    priceData={priceData}
+                                                    quantity={quantity}
+                                                    currency={currency}
+                                                />
                                             </Box>
                                         </Flex>
-
-                                        <Box flex="none" alignSelf="flex-end" fontWeight="600">
-                                            <DisplayPrice
-                                                priceData={priceData}
-                                                quantity={quantity}
-                                                currency={currency}
-                                            />
-                                        </Box>
-                                    </Flex>
-                                )
-                            })}
+                                    )
+                                })}
                         </Box>
                         <Box
                             display={['none', 'none', 'none', 'block']}
