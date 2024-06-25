@@ -16,77 +16,68 @@ const fs = require('fs')
 const path = require('path')
 const packagePath = path.join(process.cwd(), 'package.json')
 const pkgJSON = JSON.parse(fs.readFileSync(packagePath))
-const locale = process.argv[2]
 
 const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) => {
-    const files = fs.readdirSync(dirPath)
+    const files = fs.readdirSync(dirPath, {withFileTypes: true})
 
     files.forEach(function (file) {
-        if (fs.statSync(path.join(dirPath, file)).isDirectory()) {
-            arrayOfFiles = getAllFilesByExtensions(
-                path.join(dirPath, file),
-                arrayOfFiles,
-                extensions
-            )
-        } else {
-            arrayOfFiles.push(path.join(dirPath, file))
+        const filePath = path.join(dirPath, file.name)
+        if (file.isDirectory()) {
+            arrayOfFiles = getAllFilesByExtensions(filePath, arrayOfFiles, extensions)
+        } else if (extensions.length === 0 || extensions.includes(path.extname(filePath))) {
+            arrayOfFiles.push(filePath)
         }
     })
-    if (extensions.length) {
-        return arrayOfFiles.filter((filePath) => {
-            const getExtension = path.extname(filePath).replace('.', '')
-            return extensions.includes(getExtension)
-        })
-    }
 
     return arrayOfFiles
 }
 
-try {
-    const overridesDir = pkgJSON.ccExtensibility?.overridesDir
+function extract(locale) {
+    // `extends` is a reserved word (`class A extends B {}`)
+    const {extends: extendsPkg, overridesDir} = pkgJSON.ccExtensibility || {}
     if (!overridesDir) {
-        const command = `formatjs extract "app/**/*.{js,jsx,ts,tsx}" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+        const command = [
+            'formatjs extract "app/**/*.{js,jsx,ts,tsx}"',
+            `--out-file translations/${locale}.json`,
+            '--id-interpolation-pattern [sha512:contenthash:base64:6]'
+        ].join(' ')
         exec(command, (err) => {
             if (err) {
                 console.error(err)
             }
         })
     } else {
-        const overridesPath = path.join(process.cwd(), pkgJSON.ccExtensibility?.overridesDir)
+        const overridesPath = path.join(process.cwd(), overridesDir)
         // get all the files in extended app
         const files = getAllFilesByExtensions(
             path.join(overridesPath, 'app'),
             [],
-            ['js', 'jsx', 'ts', 'tsx']
+            ['.js', '.jsx', '.ts', '.tsx']
         )
         // get the file names that are overridden in base template
         const overriddenFiles = files
-            .map((path) => {
-                const replacedPath = path.replace(
-                    overridesDir,
-                    `node_modules/${pkgJSON.ccExtensibility?.extends}`
-                )
-                // check if this file does exist in base template
-                const isFileExist = fs.existsSync(replacedPath)
-                return isFileExist ? replacedPath : ''
-            })
-            .filter(Boolean)
-        // rename the files needs to ignore to have .ignore extensions so it won't be recognized by formatjs
-        overriddenFiles.forEach((filePath) => {
-            fs.rename(filePath, `${filePath}.ignore`, (err) => err && console.error(err))
-        })
-
-        const extractCommand = `formatjs extract "./node_modules/${pkgJSON.ccExtensibility?.extends}/app/**/*.{js,jsx,ts,tsx}" "${pkgJSON.ccExtensibility?.overridesDir}/app/**/*.{js,jsx,ts,tsx}" --out-file translations/${locale}.json --id-interpolation-pattern [sha512:contenthash:base64:6]`
+            .map((path) => path.replace(overridesDir, `node_modules/${extendsPkg}`))
+            .filter((file) => fs.existsSync(file))
+        const extractCommand = [
+            'formatjs extract',
+            `"./node_modules/${extendsPkg}/app/**/*.{js,jsx,ts,tsx}"`,
+            `"${overridesDir}/app/**/*.{js,jsx,ts,tsx}"`,
+            `--out-file translations/${locale}.json`,
+            '--id-interpolation-pattern [sha512:contenthash:base64:6]',
+            '--ignore',
+            ...overriddenFiles.map((file) => `'${file}'`)
+        ].join(' ')
         exec(extractCommand, (err) => {
             if (err) {
                 console.error(err)
             }
-            // restore file names
-            overriddenFiles.forEach((filePath) => {
-                fs.rename(`${filePath}.ignore`, filePath, (err) => err && console.error(err))
-            })
         })
     }
+}
+
+try {
+    // example usage: node ./scripts/translations/extract-default-messages en-US en-GB
+    process.argv.slice(2).forEach(extract)
 } catch (error) {
     console.error(error)
 }

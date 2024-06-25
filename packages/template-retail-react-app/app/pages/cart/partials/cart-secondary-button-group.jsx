@@ -7,7 +7,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-    Box,
     Button,
     ButtonGroup,
     Checkbox,
@@ -50,7 +49,9 @@ export const REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG = {
 const CartSecondaryButtonGroup = ({
     onAddToWishlistClick = noop,
     onEditClick = noop,
-    onRemoveItemClick = noop
+    onRemoveItemClick = noop,
+    onIsAGiftChange = noop,
+    isAGift = false
 }) => {
     const variant = useItemVariant()
 
@@ -100,20 +101,29 @@ const CartSecondaryButtonGroup = ({
                     </Button>
                 </ButtonGroup>
                 <Flex alignItems="center">
-                    <Checkbox spacing={2} isReadOnly={true}>
+                    <Checkbox
+                        name={`gift-checkbox-${variant.itemId}`}
+                        spacing={2}
+                        isChecked={isAGift}
+                        onChange={(e) => {
+                            const checked = e.target.checked
+                            onIsAGiftChange(variant, checked)
+                        }}
+                    >
                         <FormattedMessage
                             defaultMessage="This is a gift."
                             id="cart_secondary_button_group.label.this_is_gift"
                         />
                     </Checkbox>
-                    <Box marginLeft={1}>
-                        <Button marginLeft={1} variant="link" size="sm">
-                            <FormattedMessage
-                                defaultMessage="Learn More"
-                                id="cart_secondary_button_group.link_learn_more"
-                            />
-                        </Button>
-                    </Box>
+                    {/* if you want to provide a link to your gift site, uncomment this section and re-build your translation*/}
+                    {/*<Box marginLeft={1}>*/}
+                    {/*    <Button marginLeft={1} variant="link" size="sm" href="#">*/}
+                    {/*        <FormattedMessage*/}
+                    {/*            defaultMessage="Learn More"*/}
+                    {/*            id="cart_secondary_button_group.link_learn_more"*/}
+                    {/*        />*/}
+                    {/*    </Button>*/}
+                    {/*</Box>*/}
                 </Flex>
             </Stack>
             <ConfirmationModal
@@ -129,7 +139,9 @@ CartSecondaryButtonGroup.propTypes = {
     onClick: PropTypes.func,
     onEditClick: PropTypes.func,
     onAddToWishlistClick: PropTypes.func,
-    onRemoveItemClick: PropTypes.func
+    onRemoveItemClick: PropTypes.func,
+    onIsAGiftChange: PropTypes.func,
+    isAGift: PropTypes.bool
 }
 
 export default CartSecondaryButtonGroup

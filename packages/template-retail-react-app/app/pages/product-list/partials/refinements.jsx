@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2023, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -25,14 +25,27 @@ import LinkRefinements from '@salesforce/retail-react-app/app/pages/product-list
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {FILTER_ACCORDION_SATE} from '@salesforce/retail-react-app/app/constants'
 
-const componentMap = {
+/** Map of refinement attribute IDs to the components used to display values as filter options. */
+export const componentMap = {
     cgid: LinkRefinements,
     c_refinementColor: ColorRefinements,
     c_size: SizeRefinements,
     price: RadioRefinements
 }
 
-const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
+const Refinements = ({
+    itemsBefore,
+    excludedFilters = [],
+    filters = [],
+    toggleFilter,
+    selectedFilters,
+    isLoading
+}) => {
+    // Exclude filters in the exclude list.
+    if (excludedFilters) {
+        filters = filters.filter(({attributeId}) => !excludedFilters.includes(attributeId))
+    }
+
     // Getting the indices of filters to open accordions by default
     let filtersIndexes = filters?.map((filter, idx) => idx)
 
@@ -76,6 +89,8 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
                     defaultIndex={filtersIndexes}
                     reduceMotion={true}
                 >
+                    {itemsBefore}
+
                     {filters?.map((filter, idx) => {
                         // Render the appropriate component for the refinement type, fallback to checkboxes
                         const Values = componentMap[filter.attributeId] || CheckboxRefinements
@@ -90,14 +105,18 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
                             return (
                                 <Stack key={filter.attributeId} divider={<Divider />}>
                                     <AccordionItem
-                                        paddingTop={idx !== 0 ? 6 : 0}
+                                        paddingTop={idx !== 0 || itemsBefore ? 6 : 0}
                                         borderBottom={
                                             idx === filters.length - 1
                                                 ? '1px solid gray.200'
                                                 : 'none'
                                         }
                                         paddingBottom={6}
-                                        borderTop={idx === 0 && 'none'}
+                                        borderTop={
+                                            idx === 0 && !itemsBefore
+                                                ? 'none'
+                                                : '1px solid gray.200'
+                                        }
                                     >
                                         {({isExpanded}) => (
                                             <>
@@ -138,7 +157,9 @@ const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
 }
 
 Refinements.propTypes = {
+    itemsBefore: PropTypes.arrayOf(PropTypes.element),
     filters: PropTypes.array,
+    excludedFilters: PropTypes.arrayOf(PropTypes.string),
     toggleFilter: PropTypes.func,
     selectedFilters: PropTypes.object,
     isLoading: PropTypes.bool

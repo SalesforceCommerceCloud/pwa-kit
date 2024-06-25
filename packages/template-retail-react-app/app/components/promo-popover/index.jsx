@@ -16,11 +16,10 @@ import {
     PopoverContent,
     PopoverHeader,
     PopoverTrigger,
-    Portal,
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {InfoIcon} from '@salesforce/retail-react-app/app/components/icons'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 
 /**
  * This component renders a small info icon and displays a popover when hovered. It could be adapted
@@ -28,6 +27,7 @@ import {FormattedMessage} from 'react-intl'
  * promotions applied to products and/or orders on cart, checkout, order confirmation and order history.
  */
 const PromoPopover = ({header, children, ...props}) => {
+    const intl = useIntl()
     return (
         <Box position="relative" {...props}>
             <Popover isLazy placement="top" boundary="scrollParent" trigger="hover" variant="small">
@@ -49,27 +49,29 @@ const PromoPopover = ({header, children, ...props}) => {
                         minWidth="auto"
                         position="relative"
                         variant="unstyled"
+                        aria-label={intl.formatMessage({
+                            id: 'promo_popover.assistive_msg.info',
+                            defaultMessage: 'Info'
+                        })}
                     />
                 </PopoverTrigger>
-                <Portal>
-                    <PopoverContent border="none" borderRadius="base">
-                        <Box boxShadow="lg" zIndex="-1">
-                            <PopoverArrow />
-                            <PopoverCloseButton />
-                            <PopoverHeader borderBottom="none">
-                                {header || (
-                                    <Text fontWeight="bold" fontSize="md">
-                                        <FormattedMessage
-                                            defaultMessage="Promotions Applied"
-                                            id="promo_popover.heading.promo_applied"
-                                        />
-                                    </Text>
-                                )}
-                            </PopoverHeader>
-                            <PopoverBody pt={0}>{children}</PopoverBody>
-                        </Box>
-                    </PopoverContent>
-                </Portal>
+                <PopoverContent border="none" borderRadius="base">
+                    <Box boxShadow="lg">
+                        <PopoverArrow />
+                        <PopoverCloseButton />
+                        <PopoverHeader borderBottom="none">
+                            {header || (
+                                <Text fontWeight="bold" fontSize="md">
+                                    <FormattedMessage
+                                        defaultMessage="Promotions Applied"
+                                        id="promo_popover.heading.promo_applied"
+                                    />
+                                </Text>
+                            )}
+                        </PopoverHeader>
+                        <PopoverBody pt={0}>{children}</PopoverBody>
+                    </Box>
+                </PopoverContent>
             </Popover>
         </Box>
     )

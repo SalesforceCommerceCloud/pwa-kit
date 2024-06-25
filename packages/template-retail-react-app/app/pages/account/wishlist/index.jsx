@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Flex, Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -16,12 +16,13 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
 import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
 import {HeartIcon} from '@salesforce/retail-react-app/app/components/icons'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
+import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
 import WishlistPrimaryAction from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-secondary-button-group'
 
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 
 const numberOfSkeletonItems = 3
 
@@ -30,6 +31,12 @@ const AccountWishlist = () => {
     const {formatMessage} = useIntl()
     const toast = useToast()
 
+    const headingRef = useRef()
+    useEffect(() => {
+        // Focus the 'Wishlist' header when the component mounts for accessibility
+        headingRef?.current?.focus()
+    }, [])
+
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
@@ -37,7 +44,13 @@ const AccountWishlist = () => {
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
 
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
-        {parameters: {ids: productIds?.join(','), allImages: true}},
+        {
+            parameters: {
+                ids: productIds?.join(','),
+                allImages: true,
+                perPricebook: true
+            }
+        },
         {enabled: productIds?.length > 0}
     )
 
@@ -53,6 +66,7 @@ const AccountWishlist = () => {
     const deleteCustomerProductListItem = useShopperCustomersMutation(
         'deleteCustomerProductListItem'
     )
+
     const {data: customer} = useCurrentCustomer()
 
     const handleSecondaryAction = async (itemId, promise) => {
@@ -66,6 +80,23 @@ const AccountWishlist = () => {
             setWishlistItemLoading(false)
             setSelectedItem(undefined)
         }
+    }
+
+    const handleUnavailableProducts = async (unavailableProductIds) => {
+        if (!unavailableProductIds.length) return
+        await Promise.all(
+            unavailableProductIds.map(async (id) => {
+                const item = wishListItems?.find((item) => {
+                    return item.productId.toString() === id.toString()
+                })
+                const parameters = {
+                    customerId: customer.customerId,
+                    itemId: item?.id,
+                    listId: wishListData?.id
+                }
+                await deleteCustomerProductListItem.mutateAsync({parameters})
+            })
+        )
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
@@ -106,11 +137,12 @@ const AccountWishlist = () => {
         return isValidChange
     }
 
-    const isPageLoading = wishListItems ? isProductsLoading : isWishListLoading
+    const hasWishlistItems = wishListItems?.length > 0
+    const isPageLoading = hasWishlistItems ? isProductsLoading : isWishListLoading
 
     return (
         <Stack spacing={4} data-testid="account-wishlist-page">
-            <Heading as="h1" fontSize="2xl">
+            <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                 <FormattedMessage defaultMessage="Wishlist" id="account_wishlist.title.wishlist" />
             </Heading>
 
@@ -139,7 +171,7 @@ const AccountWishlist = () => {
                 </Box>
             )}
 
-            {!isPageLoading && !wishListItems && (
+            {!isPageLoading && !hasWishlistItems && (
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<HeartIcon boxSize={8} />}
@@ -184,12 +216,19 @@ const AccountWishlist = () => {
                             secondaryActions={
                                 <WishlistSecondaryButtonGroup
                                     productListItemId={item.id}
+                                    // Focus to 'Wishlist' header after remove for accessibility
+                                    focusElementOnRemove={headingRef}
                                     onClick={handleSecondaryAction}
                                 />
                             }
                         />
                     )
                 })}
+
+            <UnavailableProductConfirmationModal
+                productIds={productIds}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
         </Stack>
     )
 }

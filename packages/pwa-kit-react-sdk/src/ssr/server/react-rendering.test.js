@@ -18,6 +18,7 @@ import request from 'supertest'
 import {parse} from 'node-html-parser'
 import path from 'path'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
+import {getLocationSearch} from './react-rendering'
 
 import {getAppConfig} from '../universal/compatibility'
 
@@ -695,9 +696,8 @@ describe('The Node SSR Environment', () => {
             assertions: (res) => {
                 expect(res.statusCode).toBe(404)
 
-                // we'll expect that this method is called three times,
-                // twice for rendering pipeline because of the prepass step and one for http request logging
-                expect(console.log).toHaveBeenCalledTimes(3)
+                // Because of the prepass step we'll expect that this method is called twice.
+                expect(console.log).toHaveBeenCalledTimes(2)
             }
         }
     ]
@@ -733,5 +733,30 @@ describe('The Node SSR Environment', () => {
                 expectations(res)
             })
         })
+    })
+})
+
+describe('getLocationSearch', function () {
+    test('interprets + sign as space when interpretsPlusSignAsSpace is set to true in config', () => {
+        const req = {
+            originalUrl: '/hello-word?q=mens+shirt%20dresses',
+            query: {
+                q: 'mens+shirt%20dresses'
+            }
+        }
+        const output = getLocationSearch(req, {interpretPlusSignAsSpace: true})
+        // we called URLSearchParam.toString for the output, any encoded/not encoded space will replace + with interpretsPlusSignAsSpace is true
+        expect(output).toBe('?q=mens+shirt+dresses')
+    })
+    test('not interpret + sign as space when interpretsPlusSignAsSpace is set to false in config', () => {
+        const req = {
+            originalUrl: '/hello-word?q=mens+shirt',
+            query: {
+                q: 'mens+shirt'
+            }
+        }
+        // we called URLSearchParam.toString for the output, with interpretsPlusSignAsSpace is false, it will encode literally + to %2B
+        const output = getLocationSearch(req)
+        expect(output).toBe('?q=mens%2Bshirt')
     })
 })

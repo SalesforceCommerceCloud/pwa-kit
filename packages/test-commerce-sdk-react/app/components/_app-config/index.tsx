@@ -8,6 +8,7 @@ import React, {useState, ReactElement} from 'react'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 interface AppConfigProps {
     children: React.ReactNode
@@ -18,22 +19,20 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     const headers = {
         'correlation-id': correlationId
     }
-    const defaultSiteId = 'RefArchGlobal'
+    const defaultSiteId = 'RefArch'
     const defaultLocale = 'en-US'
     const [siteId, setSiteId] = useState(defaultSiteId)
     const [locale, setLocale] = useState(defaultLocale)
     const anotherSite = siteId === defaultSiteId ? 'RefArch' : defaultSiteId
     const anotherLocale = locale === defaultLocale ? 'en-CA' : defaultLocale
     return (
-        // @ts-expect-error: Types of property 'key' are incompatible.
-        // Possible conflicting types due to duplicate @types/react installs
         <CommerceApiProvider
             siteId={siteId}
-            shortCode="8o7m175y"
-            clientId="c9c45bfd-0ed3-4aa2-9971-40f88962b836"
-            organizationId="f_ecom_zzrf_001"
+            shortCode="kv7kzm78"
+            clientId="4afbc51f-6423-41c8-8b29-d7f2825b5bee"
+            organizationId="f_ecom_zzrf_006"
             redirectURI="http://localhost:3000/callback"
-            proxy="http://localhost:3000/mobify/proxy/api"
+            proxy={`http://localhost:3000/${String(proxyBasePath)}/api`}
             locale={locale}
             currency="USD"
             headers={headers}

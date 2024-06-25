@@ -5,12 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryResult} from '@tanstack/react-query'
+import {ShopperExperience} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions, omitNullableParameters} from '../utils'
+import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-
 type Client = ApiClients['shopperExperience']
 
 /**
@@ -35,18 +35,22 @@ export const usePages = (
     type Data = DataType<Client['getPages']>
     const {shopperExperience: client} = useCommerceApi()
     const methodName = 'getPages'
-    const requiredParameters = ['organizationId', 'aspectTypeId', 'siteId'] as const
+    const requiredParameters = ShopperExperience.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperExperience.paramKeys[methodName]
+    )
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -74,18 +78,22 @@ export const usePage = (
     type Data = DataType<Client['getPage']>
     const {shopperExperience: client} = useCommerceApi()
     const methodName = 'getPage'
-    const requiredParameters = ['organizationId', 'pageId', 'siteId'] as const
+    const requiredParameters = ShopperExperience.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperExperience.paramKeys[methodName]
+    )
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters

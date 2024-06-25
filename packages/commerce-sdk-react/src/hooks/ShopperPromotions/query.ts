@@ -5,10 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryResult} from '@tanstack/react-query'
+import {ShopperPromotions} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions, omitNullableParameters} from '../utils'
+import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 
 type Client = ApiClients['shopperPromotions']
@@ -32,18 +33,22 @@ export const usePromotions = (
     type Data = DataType<Client['getPromotions']>
     const {shopperPromotions: client} = useCommerceApi()
     const methodName = 'getPromotions'
-    const requiredParameters = ['organizationId', 'siteId', 'ids'] as const
+    const requiredParameters = ShopperPromotions.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperPromotions.paramKeys[methodName]
+    )
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters
@@ -52,7 +57,7 @@ export const usePromotions = (
 /**
  * Handles get promotion by filter criteria. Returns an array of enabled promotions matching the specified filter
 criteria. In the request URL, you must provide a campaign_id parameter, and you can optionally specify a date
-range by providing start_date and end_date parameters. Both parameters are required to specify a date range, as 
+range by providing start_date and end_date parameters. Both parameters are required to specify a date range, as
 omitting one causes the server to return a MissingParameterException fault. Each request returns only enabled
 promotions, since the server does not consider promotion qualifiers or schedules.
  * @group ShopperPromotions
@@ -72,18 +77,23 @@ export const usePromotionsForCampaign = (
     type Data = DataType<Client['getPromotionsForCampaign']>
     const {shopperPromotions: client} = useCommerceApi()
     const methodName = 'getPromotionsForCampaign'
-    const requiredParameters = ['organizationId', 'campaignId', 'siteId'] as const
+    const requiredParameters = ShopperPromotions.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
+    const parameters = pickValidParams(
+        netOptions.parameters,
+        ShopperPromotions.paramKeys[methodName]
+    )
+
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(netOptions, queryOptions, {
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
         method,
         queryKey,
         requiredParameters

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {
@@ -14,13 +14,13 @@ import {
     Stack,
     Text,
     Heading,
-    Divider
+    Divider,
+    Accordion,
+    AccordionIcon,
+    AccordionItem,
+    AccordionButton,
+    AccordionPanel
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {
-    BasketIcon,
-    ChevronDownIcon,
-    ChevronUpIcon
-} from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
@@ -30,6 +30,7 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
 import {useProducts} from '@salesforce/commerce-sdk-react'
+import {BasketIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 const CartItems = ({basket}) => {
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
@@ -54,61 +55,60 @@ const CartItems = ({basket}) => {
         }
     )
 
-    const [cartItemsExpanded, setCartItemsExpanded] = useState(false)
-
     return (
-        <Stack spacing={5} width="full">
-            <Box>
-                <Button
-                    variant="link"
-                    leftIcon={<BasketIcon boxSize="22px" />}
-                    rightIcon={cartItemsExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                    onClick={() => setCartItemsExpanded(!cartItemsExpanded)}
-                >
-                    <FormattedMessage
-                        id="order_summary.cart_items.action.num_of_items_in_cart"
-                        description="clicking it would expand/show the items in cart"
-                        defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart"
-                        values={{itemCount: totalItems}}
-                    />
-                </Button>
-            </Box>
-
-            {cartItemsExpanded && (
-                <Stack spacing={5} align="flex-start" divider={<Divider />}>
-                    {basket.productItems?.map((product, idx) => {
-                        const variant = {
-                            ...product,
-                            ...(products && products[product.productId]),
-                            price: product.price
-                        }
-                        return (
-                            <ItemVariantProvider
-                                key={product.productId}
-                                index={idx}
-                                variant={variant}
-                            >
-                                <Flex width="full" alignItems="flex-start">
-                                    <CartItemVariantImage width="80px" mr={2} />
-                                    <Stack width="full" spacing={1} marginTop="-3px">
-                                        <CartItemVariantName />
-                                        <CartItemVariantAttributes includeQuantity />
-                                        <CartItemVariantPrice baseDirection="row" />
-                                    </Stack>
-                                </Flex>
-                            </ItemVariantProvider>
-                        )
-                    })}
-
-                    <Button as={Link} to="/cart" variant="link" width="full">
+        <Accordion allowToggle={true} width="100%">
+            <AccordionItem style={{border: 0}}>
+                <AccordionButton color="blue.700">
+                    <BasketIcon aria-hidden={true} />
+                    <Box px={2}>
                         <FormattedMessage
-                            defaultMessage="Edit cart"
-                            id="order_summary.cart_items.link.edit_cart"
+                            id="order_summary.cart_items.action.num_of_items_in_cart"
+                            description="clicking it would expand/show the items in cart"
+                            defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart"
+                            values={{itemCount: totalItems}}
                         />
-                    </Button>
-                </Stack>
-            )}
-        </Stack>
+                    </Box>
+                    <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel px={0} py={4}>
+                    <Stack spacing={5} align="flex-start" divider={<Divider />}>
+                        {basket.productItems?.map((product, idx) => {
+                            const variant = {
+                                ...product,
+                                ...(products && products[product.productId]),
+                                price: product.price
+                            }
+                            return (
+                                <ItemVariantProvider
+                                    key={product.productId}
+                                    index={idx}
+                                    variant={variant}
+                                >
+                                    <Flex width="full" alignItems="flex-start">
+                                        <CartItemVariantImage width="80px" mr={2} />
+                                        <Stack width="full" spacing={1} marginTop="-3px">
+                                            <CartItemVariantName />
+                                            <CartItemVariantAttributes includeQuantity />
+                                            <CartItemVariantPrice
+                                                baseDirection="row"
+                                                currency={basket?.currency}
+                                            />
+                                        </Stack>
+                                    </Flex>
+                                </ItemVariantProvider>
+                            )
+                        })}
+
+                        <Button as={Link} to="/cart" variant="link" width="full" color="blue.700">
+                            <FormattedMessage
+                                defaultMessage="Edit cart"
+                                id="order_summary.cart_items.link.edit_cart"
+                            />
+                        </Button>
+                    </Stack>
+                </AccordionPanel>
+            </AccordionItem>
+        </Accordion>
     )
 }
 
@@ -133,18 +133,23 @@ const OrderSummary = ({
 
     return (
         <Stack data-testid="sf-order-summary" spacing={5}>
-            <Heading fontSize={fontSize} pt={1}>
+            <Heading fontSize={fontSize} pt={1} id="order-summary-heading">
                 <FormattedMessage
                     defaultMessage="Order Summary"
                     id="order_summary.heading.order_summary"
                 />
             </Heading>
 
-            <Stack spacing={4} align="flex-start">
+            <Stack
+                spacing={4}
+                align="flex-start"
+                role="region"
+                aria-labelledby="order-summary-heading"
+            >
                 {showCartItems && <CartItems basket={basket} />}
 
                 <Stack w="full">
-                    <Flex justify="space-between">
+                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
                         <Text fontWeight="bold" fontSize={fontSize}>
                             <FormattedMessage
                                 defaultMessage="Subtotal"
@@ -161,9 +166,14 @@ const OrderSummary = ({
                     </Flex>
 
                     {basket.orderPriceAdjustments?.map((adjustment) => (
-                        <Flex justify="space-between" key={adjustment.priceAdjustmentId}>
+                        <Flex
+                            justify="space-between"
+                            key={adjustment.priceAdjustmentId}
+                            aria-live="polite"
+                            aria-atomic="true"
+                        >
                             <Text fontSize={fontSize}>{adjustment.itemText}</Text>
-                            <Text color="green.500" fontSize={fontSize}>
+                            <Text color="green.600" fontSize={fontSize}>
                                 <FormattedNumber
                                     style="currency"
                                     currency={basket?.currency}
@@ -173,7 +183,7 @@ const OrderSummary = ({
                         </Flex>
                     ))}
 
-                    <Flex justify="space-between">
+                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
                         <Flex alignItems="center">
                             <Text lineHeight={1} fontSize={fontSize}>
                                 <FormattedMessage
@@ -209,7 +219,7 @@ const OrderSummary = ({
                         ) ? (
                             <Text
                                 as="span"
-                                color="green.500"
+                                color="green.700"
                                 textTransform="uppercase"
                                 fontSize={fontSize}
                             >
@@ -229,7 +239,7 @@ const OrderSummary = ({
                         )}
                     </Flex>
 
-                    <Flex justify="space-between">
+                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
                         <Text fontSize={fontSize}>
                             <FormattedMessage defaultMessage="Tax" id="order_summary.label.tax" />
                         </Text>
@@ -258,7 +268,7 @@ const OrderSummary = ({
                 )}
 
                 <Stack spacing={4} w="full">
-                    <Flex w="full" justify="space-between">
+                    <Flex w="full" justify="space-between" aria-live="polite" aria-atomic="true">
                         {isEstimate ? (
                             <Text fontWeight="bold" fontSize={fontSize}>
                                 <FormattedMessage

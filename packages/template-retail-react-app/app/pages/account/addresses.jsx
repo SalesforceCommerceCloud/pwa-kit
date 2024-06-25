@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -94,7 +94,7 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
                             <Stack spacing={6}>
                                 {form.formState.errors?.global && (
                                     <Alert status="error">
-                                        <AlertIcon color="red.500" boxSize={4} />
+                                        <AlertIcon color="red.600" boxSize={4} />
                                         <Text fontSize="sm" ml={3}>
                                             {form.formState.errors.global.message}
                                         </Text>
@@ -146,6 +146,22 @@ const AccountAddresses = () => {
     const [selectedAddressId, setSelectedAddressId] = useState(false)
     const showToast = useToast()
     const form = useForm()
+
+    const headingRef = useRef()
+    useEffect(() => {
+        // Focus the 'Addresses' header when the component mounts for accessibility
+        headingRef?.current?.focus()
+    }, [])
+
+    // keep track of the edit buttons so we can focus on them later for accessibility
+    const [editBtnRefs, setEditBtnRefs] = useState({})
+    useEffect(() => {
+        const currentRefs = {}
+        addresses?.forEach(({addressId}) => {
+            currentRefs[addressId] = React.createRef()
+        })
+        setEditBtnRefs(currentRefs)
+    }, [addresses])
 
     const hasAddresses = addresses?.length > 0
     const showError = () => {
@@ -216,6 +232,8 @@ const AccountAddresses = () => {
                             status: 'success',
                             isClosable: true
                         })
+                        // Move focus to header after we successfully remove address
+                        headingRef?.current?.focus()
                     }
                 }
             )
@@ -232,6 +250,10 @@ const AccountAddresses = () => {
             setSelectedAddressId(address.addressId)
             setIsEditing(true)
         } else {
+            // Focus on the edit button that opened the form when the form closes
+            // otherwise focus on the heading if we can't find the button
+            const focusAfterClose = editBtnRefs[selectedAddressId]?.current ?? headingRef?.current
+            focusAfterClose?.focus()
             setSelectedAddressId(undefined)
             setIsEditing(!isEditing)
         }
@@ -239,7 +261,7 @@ const AccountAddresses = () => {
 
     return (
         <Stack spacing={4} data-testid="account-addresses-page">
-            <Heading as="h1" fontSize="2xl">
+            <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                 <FormattedMessage
                     defaultMessage="Addresses"
                     id="account_addresses.title.addresses"
@@ -304,6 +326,7 @@ const AccountAddresses = () => {
                             <ActionCard
                                 borderColor="gray.200"
                                 key={address.addressId}
+                                editBtnRef={editBtnRefs[address.addressId]}
                                 onRemove={() => removeAddress(address.addressId)}
                                 onEdit={() => toggleEdit(address)}
                             >

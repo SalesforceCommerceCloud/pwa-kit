@@ -57,6 +57,7 @@ export default function useCreditCardFields({
             label: formatMessage(messages.cardNumber),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'cc-number',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your card number.',
@@ -84,6 +85,7 @@ export default function useCreditCardFields({
             label: formatMessage(messages.cardName),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'cc-name',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your name as shown on your card.',
@@ -101,6 +103,7 @@ export default function useCreditCardFields({
             label: formatMessage(messages.expiryDate),
             defaultValue: '',
             type: 'text',
+            autoComplete: 'cc-exp',
             placeholder: 'MM/YY',
             rules: {
                 required: formatMessage({
@@ -122,6 +125,8 @@ export default function useCreditCardFields({
             label: formatMessage(messages.securityCode),
             defaultValue: '',
             type: 'password',
+            // turn it off for security
+            autoComplete: 'off',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your security code.',

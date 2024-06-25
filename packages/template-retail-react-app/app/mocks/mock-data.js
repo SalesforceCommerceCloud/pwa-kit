@@ -3019,6 +3019,7 @@ export const mockProductSearch = {
         {
             currency: 'USD',
             hitType: 'master',
+            productId: '25589411M',
             image: {
                 alt: 'Trouser Leg Pant, , large',
                 disBaseLink:
@@ -3597,6 +3598,7 @@ export const mockProductSearch = {
         {
             currency: 'USD',
             hitType: 'master',
+            productId: '25586795M',
             image: {
                 alt: 'Pleated Skirt With Embroidery., , large',
                 disBaseLink:
@@ -5637,4 +5639,11 @@ export const mockCartVariant = {
     c_refinementColor: 'black',
     c_size: '9MD',
     c_width: 'Z'
+}
+
+export const mockPasswordUpdateFalure = {
+    title: 'Update Password',
+    type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/update-password',
+    detail: 'The update password request is invalid. Customer\u0027s current password is not valid',
+    errorMessage: 'Customer\u0027s current password is not valid'
 }

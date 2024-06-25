@@ -11,9 +11,7 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE,
-    CONTENT_SECURITY_POLICY,
-    STRICT_TRANSPORT_SECURITY
+    NO_CACHE
 } from './constants'
 import {
     catchAndLog,
@@ -24,14 +22,15 @@ import {
     processLambdaResponse,
     responseSend,
     configureProxyConfigs,
-    setQuiet
+    setQuiet,
+    localDevLog
 } from '../../utils/ssr-server'
 import dns from 'dns'
 import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
 import URL from 'url'
-import {Headers, X_HEADERS_TO_REMOVE, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
+import {Headers, X_HEADERS_TO_REMOVE_ORIGIN, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import assert from 'assert'
 import semver from 'semver'
 import pkg from '../../../package.json'
@@ -40,9 +39,17 @@ import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
+import {
+    proxyBasePath,
+    bundleBasePath,
+    healthCheckPath,
+    slasPrivateProxyPath
+} from '../../utils/ssr-namespace-paths'
+import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
-import {morganStream} from '../../utils/morgan-stream'
+import logger from '../../utils/logger-instance'
+import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -117,7 +124,16 @@ export const RemoteServerFactory = {
             mobify: undefined,
 
             // Toggle cookies being passed and set
-            localAllowCookies: false
+            localAllowCookies: false,
+
+            // Toggle for setting up the custom SLAS private client secret handler
+            useSLASPrivateClient: false,
+
+            // A regex for identifying which SLAS endpoints the custom SLAS private
+            // client secret handler will inject an Authorization header.
+            // Do not modify unless a project wants to customize additional SLAS
+            // endpoints that we currently do not support (ie. /oauth2/passwordless/token)
+            applySLASPrivateClientToEndpoints: /\/oauth2\/token/
         }
 
         options = Object.assign({}, defaults, options)
@@ -147,6 +163,10 @@ export const RemoteServerFactory = {
         // Toggle cookies being passed and set. Can be overridden locally,
         // always uses MRT_ALLOW_COOKIES env remotely
         options.allowCookies = this._getAllowCookies(options)
+
+        // For test only – configure the SLAS private client secret proxy endpoint
+        options.slasHostName = this._getSlasEndpoint(options)
+        options.slasTarget = options.slasTarget || `https://${options.slasHostName}`
 
         return options
     },
@@ -193,6 +213,22 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    _isBundleOrProxyPath(url) {
+        return url.startsWith(proxyBasePath) || url.startsWith(bundleBasePath)
+    },
+
+    /**
+     * @private
+     */
+    _getSlasEndpoint(options) {
+        if (!options.useSLASPrivateClient) return undefined
+        const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
+        return `${shortCode}.api.commercecloud.salesforce.com`
+    },
+
+    /**
+     * @private
+     */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setCompression(app) {
         // Let the CDN do it
@@ -203,42 +239,67 @@ export const RemoteServerFactory = {
      */
 
     _setupLogging(app) {
+        const morganLoggerFormat = function (tokens, req, res) {
+            const contentLength = tokens.res(req, res, 'content-length')
+            return [
+                `(${res.locals.requestId})`,
+                tokens.method(req, res),
+                tokens.url(req, res),
+                tokens.status(req, res),
+                tokens['response-time'](req, res),
+                'ms',
+                contentLength && `- ${contentLength}`
+            ].join(' ')
+        }
+
+        // Morgan stream for logging status codes less than 400
         app.use(
-            expressLogging(
-                function (tokens, req, res) {
-                    const contentLength = tokens.res(req, res, 'content-length')
-                    return [
-                        `(${res.locals.requestId})`,
-                        tokens.method(req, res),
-                        tokens.url(req, res),
-                        tokens.status(req, res),
-                        tokens['response-time'](req, res),
-                        'ms',
-                        contentLength && `- ${contentLength}`
-                    ].join(' ')
+            expressLogging(morganLoggerFormat, {
+                skip: function (req, res) {
+                    return res.statusCode >= 400
                 },
-                {
-                    stream: morganStream
+                stream: {
+                    write: (message) => {
+                        logger.info(message, {
+                            namespace: 'httprequest'
+                        })
+                    }
                 }
-            )
+            })
+        )
+
+        // Morgan stream for logging status codes 400 and above
+        app.use(
+            expressLogging(morganLoggerFormat, {
+                skip: function (req, res) {
+                    return res.statusCode < 400
+                },
+                stream: {
+                    write: (message) => {
+                        logger.error(message, {
+                            namespace: 'httprequest'
+                        })
+                    }
+                }
+            })
         )
     },
 
     /**
-     * Passing the requestId from apiGateway event to locals
+     * Passing the correlation Id from MRT to locals
      * @private
      */
     _setRequestId(app) {
         app.use((req, res, next) => {
-            if (!req.headers['x-apigateway-event']) {
-                console.error('Missing x-apigateway-event')
+            const correlationId = req.headers['x-correlation-id']
+            const requestId = correlationId ? correlationId : req.headers['x-apigateway-event']
+            if (!requestId) {
+                logger.error('Both x-correlation-id and x-apigateway-event headers are missing', {
+                    namespace: '_setRequestId'
+                })
                 next()
                 return
             }
-            const apiGatewayEvent = JSON.parse(
-                decodeURIComponent(req.headers['x-apigateway-event'])
-            )
-            const {requestId} = apiGatewayEvent.requestContext
             res.locals.requestId = requestId
             next()
         })
@@ -300,6 +361,8 @@ export const RemoteServerFactory = {
         this._setupMetricsFlushing(app)
         this._setupHealthcheck(app)
         this._setupProxying(app, options)
+
+        this._setupSlasPrivateClientProxy(app, options)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
@@ -406,22 +469,8 @@ export const RemoteServerFactory = {
         const processIncomingRequest = (req, res) => {
             const options = req.app.options
             // If the request is for a proxy or bundle path, do nothing
-            if (req.originalUrl.startsWith('/mobify/')) {
+            if (this._isBundleOrProxyPath(req.originalUrl)) {
                 return
-            }
-
-            // If the request has an X-Amz-Cf-Id header, log it now
-            // to make it easier to associated CloudFront requests
-            // with Lambda log entries. Generally we avoid logging
-            // because it increases the volume of log data, but this
-            // is important for log analysis.
-            const cloudfrontId = req.headers['x-amz-cf-id']
-            if (cloudfrontId) {
-                // Log the Express app request id plus the cloudfront
-                // x-edge-request-id value. The resulting line in the logs
-                // will automatically include the lambda RequestId, so
-                // one line links all ids.
-                console.log(`Req ${res.locals.requestId} for x-edge-request-id ${cloudfrontId}`)
             }
 
             // Apply the request processor
@@ -543,7 +592,7 @@ export const RemoteServerFactory = {
                     // different types of the 'req' object, and will
                     // always contain the original full path.
                     /* istanbul ignore else */
-                    if (!req.originalUrl.startsWith('/mobify/')) {
+                    if (!this._isBundleOrProxyPath(req.originalUrl)) {
                         req.app.sendMetric(
                             'RequestTime',
                             Date.now() - locals.requestStart,
@@ -573,7 +622,7 @@ export const RemoteServerFactory = {
             // do that now so that the rest of the code don't have to deal
             // with these headers, which can be large and may be accidentally
             // forwarded to other servers.
-            X_HEADERS_TO_REMOVE.forEach((key) => {
+            X_HEADERS_TO_REMOVE_ORIGIN.forEach((key) => {
                 delete req.headers[key]
             })
 
@@ -589,7 +638,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all('/mobify/proxy/*', (_, res) => {
+        app.all(`${proxyBasePath}/*`, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
@@ -600,8 +649,96 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    _handleMissingSlasPrivateEnvVar(app) {
+        app.use(slasPrivateProxyPath, (_, res) => {
+            return res.status(501).json({
+                message:
+                    'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
+            })
+        })
+    },
+
+    /**
+     * @private
+     */
+    _setupSlasPrivateClientProxy(app, options) {
+        if (!options.useSLASPrivateClient) {
+            return
+        }
+
+        localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
+
+        const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
+        const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
+        if (!clientSecret) {
+            this._handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath)
+            return
+        }
+
+        const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+
+        app.use(
+            slasPrivateProxyPath,
+            createProxyMiddleware({
+                target: options.slasTarget,
+                changeOrigin: true,
+                pathRewrite: {[slasPrivateProxyPath]: ''},
+                onProxyReq: (proxyRequest, incomingRequest) => {
+                    applyProxyRequestHeaders({
+                        proxyRequest,
+                        incomingRequest,
+                        proxyPath: slasPrivateProxyPath,
+                        targetHost: options.slasHostName,
+                        targetProtocol: 'https'
+                    })
+
+                    // We pattern match and add client secrets only to endpoints that
+                    // match the regex specified by options.applySLASPrivateClientToEndpoints.
+                    // By default, this regex matches only calls to SLAS /oauth2/token
+                    // (see option defaults at the top of this file).
+                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                    // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                    // purpose so we don't want to overwrite the header for those calls.
+                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
+                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                    }
+                },
+                onProxyRes: (proxyRes, req) => {
+                    if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
+                        logger.error(
+                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`,
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {statusCode: proxyRes.statusCode}
+                            }
+                        )
+                        logger.error(
+                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`,
+                            {namespace: '_setupSlasPrivateClientProxy'}
+                        )
+                        logger.error(
+                            `SLAS Private Client Proxy Request URL - ${req.protocol}://${req.get(
+                                'host'
+                            )}${req.originalUrl}`,
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {
+                                    protocol: req.protocol,
+                                    originalUrl: req.originalUrl
+                                }
+                            }
+                        )
+                    }
+                }
+            })
+        )
+    },
+
+    /**
+     * @private
+     */
     _setupHealthcheck(app) {
-        app.get('/mobify/ping', (_, res) =>
+        app.get(`${healthCheckPath}`, (_, res) =>
             res.set('cache-control', NO_CACHE).sendStatus(200).end()
         )
     },
@@ -614,7 +751,6 @@ export const RemoteServerFactory = {
 
         // Apply the SSR middleware to any subsequent routes that we expect users
         // to add in their projects, like in any regular Express app.
-        app.use(enforceSecurityHeaders) // Must be AFTER prepNonProxyRequest, as they both modify setHeader.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
 
@@ -881,7 +1017,7 @@ export const RemoteServerFactory = {
                             ._waitForResponses()
                             .then(() => app.metrics.flush())
                             // Now call the Lambda callback to complete the response
-                            .then(() => callback(err, processLambdaResponse(response)))
+                            .then(() => callback(err, processLambdaResponse(response, event)))
                         // DON'T add any then() handlers here, after the callback.
                         // They won't be called after the response is sent, but they
                         // *might* be called if the Lambda container running this code
@@ -939,105 +1075,6 @@ export const RemoteServerFactory = {
 }
 
 /**
- * Patches `res.setHeader` to ensure that the Content-Security-Policy header always includes the
- * directives required for PWA Kit to work.
- * @param {express.Request} req Express request object
- * @param {express.Response} res Express response object
- * @param {express.NextFunction} next Express next callback
- */
-export const enforceSecurityHeaders = (req, res, next) => {
-    /** CSP-compatible origin for Runtime Admin. */
-    // localhost doesn't include a protocol because different browsers behave differently :\
-    const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
-    /**
-     * Map of directive names/values that are required for PWA Kit to work. Array values will be
-     * merged with user-provided values; boolean values will replace user-provided values.
-     * @type Object.<string, string[] | boolean>
-     */
-    const directives = {
-        'connect-src': ["'self'", runtimeAdmin],
-        'frame-ancestors': [runtimeAdmin],
-        'img-src': ["'self'", 'data:'],
-        'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin],
-        // Always upgrade insecure requests when deployed, never upgrade on local dev server
-        'upgrade-insecure-requests': isRemote()
-    }
-
-    const setHeader = res.setHeader
-    res.setHeader = (name, value) => {
-        let modifiedValue = value
-        switch (name?.toLowerCase()) {
-            case CONTENT_SECURITY_POLICY: {
-                // If multiple Content-Security-Policy headers are provided, then the most restrictive
-                // option is chosen for each directive. Therefore, we must modify *all* directives to
-                // ensure that our required directives will work as expected.
-                // Ref: https://w3c.github.io/webappsec-csp/#multiple-policies
-                modifiedValue = Array.isArray(value)
-                    ? value.map((item) => modifyDirectives(item, directives))
-                    : modifyDirectives(value, directives)
-                break
-            }
-            case STRICT_TRANSPORT_SECURITY: {
-                // Block setting this header on local development server - it will break things!
-                if (!isRemote()) return
-                break
-            }
-            default: {
-                break
-            }
-        }
-        return setHeader.call(res, name, modifiedValue)
-    }
-    // Provide an initial CSP (or patch the existing header)
-    res.setHeader(CONTENT_SECURITY_POLICY, res.getHeader(CONTENT_SECURITY_POLICY) ?? '')
-    // Provide an initial value for HSTS, if not already set - use default from `helmet`
-    if (!res.hasHeader(STRICT_TRANSPORT_SECURITY)) {
-        res.setHeader(STRICT_TRANSPORT_SECURITY, 'max-age=15552000; includeSubDomains')
-    }
-    next()
-}
-
-/**
- * Updates the given Content-Security-Policy header to include all directives required by PWA Kit.
- * @param {string} original Original Content-Security-Policy header
- * @returns {string} Modified Content-Security-Policy header
- * @private
- */
-const modifyDirectives = (original, required) => {
-    const directives = original
-        .trim()
-        .split(';')
-        .reduce((acc, directive) => {
-            const text = directive.trim()
-            if (text) {
-                const [name, ...values] = text.split(/ +/)
-                acc[name] = values
-            }
-            return acc
-        }, {})
-
-    // Add missing required CSP directives
-    for (const [name, value] of Object.entries(required)) {
-        if (value === true) {
-            // Boolean directive (required) - overwrite original value
-            directives[name] = []
-        } else if (value === false) {
-            // Boolean directive (disabled) - delete original value
-            delete directives[name]
-        } else {
-            // Regular string[] directive - merge values
-            // Wrapping with `[...new Set(array)]` removes duplicate entries
-            directives[name] = [...new Set([...(directives[name] ?? []), ...value])]
-        }
-    }
-
-    // Re-construct header string
-    return Object.entries(directives)
-        .map(([name, values]) => [name, ...values].join(' '))
-        .join(';')
-}
-
-/**
  * ExpressJS middleware that processes any non-proxy request passing
  * through the Express app.
  *
@@ -1068,10 +1105,13 @@ const prepNonProxyRequest = (req, res, next) => {
             if (header && header.toLowerCase() !== SET_COOKIE && value) {
                 setHeader.call(this, header, value)
             } /* istanbul ignore else */ else if (!remote) {
-                console.warn(
+                logger.warn(
                     `Req ${res.locals.requestId}: ` +
                         `Cookies cannot be set on responses sent from ` +
-                        `the SSR Server. Discarding "Set-Cookie: ${value}"`
+                        `the SSR Server. Discarding "Set-Cookie: ${value}"`,
+                    {
+                        namespace: 'RemoteServerFactory.prepNonProxyRequest'
+                    }
                 )
             }
         }

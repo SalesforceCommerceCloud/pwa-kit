@@ -53,8 +53,11 @@ const Pagination = (props) => {
                 // as intended, the workaround is to use the current url when its disabled.
                 href={prev || currentURL}
                 to={prev || currentURL}
-                aria-label="Previous Page"
-                isDisabled={!prev}
+                aria-label={intl.formatMessage({
+                    id: 'pagination.link.prev.assistive_msg',
+                    defaultMessage: 'Previous Page'
+                })}
+                aria-disabled={!prev}
                 variant="link"
             >
                 <ChevronLeftIcon />
@@ -102,8 +105,11 @@ const Pagination = (props) => {
                 // as intended, the workaround is to use the current url when its disabled.
                 href={next || currentURL}
                 to={next || currentURL}
-                aria-label="Next Page"
-                isDisabled={!next}
+                aria-label={intl.formatMessage({
+                    id: 'pagination.link.next.assistive_msg',
+                    defaultMessage: 'Next Page'
+                })}
+                aria-disabled={!next}
                 variant="link"
             >
                 <Text>

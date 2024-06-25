@@ -7,7 +7,10 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { generateUserCredentials, getCreditCardExpiry } = require("../../scripts/utils.js");
+const {
+  generateUserCredentials,
+  getCreditCardExpiry,
+} = require("../../scripts/utils.js");
 
 const REGISTERED_USER_CREDENTIALS = generateUserCredentials();
 
@@ -46,27 +49,41 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await page.goto(config.RETAIL_APP_HOME);
 
   await page.getByRole("link", { name: "Womens" }).hover();
+  const topsNav = await page.getByRole("link", { name: "Tops", exact: true });
+  await expect(topsNav).toBeVisible();
 
-  await page.getByRole("link", { name: "Tops" }).click();
+  await topsNav.click();
 
-  await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
+  // PLP
+  const cableKnitShell = await page.getByRole("link", {
+    name: /Cable Knit Shell/i,
+  });
+  // selecting swatch
+  const initialImgEl = await cableKnitShell.locator("img");
+  const initialSrc = await initialImgEl.getAttribute("src");
+  await expect(cableKnitShell.getByText(/From £44\.16/i)).toBeVisible();
 
-  await page.getByRole("link", { name: /Stripe Shell/i }).click();
+  await cableKnitShell.getByLabel(/Ivory/, { exact: true }).hover();
+  const changedImgEl = await cableKnitShell.locator("img");
+  const changeImgSrc = await changedImgEl.getAttribute("src");
+  await expect(cableKnitShell.getByText(/From £44\.16/i)).toBeVisible();
+  expect(changeImgSrc).not.toBe(initialSrc);
+  await cableKnitShell.click();
 
+  // PDP
   await expect(
-    page.getByRole("heading", { name: /Stripe Shell/i })
+    page.getByRole("heading", { name: /Cable Knit Shell/i })
   ).toBeVisible();
-
   await page.getByRole("radio", { name: "L", exact: true }).click();
 
-  await page.getByRole("button", { name: "+" }).click();
+  await page.locator("button[data-testid='quantity-increment']").click();
 
   // Selected Size and Color texts are broken into multiple elements on the page.
   // So we need to look at the page URL to verify selected variants
   const updatedPageURL = await page.url();
   const params = updatedPageURL.split("?")[1];
   expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ5YPA7/i);
+  expect(params).toMatch(/color=JJ5AAXX/i);
 
   await page.getByRole("button", { name: /Add to Cart/i }).click();
 
@@ -79,7 +96,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await page.getByLabel(/My cart/i).click();
 
   await expect(
-    page.getByRole("link", { name: /Stripe Shell/i })
+    page.getByRole("link", { name: /Cable Knit Shell/i })
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
@@ -87,19 +104,33 @@ test("Registered shopper can checkout items", async ({ page }) => {
   // Confirm the email input toggles to show sign out button on clicking "Checkout as guest"
   const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']");
 
-  await expect(step0Card.getByRole("button", { name: /Sign Out/i })).toBeVisible();
+  await expect(
+    step0Card.getByRole("button", { name: /Sign Out/i })
+  ).toBeVisible();
 
   await expect(
     page.getByRole("heading", { name: /Shipping Address/i })
   ).toBeVisible();
 
-  await page.locator("input#firstName").fill(REGISTERED_USER_CREDENTIALS.firstName);
-  await page.locator("input#lastName").fill(REGISTERED_USER_CREDENTIALS.lastName);
+  await page
+    .locator("input#firstName")
+    .fill(REGISTERED_USER_CREDENTIALS.firstName);
+  await page
+    .locator("input#lastName")
+    .fill(REGISTERED_USER_CREDENTIALS.lastName);
   await page.locator("input#phone").fill(REGISTERED_USER_CREDENTIALS.phone);
-  await page.locator("input#address1").fill("5 Wall St.");
-  await page.locator("input#city").fill("Burlington");
-  await page.locator("select#stateCode").selectOption("MA");
-  await page.locator("input#postalCode").fill("01803");
+  await page
+    .locator("input#address1")
+    .fill(REGISTERED_USER_CREDENTIALS.address.street);
+  await page
+    .locator("input#city")
+    .fill(REGISTERED_USER_CREDENTIALS.address.city);
+  await page
+    .locator("select#stateCode")
+    .selectOption(REGISTERED_USER_CREDENTIALS.address.state);
+  await page
+    .locator("input#postalCode")
+    .fill(REGISTERED_USER_CREDENTIALS.address.zipcode);
 
   await page
     .getByRole("button", { name: /Continue to Shipping Method/i })
@@ -113,8 +144,15 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /Shipping & Gift Options/i })
   ).toBeVisible();
+  await page.waitForTimeout(2000);
 
-  await page.getByRole("button", { name: /Continue to Payment/i }).click();
+  const continueToPayment = page.getByRole("button", {
+    name: /Continue to Payment/i,
+  });
+
+  if (continueToPayment.isEnabled()) {
+    await continueToPayment.click();
+  }
 
   // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
   const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']");
@@ -150,5 +188,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
     page.getByRole("heading", { name: /Order Summary/i })
   ).toBeVisible();
   await expect(page.getByText(/2 Items/i)).toBeVisible();
-  await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Cable Knit Shell/i })
+  ).toBeVisible();
 });

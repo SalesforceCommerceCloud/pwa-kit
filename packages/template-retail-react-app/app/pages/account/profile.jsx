@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {forwardRef, useEffect, useRef, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
@@ -42,7 +42,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
  * the bounding element will affect the contents size.
  */
 // eslint-disable-next-line react/prop-types
-const Skeleton = ({children, height, width, ...rest}) => {
+const Skeleton = forwardRef(({children, height, width, ...rest}, ref) => {
     const {data: customer} = useCurrentCustomer()
     const {isRegistered} = customer
     const size = !isRegistered
@@ -52,15 +52,17 @@ const Skeleton = ({children, height, width, ...rest}) => {
           }
         : {}
     return (
-        <ChakraSkeleton isLoaded={!customer.isLoading} {...rest} {...size}>
+        <ChakraSkeleton ref={ref} isLoaded={!customer.isLoading} {...rest} {...size}>
             {children}
         </ChakraSkeleton>
     )
-}
+})
+
+Skeleton.displayName = 'Skeleton'
 
 const ProfileCard = () => {
     const {formatMessage} = useIntl()
-
+    const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
 
@@ -118,6 +120,7 @@ const ProfileCard = () => {
                             status: 'success',
                             isClosable: true
                         })
+                        headingRef?.current?.focus()
                     }
                 }
             )
@@ -130,11 +133,11 @@ const ProfileCard = () => {
         <ToggleCard
             id="my-profile"
             title={
-                <Skeleton height="30px" width="120px">
-                    {formatMessage({
-                        defaultMessage: 'My Profile',
-                        id: 'profile_card.title.my_profile'
-                    })}
+                <Skeleton ref={headingRef} tabIndex="-1" height="30px" width="120px">
+                    <FormattedMessage
+                        defaultMessage="My Profile"
+                        id="profile_card.title.my_profile"
+                    />
                 </Skeleton>
             }
             editing={isEditing}
@@ -155,7 +158,13 @@ const ProfileCard = () => {
                                 </Alert>
                             )}
                             <ProfileFields form={form} />
-                            <FormActionButtons onCancel={() => setIsEditing(false)} />
+                            <FormActionButtons
+                                onCancel={() => {
+                                    setIsEditing(false)
+                                    headingRef?.current?.focus()
+                                    form.reset()
+                                }}
+                            />
                         </Stack>
                     </form>
                 </Container>
@@ -221,9 +230,9 @@ const ProfileCard = () => {
 
 const PasswordCard = () => {
     const {formatMessage} = useIntl()
-
+    const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
-    const {isRegistered, customerId} = customer
+    const {isRegistered, customerId, email} = customer
 
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
 
@@ -256,23 +265,20 @@ const PasswordCard = () => {
                             isClosable: true
                         })
                         login.mutate({
-                            email: values.email,
+                            username: email,
                             password: values.password
                         })
+                        headingRef?.current?.focus()
+                        form.reset()
+                    },
+                    onError: async (err) => {
+                        const resObj = await err.response.json()
+                        form.setError('root.global', {type: 'manual', message: resObj.detail})
                     }
                 }
             )
-            setIsEditing(false)
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Password updated',
-                    id: 'password_card.info.password_updated'
-                }),
-                status: 'success',
-                isClosable: true
-            })
         } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
+            form.setError('root.global', {type: 'manual', message: error.message})
         }
     }
 
@@ -280,11 +286,8 @@ const PasswordCard = () => {
         <ToggleCard
             id="password"
             title={
-                <Skeleton height="30px" width="120px">
-                    {formatMessage({
-                        defaultMessage: 'Password',
-                        id: 'password_card.title.password'
-                    })}
+                <Skeleton ref={headingRef} tabIndex="-1" height="30px" width="120px">
+                    <FormattedMessage defaultMessage="Password" id="password_card.title.password" />
                 </Skeleton>
             }
             editing={isEditing}
@@ -296,16 +299,22 @@ const PasswordCard = () => {
                 <Container variant="form">
                     <form onSubmit={form.handleSubmit(submit)}>
                         <Stack spacing={6}>
-                            {form.formState.errors?.global && (
-                                <Alert status="error">
+                            {form.formState.errors?.root?.global && (
+                                <Alert data-testid="password-update-error" status="error">
                                     <AlertIcon color="red.500" boxSize={4} />
                                     <Text fontSize="sm" ml={3}>
-                                        {form.formState.errors.global.message}
+                                        {form.formState.errors.root.global.message}
                                     </Text>
                                 </Alert>
                             )}
                             <UpdatePasswordFields form={form} />
-                            <FormActionButtons onCancel={() => setIsEditing(false)} />
+                            <FormActionButtons
+                                onCancel={() => {
+                                    setIsEditing(false)
+                                    headingRef?.current?.focus()
+                                    form.reset()
+                                }}
+                            />
                         </Stack>
                     </form>
                 </Container>
@@ -335,9 +344,15 @@ const PasswordCard = () => {
 }
 
 const AccountDetail = () => {
+    const headingRef = useRef()
+    useEffect(() => {
+        // Focus the 'Account Details' header when the component mounts for accessibility
+        headingRef?.current?.focus()
+    }, [])
+
     return (
         <Stack data-testid="account-detail-page" spacing={6}>
-            <Heading as="h1" fontSize="24px">
+            <Heading as="h1" fontSize="24px" tabIndex="0" ref={headingRef}>
                 <FormattedMessage
                     defaultMessage="Account Details"
                     id="account_detail.title.account_details"

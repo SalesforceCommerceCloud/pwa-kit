@@ -52,6 +52,7 @@ import ProductTile, {
 } from '@salesforce/retail-react-app/app/components/product-tile'
 import {HideOnDesktop} from '@salesforce/retail-react-app/app/components/responsive'
 import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
+import CategoryLinks from '@salesforce/retail-react-app/app/pages/product-list/partials/category-links'
 import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/selected-refinements'
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/page-header'
@@ -68,11 +69,12 @@ import {
     useSearchParams
 } from '@salesforce/retail-react-app/app/hooks'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-// import {parse as parseSearchParams} from '../../hooks/use-search-params'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 // Constants
 import {
@@ -81,7 +83,10 @@ import {
     MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
+    TOAST_MESSAGE_REMOVED_FROM_WISHLIST,
+    STALE_WHILE_REVALIDATE,
+    PRODUCT_LIST_IMAGE_VIEW_TYPE,
+    PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -110,6 +115,7 @@ const ProductList = (props) => {
     const location = useLocation()
     const toast = useToast()
     const einstein = useEinstein()
+    const activeData = useActiveData()
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
@@ -136,6 +142,9 @@ const ProductList = (props) => {
     )
 
     /**************** Query Actions ****************/
+    // _refine is an invalid param for useProductSearch, we don't want to pass it to API call
+    const {_refine, ...restOfParams} = searchParams
+
     const {
         isLoading,
         isRefetching,
@@ -143,8 +152,19 @@ const ProductList = (props) => {
     } = useProductSearch(
         {
             parameters: {
-                ...searchParams,
-                refine: searchParams._refine
+                ...restOfParams,
+                perPricebook: true,
+                allVariationProperties: true,
+                allImages: true,
+                expand: [
+                    'promotions',
+                    'variations',
+                    'prices',
+                    'images',
+                    'availability',
+                    'custom_properties'
+                ],
+                refine: _refine
             }
         },
         {
@@ -184,7 +204,10 @@ const ProductList = (props) => {
 
     /**************** Response Handling ****************/
     if (res) {
-        res.set('Cache-Control', `max-age=${MAX_CACHE_AGE}`)
+        res.set(
+            'Cache-Control',
+            `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
+        )
     }
 
     // Reset scroll position when `isRefetching` becomes `true`.
@@ -356,9 +379,27 @@ const ProductList = (props) => {
     /**************** Einstein ****************/
     useEffect(() => {
         if (productSearchResult) {
-            isSearch
-                ? einstein.sendViewSearch(searchQuery, productSearchResult)
-                : einstein.sendViewCategory(category, productSearchResult)
+            if (isSearch) {
+                try {
+                    einstein.sendViewSearch(searchQuery, productSearchResult)
+                } catch (err) {
+                    logger.error('Einstein sendViewSearch error', {
+                        namespace: 'ProductList.useEffect',
+                        additionalProperties: {error: err, searchQuery}
+                    })
+                }
+                activeData.sendViewSearch(searchParams, productSearchResult)
+            } else {
+                try {
+                    einstein.sendViewCategory(category, productSearchResult)
+                } catch (err) {
+                    logger.error('Einstein sendViewCategory error', {
+                        namespace: 'ProductList.useEffect',
+                        additionalProperties: {error: err, category}
+                    })
+                }
+                activeData.sendViewCategory(searchParams, category, productSearchResult)
+            }
         }
     }, [productSearchResult])
 
@@ -371,8 +412,8 @@ const ProductList = (props) => {
             {...rest}
         >
             <Helmet>
-                <title>{category?.pageTitle}</title>
-                <meta name="description" content={category?.pageDescription} />
+                <title>{category?.pageTitle ?? searchQuery}</title>
+                <meta name="description" content={category?.pageDescription ?? searchQuery} />
                 <meta name="keywords" content={category?.pageKeywords} />
             </Helmet>
             {showNoResults ? (
@@ -486,9 +527,15 @@ const ProductList = (props) => {
                     <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
                         <Stack display={{base: 'none', md: 'flex'}}>
                             <Refinements
+                                itemsBefore={
+                                    category?.categories
+                                        ? [<CategoryLinks key="itemsBefore" category={category} />]
+                                        : undefined
+                                }
                                 isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
                                 filters={productSearchResult?.refinements}
+                                excludedFilters={['cgid']}
                                 selectedFilters={searchParams.refine}
                             />
                         </Stack>
@@ -504,7 +551,7 @@ const ProductList = (props) => {
                                           .map((value, index) => (
                                               <ProductTileSkeleton key={index} />
                                           ))
-                                    : productSearchResult.hits.map((productSearchItem) => {
+                                    : productSearchResult?.hits?.map((productSearchItem) => {
                                           const productId = productSearchItem.productId
                                           const isInWishlist =
                                               !!wishlist?.customerProductListItems?.find(
@@ -518,6 +565,10 @@ const ProductList = (props) => {
                                                   product={productSearchItem}
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
+                                                  imageViewType={PRODUCT_LIST_IMAGE_VIEW_TYPE}
+                                                  selectableAttributeId={
+                                                      PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
+                                                  }
                                                   onClick={() => {
                                                       if (searchQuery) {
                                                           einstein.sendClickSearch(
@@ -579,6 +630,7 @@ const ProductList = (props) => {
                     </Grid>
                 </>
             )}
+            {/* Modal for filter options on mobile */}
             <Modal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -602,7 +654,19 @@ const ProductList = (props) => {
                         <Refinements
                             toggleFilter={toggleFilter}
                             filters={productSearchResult?.refinements}
-                            selectedFilters={productSearchResult?.selectedRefinements}
+                            selectedFilters={searchParams.refine}
+                            itemsBefore={
+                                category?.categories
+                                    ? [
+                                          <CategoryLinks
+                                              key="itemsBefore"
+                                              category={category}
+                                              onSelect={onClose}
+                                          />
+                                      ]
+                                    : undefined
+                            }
+                            excludedFilters={['cgid']}
                         />
                     </ModalBody>
 
@@ -702,7 +766,16 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const history = useHistory()
 
     return (
-        <FormControl data-testid="sf-product-list-sort" id="page_sort" width="auto" {...otherProps}>
+        <FormControl
+            aria-label={intl.formatMessage({
+                id: 'product_list.drawer.title.sort_by',
+                defaultMessage: 'Sort By'
+            })}
+            data-testid="sf-product-list-sort"
+            id="page_sort"
+            width="auto"
+            {...otherProps}
+        >
             <Select
                 value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
                 onChange={({target}) => {

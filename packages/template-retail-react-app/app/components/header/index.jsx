@@ -49,8 +49,6 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 
-const ENTER_KEY = 'Enter'
-
 const IconButtonWithRegistration = withRegistration(IconButton)
 /**
  * The header is the main source for accessing
@@ -86,7 +84,13 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-    const {isOpen, onClose, onOpen} = useDisclosure()
+    const {
+        getButtonProps: getAccountMenuButtonProps,
+        getDisclosureProps: getAccountMenuDisclosureProps,
+        isOpen: isAccountMenuOpen,
+        onClose: onAccountMenuClose,
+        onOpen: onAccountMenuOpen
+    } = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
 
     const [showLoading, setShowLoading] = useState(false)
@@ -103,17 +107,18 @@ const Header = ({
         setShowLoading(false)
     }
 
-    const keyMap = {
-        Escape: () => onClose(),
-        Enter: () => onOpen()
-    }
-
     const handleIconsMouseLeave = () => {
         // don't close the menu if users enter the popover content
         setTimeout(() => {
-            if (!hasEnterPopoverContent.current) onClose()
+            if (!hasEnterPopoverContent.current) onAccountMenuClose()
         }, 100)
     }
+
+    const placeholder = intl.formatMessage({
+        id: 'header.field.placeholder.search_for_products',
+        defaultMessage: 'Search for products...'
+    })
+
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
@@ -143,46 +148,46 @@ const Header = ({
                     <Box {...styles.bodyContainer}>{children}</Box>
                     <Box {...styles.searchContainer}>
                         <Search
-                            placeholder={intl.formatMessage({
-                                id: 'header.field.placeholder.search_for_products',
-                                defaultMessage: 'Search for products...'
-                            })}
+                            aria-label={placeholder}
+                            placeholder={placeholder}
                             {...styles.search}
                         />
                     </Box>
-                    <AccountIcon
-                        {...styles.accountIcon}
-                        tabIndex={0}
-                        onMouseOver={isDesktop ? onOpen : noop}
-                        onKeyDown={(e) => {
-                            e.key === ENTER_KEY ? onMyAccountClick() : noop
-                        }}
-                        onClick={onMyAccountClick}
+                    <IconButtonWithRegistration
+                        icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.my_account',
                             defaultMessage: 'My account'
                         })}
+                        variant="unstyled"
+                        {...styles.icons}
+                        {...styles.accountIcon}
+                        onClick={onMyAccountClick}
+                        onMouseOver={isDesktop ? onAccountMenuOpen : noop}
                     />
 
                     {isRegistered && isHydrated() && (
                         <Popover
                             isLazy
                             arrowSize={15}
-                            isOpen={isOpen}
+                            isOpen={isAccountMenuOpen}
                             placement="bottom-end"
-                            onClose={onClose}
-                            onOpen={onOpen}
+                            onClose={onAccountMenuClose}
+                            onOpen={onAccountMenuOpen}
                         >
                             <PopoverTrigger>
-                                <ChevronDownIcon
-                                    aria-label="My account trigger"
-                                    onMouseLeave={handleIconsMouseLeave}
-                                    onKeyDown={(e) => {
-                                        keyMap[e.key]?.(e)
-                                    }}
+                                <IconButton
+                                    aria-label={intl.formatMessage({
+                                        id: 'header.button.assistive_msg.my_account_menu',
+                                        defaultMessage: 'Open account menu'
+                                    })}
+                                    icon={<ChevronDownIcon />}
+                                    variant="unstyled"
+                                    {...styles.icons}
                                     {...styles.arrowDown}
-                                    onMouseOver={onOpen}
-                                    tabIndex={0}
+                                    {...getAccountMenuButtonProps()}
+                                    onMouseOver={onAccountMenuOpen}
+                                    onMouseLeave={handleIconsMouseLeave}
                                 />
                             </PopoverTrigger>
 
@@ -190,11 +195,12 @@ const Header = ({
                                 {...styles.popoverContent}
                                 onMouseLeave={() => {
                                     hasEnterPopoverContent.current = false
-                                    onClose()
+                                    onAccountMenuClose()
                                 }}
                                 onMouseOver={() => {
                                     hasEnterPopoverContent.current = true
                                 }}
+                                {...getAccountMenuDisclosureProps()}
                             >
                                 <PopoverArrow />
                                 <PopoverHeader>
@@ -249,13 +255,17 @@ const Header = ({
                         icon={<HeartIcon />}
                         variant="unstyled"
                         {...styles.icons}
+                        {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
                     <IconButton
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.my_cart',
-                            defaultMessage: 'My cart'
-                        })}
+                        aria-label={intl.formatMessage(
+                            {
+                                id: 'header.button.assistive_msg.my_cart_with_num_items',
+                                defaultMessage: 'My cart, number of items: {numItems}'
+                            },
+                            {numItems: totalItems}
+                        )}
                         icon={
                             <>
                                 <BasketIcon />
