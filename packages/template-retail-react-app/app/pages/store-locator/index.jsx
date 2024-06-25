@@ -35,7 +35,7 @@ const StoreLocator = () => {
             postalCode: userHasSetGeolocation ? searchStoresParams.postalCode : ''
         }
     })
-
+    
     var searchStoresData = useSearchStores({
         parameters: {
             countryCode: searchStoresParams.latitude ? undefined : searchStoresParams.countryCode,
@@ -48,6 +48,7 @@ const StoreLocator = () => {
             offset: 0
         }
     })
+
     if (searchStoresData.data !== undefined) searchStoresDataRef.current = searchStoresData
     console.log('(JEREMY) searchStoresDataRef.current: ', searchStoresDataRef.current)
     const storesInfo =

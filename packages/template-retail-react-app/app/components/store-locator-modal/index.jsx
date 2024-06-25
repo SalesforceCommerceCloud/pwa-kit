@@ -192,8 +192,6 @@ const StoreLocatorModal = ({onClose = noop}) => {
                                 submitForm={submitForm}
                                 storesInfo={storesInfo}
                                 searchStoresParams={searchStoresParams}
-                                distanceLocate={STORE_LOCATOR_DISTANCE}
-                                setSearchStoresParams={setSearchStoresParams}
                             />
                         </ModalBody>
                     </ModalContent>
