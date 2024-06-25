@@ -311,8 +311,13 @@ describe('product bundles', () => {
     })
 
     test('add the bundle to cart successfully', async () => {
-        const urlPathAfterSelectingAllVariants =
-            '/en-GB/product/test-bundle?25592770M=color%3DJJGN9A0%26size%3D006&25565139M=color%3DJJ169XX%26size%3D9SM&25565094M=color%3DJJ0CZXX%26size%3D9XS'
+        const urlPathAfterSelectingAllVariants = `uk/en-GB/product/test-bundle?${new URLSearchParams(
+            {
+                '25592770M': 'color=JJGN9A0&size=006',
+                '25565139M': 'color=JJ169XX&size=9SM',
+                '25565094M': 'color=JJ0CZXX&size=9XS'
+            }
+        )}`
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
 
         // Initial basket is necessary to add items to it

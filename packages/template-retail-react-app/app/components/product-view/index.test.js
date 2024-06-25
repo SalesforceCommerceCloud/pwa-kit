@@ -261,7 +261,7 @@ test('renders a product bundle properly - parent item', () => {
     const addBundleToWishlistButton = screen.getAllByRole('button', {
         name: /add bundle to wishlist/i
     })[0]
-    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
+    const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
     const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
 
     // What should exist:
