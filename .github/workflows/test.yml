@@ -74,7 +74,7 @@ jobs:
       #          snyk_token: ${{ secrets.SNYK_TOKEN }}
 
       - name: Build Project
-        if: env.IS_NOT_FORK == 'true' && env.DEVELOP == 'true' && matrix.template == 'test-project'
+        if: env.IS_NOT_FORK == 'true' && env.DEVELOP == 'true' && matrix.template == 'express-minimal-test-project'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: ${{ env.PROJECT_DIR }}
