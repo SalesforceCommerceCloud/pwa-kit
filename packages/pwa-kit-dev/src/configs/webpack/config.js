@@ -64,6 +64,7 @@ const entryPointExists = (segments) => {
 }
 
 const findInProjectThenSDK = (pkg) => {
+    console.log('pkg', pkg)
     // Look for the SDK node_modules in two places because in CI,
     // pwa-kit-dev is published under a 'dist' directory, which
     // changes this file's location relative to the package root.
@@ -72,9 +73,11 @@ const findInProjectThenSDK = (pkg) => {
         resolve(__dirname, '..', '..', 'node_modules', pkg),
         resolve(__dirname, '..', '..', '..', 'node_modules', pkg)
     ]
+    console.log('candidates', candidates)
     let candidate
     for (candidate of candidates) {
         if (fs.existsSync(candidate)) {
+            console.log('candidate', candidate)
             return candidate
         }
     }
