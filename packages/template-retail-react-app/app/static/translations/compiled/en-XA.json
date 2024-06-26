@@ -6312,6 +6312,10 @@
     },
     {
       "type": 0,
+      "value": " īƞ"
+    },
+    {
+      "type": 0,
       "value": "]"
     }
   ],
@@ -6323,34 +6327,6 @@
     {
       "type": 0,
       "value": "Ṽīḗḗẇīƞɠ şŧǿǿřḗḗş ƞḗḗȧȧř ẏǿǿŭŭř ŀǿǿƈȧȧŧīǿǿƞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "store_locator.dropdown.germany": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ɠḗḗřḿȧȧƞẏ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "store_locator.dropdown.united_states": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŭƞīŧḗḗḓ Şŧȧȧŧḗḗş"
     },
     {
       "type": 0,

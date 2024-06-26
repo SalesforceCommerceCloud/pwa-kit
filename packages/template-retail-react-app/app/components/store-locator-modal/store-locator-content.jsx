@@ -16,6 +16,11 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
 import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
+import {
+    SUPPORTED_STORE_LOCATOR_COUNTRIES,
+    DEFAULT_STORE_LOCATOR_COUNTRY,
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE
+} from '@salesforce/retail-react-app/app/constants'
 
 const StoreLocatorContent = ({
     form,
@@ -28,11 +33,16 @@ const StoreLocatorContent = ({
 }) => {
     const intl = useIntl()
 
-    function getGeolocationError() {
+    const getGeolocationError = () => {
         console.log('Unable to retrieve your location')
+        setSearchStoresParams({
+            countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+            postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+            limit: 15
+        })
     }
 
-    function getGeolocationSuccess(position) {
+    const getGeolocationSuccess = (position) => {
         const latitude = position.coords.latitude
         const longitude = position.coords.longitude
         setSearchStoresParams({
@@ -97,13 +107,15 @@ const StoreLocatorContent = ({
                                   defaultMessage: 'Sorry, there are no locations in this area'
                               })
                             : searchStoresParams.postalCode !== undefined
-                            ? intl.formatMessage(
+                            ? `${intl.formatMessage(
                                   {
                                       id: 'store_locator.description.viewing_near_postal_code',
-                                      defaultMessage: 'Viewing stores near {postalCode}'
+                                      defaultMessage: 'Viewing stores near {postalCode} in'
                                   },
-                                  {postalCode: searchStoresParams.postalCode}
-                              )
+                                  {
+                                    postalCode: searchStoresParams.postalCode
+                                  }
+                              )} ${intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)}`
                             : intl.formatMessage({
                                   id: 'store_locator.description.viewing_near_your_location',
                                   defaultMessage: 'Viewing stores near your location'

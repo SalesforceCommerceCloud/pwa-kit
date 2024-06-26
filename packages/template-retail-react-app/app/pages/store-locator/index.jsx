@@ -12,7 +12,7 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {
-    DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
+    DEFAULT_STORE_LOCATOR_COUNTRY,
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_DISTANCE
 } from '@salesforce/retail-react-app/app/constants'
@@ -22,7 +22,7 @@ const StoreLocator = () => {
     const intl = useIntl()
     const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
     const [searchStoresParams, setSearchStoresParams] = useState({
-        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
+        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
         limit: 10
     })

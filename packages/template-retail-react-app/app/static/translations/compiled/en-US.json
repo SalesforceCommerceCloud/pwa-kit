@@ -2953,24 +2953,16 @@
     {
       "type": 1,
       "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": " in"
     }
   ],
   "store_locator.description.viewing_near_your_location": [
     {
       "type": 0,
       "value": "Viewing stores near your location"
-    }
-  ],
-  "store_locator.dropdown.germany": [
-    {
-      "type": 0,
-      "value": "Germany"
-    }
-  ],
-  "store_locator.dropdown.united_states": [
-    {
-      "type": 0,
-      "value": "United States"
     }
   ],
   "store_locator.field.placeholder.enter_postal_code": [

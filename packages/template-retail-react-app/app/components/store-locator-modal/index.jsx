@@ -20,7 +20,7 @@ import {
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {
-    DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
+    DEFAULT_STORE_LOCATOR_COUNTRY,
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_DISTANCE
 } from '@salesforce/retail-react-app/app/constants'
@@ -31,7 +31,7 @@ import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 const StoreLocatorModal = ({onClose = noop}) => {
     const intl = useIntl()
     var defaultSearchStoresParams = {
-        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
+        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
         limit: 10
     }
@@ -55,6 +55,15 @@ const StoreLocatorModal = ({onClose = noop}) => {
     )
 
     const [searchStoresParams, setSearchStoresParams] = useState(defaultSearchStoresParams)
+    const form = useForm({
+        mode: 'onChange',
+        reValidateMode: 'onChange',
+        defaultValues: {
+            countryCode: userHasSetManualGeolocation ? searchStoresParams.countryCode : '',
+            postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
+        }
+    })
+
     const searchStoresDataRef = useRef({
         data: []
     })
@@ -76,14 +85,6 @@ const StoreLocatorModal = ({onClose = noop}) => {
     const storesInfo = searchStoresDataRef.current.data ? searchStoresDataRef.current.data : []
     const numStores = isLoading ? 0 : searchStoresData.total
 
-    const form = useForm({
-        mode: 'onChange',
-        reValidateMode: 'onChange',
-        defaultValues: {
-            countryCode: userHasSetManualGeolocation ? searchStoresParams.countryCode : '',
-            postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
-        }
-    })
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
         setSearchStoresParams({
