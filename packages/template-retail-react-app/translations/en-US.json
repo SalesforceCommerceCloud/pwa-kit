@@ -1277,6 +1277,12 @@
   "store_locator.description.viewing_near_your_location": {
     "defaultMessage": "Viewing stores near your location"
   },
+  "store_locator.dropdown.germany": {
+    "defaultMessage": "Germany"
+  },
+  "store_locator.dropdown.united_states": {
+    "defaultMessage": "United States"
+  },
   "store_locator.field.placeholder.enter_postal_code": {
     "defaultMessage": "Enter postal code"
   },
