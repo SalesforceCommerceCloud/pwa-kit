@@ -45,6 +45,7 @@ import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import {morganStream} from '../../utils/morgan-stream'
 import {createProxyMiddleware} from 'http-proxy-middleware'
+import {performance} from 'perf_hooks'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -331,7 +332,12 @@ export const RemoteServerFactory = {
         // and not a bundle request, so we can apply specific
         // processing.
         this._setupCommonMiddleware(app, options)
+
+        let startTime = performance.now() // Get the current high-resolution time
         this._setupExtensions(app, options)
+        let endTime = performance.now() // Get the high-resolution time after execution
+
+        console.log(`_setupExtensions time: ${endTime - startTime} milliseconds`)
 
         this._addStaticAssetServing(app)
         this._addDevServerGarbageCollection(app)
@@ -340,7 +346,14 @@ export const RemoteServerFactory = {
 
     _setupExtensions(app, options) {
         // TODO: get actual extensions
-        const EXTENSIONS = ['my-extension', 'my-extension-b']
+        const EXTENSIONS = [
+            'my-extension',
+            'my-extension-b',
+            'my-extension-c',
+            'my-extension-d',
+            'my-extension-e',
+            'my-extension-f'
+        ]
         const _r = eval('require')
 
         EXTENSIONS.forEach((extension) => {
