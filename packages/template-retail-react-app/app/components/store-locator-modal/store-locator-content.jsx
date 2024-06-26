@@ -113,7 +113,7 @@ const StoreLocatorContent = ({
                                       defaultMessage: 'Viewing stores near {postalCode} in'
                                   },
                                   {
-                                    postalCode: searchStoresParams.postalCode
+                                      postalCode: searchStoresParams.postalCode
                                   }
                               )} ${intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)}`
                             : intl.formatMessage({
