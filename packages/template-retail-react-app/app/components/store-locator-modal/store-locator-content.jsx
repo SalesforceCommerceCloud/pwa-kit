@@ -38,7 +38,7 @@ const StoreLocatorContent = ({
         setSearchStoresParams({
             countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
             postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-            limit: 15
+            limit: 10
         })
     }
 
@@ -48,7 +48,7 @@ const StoreLocatorContent = ({
         setSearchStoresParams({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            limit: 15
+            limit: 10
         })
         console.log(`Latitude: ${latitude}, Longitude: ${longitude}`)
     }

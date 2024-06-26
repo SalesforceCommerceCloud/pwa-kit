@@ -190,110 +190,20 @@ const mockStoresData = [
         storeHours:
             'Monday 10 AM–7 PM\nTuesday 10 AM–7 PM\nWednesday 10 AM–7 PM\nThursday 10 AM–8 PM\nFriday 10 AM–7 PM\nSaturday 10 AM–6 PM\nSunday Closed',
         storeLocatorEnabled: true
-    },
-    {
-        address1: 'Huestraße 23',
-        city: 'Bochum',
-        countryCode: 'DE',
-        distance: 8975.79,
-        distanceUnit: 'km',
-        id: '00017',
-        inventoryId: 'inventory_m_store_store8',
-        latitude: 51.4818,
-        longitude: 7.2165,
-        name: 'Bochum Gadget Store',
-        phone: '+49 234 890123',
-        posEnabled: false,
-        postalCode: '44787',
-        storeHours:
-            'Monday 10 AM–7 PM\nTuesday 10 AM–7 PM\nWednesday 10 AM–7 PM\nThursday 10 AM–8 PM\nFriday 10 AM–7 PM\nSaturday 10 AM–6 PM\nSunday Closed',
-        storeLocatorEnabled: true
-    },
-    {
-        address1: 'Königsallee 16',
-        city: 'Düsseldorf',
-        countryCode: 'DE',
-        distance: 8978.68,
-        distanceUnit: 'km',
-        id: '00008',
-        inventoryId: 'inventory_m_store_store8',
-        latitude: 51.225402,
-        longitude: 6.776313,
-        name: 'Düsseldorf Electronics Shop',
-        phone: '+49 211 777777777',
-        posEnabled: false,
-        postalCode: '40212',
-        storeHours:
-            'Monday 10 AM–8 PM\nTuesday 10 AM–8 PM\nWednesday 10 AM–8 PM\nThursday 10 AM–9 PM\nFriday 10 AM–8 PM\nSaturday 10 AM–7 PM\nSunday Closed',
-        storeLocatorEnabled: true
-    },
-    {
-        address1: 'Schadowstraße 60',
-        city: 'Düsseldorf',
-        countryCode: 'DE',
-        distance: 8978.83,
-        distanceUnit: 'km',
-        id: '00029',
-        inventoryId: 'inventory_m_store_store21',
-        latitude: 51.2254,
-        longitude: 6.7798,
-        name: 'Düsseldorf Electronics Mart',
-        phone: '+49 211 789012',
-        posEnabled: false,
-        postalCode: '40212',
-        storeHours:
-            'Monday 9 AM–7 PM\nTuesday 9 AM–7 PM\nWednesday 9 AM–7 PM\nThursday 9 AM–8 PM\nFriday 9 AM–7 PM\nSaturday 9 AM–6 PM\nSunday Closed',
-        storeLocatorEnabled: true
-    },
-    {
-        address1: 'Westenhellweg 95',
-        city: 'Dortmund',
-        countryCode: 'DE',
-        distance: 8983.75,
-        distanceUnit: 'km',
-        id: '00010',
-        inventoryId: 'inventory_m_store_store1',
-        latitude: 51.51494,
-        longitude: 7.466,
-        name: 'Dortmund Digital Market',
-        phone: '+49 231 567890',
-        posEnabled: false,
-        postalCode: '44137',
-        storeHours:
-            'Monday 9 AM–7 PM\nTuesday 9 AM–7 PM\nWednesday 9 AM–7 PM\nThursday 9 AM–8 PM\nFriday 9 AM–7 PM\nSaturday 9 AM–6 PM\nSunday Closed',
-        storeLocatorEnabled: true
-    },
-    {
-        address1: 'Ostenhellweg 12',
-        city: 'Dortmund',
-        countryCode: 'DE',
-        distance: 8983.79,
-        distanceUnit: 'km',
-        id: '00027',
-        inventoryId: 'inventory_m_store_store19',
-        latitude: 51.5145,
-        longitude: 7.4661,
-        name: 'Dortmund Gadget Store',
-        phone: '+49 231 876543',
-        posEnabled: false,
-        postalCode: '44135',
-        storeHours:
-            'Monday 10 AM–7 PM\nTuesday 10 AM–7 PM\nWednesday 10 AM–7 PM\nThursday 10 AM–8 PM\nFriday 10 AM–7 PM\nSaturday 10 AM–6 PM\nSunday Closed',
-        storeLocatorEnabled: true
     }
 ]
 const mockStoresTotalIsHigherThanLimit = {
-    limit: 15,
+    limit: 10,
     data: mockStoresData,
     offset: 0,
     total: 30
 }
 
 const mockStoresTotalIsEqualToLimit = {
-    limit: 15,
+    limit: 10,
     data: mockStoresData,
     offset: 0,
-    total: 15
+    total: 10
 }
 
 describe('StoreLocatorModal', () => {

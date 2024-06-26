@@ -59,7 +59,7 @@ const StoreLocator = () => {
         setSearchStoresParams({
             postalCode: postalCode,
             countryCode: countryCode,
-            limit: 15
+            limit: 10
         })
         setUserHasSetManualGeolocation(true)
     }
@@ -93,8 +93,8 @@ const StoreLocator = () => {
                                 setSearchStoresParams({
                                     ...searchStoresParams,
                                     limit:
-                                        searchStoresParams.limit + 15 <= 200
-                                            ? searchStoresParams.limit + 15
+                                        searchStoresParams.limit + 10 <= 200
+                                            ? searchStoresParams.limit + 10
                                             : searchStoresParams.limit
                                 })
                             }}
