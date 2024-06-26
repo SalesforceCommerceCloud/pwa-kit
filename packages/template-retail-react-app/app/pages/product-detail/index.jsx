@@ -363,13 +363,15 @@ const ProductDetail = () => {
                     })
                 })
 
-                await updateItemsInBasketMutation.mutateAsync({
-                    method: 'PATCH',
-                    parameters: {
-                        basketId: basket.basketId
-                    },
-                    body: itemsToBeUpdated
-                })
+                if (itemsToBeUpdated.length) {
+                    await updateItemsInBasketMutation.mutateAsync({
+                        method: 'PATCH',
+                        parameters: {
+                            basketId: res.basketId
+                        },
+                        body: itemsToBeUpdated
+                    })
+                }
             }
 
             einstein.sendAddToCart(productItems)

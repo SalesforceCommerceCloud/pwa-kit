@@ -16,6 +16,7 @@ import ProductDetail from '.'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     basketWithProductSet,
+    basketWithProductBundle,
     mockWishlistWithItem,
     einsteinRecommendation,
     masterProduct,
@@ -289,7 +290,9 @@ describe('Recommended Products', () => {
 })
 
 describe('product bundles', () => {
+    let hasUpdatedBundleChildren = false
     beforeEach(() => {
+        hasUpdatedBundleChildren = false
         global.server.use(
             // Use product bundle instead of product set
             rest.get('*/products/:productId', (req, res, ctx) => {
@@ -297,7 +300,12 @@ describe('product bundles', () => {
             }),
             // For adding items to basket
             rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-                return res(ctx.json(basketWithProductSet))
+                return res(ctx.json(basketWithProductBundle))
+            }),
+            // Follow up call to update child bundle variant selections
+            rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
+                hasUpdatedBundleChildren = true
+                return res(ctx.json(basketWithProductBundle))
             })
         )
     })
@@ -326,6 +334,7 @@ describe('product bundles', () => {
 
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
+            expect(hasUpdatedBundleChildren).toBe(false)
         })
 
         const buttons = await screen.findAllByText(/add bundle to cart/i)
@@ -335,6 +344,7 @@ describe('product bundles', () => {
             () => {
                 const modal = screen.getByTestId('add-to-cart-modal')
                 expect(within(modal).getByText(/1 item added to cart/i)).toBeInTheDocument()
+                expect(hasUpdatedBundleChildren).toBe(true)
             },
             // Seems like rendering the modal takes a bit more time
             {timeout: 10000}
