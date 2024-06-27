@@ -24,171 +24,6 @@ import {
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import {basketWithProductBundle1} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 
-// TODO: move and consolidate
-const bundleUpdateItemsInBasket = {
-    adjustedMerchandizeTotalTax: 6.99,
-    adjustedShippingTotalTax: 1.33,
-    agentBasket: false,
-    basketId: '5c4e7de09faf3a70157597d0b5',
-    channelType: 'storefront',
-    creationDate: '2024-06-27T16:49:52.490Z',
-    currency: 'GBP',
-    customerInfo: {
-        customerId: 'abwrsVlrJGkXwRkboXlqYYkekZ',
-        email: ''
-    },
-    groupedTaxItems: [
-        {
-            taxRate: 0.05,
-            taxValue: 8.32
-        }
-    ],
-    lastModified: '2024-06-27T18:27:29.207Z',
-    merchandizeTotalTax: 6.99,
-    notes: {},
-    orderTotal: 174.79,
-    productItems: [
-        {
-            adjustedTax: 6.99,
-            basePrice: 73.4,
-            bonusProductLineItem: false,
-            bundledProductItems: [
-                {
-                    adjustedTax: null,
-                    basePrice: null,
-                    bonusProductLineItem: false,
-                    gift: false,
-                    itemId: 'a3c84fb19bbc3a033e78984899',
-                    itemText: 'Sleeveless Pleated Floral Front Blouse',
-                    price: null,
-                    priceAfterItemDiscount: null,
-                    priceAfterOrderDiscount: 0,
-                    productId: '701644044220M',
-                    productName: 'Sleeveless Pleated Floral Front Blouse',
-                    quantity: 2,
-                    shipmentId: 'me',
-                    tax: null,
-                    taxBasis: null,
-                    taxClassId: 'standard',
-                    taxRate: 0.05
-                },
-                {
-                    adjustedTax: null,
-                    basePrice: null,
-                    bonusProductLineItem: false,
-                    gift: false,
-                    itemId: '0d01c870ec19e5dd705073cc19',
-                    itemText: 'Swing Tank',
-                    price: null,
-                    priceAfterItemDiscount: null,
-                    priceAfterOrderDiscount: 0,
-                    productId: '701643473991M',
-                    productName: 'Swing Tank',
-                    quantity: 2,
-                    shipmentId: 'me',
-                    tax: null,
-                    taxBasis: null,
-                    taxClassId: 'standard',
-                    taxRate: 0.05
-                },
-                {
-                    adjustedTax: null,
-                    basePrice: null,
-                    bonusProductLineItem: false,
-                    gift: false,
-                    itemId: '1c3dba0c6c0f2b6ef45cce8398',
-                    itemText: 'Pull On Neutral Pant',
-                    price: null,
-                    priceAfterItemDiscount: null,
-                    priceAfterOrderDiscount: 0,
-                    productId: '701643458486M',
-                    productName: 'Pull On Neutral Pant',
-                    quantity: 4,
-                    shipmentId: 'me',
-                    tax: null,
-                    taxBasis: null,
-                    taxClassId: 'standard',
-                    taxRate: 0.05
-                }
-            ],
-            gift: false,
-            itemId: '353afa77af06015307998ff3e4',
-            itemText: "Women's Business Casual Bundle",
-            price: 146.8,
-            priceAfterItemDiscount: 146.8,
-            priceAfterOrderDiscount: 146.8,
-            productId: 'test-bundle',
-            productName: "Women's Business Casual Bundle",
-            quantity: 2,
-            shipmentId: 'me',
-            shippingItemId: '8b724a8d93e207d98c26d21891',
-            tax: 6.99,
-            taxBasis: 146.8,
-            taxClassId: 'standard',
-            taxRate: 0.05
-        }
-    ],
-    productSubTotal: 146.8,
-    productTotal: 146.8,
-    shipments: [
-        {
-            adjustedMerchandizeTotalTax: 6.99,
-            adjustedShippingTotalTax: 1.33,
-            gift: false,
-            merchandizeTotalTax: 6.99,
-            productSubTotal: 146.8,
-            productTotal: 146.8,
-            shipmentId: 'me',
-            shipmentTotal: 174.79,
-            shippingMethod: {
-                description: 'Order received within 7-10 business days',
-                id: 'GBP001',
-                name: 'Ground',
-                price: 27.99,
-                c_estimatedArrivalTime: '7-10 Business Days'
-            },
-            shippingStatus: 'not_shipped',
-            shippingTotal: 27.99,
-            shippingTotalTax: 1.33,
-            taxTotal: 8.32
-        }
-    ],
-    shippingItems: [
-        {
-            adjustedTax: 0.38,
-            basePrice: 7.99,
-            itemId: 'a8058ca725d9f81b972cf3667f',
-            itemText: 'Shipping',
-            price: 7.99,
-            priceAfterItemDiscount: 7.99,
-            shipmentId: 'me',
-            tax: 0.38,
-            taxBasis: 7.99,
-            taxClassId: 'standard',
-            taxRate: 0.05
-        },
-        {
-            adjustedTax: 0.95,
-            basePrice: 10,
-            itemId: '8b724a8d93e207d98c26d21891',
-            itemText: 'Item Shipping Cost (Surcharge)',
-            price: 10,
-            priceAfterItemDiscount: 20,
-            shipmentId: 'me',
-            tax: 0.95,
-            taxBasis: 20,
-            taxClassId: 'standard',
-            taxRate: 0.05
-        }
-    ],
-    shippingTotal: 27.99,
-    shippingTotalTax: 1.33,
-    taxation: 'gross',
-    taxRoundedAtGroup: false,
-    taxTotal: 8.32,
-    temporaryBasket: false
-}
-
 const mockProduct = {
     ...mockVariant,
     id: '750518699660M',
@@ -723,7 +558,23 @@ describe('Product bundles', () => {
                 return res(ctx.delay(0), ctx.json({data: [...mockGetBundleChildrenProducts]}))
             }),
             rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
-                return res(ctx.json(bundleUpdateItemsInBasket))
+                const curretProductItems = basketWithProductBundle1.productItems[0]
+                const updatedBasket = {
+                    ...basketWithProductBundle1,
+                    productItems: [
+                        {
+                            ...curretProductItems,
+                            quantity: 2,
+                            bundledProductItems: curretProductItems.bundledProductItems.map(
+                                (bundleChild) => ({
+                                    ...bundleChild,
+                                    quantity: bundleChild.quantity * 2
+                                })
+                            )
+                        }
+                    ]
+                }
+                return res(ctx.json(updatedBasket))
             })
         )
     })
@@ -813,7 +664,7 @@ describe('Product bundles', () => {
             expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
 
             // Parent bundle quantity is now 2
-            expect(screen.getByRole('spinbutton', {name: /quantity/i})).toHaveValue('2')
+            expect(screen.getByLabelText('Quantity')).toHaveValue('2')
 
             // Two children should have qty 2, one child should have qty 4
             expect(screen.getAllByText(/qty: 2/i)).toHaveLength(2)
