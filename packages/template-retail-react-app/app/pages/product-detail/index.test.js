@@ -16,15 +16,17 @@ import ProductDetail from '.'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     basketWithProductSet,
-    basketWithProductBundle,
-    bundleProductItemsForPDP,
     mockWishlistWithItem,
     einsteinRecommendation,
     masterProduct,
     productsForEinstein
 } from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
-import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import {
+    mockProductBundle,
+    basketWithProductBundle,
+    bundleProductItemsForPDP
+} from '@salesforce/retail-react-app/app/mocks/product-bundle'
 
 jest.setTimeout(60000)
 

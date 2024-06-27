@@ -20,9 +20,9 @@ import mockVariant from '@salesforce/retail-react-app/app/mocks/variant-75051869
 import {rest} from 'msw'
 import {
     mockProductBundle,
-    mockGetBundleChildrenProducts
+    mockGetBundleChildrenProducts,
+    basketWithProductBundle
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
-import {basketWithProductBundle} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 
 const mockProduct = {
     ...mockVariant,
