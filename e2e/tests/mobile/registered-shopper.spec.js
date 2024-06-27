@@ -60,7 +60,11 @@ test("Registered shopper can checkout items", async ({ page }) => {
 
   await clothingNav.click();
 
-  await page.getByRole("link", { name: "Tops" }).click();
+  const topsLink = page.getByRole("link", { name: "Tops" })
+  await topsLink.click();
+  // Wait for the nav menu to close first
+  // TODO: repeat change for other test files
+  await topsLink.waitFor({state: 'hidden'})
 
   await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
   // PLP
