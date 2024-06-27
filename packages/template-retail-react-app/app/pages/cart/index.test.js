@@ -574,7 +574,7 @@ describe('Product bundles', () => {
                 ).toBeInTheDocument()
                 expect(screen.getByText(/colour: tulip multi/i)).toBeInTheDocument()
                 const quantityQuery = screen.getAllByText(/qty: 1/i) // Two child products have `Qty: 1`
-                expect(quantityQuery.length).toBe(2)
+                expect(quantityQuery).toHaveLength(2)
                 expect(quantityQuery[0]).toBeInTheDocument()
 
                 // child product 2
