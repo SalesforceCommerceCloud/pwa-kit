@@ -545,7 +545,7 @@ describe('Update this is a gift option', function () {
     })
 })
 
-describe.only('Product bundles', () => {
+describe('Product bundles', () => {
     beforeEach(() => {
         global.server.use(
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
@@ -567,12 +567,27 @@ describe.only('Product bundles', () => {
             async () => {
                 expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
                 expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+
+                // child product 1
                 expect(
                     screen.getByText(/Sleeveless Pleated Floral Front Blouse/i)
                 ).toBeInTheDocument()
+                expect(screen.getByText(/colour: tulip multi/i)).toBeInTheDocument()
+                const quantityQuery = screen.getAllByText(/qty: 1/i) // Two child products have `Qty: 1`
+                expect(quantityQuery.length).toBe(2)
+                expect(quantityQuery[0]).toBeInTheDocument()
+
+                // child product 2
                 expect(screen.getByText(/swing tank/i)).toBeInTheDocument()
+                expect(screen.getByText(/colour: dk meadown rose/i)).toBeInTheDocument()
+                expect(screen.getByText(/size: xs/i)).toBeInTheDocument()
+                expect(quantityQuery[1]).toBeInTheDocument()
+
+                // child product 3
                 expect(screen.getByText(/pull on neutral pant/i)).toBeInTheDocument()
-                // TODO: add variation selections and quantity selections
+                expect(screen.getByText(/colour: black & sugar/i)).toBeInTheDocument()
+                expect(screen.getByText(/size: s/i)).toBeInTheDocument()
+                expect(screen.getByText(/qty: 2/i))
             },
             {timeout: 10000}
         )

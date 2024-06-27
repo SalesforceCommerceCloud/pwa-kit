@@ -1641,7 +1641,7 @@ export const mockGetBundleChildrenProducts = [
     },
     {
         currency: 'GBP',
-        id: '701643473946M',
+        id: '701643473991M',
         inventory: {
             ats: 96,
             backorderable: false,
@@ -1673,7 +1673,7 @@ export const mockGetBundleChildrenProducts = [
         shortDescription:
             'This relaxed fit tank with a ribbed inset is a perfect way to update your wardrobe for a new season.',
         slugUrl:
-            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/swing-tank/701643473946M.html?lang=en_GB',
+            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/swing-tank/701643473991M.html?lang=en_GB',
         stepQuantity: 1,
         type: {
             variant: true
@@ -1826,17 +1826,17 @@ export const mockGetBundleChildrenProducts = [
             }
         ],
         variationValues: {
-            color: 'JJ169XX',
+            color: 'JJ667A8',
             size: '9XS'
         },
-        c_color: 'JJ169XX',
+        c_color: 'JJ667A8',
         c_refinementColor: 'black',
         c_size: '9XS',
         c_width: 'Z'
     },
     {
         currency: 'GBP',
-        id: '701643458509M',
+        id: '701643458486M',
         inventory: {
             ats: 88,
             backorderable: false,
@@ -1862,14 +1862,14 @@ export const mockGetBundleChildrenProducts = [
         shortDescription:
             'Spring into a new season with this perfect neutral  pull on pant. Add the matching jacket for a perfect desk-to-dinner look.',
         slugUrl:
-            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/pull-on-neutral-pant/701643458509M.html?lang=en_GB',
+            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/pull-on-neutral-pant/701643458486M.html?lang=en_GB',
         stepQuantity: 1,
         type: {
             variant: true
         },
         unitMeasure: '',
         unitQuantity: 0,
-        upc: '701643458509',
+        upc: '701643458486',
         validFrom: {
             default: '2010-12-29T05:00:00.000Z'
         },
@@ -1966,12 +1966,12 @@ export const mockGetBundleChildrenProducts = [
         ],
         variationValues: {
             color: 'JJ0CZXX',
-            size: '9XS'
+            size: '9SM'
         },
         c_color: 'JJ0CZXX',
         c_isNewtest: true,
         c_refinementColor: 'black',
-        c_size: '9XS',
+        c_size: '9SM',
         c_width: 'Z'
     }
 ]
