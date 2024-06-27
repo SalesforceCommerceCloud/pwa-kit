@@ -17,6 +17,7 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import {
     basketWithProductSet,
     basketWithProductBundle,
+    bundleProductItemsForPDP,
     mockWishlistWithItem,
     einsteinRecommendation,
     masterProduct,
@@ -300,12 +301,16 @@ describe('product bundles', () => {
             }),
             // For adding items to basket
             rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-                return res(ctx.json(basketWithProductBundle))
+                const basketWithBundle = {
+                    ...basketWithProductBundle,
+                    productItems: bundleProductItemsForPDP
+                }
+                return res(ctx.json(basketWithBundle))
             }),
             // Follow up call to update child bundle variant selections
             rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
                 hasUpdatedBundleChildren = true
-                return res(ctx.json(basketWithProductBundle))
+                return res(ctx.json({}))
             })
         )
     })

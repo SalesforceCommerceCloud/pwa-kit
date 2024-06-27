@@ -22,7 +22,7 @@ import {
     mockProductBundle,
     mockGetBundleChildrenProducts
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
-import {basketWithProductBundle1} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
+import {basketWithProductBundle} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 
 const mockProduct = {
     ...mockVariant,
@@ -56,7 +56,7 @@ const mockPromotions = {
 const mockProductBundleBasket = {
     baskets: [
         {
-            ...basketWithProductBundle1
+            ...basketWithProductBundle
         }
     ],
     total: 1
@@ -558,9 +558,9 @@ describe('Product bundles', () => {
                 return res(ctx.delay(0), ctx.json({data: [...mockGetBundleChildrenProducts]}))
             }),
             rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
-                const curretProductItems = basketWithProductBundle1.productItems[0]
+                const curretProductItems = basketWithProductBundle.productItems[0]
                 const updatedBasket = {
-                    ...basketWithProductBundle1,
+                    ...basketWithProductBundle,
                     productItems: [
                         {
                             ...curretProductItems,
