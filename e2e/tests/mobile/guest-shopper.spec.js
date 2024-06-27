@@ -34,7 +34,10 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await clothingNav.click();
 
-  await page.getByRole("link", { name: "Tops" }).click();
+  const topsLink = page.getByRole("link", { name: "Tops" })
+  await topsLink.click();
+  // Wait for the nav menu to close first
+  await topsLink.waitFor({state: 'hidden'})
 
   await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
 
@@ -43,15 +46,17 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     name: /Cotton Turtleneck Sweater/i,
   });
   // selecting swatch
-  const initialImgEl = await productTile.locator("img");
-  const initialSrc = await initialImgEl.getAttribute("src");
+  const productTileImg = productTile.locator("img");
+  const initialSrc = await productTileImg.getAttribute("src");
   await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
 
   await productTile.getByLabel(/Black/, { exact: true }).click();
-  const changedImgEl = await productTile.locator("img");
-  const changeImgSrc = await changedImgEl.getAttribute("src");
+  // Make sure the image src has changed
+  await expect(async () => {
+    const newSrc = await productTileImg.getAttribute("src")
+    expect(newSrc).not.toBe(initialSrc)
+  }).toPass()
   await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-  expect(changeImgSrc).not.toBe(initialSrc);
   await productTile.click();
 
   // PDP
