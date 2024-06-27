@@ -4600,3 +4600,161 @@ export const basketWithProductBundle = {
     taxation: 'gross',
     taxTotal: 12.42
 }
+
+// TODO: consolidate data
+export const basketWithProductBundle1 = {
+    adjustedMerchandizeTotalTax: 3.5,
+    adjustedShippingTotalTax: 0.77,
+    agentBasket: false,
+    basketId: 'fc30fcdd188570930c5388c432',
+    channelType: 'storefront',
+    creationDate: '2024-06-27T02:28:28.370Z',
+    currency: 'GBP',
+    customerInfo: {
+        customerId: 'abwrsVlrJGkXwRkboXlqYYkekZ',
+        email: ''
+    },
+    lastModified: '2024-06-27T02:28:31.634Z',
+    merchandizeTotalTax: 3.5,
+    notes: {},
+    orderTotal: 89.39,
+    productItems: [
+        {
+            adjustedTax: 3.5,
+            basePrice: 73.4,
+            bonusProductLineItem: false,
+            bundledProductItems: [
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: 'c506ab52b4bc1343f7c99f315b',
+                    itemText: 'Sleeveless Pleated Floral Front Blouse',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    priceAfterOrderDiscount: 0,
+                    productId: '701644044220M',
+                    productName: 'Sleeveless Pleated Floral Front Blouse',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                },
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '5d3ca71f945e022649b4be65c4',
+                    itemText: 'Swing Tank',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    priceAfterOrderDiscount: 0,
+                    productId: '701643473946M',
+                    productName: 'Swing Tank',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                },
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '6d0893f677020af5543dc26292',
+                    itemText: 'Pull On Neutral Pant',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    priceAfterOrderDiscount: 0,
+                    productId: '701643458509M',
+                    productName: 'Pull On Neutral Pant',
+                    quantity: 2,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ],
+            gift: false,
+            itemId: '1032530dffefa662c1f0dcfe4e',
+            itemText: "Women's clothing test bundle",
+            price: 73.4,
+            priceAfterItemDiscount: 73.4,
+            priceAfterOrderDiscount: 73.4,
+            productId: 'test-bundle',
+            productName: "Women's clothing test bundle",
+            quantity: 1,
+            shipmentId: 'me',
+            shippingItemId: '556a3f76166cd45c3cbfbbeade',
+            tax: 3.5,
+            taxBasis: 73.4,
+            taxClassId: 'standard',
+            taxRate: 0.05,
+            type: {bundle: true}
+        }
+    ],
+    productSubTotal: 73.4,
+    productTotal: 73.4,
+    shipments: [
+        {
+            adjustedMerchandizeTotalTax: 3.5,
+            adjustedShippingTotalTax: 0.77,
+            gift: false,
+            merchandizeTotalTax: 3.5,
+            productSubTotal: 73.4,
+            productTotal: 73.4,
+            shipmentId: 'me',
+            shipmentTotal: 89.39,
+            shippingMethod: {
+                description: 'Order received within 7-10 business days',
+                id: 'GBP001',
+                name: 'Ground',
+                price: 15.99,
+                c_estimatedArrivalTime: '7-10 Business Days'
+            },
+            shippingStatus: 'not_shipped',
+            shippingTotal: 15.99,
+            shippingTotalTax: 0.77,
+            taxTotal: 4.27
+        }
+    ],
+    shippingItems: [
+        {
+            adjustedTax: 0.29,
+            basePrice: 5.99,
+            itemId: 'a39a6070667d1078c4693b6ab1',
+            itemText: 'Shipping',
+            price: 5.99,
+            priceAfterItemDiscount: 5.99,
+            shipmentId: 'me',
+            tax: 0.29,
+            taxBasis: 5.99,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        },
+        {
+            adjustedTax: 0.48,
+            basePrice: 10,
+            itemId: '556a3f76166cd45c3cbfbbeade',
+            itemText: 'Item Shipping Cost (Surcharge)',
+            price: 10,
+            priceAfterItemDiscount: 10,
+            shipmentId: 'me',
+            tax: 0.48,
+            taxBasis: 10,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        }
+    ],
+    shippingTotal: 15.99,
+    shippingTotalTax: 0.77,
+    taxation: 'gross',
+    taxTotal: 4.27
+}

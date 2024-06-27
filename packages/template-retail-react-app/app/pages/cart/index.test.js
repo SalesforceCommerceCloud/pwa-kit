@@ -18,6 +18,11 @@ import {
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockVariant from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import {rest} from 'msw'
+import {
+    mockProductBundle,
+    mockGetBundleChildrenProducts
+} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import {basketWithProductBundle1} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 
 const mockProduct = {
     ...mockVariant,
@@ -43,6 +48,15 @@ const mockPromotions = {
             id: '10offsuits',
             name: "10% off men's suits",
             startDate: '2022-10-11T00:00Z'
+        }
+    ],
+    total: 1
+}
+
+const mockProductBundleBasket = {
+    baskets: [
+        {
+            ...basketWithProductBundle1
         }
     ],
     total: 1
@@ -528,5 +542,39 @@ describe('Update this is a gift option', function () {
         await waitFor(() => {
             expect(giftCheckbox).toBeChecked()
         })
+    })
+})
+
+describe.only('Product bundles', () => {
+    beforeEach(() => {
+        global.server.use(
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
+                res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundleBasket))
+            ),
+            // rest.get('*/products/:productId', (req, res, ctx) => {
+            //     return res(ctx.delay(0), ctx.json(mockProductBundle))
+            // }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({data: [...mockGetBundleChildrenProducts]}))
+            })
+        )
+    })
+
+    test('renders in cart with variant selections', async () => {
+        renderWithProviders(<Cart />)
+
+        await waitFor(
+            async () => {
+                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+                expect(
+                    screen.getByText(/Sleeveless Pleated Floral Front Blouse/i)
+                ).toBeInTheDocument()
+                expect(screen.getByText(/swing tank/i)).toBeInTheDocument()
+                expect(screen.getByText(/pull on neutral pant/i)).toBeInTheDocument()
+                // TODO: add variation selections and quantity selections
+            },
+            {timeout: 10000}
+        )
     })
 })

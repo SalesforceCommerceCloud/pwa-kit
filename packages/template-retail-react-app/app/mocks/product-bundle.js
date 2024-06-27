@@ -1463,3 +1463,515 @@ export const mockProductBundleWithVariants = {
     ],
     total: 3
 }
+
+// TODO: see if you can consolidate this by re-using other mock product bundle data
+export const mockGetBundleChildrenProducts = [
+    {
+        currency: 'GBP',
+        id: '701644044220M',
+        inventory: {
+            ats: 83,
+            backorderable: false,
+            id: 'inventory_m',
+            orderable: true,
+            preorderable: false,
+            stockLevel: 83
+        },
+        longDescription:
+            'This sleeveless pleated front blouse is an incredibly versatile blouse.  We love it from nine-to-five and beyond.',
+        master: {
+            masterId: '25592770M',
+            orderable: true,
+            price: 35.19
+        },
+        minOrderQuantity: 1,
+        name: 'Sleeveless Pleated Floral Front Blouse',
+        pageDescription:
+            'This sleeveless pleated front blouse is an incredibly versatile blouse.  We love it from nine-to-five and beyond.',
+        pageTitle: 'Sleeveless Pleated Floral Front Blouse',
+        price: 35.19,
+        pricePerUnit: 35.19,
+        productPromotions: [
+            {
+                calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+            }
+        ],
+        shortDescription:
+            'This sleeveless pleated front blouse is an incredibly versatile blouse.  We love it from nine-to-five and beyond.',
+        slugUrl:
+            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/sleeveless-pleated-floral-front-blouse/701644044220M.html?lang=en_GB',
+        stepQuantity: 1,
+        type: {
+            variant: true
+        },
+        unitMeasure: '',
+        unitQuantity: 0,
+        upc: '701644044220',
+        validFrom: {
+            default: '2011-01-26T05:00:00.000Z'
+        },
+        variants: [
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044220M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '004'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044183M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '010'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044244M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '008'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044190M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '012'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044237M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '006'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044206M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '014'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044213M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '016'
+                }
+            }
+        ],
+        variationAttributes: [
+            {
+                id: 'color',
+                name: 'Colour',
+                values: [
+                    {
+                        name: 'Tulip Multi',
+                        orderable: true,
+                        value: 'JJGN9A0'
+                    }
+                ]
+            },
+            {
+                id: 'size',
+                name: 'Size',
+                values: [
+                    {
+                        name: '4',
+                        orderable: true,
+                        value: '004'
+                    },
+                    {
+                        name: '6',
+                        orderable: true,
+                        value: '006'
+                    },
+                    {
+                        name: '8',
+                        orderable: true,
+                        value: '008'
+                    },
+                    {
+                        name: '10',
+                        orderable: true,
+                        value: '010'
+                    },
+                    {
+                        name: '12',
+                        orderable: true,
+                        value: '012'
+                    },
+                    {
+                        name: '14',
+                        orderable: true,
+                        value: '014'
+                    },
+                    {
+                        name: '16',
+                        orderable: true,
+                        value: '016'
+                    }
+                ]
+            }
+        ],
+        variationValues: {
+            color: 'JJGN9A0',
+            size: '004'
+        },
+        c_color: 'JJGN9A0',
+        c_refinementColor: 'pink',
+        c_size: '004',
+        c_width: 'Z'
+    },
+    {
+        currency: 'GBP',
+        id: '701643473946M',
+        inventory: {
+            ats: 96,
+            backorderable: false,
+            id: 'inventory_m',
+            orderable: true,
+            preorderable: false,
+            stockLevel: 96
+        },
+        longDescription:
+            'This relaxed fit tank with a ribbed inset is a perfect way to update your wardrobe for a new season.',
+        master: {
+            masterId: '25565139M',
+            orderable: true,
+            price: 37.76
+        },
+        minOrderQuantity: 1,
+        name: 'Swing Tank',
+        pageDescription:
+            'This relaxed fit tank with a ribbed inset is a perfect way to update your wardrobe for a new season.',
+        pageTitle: 'Swing Tank',
+        price: 37.76,
+        pricePerUnit: 37.76,
+        productPromotions: [
+            {
+                calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+            }
+        ],
+        shortDescription:
+            'This relaxed fit tank with a ribbed inset is a perfect way to update your wardrobe for a new season.',
+        slugUrl:
+            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/swing-tank/701643473946M.html?lang=en_GB',
+        stepQuantity: 1,
+        type: {
+            variant: true
+        },
+        unitMeasure: '',
+        unitQuantity: 0,
+        upc: '701643473946',
+        validFrom: {
+            default: '2010-12-29T05:00:00.000Z'
+        },
+        variants: [
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473908M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9LG'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473953M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9LG'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473915M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9MD'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473960M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9MD'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473922M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9SM'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473946M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9XS'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473991M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9XS'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473939M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9XL'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473977M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9SM'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473984M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9XL'
+                }
+            }
+        ],
+        variationAttributes: [
+            {
+                id: 'color',
+                name: 'Colour',
+                values: [
+                    {
+                        name: 'Black',
+                        orderable: true,
+                        value: 'JJ169XX'
+                    },
+                    {
+                        name: 'dk meadown rose',
+                        orderable: true,
+                        value: 'JJ667A8'
+                    }
+                ]
+            },
+            {
+                id: 'size',
+                name: 'Size',
+                values: [
+                    {
+                        name: 'XS',
+                        orderable: true,
+                        value: '9XS'
+                    },
+                    {
+                        name: 'S',
+                        orderable: true,
+                        value: '9SM'
+                    },
+                    {
+                        name: 'M',
+                        orderable: true,
+                        value: '9MD'
+                    },
+                    {
+                        name: 'L',
+                        orderable: true,
+                        value: '9LG'
+                    },
+                    {
+                        name: 'XL',
+                        orderable: true,
+                        value: '9XL'
+                    }
+                ]
+            }
+        ],
+        variationValues: {
+            color: 'JJ169XX',
+            size: '9XS'
+        },
+        c_color: 'JJ169XX',
+        c_refinementColor: 'black',
+        c_size: '9XS',
+        c_width: 'Z'
+    },
+    {
+        currency: 'GBP',
+        id: '701643458509M',
+        inventory: {
+            ats: 88,
+            backorderable: false,
+            id: 'inventory_m',
+            orderable: true,
+            preorderable: false,
+            stockLevel: 88
+        },
+        longDescription:
+            'Spring into a new season with this perfect neutral  pull on pant. Add the matching jacket for a perfect desk-to-dinner look.',
+        master: {
+            masterId: '25565094M',
+            orderable: true,
+            price: 44.16
+        },
+        minOrderQuantity: 1,
+        name: 'Pull On Neutral Pant',
+        pageDescription:
+            'Spring into a new season with this perfect neutral  pull on pant. Add the matching jacket for a perfect desk-to-dinner look.',
+        pageTitle: 'Pull On Neutral Pant',
+        price: 44.16,
+        pricePerUnit: 44.16,
+        shortDescription:
+            'Spring into a new season with this perfect neutral  pull on pant. Add the matching jacket for a perfect desk-to-dinner look.',
+        slugUrl:
+            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/pull-on-neutral-pant/701643458509M.html?lang=en_GB',
+        stepQuantity: 1,
+        type: {
+            variant: true
+        },
+        unitMeasure: '',
+        unitQuantity: 0,
+        upc: '701643458509',
+        validFrom: {
+            default: '2010-12-29T05:00:00.000Z'
+        },
+        variants: [
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458462M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9LG'
+                }
+            },
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458509M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9XS'
+                }
+            },
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458479M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9MD'
+                }
+            },
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458493M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9XL'
+                }
+            },
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458486M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9SM'
+                }
+            }
+        ],
+        variationAttributes: [
+            {
+                id: 'color',
+                name: 'Colour',
+                values: [
+                    {
+                        name: 'Black & Sugar',
+                        orderable: true,
+                        value: 'JJ0CZXX'
+                    }
+                ]
+            },
+            {
+                id: 'size',
+                name: 'Size',
+                values: [
+                    {
+                        name: 'XS',
+                        orderable: true,
+                        value: '9XS'
+                    },
+                    {
+                        name: 'S',
+                        orderable: true,
+                        value: '9SM'
+                    },
+                    {
+                        name: 'M',
+                        orderable: true,
+                        value: '9MD'
+                    },
+                    {
+                        name: 'L',
+                        orderable: true,
+                        value: '9LG'
+                    },
+                    {
+                        name: 'XL',
+                        orderable: true,
+                        value: '9XL'
+                    }
+                ]
+            }
+        ],
+        variationValues: {
+            color: 'JJ0CZXX',
+            size: '9XS'
+        },
+        c_color: 'JJ0CZXX',
+        c_isNewtest: true,
+        c_refinementColor: 'black',
+        c_size: '9XS',
+        c_width: 'Z'
+    }
+]
