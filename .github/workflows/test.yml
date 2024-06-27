@@ -34,9 +34,7 @@ jobs:
     strategy:
       matrix:
         template:
-          [
-            retail-react-app-demo,
-          ]
+          [express-minimal-test-project]
     runs-on: ubuntu-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'test-project' || matrix.template == 'retail-react-app-demo' }}
