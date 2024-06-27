@@ -63,21 +63,6 @@ jobs:
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
 
-      # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.
-      # TODO: Update the SNYK_TOKEN stored in GitHub with a token generated from the proper Snyk org.
-      #      - name: Audit Generated Project
-      #        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true' && env.DEVELOP == 'true'
-      #        uses: "./.github/actions/snyk"
-      #        with:
-      #          snyk_token: ${{ secrets.SNYK_TOKEN }}
-
-#      - name: Create MRT credentials file
-#        if: env.IS_NOT_FORK == 'true' && env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-#        uses: "./.github/actions/create_mrt"
-#        with:
-#          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-#          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
       - name: Build project
         if: env.IS_NOT_FORK == 'true' && matrix.template == 'express-minimal-test-project'
         uses: "./.github/actions/push_to_mrt"
