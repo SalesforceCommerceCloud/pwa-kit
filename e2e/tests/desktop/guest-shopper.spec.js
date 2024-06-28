@@ -24,11 +24,12 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await topsNav.click();
   // PLP
-  const productTile = await page.getByRole("link", {
+  const productTile = page.getByRole("link", {
     name: /Cotton Turtleneck Sweater/i,
   });
   // selecting swatch
   const productTileImg = productTile.locator("img");
+  productTileImg.waitFor({state: 'visible'})
   const initialSrc = await productTileImg.getAttribute("src");
   await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
 
