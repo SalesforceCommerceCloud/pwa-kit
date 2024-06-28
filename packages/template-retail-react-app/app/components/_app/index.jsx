@@ -346,9 +346,10 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            {isOpenStoreLocator && (
-                                <StoreLocatorModal onClose={onCloseStoreLocator} />
-                            )}
+                            <StoreLocatorModal
+                                isOpen={isOpenStoreLocator}
+                                onClose={onCloseStoreLocator}
+                            />
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <>

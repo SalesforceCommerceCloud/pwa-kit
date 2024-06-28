@@ -5,10 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import React, {useState} from 'react'
+import {
+    DEFAULT_STORE_LOCATOR_COUNTRY,
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+    STORE_LOCATOR_NUM_STORES_PER_LOAD
+} from '@salesforce/retail-react-app/app/constants'
+import StoreLocatorModalWithHooks from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-modal-with-hooks'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
+import {screen, waitFor} from '@testing-library/react'
 
 const mockStoresData = [
     {
@@ -191,22 +197,91 @@ const mockStoresData = [
         storeLocatorEnabled: true
     }
 ]
-const mockStores = {
+const mockStoresTotalIsHigherThanLimit = {
     limit: 10,
     data: mockStoresData,
     offset: 0,
     total: 30
 }
 
-describe('StoreLocatorModal', () => {
+const mockStoresTotalIsEqualToLimit = {
+    limit: 10,
+    data: mockStoresData,
+    offset: 0,
+    total: 10
+}
+
+const WrapperComponent = () => {
+    const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
+
+    const [searchStoresParams, setSearchStoresParams] = useState({
+        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+        postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+    })
+    const onClose = jest.fn()
+
+    return (
+        <StoreLocatorModalWithHooks
+            userHasSetManualGeolocation={userHasSetManualGeolocation}
+            setUserHasSetManualGeolocation={setUserHasSetManualGeolocation}
+            searchStoresParams={searchStoresParams}
+            setSearchStoresParams={setSearchStoresParams}
+            onClose={onClose}
+            isOpen={true}
+        />
+    )
+}
+
+describe('StoreLocatorModalWithHooks', () => {
     test('renders without crashing', () => {
         global.server.use(
             rest.get('*/shopper-stores/v1/organizations/*', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(200), ctx.json(mockStores))
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json(mockStoresTotalIsHigherThanLimit)
+                )
             })
         )
         expect(() => {
-            renderWithProviders(<StoreLocatorModal />)
+            renderWithProviders(<WrapperComponent />)
         }).not.toThrow()
+    })
+
+    test('Load More button exists when total stores is higher than display limit', async () => {
+        global.server.use(
+            rest.get('*/shopper-stores/v1/organizations/*', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json(mockStoresTotalIsHigherThanLimit)
+                )
+            })
+        )
+        screen.debug()
+
+        renderWithProviders(<WrapperComponent />)
+        await waitFor(async () => {
+            const findButton = screen.getByRole('button', {name: /Find/i})
+            const aStore = screen.getByText(/162 University Ave/i)
+            const loadMore = screen.getByText(/Load More/i)
+            expect(findButton).toBeInTheDocument()
+            expect(aStore).toBeInTheDocument()
+            expect(loadMore).toBeInTheDocument()
+        })
+    })
+
+    test('Load More button exists when total stores is equal to display limit', async () => {
+        global.server.use(
+            rest.get('*/shopper-stores/v1/organizations/*', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockStoresTotalIsEqualToLimit))
+            })
+        )
+        renderWithProviders(<WrapperComponent />)
+        await waitFor(() => {
+            const loadMore = screen.queryByText(/Load More/i)
+            expect(loadMore).not.toBeInTheDocument()
+        })
     })
 })

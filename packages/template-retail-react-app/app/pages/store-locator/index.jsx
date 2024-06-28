@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState} from 'react'
 import {useIntl} from 'react-intl'
 import {Box, Container, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -34,25 +34,29 @@ const StoreLocator = () => {
             postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
         }
     })
-    const searchStoresDataRef = useRef({
-        data: []
-    })
-    var {data: searchStoresData, isLoading} = useSearchStores({
-        parameters: {
-            countryCode: searchStoresParams.latitude ? undefined : searchStoresParams.countryCode,
-            postalCode: searchStoresParams.latitude ? undefined : searchStoresParams.postalCode,
-            latitude: searchStoresParams.countryCode ? undefined : searchStoresParams.latitude,
-            longitude: searchStoresParams.countryCode ? undefined : searchStoresParams.longitude,
-            locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE,
-            limit: searchStoresParams.limit,
-            offset: 0
-        }
-    })
 
-    if (isLoading === false) searchStoresDataRef.current = searchStoresData
-    const storesInfo = searchStoresDataRef.current.data ? searchStoresDataRef.current.data : []
-    const numStores = isLoading ? 0 : searchStoresData.total
+    var {data: searchStoresData, isLoading} = useSearchStores(
+        {
+            parameters: {
+                countryCode: searchStoresParams.latitude
+                    ? undefined
+                    : searchStoresParams.countryCode,
+                postalCode: searchStoresParams.latitude ? undefined : searchStoresParams.postalCode,
+                latitude: searchStoresParams.countryCode ? undefined : searchStoresParams.latitude,
+                longitude: searchStoresParams.countryCode
+                    ? undefined
+                    : searchStoresParams.longitude,
+                locale: intl.locale,
+                maxDistance: STORE_LOCATOR_DISTANCE,
+                limit: searchStoresParams.limit,
+                offset: 0
+            }
+        },
+        {keepPreviousData: true}
+    )
+
+    const storesInfo = isLoading ? undefined : searchStoresData?.data || []
+    const numStores = searchStoresData?.total || 0
 
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData

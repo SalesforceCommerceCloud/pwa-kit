@@ -19,38 +19,29 @@ import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store
 import {
     SUPPORTED_STORE_LOCATOR_COUNTRIES,
     DEFAULT_STORE_LOCATOR_COUNTRY,
-    DEFAULT_STORE_LOCATOR_POSTAL_CODE
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+    STORE_LOCATOR_NUM_STORES_PER_LOAD
 } from '@salesforce/retail-react-app/app/constants'
 
-const StoreLocatorContent = ({
-    form,
-    submitForm,
-    storesInfo,
-    searchStoresParams,
+const useGeolocation = (
     setSearchStoresParams,
     userHasSetManualGeolocation,
     setUserHasSetManualGeolocation
-}) => {
-    const intl = useIntl()
-
+) => {
     const getGeolocationError = () => {
-        console.log('Unable to retrieve your location')
         setSearchStoresParams({
             countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
             postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-            limit: 10
+            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
         })
     }
 
     const getGeolocationSuccess = (position) => {
-        const latitude = position.coords.latitude
-        const longitude = position.coords.longitude
         setSearchStoresParams({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            limit: 10
+            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
         })
-        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`)
     }
 
     const getUserGeolocation = () => {
@@ -65,6 +56,25 @@ const StoreLocatorContent = ({
     useEffect(() => {
         if (!userHasSetManualGeolocation) getUserGeolocation()
     }, [])
+
+    return getUserGeolocation
+}
+
+const StoreLocatorContent = ({
+    form,
+    submitForm,
+    storesInfo,
+    searchStoresParams,
+    setSearchStoresParams,
+    userHasSetManualGeolocation,
+    setUserHasSetManualGeolocation
+}) => {
+    const intl = useIntl()
+    const getUserGeolocation = useGeolocation(
+        setSearchStoresParams,
+        userHasSetManualGeolocation,
+        setUserHasSetManualGeolocation
+    )
 
     return (
         <>
@@ -115,7 +125,18 @@ const StoreLocatorContent = ({
                                   {
                                       postalCode: searchStoresParams.postalCode
                                   }
-                              )} ${intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)}`
+                              )} ${
+                                  SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
+                                      ? intl.formatMessage(
+                                            SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
+                                                (o) =>
+                                                    o.countryCode === searchStoresParams.countryCode
+                                            ).countryName
+                                        )
+                                      : intl.formatMessage(
+                                            DEFAULT_STORE_LOCATOR_COUNTRY.countryName
+                                        )
+                              }`
                             : intl.formatMessage({
                                   id: 'store_locator.description.viewing_near_your_location',
                                   defaultMessage: 'Viewing stores near your location'
