@@ -12,17 +12,23 @@ import {
     Heading,
     Accordion,
     AccordionItem,
-    Box
+    Box,
+    Button
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
 import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
+import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {
     SUPPORTED_STORE_LOCATOR_COUNTRIES,
     DEFAULT_STORE_LOCATOR_COUNTRY,
+    STORE_LOCATOR_DISTANCE,
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-    STORE_LOCATOR_NUM_STORES_PER_LOAD
+    STORE_LOCATOR_NUM_STORES_PER_LOAD,
+    STORE_LOCATOR_DISTANCE_UNIT
 } from '@salesforce/retail-react-app/app/constants'
+import {useForm} from 'react-hook-form'
 
+const NUM_STORES_PER_REQUEST_API_MAX = 200
 const useGeolocation = (
     setSearchStoresParams,
     userHasSetManualGeolocation,
@@ -61,20 +67,63 @@ const useGeolocation = (
 }
 
 const StoreLocatorContent = ({
-    form,
-    submitForm,
-    storesInfo,
     searchStoresParams,
     setSearchStoresParams,
     userHasSetManualGeolocation,
     setUserHasSetManualGeolocation
 }) => {
     const intl = useIntl()
+
+    const form = useForm({
+        mode: 'onChange',
+        reValidateMode: 'onChange',
+        defaultValues: {
+            countryCode: userHasSetManualGeolocation ? searchStoresParams.countryCode : '',
+            postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
+        }
+    })
+
     const getUserGeolocation = useGeolocation(
         setSearchStoresParams,
         userHasSetManualGeolocation,
         setUserHasSetManualGeolocation
     )
+
+    const {data: searchStoresData, isLoading} = useSearchStores(
+        {
+            parameters: {
+                countryCode: searchStoresParams.latitude
+                    ? undefined
+                    : searchStoresParams.countryCode,
+                postalCode: searchStoresParams.latitude ? undefined : searchStoresParams.postalCode,
+                latitude: searchStoresParams.countryCode ? undefined : searchStoresParams.latitude,
+                longitude: searchStoresParams.countryCode
+                    ? undefined
+                    : searchStoresParams.longitude,
+                locale: intl.locale,
+                maxDistance: STORE_LOCATOR_DISTANCE,
+                limit: searchStoresParams.limit,
+                offset: 0,
+                distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            }
+        },
+        {keepPreviousData: true}
+    )
+
+    const storesInfo = isLoading ? undefined : searchStoresData?.data || []
+    const numStores = searchStoresData?.total || 0
+
+    const submitForm = async (formData) => {
+        const {postalCode, countryCode} = formData
+        if (postalCode !== '' && countryCode !== '') {
+            setSearchStoresParams({
+                postalCode: postalCode,
+                countryCode: countryCode,
+                limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+            })
+            setUserHasSetManualGeolocation(true)
+        }
+    }
 
     return (
         <>
@@ -120,23 +169,25 @@ const StoreLocatorContent = ({
                             ? `${intl.formatMessage(
                                   {
                                       id: 'store_locator.description.viewing_near_postal_code',
-                                      defaultMessage: 'Viewing stores near {postalCode} in'
+                                      defaultMessage:
+                                          'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
                                   },
                                   {
+                                      distance: STORE_LOCATOR_DISTANCE,
+                                      distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
                                       postalCode: searchStoresParams.postalCode
                                   }
-                              )} ${
-                                  SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
-                                      ? intl.formatMessage(
-                                            SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
-                                                (o) =>
-                                                    o.countryCode === searchStoresParams.countryCode
-                                            ).countryName
-                                        )
-                                      : intl.formatMessage(
-                                            DEFAULT_STORE_LOCATOR_COUNTRY.countryName
-                                        )
-                              }`
+                              )}
+                            ${
+                                SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
+                                    ? intl.formatMessage(
+                                          SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
+                                              (o) =>
+                                                  o.countryCode === searchStoresParams.countryCode
+                                          ).countryName
+                                      )
+                                    : intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
+                            }`
                             : intl.formatMessage({
                                   id: 'store_locator.description.viewing_near_your_location',
                                   defaultMessage: 'Viewing stores near your location'
@@ -145,6 +196,35 @@ const StoreLocatorContent = ({
                 </AccordionItem>
                 <StoresList storesInfo={storesInfo} />
             </Accordion>
+            {searchStoresParams.limit < numStores &&
+            searchStoresParams.limit < NUM_STORES_PER_REQUEST_API_MAX ? (
+                <Box marginTop="10px">
+                    <Button
+                        key="load-more-button"
+                        onClick={() => {
+                            setSearchStoresParams({
+                                ...searchStoresParams,
+                                limit:
+                                    searchStoresParams.limit + STORE_LOCATOR_NUM_STORES_PER_LOAD <=
+                                    NUM_STORES_PER_REQUEST_API_MAX
+                                        ? searchStoresParams.limit +
+                                          STORE_LOCATOR_NUM_STORES_PER_LOAD
+                                        : searchStoresParams.limit
+                            })
+                        }}
+                        width="100%"
+                        variant="outline"
+                        marginBottom={4}
+                    >
+                        {intl.formatMessage({
+                            id: 'store_locator.pagination.load_more',
+                            defaultMessage: 'Load More'
+                        })}
+                    </Button>
+                </Box>
+            ) : (
+                ''
+            )}
         </>
     )
 }
@@ -156,7 +236,8 @@ StoreLocatorContent.propTypes = {
     submitForm: PropTypes.func,
     setSearchStoresParams: PropTypes.func,
     userHasSetManualGeolocation: PropTypes.bool,
-    setUserHasSetManualGeolocation: PropTypes.func
+    setUserHasSetManualGeolocation: PropTypes.func,
+    numStores: PropTypes.number
 }
 
 export default StoreLocatorContent

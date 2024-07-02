@@ -2948,7 +2948,19 @@
   "store_locator.description.viewing_near_postal_code": [
     {
       "type": 0,
-      "value": "Viewing stores near "
+      "value": "Viewing stores within "
+    },
+    {
+      "type": 1,
+      "value": "distance"
+    },
+    {
+      "type": 1,
+      "value": "distanceUnit"
+    },
+    {
+      "type": 0,
+      "value": " of "
     },
     {
       "type": 1,

@@ -7,7 +7,7 @@
 
 import React, {useState} from 'react'
 import {useIntl} from 'react-intl'
-import {Box, Container, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
@@ -24,49 +24,8 @@ const StoreLocator = () => {
     const [searchStoresParams, setSearchStoresParams] = useState({
         countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-        limit: 10
+        limit: STORE_LOCATOR_DISTANCE
     })
-    const form = useForm({
-        mode: 'onChange',
-        reValidateMode: 'onChange',
-        defaultValues: {
-            countryCode: userHasSetManualGeolocation ? searchStoresParams.countryCode : '',
-            postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
-        }
-    })
-
-    var {data: searchStoresData, isLoading} = useSearchStores(
-        {
-            parameters: {
-                countryCode: searchStoresParams.latitude
-                    ? undefined
-                    : searchStoresParams.countryCode,
-                postalCode: searchStoresParams.latitude ? undefined : searchStoresParams.postalCode,
-                latitude: searchStoresParams.countryCode ? undefined : searchStoresParams.latitude,
-                longitude: searchStoresParams.countryCode
-                    ? undefined
-                    : searchStoresParams.longitude,
-                locale: intl.locale,
-                maxDistance: STORE_LOCATOR_DISTANCE,
-                limit: searchStoresParams.limit,
-                offset: 0
-            }
-        },
-        {keepPreviousData: true}
-    )
-
-    const storesInfo = isLoading ? undefined : searchStoresData?.data || []
-    const numStores = searchStoresData?.total || 0
-
-    const submitForm = async (formData) => {
-        const {postalCode, countryCode} = formData
-        setSearchStoresParams({
-            postalCode: postalCode,
-            countryCode: countryCode,
-            limit: 10
-        })
-        setUserHasSetManualGeolocation(true)
-    }
 
     return (
         <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
@@ -82,39 +41,11 @@ const StoreLocator = () => {
                 borderRadius="base"
             >
                 <StoreLocatorContent
-                    form={form}
-                    submitForm={submitForm}
-                    storesInfo={storesInfo}
                     searchStoresParams={searchStoresParams}
                     setSearchStoresParams={setSearchStoresParams}
                     setUserHasSetManualGeolocation={setUserHasSetManualGeolocation}
+                    userHasSetManualGeolocation={userHasSetManualGeolocation}
                 />
-                {searchStoresParams.limit < numStores && searchStoresParams.limit < 200 ? (
-                    <Box marginTop="10px">
-                        <Button
-                            key="load-more-button"
-                            onClick={() => {
-                                setSearchStoresParams({
-                                    ...searchStoresParams,
-                                    limit:
-                                        searchStoresParams.limit + 10 <= 200
-                                            ? searchStoresParams.limit + 10
-                                            : searchStoresParams.limit
-                                })
-                            }}
-                            width="100%"
-                            variant="outline"
-                            marginBottom={4}
-                        >
-                            {intl.formatMessage({
-                                id: 'store_locator.pagination.load_more',
-                                defaultMessage: 'Load More'
-                            })}
-                        </Button>
-                    </Box>
-                ) : (
-                    ''
-                )}
             </Container>
         </Box>
     )

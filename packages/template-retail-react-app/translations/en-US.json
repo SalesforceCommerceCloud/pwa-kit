@@ -1272,7 +1272,7 @@
     "defaultMessage": "Phone:"
   },
   "store_locator.description.viewing_near_postal_code": {
-    "defaultMessage": "Viewing stores near {postalCode} in"
+    "defaultMessage": "Viewing stores within {distance}{distanceUnit} of {postalCode} in"
   },
   "store_locator.description.viewing_near_your_location": {
     "defaultMessage": "Viewing stores near your location"
