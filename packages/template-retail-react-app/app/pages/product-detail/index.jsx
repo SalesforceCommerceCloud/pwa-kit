@@ -9,7 +9,10 @@ import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {normalizeSetBundleProduct} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {
+    normalizeSetBundleProduct,
+    getUpdateBundleChildArray
+} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
 import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -17,6 +20,7 @@ import {
     useProduct,
     useCategory,
     useShopperCustomersMutation,
+    useShopperBasketsMutation,
     useCustomerId,
     useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
@@ -69,6 +73,7 @@ const ProductDetail = () => {
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
+    const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const {res} = useServerContext()
     if (res) {
         res.set(
@@ -313,23 +318,58 @@ const ProductDetail = () => {
     const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
-            const bundledProductItems = childProductSelections.map((child) => {
-                return {
-                    productId: child.variant.productId,
-                    quantity: child.quantity
-                }
-            })
 
             const productItems = [
                 {
                     productId: product.id,
                     price: product.price,
                     quantity: selectedQuantity,
-                    bundledProductItems
+                    // The add item endpoint in the shopper baskets API does not respect variant selections
+                    // for bundle children, so we have to make a follow up call to update the basket
+                    // with the chosen variant selections
+                    bundledProductItems: childProductSelections.map((child) => {
+                        return {
+                            productId: child.variant.productId,
+                            quantity: child.quantity
+                        }
+                    })
                 }
             ]
 
-            await addItemToNewOrExistingBasket(productItems)
+            const res = await addItemToNewOrExistingBasket(productItems)
+
+            const bundleChildMasterIds = childProductSelections.map((child) => {
+                return child.product.id
+            })
+
+            // since the returned data includes all products in basket
+            // here we compare list of productIds in bundleProductItems of each productItem to filter out the
+            // current bundle that was last added into cart
+            const currentBundle = res.productItems.find((productItem) => {
+                if (!productItem.bundledProductItems?.length) return
+                const bundleChildIds = productItem.bundledProductItems?.map((item) => {
+                    // seek out the bundle child that still uses masterId as product id
+                    return item.productId
+                })
+                return bundleChildIds.every((id) => bundleChildMasterIds.includes(id))
+            })
+
+            const itemsToBeUpdated = getUpdateBundleChildArray(
+                currentBundle,
+                childProductSelections
+            )
+
+            if (itemsToBeUpdated.length) {
+                // make a follow up call to update child variant selection for product bundle
+                // since add item endpoint doesn't currently consider product bundle child variants
+                await updateItemsInBasketMutation.mutateAsync({
+                    method: 'PATCH',
+                    parameters: {
+                        basketId: res.basketId
+                    },
+                    body: itemsToBeUpdated
+                })
+            }
 
             einstein.sendAddToCart(productItems)
 

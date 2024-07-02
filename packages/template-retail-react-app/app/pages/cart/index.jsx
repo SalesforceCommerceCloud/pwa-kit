@@ -58,6 +58,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
@@ -87,6 +88,7 @@ const Cart = () => {
     const {customerId, isRegistered} = customer
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
+    const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
         'updateShippingMethodForShipment'
@@ -264,30 +266,27 @@ const Cart = () => {
 
         try {
             setCartItemLoading(true)
+            const itemsToBeUpdated = getUpdateBundleChildArray(bundle, childProducts)
 
-            const item = {
-                productId: bundle.productId,
-                quantity: bundleQuantity,
-                price: bundle.price,
-
-                bundledProductItems: bundle.bundledProductItems.map(({itemId}, i) => {
-                    const quantityPerBundle = bundle.bundledProducts[i].quantity
-                    const totalQuantity = bundleQuantity * quantityPerBundle
-
-                    return {
-                        itemId,
-                        productId: childProducts[i].variant.productId,
-                        quantity: totalQuantity
-                    }
+            // We only update the parent bundle when the quantity changes
+            // Since top level bundles don't have variants
+            if (bundle.quantity !== bundleQuantity) {
+                itemsToBeUpdated.push({
+                    itemId: bundle.itemId,
+                    productId: bundle.productId,
+                    quantity: bundleQuantity
                 })
             }
-            return await updateItemInBasketMutation.mutateAsync({
-                parameters: {
-                    basketId: basket.basketId,
-                    itemId: selectedItem.itemId
-                },
-                body: item
-            })
+
+            if (itemsToBeUpdated.length) {
+                await updateItemsInBasketMutation.mutateAsync({
+                    method: 'PATCH',
+                    parameters: {
+                        basketId: basket.basketId
+                    },
+                    body: itemsToBeUpdated
+                })
+            }
         } catch {
             showError()
         } finally {
@@ -349,7 +348,6 @@ const Cart = () => {
             })
         )
     }
-
     /***************************** Update Cart **************************/
 
     /***************************** Update quantity **************************/

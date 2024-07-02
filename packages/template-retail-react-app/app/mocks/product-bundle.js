@@ -1463,3 +1463,911 @@ export const mockProductBundleWithVariants = {
     ],
     total: 3
 }
+
+export const mockGetBundleChildrenProducts = [
+    {
+        currency: 'GBP',
+        id: '701644044220M',
+        inventory: {
+            ats: 83,
+            backorderable: false,
+            id: 'inventory_m',
+            orderable: true,
+            preorderable: false,
+            stockLevel: 83
+        },
+        longDescription:
+            'This sleeveless pleated front blouse is an incredibly versatile blouse.  We love it from nine-to-five and beyond.',
+        master: {
+            masterId: '25592770M',
+            orderable: true,
+            price: 35.19
+        },
+        minOrderQuantity: 1,
+        name: 'Sleeveless Pleated Floral Front Blouse',
+        pageDescription:
+            'This sleeveless pleated front blouse is an incredibly versatile blouse.  We love it from nine-to-five and beyond.',
+        pageTitle: 'Sleeveless Pleated Floral Front Blouse',
+        price: 35.19,
+        pricePerUnit: 35.19,
+        productPromotions: [
+            {
+                calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+            }
+        ],
+        shortDescription:
+            'This sleeveless pleated front blouse is an incredibly versatile blouse.  We love it from nine-to-five and beyond.',
+        slugUrl:
+            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/sleeveless-pleated-floral-front-blouse/701644044220M.html?lang=en_GB',
+        stepQuantity: 1,
+        type: {
+            variant: true
+        },
+        unitMeasure: '',
+        unitQuantity: 0,
+        upc: '701644044220',
+        validFrom: {
+            default: '2011-01-26T05:00:00.000Z'
+        },
+        variants: [
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044220M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '004'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044183M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '010'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044244M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '008'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044190M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '012'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044237M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '006'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044206M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '014'
+                }
+            },
+            {
+                orderable: true,
+                price: 35.19,
+                productId: '701644044213M',
+                variationValues: {
+                    color: 'JJGN9A0',
+                    size: '016'
+                }
+            }
+        ],
+        variationAttributes: [
+            {
+                id: 'color',
+                name: 'Colour',
+                values: [
+                    {
+                        name: 'Tulip Multi',
+                        orderable: true,
+                        value: 'JJGN9A0'
+                    }
+                ]
+            },
+            {
+                id: 'size',
+                name: 'Size',
+                values: [
+                    {
+                        name: '4',
+                        orderable: true,
+                        value: '004'
+                    },
+                    {
+                        name: '6',
+                        orderable: true,
+                        value: '006'
+                    },
+                    {
+                        name: '8',
+                        orderable: true,
+                        value: '008'
+                    },
+                    {
+                        name: '10',
+                        orderable: true,
+                        value: '010'
+                    },
+                    {
+                        name: '12',
+                        orderable: true,
+                        value: '012'
+                    },
+                    {
+                        name: '14',
+                        orderable: true,
+                        value: '014'
+                    },
+                    {
+                        name: '16',
+                        orderable: true,
+                        value: '016'
+                    }
+                ]
+            }
+        ],
+        variationValues: {
+            color: 'JJGN9A0',
+            size: '004'
+        },
+        c_color: 'JJGN9A0',
+        c_refinementColor: 'pink',
+        c_size: '004',
+        c_width: 'Z'
+    },
+    {
+        currency: 'GBP',
+        id: '701643473991M',
+        inventory: {
+            ats: 96,
+            backorderable: false,
+            id: 'inventory_m',
+            orderable: true,
+            preorderable: false,
+            stockLevel: 96
+        },
+        longDescription:
+            'This relaxed fit tank with a ribbed inset is a perfect way to update your wardrobe for a new season.',
+        master: {
+            masterId: '25565139M',
+            orderable: true,
+            price: 37.76
+        },
+        minOrderQuantity: 1,
+        name: 'Swing Tank',
+        pageDescription:
+            'This relaxed fit tank with a ribbed inset is a perfect way to update your wardrobe for a new season.',
+        pageTitle: 'Swing Tank',
+        price: 37.76,
+        pricePerUnit: 37.76,
+        productPromotions: [
+            {
+                calloutMsg: 'Buy one Long Center Seam Skirt and get 2 tops',
+                promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+            }
+        ],
+        shortDescription:
+            'This relaxed fit tank with a ribbed inset is a perfect way to update your wardrobe for a new season.',
+        slugUrl:
+            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/swing-tank/701643473991M.html?lang=en_GB',
+        stepQuantity: 1,
+        type: {
+            variant: true
+        },
+        unitMeasure: '',
+        unitQuantity: 0,
+        upc: '701643473946',
+        validFrom: {
+            default: '2010-12-29T05:00:00.000Z'
+        },
+        variants: [
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473908M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9LG'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473953M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9LG'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473915M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9MD'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473960M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9MD'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473922M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9SM'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473946M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9XS'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473991M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9XS'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473939M',
+                variationValues: {
+                    color: 'JJ169XX',
+                    size: '9XL'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473977M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9SM'
+                }
+            },
+            {
+                orderable: true,
+                price: 37.76,
+                productId: '701643473984M',
+                variationValues: {
+                    color: 'JJ667A8',
+                    size: '9XL'
+                }
+            }
+        ],
+        variationAttributes: [
+            {
+                id: 'color',
+                name: 'Colour',
+                values: [
+                    {
+                        name: 'Black',
+                        orderable: true,
+                        value: 'JJ169XX'
+                    },
+                    {
+                        name: 'dk meadown rose',
+                        orderable: true,
+                        value: 'JJ667A8'
+                    }
+                ]
+            },
+            {
+                id: 'size',
+                name: 'Size',
+                values: [
+                    {
+                        name: 'XS',
+                        orderable: true,
+                        value: '9XS'
+                    },
+                    {
+                        name: 'S',
+                        orderable: true,
+                        value: '9SM'
+                    },
+                    {
+                        name: 'M',
+                        orderable: true,
+                        value: '9MD'
+                    },
+                    {
+                        name: 'L',
+                        orderable: true,
+                        value: '9LG'
+                    },
+                    {
+                        name: 'XL',
+                        orderable: true,
+                        value: '9XL'
+                    }
+                ]
+            }
+        ],
+        variationValues: {
+            color: 'JJ667A8',
+            size: '9XS'
+        },
+        c_color: 'JJ667A8',
+        c_refinementColor: 'black',
+        c_size: '9XS',
+        c_width: 'Z'
+    },
+    {
+        currency: 'GBP',
+        id: '701643458486M',
+        inventory: {
+            ats: 88,
+            backorderable: false,
+            id: 'inventory_m',
+            orderable: true,
+            preorderable: false,
+            stockLevel: 88
+        },
+        longDescription:
+            'Spring into a new season with this perfect neutral  pull on pant. Add the matching jacket for a perfect desk-to-dinner look.',
+        master: {
+            masterId: '25565094M',
+            orderable: true,
+            price: 44.16
+        },
+        minOrderQuantity: 1,
+        name: 'Pull On Neutral Pant',
+        pageDescription:
+            'Spring into a new season with this perfect neutral  pull on pant. Add the matching jacket for a perfect desk-to-dinner look.',
+        pageTitle: 'Pull On Neutral Pant',
+        price: 44.16,
+        pricePerUnit: 44.16,
+        shortDescription:
+            'Spring into a new season with this perfect neutral  pull on pant. Add the matching jacket for a perfect desk-to-dinner look.',
+        slugUrl:
+            'https://zzrf-014.dx.commercecloud.salesforce.com/s/RefArchGlobal/pull-on-neutral-pant/701643458486M.html?lang=en_GB',
+        stepQuantity: 1,
+        type: {
+            variant: true
+        },
+        unitMeasure: '',
+        unitQuantity: 0,
+        upc: '701643458486',
+        validFrom: {
+            default: '2010-12-29T05:00:00.000Z'
+        },
+        variants: [
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458462M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9LG'
+                }
+            },
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458509M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9XS'
+                }
+            },
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458479M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9MD'
+                }
+            },
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458493M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9XL'
+                }
+            },
+            {
+                orderable: true,
+                price: 44.16,
+                productId: '701643458486M',
+                variationValues: {
+                    color: 'JJ0CZXX',
+                    size: '9SM'
+                }
+            }
+        ],
+        variationAttributes: [
+            {
+                id: 'color',
+                name: 'Colour',
+                values: [
+                    {
+                        name: 'Black & Sugar',
+                        orderable: true,
+                        value: 'JJ0CZXX'
+                    }
+                ]
+            },
+            {
+                id: 'size',
+                name: 'Size',
+                values: [
+                    {
+                        name: 'XS',
+                        orderable: true,
+                        value: '9XS'
+                    },
+                    {
+                        name: 'S',
+                        orderable: true,
+                        value: '9SM'
+                    },
+                    {
+                        name: 'M',
+                        orderable: true,
+                        value: '9MD'
+                    },
+                    {
+                        name: 'L',
+                        orderable: true,
+                        value: '9LG'
+                    },
+                    {
+                        name: 'XL',
+                        orderable: true,
+                        value: '9XL'
+                    }
+                ]
+            }
+        ],
+        variationValues: {
+            color: 'JJ0CZXX',
+            size: '9SM'
+        },
+        c_color: 'JJ0CZXX',
+        c_isNewtest: true,
+        c_refinementColor: 'black',
+        c_size: '9SM',
+        c_width: 'Z'
+    }
+]
+
+export const bundleProductItemsForPDP = [
+    {
+        adjustedTax: 3.5,
+        basePrice: 73.4,
+        bonusProductLineItem: false,
+        bundledProductItems: [
+            {
+                adjustedTax: null,
+                basePrice: null,
+                bonusProductLineItem: false,
+                gift: false,
+                itemId: '443cf1938dadc42f25f2c38a15',
+                itemText: 'Shimmer Blouse',
+                price: null,
+                priceAfterItemDiscount: null,
+                priceAfterOrderDiscount: 0,
+                productId: '701642893561M',
+                productName: 'Shimmer Blouse',
+                quantity: 1,
+                shipmentId: 'me',
+                tax: null,
+                taxBasis: null,
+                taxClassId: 'standard',
+                taxRate: 0.05
+            },
+            {
+                adjustedTax: null,
+                basePrice: null,
+                bonusProductLineItem: false,
+                gift: false,
+                itemId: '47263213b76f1befb4d74fdb34',
+                itemText: 'Washable Wool Classic Straight Skirt ',
+                price: null,
+                priceAfterItemDiscount: null,
+                priceAfterOrderDiscount: 0,
+                productId: '701641017319M',
+                productName: 'Washable Wool Classic Straight Skirt ',
+                quantity: 1,
+                shipmentId: 'me',
+                tax: null,
+                taxBasis: null,
+                taxClassId: 'standard',
+                taxRate: 0.05
+            },
+            {
+                adjustedTax: null,
+                basePrice: null,
+                bonusProductLineItem: false,
+                gift: false,
+                itemId: 'a5432d60a8b40233b6c9521b7f',
+                itemText: 'Aylin',
+                price: null,
+                priceAfterItemDiscount: null,
+                priceAfterOrderDiscount: 0,
+                productId: '740357479905M',
+                productName: 'Aylin',
+                quantity: 1,
+                shipmentId: 'me',
+                tax: null,
+                taxBasis: null,
+                taxClassId: 'standard',
+                taxRate: 0.05
+            }
+        ],
+        gift: false,
+        itemId: '7e9d92dd5fdc38e1d1c6241460',
+        itemText: "Women's clothing test bundle",
+        price: 73.4,
+        priceAfterItemDiscount: 73.4,
+        priceAfterOrderDiscount: 73.4,
+        productId: 'test-bundle',
+        productName: "Women's clothing test bundle",
+        quantity: 1,
+        shipmentId: 'me',
+        shippingItemId: 'd2ff12ff1cd08a5ba593fb181a',
+        tax: 3.5,
+        taxBasis: 73.4,
+        taxClassId: 'standard',
+        taxRate: 0.05
+    },
+    {
+        adjustedTax: 3.5,
+        basePrice: 73.4,
+        bonusProductLineItem: false,
+        bundledProductItems: [
+            {
+                adjustedTax: null,
+                basePrice: null,
+                bonusProductLineItem: false,
+                gift: false,
+                itemId: '609fa4fe374d39972610203c5e',
+                itemText: 'Shimmer Blouse',
+                price: null,
+                priceAfterItemDiscount: null,
+                priceAfterOrderDiscount: 0,
+                productId: '701642893547M',
+                productName: 'Shimmer Blouse',
+                quantity: 1,
+                shipmentId: 'me',
+                tax: null,
+                taxBasis: null,
+                taxClassId: 'standard',
+                taxRate: 0.05
+            },
+            {
+                adjustedTax: null,
+                basePrice: null,
+                bonusProductLineItem: false,
+                gift: false,
+                itemId: '4ea3d7d5ef65332ef04e6142c8',
+                itemText: 'Washable Wool Classic Straight Skirt ',
+                price: null,
+                priceAfterItemDiscount: null,
+                priceAfterOrderDiscount: 0,
+                productId: '701641017302M',
+                productName: 'Washable Wool Classic Straight Skirt ',
+                quantity: 1,
+                shipmentId: 'me',
+                tax: null,
+                taxBasis: null,
+                taxClassId: 'standard',
+                taxRate: 0.05
+            },
+            {
+                adjustedTax: null,
+                basePrice: null,
+                bonusProductLineItem: false,
+                gift: false,
+                itemId: '96406b029542ecd73e101e799d',
+                itemText: 'Aylin',
+                price: null,
+                priceAfterItemDiscount: null,
+                priceAfterOrderDiscount: 0,
+                productId: '740357479875M',
+                productName: 'Aylin',
+                quantity: 1,
+                shipmentId: 'me',
+                tax: null,
+                taxBasis: null,
+                taxClassId: 'standard',
+                taxRate: 0.05
+            }
+        ],
+        gift: false,
+        itemId: '10460508e7fa91e51157f48b58',
+        itemText: "Women's clothing test bundle",
+        price: 73.4,
+        priceAfterItemDiscount: 73.4,
+        priceAfterOrderDiscount: 73.4,
+        productId: 'test-bundle',
+        productName: "Women's clothing test bundle",
+        quantity: 1,
+        shipmentId: 'me',
+        shippingItemId: 'dcef3c80b398c56aa215329c95',
+        tax: 3.5,
+        taxBasis: 73.4,
+        taxClassId: 'standard',
+        taxRate: 0.05
+    },
+    {
+        adjustedTax: 3.5,
+        basePrice: 73.4,
+        bonusProductLineItem: false,
+        bundledProductItems: [
+            {
+                adjustedTax: null,
+                basePrice: null,
+                bonusProductLineItem: false,
+                gift: false,
+                itemId: 'd7a42d92e295b0f067c13ad289',
+                itemText: 'Sleeveless Pleated Floral Front Blouse',
+                price: null,
+                priceAfterItemDiscount: null,
+                priceAfterOrderDiscount: 0,
+                productId: '25592770M',
+                productName: 'Sleeveless Pleated Floral Front Blouse',
+                quantity: 1,
+                shipmentId: 'me',
+                tax: null,
+                taxBasis: null,
+                taxClassId: 'standard',
+                taxRate: 0.05
+            },
+            {
+                adjustedTax: null,
+                basePrice: null,
+                bonusProductLineItem: false,
+                gift: false,
+                itemId: '575af8f54681cf7f1b44241f99',
+                itemText: 'Swing Tank',
+                price: null,
+                priceAfterItemDiscount: null,
+                priceAfterOrderDiscount: 0,
+                productId: '25565139M',
+                productName: 'Swing Tank',
+                quantity: 1,
+                shipmentId: 'me',
+                tax: null,
+                taxBasis: null,
+                taxClassId: 'standard',
+                taxRate: 0.05
+            },
+            {
+                adjustedTax: null,
+                basePrice: null,
+                bonusProductLineItem: false,
+                gift: false,
+                itemId: 'bab1184abe0332790e0d726576',
+                itemText: 'Pull On Neutral Pant',
+                price: null,
+                priceAfterItemDiscount: null,
+                priceAfterOrderDiscount: 0,
+                productId: '25565094M',
+                productName: 'Pull On Neutral Pant',
+                quantity: 2,
+                shipmentId: 'me',
+                tax: null,
+                taxBasis: null,
+                taxClassId: 'standard',
+                taxRate: 0.05
+            }
+        ],
+        gift: false,
+        itemId: 'f5d65c1cb082a5248318693f16',
+        itemText: "Women's clothing test bundle",
+        price: 73.4,
+        priceAfterItemDiscount: 73.4,
+        priceAfterOrderDiscount: 73.4,
+        productId: 'test-bundle',
+        productName: "Women's clothing test bundle",
+        quantity: 1,
+        shipmentId: 'me',
+        shippingItemId: 'bf801710265b0180f97f022fdf',
+        tax: 3.5,
+        taxBasis: 73.4,
+        taxClassId: 'standard',
+        taxRate: 0.05
+    }
+]
+
+export const basketWithProductBundle = {
+    adjustedMerchandizeTotalTax: 3.5,
+    adjustedShippingTotalTax: 0.77,
+    agentBasket: false,
+    basketId: 'fc30fcdd188570930c5388c432',
+    channelType: 'storefront',
+    creationDate: '2024-06-27T02:28:28.370Z',
+    currency: 'GBP',
+    customerInfo: {
+        customerId: 'abwrsVlrJGkXwRkboXlqYYkekZ',
+        email: ''
+    },
+    lastModified: '2024-06-27T02:28:31.634Z',
+    merchandizeTotalTax: 3.5,
+    notes: {},
+    orderTotal: 89.39,
+    productItems: [
+        {
+            adjustedTax: 3.5,
+            basePrice: 73.4,
+            bonusProductLineItem: false,
+            bundledProductItems: [
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: 'c506ab52b4bc1343f7c99f315b',
+                    itemText: 'Sleeveless Pleated Floral Front Blouse',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    priceAfterOrderDiscount: 0,
+                    productId: '701644044220M',
+                    productName: 'Sleeveless Pleated Floral Front Blouse',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                },
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '5d3ca71f945e022649b4be65c4',
+                    itemText: 'Swing Tank',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    priceAfterOrderDiscount: 0,
+                    productId: '701643473991M',
+                    productName: 'Swing Tank',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                },
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '6d0893f677020af5543dc26292',
+                    itemText: 'Pull On Neutral Pant',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    priceAfterOrderDiscount: 0,
+                    productId: '701643458486M',
+                    productName: 'Pull On Neutral Pant',
+                    quantity: 2,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ],
+            gift: false,
+            itemId: '1032530dffefa662c1f0dcfe4e',
+            itemText: "Women's clothing test bundle",
+            price: 73.4,
+            priceAfterItemDiscount: 73.4,
+            priceAfterOrderDiscount: 73.4,
+            productId: 'test-bundle',
+            productName: "Women's clothing test bundle",
+            quantity: 1,
+            shipmentId: 'me',
+            shippingItemId: '556a3f76166cd45c3cbfbbeade',
+            tax: 3.5,
+            taxBasis: 73.4,
+            taxClassId: 'standard',
+            taxRate: 0.05,
+            type: {bundle: true}
+        }
+    ],
+    productSubTotal: 73.4,
+    productTotal: 73.4,
+    shipments: [
+        {
+            adjustedMerchandizeTotalTax: 3.5,
+            adjustedShippingTotalTax: 0.77,
+            gift: false,
+            merchandizeTotalTax: 3.5,
+            productSubTotal: 73.4,
+            productTotal: 73.4,
+            shipmentId: 'me',
+            shipmentTotal: 89.39,
+            shippingMethod: {
+                description: 'Order received within 7-10 business days',
+                id: 'GBP001',
+                name: 'Ground',
+                price: 15.99,
+                c_estimatedArrivalTime: '7-10 Business Days'
+            },
+            shippingStatus: 'not_shipped',
+            shippingTotal: 15.99,
+            shippingTotalTax: 0.77,
+            taxTotal: 4.27
+        }
+    ],
+    shippingItems: [
+        {
+            adjustedTax: 0.29,
+            basePrice: 5.99,
+            itemId: 'a39a6070667d1078c4693b6ab1',
+            itemText: 'Shipping',
+            price: 5.99,
+            priceAfterItemDiscount: 5.99,
+            shipmentId: 'me',
+            tax: 0.29,
+            taxBasis: 5.99,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        },
+        {
+            adjustedTax: 0.48,
+            basePrice: 10,
+            itemId: '556a3f76166cd45c3cbfbbeade',
+            itemText: 'Item Shipping Cost (Surcharge)',
+            price: 10,
+            priceAfterItemDiscount: 10,
+            shipmentId: 'me',
+            tax: 0.48,
+            taxBasis: 10,
+            taxClassId: 'standard',
+            taxRate: 0.05
+        }
+    ],
+    shippingTotal: 15.99,
+    shippingTotalTax: 0.77,
+    taxation: 'gross',
+    taxTotal: 4.27
+}

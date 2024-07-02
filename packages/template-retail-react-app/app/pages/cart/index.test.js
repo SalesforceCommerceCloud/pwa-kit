@@ -18,6 +18,11 @@ import {
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockVariant from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import {rest} from 'msw'
+import {
+    mockProductBundle,
+    mockGetBundleChildrenProducts,
+    basketWithProductBundle
+} from '@salesforce/retail-react-app/app/mocks/product-bundle'
 
 const mockProduct = {
     ...mockVariant,
@@ -43,6 +48,15 @@ const mockPromotions = {
             id: '10offsuits',
             name: "10% off men's suits",
             startDate: '2022-10-11T00:00Z'
+        }
+    ],
+    total: 1
+}
+
+const mockProductBundleBasket = {
+    baskets: [
+        {
+            ...basketWithProductBundle
         }
     ],
     total: 1
@@ -527,6 +541,134 @@ describe('Update this is a gift option', function () {
 
         await waitFor(() => {
             expect(giftCheckbox).toBeChecked()
+        })
+    })
+})
+
+describe('Product bundles', () => {
+    beforeEach(() => {
+        global.server.use(
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
+                res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundleBasket))
+            ),
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockProductBundle))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({data: [...mockGetBundleChildrenProducts]}))
+            }),
+            rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
+                const curretProductItems = basketWithProductBundle.productItems[0]
+                const updatedBasket = {
+                    ...basketWithProductBundle,
+                    productItems: [
+                        {
+                            ...curretProductItems,
+                            quantity: 2,
+                            bundledProductItems: curretProductItems.bundledProductItems.map(
+                                (bundleChild) => ({
+                                    ...bundleChild,
+                                    quantity: bundleChild.quantity * 2
+                                })
+                            )
+                        }
+                    ]
+                }
+                return res(ctx.json(updatedBasket))
+            })
+        )
+    })
+
+    test('renders in cart with variant selections', async () => {
+        renderWithProviders(<Cart />)
+
+        await waitFor(
+            async () => {
+                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+
+                // child product 1
+                expect(
+                    screen.getByText(/Sleeveless Pleated Floral Front Blouse/i)
+                ).toBeInTheDocument()
+                expect(screen.getByText(/colour: tulip multi/i)).toBeInTheDocument()
+                const quantityQuery = screen.getAllByText(/qty: 1/i) // Two child products have `Qty: 1`
+                expect(quantityQuery).toHaveLength(2)
+                expect(quantityQuery[0]).toBeInTheDocument()
+
+                // child product 2
+                expect(screen.getByText(/swing tank/i)).toBeInTheDocument()
+                expect(screen.getByText(/colour: dk meadown rose/i)).toBeInTheDocument()
+                expect(screen.getByText(/size: xs/i)).toBeInTheDocument()
+                expect(quantityQuery[1]).toBeInTheDocument()
+
+                // child product 3
+                expect(screen.getByText(/pull on neutral pant/i)).toBeInTheDocument()
+                expect(screen.getByText(/colour: black & sugar/i)).toBeInTheDocument()
+                expect(screen.getByText(/size: s/i)).toBeInTheDocument()
+                expect(screen.getByText(/qty: 2/i)).toBeInTheDocument()
+            },
+            {timeout: 10000}
+        )
+    })
+
+    test('can be updated using the product view modal', async () => {
+        const {user} = renderWithProviders(<Cart />)
+        await waitFor(async () => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            // Parent bundle
+            expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+            // bundle children
+            expect(screen.getByText(/Sleeveless Pleated Floral Front Blouse/i)).toBeInTheDocument()
+            expect(screen.getByText(/swing tank/i)).toBeInTheDocument()
+            expect(screen.getByText(/pull on neutral pant/i)).toBeInTheDocument()
+
+            // Two children have qty 1, one child has qty 2
+            expect(screen.getAllByText(/qty: 1/i)).toHaveLength(2)
+            expect(screen.getByText(/qty: 2/i)).toBeInTheDocument()
+        })
+
+        const editCartButton = screen.getByRole('button', {
+            name: /edit/i,
+            hidden: true
+        })
+        await user.click(editCartButton)
+
+        let productViewModal
+        await waitFor(
+            async () => {
+                productViewModal = screen.getByTestId('product-view-modal')
+                expect(productViewModal).toBeInTheDocument()
+            },
+            {timeout: 10000}
+        )
+
+        const quantityElement = within(productViewModal).getByRole('spinbutton', {id: 'quantity'})
+        expect(quantityElement).toHaveValue('1')
+        const incrementButton = await within(productViewModal).findByTestId('quantity-increment')
+
+        // For some reason clicking - fireEvent.click(incrementButton) - doesn't work,
+        // so we'll use the keyboard to increment
+        incrementButton.focus()
+        fireEvent.keyDown(incrementButton, {key: 'Enter', code: 'Enter', charCode: 13})
+
+        await waitFor(async () => {
+            expect(quantityElement).toHaveValue('2')
+        })
+
+        const updateCartButtons = within(productViewModal).getAllByRole('button', {name: 'Update'})
+        await user.click(updateCartButtons[0])
+
+        await waitFor(() => {
+            expect(productViewModal).not.toBeInTheDocument()
+            expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+
+            // Parent bundle quantity is now 2
+            expect(screen.getByLabelText('Quantity')).toHaveValue('2')
+
+            // Two children should have qty 2, one child should have qty 4
+            expect(screen.getAllByText(/qty: 2/i)).toHaveLength(2)
+            expect(screen.getByText(/qty: 4/i)).toBeInTheDocument()
         })
     })
 })
