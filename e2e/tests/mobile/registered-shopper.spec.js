@@ -60,7 +60,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
 
   await clothingNav.click();
 
-  const topsLink = page.getByRole("link", { name: "Tops" })
+  const topsLink = page.getByLabel('Womens').getByRole("link", { name: "Tops" })
   await topsLink.click();
   // Wait for the nav menu to close first
   await topsLink.waitFor({state: 'hidden'})
