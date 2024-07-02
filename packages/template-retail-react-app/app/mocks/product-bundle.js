@@ -1464,7 +1464,6 @@ export const mockProductBundleWithVariants = {
     total: 3
 }
 
-// TODO: see if you can consolidate this by re-using other mock product bundle data
 export const mockGetBundleChildrenProducts = [
     {
         currency: 'GBP',

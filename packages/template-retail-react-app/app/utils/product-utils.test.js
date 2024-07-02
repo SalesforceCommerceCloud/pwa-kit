@@ -11,7 +11,8 @@ import {
     getDecoratedVariationAttributes,
     getDisplayVariationValues,
     filterImageGroups,
-    normalizeSetBundleProduct
+    normalizeSetBundleProduct,
+    getUpdateBundleChildArray
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {
     mockMasterProductHitWithMultipleVariants,
@@ -25,7 +26,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/product-tile/promo-callout.mock'
 import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 import {mockProductSearch} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle.js'
+import {
+    mockProductBundle,
+    mockBundledProductItemsVariant
+} from '@salesforce/retail-react-app/app/mocks/product-bundle.js'
 
 const imageGroups = [
     {
@@ -945,5 +949,59 @@ describe('normalizeSetBundleProduct', () => {
     test('passing in product bundle normalizes data', () => {
         const normalizedProduct = normalizeSetBundleProduct(mockProductBundle)
         expect(normalizedProduct.childProducts).toStrictEqual(mockProductBundle.bundledProducts)
+    })
+})
+
+describe('getUpdateBundleChildArray', () => {
+    const childProductSelections = mockProductBundle.bundledProducts.map(
+        ({product: bundleProduct}, index) => ({
+            product: {
+                ...bundleProduct,
+                id: mockBundledProductItemsVariant.bundledProductItems[index].productId
+            },
+            variant: bundleProduct.variants[0],
+            quantity: bundleProduct.quantity
+        })
+    )
+
+    const expectedResult = [
+        {
+            itemId: 'bff83e67f98e7743fdff6867b6',
+            productId: '701644044220M',
+            quantity: 1
+        },
+        {
+            itemId: '789f9312984f9b178568348e92',
+            productId: '701643473908M',
+            quantity: 1
+        },
+        {
+            itemId: '330cc506eeeef0946ceb2e4de1',
+            productId: '701643458462M',
+            quantity: 2
+        }
+    ]
+
+    test('returns update product item array with selected variant', () => {
+        const result = getUpdateBundleChildArray(
+            mockBundledProductItemsVariant,
+            childProductSelections
+        )
+        expect(result).toStrictEqual(expectedResult)
+    })
+
+    test('returns empty array if product IDs do not match', () => {
+        const modifiedChildProductSelections = childProductSelections.map((childProduct) => ({
+            ...childProduct,
+            product: {
+                ...childProduct.product,
+                id: 'invalid-id'
+            }
+        }))
+        const result = getUpdateBundleChildArray(
+            mockBundledProductItemsVariant,
+            modifiedChildProductSelections
+        )
+        expect(result).toEqual([])
     })
 })
