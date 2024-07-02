@@ -29,7 +29,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   });
   // selecting swatch
   const productTileImg = productTile.locator("img");
-  productTileImg.waitFor({state: 'visible'})
+  await productTileImg.waitFor({state: 'visible'})
   const initialSrc = await productTileImg.getAttribute("src");
   await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
 
