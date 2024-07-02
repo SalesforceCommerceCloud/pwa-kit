@@ -58,6 +58,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
@@ -265,8 +266,7 @@ const Cart = () => {
 
         try {
             setCartItemLoading(true)
-
-            const itemsToBeUpdated = []
+            const itemsToBeUpdated = getUpdateBundleChildArray(bundle, childProducts)
 
             // We only update the parent bundle when the quantity changes
             // Since top level bundles don't have variants
@@ -277,21 +277,6 @@ const Cart = () => {
                     quantity: bundleQuantity
                 })
             }
-
-            bundle.bundledProductItems.forEach(async (bundleChild) => {
-                const childSelection = childProducts.find(
-                    (childProd) => childProd.product.id === bundleChild.productId
-                )
-
-                // Only update the basket if the bundle child variant has been changed
-                if (bundleChild.productId !== childSelection?.variant.productId) {
-                    itemsToBeUpdated.push({
-                        itemId: bundleChild.itemId,
-                        productId: childSelection.variant.productId,
-                        quantity: bundleChild.quantity * bundleQuantity
-                    })
-                }
-            })
 
             if (itemsToBeUpdated.length) {
                 await updateItemsInBasketMutation.mutateAsync({

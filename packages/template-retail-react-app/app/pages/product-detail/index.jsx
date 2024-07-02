@@ -9,7 +9,10 @@ import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {normalizeSetBundleProduct} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {
+    normalizeSetBundleProduct,
+    getUpdateBundleChildArray
+} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
 import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -348,30 +351,19 @@ const ProductDetail = () => {
                 return bundleChildIds.every((id) => bundleChildMasterIds.includes(id))
             })
 
-            if (currentBundle?.bundledProductItems?.length) {
-                const itemsToBeUpdated = []
+            const itemsToBeUpdated = getUpdateBundleChildArray(
+                currentBundle,
+                childProductSelections
+            )
 
-                currentBundle.bundledProductItems.forEach((bundleChild) => {
-                    const childSelection = childProductSelections.find(
-                        (childProduct) => childProduct.product.id === bundleChild.productId
-                    )
-                    if (!childSelection) return
-                    itemsToBeUpdated.push({
-                        itemId: bundleChild.itemId,
-                        productId: childSelection.variant.productId,
-                        quantity: bundleChild.quantity
-                    })
+            if (itemsToBeUpdated.length) {
+                await updateItemsInBasketMutation.mutateAsync({
+                    method: 'PATCH',
+                    parameters: {
+                        basketId: res.basketId
+                    },
+                    body: itemsToBeUpdated
                 })
-
-                if (itemsToBeUpdated.length) {
-                    await updateItemsInBasketMutation.mutateAsync({
-                        method: 'PATCH',
-                        parameters: {
-                            basketId: res.basketId
-                        },
-                        body: itemsToBeUpdated
-                    })
-                }
             }
 
             einstein.sendAddToCart(productItems)
