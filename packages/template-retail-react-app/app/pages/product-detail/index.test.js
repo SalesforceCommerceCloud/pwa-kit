@@ -312,7 +312,7 @@ describe('product bundles', () => {
             // Follow up call to update child bundle variant selections
             rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
                 hasUpdatedBundleChildren = true
-                return res(ctx.json({}))
+                return res(ctx.json(basketWithProductBundle))
             })
         )
     })
