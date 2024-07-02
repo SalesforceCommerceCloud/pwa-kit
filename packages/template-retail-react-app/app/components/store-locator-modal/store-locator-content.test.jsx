@@ -11,6 +11,11 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import {waitFor, screen} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {useForm} from 'react-hook-form'
+import {
+    DEFAULT_STORE_LOCATOR_COUNTRY,
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+    STORE_LOCATOR_NUM_STORES_PER_LOAD
+} from '@salesforce/retail-react-app/app/constants'
 import {rest} from 'msw'
 const mockStoresData = [
     {
@@ -244,7 +249,8 @@ describe('StoreLocatorContent', () => {
                 <WrapperComponent
                     searchStoresParams={{
                         postalCode: '10178',
-                        countryCode: 'DE'
+                        countryCode: 'DE',
+                        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
                     }}
                     userHasSetManualGeolocation={true}
                 />
@@ -266,7 +272,8 @@ describe('StoreLocatorContent', () => {
             <WrapperComponent
                 searchStoresParams={{
                     postalCode: '10178',
-                    countryCode: 'DE'
+                    countryCode: 'DE',
+                    limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
                 }}
                 userHasSetManualGeolocation={true}
             />
@@ -295,7 +302,8 @@ describe('StoreLocatorContent', () => {
             <WrapperComponent
                 searchStoresParams={{
                     postalCode: '10178',
-                    countryCode: 'DE'
+                    countryCode: 'DE',
+                    limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
                 }}
                 userHasSetManualGeolocation={true}
             />
@@ -323,7 +331,8 @@ describe('StoreLocatorContent', () => {
             <WrapperComponent
                 searchStoresParams={{
                     latitude: 100,
-                    longitude: 100
+                    longitude: 100,
+                    limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
                 }}
                 userHasSetManualGeolocation={true}
             />
@@ -352,7 +361,8 @@ describe('StoreLocatorContent', () => {
             <WrapperComponent
                 searchStoresParams={{
                     postalCode: '10178',
-                    countryCode: 'DE'
+                    countryCode: 'DE',
+                    limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
                 }}
                 userHasSetManualGeolocation={true}
             />
@@ -377,7 +387,8 @@ describe('StoreLocatorContent', () => {
             <WrapperComponent
                 searchStoresParams={{
                     postalCode: '10178',
-                    countryCode: 'DE'
+                    countryCode: 'DE',
+                    limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
                 }}
                 userHasSetManualGeolocation={true}
             />
