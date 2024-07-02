@@ -324,6 +324,9 @@ const ProductDetail = () => {
                     productId: product.id,
                     price: product.price,
                     quantity: selectedQuantity,
+                    // The add item endpoint in the shopper baskets API does not respect variant selections
+                    // for bundle children, so we have to make a follow up call to update the basket
+                    // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
                             productId: child.variant.productId,
@@ -357,6 +360,8 @@ const ProductDetail = () => {
             )
 
             if (itemsToBeUpdated.length) {
+                // make a follow up call to update child variant selection for product bundle
+                // since add item endpoint doesn't currently consider product bundle child variants
                 await updateItemsInBasketMutation.mutateAsync({
                     method: 'PATCH',
                     parameters: {
