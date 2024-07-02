@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
+import {screen, within, fireEvent, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import Cart from '@salesforce/retail-react-app/app/pages/cart/index'
 import {
@@ -135,7 +135,7 @@ beforeEach(() => {
                 ]
             }
             return res(ctx.json(updatedBasket))
-        }),
+        })
     )
 })
 afterEach(() => {
@@ -169,14 +169,14 @@ describe('Rendering tests', function () {
 
 test('Can update item quantity in the cart', async () => {
     renderWithProviders(<Cart />)
-    let cartItem;
+    let cartItem
     await waitFor(async () => {
         cartItem = await screen.findByTestId(
             `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
         )
         expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
-        expect(within(cartItem).getByDisplayValue('2'))
+        expect(within(cartItem).getByDisplayValue('2')).toBeInTheDocument()
     })
 
     const incrementButton = await within(cartItem).findByTestId('quantity-increment')
@@ -187,7 +187,7 @@ test('Can update item quantity in the cart', async () => {
     fireEvent.keyDown(incrementButton, {key: 'Enter', code: 'Enter', charCode: 13})
 
     await waitFor(() => {
-        expect(within(cartItem).getByDisplayValue('3'))
+        expect(within(cartItem).getByDisplayValue('3')).toBeInTheDocument()
         expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
     })
 })
@@ -223,21 +223,24 @@ describe('Update quantity in product view', function () {
         incrementButton.focus()
         fireEvent.keyDown(incrementButton, {key: 'Enter', code: 'Enter', charCode: 13})
         await waitFor(() => {
-            expect(within(productView).getByDisplayValue('3'))
+            expect(within(productView).getByDisplayValue('3')).toBeInTheDocument()
         })
 
         const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
         await user.click(updateCartButtons[0])
 
-        await waitFor(async () => {
-            // re-query screen to update
-            cartItem = await screen.findByTestId(
-                `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
-            )
-            expect(productView).not.toBeInTheDocument()
-            expect(within(cartItem).getByDisplayValue('3'))
-            expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
-        }, {timeout: 10000})
+        await waitFor(
+            async () => {
+                // re-query screen to update
+                cartItem = await screen.findByTestId(
+                    `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
+                )
+                expect(productView).not.toBeInTheDocument()
+                expect(within(cartItem).getByDisplayValue('3')).toBeInTheDocument()
+                expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+            },
+            {timeout: 10000}
+        )
     })
 })
 
