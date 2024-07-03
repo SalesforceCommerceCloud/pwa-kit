@@ -6373,28 +6373,28 @@
       "value": "]"
     }
   ],
-  "store_locator.error.please_enter_postal_code": [
+  "store_locator.error.please_enter_a_postal_code": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ƥŀḗḗȧȧşḗḗ ḗḗƞŧḗḗř ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ"
+      "value": "Ƥŀḗḗȧȧşḗḗ ḗḗƞŧḗḗř ȧȧ ƥǿǿşŧȧȧŀ ƈǿǿḓḗḗ."
     },
     {
       "type": 0,
       "value": "]"
     }
   ],
-  "store_locator.error.please_select_country": [
+  "store_locator.error.please_select_a_country": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ƥŀḗḗȧȧşḗḗ şḗḗŀḗḗƈŧ ȧȧ ƈǿǿŭŭƞŧřẏ"
+      "value": "Ƥŀḗḗȧȧşḗḗ şḗḗŀḗḗƈŧ ȧȧ ƈǿǿŭŭƞŧřẏ."
     },
     {
       "type": 0,

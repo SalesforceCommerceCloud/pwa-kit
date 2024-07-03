@@ -14,11 +14,11 @@ import {
     Select,
     Box,
     Input,
+    FormControl,
     FormErrorMessage
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Controller} from 'react-hook-form'
 import {SUPPORTED_STORE_LOCATOR_COUNTRIES} from '@salesforce/retail-react-app/app/constants'
-
 const StoreLocatorInput = ({
     form,
     submitForm,
@@ -28,7 +28,6 @@ const StoreLocatorInput = ({
 }) => {
     const {control} = form
     const intl = useIntl()
-    console.log("(JEREMY) form.formState.errors: ", form.formState.errors)
     console.log("(JEREMY) form.getValues(): ", form.getValues())
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
@@ -39,10 +38,13 @@ const StoreLocatorInput = ({
                     defaultValue={
                         userHasSetManualGeolocation ? searchStoresParams?.countryCode : ''
                     }
-                    rules={{ required: 'country is required' }}
+                    rules={{ required: intl.formatMessage({
+                        id: 'store_locator.error.please_select_a_country',
+                        defaultMessage: 'Please select a country.'
+                    })}}
                     render={({field}) => {
                         return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
-                            <>
+                            <FormControl isInvalid={form.formState.errors.countryCode}>
                                 <Select
                                     {...field}
                                     marginBottom="10px"
@@ -61,33 +63,39 @@ const StoreLocatorInput = ({
                                         }
                                     )}
                                 </Select>
-                                <FormErrorMessage color="red.600">YOOOOO</FormErrorMessage>
                                 {form.formState.errors.countryCode && (
-                                    <FormErrorMessage color="red.600">{form.formState.errors.countryCode.message}</FormErrorMessage>
+                                    <FormErrorMessage  sx = {{marginBottom: '10px'}} color="red.600">{form.formState.errors.countryCode.message}</FormErrorMessage>
                                 )}
-                            </>
+                            </FormControl>
                         ) : (
                             <></>
                         )
                     }}
                 ></Controller>
             </InputGroup>
-            <FormErrorMessage color="red.600">YOOOOO</FormErrorMessage>
             <InputGroup>
                 <Controller
                     name="postalCode"
                     control={control}
-                    rules={{ required: 'postal code is required' }}
+                    rules={{ required: intl.formatMessage({
+                        id: 'store_locator.error.please_enter_a_postal_code',
+                        defaultMessage: 'Please enter a postal code.'
+                    })}}
                     defaultValue={userHasSetManualGeolocation ? searchStoresParams?.postalCode : ''}
                     render={({field}) => {
                         return (
-                            <Input
-                                {...field}
-                                placeholder={intl.formatMessage({
-                                    id: 'store_locator.field.placeholder.enter_postal_code',
-                                    defaultMessage: 'Enter postal code'
-                                })}
-                            />
+                            <FormControl isInvalid={form.formState.errors.postalCode}>
+                                <Input
+                                    {...field}
+                                    placeholder={intl.formatMessage({
+                                        id: 'store_locator.field.placeholder.enter_postal_code',
+                                        defaultMessage: 'Enter postal code'
+                                    })}
+                                />
+                                {form.formState.errors.postalCode && (
+                                    <FormErrorMessage sx={{top: '-20px'}} color="red.600">{form.formState.errors.postalCode.message}</FormErrorMessage>
+                                )}
+                            </FormControl>
                         )
                     }}
                 ></Controller>

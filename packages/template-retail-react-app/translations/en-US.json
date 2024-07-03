@@ -1283,11 +1283,11 @@
   "store_locator.dropdown.united_states": {
     "defaultMessage": "United States"
   },
-  "store_locator.error.please_enter_postal_code": {
-    "defaultMessage": "Please enter postal code"
+  "store_locator.error.please_enter_a_postal_code": {
+    "defaultMessage": "Please enter a postal code."
   },
-  "store_locator.error.please_select_country": {
-    "defaultMessage": "Please select a country"
+  "store_locator.error.please_select_a_country": {
+    "defaultMessage": "Please select a country."
   },
   "store_locator.field.placeholder.enter_postal_code": {
     "defaultMessage": "Enter postal code"
