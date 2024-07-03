@@ -14,8 +14,8 @@ import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**
- * This Component will be responsible for determining if a given product ids has become unavailable
- * and will prompt the users to remove them before proceeding any further
+ * This Component determines if the provided products have become unavailable or out of stock or low stock that
+ * can't be fulfilled and will prompt the users to remove them before proceeding any further
  *
  * @param productItems -  basket product items
  * @param handleUnavailableProducts - callback function to handle what to do with unavailable products
