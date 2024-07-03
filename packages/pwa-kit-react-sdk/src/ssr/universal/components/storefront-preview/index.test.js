@@ -10,6 +10,7 @@ import {StorefrontPreview} from './index'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
 import {useHistory} from 'react-router-dom'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 jest.mock('./utils', () => {
     const origin = jest.requireActual('./utils')
@@ -30,17 +31,28 @@ jest.mock('react-router-dom', () => {
     }
 })
 
+jest.mock('pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
+
 describe('Storefront Preview Component', function () {
     const oldWindow = window
 
     beforeEach(() => {
         // eslint-disable-next-line
         window = {...oldWindow}
+
+        getConfig.mockReturnValue({
+            app: {
+                commerceAPI: { proxyPath: '/mobify/proxy/api', parameters: { siteId: 'site-id' } }
+            }
+        })
     })
 
     afterEach(() => {
         // eslint-disable-next-line
         window = oldWindow
+        jest.resetAllMocks()
     })
 
     test('Renders children when enabled', async () => {
@@ -104,6 +116,7 @@ describe('Storefront Preview Component', function () {
 
         mount(<StorefrontPreview getToken={() => 'my-token'} />)
         expect(window.STOREFRONT_PREVIEW.getToken).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW.siteId).toBeDefined()
         expect(window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate).toBeDefined()
         expect(window.STOREFRONT_PREVIEW.experimentalUnsafeAdditionalSearchParams).toBeDefined()
         expect(window.STOREFRONT_PREVIEW.experimentalUnsafeReloadServerSide).toBeDefined()
@@ -111,13 +124,18 @@ describe('Storefront Preview Component', function () {
 
     test('window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate', () => {
         detectStorefrontPreview.mockReturnValue(true)
+        const replace = jest.fn()
+        const push = jest.fn()
+
+        useHistory.mockReturnValue({ replace, push })
+
         mount(<StorefrontPreview getToken={() => 'my-token'} />)
 
         window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate('/', 'replace')
-        expect(useHistory().replace).toHaveBeenCalledWith('/')
+        expect(replace).toHaveBeenCalledWith('/')
 
         window.STOREFRONT_PREVIEW.experimentalUnsafeNavigate('/')
-        expect(useHistory().push).toHaveBeenCalledWith('/')
+        expect(push).toHaveBeenCalledWith('/')
     })
 
     test('window.STOREFRONT_PREVIEW.experimentalUnsafeAdditionalSearchParams', async () => {
