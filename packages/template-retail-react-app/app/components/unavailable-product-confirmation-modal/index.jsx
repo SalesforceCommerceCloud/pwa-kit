@@ -35,7 +35,7 @@ const UnavailableProductConfirmationModal = ({
             onSuccess: (result) => {
                 const resProductIds = []
                 const unOrderableIds = []
-                result.data?.forEach(({id, inventory, quantity}) => {
+                result.data?.forEach(({id, inventory}) => {
                     const productItem = productItems.find((item) => item.productId === id)
                     // when a product is unavailable, the getProducts will not return its product detail.
                     // we compare the response ids with the ones in basket to figure which product has become unavailable

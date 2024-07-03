@@ -27,7 +27,7 @@ const ConfirmationModal = ({
     primaryActionLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.primaryActionLabel,
     primaryActionAriaLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.primaryActionAriaLabel,
     alternateActionLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.alternateActionLabel,
-    alternateAriaActionLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.alternateActionLabel,
+    alternateActionAriaLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.alternateActionAriaLabel,
     hideAlternateAction = false,
     onPrimaryAction = noop,
     onAlternateAction = noop,
@@ -63,7 +63,7 @@ const ConfirmationModal = ({
                         <Button
                             variant="ghost"
                             mr={3}
-                            aria-label={formatMessage(alternateAriaActionLabel)}
+                            aria-label={formatMessage(alternateActionAriaLabel)}
                             onClick={handleAlternateActionClick}
                         >
                             {formatMessage(alternateActionLabel)}

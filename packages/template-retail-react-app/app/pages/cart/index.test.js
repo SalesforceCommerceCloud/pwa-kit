@@ -536,13 +536,13 @@ describe('Update this is a gift option', function () {
     })
 })
 describe('Unavailable products tests', function () {
-    test('Remove unavailable products from cart', async () => {
+    test('Remove unavailable/out of stock/low stock products from cart', async () => {
         prependHandlersToServer([
-            {path: '*/customers/:customerId/baskets', res: (req, res, ctx) => mockBaskets},
+            {path: '*/customers/:customerId/baskets', res: () => mockBaskets},
             {path: '*/products', res: () => mockProducts}
         ])
 
-        const {user, getByText, getByTestId} = renderWithProviders(<Cart />)
+        const {user, getByText} = renderWithProviders(<Cart />)
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             expect(screen.getByText(/Worn Gold Dangle Earring/i)).toBeInTheDocument()

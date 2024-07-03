@@ -54,9 +54,12 @@ export const CONFIRMATION_DIALOG_DEFAULT_CONFIG = defineMessages({
     },
     primaryActionLabel: {defaultMessage: 'Yes', id: 'confirmation_modal.default.action.yes'},
     primaryActionAriaLabel: {
-        defaultMessage: 'Yes',
+        defaultMessage: 'Yes, confirm action',
         id: 'confirmation_modal.default.assistive_msg.yes'
     },
     alternateActionLabel: {defaultMessage: 'No', id: 'confirmation_modal.default.action.no'},
-    alternateAriaLabel: {defaultMessage: 'No', id: 'confirmation_modal.default.assistive_msg.no'}
+    alternateActionAriaLabel: {
+        defaultMessage: 'No, cancel action',
+        id: 'confirmation_modal.default.assistive_msg.no'
+    }
 })
