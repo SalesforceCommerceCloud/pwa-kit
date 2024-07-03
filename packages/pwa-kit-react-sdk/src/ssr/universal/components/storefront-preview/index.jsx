@@ -35,7 +35,6 @@ export const StorefrontPreview = ({
     // Inside the render, we update the configuration object with the current siteId. This change gets serialized
     // and placed in the DOM. We should be aware that the mutable behavior could introduce potential bugs.
     const {app} = getConfig()
-    console.log('getConfig()',getConfig())
     const siteId = app.commerceAPI.parameters.siteId
 
     useEffect(() => {
