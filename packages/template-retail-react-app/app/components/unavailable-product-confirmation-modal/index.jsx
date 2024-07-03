@@ -17,37 +17,42 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
  * This Component will be responsible for determining if a given product ids has become unavailable
  * and will prompt the users to remove them before proceeding any further
  *
- * @param productIds -  list of product ids to check for availability
+ * @param productItems -  basket product items
  * @param handleUnavailableProducts - callback function to handle what to do with unavailable products
  * @returns {JSX.Element} -  Conformation Modal Component
  *
  */
 const UnavailableProductConfirmationModal = ({
-    productIds = [],
+    productItems = [],
     handleUnavailableProducts = noop
 }) => {
     const unavailableProductIdsRef = useRef(null)
+    const productIds = productItems.map((i) => i.productId)
     useProducts(
         {parameters: {ids: productIds?.join(','), allImages: true}},
         {
             enabled: productIds?.length > 0,
             onSuccess: (result) => {
                 const resProductIds = []
-                const outOfStockProductIds = []
-
-                result.data?.forEach(({id, inventory}) => {
+                const unOrderableIds = []
+                result.data?.forEach(({id, inventory, quantity}) => {
+                    const productItem = productItems.find((item) => item.productId === id)
                     // when a product is unavailable, the getProducts will not return its product detail.
                     // we compare the response ids with the ones in basket to figure which product has become unavailable
                     resProductIds.push(id)
-                    if (!inventory?.stockLevel) {
-                        // For out of stock products, baskets will have them but we want to make sure they are also removed before allowing
-                        // shoppers go to checkout
-                        outOfStockProductIds.push(id)
+
+                    // when a product is orderable, but the quantity in the basket is more than the remaining stock
+                    // we want to make sure it is removed before go to checkout page to avoid error when placing order
+                    if (
+                        !inventory?.orderable ||
+                        (inventory?.orderable && productItem?.quantity > inventory.stockLevel)
+                    ) {
+                        unOrderableIds.push(id)
                     }
                 })
 
                 const unavailableProductIds = productIds.filter(
-                    (id) => !resProductIds.includes(id) || outOfStockProductIds.includes(id)
+                    (id) => !resProductIds.includes(id) || unOrderableIds.includes(id)
                 )
 
                 unavailableProductIdsRef.current = unavailableProductIds
@@ -63,6 +68,7 @@ const UnavailableProductConfirmationModal = ({
 
     return (
         <ConfirmationModal
+            data-testid="unavailable-product-modal"
             closeOnEsc={false}
             closeOnOverlayClick={false}
             {...REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG}
@@ -79,7 +85,7 @@ const UnavailableProductConfirmationModal = ({
 }
 
 UnavailableProductConfirmationModal.propTypes = {
-    productIds: PropTypes.array,
+    productItems: PropTypes.array,
     handleUnavailableProducts: PropTypes.func
 }
 

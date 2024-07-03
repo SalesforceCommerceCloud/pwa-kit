@@ -75,7 +75,10 @@ beforeEach(() => {
                             pricePerUnit: 19.18,
                             price: 19.18,
                             inventory: {
-                                stockLevel: 10
+                                stockLevel: 10,
+                                orderable: true,
+                                backorder: false,
+                                preorderable: false
                             }
                         }
                     ]
