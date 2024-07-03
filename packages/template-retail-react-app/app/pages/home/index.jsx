@@ -69,7 +69,7 @@ const Home = () => {
         parameters: {
             allImages: true,
             allVariationProperties: true,
-            expand: ['promotions', 'variations', 'prices', 'images', 'availability'],
+            expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
             limit: HOME_SHOP_PRODUCTS_LIMIT,
             perPricebook: true,
             refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master']
