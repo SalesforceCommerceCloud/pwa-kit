@@ -7,6 +7,7 @@
 import React, {useEffect} from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useQueryClient} from '@tanstack/react-query'
+import logger from '../../../../utils/logger-instance'
 
 // For good UX, show loading spinner long enough for users to see
 const LOADING_SPINNER_MIN_DURATION = 500
@@ -47,7 +48,9 @@ const Refresh = () => {
             // Soft navigate to the referrer
             let referrer = new URLSearchParams(location.search).get('referrer')
             if (!referrer) {
-                console.warn('Could not find `referrer` search param - redirecting to home page.')
+                logger.warn('Could not find `referrer` search param - redirecting to home page.', {
+                    namespace: 'Refresh.useEffect'
+                })
                 referrer = '/'
             }
             history.replace(referrer)

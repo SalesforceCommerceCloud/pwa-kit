@@ -14,6 +14,7 @@ import {
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {keysToCamel} from '@salesforce/retail-react-app/app/utils/utils'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 export class EinsteinAPI {
     constructor({host, einsteinId, siteId, isProduction}) {
@@ -126,17 +127,28 @@ export class EinsteinAPI {
                     body: JSON.stringify(body)
                 })
             })
-        } catch {
-            console.warn('Einstein request failed')
+        } catch (error) {
+            logger.error('Einstein request failed', {
+                namespace: 'useEinstein.einsteinFetch',
+                additionalProperties: {error: error}
+            })
         }
 
         if (!response?.ok) {
             return {}
         }
 
-        const responseJson = await response.json()
+        try {
+            const responseJson = await response.json()
 
-        return keysToCamel(responseJson)
+            return keysToCamel(responseJson)
+        } catch (error) {
+            logger.error('Error parsing response JSON', {
+                namespace: 'useEinstein.einsteinFetch',
+                additionalProperties: {error: error}
+            })
+            return {}
+        }
     }
 
     /**
@@ -402,26 +414,54 @@ const useEinstein = () => {
     const fetchRecProductDetails = async (reco) => {
         const ids = reco.recs?.map((rec) => rec.id)
         if (ids?.length > 0) {
-            const token = await getTokenWhenReady()
-            // Fetch the product details for the recommendations
-            const products = await api.shopperProducts.getProducts({
-                parameters: {ids: ids.join(',')},
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-
-            // Merge the product detail into the recommendations response
-            return {
-                ...reco,
-                recs: reco.recs.map((rec) => {
-                    const product = products?.data?.find((product) => product.id === rec.id)
-                    return {
-                        ...rec,
-                        ...product,
-                        productId: rec.id,
-                        image: {disBaseLink: rec.imageUrl, alt: rec.productName}
+            try {
+                const token = await getTokenWhenReady()
+                // Fetch the product details for the recommendations
+                const products = await api.shopperProducts.getProducts({
+                    parameters: {
+                        ids: ids.join(','),
+                        allImages: true,
+                        perPricebook: true,
+                        expand: [
+                            'availability',
+                            'links',
+                            'promotions',
+                            'options',
+                            'images',
+                            'prices',
+                            'variations'
+                        ]
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`
                     }
+                })
+                // Einstein is not aware of items that becomes unavailable from BM
+                // we want to make sure to filter out any recs that is not available
+                // before merging getProducts data in
+                const recs = reco.recs
+                    .filter((rec) => {
+                        return !!products?.data?.find((product) => product.id === rec.id)
+                    })
+                    .map((rec) => {
+                        const product = products?.data?.find((product) => product.id === rec.id)
+                        return {
+                            ...rec,
+                            ...product,
+                            productId: rec.id,
+                            image: {disBaseLink: rec.imageUrl, alt: rec.productName}
+                        }
+                    })
+
+                // Merge the product detail into the recommendations response
+                return {
+                    ...reco,
+                    recs: recs
+                }
+            } catch (error) {
+                logger.error('Error fetching product details for recommendations', {
+                    namespace: 'useEinstein.fetchRecProductDetails',
+                    additionalProperties: {error: error}
                 })
             }
         }
@@ -500,7 +540,10 @@ const useEinstein = () => {
                 const recommendations = await fetchRecProductDetails(reco)
                 setRecommendations(recommendations)
             } catch (err) {
-                console.error(err)
+                logger.error('Error in getRecommendations', {
+                    namespace: 'useEinstein.getRecommendations',
+                    additionalProperties: {error: err}
+                })
             } finally {
                 setIsLoading(false)
             }
@@ -517,7 +560,10 @@ const useEinstein = () => {
                 const recommendations = await fetchRecProductDetails(reco)
                 setRecommendations(recommendations)
             } catch (err) {
-                console.error(err)
+                logger.error('Error in getZoneRecommendations', {
+                    namespace: 'useEinstein.getRecommendations',
+                    additionalProperties: {error: err}
+                })
             } finally {
                 setIsLoading(false)
             }

@@ -15,6 +15,7 @@ const {
 const GUEST_USER_CREDENTIALS = generateUserCredentials();
 
 test("Guest shopper can checkout items as guest", async ({ page }) => {
+  // Home page
   await page.goto(config.RETAIL_APP_HOME);
 
   await page.getByLabel("Menu", { exact: true }).click();
@@ -33,16 +34,37 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await clothingNav.click();
 
-  await page.getByRole("link", { name: "Tops" }).click();
+  const topsLink = page.getByLabel('Womens').getByRole("link", { name: "Tops" })
+  await topsLink.click();
+  // Wait for the nav menu to close first
+  await topsLink.waitFor({state: 'hidden'})
 
   await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
 
-  await page.getByRole("link", { name: /Stripe Shell/i }).click();
+  // PLP
+  const productTile = page.getByRole("link", {
+    name: /Cotton Turtleneck Sweater/i,
+  });
+  await productTile.scrollIntoViewIfNeeded()
+  // selecting swatch
+  const productTileImg = productTile.locator("img");
+  await productTileImg.waitFor({state: 'visible'})
+  const initialSrc = await productTileImg.getAttribute("src");
+  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
 
+  await productTile.getByLabel(/Black/, { exact: true }).click();
+  // Make sure the image src has changed
+  await expect(async () => {
+    const newSrc = await productTileImg.getAttribute("src")
+    expect(newSrc).not.toBe(initialSrc)
+  }).toPass()
+  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
+  await productTile.click();
+
+  // PDP
   await expect(
-    page.getByRole("heading", { name: /Stripe Shell/i })
+    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
-
   await page.getByRole("radio", { name: "L", exact: true }).click();
 
   await page.locator("button[data-testid='quantity-increment']").click();
@@ -52,7 +74,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   const updatedPageURL = await page.url();
   const params = updatedPageURL.split("?")[1];
   expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ5YPA7/i);
+  expect(params).toMatch(/color=JJ169XX/i);
 
   await page.getByRole("button", { name: /Add to Cart/i }).click();
 
@@ -62,12 +84,16 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await page.getByLabel("Close").click();
 
+  // Cart
   await page.getByLabel(/My cart/i).click();
 
-  await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
+  ).toBeVisible();
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
 
+  // Check out
   await expect(
     page.getByRole("heading", { name: /Contact Info/i })
   ).toBeVisible();
@@ -141,6 +167,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     .first()
     .click();
 
+  // Order confirmation
   const orderConfirmationHeading = page.getByRole("heading", {
     name: /Thank you for your order!/i,
   });
@@ -150,5 +177,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     page.getByRole("heading", { name: /Order Summary/i })
   ).toBeVisible();
   await expect(page.getByText(/2 Items/i)).toBeVisible();
-  await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
+  ).toBeVisible();
 });

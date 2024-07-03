@@ -23,14 +23,16 @@ export default {
             marginLeft: 'auto',
             marginRight: 'auto',
             border: 0,
+            minWidth: '100%',
+            position: 'absolute'
+        },
+        popoverBody: {
             boxShadow: 'xl',
             paddingTop: 3,
             paddingRight: 4,
             paddingBottom: 4,
             paddingLeft: 4,
-            minWidth: '100%',
-            borderRadius: 0,
-            position: 'absolute'
+            zIndex: 1
         },
         popoverContainer: {
             paddingTop: 0,
@@ -64,6 +66,18 @@ export default {
                 backgroundColor: 'black',
                 content: 'attr(name)',
                 height: '2px',
+                color: 'transparent',
+                bottom: '0px'
+            }
+        },
+        listMenuTriggerlessLinkActive: {
+            textDecoration: 'none',
+            _before: {
+                position: 'absolute',
+                backgroundColor: 'black',
+                content: 'attr(name)',
+                height: '2px',
+                width: '-webkit-fill-available',
                 color: 'transparent',
                 bottom: '0px'
             }

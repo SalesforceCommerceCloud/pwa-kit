@@ -18,7 +18,11 @@ import {
     Select,
     Checkbox
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {VisibilityIcon, VisibilityOffIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {
+    VisibilityIcon,
+    VisibilityOffIcon,
+    AlertIcon
+} from '@salesforce/retail-react-app/app/components/icons'
 import {useIntl} from 'react-intl'
 
 const Field = ({
@@ -32,6 +36,7 @@ const Field = ({
     placeholder,
     inputProps,
     control,
+    autoComplete,
     defaultValue,
     helpText,
     children
@@ -75,6 +80,7 @@ const Field = ({
                                     value={value}
                                     type={inputType}
                                     placeholder={placeholder}
+                                    autoComplete={autoComplete}
                                     {..._inputProps}
                                 />
                             )}
@@ -131,7 +137,10 @@ const Field = ({
                         </InputGroup>
 
                         {error && type !== 'hidden' && (
-                            <FormErrorMessage color="red.600">{error.message}</FormErrorMessage>
+                            <FormErrorMessage color="red.600">
+                                <AlertIcon aria-hidden="true" mr={2} />
+                                {error.message}
+                            </FormErrorMessage>
                         )}
 
                         {helpText}
@@ -145,6 +154,7 @@ const Field = ({
 Field.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
+    autoComplete: PropTypes.string,
     formLabel: PropTypes.any,
     type: PropTypes.oneOf([
         'text',
