@@ -13,7 +13,8 @@ import {
     InputGroup,
     Select,
     Box,
-    Input
+    Input,
+    FormErrorMessage
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Controller} from 'react-hook-form'
 import {SUPPORTED_STORE_LOCATOR_COUNTRIES} from '@salesforce/retail-react-app/app/constants'
@@ -27,7 +28,8 @@ const StoreLocatorInput = ({
 }) => {
     const {control} = form
     const intl = useIntl()
-
+    console.log("(JEREMY) form.formState.errors: ", form.formState.errors)
+    console.log("(JEREMY) form.getValues(): ", form.getValues())
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>
@@ -37,36 +39,45 @@ const StoreLocatorInput = ({
                     defaultValue={
                         userHasSetManualGeolocation ? searchStoresParams?.countryCode : ''
                     }
+                    rules={{ required: 'country is required' }}
                     render={({field}) => {
                         return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
-                            <Select
-                                {...field}
-                                marginBottom="10px"
-                                placeholder={intl.formatMessage({
-                                    id: 'store_locator.action.select_a_country',
-                                    defaultMessage: 'Select a country'
-                                })}
-                            >
-                                {SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
-                                    ({countryCode, countryName}) => {
-                                        return (
-                                            <option value={countryCode} key={countryCode}>
-                                                {intl.formatMessage(countryName)}
-                                            </option>
-                                        )
-                                    }
+                            <>
+                                <Select
+                                    {...field}
+                                    marginBottom="10px"
+                                    placeholder={intl.formatMessage({
+                                        id: 'store_locator.action.select_a_country',
+                                        defaultMessage: 'Select a country'
+                                    })}
+                                >
+                                    {SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
+                                        ({countryCode, countryName}) => {
+                                            return (
+                                                <option value={countryCode} key={countryCode}>
+                                                    {intl.formatMessage(countryName)}
+                                                </option>
+                                            )
+                                        }
+                                    )}
+                                </Select>
+                                <FormErrorMessage color="red.600">YOOOOO</FormErrorMessage>
+                                {form.formState.errors.countryCode && (
+                                    <FormErrorMessage color="red.600">{form.formState.errors.countryCode.message}</FormErrorMessage>
                                 )}
-                            </Select>
+                            </>
                         ) : (
                             <></>
                         )
                     }}
                 ></Controller>
             </InputGroup>
+            <FormErrorMessage color="red.600">YOOOOO</FormErrorMessage>
             <InputGroup>
                 <Controller
                     name="postalCode"
                     control={control}
+                    rules={{ required: 'postal code is required' }}
                     defaultValue={userHasSetManualGeolocation ? searchStoresParams?.postalCode : ''}
                     render={({field}) => {
                         return (
@@ -93,6 +104,7 @@ const StoreLocatorInput = ({
                     })}
                 </Button>
             </InputGroup>
+            <FormErrorMessage color="red.600">YOOOOO</FormErrorMessage>
             <Box
                 style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
                 margin="10px"

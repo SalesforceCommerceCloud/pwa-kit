@@ -2989,6 +2989,18 @@
       "value": "United States"
     }
   ],
+  "store_locator.error.please_enter_postal_code": [
+    {
+      "type": 0,
+      "value": "Please enter postal code"
+    }
+  ],
+  "store_locator.error.please_select_country": [
+    {
+      "type": 0,
+      "value": "Please select a country"
+    }
+  ],
   "store_locator.field.placeholder.enter_postal_code": [
     {
       "type": 0,

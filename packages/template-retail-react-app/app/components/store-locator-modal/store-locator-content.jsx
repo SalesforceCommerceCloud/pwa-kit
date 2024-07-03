@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -73,7 +73,6 @@ const StoreLocatorContent = ({
     setUserHasSetManualGeolocation
 }) => {
     const intl = useIntl()
-
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -82,12 +81,13 @@ const StoreLocatorContent = ({
             postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
         }
     })
-
+    
     const getUserGeolocation = useGeolocation(
         setSearchStoresParams,
         userHasSetManualGeolocation,
         setUserHasSetManualGeolocation
     )
+    const [limit, setLimit] = useState(searchStoresParams.limit)
 
     const {data: searchStoresData, isLoading} = useSearchStores(
         {
@@ -102,15 +102,13 @@ const StoreLocatorContent = ({
                     : searchStoresParams.longitude,
                 locale: intl.locale,
                 maxDistance: STORE_LOCATOR_DISTANCE,
-                limit: searchStoresParams.limit,
-                offset: 0,
+                limit: 200,
                 distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
             }
         },
         {keepPreviousData: true}
     )
-
-    const storesInfo = isLoading ? undefined : searchStoresData?.data || []
+    const storesInfo = isLoading ? undefined : searchStoresData?.data.slice(0, limit) || []
     const numStores = searchStoresData?.total || 0
 
     const submitForm = async (formData) => {
@@ -194,37 +192,34 @@ const StoreLocatorContent = ({
                               })}
                     </Box>
                 </AccordionItem>
-                <StoresList storesInfo={storesInfo} />
+                <StoresList 
+                    storesInfo={storesInfo} />
             </Accordion>
-            {searchStoresParams.limit < numStores &&
-            searchStoresParams.limit < NUM_STORES_PER_REQUEST_API_MAX ? (
-                <Box marginTop="10px">
-                    <Button
-                        key="load-more-button"
-                        onClick={() => {
-                            setSearchStoresParams({
-                                ...searchStoresParams,
-                                limit:
-                                    searchStoresParams.limit + STORE_LOCATOR_NUM_STORES_PER_LOAD <=
-                                    NUM_STORES_PER_REQUEST_API_MAX
-                                        ? searchStoresParams.limit +
-                                          STORE_LOCATOR_NUM_STORES_PER_LOAD
-                                        : searchStoresParams.limit
-                            })
-                        }}
-                        width="100%"
-                        variant="outline"
-                        marginBottom={4}
-                    >
-                        {intl.formatMessage({
-                            id: 'store_locator.pagination.load_more',
-                            defaultMessage: 'Load More'
-                        })}
-                    </Button>
-                </Box>
-            ) : (
-                ''
-            )}
+            {limit < numStores &&
+                    limit < NUM_STORES_PER_REQUEST_API_MAX ? (
+                        <Box paddingTop="10px" marginTop="10px">
+                            <Button
+                                key="load-more-button"
+                                onClick={() => {
+                                    setLimit(limit + STORE_LOCATOR_NUM_STORES_PER_LOAD <=
+                                        NUM_STORES_PER_REQUEST_API_MAX
+                                            ? limit +
+                                            STORE_LOCATOR_NUM_STORES_PER_LOAD
+                                            : limit)
+                                }}
+                                width="100%"
+                                variant="outline"
+                                marginBottom={4}
+                            >
+                                {intl.formatMessage({
+                                    id: 'store_locator.pagination.load_more',
+                                    defaultMessage: 'Load More'
+                                })}
+                            </Button>
+                        </Box>
+                    ) : (
+                        ''
+                    )}
         </>
     )
 }

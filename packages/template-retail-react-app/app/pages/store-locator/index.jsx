@@ -6,25 +6,21 @@
  */
 
 import React, {useState} from 'react'
-import {useIntl} from 'react-intl'
 import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
-import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {
     DEFAULT_STORE_LOCATOR_COUNTRY,
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-    STORE_LOCATOR_DISTANCE
+    STORE_LOCATOR_NUM_STORES_PER_LOAD
 } from '@salesforce/retail-react-app/app/constants'
-import {useForm} from 'react-hook-form'
 
 const StoreLocator = () => {
-    const intl = useIntl()
     const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
     const [searchStoresParams, setSearchStoresParams] = useState({
         countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
         postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-        limit: STORE_LOCATOR_DISTANCE
+        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
     })
 
     return (
