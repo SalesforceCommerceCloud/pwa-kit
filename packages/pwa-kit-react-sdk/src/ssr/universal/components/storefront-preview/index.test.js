@@ -44,7 +44,7 @@ describe('Storefront Preview Component', function () {
 
         getConfig.mockReturnValue({
             app: {
-                commerceAPI: { proxyPath: '/mobify/proxy/api', parameters: { siteId: 'site-id' } }
+                commerceAPI: {proxyPath: '/mobify/proxy/api', parameters: {siteId: 'site-id'}}
             }
         })
     })
@@ -127,7 +127,7 @@ describe('Storefront Preview Component', function () {
         const replace = jest.fn()
         const push = jest.fn()
 
-        useHistory.mockReturnValue({ replace, push })
+        useHistory.mockReturnValue({replace, push})
 
         mount(<StorefrontPreview getToken={() => 'my-token'} />)
 

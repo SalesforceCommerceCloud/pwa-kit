@@ -12,8 +12,6 @@ import {detectStorefrontPreview, getClientScript} from './utils'
 import {useHistory} from 'react-router-dom'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
-
-
 /**
  *
  * @param {boolean} enabled - flag to turn on/off Storefront Preview feature
