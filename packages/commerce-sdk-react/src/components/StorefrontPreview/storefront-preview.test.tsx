@@ -10,8 +10,7 @@ import StorefrontPreview from './storefront-preview'
 import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
 import {mockQueryEndpoint, renderWithProviders} from '../../test-utils'
-import {useCommerceApi} from '../../hooks'
-import useConfig from '../../hooks/useConfig'
+import {useCommerceApi, useConfig} from '../../hooks'
 
 declare global {
     interface Window {

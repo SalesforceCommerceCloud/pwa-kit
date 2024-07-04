@@ -11,8 +11,7 @@ import {Helmet} from 'react-helmet'
 import {CustomPropTypes, detectStorefrontPreview, getClientScript, proxyRequests} from './utils'
 import {useHistory} from 'react-router-dom'
 import type {LocationDescriptor} from 'history'
-import {useCommerceApi} from '../../hooks'
-import useConfig from "../../hooks/useConfig";
+import {useCommerceApi, useConfig} from '../../hooks'
 
 type GetToken = () => string | undefined | Promise<string | undefined>
 type ContextChangeHandler = () => void | Promise<void>
