@@ -55,20 +55,22 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await topsNav.click();
 
   // PLP
-  const productTile = await page.getByRole("link", {
+  const productTile = page.getByRole("link", {
     name: /Cotton Turtleneck Sweater/i,
   });
   // selecting swatch
-  const initialImgEl = await productTile.locator("img");
-  const initialSrc = await initialImgEl.getAttribute("src");
+  const productTileImg = productTile.locator("img");
+  await productTileImg.waitFor({state: 'visible'})
+  const initialSrc = await productTileImg.getAttribute("src");
   await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
 
   await productTile.getByLabel(/Black/, { exact: true }).hover();
-  const changedImgEl = await productTile.locator("img");
-  const changeImgSrc = await changedImgEl.getAttribute("src");
+  // Make sure the image src has changed
+  await expect(async () => {
+    const newSrc = await productTileImg.getAttribute("src")
+    expect(newSrc).not.toBe(initialSrc)
+  }).toPass()
   await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-
-  expect(changeImgSrc).not.toBe(initialSrc);
   await productTile.click();
 
   // PDP
