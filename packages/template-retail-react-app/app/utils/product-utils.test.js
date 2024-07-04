@@ -871,7 +871,8 @@ describe('findLowestPrice', function () {
     test('master product that does not have variants', () => {
         // It's possible that the API data for this master product to not have variants.
         // The API request needs to include allVariationProperties=true
-        const product = mockProductSearch.hits[0]
+        const product = {...mockProductSearch.hits[0]}
+        delete product.variants
         const result = findLowestPrice(product)
         expect(result.minPrice).toBe(product.price)
         expect(result.data).toBe(product)

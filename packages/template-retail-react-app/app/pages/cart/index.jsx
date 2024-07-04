@@ -561,7 +561,7 @@ const Cart = () => {
             />
 
             <UnavailableProductConfirmationModal
-                productIds={productIds.split(',')}
+                productItems={basket?.productItems}
                 handleUnavailableProducts={handleUnavailableProducts}
             />
         </Box>
