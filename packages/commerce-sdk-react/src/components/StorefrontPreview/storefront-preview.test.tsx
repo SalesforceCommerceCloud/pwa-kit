@@ -11,6 +11,7 @@ import {detectStorefrontPreview} from './utils'
 import {Helmet} from 'react-helmet'
 import {mockQueryEndpoint, renderWithProviders} from '../../test-utils'
 import {useCommerceApi} from '../../hooks'
+import useConfig from '../../hooks/useConfig'
 
 declare global {
     interface Window {
@@ -26,10 +27,13 @@ jest.mock('./utils', () => {
     }
 })
 jest.mock('../../auth/index.ts')
+jest.mock('../../hooks/useConfig', () => jest.fn())
 
 describe('Storefront Preview Component', function () {
     beforeEach(() => {
         delete window.STOREFRONT_PREVIEW
+        ;(useConfig as jest.Mock).mockReturnValue({siteId: 'site-id'})
+
     })
     afterEach(() => {
         jest.restoreAllMocks()
@@ -101,6 +105,7 @@ describe('Storefront Preview Component', function () {
         )
         expect(window.STOREFRONT_PREVIEW?.getToken).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.onContextChange).toBeDefined()
+        expect(window.STOREFRONT_PREVIEW?.siteId).toBeDefined()
         expect(window.STOREFRONT_PREVIEW?.experimentalUnsafeNavigate).toBeDefined()
     })
 
