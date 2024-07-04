@@ -1,5 +1,5 @@
-## v2.1.0-dev (Jun 25, 2024)
-- Fix bug where `useCustomQuery` would always be a success even on error responses [#1879](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1879)
+## v2.0.1-dev (Jul 04, 2024)
+- Fix `useCustomQuery` error handling [#1879](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1879)
 
 ## v2.0.0 (Jun 25, 2024)
 - Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
