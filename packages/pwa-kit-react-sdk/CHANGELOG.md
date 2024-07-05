@@ -1,3 +1,6 @@
+## v2.8.4 (Apr 09, 2024)
+-   Updated StorefrontPreview component to make siteId available [#1876](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1876)
+
 ## v2.8.3 (Apr 09, 2024)
 ## v2.8.2 (Dec 01, 2023)
 ## v2.8.1 (Nov 08, 2023)

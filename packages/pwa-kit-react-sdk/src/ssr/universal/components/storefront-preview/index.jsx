@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {detectStorefrontPreview, getClientScript} from './utils'
 import {useHistory} from 'react-router-dom'
+import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 
 /**
  *
@@ -28,11 +29,18 @@ export const StorefrontPreview = ({
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
 
+    // The result of getConfig is a mutable object. When it is changed, it affects subsequent calls of getConfig.
+    // Inside the render, we update the configuration object with the current siteId. This change gets serialized
+    // and placed in the DOM. We should be aware that the mutable behavior could introduce potential bugs.
+    const {app} = getConfig()
+    const siteId = app.commerceAPI.parameters.siteId
+
     useEffect(() => {
         if (enabled && isHostTrusted) {
             window.STOREFRONT_PREVIEW = {
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
+                siteId,
                 experimentalUnsafeNavigate: (path, action = 'push', ...args) => {
                     history[action](path, ...args)
                 },
@@ -43,6 +51,7 @@ export const StorefrontPreview = ({
     }, [
         enabled,
         getToken,
+        siteId,
         experimentalUnsafeAdditionalSearchParams,
         experimentalUnsafeReloadServerSide
     ])
