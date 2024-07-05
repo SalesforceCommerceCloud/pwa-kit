@@ -1,4 +1,5 @@
-## v2.1.0-dev (Jun 25, 2024)
+## v2.0.1-dev (Jul 05, 2024)
+- Fix `updateCustomer` squashing existing data [#1882](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1882)
 
 ## v2.0.0 (Jun 25, 2024)
 - Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
