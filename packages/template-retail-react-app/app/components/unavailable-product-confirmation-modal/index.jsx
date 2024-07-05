@@ -17,21 +17,23 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
  * This Component determines if the provided products have become unavailable or out of stock or low stock that
  * can't be fulfilled and will prompt the users to remove them before proceeding any further
  *
+ * @param productIds -  list of product ids to check for availability
  * @param productItems -  basket product items
  * @param handleUnavailableProducts - callback function to handle what to do with unavailable products
  * @returns {JSX.Element} -  Conformation Modal Component
  *
  */
 const UnavailableProductConfirmationModal = ({
+    productIds = [],
     productItems = [],
     handleUnavailableProducts = noop
 }) => {
     const unavailableProductIdsRef = useRef(null)
-    const productIds = productItems.map((i) => i.productId)
+    const ids = productIds.length ? productIds : productItems.map((i) => i.productId)
     useProducts(
-        {parameters: {ids: productIds?.join(','), allImages: true}},
+        {parameters: {ids: ids?.join(','), allImages: true}},
         {
-            enabled: productIds?.length > 0,
+            enabled: ids?.length > 0,
             onSuccess: (result) => {
                 const resProductIds = []
                 const unOrderableIds = []
@@ -54,7 +56,7 @@ const UnavailableProductConfirmationModal = ({
                     }
                 })
 
-                const unavailableProductIds = productIds.filter(
+                const unavailableProductIds = ids.filter(
                     (id) => !resProductIds.includes(id) || unOrderableIds.includes(id)
                 )
 
