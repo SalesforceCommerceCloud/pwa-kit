@@ -91,6 +91,7 @@ const UnavailableProductConfirmationModal = ({
 
 UnavailableProductConfirmationModal.propTypes = {
     productItems: PropTypes.array,
+    productIds: PropTypes.array,
     handleUnavailableProducts: PropTypes.func
 }
 
