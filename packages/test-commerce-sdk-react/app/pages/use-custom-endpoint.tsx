@@ -21,7 +21,7 @@ const UseCustomEndpoint = () => {
         },
         rawResponse: false
     })
-    
+
     if (error) {
         return <h1 style={{color: 'red'}}>Something is wrong</h1>
     }
