@@ -867,6 +867,18 @@
       "value": "Yes"
     }
   ],
+  "confirmation_modal.default.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "No, cancel action"
+    }
+  ],
+  "confirmation_modal.default.assistive_msg.yes": [
+    {
+      "type": 0,
+      "value": "Yes, confirm action"
+    }
+  ],
   "confirmation_modal.default.message.you_want_to_continue": [
     {
       "type": 0,
@@ -892,6 +904,24 @@
     }
   ],
   "confirmation_modal.remove_cart_item.action.yes": [
+    {
+      "type": 0,
+      "value": "Yes, remove item"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "No, keep item"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": [
+    {
+      "type": 0,
+      "value": "Remove unavailable products"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": [
     {
       "type": 0,
       "value": "Yes, remove item"
