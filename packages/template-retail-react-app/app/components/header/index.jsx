@@ -204,7 +204,7 @@ const Header = ({
                             >
                                 <PopoverArrow />
                                 <PopoverHeader>
-                                    <Text>
+                                    <Text as="h2" fontSize="l" fontFamily="body" fontWeight="700">
                                         {intl.formatMessage({
                                             defaultMessage: 'My Account',
                                             id: 'header.popover.title.my_account'
