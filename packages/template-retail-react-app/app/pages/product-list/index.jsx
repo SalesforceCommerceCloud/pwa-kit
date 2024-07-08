@@ -544,12 +544,14 @@ const ProductList = (props) => {
                                           .map((value, index) => (
                                               <ProductTileSkeleton key={index} />
                                           ))
-                                    : productSearchResult?.hits?.map((productSearchItem) => {
+                                    : productSearchResult?.hits?.map((productSearchItem, i) => {
                                           const productId = productSearchItem.productId
                                           const isInWishlist =
                                               !!wishlist?.customerProductListItems?.find(
                                                   (item) => item.productId === productId
                                               )
+
+                                          const shouldLazyLoadImage = i >= 2
 
                                           return (
                                               <ProductTile
@@ -588,7 +590,12 @@ const ProductList = (props) => {
                                                           '20vw',
                                                           '20vw',
                                                           '25vw'
-                                                      ]
+                                                      ],
+                                                      imageProps: {
+                                                          loading: shouldLazyLoadImage
+                                                              ? 'lazy'
+                                                              : 'eager'
+                                                      }
                                                   }}
                                               />
                                           )
