@@ -58,7 +58,7 @@ describe('UnavailableProductConfirmationModal', () => {
         }).not.toThrow()
     })
 
-    test('opens confirmation modal when unavailable products are found', async () => {
+    test('opens confirmation modal when unavailable products are found with defined productItems prop', async () => {
         prependHandlersToServer([
             {
                 path: '*/products',
@@ -84,6 +84,38 @@ describe('UnavailableProductConfirmationModal', () => {
         const {getByText, queryByText, queryByRole, user} = renderWithProviders(
             <UnavailableProductConfirmationModal
                 productItems={basket.productItems}
+                handleUnavailableProducts={mockFunc}
+            />
+        )
+
+        await waitFor(async () => {
+            expect(getByText(/^Items Unavailable$/i)).toBeInTheDocument()
+        })
+        const removeBtn = queryByRole('button')
+
+        expect(removeBtn).toBeInTheDocument()
+        await user.click(removeBtn)
+        expect(mockFunc).toHaveBeenCalled()
+        await waitFor(async () => {
+            expect(queryByText(/Items Unavailable/i)).not.toBeInTheDocument()
+        })
+        expect(removeBtn).not.toBeInTheDocument()
+    })
+
+    test('opens confirmation modal when unavailable products are found with defined productIds prop', async () => {
+        const mockProductIds = ['701642889899M', '701642889830M']
+        prependHandlersToServer([
+            {
+                path: '*/products',
+                res: () => {
+                    return mockProductsWithUnavailableProducts
+                }
+            }
+        ])
+        const mockFunc = jest.fn()
+        const {getByText, queryByText, queryByRole, user} = renderWithProviders(
+            <UnavailableProductConfirmationModal
+                productIds={mockProductIds}
                 handleUnavailableProducts={mockFunc}
             />
         )
