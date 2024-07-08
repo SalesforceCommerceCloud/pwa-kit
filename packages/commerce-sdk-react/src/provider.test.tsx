@@ -54,4 +54,22 @@ describe('provider', () => {
         expect(authInstance.ready).toHaveBeenCalledTimes(1)
         expect(authInstance.queueRequest).toHaveBeenCalledTimes(0)
     })
+
+    test('shopper login api client uses private proxy when enabled', () => {
+        const Component = () => {
+            const api = useCommerceApi()
+            return (
+                <ul>
+                    <li data-testid="proxy-value">{api?.shopperLogin?.clientConfig?.proxy}</li>
+                </ul>
+            )
+        }
+        const config = {
+            enablePWAKitPrivateClient: true
+        }
+        renderWithProviders(<Component />, config)
+        const element = screen.getByTestId('proxy-value')
+        expect(element).toBeInTheDocument()
+        expect(element.textContent?.includes('/mobify/slas/private')).toBeTruthy()
+    })
 })
