@@ -1083,6 +1083,20 @@
       "value": "]"
     }
   ],
+  "category_links.button_text": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈȧȧŧḗḗɠǿǿřīḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "cc_radio_group.action.remove": [
     {
       "type": 0,
@@ -2065,6 +2079,96 @@
     {
       "type": 0,
       "value": "Şḗḗƈŭŭřīŧẏ ƈǿǿḓḗḗ īƞƒǿǿ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "display_price.assistive_msg.current_price": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "ƈŭŭřřḗḗƞŧ ƥřīƈḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "display_price.assistive_msg.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒřǿǿḿ ƈŭŭřřḗḗƞŧ ƥřīƈḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "ǿǿřīɠīƞȧȧŀ ƥřīƈḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price_with_range": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒřǿǿḿ ǿǿřīɠīƞȧȧŀ ƥřīƈḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "display_price.label.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒřǿǿḿ "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
     },
     {
       "type": 0,
@@ -3509,14 +3613,18 @@
       "value": "]"
     }
   ],
-  "item_price.label.starting_at": [
+  "item_variant.assistive_msg.quantity": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Şŧȧȧřŧīƞɠ ȧȧŧ"
+      "value": "Ɋŭŭȧȧƞŧīŧẏ "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
     },
     {
       "type": 0,
@@ -5289,18 +5397,28 @@
       "value": "]"
     }
   ],
-  "product_tile.label.starting_at_price": [
+  "product_tile.badge.label.new": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Şŧȧȧřŧīƞɠ ȧȧŧ "
+      "value": "Ƞḗḗẇ"
     },
     {
-      "type": 1,
-      "value": "price"
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_tile.badge.label.sale": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şȧȧŀḗḗ"
     },
     {
       "type": 0,
@@ -5441,20 +5559,6 @@
     {
       "type": 0,
       "value": "+"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "product_view.label.starting_at_price": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şŧȧȧřŧīƞɠ ȧȧŧ"
     },
     {
       "type": 0,

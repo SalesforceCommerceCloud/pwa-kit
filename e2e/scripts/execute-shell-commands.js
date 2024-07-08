@@ -15,14 +15,9 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
     if (cliResponses && cliResponses.length) {
       ({ expectedPrompt, response } = cliResponses.shift());
     }
-    let isGenratorRunning = false;
 
     child.stdout.on("data", (data) => {
       console.log(data);
-      if (isPrompt(data, /Running the generator/i)) {
-        isGenratorRunning = true;
-        return;
-      }
       if (isPrompt(data, expectedPrompt)) {
         child.stdin.write(response);
         if (cliResponses.length > 0) {
@@ -32,12 +27,7 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
     });
 
     child.stderr.on("data", (err) => {
-      // Lerna warnings are also seen as errors but we want to continue in those cases
-      // We exit the process if something breaks after the generator is actually running.
-      if (isGenratorRunning) {
-        console.error(err);
-        reject(err);
-      }
+      console.error(err);
     });
 
     child.on("error", (code) => {

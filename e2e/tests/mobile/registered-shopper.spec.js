@@ -63,13 +63,25 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await page.getByRole("link", { name: "Tops" }).click();
 
   await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
+  // PLP
+  const productTile = await page.getByRole("link", {
+    name: /Cotton Turtleneck Sweater/i,
+  });
+  // selecting swatch
+  const initialImgEl = await productTile.locator("img");
+  const initialSrc = await initialImgEl.getAttribute("src");
+  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
 
-  await page.getByRole("link", { name: /Stripe Shell/i }).click();
-
+  await productTile.getByLabel(/Black/, { exact: true }).click();
+  const changedImgEl = await productTile.locator("img");
+  const changeImgSrc = await changedImgEl.getAttribute("src");
+  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
+  expect(changeImgSrc).not.toBe(initialSrc);
+  await productTile.click();
+  // PDP
   await expect(
-    page.getByRole("heading", { name: /Stripe Shell/i })
+    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
-
   await page.getByRole("radio", { name: "L", exact: true }).click();
 
   await page.locator("button[data-testid='quantity-increment']").click();
@@ -79,7 +91,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
   const updatedPageURL = await page.url();
   const params = updatedPageURL.split("?")[1];
   expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ5YPA7/i);
+  expect(params).toMatch(/color=JJ169XX/i);
 
   await page.getByRole("button", { name: /Add to Cart/i }).click();
 
@@ -89,9 +101,12 @@ test("Registered shopper can checkout items", async ({ page }) => {
 
   await page.getByLabel("Close").click();
 
+  // cart
   await page.getByLabel(/My cart/i).click();
 
-  await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
+  ).toBeVisible();
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
 
@@ -181,5 +196,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
     page.getByRole("heading", { name: /Order Summary/i })
   ).toBeVisible();
   await expect(page.getByText(/2 Items/i)).toBeVisible();
-  await expect(page.getByRole("link", { name: /Stripe Shell/i })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
+  ).toBeVisible();
 });

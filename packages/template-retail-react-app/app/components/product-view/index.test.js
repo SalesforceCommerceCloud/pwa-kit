@@ -47,10 +47,9 @@ afterEach(() => {
 
 test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
+    renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
     expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
-    expect(screen.getAllByText(/299.99/)).toHaveLength(2)
+    expect(screen.getAllByText(/299\.99/)).toHaveLength(4)
     expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
     expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
     expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
@@ -137,14 +136,14 @@ test('renders a product set properly - parent item', () => {
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
     // (they're hidden with display:none style)
 
-    const startingAtLabel = screen.getAllByText(/starting at/i)[0]
+    const fromAtLabel = screen.getAllByText(/from/i)[0]
     const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
     const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
     const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
     const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
 
     // What should exist:
-    expect(startingAtLabel).toBeInTheDocument()
+    expect(fromAtLabel).toBeInTheDocument()
     expect(addSetToCartButton).toBeInTheDocument()
     expect(addSetToWishlistButton).toBeInTheDocument()
 
@@ -166,7 +165,7 @@ test('renders a product set properly - child item', () => {
     const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
     const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
     const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
-    const startingAtLabels = screen.queryAllByText(/starting at/i)
+    const fromLabels = screen.queryAllByText(/from/i)
 
     // What should exist:
     expect(addToCartButton).toBeInTheDocument()
@@ -174,8 +173,9 @@ test('renders a product set properly - child item', () => {
     expect(variationAttributes).toHaveLength(2)
     expect(quantityPicker).toBeInTheDocument()
 
-    // What should _not_ exist:
-    expect(startingAtLabels).toHaveLength(0)
+    // since setProducts are master products, as pricing now display From X (cross) Y where X Y are sale and lis price respectively
+    // of the variant that has lowest price (including promotional price)
+    expect(fromLabels).toHaveLength(4)
 })
 
 test('validateOrderability callback is called when adding a set to cart', async () => {

@@ -3019,6 +3019,7 @@ export const mockProductSearch = {
         {
             currency: 'USD',
             hitType: 'master',
+            productId: '25589411M',
             image: {
                 alt: 'Trouser Leg Pant, , large',
                 disBaseLink:
@@ -3597,6 +3598,7 @@ export const mockProductSearch = {
         {
             currency: 'USD',
             hitType: 'master',
+            productId: '25586795M',
             image: {
                 alt: 'Pleated Skirt With Embroidery., , large',
                 disBaseLink:

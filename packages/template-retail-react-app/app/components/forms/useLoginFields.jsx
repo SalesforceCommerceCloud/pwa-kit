@@ -21,6 +21,7 @@ export default function useLoginFields({
             placeholder: 'you@email.com',
             defaultValue: '',
             type: 'email',
+            autoComplete: 'email',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your email address.',

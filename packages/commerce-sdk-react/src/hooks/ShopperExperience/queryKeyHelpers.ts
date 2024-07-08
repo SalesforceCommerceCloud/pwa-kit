@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperExperience} from 'commerce-sdk-isomorphic'
+import {ShopperExperience} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {getCustomKeys, pick} from '../utils'
-import paramKeysMap from './paramKeys'
+import {pickValidParams} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperExperience<{shortCode: string}>
@@ -42,8 +41,10 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 export const getPages: QueryKeyHelper<'getPages'> = {
     path: (params) => ['/commerce-sdk-react', '/organizations/', params.organizationId, '/pages'],
     queryKey: (params: Params<'getPages'>) => {
-        const paramKeys = [...paramKeysMap['getPages'], ...getCustomKeys(params)]
-        return [...getPages.path(params), pick(params, paramKeys)]
+        return [
+            ...getPages.path(params),
+            pickValidParams(params, ShopperExperience.paramKeys.getPages)
+        ]
     }
 }
 
@@ -56,7 +57,9 @@ export const getPage: QueryKeyHelper<'getPage'> = {
         params.pageId
     ],
     queryKey: (params: Params<'getPage'>) => {
-        const paramKeys = [...paramKeysMap['getPage'], ...getCustomKeys(params)]
-        return [...getPage.path(params), pick(params, paramKeys)]
+        return [
+            ...getPage.path(params),
+            pickValidParams(params, ShopperExperience.paramKeys.getPage)
+        ]
     }
 }

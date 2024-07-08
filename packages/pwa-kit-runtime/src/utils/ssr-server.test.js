@@ -43,9 +43,10 @@ import {
     CONTENT_ENCODING,
     CONTENT_TYPE,
     X_ORIGINAL_CONTENT_TYPE,
-    APPLICATION_OCTET_STREAM,
-    PROXY_PATH_PREFIX
+    APPLICATION_OCTET_STREAM
 } from '../ssr/server/constants'
+
+import {proxyBasePath} from './ssr-namespace-paths'
 
 const baseMobify = {
     ssrEnabled: true,
@@ -117,11 +118,11 @@ describe('utils/ssr-server tests', () => {
 
         updatePackageMobify(baseMobify)
 
-        expect(getFullRequestURL(`${PROXY_PATH_PREFIX}/base/somepath`)).toBe(
+        expect(getFullRequestURL(`${proxyBasePath}/base/somepath`)).toBe(
             'https://www.merlinspotions.com/somepath'
         )
 
-        expect(getFullRequestURL(`${PROXY_PATH_PREFIX}/base2/somepath`)).toBe(
+        expect(getFullRequestURL(`${proxyBasePath}/base2/somepath`)).toBe(
             'https://api.merlinspotions.com/somepath'
         )
     })
@@ -559,9 +560,35 @@ describe('MetricsSender', () => {
     })
 })
 
-test('processLambdaResponse with no parameter', () => {
-    expect(processLambdaResponse()).toBeUndefined()
-    expect(processLambdaResponse(null)).toBeNull()
+describe('processLambdaResponse', () => {
+    test('processLambdaResponse with no parameter', () => {
+        expect(processLambdaResponse()).toBeUndefined()
+        expect(processLambdaResponse(null)).toBeNull()
+    })
+
+    const testCases = [
+        {
+            name: 'valid correlation id header in event object',
+            event: {headers: {'x-correlation-id': 'e46cd109-39b7-4173-963e-2c5de78ba087'}},
+            validate: (headers) => {
+                expect(headers['x-correlation-id']).toBe('e46cd109-39b7-4173-963e-2c5de78ba087')
+            }
+        },
+        {
+            name: 'no correlation id header in event object',
+            event: {headers: {}},
+            validate: (headers) => {
+                expect(headers['x-correlation-id']).toBeFalsy()
+            }
+        }
+    ]
+    testCases.forEach((testCase) => {
+        test(`${testCase.name}`, () => {
+            const response = {}
+            const res = processLambdaResponse(response, testCase.event)
+            testCase.validate(res.headers)
+        })
+    })
 })
 
 describe('processExpressResponse', () => {

@@ -1,5 +1,36 @@
-## v2.5.0-dev (Apr 17, 2024)
+## v3.0.0 (Jun 25, 2024)
+
+### Improvements
+
+- Product Tile Revamp
+  - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760) 
+  - Display pricing for cart, checkout and wishlist page [#1796](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1796) 
+  - Shows promotional callout message on Product List and Product Detail pages [#1786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1786) [#1804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1804)
+  - Display selectable swatch groups for attributes like color [#1773](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1773)
+  - Show badges [#1791](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1791)
+
+- Lazy basket creation [#1677](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1677)
 - Use `stale-while-revalidate` cache control directive [#1744](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1744)
+
+### Accessibility Improvements
+
+- Added live region support to components [#1825](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1825)
+- Replace p tag with heading tags in cart page [#1818](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1818)
+- Fix product tile img alt text [#1769](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1769)
+- Add aria-hidden to search icon [#1809](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1809)
+- Add explicit headers to cart modal [#1811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1811)
+- Add autocomplete to text input fields [#1840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1840)
+- Add error icon to error messages [#1839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1839)
+  
+### Performance Improvements
+
+- Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656) [#1673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1673)
+
+### Bug Fixes
+
+- Fix seo component not settings keywords meta tag [#1762](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1762)
+- Fix RecommendedProducts' toggling of the favourite icon [#1861](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1861)
+
 
 ## v2.4.1 (Apr 17, 2024)
 - Update dependency commerce-sdk-react to 1.4.1 to have access to all params keys for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
