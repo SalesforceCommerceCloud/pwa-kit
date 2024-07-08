@@ -42,10 +42,11 @@ export default {
             color: 'black',
             justifyContent: 'flex-start',
             fontSize: 'sm',
-            _hover: {bg: 'gray.50', textDecoration: 'none'},
+            _hover: {bg: 'gray.50', textDecoration: 'underline'},
             _activeLink: {
                 bg: 'gray.50',
-                textDecoration: 'none'
+                borderBlock: 'solid',
+                borderBlockWidth: '1px'
             }
         },
         'menu-link-mobile': {
