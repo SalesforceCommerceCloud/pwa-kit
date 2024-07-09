@@ -161,7 +161,8 @@ const ProductList = (props) => {
             }
         },
         {
-            keepPreviousData: true
+            keepPreviousData: true,
+            staleTime: 15 * 60 * 1000 // 15 min, to align with page caching
         }
     )
 
