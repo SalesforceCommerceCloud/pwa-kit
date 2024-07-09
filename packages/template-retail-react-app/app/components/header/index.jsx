@@ -212,23 +212,34 @@ const Header = ({
                                     </Text>
                                 </PopoverHeader>
                                 <PopoverBody>
-                                    <Stack spacing={0} as="nav" data-testid="account-detail-nav">
-                                        {navLinks.map((link) => {
-                                            const LinkIcon = link.icon
-                                            return (
-                                                <Button
-                                                    key={link.name}
-                                                    as={Link}
-                                                    to={`/account${link.path}`}
-                                                    useNavLink={true}
-                                                    variant="menu-link"
-                                                    leftIcon={<LinkIcon boxSize={5} />}
-                                                >
-                                                    {intl.formatMessage(messages[link.name])}
-                                                </Button>
-                                            )
-                                        })}
-                                    </Stack>
+                                    <Box as="nav">
+                                        <Stack spacing={0} as="ul" data-testid="account-detail-nav">
+                                            {navLinks.map((link) => {
+                                                const LinkIcon = link.icon
+                                                return (
+                                                    <Box
+                                                        key={link.name}
+                                                        position="relative"
+                                                        as="li"
+                                                        listStyleType="none"
+                                                    >
+                                                        <Button
+                                                            as={Link}
+                                                            to={`/account${link.path}`}
+                                                            useNavLink={true}
+                                                            variant="menu-link"
+                                                            leftIcon={<LinkIcon boxSize={5} />}
+                                                            width="100%"
+                                                        >
+                                                            {intl.formatMessage(
+                                                                messages[link.name]
+                                                            )}
+                                                        </Button>
+                                                    </Box>
+                                                )
+                                            })}
+                                        </Stack>
+                                    </Box>
                                 </PopoverBody>
                                 <PopoverFooter onClick={onSignoutClick} cursor="pointer">
                                     <Divider colorScheme="gray" />
