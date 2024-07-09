@@ -539,7 +539,7 @@ const ProductList = (props) => {
                                 spacingX={4}
                                 spacingY={{base: 12, lg: 16}}
                             >
-                                {isHydrated() && !productSearchResult
+                                {isHydrated() && (isRefetching || !productSearchResult)
                                     ? new Array(searchParams.limit)
                                           .fill(0)
                                           .map((value, index) => (
