@@ -8,6 +8,8 @@
 import React, {useState, useEffect} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
+
+// Components
 import {
     Heading,
     Accordion,
@@ -17,7 +19,8 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
 import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
-import {useSearchStores} from '@salesforce/commerce-sdk-react'
+
+// Others
 import {
     SUPPORTED_STORE_LOCATOR_COUNTRIES,
     DEFAULT_STORE_LOCATOR_COUNTRY,
@@ -25,9 +28,11 @@ import {
     STORE_LOCATOR_NUM_STORES_PER_LOAD,
     STORE_LOCATOR_DISTANCE_UNIT
 } from '@salesforce/retail-react-app/app/constants'
-import {useForm} from 'react-hook-form'
-
 const NUM_STORES_PER_REQUEST_API_MAX = 200
+
+// Hooks
+import {useSearchStores} from '@salesforce/commerce-sdk-react'
+import {useForm} from 'react-hook-form'
 const useGeolocation = (
     setSearchStoresParams,
     userHasSetManualGeolocation,

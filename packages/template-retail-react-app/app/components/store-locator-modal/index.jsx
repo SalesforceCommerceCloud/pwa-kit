@@ -7,6 +7,8 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
+
+// Components
 import {
     Modal,
     ModalBody,
@@ -14,12 +16,14 @@ import {
     ModalContent,
     useBreakpointValue
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
+
+// Others
 import {
     DEFAULT_STORE_LOCATOR_COUNTRY,
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD
 } from '@salesforce/retail-react-app/app/constants'
-import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 
 const StoreLocatorModal = ({isOpen, onClose}) => {
     const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)

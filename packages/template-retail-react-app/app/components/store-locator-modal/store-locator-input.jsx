@@ -8,6 +8,8 @@
 import React from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
+
+// Components
 import {
     Button,
     InputGroup,
@@ -17,11 +19,12 @@ import {
     FormControl,
     FormErrorMessage
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {
-    AlertIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {Controller} from 'react-hook-form'
+
+// Others
 import {SUPPORTED_STORE_LOCATOR_COUNTRIES} from '@salesforce/retail-react-app/app/constants'
+
 const StoreLocatorInput = ({
     form,
     submitForm,
