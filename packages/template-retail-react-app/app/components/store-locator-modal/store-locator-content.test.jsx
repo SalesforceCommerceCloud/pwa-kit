@@ -278,7 +278,7 @@ describe('StoreLocatorContent', () => {
             const findButton = screen.getByRole('button', {name: /Find/i})
             const useMyLocationButton = screen.getByRole('button', {name: /Use My Location/i})
             const descriptionFindAStore = screen.getByText(/Find a Store/i)
-            const viewing = screen.getByText(/Viewing stores within 100km of 10178 in Germany/i)
+            const viewing = screen.getByText(/Viewing stores within 100mi of 10178 in Germany/i)
 
             expect(findButton).toBeInTheDocument()
             expect(useMyLocationButton).toBeInTheDocument()

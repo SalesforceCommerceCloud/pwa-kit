@@ -32,6 +32,8 @@ const WrapperComponent = ({userHasSetManualGeolocation, getUserGeolocation}) => 
             form={form}
             submitForm={jest.fn()}
             userHasSetManualGeolocation={userHasSetManualGeolocation}
+            setUserWantsToShareLocation={jest.fn()}
+            userWantsToShareLocation={false}
         />
     )
 }
