@@ -8,7 +8,6 @@
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
-import logger from '../../../utils/logger-instance'
 
 const CorrelationIdContext = React.createContext()
 const ServerContext = React.createContext()
@@ -25,9 +24,8 @@ const CorrelationIdProvider = ({children, correlationId, resetOnPageChange = tru
     const _correlationIdFn = typeof correlationId === 'function' && correlationId
     const _correlationId = typeof correlationId !== 'function' && correlationId
     if (resetOnPageChange && !_correlationIdFn) {
-        logger.warn(
-            'correlationId needs to be a function returning a uuid string when resetOnPageChange is true',
-            {namespace: 'contexts.CorrelationIdProvider'}
+        console.warn(
+            'correlationId needs to be a function returning a uuid string when resetOnPageChange is true'
         )
     }
     const [id, setId] = React.useState(_correlationId || _correlationIdFn())

@@ -137,7 +137,6 @@ const testMap: TestMap = {
         {}
     ),
     updateItemInBasket: createOptions<'updateItemInBasket'>({}, {itemId: 'itemId'}),
-    updateItemsInBasket: createOptions<'updateItemsInBasket'>([], {}),
     updatePaymentInstrumentInBasket: createOptions<'updatePaymentInstrumentInBasket'>(
         {},
         {paymentInstrumentId: 'paymentInstrumentId'}

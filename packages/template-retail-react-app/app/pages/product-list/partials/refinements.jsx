@@ -33,19 +33,7 @@ export const componentMap = {
     price: RadioRefinements
 }
 
-const Refinements = ({
-    itemsBefore,
-    excludedFilters = [],
-    filters = [],
-    toggleFilter,
-    selectedFilters,
-    isLoading
-}) => {
-    // Exclude filters in the exclude list.
-    if (excludedFilters) {
-        filters = filters.filter(({attributeId}) => !excludedFilters.includes(attributeId))
-    }
-
+const Refinements = ({filters, toggleFilter, selectedFilters, isLoading}) => {
     // Getting the indices of filters to open accordions by default
     let filtersIndexes = filters?.map((filter, idx) => idx)
 
@@ -89,8 +77,6 @@ const Refinements = ({
                     defaultIndex={filtersIndexes}
                     reduceMotion={true}
                 >
-                    {itemsBefore}
-
                     {filters?.map((filter, idx) => {
                         // Render the appropriate component for the refinement type, fallback to checkboxes
                         const Values = componentMap[filter.attributeId] || CheckboxRefinements
@@ -105,18 +91,14 @@ const Refinements = ({
                             return (
                                 <Stack key={filter.attributeId} divider={<Divider />}>
                                     <AccordionItem
-                                        paddingTop={idx !== 0 || itemsBefore ? 6 : 0}
+                                        paddingTop={idx !== 0 ? 6 : 0}
                                         borderBottom={
                                             idx === filters.length - 1
                                                 ? '1px solid gray.200'
                                                 : 'none'
                                         }
                                         paddingBottom={6}
-                                        borderTop={
-                                            idx === 0 && !itemsBefore
-                                                ? 'none'
-                                                : '1px solid gray.200'
-                                        }
+                                        borderTop={idx === 0 && 'none'}
                                     >
                                         {({isExpanded}) => (
                                             <>
@@ -157,9 +139,7 @@ const Refinements = ({
 }
 
 Refinements.propTypes = {
-    itemsBefore: PropTypes.arrayOf(PropTypes.element),
     filters: PropTypes.array,
-    excludedFilters: PropTypes.arrayOf(PropTypes.string),
     toggleFilter: PropTypes.func,
     selectedFilters: PropTypes.object,
     isLoading: PropTypes.bool

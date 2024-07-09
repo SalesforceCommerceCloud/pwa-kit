@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperLogin} from 'commerce-sdk-isomorphic'
+import type {ShopperLogin} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pickValidParams} from '../utils'
+import {getCustomKeys, pick} from '../utils'
+import paramKeysMap from './paramKeys'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperLogin<{shortCode: string}>
@@ -52,10 +53,8 @@ export const getUserInfo: QueryKeyHelper<'getUserInfo'> = {
         '/oauth2/userinfo'
     ],
     queryKey: (params: Params<'getUserInfo'>) => {
-        return [
-            ...getUserInfo.path(params),
-            pickValidParams(params, ShopperLogin.paramKeys.getUserInfo)
-        ]
+        const paramKeys = [...paramKeysMap['getUserInfo'], ...getCustomKeys(params)]
+        return [...getUserInfo.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -67,10 +66,12 @@ export const getWellknownOpenidConfiguration: QueryKeyHelper<'getWellknownOpenid
         '/oauth2/.well-known/openid-configuration'
     ],
     queryKey: (params: Params<'getWellknownOpenidConfiguration'>) => {
-        return [
-            ...getWellknownOpenidConfiguration.path(params),
-            pickValidParams(params, ShopperLogin.paramKeys.getWellknownOpenidConfiguration)
+        const paramKeys = [
+            ...paramKeysMap['getWellknownOpenidConfiguration'],
+            ...getCustomKeys(params)
         ]
+
+        return [...getWellknownOpenidConfiguration.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -82,9 +83,7 @@ export const getJwksUri: QueryKeyHelper<'getJwksUri'> = {
         '/oauth2/jwks'
     ],
     queryKey: (params: Params<'getJwksUri'>) => {
-        return [
-            ...getJwksUri.path(params),
-            pickValidParams(params, ShopperLogin.paramKeys.getJwksUri)
-        ]
+        const paramKeys = [...paramKeysMap['getJwksUri'], ...getCustomKeys(params)]
+        return [...getJwksUri.path(params), pick(params, paramKeys)]
     }
 }

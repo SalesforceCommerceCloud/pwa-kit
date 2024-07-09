@@ -6,8 +6,6 @@
  */
 /*global dw*/
 import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 const useActiveData = () => {
     // Returns true when the feature flag is enabled and the tracking scripts have been executed
@@ -29,10 +27,7 @@ const useActiveData = () => {
                     }
                 }
             } catch (err) {
-                logger.error('ActiveData sendViewProduct error', {
-                    namespace: 'useActiveData.sendViewProduct',
-                    additionalProperties: {error: err}
-                })
+                console.error(err)
             }
         },
         async sendViewSearch(searchParams, productSearchResult) {
@@ -48,10 +43,7 @@ const useActiveData = () => {
                     })
                 }
             } catch (err) {
-                logger.error('ActiveData sendViewSearch error', {
-                    namespace: 'useActiveData.sendViewSearch',
-                    additionalProperties: {error: err}
-                })
+                console.error(err)
             }
         },
         async sendViewCategory(searchParams, category, productSearchResult) {
@@ -69,17 +61,14 @@ const useActiveData = () => {
                     })
                 }
             } catch (err) {
-                logger.error('ActiveData sendViewCategory error', {
-                    namespace: 'useActiveData.sendViewCategory',
-                    additionalProperties: {error: err}
-                })
+                console.error(err)
             }
         },
         async trackPage(siteId, localeId, currency) {
             if (!canTrack()) return
             try {
                 var activeDataUrl =
-                    `${proxyBasePath}/ocapi/on/demandware.store/Sites-` +
+                    '/mobify/proxy/ocapi/on/demandware.store/Sites-' +
                     siteId +
                     '-Site/' +
                     localeId +
@@ -93,18 +82,12 @@ const useActiveData = () => {
                             dw.ac._setSiteCurrency(currency)
                         }
                     } catch (err) {
-                        logger.error('ActiveData trackPage error', {
-                            namespace: 'useActiveData.trackPage',
-                            additionalProperties: {error: err}
-                        })
+                        console.error(err)
                     }
                     dw.ac.setDWAnalytics(dwAnalytics)
                 }
             } catch (err) {
-                logger.error('ActiveData trackPage error', {
-                    namespace: 'useActiveData.trackPage',
-                    additionalProperties: {error: err}
-                })
+                console.error(err)
             }
         }
     }

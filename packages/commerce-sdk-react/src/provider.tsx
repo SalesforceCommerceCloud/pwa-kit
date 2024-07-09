@@ -22,7 +22,6 @@ import {
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-import {Logger} from './types'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -37,7 +36,6 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
-    logger?: Logger
 }
 
 /**
@@ -77,7 +75,6 @@ export const AuthContext = React.createContext({} as Auth)
                     locale="en-US"
                     enablePWAKitPrivateClient={true}
                     currency="USD"
-                    logger={logger}
                 >
                     {children}
                 </CommerceApiProvider>
@@ -114,13 +111,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         OCAPISessionsURL,
         enablePWAKitPrivateClient,
         clientSecret,
-        silenceWarnings,
-        logger
+        silenceWarnings
     } = props
-
-    // Set the logger based on provided configuration, or default to the console object if no logger is provided
-    const configLogger = logger || console
-
     const config = {
         proxy,
         headers,
@@ -135,7 +127,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
         fetchOptions
     }
-
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -176,8 +167,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             OCAPISessionsURL,
             enablePWAKitPrivateClient,
             clientSecret,
-            silenceWarnings,
-            logger: configLogger
+            silenceWarnings
         })
     }, [
         clientId,
@@ -191,8 +181,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         OCAPISessionsURL,
         enablePWAKitPrivateClient,
         clientSecret,
-        silenceWarnings,
-        configLogger
+        silenceWarnings
     ])
 
     // Initialize the session
@@ -211,8 +200,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 shortCode,
                 locale,
                 currency,
-                silenceWarnings,
-                logger: configLogger
+                silenceWarnings
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>

@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperProducts} from 'commerce-sdk-isomorphic'
+import type {ShopperProducts} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pickValidParams} from '../utils'
+import {getCustomKeys, pick} from '../utils'
+import paramKeysMap from './paramKeys'
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperProducts<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
@@ -60,10 +61,8 @@ export const getProducts: QueryKeyHelper<'getProducts'> = {
         '/products'
     ],
     queryKey: (params: Params<'getProducts'>) => {
-        return [
-            ...getProducts.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys.getProducts)
-        ]
+        const paramKeys = [...paramKeysMap['getProducts'], ...getCustomKeys(params)]
+        return [...getProducts.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -76,10 +75,8 @@ export const getProduct: QueryKeyHelper<'getProduct'> = {
         params.id
     ],
     queryKey: (params: Params<'getProduct'>) => {
-        return [
-            ...getProduct.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys.getProduct)
-        ]
+        const paramKeys = [...paramKeysMap['getProduct'], ...getCustomKeys(params)]
+        return [...getProduct.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -91,10 +88,8 @@ export const getCategories: QueryKeyHelper<'getCategories'> = {
         '/categories'
     ],
     queryKey: (params: Params<'getCategories'>) => {
-        return [
-            ...getCategories.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys.getCategories)
-        ]
+        const paramKeys = [...paramKeysMap['getCategories'], ...getCustomKeys(params)]
+        return [...getCategories.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -107,9 +102,7 @@ export const getCategory: QueryKeyHelper<'getCategory'> = {
         params.id
     ],
     queryKey: (params: Params<'getCategory'>) => {
-        return [
-            ...getCategory.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys.getCategory)
-        ]
+        const paramKeys = [...paramKeysMap['getCategory'], ...getCustomKeys(params)]
+        return [...getCategory.path(params), pick(params, paramKeys)]
     }
 }

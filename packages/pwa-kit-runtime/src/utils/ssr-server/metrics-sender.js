@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {isRemote} from './utils'
-import logger from '../logger-instance'
 
 /**
  * A class that will handle asynchronous sending of CloudWatch
@@ -81,13 +80,7 @@ export class MetricsSender {
                 },
                 (err) => {
                     if (err) {
-                        logger.warn(`Metrics: error sending data: ${err}`, {
-                            namespace: 'metrics-sender._putMetricData',
-                            additionalProperties: {
-                                metrics,
-                                error: err
-                            }
-                        })
+                        console.warn(`Metrics: error sending data: ${err}`)
                     }
                     resolve()
                 }
@@ -119,11 +112,7 @@ export class MetricsSender {
 
         return Promise.all(promises).catch(
             /* istanbul ignore next */
-            (err) =>
-                logger.warn(`Metrics: error during flush: ${err}`, {
-                    namespace: 'metrics-sender.flush',
-                    additionalProperties: {error: err}
-                })
+            (err) => console.warn(`Metrics: error during flush: ${err}`)
         )
     }
 

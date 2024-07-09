@@ -8,9 +8,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-// Project Components
-import Link from '@salesforce/retail-react-app/app/components/link'
-
 // Components
 import {
     Accordion,
@@ -22,7 +19,7 @@ import {
     // Hooks
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-
+import Link from '@salesforce/retail-react-app/app/components/link'
 // Icons
 import {ChevronDownIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 
@@ -40,7 +37,6 @@ const NestedAccordion = (props) => {
         itemsAfter,
         itemsBefore,
         itemsKey = 'items',
-        itemsCountKey = 'count',
         fontWeights = [],
         fontSizes = [],
         urlBuilder = (item) => `/${item.id}`,
@@ -54,8 +50,6 @@ const NestedAccordion = (props) => {
     const filter = (item) =>
         typeof itemsFilter === 'function' ? itemsFilter(item) : !!item[itemsFilter]
 
-    const ItemComponent = props?.itemComponent || NestedAccordion
-
     return (
         <Accordion className="sf-nested-accordion" {...rest}>
             {/* Optional accordion items before others in items list.  */}
@@ -63,7 +57,7 @@ const NestedAccordion = (props) => {
 
             {items.filter(filter).map((item) => {
                 const {id, name} = item
-                const itemsCount = item[itemsCountKey] || item[itemsKey]?.length || 0
+                const items = item[itemsKey]
 
                 return (
                     <AccordionItem key={id} border="none">
@@ -72,7 +66,7 @@ const NestedAccordion = (props) => {
                                 {/* Heading */}
                                 <h2>
                                     {/* Show item as a leaf node if it has no visible child items. */}
-                                    {itemsCount > 0 ? (
+                                    {items && items.filter(filter).length > 0 ? (
                                         <AccordionButton {...styles.internalButton}>
                                             {/* Replace default expanded/collapsed icons. */}
                                             {isExpanded ? (
@@ -105,17 +99,13 @@ const NestedAccordion = (props) => {
                                 </h2>
 
                                 {/* Child Items */}
-                                {isExpanded && (
+                                {items && (
                                     <AccordionPanel {...styles.panel}>
-                                        <ItemComponent
+                                        <NestedAccordion
                                             {...styles.nestedAccordion}
                                             {...props}
                                             item={item}
-                                            itemsKey={itemsKey}
-                                            itemsCountKey={itemsCountKey}
                                             initialDepth={depth + 1}
-                                            itemComponent={NestedAccordion}
-                                            isExpanded={isExpanded}
                                         />
                                     </AccordionPanel>
                                 )}
@@ -160,19 +150,10 @@ NestedAccordion.propTypes = {
      */
     initialDepth: PropTypes.number,
     /**
-     * Component to be rendered in place of the inner nested accordion.
-     */
-    itemComponent: PropTypes.elementType,
-    /**
      * By default child items are keyed at `items` but if your data differs you
      * can specify a custom key name for chile items. (e.g. children)
      */
     itemsKey: PropTypes.string,
-    /**
-     * This property represents the item key that represents the count of sub-items. This is used
-     * to display a leaf node of a sub nested accordion.
-     */
-    itemsCountKey: PropTypes.string,
     /**
      * Programatically filter out items that you do not want to show. You can do this by
      * supplying a string that will be used to access an items value, the the value is truthy

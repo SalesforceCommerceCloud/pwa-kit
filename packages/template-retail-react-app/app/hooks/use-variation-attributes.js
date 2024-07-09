@@ -14,7 +14,7 @@ import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-var
 // Utils
 import {updateSearchParams} from '@salesforce/retail-react-app/app/utils/url'
 import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp-search-params'
-import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
+
 /**
  * Return the first image in the `swatch` type image group for a given
  * variation value of a product.
@@ -23,15 +23,21 @@ import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-
  * @param {Object} variationValue
  * @returns {Object} image
  */
-export const getVariantValueSwatch = (product, variationValue) => {
+const getVariantValueSwatch = (product, variationValue) => {
     const {imageGroups = []} = product
 
-    return filterImageGroups(imageGroups, {
-        viewType: 'swatch',
-        variationValues: {
-            ['color']: variationValue.value
-        }
-    })?.[0]?.images?.[0]
+    const imageGroup = imageGroups
+        .filter(({viewType}) => viewType === 'swatch')
+        .find(({variationAttributes = []}) => {
+            const colorAttribute = variationAttributes.find(({id}) => id === 'color')
+            const colorValues = colorAttribute?.values || []
+
+            // A single image can represent multiple variation values, so we only need
+            // ensure the variation values appears in once of the images represented values.
+            return colorValues.some(({value}) => value === variationValue.value)
+        })
+
+    return imageGroup?.images?.[0]
 }
 
 /**
@@ -42,7 +48,7 @@ export const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} location
  * @returns {String} a product url for the current variation value.
  */
-export const buildVariantValueHref = ({
+const buildVariantValueHref = ({
     pathname,
     existingParams,
     newParams,
@@ -70,7 +76,7 @@ export const buildVariantValueHref = ({
  * @param {Object} variationParams
  * @returns
  */
-export const isVariantValueOrderable = (product, variationParams) => {
+const isVariantValueOrderable = (product, variationParams) => {
     return product.variants
         .filter(({variationValues}) =>
             Object.keys(variationParams).every(

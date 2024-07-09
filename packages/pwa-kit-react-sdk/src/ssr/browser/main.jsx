@@ -16,7 +16,6 @@ import {getRoutes, routeComponent} from '../universal/components/route-component
 import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
 import PropTypes from 'prop-types'
-import logger from '../../utils/logger-instance'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -26,17 +25,11 @@ export const registerServiceWorker = (url) => {
                 .then(() => new Promise((resolve) => window.addEventListener('load', resolve)))
                 .then(() => navigator.serviceWorker.register(url))
                 .then((registration) =>
-                    logger.info(
-                        `ServiceWorker registration successful with scope: ${registration.scope}`,
-                        {namespace: 'registerServiceWorker'}
+                    console.log(
+                        `ServiceWorker registration successful with scope: ${registration.scope}`
                     )
                 )
-                .catch((err) =>
-                    logger.error('ServiceWorker registration failed', {
-                        namespace: 'registerServiceWorker',
-                        additionalProperties: {error: err}
-                    })
-                )
+                .catch((err) => console.log('ServiceWorker registration failed: ', err))
         }
     })
 }

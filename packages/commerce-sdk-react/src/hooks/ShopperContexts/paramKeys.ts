@@ -5,4 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-menu/drawer-menu'
+const getShopperContext = ['organizationId', 'usid'] as const
+
+export default {
+    getShopperContext
+}

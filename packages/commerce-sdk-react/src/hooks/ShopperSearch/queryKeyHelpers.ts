@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperSearch} from 'commerce-sdk-isomorphic'
+import type {ShopperSearch} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pickValidParams} from '../utils'
+import {getCustomKeys, pick} from '../utils'
+import paramKeysMap from './paramKeys'
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperSearch<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
@@ -44,10 +45,9 @@ export const productSearch: QueryKeyHelper<'productSearch'> = {
         '/product-search'
     ],
     queryKey: (params: Params<'productSearch'>) => {
-        return [
-            ...productSearch.path(params),
-            pickValidParams(params, ShopperSearch.paramKeys.productSearch)
-        ]
+        const paramKeys = [...paramKeysMap['productSearch'], ...getCustomKeys(params)]
+
+        return [...productSearch.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -59,9 +59,8 @@ export const getSearchSuggestions: QueryKeyHelper<'getSearchSuggestions'> = {
         '/search-suggestions'
     ],
     queryKey: (params: Params<'getSearchSuggestions'>) => {
-        return [
-            ...getSearchSuggestions.path(params),
-            pickValidParams(params, ShopperSearch.paramKeys.getSearchSuggestions)
-        ]
+        const paramKeys = [...paramKeysMap['getSearchSuggestions'], ...getCustomKeys(params)]
+
+        return [...getSearchSuggestions.path(params), pick(params, paramKeys)]
     }
 }

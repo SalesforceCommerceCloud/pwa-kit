@@ -25,7 +25,6 @@ export default function useUpdatePasswordFields({
             }),
             defaultValue: '',
             type: 'password',
-            autoComplete: 'current-password',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your password.',
@@ -42,7 +41,6 @@ export default function useUpdatePasswordFields({
                 id: 'use_update_password_fields.label.new_password'
             }),
             type: 'password',
-            autoComplete: 'new-password',
             defaultValue: '',
             rules: {
                 required: formatMessage({

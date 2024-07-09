@@ -31,7 +31,7 @@ import RecommendedProducts from '@salesforce/retail-react-app/app/components/rec
 import {LockIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {
-    getPriceData,
+    getDisplayPrice,
     getDisplayVariationValues
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
@@ -117,7 +117,10 @@ export const AddToCartModal = () => {
                                     viewType: 'small',
                                     selectedVariationAttributes: variant.variationValues
                                 })?.images?.[0]
-                                const priceData = getPriceData(product, {quantity})
+                                const {
+                                    basePrice: lineItemBasePrice,
+                                    discountPrice: lineItemDiscountPrice
+                                } = getDisplayPrice(product)
                                 const variationAttributeValues = getDisplayVariationValues(
                                     product.variationAttributes,
                                     variant.variationValues
@@ -177,8 +180,13 @@ export const AddToCartModal = () => {
 
                                         <Box flex="none" alignSelf="flex-end" fontWeight="600">
                                             <DisplayPrice
-                                                priceData={priceData}
-                                                quantity={quantity}
+                                                discountPriceProps={{as: 'p'}}
+                                                basePrice={lineItemBasePrice * quantity}
+                                                discountPrice={
+                                                    typeof lineItemDiscountPrice === 'number'
+                                                        ? lineItemDiscountPrice * quantity
+                                                        : null
+                                                }
                                                 currency={currency}
                                             />
                                         </Box>

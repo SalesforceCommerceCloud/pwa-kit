@@ -31,7 +31,6 @@ import * as errors from '../universal/errors'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import logger from '../../utils/logger-instance'
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import PropTypes from 'prop-types'
 
@@ -67,7 +66,7 @@ const logAndFormatError = (err) => {
         return {message: err.message, status: err.status, stack: err.stack}
     } else {
         const cause = err.stack || err.toString()
-        logger.error(cause, {namespace: 'react-rendering.render'})
+        console.error(cause)
         const safeMessage = 'Internal Server Error'
         return {message: safeMessage, status: 500, stack: err.stack}
     }

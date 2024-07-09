@@ -6,7 +6,6 @@
  */
 
 import theme from '@salesforce/retail-react-app/app/components/shared/theme'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 /**
  * @param {Object} breakpoints
@@ -116,9 +115,7 @@ const convertToPxNumbers = (widths) => {
             } else if (pxValue.test(width)) {
                 return parseInt(width)
             } else {
-                logger.error('Expecting to see values with vw or px unit only', {
-                    namespace: 'utils.convertToPxNumbers'
-                })
+                console.error('Expecting to see values with vw or px unit only')
                 return 0
             }
         })

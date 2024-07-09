@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
+import type {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pickValidParams} from '../utils'
+import {getCustomKeys, pick} from '../utils'
+import paramKeysMap from './paramKeys'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperGiftCertificates<{shortCode: string}>
@@ -38,9 +39,7 @@ export const getGiftCertificate: QueryKeyHelper<'getGiftCertificate'> = {
         '/gift-certificate'
     ],
     queryKey: (params: Params<'getGiftCertificate'>) => {
-        return [
-            ...getGiftCertificate.path(params),
-            pickValidParams(params, ShopperGiftCertificates.paramKeys.getGiftCertificate)
-        ]
+        const paramKeys = [...paramKeysMap['getGiftCertificate'], ...getCustomKeys(params)]
+        return [...getGiftCertificate.path(params), pick(params, paramKeys)]
     }
 }

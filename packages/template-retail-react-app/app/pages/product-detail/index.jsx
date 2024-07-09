@@ -15,9 +15,9 @@ import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/sh
 import {
     useProduct,
     useCategory,
+    useShopperBasketsMutation,
     useShopperCustomersMutation,
-    useCustomerId,
-    useShopperBasketsMutationHelper
+    useCustomerId
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -33,7 +33,6 @@ import ProductView from '@salesforce/retail-react-app/app/components/product-vie
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 // constant
 import {
@@ -62,8 +61,8 @@ const ProductDetail = () => {
     const childProductRefs = React.useRef({})
     const customerId = useCustomerId()
     /****************************** Basket *********************************/
-    const {isLoading: isBasketLoading} = useCurrentBasket()
-    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
+    const {data: basket} = useCurrentBasket()
+    const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     const {res} = useServerContext()
     if (res) {
         res.set(
@@ -71,6 +70,7 @@ const ProductDetail = () => {
             `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
         )
     }
+    const isBasketLoading = !basket?.basketId
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -84,16 +84,6 @@ const ProductDetail = () => {
         {
             parameters: {
                 id: urlParams.get('pid') || productId,
-                perPricebook: true,
-                expand: [
-                    'availability',
-                    'promotions',
-                    'options',
-                    'images',
-                    'prices',
-                    'variations',
-                    'set_products'
-                ],
                 allImages: true
             }
         },
@@ -248,7 +238,10 @@ const ProductDetail = () => {
                 quantity
             }))
 
-            await addItemToNewOrExistingBasket(productItems)
+            await addItemToBasketMutation.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: productItems
+            })
 
             einstein.sendAddToCart(productItems)
 
@@ -256,7 +249,6 @@ const ProductDetail = () => {
             // by the add to cart modal.
             return productSelectionValues
         } catch (error) {
-            console.log('error', error)
             showError(error)
         }
     }
@@ -309,10 +301,7 @@ const ProductDetail = () => {
                 try {
                     einstein.sendViewProduct(child)
                 } catch (err) {
-                    logger.error('Einstein sendViewProduct error', {
-                        namespace: 'ProductDetail.useEffect',
-                        additionalProperties: {error: err, child}
-                    })
+                    console.error(err)
                 }
                 activeData.sendViewProduct(category, child, 'detail')
             })
@@ -320,10 +309,7 @@ const ProductDetail = () => {
             try {
                 einstein.sendViewProduct(product)
             } catch (err) {
-                logger.error('Einstein sendViewProduct error', {
-                    namespace: 'ProductDetail.useEffect',
-                    additionalProperties: {error: err, product}
-                })
+                console.error(err)
             }
             activeData.sendViewProduct(category, product, 'detail')
         }

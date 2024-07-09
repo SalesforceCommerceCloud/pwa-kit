@@ -8,7 +8,6 @@
 import PropTypes from 'prop-types'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import fetch from 'cross-fetch'
 
 /**
@@ -39,9 +38,9 @@ export const fetchTranslations = async (locale) => {
 
         return await response.json()
     } catch (err) {
-        logger.error(
-            'Translation not found. Loading empty messages, so that react-intl would fall back to the inline default messages',
-            {namespace: 'utils.fetchTranslations', additionalProperties: {error: err}}
+        console.error(err)
+        console.log(
+            'Translation not found. Loading empty messages, so that react-intl would fall back to the inline default messages'
         )
         return {}
     }
