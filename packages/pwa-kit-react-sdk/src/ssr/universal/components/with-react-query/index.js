@@ -64,7 +64,7 @@ export const withReactQuery = (Wrapped, options = {}) => {
                     return q
                         .fetch()
                         .then((result) => {
-                            performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryStart}:${i}`, {
+                            performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryEnd}:${i}`, {
                                 detail: q.queryHash
                             })
                             return result

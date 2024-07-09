@@ -1,58 +1,107 @@
 const NAMESPACE = 'pwa-kit-react-sdk:ssr'
-export const PERFORMANCE_MARKS = {
-    totalStart: `${NAMESPACE}:total:start`,
-    totalEnd: `${NAMESPACE}:total:end`,
-    renderToStringStart: `${NAMESPACE}:render-to-string:start`,
-    renderToStringEnd: `${NAMESPACE}:render-to-string:end`,
-    routeMatchingStart: `${NAMESPACE}:route-matching:start`,
-    routeMatchingEnd: `${NAMESPACE}:route-matching:end`,
-    loadComponentStart: `${NAMESPACE}:load-component:start`,
-    loadComponentEnd: `${NAMESPACE}:load-component:end`,
-    asyncOperationsStart: `${NAMESPACE}:async-operations:start`,
-    asyncOperationsEnd: `${NAMESPACE}:async-operations:end`,
-    reactQueryPrerenderStart: `${NAMESPACE}:async-operations:react-query:pre-render:start`,
-    reactQueryPrerenderEnd: `${NAMESPACE}:async-operations:react-query:pre-render:end`,
-    reactQueryUseQueryStart: `${NAMESPACE}:async-operations:react-query:use-query:start`,
-    reactQueryUseQueryEnd: `${NAMESPACE}:async-operations:react-query:use-query:end`
+const PERFORMANCE_MEASUREMENTS = {
+    total: `${NAMESPACE}:total`,
+    renderToString: `${NAMESPACE}:render-to-string`,
+    routeMatching: `${NAMESPACE}:route-matching`,
+    loadComponent: `${NAMESPACE}:load-component`,
+    fetchStrategies: `${NAMESPACE}:fetch-stragegies`,
+    reactQueryPrerender: `${NAMESPACE}:fetch-stragegies:react-query:pre-render`,
+    reactQueryUseQuery: `${NAMESPACE}:fetch-stragegies:react-query:use-query`
 }
-
-/**
- * This is a utility function to measure the performance of a specific performance mark.
- *
- * @param name - string (name of the performance mark)
- * @param detail - string (description of the performance mark)
- *
- * @function
- * @private
- *
- * @return {PerformanceMeasure}
- */
-const measurePerformance = (name, detail) => {
-    let _detail = detail
-    if (!detail) {
-        const endMark = performance.getEntriesByName(`${name}:end`, 'mark')[0]
-        _detail = endMark?.detail || undefined
-    }
-    return performance.measure(name, {start: `${name}:start`, end: `${name}:end`, _detail})
+export const PERFORMANCE_MARKS = {
+    totalStart: `${PERFORMANCE_MEASUREMENTS.total}:start`,
+    totalEnd: `${PERFORMANCE_MEASUREMENTS.total}:end`,
+    renderToStringStart: `${PERFORMANCE_MEASUREMENTS.renderToString}:start`,
+    renderToStringEnd: `${PERFORMANCE_MEASUREMENTS.renderToString}:end`,
+    routeMatchingStart: `${PERFORMANCE_MEASUREMENTS.routeMatching}:start`,
+    routeMatchingEnd: `${PERFORMANCE_MEASUREMENTS.routeMatching}:end`,
+    loadComponentStart: `${PERFORMANCE_MEASUREMENTS.loadComponent}:start`,
+    loadComponentEnd: `${PERFORMANCE_MEASUREMENTS.loadComponent}:end`,
+    fetchStragegiesStart: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:start`,
+    fetchStragegiesEnd: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:end`,
+    reactQueryPrerenderStart: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:start`,
+    reactQueryPrerenderEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:end`,
+    reactQueryUseQueryStart: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:start`,
+    reactQueryUseQueryEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:end`
 }
 
 /**
  * This is a utility function to get the SSR performance metrics.
  * The function returns a map of performance measurements.
- * The data is embedded in the HTML response and will be used by the client-side code to analyze the SSR performance.
+ * The data is embedded in the HTML response and will be used to analyze the SSR performance.
  *
  * @function
  * @private
  *
- * @return {Object}
+ * @return {Array}
  */
 export const getPerformanceMetrics = () => {
-    const a = performance.getEntriesByType('mark')
-    console.log(a)
+    // all marks follow the same pattern: pwa-kit-react-sdk:<name>:<start|end>(:<index>)
+    // name components:
+    // 1. namespace: pwa-kit-react-sdk
+    // 2. event <name>
+    // 3. <start|end>
+    // 4. <index> (optional)
+    const marks = performance.getEntriesByType('mark')
+    const startMarks = new Map()
+    const result = []
 
-    // TODO: calculate durations
-    // dynamically calculate useQuery and getProps
-    return {
-        total: measurePerformance('pwa-kit-react-sdk:ssr:total')
-    }
+    marks.forEach((mark) => {
+        // Handle scenarios that don't have the optional index
+        if (mark.name.endsWith(':start')) {
+            const baseName = mark.name.slice(0, mark.name.indexOf(':start'))
+            if (!startMarks.has(baseName)) {
+                startMarks.set(baseName, [])
+            }
+            startMarks.get(baseName).push(mark)
+        } else if (mark.name.endsWith(':end')) {
+            const baseName = mark.name.slice(0, mark.name.indexOf(':end'))
+            if (startMarks.has(baseName)) {
+                const startMark = startMarks.get(baseName).shift()
+                if (startMark) {
+                    const pair = {
+                        name: baseName,
+                        duration: mark.startTime - startMark.startTime,
+                        detail: mark.detail || null
+                    }
+                    result.push(pair)
+                }
+                if (startMarks.get(baseName).length === 0) {
+                    startMarks.delete(baseName)
+                }
+            }
+        }
+
+        // Use regex to match names with the optional index
+        const baseNameMatch = mark.name.match(/^(.*):(start|end)(:\d+)$/)
+        if (baseNameMatch) {
+            const baseName = baseNameMatch[1]
+            const suffix = baseNameMatch[2]
+            const index = baseNameMatch[3]
+
+            if (suffix === 'start') {
+                if (!startMarks.has(baseName)) {
+                    startMarks.set(baseName, [])
+                }
+                startMarks.get(baseName).push(mark)
+            } else if (suffix === 'end') {
+                if (startMarks.has(baseName)) {
+                    const startMark = startMarks.get(baseName).shift()
+                    if (startMark) {
+                        const pair = {
+                            name: `${baseName}${index}`,
+                            duration: mark.startTime - startMark.startTime,
+                            detail: mark.detail || null
+                        }
+                        result.push(pair)
+                    }
+                    if (startMarks.get(baseName).length === 0) {
+                        startMarks.delete(baseName)
+                    }
+                }
+            }
+        }
+    })
+
+    return result
 }

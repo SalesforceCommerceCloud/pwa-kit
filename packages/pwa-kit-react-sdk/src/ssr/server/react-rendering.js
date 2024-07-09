@@ -176,7 +176,7 @@ export const render = async (req, res, next) => {
         appState = {}
         appStateError = new errors.HTTPNotFound('Not found')
     } else {
-        performance.mark(PERFORMANCE_MARKS.asyncOperationsStart)
+        performance.mark(PERFORMANCE_MARKS.fetchStragegiesStart)
         const ret = await AppConfig.initAppState({
             App: WrappedApp,
             component,
@@ -192,7 +192,7 @@ export const render = async (req, res, next) => {
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
         appStateError = ret.error
-        performance.mark(PERFORMANCE_MARKS.asyncOperationsEnd)
+        performance.mark(PERFORMANCE_MARKS.fetchStragegiesEnd)
     }
 
     appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
@@ -319,6 +319,9 @@ const renderApp = (args) => {
         delete error.stack
     }
     performance.mark(PERFORMANCE_MARKS.totalEnd)
+    const performanceMetrics = getPerformanceMetrics()
+    performance.clearMarks()
+    performance.clearMeasures()
 
     // Do not include *dynamic*, executable inline scripts – these cause issues with
     // strict CSP headers that customers often want to use. Avoid inline scripts,
@@ -333,7 +336,7 @@ const renderApp = (args) => {
         __CONFIG__: config,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
-        __SSR_PERFORMANCE_METRICS__: getPerformanceMetrics(),
+        __SSR_PERFORMANCE_METRICS__: performanceMetrics,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
