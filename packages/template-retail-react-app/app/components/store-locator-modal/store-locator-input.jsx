@@ -17,6 +17,9 @@ import {
     FormControl,
     FormErrorMessage
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    AlertIcon
+} from '@salesforce/retail-react-app/app/components/icons'
 import {Controller} from 'react-hook-form'
 import {SUPPORTED_STORE_LOCATOR_COUNTRIES} from '@salesforce/retail-react-app/app/constants'
 const StoreLocatorInput = ({
@@ -24,11 +27,14 @@ const StoreLocatorInput = ({
     submitForm,
     searchStoresParams,
     userHasSetManualGeolocation,
-    getUserGeolocation
+    getUserGeolocation,
+    automaticGeolocationHasFailed,
+    setUserWantsToShareLocation,
+    userWantsToShareLocation
 }) => {
     const {control} = form
     const intl = useIntl()
-    console.log("(JEREMY) form.getValues(): ", form.getValues())
+
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>
@@ -38,10 +44,12 @@ const StoreLocatorInput = ({
                     defaultValue={
                         userHasSetManualGeolocation ? searchStoresParams?.countryCode : ''
                     }
-                    rules={{ required: intl.formatMessage({
-                        id: 'store_locator.error.please_select_a_country',
-                        defaultMessage: 'Please select a country.'
-                    })}}
+                    rules={{
+                        required: intl.formatMessage({
+                            id: 'store_locator.error.please_select_a_country',
+                            defaultMessage: 'Please select a country.'
+                        })
+                    }}
                     render={({field}) => {
                         return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
                             <FormControl isInvalid={form.formState.errors.countryCode}>
@@ -64,7 +72,10 @@ const StoreLocatorInput = ({
                                     )}
                                 </Select>
                                 {form.formState.errors.countryCode && (
-                                    <FormErrorMessage  sx = {{marginBottom: '10px'}} color="red.600">{form.formState.errors.countryCode.message}</FormErrorMessage>
+                                    <FormErrorMessage sx={{marginBottom: '10px'}} color="red.600">
+                                        <AlertIcon aria-hidden="true" mr={2} />
+                                        {form.formState.errors.countryCode.message}
+                                    </FormErrorMessage>
                                 )}
                             </FormControl>
                         ) : (
@@ -77,10 +88,12 @@ const StoreLocatorInput = ({
                 <Controller
                     name="postalCode"
                     control={control}
-                    rules={{ required: intl.formatMessage({
-                        id: 'store_locator.error.please_enter_a_postal_code',
-                        defaultMessage: 'Please enter a postal code.'
-                    })}}
+                    rules={{
+                        required: intl.formatMessage({
+                            id: 'store_locator.error.please_enter_a_postal_code',
+                            defaultMessage: 'Please enter a postal code.'
+                        })
+                    }}
                     defaultValue={userHasSetManualGeolocation ? searchStoresParams?.postalCode : ''}
                     render={({field}) => {
                         return (
@@ -93,7 +106,10 @@ const StoreLocatorInput = ({
                                     })}
                                 />
                                 {form.formState.errors.postalCode && (
-                                    <FormErrorMessage sx={{top: '-20px'}} color="red.600">{form.formState.errors.postalCode.message}</FormErrorMessage>
+                                    <FormErrorMessage sx={{top: '-20px'}} color="red.600">
+                                        <AlertIcon aria-hidden="true" mr={2} />
+                                        {form.formState.errors.postalCode.message}
+                                    </FormErrorMessage>
                                 )}
                             </FormControl>
                         )
@@ -102,7 +118,9 @@ const StoreLocatorInput = ({
                 <Button
                     key="find-button"
                     type="submit"
-                    onClick={() => {}}
+                    onClick={() => {
+                        setUserWantsToShareLocation(false)
+                    }}
                     width="15%"
                     variant="solid"
                 >
@@ -112,7 +130,6 @@ const StoreLocatorInput = ({
                     })}
                 </Button>
             </InputGroup>
-            <FormErrorMessage color="red.600">YOOOOO</FormErrorMessage>
             <Box
                 style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
                 margin="10px"
@@ -124,7 +141,10 @@ const StoreLocatorInput = ({
             </Box>
             <Button
                 key="use-my-location-button"
-                onClick={getUserGeolocation}
+                onClick={() => {
+                    setUserWantsToShareLocation(true)
+                    getUserGeolocation()
+                }}
                 width="100%"
                 variant="solid"
                 fontWeight="bold"
@@ -135,6 +155,20 @@ const StoreLocatorInput = ({
                     defaultMessage: 'Use My Location'
                 })}
             </Button>
+            <FormControl isInvalid={automaticGeolocationHasFailed && userWantsToShareLocation}>
+                <FormErrorMessage
+                    color="red.600"
+                    alignItems="center"
+                    justifyContent="center"
+                    marginBottom={4}
+                >
+                    <AlertIcon aria-hidden="true" mr={2} />
+                    {intl.formatMessage({
+                        id: 'store_locator.error.agree_to_share_your_location',
+                        defaultMessage: 'Please agree to share your location'
+                    })}
+                </FormErrorMessage>
+            </FormControl>
         </form>
     )
 }
@@ -146,7 +180,10 @@ StoreLocatorInput.propTypes = {
     setSearchStoresParams: PropTypes.func,
     submitForm: PropTypes.func,
     getUserGeolocation: PropTypes.func,
-    userHasSetManualGeolocation: PropTypes.bool
+    userHasSetManualGeolocation: PropTypes.bool,
+    automaticGeolocationHasFailed: PropTypes.bool,
+    setUserWantsToShareLocation: PropTypes.func,
+    userWantsToShareLocation: PropTypes.bool
 }
 
 export default StoreLocatorInput

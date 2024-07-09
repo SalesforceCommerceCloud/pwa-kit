@@ -1301,6 +1301,9 @@
   "store_locator.dropdown.united_states": {
     "defaultMessage": "United States"
   },
+  "store_locator.error.agree_to_share_your_location": {
+    "defaultMessage": "Please agree to share your location"
+  },
   "store_locator.error.please_enter_a_postal_code": {
     "defaultMessage": "Please enter a postal code."
   },

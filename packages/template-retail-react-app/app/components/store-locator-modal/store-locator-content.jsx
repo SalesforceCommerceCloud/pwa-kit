@@ -22,7 +22,6 @@ import {
     SUPPORTED_STORE_LOCATOR_COUNTRIES,
     DEFAULT_STORE_LOCATOR_COUNTRY,
     STORE_LOCATOR_DISTANCE,
-    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD,
     STORE_LOCATOR_DISTANCE_UNIT
 } from '@salesforce/retail-react-app/app/constants'
@@ -32,17 +31,15 @@ const NUM_STORES_PER_REQUEST_API_MAX = 200
 const useGeolocation = (
     setSearchStoresParams,
     userHasSetManualGeolocation,
-    setUserHasSetManualGeolocation
+    setUserHasSetManualGeolocation,
+    setAutomaticGeolocationHasFailed
 ) => {
     const getGeolocationError = () => {
-        setSearchStoresParams({
-            countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
-            postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
-        })
+        setAutomaticGeolocationHasFailed(true)
     }
 
     const getGeolocationSuccess = (position) => {
+        setAutomaticGeolocationHasFailed(false)
         setSearchStoresParams({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -81,11 +78,14 @@ const StoreLocatorContent = ({
             postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
         }
     })
-    
+    const [automaticGeolocationHasFailed, setAutomaticGeolocationHasFailed] = useState(false)
+    const [userWantsToShareLocation, setUserWantsToShareLocation] = useState(false)
+
     const getUserGeolocation = useGeolocation(
         setSearchStoresParams,
         userHasSetManualGeolocation,
-        setUserHasSetManualGeolocation
+        setUserHasSetManualGeolocation,
+        setAutomaticGeolocationHasFailed
     )
     const [limit, setLimit] = useState(searchStoresParams.limit)
 
@@ -108,7 +108,12 @@ const StoreLocatorContent = ({
         },
         {keepPreviousData: true}
     )
-    const storesInfo = isLoading ? undefined : searchStoresData?.data.slice(0, limit) || []
+
+    const storesInfo = isLoading
+        ? undefined
+        : searchStoresData?.data
+        ? searchStoresData?.data.slice(0, limit)
+        : []
     const numStores = searchStoresData?.total || 0
 
     const submitForm = async (formData) => {
@@ -134,10 +139,13 @@ const StoreLocatorContent = ({
             <StoreLocatorInput
                 form={form}
                 searchStoresParams={searchStoresParams}
+                automaticGeolocationHasFailed={automaticGeolocationHasFailed}
                 submitForm={submitForm}
                 setSearchStoresParams={setSearchStoresParams}
                 userHasSetManualGeolocation={userHasSetManualGeolocation}
                 getUserGeolocation={getUserGeolocation}
+                setUserWantsToShareLocation={setUserWantsToShareLocation}
+                userWantsToShareLocation={userWantsToShareLocation}
             ></StoreLocatorInput>
             <Accordion allowMultiple flex={[1, 1, 1, 5]}>
                 {/* Details */}
@@ -192,34 +200,33 @@ const StoreLocatorContent = ({
                               })}
                     </Box>
                 </AccordionItem>
-                <StoresList 
-                    storesInfo={storesInfo} />
+                <StoresList storesInfo={storesInfo} />
             </Accordion>
-            {limit < numStores &&
-                    limit < NUM_STORES_PER_REQUEST_API_MAX ? (
-                        <Box paddingTop="10px" marginTop="10px">
-                            <Button
-                                key="load-more-button"
-                                onClick={() => {
-                                    setLimit(limit + STORE_LOCATOR_NUM_STORES_PER_LOAD <=
-                                        NUM_STORES_PER_REQUEST_API_MAX
-                                            ? limit +
-                                            STORE_LOCATOR_NUM_STORES_PER_LOAD
-                                            : limit)
-                                }}
-                                width="100%"
-                                variant="outline"
-                                marginBottom={4}
-                            >
-                                {intl.formatMessage({
-                                    id: 'store_locator.pagination.load_more',
-                                    defaultMessage: 'Load More'
-                                })}
-                            </Button>
-                        </Box>
-                    ) : (
-                        ''
-                    )}
+            {limit < numStores && limit < NUM_STORES_PER_REQUEST_API_MAX ? (
+                <Box paddingTop="10px" marginTop="10px">
+                    <Button
+                        key="load-more-button"
+                        onClick={() => {
+                            setLimit(
+                                limit + STORE_LOCATOR_NUM_STORES_PER_LOAD <=
+                                    NUM_STORES_PER_REQUEST_API_MAX
+                                    ? limit + STORE_LOCATOR_NUM_STORES_PER_LOAD
+                                    : limit
+                            )
+                        }}
+                        width="100%"
+                        variant="outline"
+                        marginBottom={4}
+                    >
+                        {intl.formatMessage({
+                            id: 'store_locator.pagination.load_more',
+                            defaultMessage: 'Load More'
+                        })}
+                    </Button>
+                </Box>
+            ) : (
+                ''
+            )}
         </>
     )
 }

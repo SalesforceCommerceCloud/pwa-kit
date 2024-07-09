@@ -18,7 +18,7 @@ import {
 
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
-    
+
     return storesInfo?.map((store, index) => {
         return (
             <AccordionItem key={index}>
@@ -88,7 +88,7 @@ const StoresList = ({storesInfo}) => {
 }
 
 StoresList.propTypes = {
-    storesInfo: PropTypes.array.isRequired
+    storesInfo: PropTypes.array
 }
 
 export default StoresList

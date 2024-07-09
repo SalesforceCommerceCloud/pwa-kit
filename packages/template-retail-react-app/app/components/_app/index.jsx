@@ -129,6 +129,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const {site, locale, buildUrl} = useMultiSite()
+
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
 
@@ -138,6 +139,7 @@ const App = (props) => {
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useDisclosure()
+
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be
