@@ -16,6 +16,11 @@ import {Helmet} from 'react-helmet'
 import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
+import PropTypes from 'prop-types'
+import sprite from 'svg-sprite-loader/runtime/sprite.build'
+import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
+import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
@@ -28,12 +33,8 @@ import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
-import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
-import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import logger from '../../utils/logger-instance'
-import sprite from 'svg-sprite-loader/runtime/sprite.build'
-import PropTypes from 'prop-types'
+import {getPerformanceMetrics, PERFORMANCE_MARKS} from '../../utils/performance'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -117,6 +118,7 @@ export const getLocationSearch = (req, opts = {}) => {
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
+    performance.mark(PERFORMANCE_MARKS.totalStart)
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
@@ -136,6 +138,7 @@ export const render = async (req, res, next) => {
     }
 
     // Step 1 - Find the match.
+    performance.mark(PERFORMANCE_MARKS.routeMatchingStart)
     let route
     let match
 
@@ -147,9 +150,12 @@ export const render = async (req, res, next) => {
         }
         return !!match
     })
+    performance.mark(PERFORMANCE_MARKS.routeMatchingEnd)
 
     // Step 2 - Get the component
+    performance.mark(PERFORMANCE_MARKS.loadComponentStart)
     const component = await route.component.getComponent()
+    performance.mark(PERFORMANCE_MARKS.loadComponentEnd)
 
     // Step 3 - Init the app state
     const props = {
@@ -170,6 +176,7 @@ export const render = async (req, res, next) => {
         appState = {}
         appStateError = new errors.HTTPNotFound('Not found')
     } else {
+        performance.mark(PERFORMANCE_MARKS.asyncOperationsStart)
         const ret = await AppConfig.initAppState({
             App: WrappedApp,
             component,
@@ -185,6 +192,7 @@ export const render = async (req, res, next) => {
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
         appStateError = ret.error
+        performance.mark(PERFORMANCE_MARKS.asyncOperationsEnd)
     }
 
     appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
@@ -258,6 +266,7 @@ const renderToString = (jsx, extractor) =>
     ReactDOMServer.renderToString(extractor.collectChunks(jsx))
 
 const renderApp = (args) => {
+    performance.mark(PERFORMANCE_MARKS.renderToStringStart)
     const {req, res, appStateError, appJSX, appState, config} = args
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
 
@@ -284,6 +293,7 @@ const renderApp = (args) => {
             extractor
         )
     }
+    performance.mark(PERFORMANCE_MARKS.renderToStringEnd)
 
     // Setting type: 'application/json' stops the browser from executing the code.
     const scriptProps = ssrOnly ? {type: 'application/json'} : {}
@@ -308,6 +318,7 @@ const renderApp = (args) => {
     if (error && isRemote()) {
         delete error.stack
     }
+    performance.mark(PERFORMANCE_MARKS.totalEnd)
 
     // Do not include *dynamic*, executable inline scripts – these cause issues with
     // strict CSP headers that customers often want to use. Avoid inline scripts,
@@ -322,6 +333,7 @@ const renderApp = (args) => {
         __CONFIG__: config,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
+        __SSR_PERFORMANCE_METRICS__: getPerformanceMetrics(),
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)

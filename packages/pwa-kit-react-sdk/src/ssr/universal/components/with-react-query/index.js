@@ -9,6 +9,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {FetchStrategy} from '../fetch-strategy'
+import {PERFORMANCE_MARKS} from '../../../../utils/performance'
 
 const STATE_KEY = '__reactQuery'
 
@@ -51,18 +52,28 @@ export const withReactQuery = (Wrapped, options = {}) => {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient(queryClientConfig))
 
+            performance.mark(PERFORMANCE_MARKS.reactQueryPrerenderStart)
             // Use `ssrPrepass` to collect all uses of `useQuery`.
             await ssrPrepass(appJSX)
-
+            performance.mark(PERFORMANCE_MARKS.reactQueryPrerenderEnd)
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
             await Promise.all(
-                queries.map((q) =>
-                    // If there's an error in this fetch, react-query will log the error
-                    q.fetch().catch(() => {
-                        // On our end, simply catch any error and move on to the next query
-                    })
-                )
+                queries.map((q, i) => {
+                    performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryStart}:${i}`)
+                    return q
+                        .fetch()
+                        .then((result) => {
+                            performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryStart}:${i}`, {
+                                detail: q.queryHash
+                            })
+                            return result
+                        })
+                        .catch(() => {
+                            // If there's an error in this fetch, react-query will log the error
+                            // On our end, simply catch any error and move on to the next query
+                        })
+                })
             )
 
             return {[STATE_KEY]: dehydrate(queryClient)}
