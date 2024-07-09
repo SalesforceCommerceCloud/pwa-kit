@@ -25,7 +25,7 @@ const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...o
                     {`${category?.name || searchQuery || ''}`}
                 </Heading>
                 <Heading as="h2" size="lg" marginRight={2}>
-                    {!isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>}
+                    {!isLoading && productSearchResult?.total && `(${productSearchResult.total})`}
                 </Heading>
             </Flex>
         </Box>

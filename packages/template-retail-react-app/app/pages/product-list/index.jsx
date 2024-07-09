@@ -428,7 +428,7 @@ const ProductList = (props) => {
                                 searchQuery={searchQuery}
                                 category={category}
                                 productSearchResult={productSearchResult}
-                                isLoading={isLoading}
+                                isLoading={isLoading || isRefetching}
                             />
                         </Flex>
 
@@ -455,7 +455,7 @@ const ProductList = (props) => {
                                 searchQuery={searchQuery}
                                 category={category}
                                 productSearchResult={productSearchResult}
-                                isLoading={isLoading}
+                                isLoading={isLoading || isRefetching}
                             />
                             <Stack
                                 display={{base: 'flex', md: 'none'}}
