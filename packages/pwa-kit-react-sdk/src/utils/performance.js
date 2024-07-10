@@ -55,9 +55,7 @@ export const getPerformanceMetrics = () => {
         }
 
         if (mark.name.includes(':start')) {
-            if (!startMarks.has(mark.name)) {
-                startMarks.set(mark.name, mark)
-            }
+            startMarks.set(mark.name, mark)
         }
 
         if (mark.name.includes(':end')) {
