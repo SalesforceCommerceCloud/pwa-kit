@@ -42,22 +42,24 @@ export default {
             color: 'black',
             justifyContent: 'flex-start',
             fontSize: 'sm',
-            _hover: {bg: 'gray.50', textDecoration: 'underline'},
+            _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: '#181818'},
             _activeLink: {
-                bg: 'gray.50',
-                borderBlock: 'solid',
-                borderBlockWidth: '1px'
+                bg: 'gray.100',
+                border: 'solid',
+                borderColor: '#0176D3',
+                borderWidth: '1px'
             }
         },
         'menu-link-mobile': {
             color: 'black',
             justifyContent: 'flex-start',
             fontSize: 'sm',
-            _hover: {bg: 'gray.50', textDecoration: 'underline'},
+            _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: '#181818'},
             _activeLink: {
                 bg: 'gray.100',
-                borderBlock: 'solid',
-                borderBlockWidth: '1px'
+                border: 'solid',
+                borderColor: '#0176D3',
+                borderWidth: '1px'
             }
         },
         'search-link': {
