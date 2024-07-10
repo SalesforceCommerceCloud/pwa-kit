@@ -1,5 +1,3 @@
-import {performance} from 'perf_hooks'
-
 const NAMESPACE = 'pwa-kit-react-sdk:ssr'
 const PERFORMANCE_MEASUREMENTS = {
     total: `${NAMESPACE}:total`,

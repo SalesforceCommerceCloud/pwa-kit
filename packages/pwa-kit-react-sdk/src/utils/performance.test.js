@@ -1,4 +1,3 @@
-import {performance} from 'perf_hooks'
 import {getPerformanceMetrics} from './performance'
 
 describe('getPerformanceMetrics', () => {

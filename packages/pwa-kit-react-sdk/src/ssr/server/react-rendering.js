@@ -10,7 +10,6 @@
  */
 
 import path from 'path'
-import {performance} from 'perf_hooks'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import {Helmet} from 'react-helmet'
