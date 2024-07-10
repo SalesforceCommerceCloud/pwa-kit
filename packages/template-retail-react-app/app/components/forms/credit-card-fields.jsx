@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import ccValidator from 'card-validator'
 import {useIntl} from 'react-intl'
@@ -33,6 +33,7 @@ import {
 
 const CreditCardFields = ({form, prefix = ''}) => {
     const {formatMessage} = useIntl()
+    const [isTooltipOpen, setIsTooltipOpen] = useState(false)
     const fields = useCreditCardFields({form, prefix})
 
     // Rerender the fields when we `cardType` changes so the detected
@@ -57,6 +58,22 @@ const CreditCardFields = ({form, prefix = ''}) => {
                   defaultMessage: 'This 3-digit code can be found on the back of your card.',
                   description: 'Generic credit card security code help text'
               })
+
+    const handleTooltipClose = () => {
+        setIsTooltipOpen(false)
+        if (document) {
+            document.removeEventListener('click', handleTooltipClose)
+            document.removeEventListener('keydown', handleTooltipClose)
+        }
+    }
+
+    const handleTooltipOpen = () => {
+        setIsTooltipOpen(true)
+        if (document) {
+            document.addEventListener('click', handleTooltipClose)
+            document.addEventListener('keydown', handleTooltipClose)
+        }
+    }
 
     return (
         <Box>
@@ -135,21 +152,32 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                 <FormLabel display="inline" mr={1}>
                                     {fields.securityCode.label}
                                 </FormLabel>
-                                <Tooltip
-                                    hasArrow
-                                    placement="top"
-                                    label={securityCodeTooltipLabel}
-                                    shouldWrapChildren={true}
+                                <Box
+                                    onMouseEnter={() => {
+                                        handleTooltipOpen()
+                                    }}
+                                    onFocus={() => {
+                                        handleTooltipOpen()
+                                    }}
+                                    as="span"
                                 >
-                                    <InfoIcon
-                                        boxSize={5}
-                                        color="gray.700"
-                                        aria-label={formatMessage({
-                                            id: 'credit_card_fields.tool_tip.security_code_aria_label',
-                                            defaultMessage: 'Security code info'
-                                        })}
-                                    />
-                                </Tooltip>
+                                    <Tooltip
+                                        hasArrow
+                                        placement="top"
+                                        label={securityCodeTooltipLabel}
+                                        shouldWrapChildren={true}
+                                        isOpen={isTooltipOpen}
+                                    >
+                                        <InfoIcon
+                                            boxSize={5}
+                                            color="gray.700"
+                                            aria-label={formatMessage({
+                                                id: 'credit_card_fields.tool_tip.security_code_aria_label',
+                                                defaultMessage: 'Security code info'
+                                            })}
+                                        />
+                                    </Tooltip>
+                                </Box>
                             </>
                         }
                     />
