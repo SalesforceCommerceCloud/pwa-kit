@@ -55,7 +55,9 @@ export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
                             isInitialPageRef.current = false
                             return window.__INITIAL_CORRELATION_ID__
                         }
-                        return uuidv4()
+                        // TODO: expensive call (~500ms)
+                        // return uuidv4()
+                        return 'abc'
                     }}
                 >
                     <AppConfig locals={locals}>
