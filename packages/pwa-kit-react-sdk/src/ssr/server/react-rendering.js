@@ -320,15 +320,18 @@ const renderApp = (args) => {
     }
     performance.mark(PERFORMANCE_MARKS.totalEnd)
 
-    let performanceMetrics = {}
+    let performanceMetrics = []
     try {
         performanceMetrics = getPerformanceMetrics()
 
         // DISCUSSION! HOW DO WE WANT TO CONTROL THIS?
         const TBD_FEATURE_FLAG = true
         if (TBD_FEATURE_FLAG) {
-            // TODO: prettify print
-            console.debug('Performance metrics', performanceMetrics)
+            console.debug('======Performance metrics======')
+            performanceMetrics.forEach((metric) => {
+                console.debug(`${metric.name} - ${metric.duration}`)
+            })
+            console.debug('===============================')
         }
     } catch (e) {
         console.warn('Failed to get performance metrics', e)
