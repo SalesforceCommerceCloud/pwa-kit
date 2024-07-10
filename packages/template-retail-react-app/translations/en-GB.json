@@ -337,6 +337,12 @@
   "confirmation_modal.default.action.yes": {
     "defaultMessage": "Yes"
   },
+  "confirmation_modal.default.assistive_msg.no": {
+    "defaultMessage": "No, cancel action"
+  },
+  "confirmation_modal.default.assistive_msg.yes": {
+    "defaultMessage": "Yes, confirm action"
+  },
   "confirmation_modal.default.message.you_want_to_continue": {
     "defaultMessage": "Are you sure you want to continue?"
   },
@@ -350,6 +356,15 @@
     "defaultMessage": "Remove"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
+    "defaultMessage": "Yes, remove item"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.no": {
+    "defaultMessage": "No, keep item"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": {
+    "defaultMessage": "Remove unavailable products"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": {
     "defaultMessage": "Yes, remove item"
   },
   "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {

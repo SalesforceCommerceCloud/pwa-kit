@@ -73,7 +73,13 @@ beforeEach(() => {
                             currency: 'GBP',
                             name: 'Long Sleeve Crew Neck',
                             pricePerUnit: 19.18,
-                            price: 19.18
+                            price: 19.18,
+                            inventory: {
+                                stockLevel: 10,
+                                orderable: true,
+                                backorder: false,
+                                preorderable: false
+                            }
                         }
                     ]
                 })
@@ -334,9 +340,9 @@ test('Can proceed through checkout steps as guest', async () => {
     await user.click(submitBtn)
 
     // Wait for next step to render
-    await waitFor(() =>
+    await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
-    )
+    })
 
     // Email should be displayed in previous step summary
     expect(screen.getByText('test@test.com')).toBeInTheDocument()
