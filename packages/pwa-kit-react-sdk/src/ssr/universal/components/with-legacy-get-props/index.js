@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import React from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {FetchStrategy} from '../fetch-strategy'
-import React from 'react'
+import {PERFORMANCE_MARKS} from '../../../../utils/performance'
 
 export const withLegacyGetProps = (Wrapped) => {
     /* istanbul ignore next */
@@ -27,16 +28,25 @@ export const withLegacyGetProps = (Wrapped) => {
             const {params} = match
 
             const components = [App, route.component]
-            const promises = components.map((c) =>
-                c.getProps
-                    ? c.getProps({
-                          req,
-                          res,
-                          params,
-                          location
-                      })
+            const promises = components.map((c, i) => {
+                performance.mark(`${PERFORMANCE_MARKS.getPropsStart}:${i}`)
+                console.log(c)
+                return c.getProps
+                    ? c
+                          .getProps({
+                              req,
+                              res,
+                              params,
+                              location
+                          })
+                          .then((result) => {
+                              performance.mark(`${PERFORMANCE_MARKS.getPropsEnd}:${i}`, {
+                                  detail: c.displayName
+                              })
+                              return result
+                          })
                     : Promise.resolve({})
-            )
+            })
 
             const [appProps, pageProps] = await Promise.all(promises)
             return {

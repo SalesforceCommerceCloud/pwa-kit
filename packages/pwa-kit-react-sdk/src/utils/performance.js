@@ -6,7 +6,8 @@ const PERFORMANCE_MEASUREMENTS = {
     loadComponent: `${NAMESPACE}:load-component`,
     fetchStrategies: `${NAMESPACE}:fetch-stragegies`,
     reactQueryPrerender: `${NAMESPACE}:fetch-stragegies:react-query:pre-render`,
-    reactQueryUseQuery: `${NAMESPACE}:fetch-stragegies:react-query:use-query`
+    reactQueryUseQuery: `${NAMESPACE}:fetch-stragegies:react-query:use-query`,
+    getProps: `${NAMESPACE}:fetch-stragegies:get-props`
 }
 export const PERFORMANCE_MARKS = {
     totalStart: `${PERFORMANCE_MEASUREMENTS.total}:start`,
@@ -22,7 +23,9 @@ export const PERFORMANCE_MARKS = {
     reactQueryPrerenderStart: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:start`,
     reactQueryPrerenderEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:end`,
     reactQueryUseQueryStart: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:start`,
-    reactQueryUseQueryEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:end`
+    reactQueryUseQueryEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:end`,
+    getPropsStart: `${PERFORMANCE_MEASUREMENTS.getProps}:start`,
+    getPropsEnd: `${PERFORMANCE_MEASUREMENTS.getProps}:end`
 }
 
 /**
