@@ -324,6 +324,13 @@ const renderApp = (args) => {
     let performanceMetrics = {}
     try {
         performanceMetrics = getPerformanceMetrics()
+
+        // DISCUSSION! HOW DO WE WANT TO CONTROL THIS?
+        const TBD_FEATURE_FLAG = true
+        if (TBD_FEATURE_FLAG) {
+            // TODO: prettify print
+            console.debug('Performance metrics', performanceMetrics)
+        }
     } catch (e) {
         console.warn('Failed to get performance metrics', e)
     }
