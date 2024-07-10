@@ -111,7 +111,8 @@ export const useCustomQuery = (
                         shortCode: config.organizationId
                     },
                     proxy: config.proxy,
-                    ...clientConfig
+                    ...clientConfig,
+                    throwOnBadResponse: true
                 }
             })
         }

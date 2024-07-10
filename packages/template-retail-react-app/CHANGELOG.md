@@ -1,3 +1,9 @@
+## v3.0.1 (Jul 9, 2024)
+
+### Bug Fixes 
+
+- Fix basket transfer during checkout login [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
+
 ## v3.0.0 (Jun 25, 2024)
 
 ### Improvements
