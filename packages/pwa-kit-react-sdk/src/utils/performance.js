@@ -30,7 +30,7 @@ export const PERFORMANCE_MARKS = {
 
 /**
  * This is a utility function to get the SSR performance metrics.
- * The function returns a map of performance measurements.
+ * The function returns an array of performance measurements.
  * The data is embedded in the HTML response and will be used to analyze the SSR performance.
  *
  * @function
