@@ -699,6 +699,27 @@ describe('The Node SSR Environment', () => {
                 // Because of the prepass step we'll expect that this method is called twice.
                 expect(console.log).toHaveBeenCalledTimes(2)
             }
+        },
+        {
+            description: `Performance metrics are embedded in the HTML response`,
+            req: {url: '/pwa/'},
+            assertions: (res) => {
+                const html = res.text
+                const doc = parse(html)
+                const scriptContent = doc.querySelector('#mobify-data').innerHTML
+                const mobifyData = JSON.parse(scriptContent)
+
+                mobifyData.__SSR_PERFORMANCE_METRICS__.forEach((metrics) => {
+                    expect(metrics).toHaveProperty('name')
+                    expect(metrics.duration).toBeGreaterThan(0)
+                })
+
+                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:total')
+                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:route-matching')
+                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:load-component')
+                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:fetch-stragegies')
+                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:render-to-string')
+            }
         }
     ]
 
