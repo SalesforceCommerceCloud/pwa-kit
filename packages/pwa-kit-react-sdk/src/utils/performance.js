@@ -50,58 +50,26 @@ export const getPerformanceMetrics = () => {
     const result = []
 
     marks.forEach((mark) => {
-        // Handle scenarios that don't have the optional index
-        if (mark.name.endsWith(':start')) {
-            const baseName = mark.name.slice(0, mark.name.indexOf(':start'))
-            if (!startMarks.has(baseName)) {
-                startMarks.set(baseName, [])
-            }
-            startMarks.get(baseName).push(mark)
-        } else if (mark.name.endsWith(':end')) {
-            const baseName = mark.name.slice(0, mark.name.indexOf(':end'))
-            if (startMarks.has(baseName)) {
-                const startMark = startMarks.get(baseName).shift()
-                if (startMark) {
-                    const pair = {
-                        name: baseName,
-                        duration: mark.startTime - startMark.startTime,
-                        detail: mark.detail || null
-                    }
-                    result.push(pair)
-                }
-                if (startMarks.get(baseName).length === 0) {
-                    startMarks.delete(baseName)
-                }
+        if (!mark.name.includes('pwa-kit-react-sdk')) {
+            return
+        }
+
+        if (mark.name.includes(':start')) {
+            if (!startMarks.has(mark.name)) {
+                startMarks.set(mark.name, mark)
             }
         }
 
-        // Use regex to match names with the optional index
-        const baseNameMatch = mark.name.match(/^(.*):(start|end)(:\d+)$/)
-        if (baseNameMatch) {
-            const baseName = baseNameMatch[1]
-            const suffix = baseNameMatch[2]
-            const index = baseNameMatch[3]
-
-            if (suffix === 'start') {
-                if (!startMarks.has(baseName)) {
-                    startMarks.set(baseName, [])
+        if (mark.name.includes(':end')) {
+            const correspondingStartMarkName = mark.name.replace(':end', ':start')
+            const startMark = startMarks.get(correspondingStartMarkName)
+            if (startMark) {
+                const measurement = {
+                    name: mark.name.replace(':end', ''),
+                    duration: mark.startTime - startMark.startTime,
+                    detail: mark.detail || null
                 }
-                startMarks.get(baseName).push(mark)
-            } else if (suffix === 'end') {
-                if (startMarks.has(baseName)) {
-                    const startMark = startMarks.get(baseName).shift()
-                    if (startMark) {
-                        const pair = {
-                            name: `${baseName}${index}`,
-                            duration: mark.startTime - startMark.startTime,
-                            detail: mark.detail || null
-                        }
-                        result.push(pair)
-                    }
-                    if (startMarks.get(baseName).length === 0) {
-                        startMarks.delete(baseName)
-                    }
-                }
+                result.push(measurement)
             }
         }
     })

@@ -30,6 +30,10 @@ describe('getPerformanceMetrics', () => {
                     name: 'pwa-kit-react-sdk:ssr:fetch-stragegies:react-query:use-query:end:0',
                     startTime: 1500,
                     detail: 'useProduct'
+                },
+                {
+                    name: 'other:random:marks',
+                    startTime: 100
                 }
             ])
         })
