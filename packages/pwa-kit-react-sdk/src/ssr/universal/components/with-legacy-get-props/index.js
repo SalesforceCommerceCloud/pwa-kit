@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {performance} from 'perf_hooks'
 import React from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {FetchStrategy} from '../fetch-strategy'
@@ -30,7 +31,6 @@ export const withLegacyGetProps = (Wrapped) => {
             const components = [App, route.component]
             const promises = components.map((c, i) => {
                 performance.mark(`${PERFORMANCE_MARKS.getPropsStart}:${i}`)
-                console.log(c)
                 return c.getProps
                     ? c
                           .getProps({

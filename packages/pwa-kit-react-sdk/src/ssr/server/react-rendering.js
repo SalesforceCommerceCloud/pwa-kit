@@ -10,6 +10,7 @@
  */
 
 import path from 'path'
+import {performance} from 'perf_hooks'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import {Helmet} from 'react-helmet'
@@ -319,7 +320,13 @@ const renderApp = (args) => {
         delete error.stack
     }
     performance.mark(PERFORMANCE_MARKS.totalEnd)
-    const performanceMetrics = getPerformanceMetrics()
+
+    let performanceMetrics = {}
+    try {
+        performanceMetrics = getPerformanceMetrics()
+    } catch (e) {
+        console.warn('Failed to get performance metrics', e)
+    }
     performance.clearMarks()
     performance.clearMeasures()
 
