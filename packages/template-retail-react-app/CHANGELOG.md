@@ -1,4 +1,5 @@
 ## v3.1.0-dev (Jun 25, 2024)
+
 ### Bug Fixes
 
 - Out of stock and low stock items are removed from cart and checkout as unavailable products [#1865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1865)
@@ -6,6 +7,12 @@
 ### Accessibility Improvements
 
 - Improve accessibility readout for strikethrough price on shipping options in checkout page [#1892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1892)
+
+## v3.0.1 (Jul 9, 2024)
+
+### Bug Fixes 
+
+- Fix basket transfer during checkout login [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
 
 ## v3.0.0 (Jun 25, 2024)
 
