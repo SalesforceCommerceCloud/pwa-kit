@@ -659,6 +659,24 @@
       "value": "Shipping"
     }
   ],
+  "checkout_confirmation.label.shipping.strikethrough.price": [
+    {
+      "type": 0,
+      "value": "Orginally "
+    },
+    {
+      "type": 1,
+      "value": "originalPrice"
+    },
+    {
+      "type": 0,
+      "value": ", now "
+    },
+    {
+      "type": 1,
+      "value": "newPrice"
+    }
+  ],
   "checkout_confirmation.label.subtotal": [
     {
       "type": 0,

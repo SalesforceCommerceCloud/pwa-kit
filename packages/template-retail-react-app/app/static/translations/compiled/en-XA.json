@@ -1363,6 +1363,32 @@
       "value": "]"
     }
   ],
+  "checkout_confirmation.label.shipping.strikethrough.price": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿřɠīƞȧȧŀŀẏ "
+    },
+    {
+      "type": 1,
+      "value": "originalPrice"
+    },
+    {
+      "type": 0,
+      "value": ", ƞǿǿẇ "
+    },
+    {
+      "type": 1,
+      "value": "newPrice"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "checkout_confirmation.label.subtotal": [
     {
       "type": 0,
