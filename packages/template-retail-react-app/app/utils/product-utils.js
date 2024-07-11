@@ -6,6 +6,7 @@
  */
 
 import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
+import {isVariantValueOrderable} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
 
 /**
  * Get the human-friendly version of the variation values that users have selected.
@@ -142,12 +143,13 @@ export const filterImageGroups = (imageGroups = [], filters) => {
  */
 export const getDecoratedVariationAttributes = (product, opts = {}) => {
     const swatchViewType = opts.swatchViewType || 'swatch'
-
     return product?.variationAttributes?.map((variationAttribute) => ({
         ...variationAttribute,
         values: variationAttribute.values.map((value) => {
             const variationValues = {[variationAttribute.id]: value.value}
-
+            const params = {
+                [variationAttribute.id]: value.value
+            }
             return {
                 ...value,
                 swatch: filterImageGroups(product.imageGroups, {
@@ -157,7 +159,8 @@ export const getDecoratedVariationAttributes = (product, opts = {}) => {
                 href: rebuildPathWithParams(
                     productUrlBuilder({id: product.productId}),
                     variationValues
-                )
+                ),
+                orderable: isVariantValueOrderable(product, params)
             }
         })
     }))

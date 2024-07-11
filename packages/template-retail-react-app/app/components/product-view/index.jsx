@@ -361,6 +361,7 @@ const ProductView = forwardRef(
                                 variationAttributes.map(({id, name, selectedValue, values}) => {
                                     const swatches = values.map(
                                         ({href, name, image, value, orderable}, index) => {
+                                            if (!orderable) return null
                                             const content = image ? (
                                                 <Box
                                                     height="100%"

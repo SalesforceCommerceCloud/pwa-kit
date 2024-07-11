@@ -85,8 +85,8 @@ const ProductTile = (props) => {
         badgeDetails = PRODUCT_BADGE_DETAILS,
         ...rest
     } = props
-    const {imageGroups, productId, representedProduct, variants} = product
-
+    const {imageGroups, productId, representedProduct} = product
+    const variants = product?.variants?.filter((variant) => !!variant.orderable)
     const intl = useIntl()
     const {currency} = useCurrency()
     const isFavouriteLoading = useRef(false)
@@ -131,7 +131,6 @@ const ProductTile = (props) => {
 
     // NOTE: variationAttributes are only defined for master/variant type products.
     const variationAttributes = useMemo(() => getDecoratedVariationAttributes(product), [product])
-
     // ProductTile is used by two components, RecommendedProducts and ProductList.
     // RecommendedProducts provides a localized product name as `name` and non-localized product
     // name as `productName`. ProductList provides a localized name as `productName` and does not
@@ -210,7 +209,8 @@ const ProductTile = (props) => {
                                 setSelectableAttributeValue(value)
                             }}
                         >
-                            {values?.map(({name, swatch, value}) => {
+                            {values?.map(({name, swatch, value, orderable}) => {
+                                if (!orderable) return null
                                 const content = swatch ? (
                                     <Box
                                         height="100%"
