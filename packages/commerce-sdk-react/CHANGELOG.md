@@ -1,6 +1,12 @@
 ## v2.1.0-dev (Jun 25, 2024)
 - Updated StorefrontPreview component to make siteId available [#1874](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1874)
 
+## v2.0.1 (Jul 08, 2024)
+- Fix private slas proxy config for commerce api in provider [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
+- Fix `useCustomQuery` error handling [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
+- Fix `updateCustomer` squashing existing data [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
+- Fix `transferBasket` updating the wrong customer basket [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
+
 ## v2.0.0 (Jun 25, 2024)
 - Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
 - Add Shopper Stores hooks [#1788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1788)

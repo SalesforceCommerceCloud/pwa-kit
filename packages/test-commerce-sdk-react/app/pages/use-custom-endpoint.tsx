@@ -10,17 +10,23 @@ import {useCustomQuery} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
 
 const UseCustomEndpoint = () => {
-    const query = useCustomQuery({
+    const {data, error} = useCustomQuery({
         options: {
             method: 'GET',
             customApiPathParameters: {
+                apiVersion: 'v1',
                 endpointPath: 'test-hello-world',
                 apiName: 'hello-world'
             }
         },
         rawResponse: false
     })
-    return <Json data={query.data} />
+
+    if (error) {
+        return <h1 style={{color: 'red'}}>Something is wrong</h1>
+    }
+
+    return <Json data={data} />
 }
 
 UseCustomEndpoint.getTemplateName = () => 'UseCustomEndpoint'

@@ -23,7 +23,7 @@ import {
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {Logger} from './types'
-
+import {MOBIFY_PATH, SLAS_PRIVATE_PROXY_PATH} from './constant'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
@@ -136,6 +136,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchOptions
     }
 
+    const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
+    const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -143,7 +146,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperCustomers: new ShopperCustomers(config),
             shopperExperience: new ShopperExperience(config),
             shopperGiftCertificates: new ShopperGiftCertificates(config),
-            shopperLogin: new ShopperLogin(config),
+            shopperLogin: new ShopperLogin({
+                ...config,
+                proxy: enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy
+            }),
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
