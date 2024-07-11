@@ -42,11 +42,11 @@ export default {
             color: 'black',
             justifyContent: 'flex-start',
             fontSize: 'sm',
-            _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: '#181818'},
+            _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
             _activeLink: {
                 bg: 'gray.100',
                 border: 'solid',
-                borderColor: '#0176D3',
+                borderColor: 'blue.600',
                 borderWidth: '1px'
             }
         },
@@ -54,11 +54,11 @@ export default {
             color: 'black',
             justifyContent: 'flex-start',
             fontSize: 'sm',
-            _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: '#181818'},
+            _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
             _activeLink: {
                 bg: 'gray.100',
                 border: 'solid',
-                borderColor: '#0176D3',
+                borderColor: 'blue.600',
                 borderWidth: '1px'
             }
         },
