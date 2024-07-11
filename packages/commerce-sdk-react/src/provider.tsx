@@ -18,7 +18,8 @@ import {
     ShopperSearch,
     ShopperSeo,
     ShopperBasketsTypes,
-    ShopperStores
+    ShopperStores,
+    ClientConfigInit
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
@@ -137,6 +138,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     }
 
     const apiClients = useMemo(() => {
+        return new MyApiClients(config)
+
+        // TODO: can we delay/lazy-load these? ~70ms
+        /*
         return {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
@@ -151,6 +156,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperSeo: new ShopperSeo(config),
             shopperStores: new ShopperStores(config)
         }
+        */
     }, [
         clientId,
         organizationId,
@@ -223,3 +229,62 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
 }
 
 export default CommerceApiProvider
+
+class MyApiClients implements ApiClients {
+    private config
+    private clients: Partial<ApiClients>
+
+    // @ts-ignore
+    private getClient(name: string, ClientClass) {
+        // @ts-ignore
+        if (this.clients[name]) return this.clients[name]
+
+        console.log('--- Initialize client for', name)
+        // @ts-ignore
+        this.clients[name] = new ClientClass(this.config)
+        // @ts-ignore
+        return this.clients[name]
+    }
+
+    constructor(config: ClientConfigInit<ApiClientConfigParams>) {
+        this.config = config
+        this.clients = {}
+    }
+
+    get shopperBaskets(): ShopperBaskets<ApiClientConfigParams> {
+        return this.getClient('shopperBaskets', ShopperBaskets)
+    }
+    get shopperContexts(): ShopperContexts<ApiClientConfigParams> {
+        return this.getClient('shopperContexts', ShopperContexts)
+    }
+    get shopperCustomers(): ShopperCustomers<ApiClientConfigParams> {
+        return this.getClient('shopperCustomers', ShopperCustomers)
+    }
+    get shopperExperience(): ShopperExperience<ApiClientConfigParams> {
+        return this.getClient('shopperExperience', ShopperExperience)
+    }
+    get shopperGiftCertificates(): ShopperGiftCertificates<ApiClientConfigParams> {
+        return this.getClient('shopperGiftCertificates', ShopperGiftCertificates)
+    }
+    get shopperLogin(): ShopperLogin<ApiClientConfigParams> {
+        return this.getClient('shopperLogin', ShopperLogin)
+    }
+    get shopperOrders(): ShopperOrders<ApiClientConfigParams> {
+        return this.getClient('shopperOrders', ShopperOrders)
+    }
+    get shopperProducts(): ShopperProducts<ApiClientConfigParams> {
+        return this.getClient('shopperProducts', ShopperProducts)
+    }
+    get shopperPromotions(): ShopperPromotions<ApiClientConfigParams> {
+        return this.getClient('shopperPromotions', ShopperPromotions)
+    }
+    get shopperSearch(): ShopperSearch<ApiClientConfigParams> {
+        return this.getClient('shopperSearch', ShopperSearch)
+    }
+    get shopperSeo(): ShopperSeo<ApiClientConfigParams> {
+        return this.getClient('shopperSeo', ShopperSeo)
+    }
+    get shopperStores(): ShopperStores<ApiClientConfigParams> {
+        return this.getClient('shopperStores', ShopperStores)
+    }
+}
