@@ -116,8 +116,8 @@ const StoreLocatorContent = ({
 
     const storesInfo = isLoading
         ? undefined
-        : searchStoresData.data
-        ? searchStoresData.data.slice(0, limit)
+        : searchStoresData?.data
+        ? searchStoresData?.data.slice(0, limit)
         : []
     const numStores = searchStoresData?.total || 0
 
