@@ -118,7 +118,7 @@ export const start = () => {
     const props = {
         error: window.__ERROR__,
         locals: locals,
-        routes: getRoutes(locals),
+        routes: getRoutes(locals), // quite an expensive call ~80ms
         WrappedApp: routeComponent(App, false, locals)
     }
 

@@ -170,6 +170,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     ])
 
     const auth = useMemo(() => {
+        // TODO: quite expensive call ~70ms
         return new Auth({
             clientId,
             organizationId,
