@@ -2,6 +2,7 @@
 ### Bug Fixes
 
 - Out of stock and low stock items are removed from cart and checkout as unavailable products [#1865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1865)
+- Does not show swatch of unorderable product on product tile [#1893](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1893)
 
 ## v3.0.0 (Jun 25, 2024)
 
