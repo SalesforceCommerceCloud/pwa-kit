@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import PropTypes from 'prop-types'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {useIntl} from 'react-intl'
@@ -28,7 +27,6 @@ const withRegistration = (
 ) => {
     const WrappedComponent = ({onClick = noop, ...passThroughProps}) => {
         const {data: customer} = useCurrentCustomer()
-        const authModal = useAuthModal()
         const showToast = useToast()
         const location = useLocation()
         const {formatMessage, locale} = useIntl()
@@ -46,7 +44,7 @@ const withRegistration = (
                         status: 'info'
                     })
                 } else {
-                    authModal.onOpen()
+                    // authModal.onOpen()
                 }
             } else {
                 onClick()
@@ -56,7 +54,6 @@ const withRegistration = (
         return (
             <React.Fragment>
                 <Component {...passThroughProps} onClick={handleClick} />
-                <AuthModal {...authModal} onLoginSuccess={onClick} />
             </React.Fragment>
         )
     }

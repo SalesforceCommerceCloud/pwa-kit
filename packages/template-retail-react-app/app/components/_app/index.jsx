@@ -47,7 +47,6 @@ import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/comp
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
 
 // Hooks
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
@@ -127,7 +126,6 @@ const App = (props) => {
     const activeData = useActiveData()
     const history = useHistory()
     const location = useLocation()
-    const authModal = useAuthModal()
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
@@ -407,8 +405,6 @@ const App = (props) => {
                                 </SkipNavContent>
 
                                 {!isCheckout ? <Footer /> : <CheckoutFooter />}
-
-                                <AuthModal {...authModal} />
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>
