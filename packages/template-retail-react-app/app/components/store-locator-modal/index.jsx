@@ -24,29 +24,15 @@ import {
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD
 } from '@salesforce/retail-react-app/app/constants'
+import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/hooks'
 
 const StoreLocatorModal = ({isOpen, onClose}) => {
-    const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
-
-    const [searchStoresParams, setSearchStoresParams] = useState({
-        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
-        postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
-    })
-
+    const storeLocator = useStoreLocator()
     const isDesktopView = useBreakpointValue({base: false, lg: true})
 
-    const storeLocatorContent = (
-        <StoreLocatorContent
-            searchStoresParams={searchStoresParams}
-            setSearchStoresParams={setSearchStoresParams}
-            userHasSetManualGeolocation={userHasSetManualGeolocation}
-            setUserHasSetManualGeolocation={setUserHasSetManualGeolocation}
-        />
-    )
-
-    return isOpen ? (
-        <>
+    // Instead of prop-drilling the storeLocator states, we can use React Context to pass those states around
+    return (
+        <StoreLocatorContext.Provider value={storeLocator}>
             {isDesktopView ? (
                 <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
                     <ModalContent
@@ -67,7 +53,7 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                             borderLeft="1px solid"
                             borderColor="gray.200"
                         >
-                            {storeLocatorContent}
+                            <StoreLocatorContent />
                         </ModalBody>
                     </ModalContent>
                 </Modal>
@@ -84,14 +70,12 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                     >
                         <ModalCloseButton onClick={onClose} />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
-                            {storeLocatorContent}
+                            <StoreLocatorContent />
                         </ModalBody>
                     </ModalContent>
                 </Modal>
             )}
-        </>
-    ) : (
-        <></>
+        </StoreLocatorContext.Provider>
     )
 }
 
@@ -101,3 +85,5 @@ StoreLocatorModal.propTypes = {
 }
 
 export default StoreLocatorModal
+
+export const StoreLocatorContext = React.createContext()

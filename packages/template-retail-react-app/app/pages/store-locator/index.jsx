@@ -18,36 +18,30 @@ import {
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD
 } from '@salesforce/retail-react-app/app/constants'
+import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/hooks'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
 
 const StoreLocator = () => {
-    const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
-    const [searchStoresParams, setSearchStoresParams] = useState({
-        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
-        postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
-    })
+    const storeLocator = useStoreLocator()
 
     return (
-        <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
-            <Seo title="Store Locator" description="Find a Store" />
-            <Container
-                overflowY="scroll"
-                paddingTop={8}
-                width={['90%']}
-                bg="white"
-                paddingBottom={14}
-                marginTop={8}
-                marginBottom={8}
-                borderRadius="base"
-            >
-                <StoreLocatorContent
-                    searchStoresParams={searchStoresParams}
-                    setSearchStoresParams={setSearchStoresParams}
-                    setUserHasSetManualGeolocation={setUserHasSetManualGeolocation}
-                    userHasSetManualGeolocation={userHasSetManualGeolocation}
-                />
-            </Container>
-        </Box>
+        <StoreLocatorContext.Provider value={storeLocator}>
+            <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
+                <Seo title="Store Locator" description="Find a Store" />
+                <Container
+                    overflowY="scroll"
+                    paddingTop={8}
+                    width={['90%']}
+                    bg="white"
+                    paddingBottom={14}
+                    marginTop={8}
+                    marginBottom={8}
+                    borderRadius="base"
+                >
+                    <StoreLocatorContent />
+                </Container>
+            </Box>
+        </StoreLocatorContext.Provider>
     )
 }
 

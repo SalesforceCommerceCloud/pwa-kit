@@ -33,16 +33,23 @@ const NUM_STORES_PER_REQUEST_API_MAX = 200
 // Hooks
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
-const useGeolocation = (
-    setSearchStoresParams,
-    userHasSetManualGeolocation,
-    setUserHasSetManualGeolocation,
-    setAutomaticGeolocationHasFailed
-) => {
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/hooks'
+
+// This custom hooks no longer requires input from you.
+// Typically custom hooks are seen as convenient helpers
+// and so usually they don't require React states but they create them for you.
+export const useGeolocation = () => {
+    const {
+        setSearchStoresParams,
+        setAutomaticGeolocationHasFailed,
+        setUserHasSetManualGeolocation,
+        userHasSetManualGeolocation
+    } = useStoreLocator()
+
     const getGeolocationError = () => {
         setAutomaticGeolocationHasFailed(true)
     }
-
     const getGeolocationSuccess = (position) => {
         setAutomaticGeolocationHasFailed(false)
         setSearchStoresParams({
@@ -53,7 +60,7 @@ const useGeolocation = (
     }
 
     const getUserGeolocation = () => {
-        if (typeof navigator !== 'undefined' && navigator.geolocation) {
+        if (navigator?.geolocation) {
             navigator.geolocation.getCurrentPosition(getGeolocationSuccess, getGeolocationError)
             setUserHasSetManualGeolocation(false)
         } else {
@@ -68,12 +75,14 @@ const useGeolocation = (
     return getUserGeolocation
 }
 
-const StoreLocatorContent = ({
-    searchStoresParams,
-    setSearchStoresParams,
-    userHasSetManualGeolocation,
-    setUserHasSetManualGeolocation
-}) => {
+const StoreLocatorContent = () => {
+    const {
+        userHasSetManualGeolocation,
+        setUserHasSetManualGeolocation,
+        searchStoresParams,
+        setSearchStoresParams
+    } = React.useContext(StoreLocatorContext)
+
     const intl = useIntl()
     const form = useForm({
         mode: 'onChange',
@@ -83,15 +92,7 @@ const StoreLocatorContent = ({
             postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
         }
     })
-    const [automaticGeolocationHasFailed, setAutomaticGeolocationHasFailed] = useState(false)
-    const [userWantsToShareLocation, setUserWantsToShareLocation] = useState(false)
 
-    const getUserGeolocation = useGeolocation(
-        setSearchStoresParams,
-        userHasSetManualGeolocation,
-        setUserHasSetManualGeolocation,
-        setAutomaticGeolocationHasFailed
-    )
     const [limit, setLimit] = useState(searchStoresParams.limit)
 
     const {data: searchStoresData, isLoading} = useSearchStores(
@@ -141,17 +142,7 @@ const StoreLocatorContent = ({
                     defaultMessage: 'Find a Store'
                 })}
             </Heading>
-            <StoreLocatorInput
-                form={form}
-                searchStoresParams={searchStoresParams}
-                automaticGeolocationHasFailed={automaticGeolocationHasFailed}
-                submitForm={submitForm}
-                setSearchStoresParams={setSearchStoresParams}
-                userHasSetManualGeolocation={userHasSetManualGeolocation}
-                getUserGeolocation={getUserGeolocation}
-                setUserWantsToShareLocation={setUserWantsToShareLocation}
-                userWantsToShareLocation={userWantsToShareLocation}
-            ></StoreLocatorInput>
+            <StoreLocatorInput form={form} submitForm={submitForm}></StoreLocatorInput>
             <Accordion allowMultiple flex={[1, 1, 1, 5]}>
                 {/* Details */}
                 <AccordionItem>

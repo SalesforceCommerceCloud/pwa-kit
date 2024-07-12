@@ -24,19 +24,20 @@ import {Controller} from 'react-hook-form'
 
 // Others
 import {SUPPORTED_STORE_LOCATOR_COUNTRIES} from '@salesforce/retail-react-app/app/constants'
+import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/hooks'
+import {useGeolocation} from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 
-const StoreLocatorInput = ({
-    form,
-    submitForm,
-    searchStoresParams,
-    userHasSetManualGeolocation,
-    getUserGeolocation,
-    automaticGeolocationHasFailed,
-    setUserWantsToShareLocation,
-    userWantsToShareLocation
-}) => {
+const StoreLocatorInput = ({form, submitForm}) => {
     const {control} = form
     const intl = useIntl()
+    const getUserGeolocation = useGeolocation()
+    const {
+        searchStoresParams,
+        userHasSetManualGeolocation,
+        userWantsToShareLocation,
+        setUserWantsToShareLocation,
+        automaticGeolocationHasFailed
+    } = useStoreLocator()
 
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
@@ -142,6 +143,7 @@ const StoreLocatorInput = ({
                     defaultMessage: 'Or'
                 })}
             </Box>
+            {/* TODO: a bug with my code: clicking this button does not show the error message */}
             <Button
                 key="use-my-location-button"
                 onClick={() => {
