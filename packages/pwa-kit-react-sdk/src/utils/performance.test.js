@@ -23,7 +23,7 @@ describe('getPerformanceMetrics', () => {
         performance.mark('pwa-kit-react-sdk:ssr:total:end')
         const result = getPerformanceMetrics()
         expect(result).toHaveLength(1)
-        expect(result[0].name).toBe('pwa-kit-react-sdk:ssr:total')
+        expect(result[0].name).toBe('total')
     })
 })
 
@@ -43,9 +43,7 @@ describe('buildServerTimingHeader', () => {
             {name: 'pwa-kit-react-sdk:ssr:total', duration: 1900, detail: null}
         ]
         const result = buildServerTimingHeader(metrics)
-        expect(result).toBe(
-            'fetch-stragegies:react-query:use-query:0;dur=1000;desc="useProduct", total;dur=1900'
-        )
+        expect(result).toBe('fetch-stragegies:react-query:use-query:0;dur=1000, total;dur=1900')
     })
 })
 

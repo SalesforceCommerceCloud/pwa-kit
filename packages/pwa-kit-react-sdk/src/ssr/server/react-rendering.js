@@ -237,16 +237,9 @@ export const render = async (req, res, next) => {
     let performanceMetrics = []
     try {
         performanceMetrics = getPerformanceMetrics()
-
-        // DISCUSSION! HOW DO WE WANT TO CONTROL THIS?
-        const TBD_FEATURE_FLAG = true
-        if (TBD_FEATURE_FLAG) {
-            console.debug('======Performance metrics======')
-            performanceMetrics.forEach((metric) => {
-                console.debug(`${metric.name} - ${metric.duration}`)
-            })
-            console.debug('===============================')
-        }
+        performanceMetrics.forEach((metric) => {
+            logger.debug(`${metric.name} - ${metric.duration}ms`, {namespace: 'performance'})
+        })
     } catch (e) {
         console.warn('Failed to get performance metrics', e)
     }

@@ -69,8 +69,8 @@ export const getPerformanceMetrics = () => {
             const startMark = startMarks.get(correspondingStartMarkName)
             if (startMark) {
                 const measurement = {
-                    name: mark.name.replace(':end', ''),
-                    duration: mark.startTime - startMark.startTime,
+                    name: mark.name.replace(':end', '').replace(`${NAMESPACE}:`, ''),
+                    duration: (mark.startTime - startMark.startTime).toFixed(2),
                     detail: mark.detail || null
                 }
                 result.push(measurement)
@@ -95,11 +95,7 @@ export const getPerformanceMetrics = () => {
 export const buildServerTimingHeader = (metrics) => {
     const header = metrics
         .map((metric) => {
-            // strip out the namespace from the header to reduce http response size
-            const name = metric.name.replace(`${NAMESPACE}:`, '')
-            const dur = `;dur=${metric.duration}`
-            const desc = metric.detail ? `;desc="${metric.detail}"` : ''
-            return `${name}${dur}${desc}`
+            return `${metric.name};dur=${metric.duration}`
         })
         .join(', ')
 
