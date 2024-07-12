@@ -134,10 +134,10 @@ describe('Swatch Component', () => {
         )
 
         expect(screen.getAllByRole('radio')).toHaveLength(data.values.length)
-        const firstSwatch = screen.getAllByRole('radio')[0]
+        const firstSwatch = screen.getAllByRole('radio')[2]
         fireEvent.click(firstSwatch)
         await waitFor(() => {
-            expect(history.location.search).toBe('?color=BLACKFB')
+            expect(history.location.search).toBe('?color=JJ3HDXX')
         })
     })
 
