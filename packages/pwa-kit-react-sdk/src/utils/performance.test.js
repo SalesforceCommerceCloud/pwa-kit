@@ -7,6 +7,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+// The @jest-environment comment block *MUST* be the first line of the file for the tests to pass.
+// That conflicts with the monorepo header rule, so we must disable the rule!
+/* eslint-disable header/header */
+
 import {getPerformanceMetrics, clearPerformanceMarks, buildServerTimingHeader} from './performance'
 
 describe('getPerformanceMetrics', () => {
@@ -18,8 +22,8 @@ describe('getPerformanceMetrics', () => {
         performance.mark('pwa-kit-react-sdk:ssr:total:start')
         performance.mark('pwa-kit-react-sdk:ssr:total:end')
         const result = getPerformanceMetrics()
-        expect(result.length).toEqual(1)
-        expect(result[0].name).toEqual('pwa-kit-react-sdk:ssr:total')
+        expect(result).toHaveLength(1)
+        expect(result[0].name).toBe('pwa-kit-react-sdk:ssr:total')
     })
 })
 
