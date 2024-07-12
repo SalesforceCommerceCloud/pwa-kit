@@ -182,7 +182,7 @@ export const render = async (req, res, next) => {
         appState = {}
         appStateError = new errors.HTTPNotFound('Not found')
     } else {
-        performance.mark(PERFORMANCE_MARKS.fetchStragegiesStart)
+        performance.mark(PERFORMANCE_MARKS.fetchStrategiesStart)
         const ret = await AppConfig.initAppState({
             App: WrappedApp,
             component,
@@ -198,7 +198,7 @@ export const render = async (req, res, next) => {
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
         appStateError = ret.error
-        performance.mark(PERFORMANCE_MARKS.fetchStragegiesEnd)
+        performance.mark(PERFORMANCE_MARKS.fetchStrategiesEnd)
     }
     performance.mark(PERFORMANCE_MARKS.renderToStringStart)
     appJSX = React.cloneElement(appJSX, {error: appStateError, appState})

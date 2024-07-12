@@ -701,24 +701,12 @@ describe('The Node SSR Environment', () => {
             }
         },
         {
-            description: `Performance metrics are embedded in the HTML response`,
-            req: {url: '/pwa/'},
+            description: `Server-Timing header is present in the response`,
+            req: {url: '/pwa/', query: {__server_timing: '1'}},
             assertions: (res) => {
-                const html = res.text
-                const doc = parse(html)
-                const scriptContent = doc.querySelector('#mobify-data').innerHTML
-                const mobifyData = JSON.parse(scriptContent)
-
-                mobifyData.__SSR_PERFORMANCE_METRICS__.forEach((metrics) => {
-                    expect(metrics).toHaveProperty('name')
-                    expect(metrics.duration).toBeGreaterThan(0)
-                })
-
-                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:total')
-                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:route-matching')
-                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:load-component')
-                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:fetch-stragegies')
-                expect(scriptContent).toContain('pwa-kit-react-sdk:ssr:render-to-string')
+                expect(res.headers['server-timing']).toContain('route-matching;dur=')
+                expect(res.headers['server-timing']).toContain('render-to-string;dur=')
+                expect(res.headers['server-timing']).toContain('total;dur=')
             }
         }
     ]

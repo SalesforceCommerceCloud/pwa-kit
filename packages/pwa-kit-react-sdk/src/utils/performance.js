@@ -4,10 +4,10 @@ const PERFORMANCE_MEASUREMENTS = {
     renderToString: `${NAMESPACE}:render-to-string`,
     routeMatching: `${NAMESPACE}:route-matching`,
     loadComponent: `${NAMESPACE}:load-component`,
-    fetchStrategies: `${NAMESPACE}:fetch-stragegies`,
-    reactQueryPrerender: `${NAMESPACE}:fetch-stragegies:react-query:pre-render`,
-    reactQueryUseQuery: `${NAMESPACE}:fetch-stragegies:react-query:use-query`,
-    getProps: `${NAMESPACE}:fetch-stragegies:get-props`
+    fetchStrategies: `${NAMESPACE}:fetch-strategies`,
+    reactQueryPrerender: `${NAMESPACE}:fetch-strategies:react-query:pre-render`,
+    reactQueryUseQuery: `${NAMESPACE}:fetch-strategies:react-query:use-query`,
+    getProps: `${NAMESPACE}:fetch-strategies:get-props`
 }
 export const PERFORMANCE_MARKS = {
     totalStart: `${PERFORMANCE_MEASUREMENTS.total}:start`,
@@ -18,8 +18,8 @@ export const PERFORMANCE_MARKS = {
     routeMatchingEnd: `${PERFORMANCE_MEASUREMENTS.routeMatching}:end`,
     loadComponentStart: `${PERFORMANCE_MEASUREMENTS.loadComponent}:start`,
     loadComponentEnd: `${PERFORMANCE_MEASUREMENTS.loadComponent}:end`,
-    fetchStragegiesStart: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:start`,
-    fetchStragegiesEnd: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:end`,
+    fetchStrategiesStart: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:start`,
+    fetchStrategiesEnd: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:end`,
     reactQueryPrerenderStart: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:start`,
     reactQueryPrerenderEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:end`,
     reactQueryUseQueryStart: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:start`,
