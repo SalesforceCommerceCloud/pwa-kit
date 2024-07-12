@@ -1,3 +1,6 @@
+## v2.0.2 (Jul 12, 2024)
+- Updated StorefrontPreview component to make siteId available [#1874](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1874)
+
 ## v2.0.1 (Jul 08, 2024)
 - Fix private slas proxy config for commerce api in provider [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
 - Fix `useCustomQuery` error handling [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
