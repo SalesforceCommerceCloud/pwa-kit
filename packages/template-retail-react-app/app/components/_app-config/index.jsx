@@ -27,7 +27,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {ssrNamespace, proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
@@ -55,6 +55,13 @@ const AppConfig = ({children, locals = {}}) => {
 
     const appOrigin = getAppOrigin()
 
+    // we can either do this here or update the proxy path in the app config
+    // inside default.js
+    // this endpoint is where commerce-sdk-react will send requests to
+    const proxy = ssrNamespace
+        ? `${appOrigin}/${ssrNamespace}${commerceApiConfig.proxyPath}`
+        : `${appOrigin}${commerceApiConfig.proxyPath}`
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -64,7 +71,7 @@ const AppConfig = ({children, locals = {}}) => {
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
-            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            proxy={proxy}
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
