@@ -16,5 +16,9 @@
 
 import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
+//console.log(`Bundle base path: ${bundleBasePath}`)
+
 /* global __webpack_public_path__: writable */
 __webpack_public_path__ = `${bundleBasePath}/development/`
+
+// __webpack_public_path__ = `/local/mobify/bundle/development/`
