@@ -44,7 +44,7 @@ export default {
             fontSize: 'sm',
             _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
             _activeLink: {
-                bg: 'gray.100',
+                bg: 'gray.50',
                 border: 'solid',
                 borderColor: 'blue.600',
                 borderWidth: '1px'
@@ -56,7 +56,7 @@ export default {
             fontSize: 'sm',
             _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
             _activeLink: {
-                bg: 'gray.100',
+                bg: 'gray.50',
                 border: 'solid',
                 borderColor: 'blue.600',
                 borderWidth: '1px'
