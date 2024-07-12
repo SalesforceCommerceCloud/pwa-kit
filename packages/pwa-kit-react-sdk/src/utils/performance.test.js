@@ -36,11 +36,11 @@ describe('buildServerTimingHeader', () => {
     test('should build the Server-Timing header', () => {
         const metrics = [
             {
-                name: 'pwa-kit-react-sdk:ssr:fetch-stragegies:react-query:use-query:0',
+                name: 'fetch-stragegies:react-query:use-query:0',
                 duration: 1000,
                 detail: 'useProduct'
             },
-            {name: 'pwa-kit-react-sdk:ssr:total', duration: 1900, detail: null}
+            {name: 'total', duration: 1900, detail: null}
         ]
         const result = buildServerTimingHeader(metrics)
         expect(result).toBe('fetch-stragegies:react-query:use-query:0;dur=1000, total;dur=1900')
