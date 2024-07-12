@@ -34,7 +34,12 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import logger from '../../utils/logger-instance'
-import {getPerformanceMetrics, PERFORMANCE_MARKS} from '../../utils/performance'
+import {
+    buildServerTimingHeader,
+    clearPerformanceMarks,
+    getPerformanceMetrics,
+    PERFORMANCE_MARKS
+} from '../../utils/performance'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -118,6 +123,7 @@ export const getLocationSearch = (req, opts = {}) => {
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
+    const includeServerTimingHeader = '__server_timing' in req.query
     performance.mark(PERFORMANCE_MARKS.totalStart)
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
@@ -194,7 +200,7 @@ export const render = async (req, res, next) => {
         appStateError = ret.error
         performance.mark(PERFORMANCE_MARKS.fetchStragegiesEnd)
     }
-
+    performance.mark(PERFORMANCE_MARKS.renderToStringStart)
     appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
 
     // Step 4 - Render the App
@@ -219,12 +225,36 @@ export const render = async (req, res, next) => {
         // default error handling middleware provided by Express
         return next(e)
     }
+    performance.mark(PERFORMANCE_MARKS.renderToStringEnd)
+    performance.mark(PERFORMANCE_MARKS.totalEnd)
 
     // Step 5 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
     const {html, routerContext, error} = renderResult
     const redirectUrl = routerContext.url
     const status = (error && error.status) || res.statusCode
+
+    let performanceMetrics = []
+    try {
+        performanceMetrics = getPerformanceMetrics()
+
+        // DISCUSSION! HOW DO WE WANT TO CONTROL THIS?
+        const TBD_FEATURE_FLAG = true
+        if (TBD_FEATURE_FLAG) {
+            console.debug('======Performance metrics======')
+            performanceMetrics.forEach((metric) => {
+                console.debug(`${metric.name} - ${metric.duration}`)
+            })
+            console.debug('===============================')
+        }
+    } catch (e) {
+        console.warn('Failed to get performance metrics', e)
+    }
+    clearPerformanceMarks()
+
+    if (includeServerTimingHeader) {
+        res.setHeader('Server-Timing', buildServerTimingHeader(performanceMetrics))
+    }
 
     if (redirectUrl) {
         res.redirect(302, redirectUrl)
@@ -266,7 +296,6 @@ const renderToString = (jsx, extractor) =>
     ReactDOMServer.renderToString(extractor.collectChunks(jsx))
 
 const renderApp = (args) => {
-    performance.mark(PERFORMANCE_MARKS.renderToStringStart)
     const {req, res, appStateError, appJSX, appState, config} = args
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
 
@@ -293,7 +322,6 @@ const renderApp = (args) => {
             extractor
         )
     }
-    performance.mark(PERFORMANCE_MARKS.renderToStringEnd)
 
     // Setting type: 'application/json' stops the browser from executing the code.
     const scriptProps = ssrOnly ? {type: 'application/json'} : {}
@@ -318,26 +346,6 @@ const renderApp = (args) => {
     if (error && isRemote()) {
         delete error.stack
     }
-    performance.mark(PERFORMANCE_MARKS.totalEnd)
-
-    let performanceMetrics = []
-    try {
-        performanceMetrics = getPerformanceMetrics()
-
-        // DISCUSSION! HOW DO WE WANT TO CONTROL THIS?
-        const TBD_FEATURE_FLAG = true
-        if (TBD_FEATURE_FLAG) {
-            console.debug('======Performance metrics======')
-            performanceMetrics.forEach((metric) => {
-                console.debug(`${metric.name} - ${metric.duration}`)
-            })
-            console.debug('===============================')
-        }
-    } catch (e) {
-        console.warn('Failed to get performance metrics', e)
-    }
-    performance.clearMarks()
-    performance.clearMeasures()
 
     // Do not include *dynamic*, executable inline scripts – these cause issues with
     // strict CSP headers that customers often want to use. Avoid inline scripts,
@@ -352,7 +360,6 @@ const renderApp = (args) => {
         __CONFIG__: config,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
-        __SSR_PERFORMANCE_METRICS__: performanceMetrics,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)

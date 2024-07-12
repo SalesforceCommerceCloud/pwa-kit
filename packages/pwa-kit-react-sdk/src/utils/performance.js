@@ -74,3 +74,46 @@ export const getPerformanceMetrics = () => {
 
     return result
 }
+
+/**
+ * This is a utility function to build the Server-Timing header.
+ * The function receives an array of performance metrics and returns a string that represents the Server-Timing header.
+ *
+ * see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Server-Timing
+ *
+ * @function
+ * @private
+ *
+ * @return {String}
+ */
+export const buildServerTimingHeader = (metrics) => {
+    const header = metrics
+        .map((metric) => {
+            // strip out the namespace from the header to reduce http response size
+            const name = metric.name.replace(`${NAMESPACE}:`, '')
+            const dur = `;dur=${metric.duration}`
+            const desc = metric.detail ? `;desc="${metric.detail}"` : ''
+            return `${name}${dur}${desc}`
+        })
+        .join(', ')
+
+    return header
+}
+
+/**
+ * This is a utility function that clears all performance marks created by the sdk.
+ *
+ * @function
+ * @private
+ *
+ * @return {String}
+ */
+export const clearPerformanceMarks = () => {
+    const marks = performance.getEntriesByType('mark')
+
+    marks.forEach((mark) => {
+        if (mark.name.includes(NAMESPACE)) {
+            performance.clearMarks(mark.name)
+        }
+    })
+}
