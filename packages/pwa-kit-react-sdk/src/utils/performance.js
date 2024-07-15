@@ -15,26 +15,14 @@ export const PERFORMANCE_MARKS = {
     reactQueryUseQuery: 'ssr:fetch-strategies:react-query:use-query',
     getProps: 'ssr:fetch-strategies:get-prop'
 }
-// export const PERFORMANCE_MARKS = {
-//     totalStart: `${PERFORMANCE_MEASUREMENTS.total}:start`,
-//     totalEnd: `${PERFORMANCE_MEASUREMENTS.total}:end`,
-//     renderToStringStart: `${PERFORMANCE_MEASUREMENTS.renderToString}:start`,
-//     renderToStringEnd: `${PERFORMANCE_MEASUREMENTS.renderToString}:end`,
-//     routeMatchingStart: `${PERFORMANCE_MEASUREMENTS.routeMatching}:start`,
-//     routeMatchingEnd: `${PERFORMANCE_MEASUREMENTS.routeMatching}:end`,
-//     loadComponentStart: `${PERFORMANCE_MEASUREMENTS.loadComponent}:start`,
-//     loadComponentEnd: `${PERFORMANCE_MEASUREMENTS.loadComponent}:end`,
-//     fetchStrategiesStart: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:start`,
-//     fetchStrategiesEnd: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:end`,
-//     reactQueryPrerenderStart: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:start`,
-//     reactQueryPrerenderEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:end`,
-//     reactQueryUseQueryStart: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:start`,
-//     reactQueryUseQueryEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:end`,
-//     getPropsStart: `${PERFORMANCE_MEASUREMENTS.getProps}:start`,
-//     getPropsEnd: `${PERFORMANCE_MEASUREMENTS.getProps}:end`
-// }
 
 /**
+ * This is an SDK internal class that is responsible for measuring server side performance.
+ *
+ * This class manages two types of performance marks: start and end.
+ *
+ * By default, this timer is disabled. Only certain environment variables and feature flags turns it on.
+ *
  * @private
  */
 export default class PerformanceTimer {
@@ -51,6 +39,17 @@ export default class PerformanceTimer {
         this.metrics = []
     }
 
+    /**
+     * This is a utility function to build the Server-Timing header.
+     * The function receives an array of performance metrics and returns a string that represents the Server-Timing header.
+     *
+     * see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Server-Timing
+     *
+     * @function
+     * @private
+     *
+     * @return {String}
+     */
     buildServerTimingHeader() {
         const header = this.metrics
             .map((metric) => {
@@ -61,6 +60,12 @@ export default class PerformanceTimer {
         return header
     }
 
+    /**
+     * A utility function to format and log the performance metrics.
+     *
+     * @function
+     * @private
+     */
     log() {
         this.metrics.forEach((metric) => {
             logger.debug(`${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
@@ -69,6 +74,13 @@ export default class PerformanceTimer {
         })
     }
 
+    /**
+     * This is a utility function to create performance marks.
+     * The data will be used in console logs and the http response header `server-timing`.
+     *
+     * @function
+     * @private
+     */
     mark(name, type, options = {}) {
         if (!this.enabled) {
             return
