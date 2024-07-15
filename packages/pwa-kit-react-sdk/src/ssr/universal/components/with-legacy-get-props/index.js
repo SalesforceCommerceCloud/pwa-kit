@@ -29,7 +29,12 @@ export const withLegacyGetProps = (Wrapped) => {
 
             const components = [App, route.component]
             const promises = components.map((c, i) => {
-                performance.mark(`${PERFORMANCE_MARKS.getPropsStart}:${i}`)
+                // getTemplateName is a promise and it's intentially not awaited here
+                // to avoid blocking the execution of the getProps function to maximize performance
+                // getTemplateName should be very fast, under 0.2ms
+                c.getTemplateName().then((templateName) => {
+                    performance.mark(`${PERFORMANCE_MARKS.getPropsStart}::${templateName}`)
+                })
                 return c.getProps
                     ? c
                           .getProps({
@@ -39,8 +44,10 @@ export const withLegacyGetProps = (Wrapped) => {
                               location
                           })
                           .then((result) => {
-                              performance.mark(`${PERFORMANCE_MARKS.getPropsEnd}:${i}`, {
-                                  detail: c.displayName
+                              c.getTemplateName().then((templateName) => {
+                                  performance.mark(
+                                      `${PERFORMANCE_MARKS.getPropsEnd}::${templateName}`
+                                  )
                               })
                               return result
                           })

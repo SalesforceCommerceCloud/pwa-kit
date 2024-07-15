@@ -60,11 +60,11 @@ export const withReactQuery = (Wrapped, options = {}) => {
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
             await Promise.all(
                 queries.map((q, i) => {
-                    performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryStart}:${i}`)
+                    performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryStart}::${i}`)
                     return q
                         .fetch()
                         .then((result) => {
-                            performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryEnd}:${i}`, {
+                            performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryEnd}::${i}`, {
                                 detail: q.queryHash
                             })
                             return result
