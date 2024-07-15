@@ -65,6 +65,9 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                         width="33.33%"
                         height="100vh"
                         marginTop="0px"
+                        overflowY="auto"
+                        borderLeft="1px solid"
+                        borderColor="gray.200"
                     >
                         <ModalCloseButton onClick={onClose} />
                         <ModalBody
@@ -72,8 +75,6 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                             bg="white"
                             paddingBottom={6}
                             paddingTop={6}
-                            borderLeft="1px solid"
-                            borderColor="gray.200"
                         >
                             <StoreLocatorContent />
                         </ModalBody>
@@ -86,8 +87,6 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                         top="0"
                         right="0"
                         height="100vh"
-                        borderLeft="1px solid"
-                        borderColor="gray.200"
                         marginTop="0px"
                     >
                         <ModalCloseButton onClick={onClose} />

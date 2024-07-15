@@ -28,16 +28,18 @@ import {
     STORE_LOCATOR_NUM_STORES_PER_LOAD
 } from '@salesforce/retail-react-app/app/constants'
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
-const useGeolocation = (
-    setSearchStoresParams,
-    userHasSetManualGeolocation,
-    setUserHasSetManualGeolocation,
-    setAutomaticGeolocationHasFailed
-) => {
+
+const useGeolocation = () => {
+    const {
+        setSearchStoresParams,
+        setAutomaticGeolocationHasFailed,
+        setUserHasSetManualGeolocation,
+        userHasSetManualGeolocation
+    } = useContext(StoreLocatorContext)
+
     const getGeolocationError = () => {
         setAutomaticGeolocationHasFailed(true)
     }
-
     const getGeolocationSuccess = (position) => {
         setAutomaticGeolocationHasFailed(false)
         setSearchStoresParams({
@@ -48,7 +50,7 @@ const useGeolocation = (
     }
 
     const getUserGeolocation = () => {
-        if (typeof navigator !== 'undefined' && navigator.geolocation) {
+        if (navigator?.geolocation) {
             navigator.geolocation.getCurrentPosition(getGeolocationSuccess, getGeolocationError)
             setUserHasSetManualGeolocation(false)
         } else {
@@ -66,21 +68,13 @@ const useGeolocation = (
 const StoreLocatorInput = ({form, submitForm}) => {
     const {
         searchStoresParams,
-        setSearchStoresParams,
         userHasSetManualGeolocation,
         automaticGeolocationHasFailed,
         setUserWantsToShareLocation,
-        userWantsToShareLocation,
-        setUserHasSetManualGeolocation,
-        setAutomaticGeolocationHasFailed
+        userWantsToShareLocation
     } = useContext(StoreLocatorContext)
 
-    const getUserGeolocation = useGeolocation(
-        setSearchStoresParams,
-        userHasSetManualGeolocation,
-        setUserHasSetManualGeolocation,
-        setAutomaticGeolocationHasFailed
-    )
+    const getUserGeolocation = useGeolocation()
     const {control} = form
     const intl = useIntl()
     return (
