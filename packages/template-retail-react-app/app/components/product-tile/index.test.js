@@ -62,7 +62,7 @@ test('Remove from wishlist cannot be muti-clicked', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
 })
 
-test.only('Renders variant details based on the selected swatch', async () => {
+test('Renders variant details based on the selected swatch', async () => {
     useBreakpointValue.mockReturnValue(true)
 
     const {getAllByRole, getByTestId} = renderWithProviders(
