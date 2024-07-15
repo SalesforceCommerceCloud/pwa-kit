@@ -220,10 +220,6 @@ const WrapperComponent = ({searchStoresParams, userHasSetManualGeolocation}) => 
         storeLocator.setSearchStoresParams(searchStoresParams)
         storeLocator.setUserHasSetManualGeolocation(userHasSetManualGeolocation)
     }, [])
-    console.log(
-        '(JEREMY) storeLocator.userHasSetManualGeolocation: ',
-        storeLocator.userHasSetManualGeolocation
-    )
     return (
         <StoreLocatorContext.Provider value={storeLocator}>
             <StoreLocatorContent />
