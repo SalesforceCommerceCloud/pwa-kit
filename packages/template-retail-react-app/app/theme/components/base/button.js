@@ -45,9 +45,9 @@ export default {
             _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
             _activeLink: {
                 bg: 'gray.50',
-                border: 'solid',
-                borderColor: 'blue.600',
-                borderWidth: '1px'
+                borderLeft: 'solid',
+                borderLeftColor: 'gray.600',
+                borderLeftWidth: '4px'
             }
         },
         'menu-link-mobile': {
@@ -57,9 +57,9 @@ export default {
             _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
             _activeLink: {
                 bg: 'gray.50',
-                border: 'solid',
-                borderColor: 'blue.600',
-                borderWidth: '1px'
+                borderLeft: 'solid',
+                borderLeftColor: 'gray.300',
+                borderLeftWidth: '4px'
             }
         },
         'search-link': {
