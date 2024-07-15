@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect, useContext} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -23,21 +23,66 @@ import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {Controller} from 'react-hook-form'
 
 // Others
-import {SUPPORTED_STORE_LOCATOR_COUNTRIES} from '@salesforce/retail-react-app/app/constants'
-
-const StoreLocatorInput = ({
-    form,
-    submitForm,
-    searchStoresParams,
+import {
+    SUPPORTED_STORE_LOCATOR_COUNTRIES,
+    STORE_LOCATOR_NUM_STORES_PER_LOAD
+} from '@salesforce/retail-react-app/app/constants'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+const useGeolocation = (
+    setSearchStoresParams,
     userHasSetManualGeolocation,
-    getUserGeolocation,
-    automaticGeolocationHasFailed,
-    setUserWantsToShareLocation,
-    userWantsToShareLocation
-}) => {
+    setUserHasSetManualGeolocation,
+    setAutomaticGeolocationHasFailed
+) => {
+    const getGeolocationError = () => {
+        setAutomaticGeolocationHasFailed(true)
+    }
+
+    const getGeolocationSuccess = (position) => {
+        setAutomaticGeolocationHasFailed(false)
+        setSearchStoresParams({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+        })
+    }
+
+    const getUserGeolocation = () => {
+        if (typeof navigator !== 'undefined' && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(getGeolocationSuccess, getGeolocationError)
+            setUserHasSetManualGeolocation(false)
+        } else {
+            console.log('Geolocation not supported')
+        }
+    }
+
+    useEffect(() => {
+        if (!userHasSetManualGeolocation) getUserGeolocation()
+    }, [])
+
+    return getUserGeolocation
+}
+
+const StoreLocatorInput = ({form, submitForm}) => {
+    const {
+        searchStoresParams,
+        setSearchStoresParams,
+        userHasSetManualGeolocation,
+        automaticGeolocationHasFailed,
+        setUserWantsToShareLocation,
+        userWantsToShareLocation,
+        setUserHasSetManualGeolocation,
+        setAutomaticGeolocationHasFailed
+    } = useContext(StoreLocatorContext)
+
+    const getUserGeolocation = useGeolocation(
+        setSearchStoresParams,
+        userHasSetManualGeolocation,
+        setUserHasSetManualGeolocation,
+        setAutomaticGeolocationHasFailed
+    )
     const {control} = form
     const intl = useIntl()
-
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>
@@ -178,15 +223,7 @@ const StoreLocatorInput = ({
 
 StoreLocatorInput.propTypes = {
     form: PropTypes.object,
-    storesInfo: PropTypes.array,
-    searchStoresParams: PropTypes.object,
-    setSearchStoresParams: PropTypes.func,
-    submitForm: PropTypes.func,
-    getUserGeolocation: PropTypes.func,
-    userHasSetManualGeolocation: PropTypes.bool,
-    automaticGeolocationHasFailed: PropTypes.bool,
-    setUserWantsToShareLocation: PropTypes.func,
-    userWantsToShareLocation: PropTypes.bool
+    submitForm: PropTypes.func
 }
 
 export default StoreLocatorInput

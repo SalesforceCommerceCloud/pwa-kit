@@ -5,13 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '@salesforce/retail-react-app/app/constants'
 import {rest} from 'msw'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
 const mockStoresData = [
     {
         address1: '162 University Ave',
@@ -213,13 +215,19 @@ const mockNoStores = {
 }
 
 const WrapperComponent = ({searchStoresParams, userHasSetManualGeolocation}) => {
+    const storeLocator = useStoreLocator()
+    useEffect(() => {
+        storeLocator.setSearchStoresParams(searchStoresParams)
+        storeLocator.setUserHasSetManualGeolocation(userHasSetManualGeolocation)
+    }, [])
+    console.log(
+        '(JEREMY) storeLocator.userHasSetManualGeolocation: ',
+        storeLocator.userHasSetManualGeolocation
+    )
     return (
-        <StoreLocatorContent
-            searchStoresParams={searchStoresParams}
-            setSearchStoresParams={jest.fn()}
-            userHasSetManualGeolocation={userHasSetManualGeolocation}
-            setUserHasSetManualGeolocation={jest.fn()}
-        />
+        <StoreLocatorContext.Provider value={storeLocator}>
+            <StoreLocatorContent />
+        </StoreLocatorContext.Provider>
     )
 }
 WrapperComponent.propTypes = {
@@ -278,7 +286,7 @@ describe('StoreLocatorContent', () => {
             const findButton = screen.getByRole('button', {name: /Find/i})
             const useMyLocationButton = screen.getByRole('button', {name: /Use My Location/i})
             const descriptionFindAStore = screen.getByText(/Find a Store/i)
-            const viewing = screen.getByText(/Viewing stores within 100mi of 10178 in Germany/i)
+            const viewing = screen.getByText(/Viewing stores within 100km of 10178 in Germany/i)
 
             expect(findButton).toBeInTheDocument()
             expect(useMyLocationButton).toBeInTheDocument()

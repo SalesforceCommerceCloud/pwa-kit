@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useState, createContext} from 'react'
 import PropTypes from 'prop-types'
 
 // Components
@@ -25,8 +25,11 @@ import {
     STORE_LOCATOR_NUM_STORES_PER_LOAD
 } from '@salesforce/retail-react-app/app/constants'
 
-const StoreLocatorModal = ({isOpen, onClose}) => {
+export const StoreLocatorContext = createContext()
+export const useStoreLocator = () => {
     const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
+    const [automaticGeolocationHasFailed, setAutomaticGeolocationHasFailed] = useState(false)
+    const [userWantsToShareLocation, setUserWantsToShareLocation] = useState(false)
 
     const [searchStoresParams, setSearchStoresParams] = useState({
         countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
@@ -34,19 +37,24 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
         limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
     })
 
+    return {
+        userHasSetManualGeolocation,
+        setUserHasSetManualGeolocation,
+        automaticGeolocationHasFailed,
+        setAutomaticGeolocationHasFailed,
+        userWantsToShareLocation,
+        setUserWantsToShareLocation,
+        searchStoresParams,
+        setSearchStoresParams
+    }
+}
+
+const StoreLocatorModal = ({isOpen, onClose}) => {
+    const storeLocator = useStoreLocator()
     const isDesktopView = useBreakpointValue({base: false, lg: true})
 
-    const storeLocatorContent = (
-        <StoreLocatorContent
-            searchStoresParams={searchStoresParams}
-            setSearchStoresParams={setSearchStoresParams}
-            userHasSetManualGeolocation={userHasSetManualGeolocation}
-            setUserHasSetManualGeolocation={setUserHasSetManualGeolocation}
-        />
-    )
-
-    return isOpen ? (
-        <>
+    return (
+        <StoreLocatorContext.Provider value={storeLocator}>
             {isDesktopView ? (
                 <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
                     <ModalContent
@@ -67,7 +75,7 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                             borderLeft="1px solid"
                             borderColor="gray.200"
                         >
-                            {storeLocatorContent}
+                            <StoreLocatorContent />
                         </ModalBody>
                     </ModalContent>
                 </Modal>
@@ -84,14 +92,12 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                     >
                         <ModalCloseButton onClick={onClose} />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
-                            {storeLocatorContent}
+                            <StoreLocatorContent />
                         </ModalBody>
                     </ModalContent>
                 </Modal>
             )}
-        </>
-    ) : (
-        <></>
+        </StoreLocatorContext.Provider>
     )
 }
 

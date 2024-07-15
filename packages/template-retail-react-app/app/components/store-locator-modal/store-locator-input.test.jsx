@@ -5,14 +5,17 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {waitFor, screen, fireEvent} from '@testing-library/react'
+import {waitFor, screen} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
 import PropTypes from 'prop-types'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '@salesforce/retail-react-app/app/constants'
 
-const WrapperComponent = ({userHasSetManualGeolocation, getUserGeolocation}) => {
+const WrapperComponent = ({userHasSetManualGeolocation}) => {
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -21,20 +24,20 @@ const WrapperComponent = ({userHasSetManualGeolocation, getUserGeolocation}) => 
             postalCode: '10178'
         }
     })
+    const storeLocator = useStoreLocator()
+    useEffect(() => {
+        storeLocator.setUserHasSetManualGeolocation(userHasSetManualGeolocation)
+        storeLocator.setSearchStoresParams({
+            postalCode: '10178',
+            countryCode: 'DE',
+            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+        })
+    }, [])
 
     return (
-        <StoreLocatorInput
-            searchStoresParams={{
-                postalCode: '10178',
-                countryCode: 'DE'
-            }}
-            getUserGeolocation={getUserGeolocation}
-            form={form}
-            submitForm={jest.fn()}
-            userHasSetManualGeolocation={userHasSetManualGeolocation}
-            setUserWantsToShareLocation={jest.fn()}
-            userWantsToShareLocation={false}
-        />
+        <StoreLocatorContext.Provider value={storeLocator}>
+            <StoreLocatorInput form={form} submitForm={jest.fn()} />
+        </StoreLocatorContext.Provider>
     )
 }
 WrapperComponent.propTypes = {
@@ -51,20 +54,14 @@ describe('StoreLocatorInput', () => {
     test('Renders without crashing', () => {
         expect(() => {
             renderWithProviders(
-                <WrapperComponent
-                    userHasSetManualGeolocation={true}
-                    getUserGeolocation={jest.fn()}
-                ></WrapperComponent>
+                <WrapperComponent userHasSetManualGeolocation={true}></WrapperComponent>
             )
         }).not.toThrow()
     })
 
     test('Expected information exists', async () => {
         renderWithProviders(
-            <WrapperComponent
-                userHasSetManualGeolocation={true}
-                getUserGeolocation={jest.fn()}
-            ></WrapperComponent>
+            <WrapperComponent userHasSetManualGeolocation={true}></WrapperComponent>
         )
 
         await waitFor(async () => {
@@ -73,22 +70,6 @@ describe('StoreLocatorInput', () => {
 
             expect(findButton).toBeInTheDocument()
             expect(useMyLocationButton).toBeInTheDocument()
-        })
-    })
-
-    test('Prop is called when Use My Location is clicked', async () => {
-        const getUserGeolocation = jest.fn()
-        renderWithProviders(
-            <WrapperComponent
-                userHasSetManualGeolocation={true}
-                getUserGeolocation={getUserGeolocation}
-            ></WrapperComponent>
-        )
-        await waitFor(async () => {
-            const useMyLocationButton = screen.getByRole('button', {name: /Use My Location/i})
-
-            fireEvent.click(useMyLocationButton)
-            expect(getUserGeolocation).toHaveBeenCalled()
         })
     })
 })
