@@ -71,40 +71,40 @@ afterEach(() => {
 })
 
 test('should render product list page', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/womens-clothing-bottoms')
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
     await waitFor(() => {
-        expect(screen.getByText(/Classic Glen Plaid Pant/i)).toBeInTheDocument()
+        expect(screen.getByText(/Cuffed Cargo Pant/i)).toBeInTheDocument()
     })
 })
 
 test('should render sort option list page', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/womens-clothing-bottoms')
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-product-list-sort')).toBeInTheDocument()
 })
 
 test('should render skeleton', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/womens-clothing-bottoms')
     renderWithProviders(<MockedComponent isLoading />)
     expect(screen.getAllByTestId('sf-product-tile-skeleton')).toHaveLength(25)
 })
 
 test('should render empty list page', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/womens-clothing-bottoms')
     renderWithProviders(<MockedEmptyPage />)
     expect(await screen.findByTestId('sf-product-empty-list-page')).toBeInTheDocument()
 })
 
 test('pagination is rendered', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/womens-clothing-bottoms')
     renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('sf-pagination')).toBeInTheDocument()
 })
 
 test('should display Selected refinements as there are some in the response', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/womens-clothing-bottoms')
     renderWithProviders(<MockedComponent />)
     const countOfRefinements = await screen.findAllByLabelText(`Remove filter: Black`)
     expect(countOfRefinements).toHaveLength(2)
@@ -113,7 +113,7 @@ test('should display Selected refinements as there are some in the response', as
 // TODO: Fix flaky/broken test
 // eslint-disable-next-line jest/no-disabled-tests
 test.skip('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/womens-clothing-bottoms')
     const {user} = renderWithProviders(<MockedComponent />)
     expect(await screen.findAllByText('Black')).toBeInTheDocument()
     const wishlistButton = await screen.getAllByLabelText('Wishlist')
@@ -124,7 +124,7 @@ test.skip('show login modal when an unauthenticated user tries to add an item to
 })
 
 test('clicking a filter will change url', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/womens-clothing-bottoms')
     const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
@@ -140,7 +140,7 @@ test('clicking a filter will change url', async () => {
 })
 
 test('clicking a filter on mobile or desktop applies changes to both', async () => {
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/womens-clothing-bottoms')
     const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
@@ -201,7 +201,7 @@ test('click on Clear All should clear out all the filter in search params', asyn
     window.history.pushState(
         {},
         'ProductList',
-        '/uk/en-GB/category/mens-clothing-jackets?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
+        '/uk/en-GB/category/womens-clothing-bottoms?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
     )
     const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}

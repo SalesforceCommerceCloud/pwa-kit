@@ -200,48 +200,52 @@ const ProductTile = (props) => {
                 {/* Swatches */}
                 {variationAttributes
                     ?.filter(({id}) => selectableAttributeId === id)
-                    ?.map(({id, name, values}) => (
-                        <SwatchGroup
-                            ariaLabel={name}
-                            key={id}
-                            value={selectableAttributeValue}
-                            handleChange={(value) => {
-                                setSelectableAttributeValue(value)
-                            }}
-                        >
-                            {values
-                                ?.filter((val) => val.orderable)
-                                .map(({name, swatch, value}) => {
-                                    const content = swatch ? (
-                                        <Box
-                                            height="100%"
-                                            width="100%"
-                                            minWidth="32px"
-                                            backgroundRepeat="no-repeat"
-                                            backgroundSize="cover"
-                                            backgroundColor={name.toLowerCase()}
-                                            backgroundImage={`url(${
-                                                swatch?.disBaseLink || swatch.link
-                                            })`}
-                                        />
-                                    ) : (
-                                        name
-                                    )
+                    ?.map(({id, name, values}) => {
+                        // we don't want to show swatch that is not orderable on UI
+                        const filteredValues = values.filter((val) => val.orderable)
+                        return (
+                            filteredValues.length && (
+                                <SwatchGroup
+                                    ariaLabel={name}
+                                    key={id}
+                                    value={selectableAttributeValue}
+                                    handleChange={(value) => {
+                                        setSelectableAttributeValue(value)
+                                    }}
+                                >
+                                    {filteredValues?.map(({name, swatch, value}) => {
+                                        const content = swatch ? (
+                                            <Box
+                                                height="100%"
+                                                width="100%"
+                                                minWidth="32px"
+                                                backgroundRepeat="no-repeat"
+                                                backgroundSize="cover"
+                                                backgroundColor={name.toLowerCase()}
+                                                backgroundImage={`url(${
+                                                    swatch?.disBaseLink || swatch.link
+                                                })`}
+                                            />
+                                        ) : (
+                                            name
+                                        )
 
-                                    return (
-                                        <Swatch
-                                            key={value}
-                                            value={value}
-                                            name={name}
-                                            variant={'circle'}
-                                            isFocusable={true}
-                                        >
-                                            {content}
-                                        </Swatch>
-                                    )
-                                })}
-                        </SwatchGroup>
-                    ))}
+                                        return (
+                                            <Swatch
+                                                key={value}
+                                                value={value}
+                                                name={name}
+                                                variant={'circle'}
+                                                isFocusable={true}
+                                            >
+                                                {content}
+                                            </Swatch>
+                                        )
+                                    })}
+                                </SwatchGroup>
+                            )
+                        )
+                    })}
 
                 {/* Title */}
                 <Text {...styles.title}>{localizedProductName}</Text>

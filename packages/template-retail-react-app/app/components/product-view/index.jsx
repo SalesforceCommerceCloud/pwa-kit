@@ -394,7 +394,6 @@ const ProductView = forwardRef(
                                                 <Swatch
                                                     key={value}
                                                     href={href}
-                                                    disabled={!orderable}
                                                     value={value}
                                                     name={name}
                                                     variant={id === 'color' ? 'circle' : 'square'}
@@ -406,20 +405,22 @@ const ProductView = forwardRef(
                                             )
                                         })
                                     return (
-                                        <SwatchGroup
-                                            key={id}
-                                            value={selectedValue?.value}
-                                            displayName={selectedValue?.name || ''}
-                                            label={intl.formatMessage(
-                                                {
-                                                    defaultMessage: '{variantType}',
-                                                    id: 'product_view.label.variant_type'
-                                                },
-                                                {variantType: name}
-                                            )}
-                                        >
-                                            {swatches}
-                                        </SwatchGroup>
+                                        swatches.length && (
+                                            <SwatchGroup
+                                                key={id}
+                                                value={selectedValue?.value}
+                                                displayName={selectedValue?.name || ''}
+                                                label={intl.formatMessage(
+                                                    {
+                                                        defaultMessage: '{variantType}',
+                                                        id: 'product_view.label.variant_type'
+                                                    },
+                                                    {variantType: name}
+                                                )}
+                                            >
+                                                {swatches}
+                                            </SwatchGroup>
+                                        )
                                     )
                                 })
                             )}
