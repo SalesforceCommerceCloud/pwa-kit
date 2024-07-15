@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+- A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
 - Out of stock and low stock items are removed from cart and checkout as unavailable products [#1865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1865)
 - Does not show swatches of unorderable products on product tiles [#1893](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1893)
 
@@ -13,7 +14,7 @@
 
 ## v3.0.1 (Jul 9, 2024)
 
-### Bug Fixes 
+### Bug Fixes
 
 - Fix basket transfer during checkout login [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
 
@@ -22,8 +23,8 @@
 ### Improvements
 
 - Product Tile Revamp
-  - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760) 
-  - Display pricing for cart, checkout and wishlist page [#1796](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1796) 
+  - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760)
+  - Display pricing for cart, checkout and wishlist page [#1796](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1796)
   - Shows promotional callout message on Product List and Product Detail pages [#1786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1786) [#1804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1804)
   - Display selectable swatch groups for attributes like color [#1773](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1773)
   - Show badges [#1791](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1791)
@@ -40,7 +41,7 @@
 - Add explicit headers to cart modal [#1811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1811)
 - Add autocomplete to text input fields [#1840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1840)
 - Add error icon to error messages [#1839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1839)
-  
+
 ### Performance Improvements
 
 - Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656) [#1673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1673)
