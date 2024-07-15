@@ -5,6 +5,7 @@
 - A11y: Account Nav fixes [#1884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1884)
 - A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
 - Out of stock and low stock items are removed from cart and checkout as unavailable products [#1865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1865)
+- Fix infinity sign price on product tile [#1903](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1903)
 
 ## v3.0.2 (Jul 11, 2024)
 
