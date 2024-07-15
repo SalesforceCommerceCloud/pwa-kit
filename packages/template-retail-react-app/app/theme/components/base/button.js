@@ -42,20 +42,24 @@ export default {
             color: 'black',
             justifyContent: 'flex-start',
             fontSize: 'sm',
-            _hover: {bg: 'gray.50', textDecoration: 'none'},
+            _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
             _activeLink: {
                 bg: 'gray.50',
-                textDecoration: 'none'
+                borderLeft: 'solid',
+                borderLeftColor: 'gray.600',
+                borderLeftWidth: '4px'
             }
         },
         'menu-link-mobile': {
             color: 'black',
             justifyContent: 'flex-start',
             fontSize: 'sm',
-            _hover: {bg: 'gray.50', textDecoration: 'none'},
+            _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
             _activeLink: {
-                bg: 'gray.100',
-                textDecoration: 'none'
+                bg: 'gray.50',
+                borderLeft: 'solid',
+                borderLeftColor: 'gray.300',
+                borderLeftWidth: '4px'
             }
         },
         'search-link': {
