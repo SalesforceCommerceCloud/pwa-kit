@@ -18,8 +18,8 @@ import Field from '@salesforce/retail-react-app/app/components/field'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const defaultAriaLabel = defineMessage({
-    defaultMessage: 'use_address_fields.label.address_form',
-    id: 'Address Form'
+    defaultMessage: 'Address Form',
+    id: 'use_address_fields.label.address_form'
 })
 
 const AddressFields = ({form, prefix = '', ariaLabel = defaultAriaLabel}) => {

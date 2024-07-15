@@ -1,10 +1,4 @@
 {
-  "Address Form": [
-    {
-      "type": 0,
-      "value": "use_address_fields.label.address_form"
-    }
-  ],
   "account.accordion.button.my_account": [
     {
       "type": 0,
@@ -3075,6 +3069,12 @@
     {
       "type": 0,
       "value": "Address"
+    }
+  ],
+  "use_address_fields.label.address_form": [
+    {
+      "type": 0,
+      "value": "Address Form"
     }
   ],
   "use_address_fields.label.city": [

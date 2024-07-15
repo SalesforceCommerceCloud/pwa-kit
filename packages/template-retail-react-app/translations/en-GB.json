@@ -1,7 +1,4 @@
 {
-  "Address Form": {
-    "defaultMessage": "use_address_fields.label.address_form"
-  },
   "account.accordion.button.my_account": {
     "defaultMessage": "My Account"
   },
@@ -1326,6 +1323,9 @@
   },
   "use_address_fields.label.address": {
     "defaultMessage": "Address"
+  },
+  "use_address_fields.label.address_form": {
+    "defaultMessage": "Address Form"
   },
   "use_address_fields.label.city": {
     "defaultMessage": "City"

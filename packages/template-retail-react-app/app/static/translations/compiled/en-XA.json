@@ -1,18 +1,4 @@
 {
-  "Address Form": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "ŭŭşḗḗ_ȧȧḓḓřḗḗşş_ƒīḗḗŀḓş.ŀȧȧƀḗḗŀ.ȧȧḓḓřḗḗşş_ƒǿǿřḿ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "account.accordion.button.my_account": [
     {
       "type": 0,
@@ -6567,6 +6553,20 @@
     {
       "type": 0,
       "value": "Ȧḓḓřḗḗşş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "use_address_fields.label.address_form": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓřḗḗşş Ƒǿǿřḿ"
     },
     {
       "type": 0,
