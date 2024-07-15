@@ -219,6 +219,10 @@ const Payment = () => {
                     {!billingSameAsShipping && (
                         <ShippingAddressSelection
                             form={billingAddressForm}
+                            title={formatMessage({
+                                defaultMessage: 'Billing Address',
+                                id: 'checkout_payment.heading.billing_address'
+                            })}
                             selectedAddress={selectedBillingAddress}
                             hideSubmitButton
                         />

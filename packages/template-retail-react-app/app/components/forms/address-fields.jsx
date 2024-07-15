@@ -17,11 +17,17 @@ import useAddressFields from '@salesforce/retail-react-app/app/components/forms/
 import Field from '@salesforce/retail-react-app/app/components/field'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
-const AddressFields = ({form, prefix = ''}) => {
+const AddressFields = ({form, prefix = '', ariaLabel}) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
     const intl = useIntl()
 
+    if (!ariaLabel) {
+        ariaLabel = intl.formatMessage({
+            id: 'use_address_fields.label.address_form',
+            defaultMessage: 'Address Form'
+        })
+    }
     const addressFormRef = useRef()
     useEffect(() => {
         // Focus on the form when the component mounts for accessibility
@@ -29,15 +35,7 @@ const AddressFields = ({form, prefix = ''}) => {
     }, [])
 
     return (
-        <Stack
-            spacing={5}
-            aria-label={intl.formatMessage({
-                id: 'use_address_fields.label.address_form',
-                defaultMessage: 'Address Form'
-            })}
-            tabIndex="0"
-            ref={addressFormRef}
-        >
+        <Stack spacing={5} aria-label={ariaLabel} tabIndex="0" ref={addressFormRef}>
             <SimpleGrid columns={[1, 1, 2]} gap={5}>
                 <Field {...fields.firstName} />
                 <Field {...fields.lastName} />
@@ -64,7 +62,10 @@ AddressFields.propTypes = {
     form: PropTypes.object.isRequired,
 
     /** Optional prefix for field names */
-    prefix: PropTypes.string
+    prefix: PropTypes.string,
+
+    /** Optional aria label to use for the address group */
+    ariaLabel: PropTypes.string
 }
 
 export default AddressFields

@@ -103,13 +103,15 @@ export default function ShippingAddress() {
         setIsLoading(false)
     }
 
+    const title = formatMessage({
+        defaultMessage: 'Shipping Address',
+        id: 'shipping_address.title.shipping_address'
+    })
+
     return (
         <ToggleCard
             id="step-1"
-            title={formatMessage({
-                defaultMessage: 'Shipping Address',
-                id: 'shipping_address.title.shipping_address'
-            })}
+            title={title}
             editing={step === STEPS.SHIPPING_ADDRESS}
             isLoading={isLoading}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
@@ -120,6 +122,7 @@ export default function ShippingAddress() {
                     selectedAddress={selectedShippingAddress}
                     submitButtonLabel={submitButtonMessage}
                     onSubmit={submitAndContinue}
+                    title={title}
                 />
             </ToggleCardEdit>
             {selectedShippingAddress && (
