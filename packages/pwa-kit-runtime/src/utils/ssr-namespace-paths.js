@@ -38,7 +38,7 @@ const _getNamespace = () => {
     // I don't think this will work client side?
 
     const config = {
-        ssrNamespace: '/ca'
+        ssrNamespace: '/'
     }
 
     let ssrNamespace = config?.ssrNamespace ? config.ssrNamespace : ''

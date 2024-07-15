@@ -59,8 +59,12 @@ const AppConfig = ({children, locals = {}}) => {
     // inside default.js
     // this endpoint is where commerce-sdk-react will send requests to
     const proxy = ssrNamespace
-        ? `${appOrigin}/${ssrNamespace}${commerceApiConfig.proxyPath}`
+        ? `${appOrigin}${commerceApiConfig.proxyPath}`
         : `${appOrigin}${commerceApiConfig.proxyPath}`
+
+    const redirectURI = ssrNamespace
+        ? `${appOrigin}${ssrNamespace}/callback`
+        : `${appOrigin}/callback`
 
     return (
         <CommerceApiProvider
@@ -70,7 +74,7 @@ const AppConfig = ({children, locals = {}}) => {
             siteId={locals.site?.id}
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
-            redirectURI={`${appOrigin}/callback`}
+            redirectURI={redirectURI}
             proxy={proxy}
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
