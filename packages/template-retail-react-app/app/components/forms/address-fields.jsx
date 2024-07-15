@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useRef} from 'react'
-import {useIntl} from 'react-intl'
+import {defineMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
     Grid,
@@ -17,17 +17,16 @@ import useAddressFields from '@salesforce/retail-react-app/app/components/forms/
 import Field from '@salesforce/retail-react-app/app/components/field'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
-const AddressFields = ({form, prefix = '', ariaLabel}) => {
+const defaultAriaLabel = defineMessage({
+    defaultMessage: 'use_address_fields.label.address_form',
+    id: 'Address Form'
+})
+
+const AddressFields = ({form, prefix = '', ariaLabel = defaultAriaLabel}) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
     const intl = useIntl()
 
-    if (!ariaLabel) {
-        ariaLabel = intl.formatMessage({
-            id: 'use_address_fields.label.address_form',
-            defaultMessage: 'Address Form'
-        })
-    }
     const addressFormRef = useRef()
     useEffect(() => {
         // Focus on the form when the component mounts for accessibility
@@ -35,7 +34,12 @@ const AddressFields = ({form, prefix = '', ariaLabel}) => {
     }, [])
 
     return (
-        <Stack spacing={5} aria-label={ariaLabel} tabIndex="0" ref={addressFormRef}>
+        <Stack
+            spacing={5}
+            aria-label={intl.formatMessage(ariaLabel)}
+            tabIndex="0"
+            ref={addressFormRef}
+        >
             <SimpleGrid columns={[1, 1, 2]} gap={5}>
                 <Field {...fields.firstName} />
                 <Field {...fields.lastName} />
@@ -65,7 +69,7 @@ AddressFields.propTypes = {
     prefix: PropTypes.string,
 
     /** Optional aria label to use for the address group */
-    ariaLabel: PropTypes.string
+    ariaLabel: PropTypes.MESSAGE_PROPTYPE
 }
 
 export default AddressFields
