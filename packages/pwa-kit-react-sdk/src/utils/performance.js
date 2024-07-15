@@ -4,39 +4,55 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-const NAMESPACE = 'pwa-kit-react-sdk:ssr'
-const PERFORMANCE_MEASUREMENTS = {
-    total: `${NAMESPACE}:total`,
-    renderToString: `${NAMESPACE}:render-to-string`,
-    routeMatching: `${NAMESPACE}:route-matching`,
-    loadComponent: `${NAMESPACE}:load-component`,
-    fetchStrategies: `${NAMESPACE}:fetch-strategies`,
-    reactQueryPrerender: `${NAMESPACE}:fetch-strategies:react-query:pre-render`,
-    reactQueryUseQuery: `${NAMESPACE}:fetch-strategies:react-query:use-query`,
-    getProps: `${NAMESPACE}:fetch-strategies:get-props`
-}
+import logger from './logger-instance'
 export const PERFORMANCE_MARKS = {
-    totalStart: `${PERFORMANCE_MEASUREMENTS.total}:start`,
-    totalEnd: `${PERFORMANCE_MEASUREMENTS.total}:end`,
-    renderToStringStart: `${PERFORMANCE_MEASUREMENTS.renderToString}:start`,
-    renderToStringEnd: `${PERFORMANCE_MEASUREMENTS.renderToString}:end`,
-    routeMatchingStart: `${PERFORMANCE_MEASUREMENTS.routeMatching}:start`,
-    routeMatchingEnd: `${PERFORMANCE_MEASUREMENTS.routeMatching}:end`,
-    loadComponentStart: `${PERFORMANCE_MEASUREMENTS.loadComponent}:start`,
-    loadComponentEnd: `${PERFORMANCE_MEASUREMENTS.loadComponent}:end`,
-    fetchStrategiesStart: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:start`,
-    fetchStrategiesEnd: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:end`,
-    reactQueryPrerenderStart: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:start`,
-    reactQueryPrerenderEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:end`,
-    reactQueryUseQueryStart: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:start`,
-    reactQueryUseQueryEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:end`,
-    getPropsStart: `${PERFORMANCE_MEASUREMENTS.getProps}:start`,
-    getPropsEnd: `${PERFORMANCE_MEASUREMENTS.getProps}:end`
+    total: 'ssr:total',
+    renderToString: 'ssr:render-to-string',
+    routeMatching: 'ssr:route-matching',
+    loadComponent: 'ssr:load-component',
+    fetchStrategies: 'ssr:fetch-strategies',
+    reactQueryPrerender: 'ssr:fetch-strategies:react-query:pre-render',
+    reactQueryUseQuery: 'ssr:fetch-strategies:react-query:use-query',
+    getProps: 'ssr:fetch-strategies:get-prop'
 }
+// export const PERFORMANCE_MARKS = {
+//     totalStart: `${PERFORMANCE_MEASUREMENTS.total}:start`,
+//     totalEnd: `${PERFORMANCE_MEASUREMENTS.total}:end`,
+//     renderToStringStart: `${PERFORMANCE_MEASUREMENTS.renderToString}:start`,
+//     renderToStringEnd: `${PERFORMANCE_MEASUREMENTS.renderToString}:end`,
+//     routeMatchingStart: `${PERFORMANCE_MEASUREMENTS.routeMatching}:start`,
+//     routeMatchingEnd: `${PERFORMANCE_MEASUREMENTS.routeMatching}:end`,
+//     loadComponentStart: `${PERFORMANCE_MEASUREMENTS.loadComponent}:start`,
+//     loadComponentEnd: `${PERFORMANCE_MEASUREMENTS.loadComponent}:end`,
+//     fetchStrategiesStart: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:start`,
+//     fetchStrategiesEnd: `${PERFORMANCE_MEASUREMENTS.fetchStrategies}:end`,
+//     reactQueryPrerenderStart: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:start`,
+//     reactQueryPrerenderEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryPrerender}:end`,
+//     reactQueryUseQueryStart: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:start`,
+//     reactQueryUseQueryEnd: `${PERFORMANCE_MEASUREMENTS.reactQueryUseQuery}:end`,
+//     getPropsStart: `${PERFORMANCE_MEASUREMENTS.getProps}:start`,
+//     getPropsEnd: `${PERFORMANCE_MEASUREMENTS.getProps}:end`
+// }
 
+/**
+ * @private
+ */
 export default class PerformanceTimer {
-    buildServerTimingHeader(metrics) {
-        const header = metrics
+    MARKER_TYPES = {
+        START: 'start',
+        END: 'end'
+    }
+    constructor(options = {}) {
+        this.enabled = options.enabled || false
+        this.marks = {
+            start: new Map(),
+            end: new Map()
+        }
+        this.metrics = []
+    }
+
+    buildServerTimingHeader() {
+        const header = this.metrics
             .map((metric) => {
                 return `${metric.name};dur=${metric.duration}`
             })
@@ -45,140 +61,50 @@ export default class PerformanceTimer {
         return header
     }
 
-    clearPerformanceMarks() {
-        const marks = performance.getEntriesByType('mark')
-
-        marks.forEach((mark) => {
-            if (mark.name.includes(NAMESPACE)) {
-                performance.clearMarks(mark.name)
-            }
+    log() {
+        this.metrics.forEach((metric) => {
+            logger.debug(`${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
+                namespace: 'performance'
+            })
         })
     }
 
-    getPerformanceMetrics() {
-        // all marks follow the same pattern: pwa-kit-react-sdk:<name>:<start|end>(:<index>)
-        // name components:
-        // 1. namespace: pwa-kit-react-sdk
-        // 2. event <name>
-        // 3. <start|end>
-        // 4. <index> (optional)
-        const marks = performance.getEntriesByType('mark')
-        const startMarks = new Map()
-        const result = []
-
-        marks.forEach((mark) => {
-            if (!mark.name.includes('pwa-kit-react-sdk')) {
-                return
-            }
-
-            if (mark.name.includes(':start')) {
-                startMarks.set(mark.name, mark)
-            }
-
-            if (mark.name.includes(':end')) {
-                const correspondingStartMarkName = mark.name.replace(':end', ':start')
-                const startMark = startMarks.get(correspondingStartMarkName)
-                if (startMark) {
-                    const measurement = {
-                        name: mark.name.replace(':end', '').replace(`${NAMESPACE}:`, ''),
-                        duration: (mark.startTime - startMark.startTime).toFixed(2),
-                        detail: mark.detail || null
-                    }
-                    result.push(measurement)
-                }
-            }
-        })
-
-        return result
-    }
-
-    mark(name, detail) {
-        performance.mark(name, detail)
-    }
-}
-
-/**
- * This is a utility function to get the SSR performance metrics.
- * The function returns an array of performance measurements.
- * The data is available in console logs and the http response header `server-timing`.
- *
- * @function
- * @private
- *
- * @return {Array}
- */
-export const getPerformanceMetrics = () => {
-    // all marks follow the same pattern: pwa-kit-react-sdk:<name>:<start|end>(:<index>)
-    // name components:
-    // 1. namespace: pwa-kit-react-sdk
-    // 2. event <name>
-    // 3. <start|end>
-    // 4. <index> (optional)
-    const marks = performance.getEntriesByType('mark')
-    const startMarks = new Map()
-    const result = []
-
-    marks.forEach((mark) => {
-        if (!mark.name.includes('pwa-kit-react-sdk')) {
+    mark(name, type, options = {}) {
+        if (!this.enabled) {
             return
         }
 
-        if (mark.name.includes(':start')) {
-            startMarks.set(mark.name, mark)
+        if (!name) {
+            console.warn('Performance mark cannot be created because the name is undefined.')
+            return
         }
 
-        if (mark.name.includes(':end')) {
-            const correspondingStartMarkName = mark.name.replace(':end', ':start')
-            const startMark = startMarks.get(correspondingStartMarkName)
+        if (type !== this.MARKER_TYPES.START && type !== this.MARKER_TYPES.END) {
+            console.warn(
+                'Performance mark cannot be created because the type must be either "start" or "end".'
+            )
+            return
+        }
+
+        const timestamp = performance.now()
+        const isEnd = type === this.MARKER_TYPES.END
+        const storage = isEnd ? this.marks.end : this.marks.start
+        storage.set(name, {
+            name,
+            timestamp,
+            detail: options.detail
+        })
+
+        if (isEnd) {
+            const startMark = this.marks.start.get(name)
             if (startMark) {
                 const measurement = {
-                    name: mark.name.replace(':end', '').replace(`${NAMESPACE}:`, ''),
-                    duration: (mark.startTime - startMark.startTime).toFixed(2),
-                    detail: mark.detail || null
+                    name,
+                    duration: (timestamp - startMark.timestamp).toFixed(2),
+                    detail: options.detail
                 }
-                result.push(measurement)
+                this.metrics.push(measurement)
             }
         }
-    })
-
-    return result
-}
-
-/**
- * This is a utility function to build the Server-Timing header.
- * The function receives an array of performance metrics and returns a string that represents the Server-Timing header.
- *
- * see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Server-Timing
- *
- * @function
- * @private
- *
- * @return {String}
- */
-export const buildServerTimingHeader = (metrics) => {
-    const header = metrics
-        .map((metric) => {
-            return `${metric.name};dur=${metric.duration}`
-        })
-        .join(', ')
-
-    return header
-}
-
-/**
- * This is a utility function that clears all performance marks created by the sdk.
- *
- * @function
- * @private
- *
- * @return {String}
- */
-export const clearPerformanceMarks = () => {
-    const marks = performance.getEntriesByType('mark')
-
-    marks.forEach((mark) => {
-        if (mark.name.includes(NAMESPACE)) {
-            performance.clearMarks(mark.name)
-        }
-    })
+    }
 }
