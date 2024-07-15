@@ -238,7 +238,9 @@ export const render = async (req, res, next) => {
     try {
         performanceMetrics = getPerformanceMetrics()
         performanceMetrics.forEach((metric) => {
-            logger.debug(`${metric.name} - ${metric.duration}ms`, {namespace: 'performance'})
+            logger.debug(`${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
+                namespace: 'performance'
+            })
         })
     } catch (e) {
         console.warn('Failed to get performance metrics', e)
