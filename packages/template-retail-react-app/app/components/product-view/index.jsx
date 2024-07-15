@@ -41,7 +41,6 @@ import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
 
 const ProductViewHeader = ({name, currency, priceData, category, product}) => {
-    console.log('priceData', priceData)
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
