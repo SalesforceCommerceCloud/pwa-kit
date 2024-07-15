@@ -33,6 +33,7 @@ import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
+import logger from '../../utils/logger-instance'
 
 import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
 
