@@ -209,36 +209,37 @@ const ProductTile = (props) => {
                                 setSelectableAttributeValue(value)
                             }}
                         >
-                            {values?.map(({name, swatch, value, orderable}) => {
-                                if (!orderable) return null
-                                const content = swatch ? (
-                                    <Box
-                                        height="100%"
-                                        width="100%"
-                                        minWidth="32px"
-                                        backgroundRepeat="no-repeat"
-                                        backgroundSize="cover"
-                                        backgroundColor={name.toLowerCase()}
-                                        backgroundImage={`url(${
-                                            swatch?.disBaseLink || swatch.link
-                                        })`}
-                                    />
-                                ) : (
-                                    name
-                                )
+                            {values
+                                ?.filter((val) => val.orderable)
+                                .map(({name, swatch, value}) => {
+                                    const content = swatch ? (
+                                        <Box
+                                            height="100%"
+                                            width="100%"
+                                            minWidth="32px"
+                                            backgroundRepeat="no-repeat"
+                                            backgroundSize="cover"
+                                            backgroundColor={name.toLowerCase()}
+                                            backgroundImage={`url(${
+                                                swatch?.disBaseLink || swatch.link
+                                            })`}
+                                        />
+                                    ) : (
+                                        name
+                                    )
 
-                                return (
-                                    <Swatch
-                                        key={value}
-                                        value={value}
-                                        name={name}
-                                        variant={'circle'}
-                                        isFocusable={true}
-                                    >
-                                        {content}
-                                    </Swatch>
-                                )
-                            })}
+                                    return (
+                                        <Swatch
+                                            key={value}
+                                            value={value}
+                                            name={name}
+                                            variant={'circle'}
+                                            isFocusable={true}
+                                        >
+                                            {content}
+                                        </Swatch>
+                                    )
+                                })}
                         </SwatchGroup>
                     ))}
 
