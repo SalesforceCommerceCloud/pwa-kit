@@ -361,6 +361,7 @@ const mockProductSearchItem = {
     },
     variants: [
         {
+            orderable: true,
             price: 191.99,
             productId: '750518894461M',
             tieredPrices: [
@@ -382,6 +383,7 @@ const mockProductSearchItem = {
             }
         },
         {
+            orderable: true,
             price: 191.99,
             productId: '750518548272M',
             productPromotions: [
