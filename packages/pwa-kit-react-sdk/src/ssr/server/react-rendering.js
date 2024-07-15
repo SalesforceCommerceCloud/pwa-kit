@@ -119,7 +119,8 @@ export const getLocationSearch = (req, opts = {}) => {
  */
 export const render = async (req, res, next) => {
     const includeServerTimingHeader = '__server_timing' in req.query
-    res.__performanceTimer = new PerformanceTimer({enabled: true})
+    const trackPerformance = includeServerTimingHeader || process.env.SERVER_TIMING
+    res.__performanceTimer = new PerformanceTimer({enabled: trackPerformance})
     res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'start')
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
