@@ -70,12 +70,7 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                         borderColor="gray.200"
                     >
                         <ModalCloseButton onClick={onClose} />
-                        <ModalBody
-                            pb={8}
-                            bg="white"
-                            paddingBottom={6}
-                            paddingTop={6}
-                        >
+                        <ModalBody pb={8} bg="white" paddingBottom={6} paddingTop={6}>
                             <StoreLocatorContent />
                         </ModalBody>
                     </ModalContent>
