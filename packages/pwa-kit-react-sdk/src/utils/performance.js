@@ -34,6 +34,69 @@ export const PERFORMANCE_MARKS = {
     getPropsEnd: `${PERFORMANCE_MEASUREMENTS.getProps}:end`
 }
 
+export default class PerformanceTimer {
+    buildServerTimingHeader(metrics) {
+        const header = metrics
+            .map((metric) => {
+                return `${metric.name};dur=${metric.duration}`
+            })
+            .join(', ')
+
+        return header
+    }
+
+    clearPerformanceMarks() {
+        const marks = performance.getEntriesByType('mark')
+
+        marks.forEach((mark) => {
+            if (mark.name.includes(NAMESPACE)) {
+                performance.clearMarks(mark.name)
+            }
+        })
+    }
+
+    getPerformanceMetrics() {
+        // all marks follow the same pattern: pwa-kit-react-sdk:<name>:<start|end>(:<index>)
+        // name components:
+        // 1. namespace: pwa-kit-react-sdk
+        // 2. event <name>
+        // 3. <start|end>
+        // 4. <index> (optional)
+        const marks = performance.getEntriesByType('mark')
+        const startMarks = new Map()
+        const result = []
+
+        marks.forEach((mark) => {
+            if (!mark.name.includes('pwa-kit-react-sdk')) {
+                return
+            }
+
+            if (mark.name.includes(':start')) {
+                startMarks.set(mark.name, mark)
+            }
+
+            if (mark.name.includes(':end')) {
+                const correspondingStartMarkName = mark.name.replace(':end', ':start')
+                const startMark = startMarks.get(correspondingStartMarkName)
+                if (startMark) {
+                    const measurement = {
+                        name: mark.name.replace(':end', '').replace(`${NAMESPACE}:`, ''),
+                        duration: (mark.startTime - startMark.startTime).toFixed(2),
+                        detail: mark.detail || null
+                    }
+                    result.push(measurement)
+                }
+            }
+        })
+
+        return result
+    }
+
+    mark(name, detail) {
+        performance.mark(name, detail)
+    }
+}
+
 /**
  * This is a utility function to get the SSR performance metrics.
  * The function returns an array of performance measurements.

@@ -34,12 +34,7 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import logger from '../../utils/logger-instance'
-import {
-    buildServerTimingHeader,
-    clearPerformanceMarks,
-    getPerformanceMetrics,
-    PERFORMANCE_MARKS
-} from '../../utils/performance'
+import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -124,7 +119,8 @@ export const getLocationSearch = (req, opts = {}) => {
  */
 export const render = async (req, res, next) => {
     const includeServerTimingHeader = '__server_timing' in req.query
-    performance.mark(PERFORMANCE_MARKS.totalStart)
+    res.__performanceTimer = new PerformanceTimer()
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.totalStart)
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
@@ -144,7 +140,7 @@ export const render = async (req, res, next) => {
     }
 
     // Step 1 - Find the match.
-    performance.mark(PERFORMANCE_MARKS.routeMatchingStart)
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatchingStart)
     let route
     let match
 
@@ -156,12 +152,12 @@ export const render = async (req, res, next) => {
         }
         return !!match
     })
-    performance.mark(PERFORMANCE_MARKS.routeMatchingEnd)
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatchingEnd)
 
     // Step 2 - Get the component
-    performance.mark(PERFORMANCE_MARKS.loadComponentStart)
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponentStart)
     const component = await route.component.getComponent()
-    performance.mark(PERFORMANCE_MARKS.loadComponentEnd)
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponentEnd)
 
     // Step 3 - Init the app state
     const props = {
@@ -182,7 +178,7 @@ export const render = async (req, res, next) => {
         appState = {}
         appStateError = new errors.HTTPNotFound('Not found')
     } else {
-        performance.mark(PERFORMANCE_MARKS.fetchStrategiesStart)
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategiesStart)
         const ret = await AppConfig.initAppState({
             App: WrappedApp,
             component,
@@ -198,9 +194,9 @@ export const render = async (req, res, next) => {
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
         appStateError = ret.error
-        performance.mark(PERFORMANCE_MARKS.fetchStrategiesEnd)
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategiesEnd)
     }
-    performance.mark(PERFORMANCE_MARKS.renderToStringStart)
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToStringStart)
     appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
 
     // Step 4 - Render the App
@@ -225,8 +221,8 @@ export const render = async (req, res, next) => {
         // default error handling middleware provided by Express
         return next(e)
     }
-    performance.mark(PERFORMANCE_MARKS.renderToStringEnd)
-    performance.mark(PERFORMANCE_MARKS.totalEnd)
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToStringEnd)
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.totalEnd)
 
     // Step 5 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
@@ -236,7 +232,7 @@ export const render = async (req, res, next) => {
 
     let performanceMetrics = []
     try {
-        performanceMetrics = getPerformanceMetrics()
+        performanceMetrics = res.__performanceTimer.getPerformanceMetrics()
         performanceMetrics.forEach((metric) => {
             logger.debug(`${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
                 namespace: 'performance'
@@ -245,10 +241,13 @@ export const render = async (req, res, next) => {
     } catch (e) {
         console.warn('Failed to get performance metrics', e)
     }
-    clearPerformanceMarks()
+    res.__performanceTimer.clearPerformanceMarks()
 
     if (includeServerTimingHeader) {
-        res.setHeader('Server-Timing', buildServerTimingHeader(performanceMetrics))
+        res.setHeader(
+            'Server-Timing',
+            res.__performanceTimer.buildServerTimingHeader(performanceMetrics)
+        )
     }
 
     if (redirectUrl) {

@@ -52,21 +52,26 @@ export const withReactQuery = (Wrapped, options = {}) => {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient(queryClientConfig))
 
-            performance.mark(PERFORMANCE_MARKS.reactQueryPrerenderStart)
+            res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerenderStart)
             // Use `ssrPrepass` to collect all uses of `useQuery`.
             await ssrPrepass(appJSX)
-            performance.mark(PERFORMANCE_MARKS.reactQueryPrerenderEnd)
+            res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerenderEnd)
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
             await Promise.all(
                 queries.map((q, i) => {
-                    performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryStart}::${i}`)
+                    res.__performanceTimer.mark(
+                        `${PERFORMANCE_MARKS.reactQueryUseQueryStart}::${i}`
+                    )
                     return q
                         .fetch()
                         .then((result) => {
-                            performance.mark(`${PERFORMANCE_MARKS.reactQueryUseQueryEnd}::${i}`, {
-                                detail: q.queryHash
-                            })
+                            res.__performanceTimer.mark(
+                                `${PERFORMANCE_MARKS.reactQueryUseQueryEnd}::${i}`,
+                                {
+                                    detail: q.queryHash
+                                }
+                            )
                             return result
                         })
                         .catch(() => {
