@@ -25,39 +25,21 @@ describe('PerformanceTimer', () => {
         timer.mark('test', 'start')
         expect(timer.marks.start.size).toBe(1)
     })
+
+    test('marks can be added for both types', () => {
+        const timer = new PerformanceTimer({enabled: true})
+        timer.mark('test', 'start')
+        timer.mark('test', 'end')
+        expect(timer.marks.start.size).toBe(1)
+        expect(timer.marks.end.size).toBe(1)
+    })
+
+    test('measurements are created when a pair of marks is added', () => {
+        const timer = new PerformanceTimer({enabled: true})
+        timer.mark('test', 'start')
+        timer.mark('test', 'end')
+        expect(timer.metrics).toHaveLength(1)
+        expect(timer.metrics[0].name).toBe('test')
+        expect(parseFloat(timer.metrics[0].duration)).toBeGreaterThan(0)
+    })
 })
-
-// describe('buildServerTimingHeader', () => {
-//     test('should return an empty string if no performance metrics are provided', () => {
-//         const result = buildServerTimingHeader([])
-//         expect(result).toBe('')
-//     })
-
-//     test('should build the Server-Timing header', () => {
-//         const metrics = [
-//             {
-//                 name: 'fetch-stragegies:react-query:use-query:0',
-//                 duration: 1000,
-//                 detail: 'useProduct'
-//             },
-//             {name: 'total', duration: 1900, detail: null}
-//         ]
-//         const result = buildServerTimingHeader(metrics)
-//         expect(result).toBe('fetch-stragegies:react-query:use-query:0;dur=1000, total;dur=1900')
-//     })
-// })
-
-// describe('clearPerformanceMarks', () => {
-//     afterEach(() => {
-//         performance.clearMarks()
-//     })
-//     test('should clear all performance marks created by the sdk', () => {
-//         performance.mark('pwa-kit-react-sdk:ssr:total:start')
-//         performance.mark('non-sdk:random:mark')
-//         const marks = performance.getEntriesByType('mark')
-//         expect(marks).toHaveLength(2)
-//         clearPerformanceMarks()
-//         const clearedMarks = performance.getEntriesByType('mark')
-//         expect(clearedMarks).toHaveLength(1)
-//     })
-// })
