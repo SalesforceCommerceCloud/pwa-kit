@@ -1,4 +1,10 @@
 {
+  "Address Form": [
+    {
+      "type": 0,
+      "value": "use_address_fields.label.address_form"
+    }
+  ],
   "account.accordion.button.my_account": [
     {
       "type": 0,
@@ -823,6 +829,12 @@
     {
       "type": 0,
       "value": "Credit Card"
+    }
+  ],
+  "checkout_payment.label.billing_address_form": [
+    {
+      "type": 0,
+      "value": "Billing Address Form"
     }
   ],
   "checkout_payment.label.same_as_shipping": [
@@ -2881,6 +2893,12 @@
       "value": "Continue to Shipping Method"
     }
   ],
+  "shipping_address.label.shipping_address_form": [
+    {
+      "type": 0,
+      "value": "Shipping Address Form"
+    }
+  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -3057,12 +3075,6 @@
     {
       "type": 0,
       "value": "Address"
-    }
-  ],
-  "use_address_fields.label.address_form": [
-    {
-      "type": 0,
-      "value": "Address Form"
     }
   ],
   "use_address_fields.label.city": [
