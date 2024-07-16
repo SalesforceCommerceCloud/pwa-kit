@@ -153,12 +153,8 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                     {fields.securityCode.label}
                                 </FormLabel>
                                 <Box
-                                    onMouseEnter={() => {
-                                        handleTooltipOpen()
-                                    }}
-                                    onFocus={() => {
-                                        handleTooltipOpen()
-                                    }}
+                                    onMouseEnter={handleTooltipOpen}
+                                    onFocus={handleTooltipOpen}
                                     as="span"
                                 >
                                     <Tooltip
