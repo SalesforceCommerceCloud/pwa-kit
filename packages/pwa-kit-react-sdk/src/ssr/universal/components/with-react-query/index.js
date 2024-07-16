@@ -60,7 +60,8 @@ export const withReactQuery = (Wrapped, options = {}) => {
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
             await Promise.all(
                 queries.map((q, i) => {
-                    const displayName = q.meta?.displayName || `${i}`
+                    // always include the index to avoid duplicate entries
+                    const displayName = q.meta?.displayName ? `${q.meta?.displayName}:${i}` : `${i}`
                     res.__performanceTimer.mark(
                         `${PERFORMANCE_MARKS.reactQueryUseQuery}::${displayName}`,
                         'start'
