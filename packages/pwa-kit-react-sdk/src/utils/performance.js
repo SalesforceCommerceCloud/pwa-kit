@@ -68,7 +68,7 @@ export default class PerformanceTimer {
      */
     log() {
         this.metrics.forEach((metric) => {
-            logger.debug(`${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
+            logger.info(`${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
                 namespace: 'performance'
             })
         })
@@ -87,13 +87,18 @@ export default class PerformanceTimer {
         }
 
         if (!name) {
-            console.warn('Performance mark cannot be created because the name is undefined.')
+            logger.warn('Performance mark cannot be created because the name is undefined.', {
+                namespace: 'performance'
+            })
             return
         }
 
         if (type !== this.MARKER_TYPES.START && type !== this.MARKER_TYPES.END) {
-            console.warn(
-                'Performance mark cannot be created because the type must be either "start" or "end".'
+            logger.warn(
+                'Performance mark cannot be created because the type must be either "start" or "end".',
+                {
+                    namespace: 'performance'
+                }
             )
             return
         }
