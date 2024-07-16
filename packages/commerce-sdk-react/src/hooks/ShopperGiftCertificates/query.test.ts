@@ -48,7 +48,7 @@ describe('Shopper Gift Certificates query hooks', () => {
     })
 
     test.each(testCases)('`%s` has meta.displayName defined', async (queryName, data) => {
-        mockQueryEndpoint(giftCertificatesEndpoint, data)
+        mockMutationEndpoints(giftCertificatesEndpoint, data)
         const queryClient = createQueryClient()
         const {result} = renderHookWithProviders(
             () => {
