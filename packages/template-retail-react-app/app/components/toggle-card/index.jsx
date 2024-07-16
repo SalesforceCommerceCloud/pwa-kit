@@ -37,7 +37,10 @@ export const ToggleCard = ({
     let editButtonAriaLabel = 'Edit'
     if (typeof editLabel === 'string') {
         editButtonAriaLabel = editLabel
-    } else if (typeof editLabel === 'object' && editLabel?.type?.displayName === 'MemoizedFormattedMessage') {
+    } else if (
+        typeof editLabel === 'object' &&
+        editLabel?.type?.displayName === 'MemoizedFormattedMessage'
+    ) {
         editButtonAriaLabel = editLabel?.props.defaultMessage[0].value
     }
     return (
