@@ -102,7 +102,7 @@ export default function ShippingOptions() {
 
         shippingPriceLabel = formatMessage(
             {
-                defaultMessage: 'Orginally {originalPrice}, now {newPrice}',
+                defaultMessage: 'Originally {originalPrice}, now {newPrice}',
                 id: 'checkout_confirmation.label.shipping.strikethrough.price'
             },
             {
