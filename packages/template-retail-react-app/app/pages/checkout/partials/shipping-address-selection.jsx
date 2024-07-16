@@ -39,7 +39,7 @@ const ShippingAddressEditForm = ({
     hideSubmitButton,
     form,
     submitButtonLabel,
-    ariaLabel
+    formTitleAriaLabel
 }) => {
     const {formatMessage} = useIntl()
 
@@ -63,7 +63,7 @@ const ShippingAddressEditForm = ({
                 )}
 
                 <Stack spacing={6}>
-                    <AddressFields form={form} ariaLabel={ariaLabel} />
+                    <AddressFields form={form} formTitleAriaLabel={formTitleAriaLabel} />
 
                     {hasSavedAddresses && !hideSubmitButton ? (
                         <FormActionButtons
@@ -98,7 +98,7 @@ ShippingAddressEditForm.propTypes = {
     hideSubmitButton: PropTypes.bool,
     form: PropTypes.object,
     submitButtonLabel: MESSAGE_PROPTYPE,
-    ariaLabel: MESSAGE_PROPTYPE
+    formTitleAriaLabel: MESSAGE_PROPTYPE
 }
 
 const submitButtonMessage = defineMessage({
@@ -110,7 +110,7 @@ const ShippingAddressSelection = ({
     form,
     selectedAddress,
     submitButtonLabel = submitButtonMessage,
-    ariaLabel,
+    formTitleAriaLabel,
     hideSubmitButton = false,
     onSubmit = async () => null
 }) => {
@@ -325,7 +325,7 @@ const ShippingAddressSelection = ({
                                                         hideSubmitButton={hideSubmitButton}
                                                         form={form}
                                                         submitButtonLabel={submitButtonLabel}
-                                                        ariaLabel={ariaLabel}
+                                                        formTitleAriaLabel={formTitleAriaLabel}
                                                     />
                                                 )}
                                         </React.Fragment>
@@ -379,7 +379,7 @@ const ShippingAddressSelection = ({
                         hideSubmitButton={hideSubmitButton}
                         form={form}
                         submitButtonLabel={submitButtonLabel}
-                        ariaLabel={ariaLabel}
+                        formTitleAriaLabel={formTitleAriaLabel}
                     />
                 )}
 
@@ -412,7 +412,7 @@ ShippingAddressSelection.propTypes = {
     submitButtonLabel: MESSAGE_PROPTYPE,
 
     /** aria label to use for the address group */
-    ariaLabel: PropTypes.MESSAGE_PROPTYPE,
+    formTitleAriaLabel: PropTypes.MESSAGE_PROPTYPE,
 
     /** Show or hide the submit button (for controlling the form from outside component) */
     hideSubmitButton: PropTypes.bool,

@@ -17,12 +17,12 @@ import useAddressFields from '@salesforce/retail-react-app/app/components/forms/
 import Field from '@salesforce/retail-react-app/app/components/field'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
-const defaultAriaLabel = defineMessage({
+const defaultFormTitleAriaLabel = defineMessage({
     defaultMessage: 'Address Form',
     id: 'use_address_fields.label.address_form'
 })
 
-const AddressFields = ({form, prefix = '', ariaLabel = defaultAriaLabel}) => {
+const AddressFields = ({form, prefix = '', formTitleAriaLabel = defaultFormTitleAriaLabel}) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
     const intl = useIntl()
@@ -36,7 +36,7 @@ const AddressFields = ({form, prefix = '', ariaLabel = defaultAriaLabel}) => {
     return (
         <Stack
             spacing={5}
-            aria-label={intl.formatMessage(ariaLabel)}
+            aria-label={intl.formatMessage(formTitleAriaLabel)}
             tabIndex="0"
             ref={addressFormRef}
         >
@@ -68,8 +68,8 @@ AddressFields.propTypes = {
     /** Optional prefix for field names */
     prefix: PropTypes.string,
 
-    /** Optional aria label to use for the address group */
-    ariaLabel: PropTypes.MESSAGE_PROPTYPE
+    /** Optional aria label to use for the address form */
+    formTitleAriaLabel: PropTypes.MESSAGE_PROPTYPE
 }
 
 export default AddressFields

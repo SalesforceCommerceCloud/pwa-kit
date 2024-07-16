@@ -225,7 +225,7 @@ const Payment = () => {
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}
-                            ariaLabel={billingAddressAriaLabel}
+                            formTitleAriaLabel={billingAddressAriaLabel}
                             hideSubmitButton
                         />
                     )}

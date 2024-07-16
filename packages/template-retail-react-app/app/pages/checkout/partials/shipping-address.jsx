@@ -124,7 +124,7 @@ export default function ShippingAddress() {
                     selectedAddress={selectedShippingAddress}
                     submitButtonLabel={submitButtonMessage}
                     onSubmit={submitAndContinue}
-                    ariaLabel={shippingAddressAriaLabel}
+                    formTitleAriaLabel={shippingAddressAriaLabel}
                 />
             </ToggleCardEdit>
             {selectedShippingAddress && (
