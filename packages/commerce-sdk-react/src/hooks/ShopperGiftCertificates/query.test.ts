@@ -11,7 +11,8 @@ import {
     mockQueryEndpoint,
     renderHookWithProviders,
     waitAndExpectError,
-    waitAndExpectSuccess
+    waitAndExpectSuccess,
+    createQueryClient
 } from '../../test-utils'
 import * as queries from './query'
 
@@ -44,6 +45,19 @@ describe('Shopper Gift Certificates query hooks', () => {
         })
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(data)
+    })
+
+    test.each(testCases)('`%s` has meta.displayName defined', async (queryName, data) => {
+        mockMutationEndpoints(giftCertificatesEndpoint, data)
+        const queryClient = createQueryClient()
+        const {result} = renderHookWithProviders(
+            () => {
+                return queries[queryName](OPTIONS)
+            },
+            {queryClient}
+        )
+        await waitAndExpectSuccess(() => result.current)
+        expect(queryClient.getQueryCache().getAll()[0].meta?.displayName).toBe(queryName)
     })
 
     test.each(testCases)('`%s` returns error on error', async (queryName) => {
