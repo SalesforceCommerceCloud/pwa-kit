@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import {nanoid} from 'nanoid'
-import {defineMessage, useIntl} from 'react-intl'
+import {FormattedMessage, defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {
     ToggleCard,
@@ -114,6 +114,12 @@ export default function ShippingAddress() {
             isLoading={isLoading}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
+            editLabel={
+                <FormattedMessage
+                    defaultMessage="Edit Shipping Address"
+                    id="toggle_card.action.editShippingAddress"
+                />
+            }
         >
             <ToggleCardEdit>
                 <ShippingAddressSelection

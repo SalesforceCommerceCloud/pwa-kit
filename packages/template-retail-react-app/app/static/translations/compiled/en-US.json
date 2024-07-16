@@ -2987,6 +2987,30 @@
       "value": "Edit"
     }
   ],
+  "toggle_card.action.editContactInfo": [
+    {
+      "type": 0,
+      "value": "Edit Contact Info"
+    }
+  ],
+  "toggle_card.action.editPaymentInfo": [
+    {
+      "type": 0,
+      "value": "Edit Payment Info"
+    }
+  ],
+  "toggle_card.action.editShippingAddress": [
+    {
+      "type": 0,
+      "value": "Edit Shipping Address"
+    }
+  ],
+  "toggle_card.action.editShippingOptions": [
+    {
+      "type": 0,
+      "value": "Edit Shipping Options"
+    }
+  ],
   "update_password_fields.button.forgot_password": [
     {
       "type": 0,

@@ -105,6 +105,12 @@ export default function ShippingOptions() {
             isLoading={form.formState.isSubmitting}
             disabled={selectedShippingMethod == null || !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
+            editLabel={
+                <FormattedMessage
+                    defaultMessage="Edit Shipping Options"
+                    id="toggle_card.action.editShippingOptions"
+                />
+            }
         >
             <ToggleCardEdit>
                 <form

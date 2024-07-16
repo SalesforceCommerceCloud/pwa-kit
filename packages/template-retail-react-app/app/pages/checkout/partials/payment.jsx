@@ -152,6 +152,12 @@ const Payment = () => {
             }
             disabled={appliedPayment == null}
             onEdit={() => goToStep(STEPS.PAYMENT)}
+            editLabel={
+                <FormattedMessage
+                    defaultMessage="Edit Payment Info"
+                    id="toggle_card.action.editPaymentInfo"
+                />
+            }
         >
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>
