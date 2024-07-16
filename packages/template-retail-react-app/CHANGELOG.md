@@ -2,11 +2,24 @@
 
 ### Bug Fixes
 
+- A11y: Account Nav fixes [#1884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1884)
+- A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
 - Out of stock and low stock items are removed from cart and checkout as unavailable products [#1865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1865)
+- Fix infinity sign price on product tile [#1903](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1903)
+
+### Accessibility Improvements
+
+- Improve accessibility readout for strikethrough price on shipping options in checkout page [#1892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1892)
+
+## v3.0.2 (Jul 11, 2024)
+
+### Bug Fixes
+
+- Fix StorefrontPreview component add siteId query parameter to shopper context calls [#1891](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1891)
 
 ## v3.0.1 (Jul 9, 2024)
 
-### Bug Fixes 
+### Bug Fixes
 
 - Fix basket transfer during checkout login [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
 
@@ -15,8 +28,8 @@
 ### Improvements
 
 - Product Tile Revamp
-  - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760) 
-  - Display pricing for cart, checkout and wishlist page [#1796](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1796) 
+  - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760)
+  - Display pricing for cart, checkout and wishlist page [#1796](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1796)
   - Shows promotional callout message on Product List and Product Detail pages [#1786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1786) [#1804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1804)
   - Display selectable swatch groups for attributes like color [#1773](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1773)
   - Show badges [#1791](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1791)
@@ -33,7 +46,7 @@
 - Add explicit headers to cart modal [#1811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1811)
 - Add autocomplete to text input fields [#1840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1840)
 - Add error icon to error messages [#1839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1839)
-  
+
 ### Performance Improvements
 
 - Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656) [#1673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1673)
