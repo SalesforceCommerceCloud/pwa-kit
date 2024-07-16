@@ -2345,6 +2345,12 @@
       "value": "1 uppercase letter"
     }
   ],
+  "payment_selection.group_title.assistive_msg.payment_form": [
+    {
+      "type": 0,
+      "value": "Payment form"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
@@ -2939,6 +2945,12 @@
     {
       "type": 0,
       "value": "Continue to Payment"
+    }
+  ],
+  "shipping_options.form.group_tile.assistive_msg.shipping_methods": [
+    {
+      "type": 0,
+      "value": "Shipping methods"
     }
   ],
   "shipping_options.title.shipping_gift_options": [

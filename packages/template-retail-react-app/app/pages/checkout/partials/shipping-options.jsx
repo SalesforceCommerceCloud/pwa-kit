@@ -34,6 +34,7 @@ import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+    const intl = useIntl()
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
@@ -120,7 +121,13 @@ export default function ShippingOptions() {
                     onSubmit={form.handleSubmit(submitForm)}
                     data-testid="sf-checkout-shipping-options-form"
                 >
-                    <Stack spacing={6} aria-label="Shipping methods">
+                    <Stack
+                        spacing={6}
+                        aria-label={intl.formatMessage({
+                            id: 'shipping_options.form.group_tile.assistive_msg.shipping_methods',
+                            defaultMessage: 'Shipping methods'
+                        })}
+                    >
                         {shippingMethods?.applicableShippingMethods && (
                             <Controller
                                 name="shippingMethodId"

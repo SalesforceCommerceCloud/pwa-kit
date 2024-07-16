@@ -24,6 +24,7 @@ import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 const PaymentForm = ({form, onSubmit}) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
+    const intl = useIntl()
     const {currency} = useCurrency()
     const paymentFormRef = useRef()
     useEffect(() => {
@@ -39,7 +40,10 @@ const PaymentForm = ({form, onSubmit}) => {
                             value="cc"
                             ref={paymentFormRef}
                             tabIndex="0"
-                            aria-label="Payment form"
+                            aria-label={intl.formatMessage({
+                                id: 'payment_selection.group_title.assistive_msg.payment_form',
+                                defaultMessage: 'Payment form'
+                            })}
                         >
                             <Box
                                 py={3}

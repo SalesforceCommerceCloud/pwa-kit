@@ -1014,6 +1014,9 @@
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
   },
+  "payment_selection.group_title.assistive_msg.payment_form": {
+    "defaultMessage": "Payment form"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Credit Card"
   },
@@ -1258,6 +1261,9 @@
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
+  },
+  "shipping_options.form.group_tile.assistive_msg.shipping_methods": {
+    "defaultMessage": "Shipping methods"
   },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "Shipping & Gift Options"
