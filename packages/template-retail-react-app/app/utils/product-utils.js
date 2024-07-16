@@ -181,7 +181,7 @@ export const findLowestPrice = (product) => {
     }
     const array = isMaster && product.variants ? product.variants : [product]
 
-    return array.reduce(
+    const res = array.reduce(
         (prev, data) => {
             const promotions = data.productPromotions || []
             const [smallestPromotionalPrice, promo] = getSmallestValByProperty(
@@ -200,6 +200,11 @@ export const findLowestPrice = (product) => {
         },
         {minPrice: Infinity, promotion: null, data: null}
     )
+    return {
+        ...res,
+        // when minPrice is infinity, meaning there is no variant with lowest price found, we rest the value to 0 as minPrice to be able to use this value on UI
+        minPrice: res.minPrice === Infinity ? 0 : res.minPrice
+    }
 }
 
 /**
