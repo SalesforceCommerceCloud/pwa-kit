@@ -54,8 +54,8 @@ const ProductViewHeader = ({name, currency, priceData, category, product}) => {
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            <Skeleton isLoaded={priceData?.currentPrice}>
-                {priceData?.currentPrice && (
+            <Skeleton isLoaded={typeof priceData?.currentPrice === 'number'}>
+                {typeof priceData?.currentPrice === 'number' && (
                     <DisplayPrice priceData={priceData} currency={currency} />
                 )}
             </Skeleton>
