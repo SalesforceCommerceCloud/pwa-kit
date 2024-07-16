@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {
     Box,
@@ -59,6 +59,15 @@ export default function ShippingOptions() {
         }
     })
 
+    const shippingMethodRef = useRef()
+    // Intentionally not adding dependency on this hook to make it aware of the form whenever it is shown.
+    // The form only mounts once when shopper gets to this step and it will be hidden/displayed based on editing state
+    // using [] for dependency will result in the form being focused once on first mounted
+    useEffect(() => {
+        // Focus on the form when the component mounts for accessibility
+        shippingMethodRef?.current?.focus()
+    })
+
     useEffect(() => {
         const defaultMethodId = shippingMethods?.defaultShippingMethodId
         const methodId = form.getValues().shippingMethodId
@@ -111,7 +120,7 @@ export default function ShippingOptions() {
                     onSubmit={form.handleSubmit(submitForm)}
                     data-testid="sf-checkout-shipping-options-form"
                 >
-                    <Stack spacing={6}>
+                    <Stack spacing={6} aria-label="Shipping methods">
                         {shippingMethods?.applicableShippingMethods && (
                             <Controller
                                 name="shippingMethodId"
@@ -121,6 +130,8 @@ export default function ShippingOptions() {
                                     <RadioGroup
                                         name="shipping-options-radiogroup"
                                         value={value}
+                                        tabIndex="0"
+                                        ref={shippingMethodRef}
                                         onChange={onChange}
                                     >
                                         <Stack spacing={5}>

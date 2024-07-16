@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -25,13 +25,22 @@ const PaymentForm = ({form, onSubmit}) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
-
+    const paymentFormRef = useRef()
+    useEffect(() => {
+        // Focus on the form when the component mounts for accessibility
+        paymentFormRef?.current?.focus()
+    }, [])
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
             <Stack spacing={8}>
                 <Stack spacing={5}>
                     <Box border="1px solid" borderColor="gray.100" rounded="base" overflow="hidden">
-                        <RadioGroup value="cc">
+                        <RadioGroup
+                            value="cc"
+                            ref={paymentFormRef}
+                            tabIndex="0"
+                            aria-label="Payment form"
+                        >
                             <Box
                                 py={3}
                                 px={[4, 4, 6]}
