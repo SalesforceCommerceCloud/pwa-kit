@@ -10,9 +10,6 @@
 ### Accessibility Improvements
 
 - Improve accessibility readout for strikethrough price on shipping options in checkout page [#1892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1892)
-
-### Accessibility improvements
-
 - Ensure credit card informational tooltip on checkout page persists after the user is no longer hovering over it [#1890](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1890)
 
 ## v3.0.2 (Jul 11, 2024)
