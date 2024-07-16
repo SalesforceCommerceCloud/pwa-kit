@@ -264,6 +264,9 @@
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "Shipping"
   },
+  "checkout_confirmation.label.shipping.strikethrough.price": {
+    "defaultMessage": "Originally {originalPrice}, now {newPrice}"
+  },
   "checkout_confirmation.label.subtotal": {
     "defaultMessage": "Subtotal"
   },
