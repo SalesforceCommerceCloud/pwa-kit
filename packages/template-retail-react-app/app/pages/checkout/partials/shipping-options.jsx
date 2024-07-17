@@ -61,11 +61,7 @@ export default function ShippingOptions() {
     })
 
     const shippingMethodRef = useRef()
-    // Intentionally not adding dependency on this hook to make it aware of the form whenever it is shown.
-    // The form only mounts once when shopper gets to this step and it will be hidden/displayed based on editing state
-    // using [] for dependency will result in the form being focused once on first mounted
     useEffect(() => {
-        // Focus on the form when the component mounts for accessibility
         shippingMethodRef?.current?.focus()
     })
 
