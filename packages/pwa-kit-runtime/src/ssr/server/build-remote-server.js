@@ -357,6 +357,8 @@ export const RemoteServerFactory = {
         // processing.
         this._setupCommonMiddleware(app, options)
 
+        this._setupExtensions(app, options)
+
         this._addStaticAssetServing(app)
         this._addDevServerGarbageCollection(app)
         return app
@@ -631,6 +633,26 @@ export const RemoteServerFactory = {
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
             })
+        })
+    },
+
+    /**
+     * @private
+     */
+    _setupExtensions(app, options) {
+        // TODO: get actual extensions
+        const EXTENSIONS = ['test-extension-a', 'test-extension-b']
+        const _r = eval('require')
+
+        EXTENSIONS.forEach((extension) => {
+            const extensionPath = path.join(
+                options.buildDir,
+                'extensions',
+                extension,
+                'setup-server.js'
+            )
+            const module = _r(extensionPath)
+            module.default({app, options})
         })
     },
 

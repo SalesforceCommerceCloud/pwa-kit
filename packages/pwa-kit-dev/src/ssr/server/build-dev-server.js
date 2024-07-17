@@ -28,6 +28,11 @@ import {
 
 import {randomUUID} from 'crypto'
 import chalk from 'chalk'
+import esm from 'esm'
+
+// This allows us to dynamically import a module in both CommonJS and ESM format
+// Note: the package babel-node we are using for `npm start` doesn't work for dynamic imports
+const esmImport = esm(module)
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -123,6 +128,26 @@ export const DevServerMixin = {
         proxyConfigs.forEach((config) => {
             app.use(config.proxyPath, config.proxy)
             app.use(config.cachingPath, config.cachingProxy)
+        })
+    },
+
+    /**
+     * @private
+     */
+    _setupExtensions(app, options) {
+        // TODO: typescript support for extensions
+        // TODO: Replace this with the actual extension names
+        const extensions = ['test-extension-a', 'test-extension-b']
+
+        extensions.forEach((extension) => {
+            const customizerPath = path.join(
+                options.projectDir,
+                'node_modules',
+                extension,
+                'setup-server.js'
+            )
+            const customizer = esmImport(customizerPath)
+            customizer.default({app, options})
         })
     },
 
