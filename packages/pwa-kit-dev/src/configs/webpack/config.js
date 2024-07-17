@@ -557,12 +557,13 @@ const requestProcessor =
         .build()
 
 // TODO: get actual extensions from package.json
-const EXTENSIONS = ['my-extension', 'my-extension-b']
+const EXTENSIONS = ['test-extension-one', 'test-extension-two']
 
 const extensions = EXTENSIONS.map((extension) => {
     return {
         name: 'extensions',
         target: 'node',
+        mode,
         entry: `${projectDir}/node_modules/${extension}/server.js`,
         output: {
             path: `${buildDir}/extensions/${extension}`,

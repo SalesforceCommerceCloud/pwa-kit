@@ -132,8 +132,9 @@ export const DevServerMixin = {
     },
 
     _setupExtensions(app, options) {
+        // TODO: typescript support for extensions
         // TODO: Replace this with the actual extension names
-        const extensions = ['my-extension', 'my-extension-b']
+        const extensions = ['test-extension-one', 'test-extension-two']
 
         extensions.forEach((extension) => {
             const customizerPath = path.join(

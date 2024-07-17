@@ -346,14 +346,7 @@ export const RemoteServerFactory = {
 
     _setupExtensions(app, options) {
         // TODO: get actual extensions
-        const EXTENSIONS = [
-            'my-extension',
-            'my-extension-b',
-            'my-extension-c',
-            'my-extension-d',
-            'my-extension-e',
-            'my-extension-f'
-        ]
+        const EXTENSIONS = ['test-extension-one', 'test-extension-two']
         const _r = eval('require')
 
         EXTENSIONS.forEach((extension) => {
