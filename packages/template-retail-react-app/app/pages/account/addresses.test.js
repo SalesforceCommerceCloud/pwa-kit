@@ -100,7 +100,27 @@ test('Allows customer to add addresses', async () => {
         expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
     })
 
-    await helperAddNewAddress(user)
+    // Add new address
+    await user.click(screen.getByText(/add address/i))
+
+    // Address Form must be present
+    expect(screen.getByLabelText('Address Form')).toBeInTheDocument()
+
+    await user.type(screen.getByLabelText('First Name'), 'Test')
+    await user.type(screen.getByLabelText('Last Name'), 'McTester')
+    await user.type(screen.getByLabelText('Phone'), '7275551234')
+    await user.type(screen.getByLabelText('Address'), '123 Main St')
+    await user.type(screen.getByLabelText('City'), 'Tampa')
+    await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
+    await user.type(screen.getByLabelText('Zip Code'), '33712')
+
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) =>
+            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        )
+    )
+    await user.click(screen.getByText(/^Save$/i))
+
     expect(await screen.findByText(/123 Main St/i)).toBeInTheDocument()
 })
 

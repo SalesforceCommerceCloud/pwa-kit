@@ -412,7 +412,7 @@ ShippingAddressSelection.propTypes = {
     submitButtonLabel: MESSAGE_PROPTYPE,
 
     /** aria label to use for the address group */
-    formTitleAriaLabel: PropTypes.MESSAGE_PROPTYPE,
+    formTitleAriaLabel: MESSAGE_PROPTYPE,
 
     /** Show or hide the submit button (for controlling the form from outside component) */
     hideSubmitButton: PropTypes.bool,
