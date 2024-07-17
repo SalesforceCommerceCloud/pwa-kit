@@ -136,6 +136,7 @@ export const DevServerMixin = {
      */
     _setupExtensions(app, options) {
         // TODO: typescript support for extensions
+        // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
 
         extensions.forEach((extension) => {
