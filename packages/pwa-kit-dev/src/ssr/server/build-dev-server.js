@@ -136,8 +136,7 @@ export const DevServerMixin = {
      */
     _setupExtensions(app, options) {
         // TODO: typescript support for extensions
-        // TODO: Replace this with the actual extension names
-        const extensions = ['test-extension-a', 'test-extension-b']
+        const extensions = options.mobify?.app?.extensions || []
 
         extensions.forEach((extension) => {
             const customizerPath = path.join(

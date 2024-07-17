@@ -556,10 +556,7 @@ const requestProcessor =
         })
         .build()
 
-// TODO: get actual extensions from package.json
-const EXTENSIONS = ['test-extension-a', 'test-extension-b']
-
-const extensions = EXTENSIONS.map((extension) => {
+const extensions = (pkg.mobify.app.extensions || []).map((extension) => {
     return {
         name: 'extensions',
         target: 'node',

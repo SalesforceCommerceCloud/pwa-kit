@@ -640,11 +640,10 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupExtensions(app, options) {
-        // TODO: get actual extensions
-        const EXTENSIONS = ['test-extension-a', 'test-extension-b']
+        const extensions = options.mobify?.app?.extensions || []
         const _r = eval('require')
 
-        EXTENSIONS.forEach((extension) => {
+        extensions.forEach((extension) => {
             const extensionPath = path.join(
                 options.buildDir,
                 'extensions',

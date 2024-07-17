@@ -40,11 +40,8 @@
   "mobify": {
     "app":{
       "extensions": [
-        "test-a",
-        ["test-b", {
-          "greeting": "hello"
-        }],
-        "./app/extensions/extension-test-c"
+        "test-extension-a",
+        "test-extension-b"
       ]
     },
     "ssrEnabled": true,
