@@ -55,6 +55,7 @@ const ContactInfo = () => {
     })
 
     const fields = useLoginFields({form})
+    const emailRef = useRef()
 
     const [error, setError] = useState(null)
     const [showPasswordField, setShowPasswordField] = useState(false)
@@ -97,6 +98,9 @@ const ContactInfo = () => {
             setError(null)
         }
         setShowPasswordField(!showPasswordField)
+        if (emailRef.current) {
+            emailRef.current.focus()
+        }
     }
 
     const onForgotPasswordClick = () => {
@@ -143,7 +147,7 @@ const ContactInfo = () => {
                             )}
 
                             <Stack spacing={5} position="relative">
-                                <Field {...fields.email} />
+                                <Field {...fields.email} inputRef={emailRef} />
                                 {showPasswordField && (
                                     <Stack>
                                         <Field {...fields.password} />

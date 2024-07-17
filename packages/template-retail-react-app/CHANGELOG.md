@@ -19,6 +19,10 @@
 
 - Fix StorefrontPreview component add siteId query parameter to shopper context calls [#1891](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1891)
 
+### Accessibility improvements
+
+- Ensure that the email field on the checkout page receives focus after content updates [#1894](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1894)
+
 ## v3.0.1 (Jul 9, 2024)
 
 ### Bug Fixes
