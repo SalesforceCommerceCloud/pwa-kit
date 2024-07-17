@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import {nanoid} from 'nanoid'
-import {FormattedMessage, defineMessage, useIntl} from 'react-intl'
+import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {
     ToggleCard,
