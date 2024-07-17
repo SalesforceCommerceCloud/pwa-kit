@@ -7,9 +7,6 @@
 import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
 
-import HelloTS from '../components/hello-typescript'
-import HelloJS from '../components/hello-javascript'
-
 interface Props {
     value: number
 }
@@ -18,100 +15,29 @@ const style = `
 body {
     background: linear-gradient(-45deg, #e73c7e, #23a6d5, #ee7752);
     background-size: 400% 400%;
-    animation: gradient 10s ease 5;
-    height: 100vh;
-}
-@keyframes gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-@keyframes fade {
-  0% { opacity: 0 }
-  100% { opacity: 1 }
-}
-.fade-in {
-    font-size: 18px;
-    opacity: 0;
-    animation: fade 1s ease-in-out;
-    animation-fill-mode: forwards;
-}
-.fade-in-0 { animation-delay: 0s}
-.fade-in-1 { animation-delay: 4s}
-.fade-in-2 { animation-delay: 8s}
-.fade-in-3 { animation-delay: 12s}
-.fade-in-4 { animation-delay: 16s}
-.fade-in-5 { animation-delay: 20s}
-body {
-    font-family: "Helvetica", sans-serif;
-    font-weight: 300;
-    color: rgba(255,255,255,0.8);
-    color: chartreuse;
-}
-.loading-screen {
-    mix-blend-mode: color-dodge;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
 }
 h1 {
     font-size: 10em;
     font-weight: 900;
     letter-spacing: -0.05em;
+    color: #fff;
 }
 .title {
-    text-align: right;
-}
-.divider {
-    mix-blend-mode: lighten;
-    width: 8px;
-    background-color: chartreuse;
-    height: 507px;
-    margin-left: 5em;
-    margin-right: 3em;
+    text-align: left;
 }
 `
 
 const Home = ({value}: Props) => {
-    const [counter, setCounter] = useState(0)
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCounter(counter + 1)
-        }, 1000)
-        return () => clearInterval(interval)
-    }, [counter, setCounter])
-
-    const query = useQuery(
-        ['example-data'],
-        () =>
-            new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve('This came from react-query')
-                }, 1000)
-            })
-    )
-
     return (
         <div>
             <style dangerouslySetInnerHTML={{__html: style}} />
-            <div className="loading-screen">
-                <div className="panel title">
-                    <h1>
-                        Multi
-                        <br />
-                        Extensibility
-                    </h1>
-                </div>
+            <div className="panel title">
+                <h1>
+                    Multi
+                    <br />
+                    Extensibility
+                </h1>
             </div>
         </div>
     )
