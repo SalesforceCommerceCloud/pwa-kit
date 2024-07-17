@@ -33,7 +33,7 @@ test('renders Field component and forwards ref', () => {
                     type="email"
                     control={control}
                     placeholder="Enter your email"
-                    ref={emailRef}
+                    inputRef={emailRef}
                 />
             )}
         </TestComponent>
@@ -49,7 +49,7 @@ test('renders Field component and forwards ref', () => {
 
 test('renders Field component without ref and works correctly', () => {
     renderWithProviders(
-        <TestComponent defaultValues={{username: ''}}>
+        <TestComponent defaultValues={{email: ''}}>
             {({control}) => (
                 <Field
                     name="email"

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, forwardRef} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Controller} from 'react-hook-form'
 import {
@@ -25,142 +25,136 @@ import {
 } from '@salesforce/retail-react-app/app/components/icons'
 import {useIntl} from 'react-intl'
 
-const Field = forwardRef(
-    (
-        {
-            name,
-            label,
-            formLabel,
-            type = 'text',
-            options = [],
-            rules = {},
-            error,
-            placeholder,
-            inputProps,
-            control,
-            autoComplete,
-            defaultValue,
-            helpText,
-            children
-        },
-        ref
-    ) => {
-        const intl = useIntl()
-        const [hidePassword, setHidePassword] = useState(true)
-        const PasswordIcon = hidePassword ? VisibilityIcon : VisibilityOffIcon
-        const passwordIconLabel = hidePassword
-            ? intl.formatMessage({
-                  id: 'field.password.assistive_msg.show_password',
-                  defaultMessage: 'Show password'
-              })
-            : intl.formatMessage({
-                  id: 'field.password.assistive_msg.hide_password',
-                  defaultMessage: 'Hide password'
-              })
-        const inputType =
-            type === 'password' && hidePassword ? 'password' : type === 'password' ? 'text' : type
+const Field = ({
+    name,
+    label,
+    formLabel,
+    type = 'text',
+    options = [],
+    rules = {},
+    error,
+    placeholder,
+    inputProps,
+    control,
+    autoComplete,
+    defaultValue,
+    helpText,
+    children,
+    inputRef
+}) => {
+    const intl = useIntl()
+    const [hidePassword, setHidePassword] = useState(true)
+    const PasswordIcon = hidePassword ? VisibilityIcon : VisibilityOffIcon
+    const passwordIconLabel = hidePassword
+        ? intl.formatMessage({
+              id: 'field.password.assistive_msg.show_password',
+              defaultMessage: 'Show password'
+          })
+        : intl.formatMessage({
+              id: 'field.password.assistive_msg.hide_password',
+              defaultMessage: 'Hide password'
+          })
+    const inputType =
+        type === 'password' && hidePassword ? 'password' : type === 'password' ? 'text' : type
 
-        return (
-            <Controller
-                name={name}
-                control={control}
-                rules={rules}
-                defaultValue={defaultValue}
-                render={({field: {onChange, value}}) => {
-                    const _inputProps =
-                        typeof inputProps === 'function'
-                            ? inputProps({value, onChange})
-                            : inputProps
+    return (
+        <Controller
+            name={name}
+            control={control}
+            rules={rules}
+            defaultValue={defaultValue}
+            render={({field: {onChange, value, ref}}) => {
+                const _inputProps =
+                    typeof inputProps === 'function' ? inputProps({value, onChange}) : inputProps
 
-                    return (
-                        <FormControl id={name} isInvalid={error}>
-                            {!['checkbox', 'radio', 'hidden'].includes(type) &&
-                                (formLabel || <FormLabel>{label}</FormLabel>)}
+                return (
+                    <FormControl id={name} isInvalid={error}>
+                        {!['checkbox', 'radio', 'hidden'].includes(type) &&
+                            (formLabel || <FormLabel>{label}</FormLabel>)}
 
-                            <InputGroup>
-                                {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(
-                                    type
-                                ) && (
-                                    <Input
-                                        ref={ref}
-                                        onChange={onChange}
-                                        value={value}
-                                        type={inputType}
-                                        placeholder={placeholder}
-                                        autoComplete={autoComplete}
-                                        {..._inputProps}
-                                    />
-                                )}
-
-                                {type === 'hidden' && (
-                                    <input
-                                        ref={ref}
-                                        onChange={onChange}
-                                        value={value}
-                                        type="hidden"
-                                        {..._inputProps}
-                                    />
-                                )}
-
-                                {type === 'password' && (
-                                    <InputRightElement>
-                                        <IconButton
-                                            variant="ghosted"
-                                            aria-label={passwordIconLabel}
-                                            icon={<PasswordIcon color="gray.500" boxSize={6} />}
-                                            onClick={() => setHidePassword(!hidePassword)}
-                                        />
-                                    </InputRightElement>
-                                )}
-
-                                {type === 'select' && (
-                                    <Select
-                                        ref={ref}
-                                        onChange={onChange}
-                                        value={value}
-                                        placeholder={placeholder}
-                                        {..._inputProps}
-                                    >
-                                        {options.map((opt) => (
-                                            <option
-                                                key={`${opt.label}-${opt.value}`}
-                                                value={opt.value}
-                                            >
-                                                {opt.label}
-                                            </option>
-                                        ))}
-                                    </Select>
-                                )}
-
-                                {type === 'checkbox' && (
-                                    <Checkbox
-                                        ref={ref}
-                                        onChange={(e) => onChange(e.target.checked)}
-                                        isChecked={value}
-                                        {..._inputProps}
-                                    >
-                                        {formLabel || label}
-                                    </Checkbox>
-                                )}
-
-                                {children}
-                            </InputGroup>
-
-                            {error && type !== 'hidden' && (
-                                <FormErrorMessage color="red.600">
-                                    <AlertIcon aria-hidden="true" mr={2} />
-                                    {error.message}
-                                </FormErrorMessage>
+                        <InputGroup>
+                            {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(
+                                type
+                            ) && (
+                                <Input
+                                    ref={(node) => {
+                                        ref(node)
+                                        if (inputRef) inputRef.current = node
+                                    }}
+                                    onChange={onChange}
+                                    value={value}
+                                    type={inputType}
+                                    placeholder={placeholder}
+                                    autoComplete={autoComplete}
+                                    {..._inputProps}
+                                />
                             )}
 
-                            {helpText}
-                        </FormControl>
-                    )
-                }}
-            />
-        )
-    }
-)
+                            {type === 'hidden' && (
+                                <input
+                                    ref={ref}
+                                    onChange={onChange}
+                                    value={value}
+                                    type="hidden"
+                                    {..._inputProps}
+                                />
+                            )}
+
+                            {type === 'password' && (
+                                <InputRightElement>
+                                    <IconButton
+                                        variant="ghosted"
+                                        aria-label={passwordIconLabel}
+                                        icon={<PasswordIcon color="gray.500" boxSize={6} />}
+                                        onClick={() => setHidePassword(!hidePassword)}
+                                    />
+                                </InputRightElement>
+                            )}
+
+                            {type === 'select' && (
+                                <Select
+                                    ref={ref}
+                                    onChange={onChange}
+                                    value={value}
+                                    placeholder={placeholder}
+                                    {..._inputProps}
+                                >
+                                    {options.map((opt) => (
+                                        <option key={`${opt.label}-${opt.value}`} value={opt.value}>
+                                            {opt.label}
+                                        </option>
+                                    ))}
+                                </Select>
+                            )}
+
+                            {type === 'checkbox' && (
+                                <Checkbox
+                                    ref={ref}
+                                    onChange={(e) => onChange(e.target.checked)}
+                                    isChecked={value}
+                                    {..._inputProps}
+                                >
+                                    {formLabel || label}
+                                </Checkbox>
+                            )}
+
+                            {children}
+                        </InputGroup>
+
+                        {error && type !== 'hidden' && (
+                            <FormErrorMessage color="red.600">
+                                <AlertIcon aria-hidden="true" mr={2} />
+                                {error.message}
+                            </FormErrorMessage>
+                        )}
+
+                        {helpText}
+                    </FormControl>
+                )
+            }}
+        />
+    )
+}
 
 Field.propTypes = {
     name: PropTypes.string,
@@ -186,8 +180,8 @@ Field.propTypes = {
     control: PropTypes.object,
     defaultValue: PropTypes.any,
     helpText: PropTypes.any,
-    children: PropTypes.any
+    children: PropTypes.any,
+    inputRef: PropTypes.object
 }
 
-Field.displayName = 'Field'
 export default Field

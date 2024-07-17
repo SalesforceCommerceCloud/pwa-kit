@@ -147,7 +147,7 @@ const ContactInfo = () => {
                             )}
 
                             <Stack spacing={5} position="relative">
-                                <Field {...fields.email} ref={emailRef} />
+                                <Field {...fields.email} inputRef={emailRef} />
                                 {showPasswordField && (
                                     <Stack>
                                         <Field {...fields.password} />
