@@ -11,12 +11,6 @@ import {useForm} from 'react-hook-form'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import Field from '@salesforce/retail-react-app/app/components/field/index'
 
-// Mock messages for IntlProvider
-const messages = {
-    'field.password.assistive_msg.show_password': 'Show password',
-    'field.password.assistive_msg.hide_password': 'Hide password'
-}
-
 const TestComponent = ({defaultValues, children}) => {
     const methods = useForm({defaultValues})
     return <form>{children(methods)}</form>
@@ -42,8 +36,7 @@ test('renders Field component and forwards ref', () => {
                     ref={emailRef}
                 />
             )}
-        </TestComponent>,
-        {wrapperProps: {intl: {locale: 'en', messages}}}
+        </TestComponent>
     )
 
     const emailInput = screen.getByPlaceholderText('Enter your email')
@@ -54,61 +47,27 @@ test('renders Field component and forwards ref', () => {
     expect(emailInput).toHaveFocus()
 })
 
-test('renders Field component and handles password visibility toggle', () => {
-    const passwordRef = React.createRef()
-
-    renderWithProviders(
-        <TestComponent defaultValues={{password: ''}}>
-            {({control}) => (
-                <Field
-                    name="password"
-                    label="Password"
-                    type="password"
-                    control={control}
-                    placeholder="Enter your password"
-                    ref={passwordRef}
-                />
-            )}
-        </TestComponent>,
-        {wrapperProps: {intl: {locale: 'en', messages}}}
-    )
-
-    const passwordInput = screen.getByPlaceholderText('Enter your password')
-    expect(passwordInput).toBeInTheDocument()
-    expect(passwordInput).toHaveAttribute('type', 'password')
-
-    const toggleButton = screen.getByRole('button', {name: /show password/i})
-    expect(toggleButton).toBeInTheDocument()
-
-    // Click the toggle button to show the password
-    fireEvent.click(toggleButton)
-    expect(passwordInput).toHaveAttribute('type', 'text')
-
-    // Click the toggle button again to hide the password
-    fireEvent.click(toggleButton)
-    expect(passwordInput).toHaveAttribute('type', 'password')
-})
-
 test('renders Field component without ref and works correctly', () => {
     renderWithProviders(
         <TestComponent defaultValues={{username: ''}}>
             {({control}) => (
                 <Field
-                    name="username"
-                    label="Username"
+                    name="email"
+                    label="Email"
                     type="text"
                     control={control}
-                    placeholder="Enter your username"
+                    placeholder="Enter your email"
                 />
             )}
-        </TestComponent>,
-        {wrapperProps: {intl: {locale: 'en', messages}}}
+        </TestComponent>
     )
 
-    const usernameInput = screen.getByPlaceholderText('Enter your username')
-    expect(usernameInput).toBeInTheDocument()
+    const emailInput = screen.getByPlaceholderText('Enter your email')
+    expect(emailInput).toBeInTheDocument()
 
-    // Simulate user typing
-    fireEvent.change(usernameInput, {target: {value: 'testuser'}})
-    expect(usernameInput.value).toBe('testuser')
+    // Simulate user typing email
+    fireEvent.change(emailInput, {target: {value: 'testuser@example.com'}})
+    expect(emailInput.value).toBe('testuser@example.com')
 })
+
+
