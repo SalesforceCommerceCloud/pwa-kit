@@ -69,5 +69,3 @@ test('renders Field component without ref and works correctly', () => {
     fireEvent.change(emailInput, {target: {value: 'testuser@example.com'}})
     expect(emailInput.value).toBe('testuser@example.com')
 })
-
-
