@@ -34,15 +34,6 @@ export const ToggleCard = ({
     children,
     ...props
 }) => {
-    let editButtonAriaLabel = 'Edit'
-    if (typeof editLabel === 'string') {
-        editButtonAriaLabel = editLabel
-    } else if (
-        typeof editLabel === 'object' &&
-        editLabel?.type?.displayName === 'MemoizedFormattedMessage'
-    ) {
-        editButtonAriaLabel = editLabel?.props.defaultMessage[0].value
-    }
     return (
         <ToggleCardContext.Provider value={{editing, disabled}}>
             <Box
@@ -68,7 +59,7 @@ export const ToggleCard = ({
                                 variant="link"
                                 size="sm"
                                 onClick={onEdit}
-                                aria-label={editButtonAriaLabel}
+                                aria-label={editLabel}
                             >
                                 {editLabel || (
                                     <FormattedMessage

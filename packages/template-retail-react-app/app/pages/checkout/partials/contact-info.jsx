@@ -126,14 +126,15 @@ const ContactInfo = () => {
                 }
             }}
             editLabel={
-                customer.isRegistered ? (
-                    <FormattedMessage defaultMessage="Sign Out" id="contact_info.action.sign_out" />
-                ) : (
-                    <FormattedMessage
-                        defaultMessage="Edit Contact Info"
-                        id="toggle_card.action.editContactInfo"
-                    />
-                )
+                customer.isRegistered
+                    ? formatMessage({
+                          defaultMessage: 'Sign Out',
+                          id: 'contact_info.action.sign_out'
+                      })
+                    : formatMessage({
+                          defaultMessage: 'Edit Contact Info',
+                          id: 'toggle_card.action.editContactInfo'
+                      })
             }
         >
             <ToggleCardEdit>
