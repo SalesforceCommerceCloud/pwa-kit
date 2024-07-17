@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useRef} from 'react'
-import {useIntl} from 'react-intl'
+import {defineMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
     Grid,
@@ -16,8 +16,14 @@ import {
 import useAddressFields from '@salesforce/retail-react-app/app/components/forms/useAddressFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {MESSAGE_PROPTYPE} from '@salesforce/retail-react-app/app/utils/locale'
 
-const AddressFields = ({form, prefix = ''}) => {
+const defaultFormTitleAriaLabel = defineMessage({
+    defaultMessage: 'Address Form',
+    id: 'use_address_fields.label.address_form'
+})
+
+const AddressFields = ({form, prefix = '', formTitleAriaLabel = defaultFormTitleAriaLabel}) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
     const intl = useIntl()
@@ -31,10 +37,7 @@ const AddressFields = ({form, prefix = ''}) => {
     return (
         <Stack
             spacing={5}
-            aria-label={intl.formatMessage({
-                id: 'use_address_fields.label.address_form',
-                defaultMessage: 'Address Form'
-            })}
+            aria-label={intl.formatMessage(formTitleAriaLabel)}
             tabIndex="0"
             ref={addressFormRef}
         >
@@ -64,7 +67,10 @@ AddressFields.propTypes = {
     form: PropTypes.object.isRequired,
 
     /** Optional prefix for field names */
-    prefix: PropTypes.string
+    prefix: PropTypes.string,
+
+    /** Optional aria label to use for the address form */
+    formTitleAriaLabel: MESSAGE_PROPTYPE
 }
 
 export default AddressFields

@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
     Box,
     Button,
@@ -141,6 +141,11 @@ const Payment = () => {
         }
     })
 
+    const billingAddressAriaLabel = defineMessage({
+        defaultMessage: 'Billing Address Form',
+        id: 'checkout_payment.label.billing_address_form'
+    })
+
     return (
         <ToggleCard
             id="step-3"
@@ -224,6 +229,7 @@ const Payment = () => {
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}
+                            formTitleAriaLabel={billingAddressAriaLabel}
                             hideSubmitButton
                         />
                     )}

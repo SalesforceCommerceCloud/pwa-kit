@@ -843,6 +843,12 @@
       "value": "Credit Card"
     }
   ],
+  "checkout_payment.label.billing_address_form": [
+    {
+      "type": 0,
+      "value": "Billing Address Form"
+    }
+  ],
   "checkout_payment.label.same_as_shipping": [
     {
       "type": 0,
@@ -2897,6 +2903,12 @@
     {
       "type": 0,
       "value": "Continue to Shipping Method"
+    }
+  ],
+  "shipping_address.label.shipping_address_form": [
+    {
+      "type": 0,
+      "value": "Shipping Address Form"
     }
   ],
   "shipping_address.title.shipping_address": [

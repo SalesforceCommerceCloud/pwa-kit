@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+- A11y: Add aria-label to the address form based on the address type [#1904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1904)
 - A11y: Account Nav fixes [#1884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1884)
 - A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
 - Out of stock and low stock items are removed from cart and checkout as unavailable products [#1865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1865)
@@ -10,12 +11,17 @@
 ### Accessibility Improvements
 
 - Improve accessibility readout for strikethrough price on shipping options in checkout page [#1892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1892)
+- Ensure credit card informational tooltip on checkout page persists after the user is no longer hovering over it [#1890](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1890)
 
 ## v3.0.2 (Jul 11, 2024)
 
 ### Bug Fixes
 
 - Fix StorefrontPreview component add siteId query parameter to shopper context calls [#1891](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1891)
+
+### Accessibility improvements
+
+- Ensure that the email field on the checkout page receives focus after content updates [#1894](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1894)
 
 ## v3.0.1 (Jul 9, 2024)
 
