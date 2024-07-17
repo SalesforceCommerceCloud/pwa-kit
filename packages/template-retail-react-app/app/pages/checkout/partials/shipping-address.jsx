@@ -26,6 +26,10 @@ const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
     id: 'shipping_address.button.continue_to_shipping'
 })
+const shippingAddressAriaLabel = defineMessage({
+    defaultMessage: 'Shipping Address Form',
+    id: 'shipping_address.label.shipping_address_form'
+})
 
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
@@ -120,6 +124,7 @@ export default function ShippingAddress() {
                     selectedAddress={selectedShippingAddress}
                     submitButtonLabel={submitButtonMessage}
                     onSubmit={submitAndContinue}
+                    formTitleAriaLabel={shippingAddressAriaLabel}
                 />
             </ToggleCardEdit>
             {selectedShippingAddress && (

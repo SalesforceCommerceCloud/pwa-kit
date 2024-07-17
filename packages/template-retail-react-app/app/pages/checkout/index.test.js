@@ -347,6 +347,9 @@ test('Can proceed through checkout steps as guest', async () => {
     // Email should be displayed in previous step summary
     expect(screen.getByText('test@test.com')).toBeInTheDocument()
 
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
+
     // Fill out shipping address form and submit
     await user.type(screen.getByLabelText(/first name/i), 'Tester')
     await user.type(screen.getByLabelText(/last name/i), 'McTesting')
@@ -540,6 +543,8 @@ test('Can edit address during checkout as a registered customer', async () => {
         expect(screen.getByTestId('sf-shipping-address-edit-form')).not.toBeEmptyDOMElement()
     )
 
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
     expect(screen.getByLabelText(/first name/i)).toBeInTheDocument()
 
     // Edit and save the address
@@ -580,6 +585,9 @@ test('Can add address during checkout as a registered customer', async () => {
     })
     // Add address
     await user.click(screen.getByText(/add new address/i))
+
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
 
     const firstName = await screen.findByLabelText(/first name/i)
     await user.type(firstName, 'Test2')

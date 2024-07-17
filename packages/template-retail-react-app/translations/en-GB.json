@@ -325,6 +325,9 @@
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "Credit Card"
   },
+  "checkout_payment.label.billing_address_form": {
+    "defaultMessage": "Billing Address Form"
+  },
   "checkout_payment.label.same_as_shipping": {
     "defaultMessage": "Same as shipping address"
   },
@@ -1231,6 +1234,9 @@
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
+  },
+  "shipping_address.label.shipping_address_form": {
+    "defaultMessage": "Shipping Address Form"
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
