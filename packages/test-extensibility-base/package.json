@@ -1,0 +1,75 @@
+{
+  "name": "test-extensibility-base",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "pwa-kit-dev build",
+    "format": "pwa-kit-dev format \"**/*.{js,jsx,ts,tsx}\"",
+    "lint": "npm run lint:js && npm run typecheck",
+    "lint:fix": "npm run lint:js -- --fix",
+    "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
+    "push": "npm run build && pwa-kit-dev push",
+    "save-credentials": "pwa-kit-dev save-credentials",
+    "start": "pwa-kit-dev start",
+    "start:inspect": "npm run start -- --inspect",
+    "tail-logs": "pwa-kit-dev tail-logs",
+    "test": "pwa-kit-dev test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@loadable/component": "^5.15.3",
+    "@salesforce/pwa-kit-dev": "4.0.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
+    "@salesforce/pwa-kit-runtime": "4.0.0-dev",
+    "@tanstack/react-query": "^4.28.0",
+    "@types/loadable__component": "~5.13.4",
+    "@types/react": "~18.2.0",
+    "@types/react-dom": "~18.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
+    "react-router-dom": "^5.3.4",
+    "typescript": "4.9.5"
+  },
+  "engines": {
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
+  },
+  "mobify": {
+    "app":{
+      "extensions": [
+        "test-a",
+        ["test-b", {
+          "greeting": "hello"
+        }],
+        "./app/extensions/extension-test-c"
+      ]
+    },
+    "ssrEnabled": true,
+    "ssrOnly": [
+      "ssr.js",
+      "ssr.js.map",
+      "node_modules/**/*.*"
+    ],
+    "ssrShared": [
+      "static/favicon.ico",
+      "static/robots.txt",
+      "**/*.js",
+      "**/*.js.map",
+      "**/*.json"
+    ],
+    "ssrParameters": {
+      "ssrFunctionNodeVersion": "18.x",
+      "proxyConfigs": [
+        {
+          "host": "kv7kzm78.api.commercecloud.salesforce.com",
+          "path": "api"
+        },
+        {
+          "host": "zzrf-001.dx.commercecloud.salesforce.com",
+          "path": "ocapi"
+        }
+      ]
+    }
+  }
+}
