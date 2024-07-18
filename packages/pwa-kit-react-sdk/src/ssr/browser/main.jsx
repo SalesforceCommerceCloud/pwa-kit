@@ -17,7 +17,7 @@ import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
 import PropTypes from 'prop-types'
 import logger from '../../utils/logger-instance'
-import {ssrNamespace} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getNamespace} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -46,7 +46,8 @@ export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
 
-    const baseName = ssrNamespace ? ssrNamespace : '/'
+    const baseName = getNamespace() ? getNamespace() : '/'
+    console.log(`Namespace from main: ${getNamespace()}`)
     console.log(`Basename from main: ${baseName}`)
 
     return (

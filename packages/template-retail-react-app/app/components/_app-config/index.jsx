@@ -27,7 +27,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {ssrNamespace, proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getNamespace, proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
@@ -58,12 +58,14 @@ const AppConfig = ({children, locals = {}}) => {
     // we can either do this here or update the proxy path in the app config
     // inside default.js
     // this endpoint is where commerce-sdk-react will send requests to
-    const proxy = ssrNamespace
-        ? `${appOrigin}${commerceApiConfig.proxyPath}`
+    const proxy = getNamespace()
+        ? `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
         : `${appOrigin}${commerceApiConfig.proxyPath}`
 
-    const redirectURI = ssrNamespace
-        ? `${appOrigin}${ssrNamespace}/callback`
+    console.log(proxy)
+
+    const redirectURI = getNamespace()
+        ? `${appOrigin}${getNamespace()}/callback`
         : `${appOrigin}/callback`
 
     return (
