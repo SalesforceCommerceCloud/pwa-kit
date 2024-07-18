@@ -50,6 +50,34 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
+
+/**
+ * Search bar for the header.
+ *
+ * The search bar is a simple input field with a search icon.
+ * It can be used to search for products or navigate to a
+ * specific page.
+ *
+ * @param props {object} the component props
+ * @returns {Element} the search bar element
+ */
+const SearchBar = (props) => {
+    const styles = useMultiStyleConfig('Header')
+    const placeholder = intl.formatMessage({
+        id: 'header.field.placeholder.search_for_products',
+        defaultMessage: 'Search for products...'
+    })
+    return (
+        <Box {...styles.searchContainer}>
+            <Search
+                aria-label={placeholder}
+                placeholder={placeholder}
+                {...styles.search}
+                {...props}
+            />
+        </Box>
+    )
+}
 /**
  * The header is the main source for accessing
  * navigation, search, basket, and other
@@ -146,13 +174,7 @@ const Header = ({
                         onClick={onLogoClick}
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
-                    <Box {...styles.searchContainer}>
-                        <Search
-                            aria-label={placeholder}
-                            placeholder={placeholder}
-                            {...styles.search}
-                        />
-                    </Box>
+                    {isDesktop && <SearchBar />}
                     <IconButtonWithRegistration
                         icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
@@ -289,6 +311,7 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMyCartClick}
                     />
+                    {!isDesktop && <SearchBar />}
                 </Flex>
             </Box>
         </Box>
