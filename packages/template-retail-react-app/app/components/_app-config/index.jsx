@@ -139,12 +139,12 @@ const options = {
         }
     },
     beforeHydrate: (data) => {
-        console.log('beforeHydrate!', data, data['mutations'], data['queries'])
-        ;['mutations', 'queries'].forEach((type) => {
-            ;(data[type] || []).forEach(({state}) => {
-                state.dataUpdatedAt = now
-            })
-        })
+        // Helper for updating the data timestamp.
+        const updateQueryTimeStamp = ({state}) => state.dataUpdatedAt = now
+        
+        // Update serialized mutations and queries.
+        data?.mutations?.forEach(updateQueryTimeStamp)
+        data?.queries?.forEach(updateQueryTimeStamp)
         
         return data
     }
