@@ -30,14 +30,14 @@ export const getNamespace = () => {
     // Problem:
     // getConfig is undefined client side when we call it in public-path.js and ssr-shared.js
     // because they execute before we call main.js start() in webpack config
-    // const config = getConfig()
+    const config = getConfig()
 
     // Possible solution: what if instead of config, we use an env var?
     // I don't think this will work client side?
 
-    const config = {
-        ssrNamespace: '/local'
-    }
+    // const config = {
+    //     ssrNamespace: '/local'
+    // }
 
     let ssrNamespace = config?.ssrNamespace ? config.ssrNamespace : ''
     ssrNamespace = typeof ssrNamespace === 'function' ? namespace() : ssrNamespace
@@ -49,7 +49,7 @@ export const getNamespace = () => {
 
 // TODO: something is breaking when namespace is applied to proxy - it causes the app to freeze
 // Solved: the break is because the AppConfig proxy in default.js was not namespaced
-export const proxyBasePath = `${getNamespace()}${PROXY_PATH_BASE}`
+export const proxyBasePath = `${PROXY_PATH_BASE}`
 export const bundleBasePath = `${BUNDLE_PATH_BASE}`
 export const cachingBasePath = `${getNamespace()}${CACHING_PATH_BASE}`
 export const healthCheckPath = `${getNamespace()}${HEALTHCHECK_PATH}`

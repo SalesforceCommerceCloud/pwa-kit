@@ -59,7 +59,7 @@ const AppConfig = ({children, locals = {}}) => {
     // inside default.js
     // this endpoint is where commerce-sdk-react will send requests to
     const proxy = getNamespace()
-        ? `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
+        ? `${appOrigin}${commerceApiConfig.proxyPath}`
         : `${appOrigin}${commerceApiConfig.proxyPath}`
 
     console.log(proxy)
