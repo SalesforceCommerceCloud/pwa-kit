@@ -1,7 +1,7 @@
 import React from 'react'
 import {screen, fireEvent} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
-import { ToggleCard } from './index'
+import {ToggleCard} from './index'
 
 test('ToggleCard renders edit button with correct aria-label and calls onEdit on click', () => {
     const mockOnEdit = jest.fn()
