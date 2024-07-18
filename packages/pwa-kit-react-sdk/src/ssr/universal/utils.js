@@ -23,7 +23,7 @@ export const getAssetUrl = (path) => {
     /* istanbul ignore next */
     const publicPath = onClient
         ? `${window.Progressive.buildOrigin}`
-        : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
+        : `${bundleBasePath()}/${process.env.BUNDLE_ID || 'development'}/`
     return path ? `${publicPath}${path}` : publicPath
 }
 

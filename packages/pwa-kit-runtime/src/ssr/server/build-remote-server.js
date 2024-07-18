@@ -214,7 +214,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _isBundleOrProxyPath(url) {
-        return url.startsWith(proxyBasePath) || url.startsWith(bundleBasePath)
+        return url.startsWith(proxyBasePath) || url.startsWith(bundleBasePath())
     },
 
     /**
