@@ -10,6 +10,7 @@ import ssrPrepass from 'react-ssr-prepass'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {FetchStrategy} from '../fetch-strategy'
 import {PERFORMANCE_MARKS} from '../../../../utils/performance'
+import logger from '../../../../utils/logger-instance'
 
 const STATE_KEY = '__reactQuery'
 const passthrough = (input) => input
@@ -40,13 +41,15 @@ export const withReactQuery = (Wrapped, options = {}) => {
             this.props.locals.__queryClient =
                 this.props.locals.__queryClient || new QueryClient(queryClientConfig)
 
-            // BUGFIX: To avoid re-fetching data fetched on the server, set the
-            // `dataUpdatedAt` to the current date.
-            // https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912
             if (!isServerSide) {
-                // Get serialized data.
-                // NOTE: Maybe wrap in a try catch here.
-                preloadedState = beforeHydrate(window.__PRELOADED_STATE__?.[STATE_KEY] || {})
+                try {
+                    preloadedState = beforeHydrate(window.__PRELOADED_STATE__?.[STATE_KEY] || {})
+                } catch (e) {
+                    logger.error('Client `beforeHydrate` failed', {
+                        namespace: 'WithReactQuery render',
+                        additionalProperties: {error: e}
+                    })
+                }
             }
 
             return (
