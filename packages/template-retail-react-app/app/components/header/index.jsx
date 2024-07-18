@@ -63,6 +63,7 @@ const IconButtonWithRegistration = withRegistration(IconButton)
  */
 const SearchBar = (props) => {
     const styles = useMultiStyleConfig('Header')
+    const intl = useIntl()
     const placeholder = intl.formatMessage({
         id: 'header.field.placeholder.search_for_products',
         defaultMessage: 'Search for products...'
@@ -141,11 +142,6 @@ const Header = ({
             if (!hasEnterPopoverContent.current) onAccountMenuClose()
         }, 100)
     }
-
-    const placeholder = intl.formatMessage({
-        id: 'header.field.placeholder.search_for_products',
-        defaultMessage: 'Search for products...'
-    })
 
     return (
         <Box {...styles.container} {...props}>
