@@ -36,9 +36,25 @@ export const withReactQuery = (Wrapped, options = {}) => {
             this.props.locals.__queryClient =
                 this.props.locals.__queryClient || new QueryClient(queryClientConfig)
 
+            const preloadedState = isServerSide ? {} : window.__PRELOADED_STATE__?.[STATE_KEY]
+
+            // BUGFIX: To ensure we preserve the functionality of the `staleTime` options, we will
+            // set the `dataUpdatedAt` to the current data (of app load). If we don't do this, we run the
+            // risk of re-fetching our serialized data on first page load which isn't great for performance.
+            if (!isServerSide) {
+                const date = Date.now()
+
+                // Set `dataUpdatedAt` for all mutations and queries to current date.
+                ;['mutations', 'queries'].forEach((type) => {
+                    ;(preloadedState[type] || []).forEach(({state}) => {
+                        state.dataUpdatedAt = date
+                    })
+                })
+            }
+
             return (
                 <QueryClientProvider client={this.props.locals.__queryClient}>
-                    <Hydrate state={isServerSide ? {} : window.__PRELOADED_STATE__?.[STATE_KEY]}>
+                    <Hydrate state={preloadedState}>
                         <Wrapped {...this.props} />
                     </Hydrate>
                 </QueryClientProvider>
