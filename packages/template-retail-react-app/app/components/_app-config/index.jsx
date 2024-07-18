@@ -119,6 +119,8 @@ AppConfig.propTypes = {
 
 const isServerSide = typeof window === 'undefined'
 
+const now = Date.now() // 396687600000
+
 // Recommended settings for PWA-Kit usages.
 // NOTE: they will be applied on both server and client side.
 // retry is always disabled on server side regardless of the value from the options
@@ -135,6 +137,16 @@ const options = {
                 retry: false
             }
         }
+    },
+    beforeHydrate: (data) => {
+        console.log('beforeHydrate!', data, data['mutations'], data['queries'])
+        ;['mutations', 'queries'].forEach((type) => {
+            ;(data[type] || []).forEach(({state}) => {
+                state.dataUpdatedAt = now
+            })
+        })
+        
+        return data
     }
 }
 

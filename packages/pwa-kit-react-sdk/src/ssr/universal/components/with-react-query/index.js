@@ -12,6 +12,7 @@ import {FetchStrategy} from '../fetch-strategy'
 import {PERFORMANCE_MARKS} from '../../../../utils/performance'
 
 const STATE_KEY = '__reactQuery'
+const passthrough = (input) => input
 
 /**
  * A HoC for adding React Query support to your application.
@@ -27,29 +28,25 @@ export const withReactQuery = (Wrapped, options = {}) => {
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
     const queryClientConfig = options.queryClientConfig
+    const beforeHydrate = options.beforeHydrate || passthrough
 
     /**
      * @private
      */
     class WithReactQuery extends FetchStrategy {
         render() {
+            let preloadedState = {}
+
             this.props.locals.__queryClient =
                 this.props.locals.__queryClient || new QueryClient(queryClientConfig)
 
-            const preloadedState = isServerSide ? {} : window.__PRELOADED_STATE__?.[STATE_KEY]
-
-            // BUGFIX: To ensure we preserve the functionality of the `staleTime` options, we will
-            // set the `dataUpdatedAt` to the current data (of app load). If we don't do this, we run the
-            // risk of re-fetching our serialized data on first page load which isn't great for performance.
+            // BUGFIX: To avoid re-fetching data fetched on the server, set the
+            // `dataUpdatedAt` to the current date.
+            // https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912
             if (!isServerSide) {
-                const date = Date.now()
-
-                // Set `dataUpdatedAt` for all mutations and queries to current date.
-                ;['mutations', 'queries'].forEach((type) => {
-                    ;(preloadedState[type] || []).forEach(({state}) => {
-                        state.dataUpdatedAt = date
-                    })
-                })
+                // Get serialized data.
+                // NOTE: Maybe wrap in a try catch here.
+                preloadedState = beforeHydrate(window.__PRELOADED_STATE__?.[STATE_KEY] || {})
             }
 
             return (
