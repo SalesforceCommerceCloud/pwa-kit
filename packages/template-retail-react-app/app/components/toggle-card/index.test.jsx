@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React from 'react'
 import {screen, fireEvent} from '@testing-library/react'
-import {renderWithProviders} from '../../utils/test-utils'
-import {ToggleCard} from './index'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {ToggleCard} from '@salesforce/retail-react-app/app/components/toggle-card'
 
 test('ToggleCard renders edit button with correct aria-label and calls onEdit on click', () => {
     const mockOnEdit = jest.fn()
