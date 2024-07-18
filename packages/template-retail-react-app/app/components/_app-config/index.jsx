@@ -59,7 +59,7 @@ const AppConfig = ({children, locals = {}}) => {
     // inside default.js
     // this endpoint is where commerce-sdk-react will send requests to
     const proxy = getNamespace()
-        ? `${appOrigin}${commerceApiConfig.proxyPath}`
+        ? `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
         : `${appOrigin}${commerceApiConfig.proxyPath}`
 
     console.log(proxy)
@@ -82,7 +82,7 @@ const AppConfig = ({children, locals = {}}) => {
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             // enablePWAKitPrivateClient={true}
-            OCAPISessionsURL={`${appOrigin}${proxyBasePath}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
+            OCAPISessionsURL={`${appOrigin}${proxyBasePath()}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>

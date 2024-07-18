@@ -169,7 +169,7 @@ export const updatePackageMobify = (newValue) => {
         }
 
         // Generate paths
-        config.proxyPath = `${proxyBasePath}/${config.path}`
+        config.proxyPath = `${proxyBasePath()}/${config.path}`
         config.cachingPath = `${cachingBasePath}/${config.path}`
 
         proxyConfigs.push(config)

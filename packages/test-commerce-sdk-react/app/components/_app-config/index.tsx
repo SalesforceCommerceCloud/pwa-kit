@@ -32,7 +32,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
             clientId="4afbc51f-6423-41c8-8b29-d7f2825b5bee"
             organizationId="f_ecom_zzrf_006"
             redirectURI="http://localhost:3000/callback"
-            proxy={`http://localhost:3000/${String(proxyBasePath)}/api`}
+            proxy={`http://localhost:3000/${String(proxyBasePath())}/api`}
             locale={locale}
             currency="USD"
             headers={headers}

@@ -49,7 +49,7 @@ export const getNamespace = () => {
 
 // TODO: something is breaking when namespace is applied to proxy - it causes the app to freeze
 // Solved: the break is because the AppConfig proxy in default.js was not namespaced
-export const proxyBasePath = `${PROXY_PATH_BASE}`
+export const proxyBasePath = () => `${getNamespace()}${PROXY_PATH_BASE}`
 
 // this needs to be a function. if it is a value, this value gets resolved
 // before the config is hydrated so namespace becomes undefined and assets don't load

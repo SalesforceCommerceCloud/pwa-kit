@@ -214,7 +214,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _isBundleOrProxyPath(url) {
-        return url.startsWith(proxyBasePath) || url.startsWith(bundleBasePath())
+        return url.startsWith(proxyBasePath()) || url.startsWith(bundleBasePath())
     },
 
     /**
@@ -638,7 +638,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all(`${proxyBasePath}/*`, (_, res) => {
+        app.all(`${proxyBasePath()}/*`, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
