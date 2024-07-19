@@ -8,6 +8,9 @@
 import path from 'path'
 import * as resolverUtils from './resolver-utils'
 
+const PROJECT_PATH_GOOD = '/home/user/testproject'
+const PROJECT_PATH_BAD = '/home/user/test.project'
+
 describe('resolverUtils', () => {
     describe('"isSelfReference" util returns whether or not a wildcard import is for the same module it is coming from.', () => {
         ;[
@@ -15,21 +18,33 @@ describe('resolverUtils', () => {
                 name: 'Importing the wildcard routes from the routes file',
                 importPath: 'app/routes',
                 sourcePath: path.join(
-                    process.cwd(),
+                    PROJECT_PATH_GOOD,
                     'node_modules',
                     '@salesforce',
                     'extension-module-extension-b',
                     'app',
                     'routes.jsx'
                 ),
-
+                expected: true
+            },
+            {
+                name: 'Importing the wildcard routes from the routes file where project path has dots in it',
+                importPath: 'app/routes',
+                sourcePath: path.join(
+                    PROJECT_PATH_BAD,
+                    'node_modules',
+                    '@salesforce',
+                    'extension-module-extension-b',
+                    'app',
+                    'routes.jsx'
+                ),
                 expected: true
             },
             {
                 name: 'Importing a page component from the routes file',
                 importPath: 'app/pages/new-home',
                 sourcePath: path.join(
-                    process.cwd(),
+                    PROJECT_PATH_GOOD,
                     'node_modules',
                     '@salesforce',
                     'extension-module-extension-b',
