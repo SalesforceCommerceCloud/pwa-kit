@@ -42,54 +42,62 @@ const StoreLocatorContent = () => {
         userHasSetManualGeolocation,
         setUserHasSetManualGeolocation
     } = useContext(StoreLocatorContext)
+    const {countryCode, postalCode, latitude, longitude, limit} = searchStoresParams
     const intl = useIntl()
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
         defaultValues: {
-            countryCode: userHasSetManualGeolocation ? searchStoresParams.countryCode : '',
-            postalCode: userHasSetManualGeolocation ? searchStoresParams.postalCode : ''
+            countryCode: userHasSetManualGeolocation ? countryCode : '',
+            postalCode: userHasSetManualGeolocation ? postalCode : ''
         }
     })
 
-    const [numStoresToShow, setNumStoresToShow] = useState(searchStoresParams.limit)
-
-    const {data: searchStoresData, isLoading} = useSearchStores(
-        {
-            parameters: {
-                countryCode: searchStoresParams.latitude
-                    ? undefined
-                    : searchStoresParams.countryCode,
-                postalCode: searchStoresParams.latitude ? undefined : searchStoresParams.postalCode,
-                latitude: searchStoresParams.countryCode ? undefined : searchStoresParams.latitude,
-                longitude: searchStoresParams.countryCode
-                    ? undefined
-                    : searchStoresParams.longitude,
-                locale: intl.locale,
-                maxDistance: STORE_LOCATOR_DISTANCE,
-                limit: NUM_STORES_PER_REQUEST_API_MAX,
-                distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
-            }
-        },
-        {keepPreviousData: true}
-    )
+    const [numStoresToShow, setNumStoresToShow] = useState(limit)
+    // Either the countryCode & postalCode or latitude & longitude are defined, never both
+    const {
+        data: searchStoresData,
+        isLoading,
+        isFetching,
+        isStale
+    } = useSearchStores({
+        parameters: {
+            countryCode: countryCode,
+            postalCode: postalCode,
+            latitude: latitude,
+            longitude: longitude,
+            locale: intl.locale,
+            maxDistance: STORE_LOCATOR_DISTANCE,
+            limit: NUM_STORES_PER_REQUEST_API_MAX,
+            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+        }
+    })
 
     const storesInfo = isLoading
         ? undefined
-        : searchStoresData?.data
-        ? searchStoresData?.data.slice(0, numStoresToShow)
-        : []
+        : searchStoresData?.data?.slice(0, numStoresToShow) || []
     const numStores = searchStoresData?.total || 0
 
     const submitForm = async (formData) => {
         const {postalCode, countryCode} = formData
-        if (postalCode !== '' && countryCode !== '') {
-            setSearchStoresParams({
-                postalCode: postalCode,
-                countryCode: countryCode,
-                limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
-            })
-            setUserHasSetManualGeolocation(true)
+        if (postalCode !== '') {
+            if (countryCode !== '') {
+                setSearchStoresParams({
+                    postalCode: postalCode,
+                    countryCode: countryCode,
+                    limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                })
+                setUserHasSetManualGeolocation(true)
+            } else {
+                if (SUPPORTED_STORE_LOCATOR_COUNTRIES.length === 0) {
+                    setSearchStoresParams({
+                        postalCode: postalCode,
+                        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+                        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                    })
+                    setUserHasSetManualGeolocation(true)
+                }
+            }
         }
     }
 

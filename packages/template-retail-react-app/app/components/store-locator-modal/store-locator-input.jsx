@@ -80,51 +80,57 @@ const StoreLocatorInput = ({form, submitForm}) => {
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>
-                <Controller
-                    name="countryCode"
-                    control={control}
-                    defaultValue={
-                        userHasSetManualGeolocation ? searchStoresParams?.countryCode : ''
-                    }
-                    rules={{
-                        required: intl.formatMessage({
-                            id: 'store_locator.error.please_select_a_country',
-                            defaultMessage: 'Please select a country.'
-                        })
-                    }}
-                    render={({field}) => {
-                        return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
-                            <FormControl isInvalid={form.formState.errors.countryCode}>
-                                <Select
-                                    {...field}
-                                    marginBottom="10px"
-                                    placeholder={intl.formatMessage({
-                                        id: 'store_locator.action.select_a_country',
-                                        defaultMessage: 'Select a country'
-                                    })}
-                                >
-                                    {SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
-                                        ({countryCode, countryName}) => {
-                                            return (
-                                                <option value={countryCode} key={countryCode}>
-                                                    {intl.formatMessage(countryName)}
-                                                </option>
-                                            )
-                                        }
+                {SUPPORTED_STORE_LOCATOR_COUNTRIES.length > 0 ? (
+                    <Controller
+                        name="countryCode"
+                        control={control}
+                        defaultValue={
+                            userHasSetManualGeolocation ? searchStoresParams?.countryCode : ''
+                        }
+                        rules={{
+                            required: intl.formatMessage({
+                                id: 'store_locator.error.please_select_a_country',
+                                defaultMessage: 'Please select a country.'
+                            })
+                        }}
+                        render={({field}) => {
+                            return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
+                                <FormControl isInvalid={form.formState.errors.countryCode}>
+                                    <Select
+                                        {...field}
+                                        marginBottom="10px"
+                                        placeholder={intl.formatMessage({
+                                            id: 'store_locator.action.select_a_country',
+                                            defaultMessage: 'Select a country'
+                                        })}
+                                        borderColor="gray.500"
+                                    >
+                                        {SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
+                                            ({countryCode, countryName}) => {
+                                                return (
+                                                    <option value={countryCode} key={countryCode}>
+                                                        {intl.formatMessage(countryName)}
+                                                    </option>
+                                                )
+                                            }
+                                        )}
+                                    </Select>
+                                    {form.formState.errors.countryCode && (
+                                        <FormErrorMessage
+                                            sx={{marginBottom: '10px'}}
+                                            color="red.600"
+                                        >
+                                            <AlertIcon aria-hidden="true" mr={2} />
+                                            {form.formState.errors.countryCode.message}
+                                        </FormErrorMessage>
                                     )}
-                                </Select>
-                                {form.formState.errors.countryCode && (
-                                    <FormErrorMessage sx={{marginBottom: '10px'}} color="red.600">
-                                        <AlertIcon aria-hidden="true" mr={2} />
-                                        {form.formState.errors.countryCode.message}
-                                    </FormErrorMessage>
-                                )}
-                            </FormControl>
-                        ) : (
-                            <></>
-                        )
-                    }}
-                ></Controller>
+                                </FormControl>
+                            ) : (
+                                <></>
+                            )
+                        }}
+                    ></Controller>
+                ) : undefined}
             </InputGroup>
             <InputGroup>
                 <Controller
@@ -164,6 +170,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                         setUserWantsToShareLocation(false)
                     }}
                     width="15%"
+                    marginLeft={2}
                     variant="solid"
                 >
                     {intl.formatMessage({
