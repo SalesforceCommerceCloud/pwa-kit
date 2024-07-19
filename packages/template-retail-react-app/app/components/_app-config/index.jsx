@@ -68,8 +68,7 @@ const AppConfig = ({children, locals = {}}) => {
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            // TODO: Changed for testing private client. Restore config before merging.
-            enablePWAKitPrivateClient={true}
+            // enablePWAKitPrivateClient={true}
             OCAPISessionsURL={`${appOrigin}${proxyBasePath}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
