@@ -218,7 +218,7 @@ const AccountWishlist = () => {
                 ))}
 
             <UnavailableProductConfirmationModal
-                productIds={productIds}
+                productItems={wishListData?.customerProductListItems}
                 handleUnavailableProducts={handleUnavailableProducts}
             />
         </Stack>

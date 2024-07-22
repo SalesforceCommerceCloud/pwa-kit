@@ -34,7 +34,8 @@ const Field = ({
     control,
     defaultValue,
     helpText,
-    children
+    children,
+    inputRef
 }) => {
     const intl = useIntl()
     const [hidePassword, setHidePassword] = useState(true)
@@ -50,6 +51,7 @@ const Field = ({
           })
     const inputType =
         type === 'password' && hidePassword ? 'password' : type === 'password' ? 'text' : type
+
     return (
         <Controller
             name={name}
@@ -70,7 +72,10 @@ const Field = ({
                                 type
                             ) && (
                                 <Input
-                                    ref={ref}
+                                    ref={(node) => {
+                                        ref(node)
+                                        if (inputRef) inputRef.current = node
+                                    }}
                                     onChange={onChange}
                                     value={value}
                                     type={inputType}
@@ -165,7 +170,8 @@ Field.propTypes = {
     control: PropTypes.object,
     defaultValue: PropTypes.any,
     helpText: PropTypes.any,
-    children: PropTypes.any
+    children: PropTypes.any,
+    inputRef: PropTypes.object
 }
 
 export default Field

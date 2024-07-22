@@ -1,4 +1,8 @@
-## v3.6.0-dev (Apr 17, 2024)
+## v3.7.0-dev (Jun 25, 2024)
+- Add server side rendering performance metrics via query parameter `__server_timing` or environment variable `SERVER_TIMING`, the metrics is available in the console logs and response header `server-timing`. [#1895](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1895)
+
+## v3.6.0 (Jun 25, 2024)
+
 ## v3.5.1 (Apr 17, 2024)
 
 ## v3.5.0 (Apr 15, 2024)
