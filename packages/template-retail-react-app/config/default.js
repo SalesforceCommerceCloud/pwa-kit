@@ -24,7 +24,8 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'e64fd71c-f9f3-4bec-bbb9-1682443a7502',
+                // TODO: Changed for testing private client. Restore config before merging.
+                clientId: '6f450324-d2f3-4c69-b6a0-b5acf35eed16',
                 organizationId: 'f_ecom_zzrf_001',
                 shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
