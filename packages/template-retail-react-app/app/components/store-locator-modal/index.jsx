@@ -58,7 +58,6 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
             {isDesktopView ? (
                 <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
                     <ModalContent
-                        display={{base: 'none', lg: 'block'}}
                         position="absolute"
                         top="0"
                         right="0"
