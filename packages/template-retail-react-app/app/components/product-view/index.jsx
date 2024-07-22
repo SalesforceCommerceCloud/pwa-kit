@@ -55,12 +55,15 @@ const ProductViewHeader = ({name, basePrice, discountPrice, currency, category, 
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
-            <DisplayPrice
-                basePrice={basePrice}
-                discountPrice={discountPrice}
-                currency={currency}
-                isProductASet={isProductASet}
-            />
+            <Skeleton isLoaded={typeof priceData?.currentPrice === 'number'}>
+                {typeof priceData?.currentPrice === 'number' && (
+                    <DisplayPrice priceData={priceData} currency={currency} />
+                )}
+            </Skeleton>
+
+            <Skeleton isLoaded={product}>
+                {product?.productPromotions && <PromoCallout product={product} />}
+            </Skeleton>
         </VStack>
     )
 }

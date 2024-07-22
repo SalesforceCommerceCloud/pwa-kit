@@ -55,7 +55,12 @@ export const ToggleCard = ({
                             {title}
                         </Heading>
                         {!editing && !disabled && onEdit && (
-                            <Button variant="link" size="sm" onClick={onEdit}>
+                            <Button
+                                variant="link"
+                                size="sm"
+                                onClick={onEdit}
+                                aria-label={editLabel}
+                            >
                                 {editLabel || (
                                     <FormattedMessage
                                         defaultMessage="Edit"

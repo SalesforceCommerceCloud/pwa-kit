@@ -261,6 +261,9 @@
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "Shipping"
   },
+  "checkout_confirmation.label.shipping.strikethrough.price": {
+    "defaultMessage": "Originally {originalPrice}, now {newPrice}"
+  },
   "checkout_confirmation.label.subtotal": {
     "defaultMessage": "Subtotal"
   },
@@ -319,6 +322,9 @@
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "Credit Card"
   },
+  "checkout_payment.label.billing_address_form": {
+    "defaultMessage": "Billing Address Form"
+  },
   "checkout_payment.label.same_as_shipping": {
     "defaultMessage": "Same as shipping address"
   },
@@ -334,6 +340,12 @@
   "confirmation_modal.default.action.yes": {
     "defaultMessage": "Yes"
   },
+  "confirmation_modal.default.assistive_msg.no": {
+    "defaultMessage": "No, cancel action"
+  },
+  "confirmation_modal.default.assistive_msg.yes": {
+    "defaultMessage": "Yes, confirm action"
+  },
   "confirmation_modal.default.message.you_want_to_continue": {
     "defaultMessage": "Are you sure you want to continue?"
   },
@@ -347,6 +359,15 @@
     "defaultMessage": "Remove"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
+    "defaultMessage": "Yes, remove item"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.no": {
+    "defaultMessage": "No, keep item"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": {
+    "defaultMessage": "Remove unavailable products"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": {
     "defaultMessage": "Yes, remove item"
   },
   "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
@@ -1199,6 +1220,9 @@
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
   },
+  "shipping_address.label.shipping_address_form": {
+    "defaultMessage": "Shipping Address Form"
+  },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
@@ -1306,6 +1330,18 @@
   },
   "toggle_card.action.edit": {
     "defaultMessage": "Edit"
+  },
+  "toggle_card.action.editContactInfo": {
+    "defaultMessage": "Edit Contact Info"
+  },
+  "toggle_card.action.editPaymentInfo": {
+    "defaultMessage": "Edit Payment Info"
+  },
+  "toggle_card.action.editShippingAddress": {
+    "defaultMessage": "Edit Shipping Address"
+  },
+  "toggle_card.action.editShippingOptions": {
+    "defaultMessage": "Edit Shipping Options"
   },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "Forgot Password?"
