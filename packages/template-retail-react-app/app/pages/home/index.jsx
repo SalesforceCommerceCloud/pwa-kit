@@ -67,8 +67,12 @@ const Home = () => {
 
     const {data: productSearchResult, isLoading} = useProductSearch({
         parameters: {
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT
+            allImages: true,
+            allVariationProperties: true,
+            expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
+            limit: HOME_SHOP_PRODUCTS_LIMIT,
+            perPricebook: true,
+            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master']
         }
     })
 

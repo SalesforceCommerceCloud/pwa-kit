@@ -113,7 +113,7 @@ describe('UnavailableProductConfirmationModal', () => {
             }
         ])
         const mockFunc = jest.fn()
-        const {getByRole, user} = renderWithProviders(
+        const {getByText, queryByText, queryByRole, user} = renderWithProviders(
             <UnavailableProductConfirmationModal
                 productIds={mockProductIds}
                 handleUnavailableProducts={mockFunc}
@@ -123,5 +123,14 @@ describe('UnavailableProductConfirmationModal', () => {
         await waitFor(async () => {
             expect(getByText(/^Items Unavailable$/i)).toBeInTheDocument()
         })
+        const removeBtn = queryByRole('button')
+
+        expect(removeBtn).toBeInTheDocument()
+        await user.click(removeBtn)
+        expect(mockFunc).toHaveBeenCalled()
+        await waitFor(async () => {
+            expect(queryByText(/Items Unavailable/i)).not.toBeInTheDocument()
+        })
+        expect(removeBtn).not.toBeInTheDocument()
     })
 })

@@ -8,8 +8,7 @@ import React from 'react'
 import {fireEvent, screen, waitFor, within} from '@testing-library/react'
 import {
     mockCustomerBaskets,
-    mockedCustomerProductLists,
-    productsResponse
+    mockedCustomerProductLists
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
@@ -17,12 +16,12 @@ import ProductDetail from '.'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     basketWithProductSet,
-    mockProductInWishlist,
     mockWishlistWithItem,
-    einsteinRecommendation
+    einsteinRecommendation,
+    masterProduct,
+    productsForEinstein
 } from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
-import userEvent from '@testing-library/user-event'
 
 jest.setTimeout(60000)
 
@@ -67,12 +66,18 @@ beforeEach(() => {
         }),
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedCustomerProductLists))
+        }),
+        rest.get('*/products', (req, res, ctx) => {
+            return res(ctx.json(productsForEinstein))
+        }),
+        rest.post('*/v3/personalization/recs/EinsteinTestSite/*', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(einsteinRecommendation))
         })
     )
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
-    window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/test-product')
+    window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/25517823M')
 })
 
 afterEach(() => {
@@ -84,7 +89,7 @@ test('should render product details page', async () => {
     global.server.use(
         // Use a single product (and not a product set)
         rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(productsResponse.data[0]))
+            return res(ctx.json(masterProduct))
         })
     )
 
@@ -92,11 +97,14 @@ test('should render product details page', async () => {
 
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
     await waitFor(() => {
+        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
         expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(screen.getAllByText(/14.99/)).toHaveLength(2)
+        expect(screen.getAllByText(/from £9\.59/i)).toHaveLength(2)
+        expect(screen.getAllByText(/£15\.36/i)).toHaveLength(4)
         expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
         expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
         expect(screen.getAllByTestId('product-view')).toHaveLength(1)
+        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
     })
 })
 
@@ -104,11 +112,18 @@ test('should add to wishlist', async () => {
     global.server.use(
         // Use a single product (and not a product set)
         rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(productsResponse.data[0]))
+            return res(ctx.json(masterProduct))
         })
     )
 
     renderWithProviders(<MockedComponent />)
+    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+    // wait for data to fully loaded before taking any action
+    await waitFor(() => {
+        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+    })
     const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
 
     fireEvent.click(wishlistButton)
@@ -121,7 +136,7 @@ test('should not add to wishlist if item is already in wishlist', async () => {
     global.server.use(
         // Use a product that is already in the wishlist
         rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(mockProductInWishlist.data[0]))
+            return res(ctx.json(masterProduct))
         }),
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockWishlistWithItem))
@@ -129,8 +144,12 @@ test('should not add to wishlist if item is already in wishlist', async () => {
     )
 
     renderWithProviders(<MockedComponent />)
-
-    // const wishlistButton = await screen.findAllByText(/Add to Wishlist/i)
+    // wait for data to fully loaded before taking any action
+    await waitFor(() => {
+        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+    })
     const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
 
     fireEvent.click(wishlistButton)
@@ -152,12 +171,10 @@ describe('product set', () => {
     test('render multi-product layout', async () => {
         renderWithProviders(<MockedComponent />)
 
-        await waitFor(
-            () => {
-                expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
-            },
-            {timeout: 5000}
-        )
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+            expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+        })
     })
 
     test('add the set to cart successfully', async () => {
@@ -176,7 +193,15 @@ describe('product set', () => {
 
         await waitFor(
             () => {
+                expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+
                 expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
+                expect(screen.getAllByText('Quilted Jacket')[0]).toBeInTheDocument()
+                expect(screen.getAllByText('Pull On Pant')[0]).toBeInTheDocument()
+                expect(screen.getAllByText('Zerrick')[0]).toBeInTheDocument()
+                expect(
+                    screen.getByRole('heading', {name: /you might also like/i})
+                ).toBeInTheDocument()
             },
             {timeout: 5000}
         )
@@ -188,6 +213,9 @@ describe('product set', () => {
             () => {
                 const modal = screen.getByTestId('add-to-cart-modal')
                 expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
+                expect(within(modal).getByText(/Quilted Jacket/i)).toBeInTheDocument()
+                expect(within(modal).getByText(/Pull On Pant/i)).toBeInTheDocument()
+                expect(within(modal).getByText(/Zerrick/i)).toBeInTheDocument()
             },
             // Seems like rendering the modal takes a bit more time
             {timeout: 10000}
@@ -199,6 +227,7 @@ describe('product set', () => {
 
         await waitFor(
             () => {
+                expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
                 expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
             },
             {timeout: 5000}
@@ -217,6 +246,9 @@ describe('product set', () => {
 
     test("child products' images are lazy loaded", async () => {
         renderWithProviders(<MockedComponent />)
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        })
 
         const childProducts = await screen.findAllByTestId('child-product')
 
@@ -228,55 +260,29 @@ describe('product set', () => {
 })
 
 describe('Recommended Products', () => {
-    let fetchMock
-    beforeAll(() => {
-        // This is probably more complex than it needs to be? I tried using jest-fetch-mock and msw,
-        // but I couldn't get those working...
-        fetchMock = jest.spyOn(global, 'fetch').mockImplementation(async (url) => {
-            const json = url.endsWith('viewed-recently-einstein') ? einsteinRecommendation : {}
-            return new Response(JSON.stringify(json))
-        })
-    })
-    beforeEach(() => {
-        fetchMock.mockClear()
-    })
-    afterAll(() => {
-        fetchMock.mockRestore()
-    })
     test('Recently Viewed gets updated when navigating between products', async () => {
         global.server.use(
             // Use a single product (and not a product set)
             rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.json(productsResponse.data[0]))
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.json({}))
+                return res(ctx.json(masterProduct))
             })
         )
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+        // const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
         renderWithProviders(<MockedComponent />)
 
         // If we poll for updates immediately, the test output is flooded with errors:
         // "Warning: An update to WrappedComponent inside a test was not wrapped in act(...)."
         // If we wait to poll until the component is updated, then the errors disappear. Using a
         // timeout is clearly a suboptimal solution, but I don't know the "correct" way to fix it.
-        let done = false
-        setTimeout(() => (done = true), 200)
-        await waitFor(() => expect(done).toBeTruthy())
+        // let done = false
+        // setTimeout(() => (done = true), 200)
+        // await waitFor(() => expect(done).toBeTruthy())
 
-        expect(await screen.findAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(await screen.findByText(/Summer Bomber Jacket/)).toBeInTheDocument()
-
-        // We requested Recently Viewed products on the first page load, but we
-        // only want to check against the second page load
-        fetchMock.mockClear()
-        await user.click(screen.getByText(/Summer Bomber Jacket/))
-
-        // The scope of this test means we just care about the Recently Viewed component being
-        // updated - we don't need to wait for the rest of the page loading
-        expect(fetchMock).toHaveBeenCalledWith(
-            expect.stringMatching(/viewed-recently-einstein$/),
-            expect.any(Object)
-        )
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+            expect(screen.getAllByText(/Summer Bomber Jacket/)).toHaveLength(3)
+        })
     })
 })

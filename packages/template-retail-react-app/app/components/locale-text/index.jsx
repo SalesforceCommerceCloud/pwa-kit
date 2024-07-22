@@ -8,14 +8,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {defineMessages, useIntl} from 'react-intl'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 const LocaleText = ({shortCode}) => {
     const intl = useIntl()
     const message = LOCALE_MESSAGES[shortCode]
 
     if (!message) {
-        console.error(
-            `No locale message found for "${shortCode}". Please update the list accordingly.`
+        logger.error(
+            `No locale message found for "${shortCode}". Please update the list accordingly.`,
+            {
+                namespace: 'LocaleText',
+                additionalProperties: {shortCode}
+            }
         )
         return <>Unknown {shortCode}</>
     }
