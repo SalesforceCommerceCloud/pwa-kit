@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperContexts} from 'commerce-sdk-isomorphic'
+import {ShopperContexts} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {getCustomKeys, pick} from '../utils'
-import paramKeysMap from './paramKeys'
+import {pickValidParams} from '../utils'
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperContexts<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
@@ -40,7 +39,9 @@ export const getShopperContext: QueryKeyHelper<'getShopperContext'> = {
         params.usid
     ],
     queryKey: (params: Params<'getShopperContext'>) => {
-        const paramKeys = [...paramKeysMap['getShopperContext'], ...getCustomKeys(params)]
-        return [...getShopperContext.path(params), pick(params, paramKeys)]
+        return [
+            ...getShopperContext.path(params),
+            pickValidParams(params, ShopperContexts.paramKeys.getShopperContext)
+        ]
     }
 }

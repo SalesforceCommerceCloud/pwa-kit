@@ -14,6 +14,12 @@ export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
     'https://runtime-admin-preview.mobify-storefront.com'
 ])
 
+// We hardcode these here since we don't want commerce-sdk-react to have a dependency on pwa-kit-runtime
+export const MOBIFY_PATH = '/mobify'
+export const PROXY_PATH = `${MOBIFY_PATH}/proxy`
+export const LOCAL_BUNDLE_PATH = `${MOBIFY_PATH}/bundle/development`
+export const SLAS_PRIVATE_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
+
 export const SLAS_SECRET_WARNING_MSG =
     'You are potentially exposing SLAS secret on browser. Make sure to keep it safe and secure!'
 

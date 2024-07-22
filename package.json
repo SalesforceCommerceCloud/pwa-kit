@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit",
-  "version": "3.6.0-dev",
+  "version": "3.7.0-dev",
   "scripts": {
     "bump-version": "node ./scripts/bump-version/index.js",
     "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
@@ -14,6 +14,8 @@
     "lint:fix": "lerna run lint:fix",
     "start": "npm start --prefix packages/template-retail-react-app",
     "pretest": "npm run lint",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
     "test": "lerna run --stream --concurrency=1 test",
     "test:max-file-size": "lerna run --stream test:max-file-size",
     "check-dep-version": "syncpack list-mismatches"
