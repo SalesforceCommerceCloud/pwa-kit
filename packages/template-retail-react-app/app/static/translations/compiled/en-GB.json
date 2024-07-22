@@ -2117,6 +2117,12 @@
       "value": "Create account"
     }
   ],
+  "login_form.button.google_sign_in": [
+    {
+      "type": 0,
+      "value": "Login with Google"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,

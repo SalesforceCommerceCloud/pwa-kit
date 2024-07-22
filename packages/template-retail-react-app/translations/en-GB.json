@@ -909,6 +909,9 @@
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
   },
+  "login_form.button.google_sign_in": {
+    "defaultMessage": "Login with Google"
+  },
   "login_form.button.sign_in": {
     "defaultMessage": "Sign In"
   },

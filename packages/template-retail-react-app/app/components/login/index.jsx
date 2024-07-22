@@ -18,8 +18,10 @@ import {
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import useGoogleSignIn from '@salesforce/retail-react-app/app/hooks/use-google-signin'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
+    const googleSignIn = useGoogleSignIn()
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
@@ -57,9 +59,9 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                             </Button>
                         </Box>
                     </Stack>
-                    <Stack spacing={6}>
+                    <Stack spacing={4}>
                         <Button
-                            type="submit"
+                            type="link"
                             onClick={() => {
                                 form.clearErrors('global')
                             }}
@@ -69,6 +71,19 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                                 defaultMessage="Sign In"
                                 id="login_form.button.sign_in"
                             />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={async () => {
+                                await googleSignIn.loginRedirect('google')
+                            }}
+                        >
+                            <Text>
+                                <FormattedMessage
+                                    defaultMessage="Login with Google"
+                                    id="login_form.button.google_sign_in"
+                                />
+                            </Text>
                         </Button>
 
                         <Stack direction="row" spacing={1} justify="center">

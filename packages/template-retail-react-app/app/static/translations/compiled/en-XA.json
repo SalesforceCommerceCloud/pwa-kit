@@ -4525,6 +4525,20 @@
       "value": "]"
     }
   ],
+  "login_form.button.google_sign_in": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀǿǿɠīƞ ẇīŧħ Ɠǿǿǿǿɠŀḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
