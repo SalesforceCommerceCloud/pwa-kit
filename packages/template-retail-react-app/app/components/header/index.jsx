@@ -49,7 +49,7 @@ import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
-
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 const IconButtonWithRegistration = withRegistration(IconButton)
 /**
  * The header is the main source for accessing
@@ -260,17 +260,18 @@ const Header = ({
                         {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
-                    <IconButton
-                        aria-label={intl.formatMessage({
-                            defaultMessage: 'Store Locator',
-                            id: 'header.button.assistive_msg.store_locator'
-                        })}
-                        icon={<StoreIcon />}
-                        {...styles.icons}
-                        variant="unstyled"
-                        onClick={onStoreLocatorClick}
-                    />
-
+                    {STORE_LOCATOR_IS_ENABLED && (
+                        <IconButton
+                            aria-label={intl.formatMessage({
+                                defaultMessage: 'Store Locator',
+                                id: 'header.button.assistive_msg.store_locator'
+                            })}
+                            icon={<StoreIcon />}
+                            {...styles.icons}
+                            variant="unstyled"
+                            onClick={onStoreLocatorClick}
+                        />
+                    )}
                     <IconButton
                         aria-label={intl.formatMessage(
                             {

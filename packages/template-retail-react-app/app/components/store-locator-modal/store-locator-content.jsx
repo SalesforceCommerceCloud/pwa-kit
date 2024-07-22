@@ -27,6 +27,8 @@ import {
     STORE_LOCATOR_NUM_STORES_PER_LOAD,
     STORE_LOCATOR_DISTANCE_UNIT
 } from '@salesforce/retail-react-app/app/constants'
+
+//This is an API limit and is therefore not configurable
 const NUM_STORES_PER_REQUEST_API_MAX = 200
 
 // Hooks
@@ -58,8 +60,8 @@ const StoreLocatorContent = () => {
     const {
         data: searchStoresData,
         isLoading,
-        isFetching,
-        isStale
+        refetch,
+        isFetching
     } = useSearchStores({
         parameters: {
             countryCode: countryCode,
@@ -73,9 +75,10 @@ const StoreLocatorContent = () => {
         }
     })
 
-    const storesInfo = isLoading
-        ? undefined
-        : searchStoresData?.data?.slice(0, numStoresToShow) || []
+    const storesInfo =
+        isLoading || isFetching
+            ? undefined
+            : searchStoresData?.data?.slice(0, numStoresToShow) || []
     const numStores = searchStoresData?.total || 0
 
     const submitForm = async (formData) => {
@@ -99,6 +102,9 @@ const StoreLocatorContent = () => {
                 }
             }
         }
+        setNumStoresToShow(STORE_LOCATOR_NUM_STORES_PER_LOAD)
+        // Ensures API call is made regardless of caching to provide UX feedback on click
+        refetch()
     }
 
     const displayStoreLocatorStatusMessage = () => {
@@ -169,7 +175,9 @@ const StoreLocatorContent = () => {
                 </AccordionItem>
                 <StoresList storesInfo={storesInfo} />
             </Accordion>
-            {numStoresToShow < numStores && numStoresToShow < NUM_STORES_PER_REQUEST_API_MAX ? (
+            {!isFetching &&
+            numStoresToShow < numStores &&
+            numStoresToShow < NUM_STORES_PER_REQUEST_API_MAX ? (
                 <Box paddingTop="10px" marginTop="10px">
                     <Button
                         key="load-more-button"
