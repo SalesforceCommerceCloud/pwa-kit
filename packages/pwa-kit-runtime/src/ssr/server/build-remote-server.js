@@ -473,6 +473,8 @@ export const RemoteServerFactory = {
                 return
             }
 
+            console.log(`Path prefix from eCDN: ${req.headers['x-sfdc-path-prefix']}`)
+
             // Apply the request processor
             // `this` is bound to the calling context, usually RemoteServerFactory
             const requestProcessor = this._getRequestProcessor(req)
