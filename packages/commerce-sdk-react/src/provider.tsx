@@ -22,7 +22,8 @@ import {
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-
+import {Logger} from './types'
+import {MOBIFY_PATH, SLAS_PRIVATE_PROXY_PATH} from './constant'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
@@ -36,6 +37,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
+    logger?: Logger
 }
 
 /**
@@ -75,6 +77,7 @@ export const AuthContext = React.createContext({} as Auth)
                     locale="en-US"
                     enablePWAKitPrivateClient={true}
                     currency="USD"
+                    logger={logger}
                 >
                     {children}
                 </CommerceApiProvider>
@@ -111,8 +114,13 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         OCAPISessionsURL,
         enablePWAKitPrivateClient,
         clientSecret,
-        silenceWarnings
+        silenceWarnings,
+        logger
     } = props
+
+    // Set the logger based on provided configuration, or default to the console object if no logger is provided
+    const configLogger = logger || console
+
     const config = {
         proxy,
         headers,
@@ -127,6 +135,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         throwOnBadResponse: true,
         fetchOptions
     }
+
+    const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
+    const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -134,7 +146,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperCustomers: new ShopperCustomers(config),
             shopperExperience: new ShopperExperience(config),
             shopperGiftCertificates: new ShopperGiftCertificates(config),
-            shopperLogin: new ShopperLogin(config),
+            shopperLogin: new ShopperLogin({
+                ...config,
+                proxy: enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy
+            }),
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
@@ -167,7 +182,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             OCAPISessionsURL,
             enablePWAKitPrivateClient,
             clientSecret,
-            silenceWarnings
+            silenceWarnings,
+            logger: configLogger
         })
     }, [
         clientId,
@@ -181,7 +197,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         OCAPISessionsURL,
         enablePWAKitPrivateClient,
         clientSecret,
-        silenceWarnings
+        silenceWarnings,
+        configLogger
     ])
 
     // Initialize the session
@@ -200,7 +217,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 shortCode,
                 locale,
                 currency,
-                silenceWarnings
+                silenceWarnings,
+                logger: configLogger
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>

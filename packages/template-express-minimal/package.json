@@ -1,6 +1,6 @@
 {
   "name": "template-express-minimal",
-  "version": "3.6.0-dev",
+  "version": "3.7.0-dev",
   "private": true,
   "license": "See license in LICENSE",
   "scripts": {
@@ -15,14 +15,14 @@
     "test": "pwa-kit-dev test"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.6.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.6.0-dev",
+    "@salesforce/pwa-kit-dev": "3.7.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.7.0-dev",
     "supertest": "^4.0.2"
   },
   "mobify": {
     "ssrEnabled": true,
     "ssrParameters": {
-      "ssrFunctionNodeVersion": "18.x"
+      "ssrFunctionNodeVersion": "20.x"
     },
     "ssrOnly": [
       "ssr.js",

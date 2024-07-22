@@ -32,12 +32,12 @@ const mockItem = {
         }
     ]
 }
-test('Renders NestedAccordion', () => {
+test('Renders NestedAccordion and nested accordions are not initially rendered', () => {
     renderWithProviders(<NestedAccordion item={mockItem} />)
 
     const accordions = document.querySelectorAll('.sf-nested-accordion')
 
-    expect(accordions).toHaveLength(2)
+    expect(accordions).toHaveLength(1)
 })
 
 test('Renders NestedAccordion with items elements before and after', () => {

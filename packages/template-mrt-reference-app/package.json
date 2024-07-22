@@ -1,6 +1,6 @@
 {
   "name": "template-mrt-reference-app",
-  "version": "3.6.0-dev",
+  "version": "3.7.0-dev",
   "private": true,
   "license": "See license in LICENSE",
   "scripts": {
@@ -16,8 +16,8 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "3.6.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.6.0-dev",
+    "@salesforce/pwa-kit-dev": "3.7.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.7.0-dev",
     "@smithy/smithy-client": "^2.1.15",
     "aws-sdk-client-mock": "^3.0.0",
     "cross-fetch": "^3.1.4",
@@ -31,7 +31,7 @@
   "mobify": {
     "ssrEnabled": true,
     "ssrParameters": {
-      "ssrFunctionNodeVersion": "18.x",
+      "ssrFunctionNodeVersion": "20.x",
       "proxyConfigs": [
         {
           "host": "httpbin.org",

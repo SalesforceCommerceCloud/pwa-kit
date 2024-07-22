@@ -34,9 +34,17 @@ export const REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG = {
         defaultMessage: 'Yes, remove item',
         id: 'confirmation_modal.remove_cart_item.action.yes'
     }),
+    primaryActionAriaLabel: defineMessage({
+        defaultMessage: 'Yes, remove item',
+        id: 'confirmation_modal.remove_cart_item.assistive_msg.yes'
+    }),
     alternateActionLabel: defineMessage({
         defaultMessage: 'No, keep item',
         id: 'confirmation_modal.remove_cart_item.action.no'
+    }),
+    alternateActionAriaLabel: defineMessage({
+        defaultMessage: 'No, keep item',
+        id: 'confirmation_modal.remove_cart_item.assistive_msg.no'
     }),
     onPrimaryAction: noop
 }

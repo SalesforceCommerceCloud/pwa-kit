@@ -1,6 +1,6 @@
 {
   "name": "typescript-minimal",
-  "version": "3.6.0-dev",
+  "version": "3.7.0-dev",
   "private": true,
   "scripts": {
     "build": "pwa-kit-dev build",
@@ -18,9 +18,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "3.6.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.6.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.6.0-dev",
+    "@salesforce/pwa-kit-dev": "3.7.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "3.7.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.7.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "@types/loadable__component": "~5.13.4",
     "@types/react": "~18.2.0",
@@ -50,7 +50,7 @@
       "**/*.json"
     ],
     "ssrParameters": {
-      "ssrFunctionNodeVersion": "18.x",
+      "ssrFunctionNodeVersion": "20.x",
       "proxyConfigs": [
         {
           "host": "kv7kzm78.api.commercecloud.salesforce.com",

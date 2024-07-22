@@ -66,7 +66,8 @@ const Cart = () => {
         {
             parameters: {
                 ids: productIds,
-                allImages: true
+                allImages: true,
+                perPricebook: true
             }
         },
         {
@@ -560,7 +561,7 @@ const Cart = () => {
             />
 
             <UnavailableProductConfirmationModal
-                productIds={productIds.split(',')}
+                productItems={basket?.productItems}
                 handleUnavailableProducts={handleUnavailableProducts}
             />
         </Box>

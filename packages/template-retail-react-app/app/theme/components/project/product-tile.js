@@ -31,7 +31,21 @@ export default {
             fontWeight: 600
         },
         rating: {},
-        variations: {}
+        variations: {},
+        badgeGroup: {
+            position: 'absolute',
+            top: 2,
+            left: 2
+        }
     }),
-    parts: ['container', 'imageWrapper', 'image', 'price', 'title', 'rating', 'variations']
+    parts: [
+        'container',
+        'imageWrapper',
+        'image',
+        'price',
+        'title',
+        'rating',
+        'variations',
+        'badgeGroup'
+    ]
 }

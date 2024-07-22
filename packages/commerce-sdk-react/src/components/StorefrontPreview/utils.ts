@@ -7,6 +7,7 @@
 
 import {ApiClients} from '../../hooks/types'
 import {DEVELOPMENT_ORIGIN, getParentOrigin, isOriginTrusted} from '../../utils'
+import {LOCAL_BUNDLE_PATH} from '../../constant'
 
 /** Detects whether the storefront is running in an iframe as part of Storefront Preview.
  * @private
@@ -16,13 +17,15 @@ export const detectStorefrontPreview = () => {
     return isOriginTrusted(parentOrigin)
 }
 
-/** Returns the URL to load the Storefront Preview client script from the parent origin.
+/**
+ * Returns the URL to load the Storefront Preview client script from the parent origin.
+ * The client script is served from Runtime Admin and is not a part of the PWA Retail React App bundle.
  * @private
  */
 export const getClientScript = () => {
     const parentOrigin = getParentOrigin() ?? 'https://runtime.commercecloud.com'
     return parentOrigin === DEVELOPMENT_ORIGIN
-        ? `${parentOrigin}/mobify/bundle/development/static/storefront-preview.js`
+        ? `${parentOrigin}${LOCAL_BUNDLE_PATH}/static/storefront-preview.js`
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }
 
