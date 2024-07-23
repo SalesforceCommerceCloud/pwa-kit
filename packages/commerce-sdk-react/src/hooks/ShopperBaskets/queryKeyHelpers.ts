@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
+import type {ShopperBaskets} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pickValidParams} from '../utils'
+import {getCustomKeys, pick} from '../utils'
+import paramKeysMap from '../ShopperBaskets/paramKeys'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperBaskets<{shortCode: string}>
@@ -78,10 +79,8 @@ export const getBasket: QueryKeyHelper<'getBasket'> = {
         params.basketId
     ],
     queryKey: (params: Params<'getBasket'>) => {
-        return [
-            ...getBasket.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getBasket)
-        ]
+        const paramKeys = [...paramKeysMap['getBasket'], ...getCustomKeys(params)]
+        return [...getBasket.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -95,10 +94,8 @@ export const getPaymentMethodsForBasket: QueryKeyHelper<'getPaymentMethodsForBas
         '/payment-methods'
     ],
     queryKey: (params: Params<'getPaymentMethodsForBasket'>) => {
-        return [
-            ...getPaymentMethodsForBasket.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getPaymentMethodsForBasket)
-        ]
+        const paramKeys = [...paramKeysMap['getPaymentMethodsForBasket'], ...getCustomKeys(params)]
+        return [...getPaymentMethodsForBasket.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -112,10 +109,9 @@ export const getPriceBooksForBasket: QueryKeyHelper<'getPriceBooksForBasket'> = 
         '/price-books'
     ],
     queryKey: (params: Params<'getPriceBooksForBasket'>) => {
-        return [
-            ...getPriceBooksForBasket.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getPriceBooksForBasket)
-        ]
+        const paramKeys = [...paramKeysMap['getPriceBooksForBasket'], ...getCustomKeys(params)]
+
+        return [...getPriceBooksForBasket.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -131,10 +127,12 @@ export const getShippingMethodsForShipment: QueryKeyHelper<'getShippingMethodsFo
         '/shipping-methods'
     ],
     queryKey: (params: Params<'getShippingMethodsForShipment'>) => {
-        return [
-            ...getShippingMethodsForShipment.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getShippingMethodsForShipment)
+        const paramKeys = [
+            ...paramKeysMap['getShippingMethodsForShipment'],
+            ...getCustomKeys(params)
         ]
+
+        return [...getShippingMethodsForShipment.path(params), pick(params, paramKeys)]
     }
 }
 
@@ -148,9 +146,7 @@ export const getTaxesFromBasket: QueryKeyHelper<'getTaxesFromBasket'> = {
         '/taxes'
     ],
     queryKey: (params: Params<'getTaxesFromBasket'>) => {
-        return [
-            ...getTaxesFromBasket.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getTaxesFromBasket)
-        ]
+        const paramKeys = [...paramKeysMap['getTaxesFromBasket'], ...getCustomKeys(params)]
+        return [...getTaxesFromBasket.path(params), pick(params, paramKeys)]
     }
 }

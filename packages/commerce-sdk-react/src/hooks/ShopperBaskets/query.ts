@@ -8,9 +8,9 @@ import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
+import {getCustomKeys, mergeOptions, omitNullableParameters, pick} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-import {ShopperBaskets} from 'commerce-sdk-isomorphic'
+import paramKeysMap from './paramKeys'
 
 type Client = ApiClients['shopperBaskets']
 
@@ -33,12 +33,14 @@ export const useBasket = (
     type Data = DataType<Client['getBasket']>
     const {shopperBaskets: client} = useCommerceApi()
     const methodName = 'getBasket'
-    const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
+    const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBaskets.paramKeys[methodName])
+    // get param keys for the api from netOptions
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -75,12 +77,14 @@ export const usePaymentMethodsForBasket = (
     type Data = DataType<Client['getPaymentMethodsForBasket']>
     const {shopperBaskets: client} = useCommerceApi()
     const methodName = 'getPaymentMethodsForBasket'
-    const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
+    const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBaskets.paramKeys[methodName])
+    // get param keys for the api from netOptions
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -117,12 +121,14 @@ export const usePriceBooksForBasket = (
     type Data = DataType<Client['getPriceBooksForBasket']>
     const {shopperBaskets: client} = useCommerceApi()
     const methodName = 'getPriceBooksForBasket'
-    const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
+    const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBaskets.paramKeys[methodName])
+    // get param keys for the api from netOptions
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -159,12 +165,14 @@ export const useShippingMethodsForShipment = (
     type Data = DataType<Client['getShippingMethodsForShipment']>
     const {shopperBaskets: client} = useCommerceApi()
     const methodName = 'getShippingMethodsForShipment'
-    const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
+    const requiredParameters = ['organizationId', 'basketId', 'shipmentId', 'siteId'] as const
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBaskets.paramKeys[methodName])
+    // get param keys for the api from netOptions
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -201,12 +209,14 @@ export const useTaxesFromBasket = (
     type Data = DataType<Client['getTaxesFromBasket']>
     const {shopperBaskets: client} = useCommerceApi()
     const methodName = 'getTaxesFromBasket'
-    const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
+    const requiredParameters = ['organizationId', 'basketId', 'siteId'] as const
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperBaskets.paramKeys[methodName])
+    // get param keys for the api from netOptions
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)

@@ -52,8 +52,7 @@ const config = {
     shortCode: 'shortCode',
     siteId: 'siteId',
     proxy: 'proxy',
-    redirectURI: 'redirectURI',
-    logger: console
+    redirectURI: 'redirectURI'
 }
 
 const configSLASPrivate = {
