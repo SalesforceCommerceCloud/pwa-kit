@@ -102,9 +102,7 @@ const StoreLocatorContent = () => {
                 }
             }
         }
-        // Reset the number of stores in the UI
         setNumStoresToShow(STORE_LOCATOR_NUM_STORES_PER_LOAD)
-
         // Ensures API call is made regardless of caching to provide UX feedback on click
         refetch()
     }
