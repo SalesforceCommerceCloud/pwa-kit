@@ -21,7 +21,7 @@ export const isSelfReference = (importPath, sourcePath) => {
     const indexRegExp = new RegExp(`(/${INDEX_FILE})$`)
 
     // Sanitize the input. Here we want to remove the file extension and index file if it exists.
-    sourcePath = sourcePath.split('.')[0]
+    sourcePath = sourcePath.replace(/\.[^/.]+$/, '')
     sourcePath = sourcePath.split(path.sep).join('/')
     sourcePath = sourcePath.replace(indexRegExp, '')
 
