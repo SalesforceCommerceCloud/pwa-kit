@@ -16,7 +16,7 @@ import {
 const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
 const clientId = '3a15f34e-fecd-4fcc-8235-86b70978e629'
 const tenantId = 'bgvn_stg'
-const proxy = 'https://sandbox-001.api.commercecloud.salesforce.com'
+const proxy = 'http://localhost:3000/mobify/proxy/api'
 
 /**
  * A hook that provides IDP auth functionality for the retail react app.
@@ -38,6 +38,7 @@ export default function useGoogleSignIn() {
         const codeChallenge = await generateCodeChallenge(codeVerifier)
 
         localStorage.setItem('codeVerifier', codeVerifier)
+        console.log('this is the code challenge', codeChallenge)
 
         redirectToAuthURL(
             proxy,

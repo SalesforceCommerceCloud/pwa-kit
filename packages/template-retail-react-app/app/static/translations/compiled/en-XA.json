@@ -3663,6 +3663,62 @@
       "value": "]"
     }
   ],
+  "idp.redirect.error": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗřřǿǿř ŀǿǿɠɠīƞɠ īƞ ẇīŧħ īḓḗḗƞŧīŧẏ ƥřǿǿṽīḓḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "idp.redirect.error.missing_parameters": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿīşşīƞɠ ƥȧȧřȧȧḿḗḗŧḗḗřş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "idp.redirect.loading": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥŀḗḗȧȧşḗḗ ħǿǿŀḓ..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "idp.redirect.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧŭŭŧħḗḗƞŧīƈȧȧŧīƞɠ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,

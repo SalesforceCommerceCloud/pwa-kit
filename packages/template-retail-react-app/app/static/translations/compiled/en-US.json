@@ -1743,6 +1743,30 @@
       "value": "Secure"
     }
   ],
+  "idp.redirect.error": [
+    {
+      "type": 0,
+      "value": "Error logging in with identity provider"
+    }
+  ],
+  "idp.redirect.error.missing_parameters": [
+    {
+      "type": 0,
+      "value": "Missing parameters"
+    }
+  ],
+  "idp.redirect.loading": [
+    {
+      "type": 0,
+      "value": "Please hold..."
+    }
+  ],
+  "idp.redirect.title": [
+    {
+      "type": 0,
+      "value": "Authenticating"
+    }
+  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,

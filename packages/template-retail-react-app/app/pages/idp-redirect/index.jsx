@@ -8,21 +8,24 @@
 // This page is here along witht the `callback` route to handle the redirect
 // after a user logs in using the SLAS Implementation
 
-import React from 'react'
-import {FormattedMessage} from 'react-intl'
+import React, {useEffect} from 'react'
+import {FormattedMessage, useIntl} from 'react-intl'
 import useGoogleSignInCallback from '../../hooks/use-google-signin-callback'
-import { useCurrentCustomer } from '../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import useNavigation from '../../hooks/use-navigation'
 import {useLocation } from 'react-router-dom'
 // Chakra
 import {
     Box,
+    VStack,
+    Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const IDPRedirect = () => {
     const navigate = useNavigation()
     const location = useLocation()
     const {data: customer} = useCurrentCustomer()
+    const {formatMessage} = useIntl()
     const {authenticationError} = useGoogleSignInCallback({
         labels: {
             missingParameters: formatMessage({

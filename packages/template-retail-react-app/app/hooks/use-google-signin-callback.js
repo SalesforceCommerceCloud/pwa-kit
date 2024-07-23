@@ -7,7 +7,6 @@
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import {useEffect, useState} from 'react'
 import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search-params'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 
 const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
 

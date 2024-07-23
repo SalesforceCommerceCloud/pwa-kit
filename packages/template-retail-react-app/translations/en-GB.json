@@ -724,6 +724,18 @@
   "icons.assistive_msg.lock": {
     "defaultMessage": "Secure"
   },
+  "idp.redirect.error": {
+    "defaultMessage": "Error logging in with identity provider"
+  },
+  "idp.redirect.error.missing_parameters": {
+    "defaultMessage": "Missing parameters"
+  },
+  "idp.redirect.loading": {
+    "defaultMessage": "Please hold..."
+  },
+  "idp.redirect.title": {
+    "defaultMessage": "Authenticating"
+  },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"
   },
