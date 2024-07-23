@@ -23,6 +23,11 @@ import {
     mockGetBundleChildrenProducts,
     basketWithProductBundle
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
+import {
+    baskets as mockBaskets,
+    products as mockProducts
+} from '@salesforce/retail-react-app/app/pages/cart/cart.mock'
 
 const mockProduct = {
     ...mockVariant,
@@ -669,6 +674,88 @@ describe('Product bundles', () => {
             // Two children should have qty 2, one child should have qty 4
             expect(screen.getAllByText(/qty: 2/i)).toHaveLength(2)
             expect(screen.getByText(/qty: 4/i)).toBeInTheDocument()
+        })
+    })
+})
+
+describe('Unavailable products tests', function () {
+    test('Remove unavailable/out of stock/low stock products from cart', async () => {
+        prependHandlersToServer([
+            {path: '*/customers/:customerId/baskets', res: () => mockBaskets},
+            {path: '*/products', res: () => mockProducts}
+        ])
+
+        const {user, getByText} = renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            expect(screen.getByText(/Worn Gold Dangle Earring/i)).toBeInTheDocument()
+            expect(screen.getByText(/Straight Leg Trousers/i)).toBeInTheDocument()
+        })
+
+        await waitFor(async () => {
+            expect(getByText(/Items Unavailable/i)).toBeVisible()
+            expect(
+                getByText(
+                    /Some items are no longer available online and will be removed from your cart./i
+                )
+            ).toBeVisible()
+        })
+        await waitFor(async () => {
+            expect(getByText(/Items Unavailable/i)).toBeVisible()
+            expect(
+                getByText(
+                    /Some items are no longer available online and will be removed from your cart./i
+                )
+            ).toBeVisible()
+        })
+
+        const removeBtn = screen.getByRole('button', {
+            name: /remove unavailable products/i
+        })
+        expect(removeBtn).toBeInTheDocument()
+
+        prependHandlersToServer([
+            {
+                path: '*/baskets/:basket/items/:itemId',
+                method: 'delete',
+                res: () => {
+                    return {
+                        ...mockBaskets.baskets[0],
+                        productItems: [
+                            {
+                                adjustedTax: 3.05,
+                                basePrice: 12.8,
+                                bonusProductLineItem: false,
+                                gift: false,
+                                itemId: '7b1a03848f0807f99f37ea93e4',
+                                itemText: 'Worn Gold Dangle Earring',
+                                price: 64,
+                                priceAfterItemDiscount: 64,
+                                priceAfterOrderDiscount: 64,
+                                productId: '013742335262M',
+                                productName: 'Worn Gold Dangle Earring',
+                                quantity: 5,
+                                shipmentId: 'me',
+                                shippingItemId: '247699907591b6b94c9f38cf08',
+                                tax: 3.05,
+                                taxBasis: 64,
+                                taxClassId: 'standard',
+                                taxRate: 0.05
+                            }
+                        ]
+                    }
+                }
+            }
+        ])
+        await user.click(removeBtn)
+
+        await waitFor(() => {
+            expect(
+                screen.getByRole('link', {name: /Worn Gold Dangle Earring$/i})
+            ).toBeInTheDocument()
+            expect(
+                screen.queryByRole('link', {name: /Straight Leg Trousers$/i})
+            ).not.toBeInTheDocument()
         })
     })
 })

@@ -156,14 +156,7 @@ const ProductList = (props) => {
                 perPricebook: true,
                 allVariationProperties: true,
                 allImages: true,
-                expand: [
-                    'promotions',
-                    'variations',
-                    'prices',
-                    'images',
-                    'availability',
-                    'custom_properties'
-                ],
+                expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
                 refine: _refine
             }
         },
@@ -582,8 +575,8 @@ const ProductList = (props) => {
                                                           )
                                                       }
                                                   }}
-                                                  onFavouriteToggle={(isFavourite) => {
-                                                      const action = isFavourite
+                                                  onFavouriteToggle={(toBeFavourite) => {
+                                                      const action = toBeFavourite
                                                           ? addItemToWishlist
                                                           : removeItemFromWishlist
                                                       return action(productSearchItem)
