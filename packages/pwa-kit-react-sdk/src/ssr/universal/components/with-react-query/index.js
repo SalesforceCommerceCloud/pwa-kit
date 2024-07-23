@@ -10,8 +10,10 @@ import ssrPrepass from 'react-ssr-prepass'
 import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {FetchStrategy} from '../fetch-strategy'
 import {PERFORMANCE_MARKS} from '../../../../utils/performance'
+import logger from '../../../../utils/logger-instance'
 
 const STATE_KEY = '__reactQuery'
+const passthrough = (input) => input
 
 /**
  * A HoC for adding React Query support to your application.
@@ -27,18 +29,32 @@ export const withReactQuery = (Wrapped, options = {}) => {
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
     const queryClientConfig = options.queryClientConfig
+    const beforeHydrate = options.beforeHydrate || passthrough
 
     /**
      * @private
      */
     class WithReactQuery extends FetchStrategy {
         render() {
+            let preloadedState = {}
+
             this.props.locals.__queryClient =
                 this.props.locals.__queryClient || new QueryClient(queryClientConfig)
 
+            if (!isServerSide) {
+                try {
+                    preloadedState = beforeHydrate(window.__PRELOADED_STATE__?.[STATE_KEY] || {})
+                } catch (e) {
+                    logger.error('Client `beforeHydrate` failed', {
+                        namespace: 'with-react-query.render',
+                        additionalProperties: {error: e}
+                    })
+                }
+            }
+
             return (
                 <QueryClientProvider client={this.props.locals.__queryClient}>
-                    <Hydrate state={isServerSide ? {} : window.__PRELOADED_STATE__?.[STATE_KEY]}>
+                    <Hydrate state={preloadedState}>
                         <Wrapped {...this.props} />
                     </Hydrate>
                 </QueryClientProvider>
