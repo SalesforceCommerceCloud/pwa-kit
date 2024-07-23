@@ -52,7 +52,6 @@
 - Add explicit headers to cart modal [#1811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1811)
 - Add autocomplete to text input fields [#1840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1840)
 - Add error icon to error messages [#1839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1839)
-
 ### Performance Improvements
 
 - Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656) [#1673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1673)
