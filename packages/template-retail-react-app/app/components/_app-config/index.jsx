@@ -138,7 +138,7 @@ const options = {
     beforeHydrate: (data) => {
         const now = Date.now()
 
-        // Helper for removing the data timestamp.
+        // Helper to reset the data timestamp to time of app load.
         const updateQueryTimeStamp = ({state}) => {
             state.dataUpdatedAt = now
         }
