@@ -8,6 +8,8 @@
 import React from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
+
+// Components
 import {
     AccordionItem,
     AccordionButton,
@@ -88,7 +90,7 @@ const StoresList = ({storesInfo}) => {
 }
 
 StoresList.propTypes = {
-    storesInfo: PropTypes.array.isRequired
+    storesInfo: PropTypes.array
 }
 
 export default StoresList

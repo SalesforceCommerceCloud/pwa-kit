@@ -3013,6 +3013,12 @@
       "value": "Find"
     }
   ],
+  "store_locator.action.select_a_country": [
+    {
+      "type": 0,
+      "value": "Select a country"
+    }
+  ],
   "store_locator.action.use_my_location": [
     {
       "type": 0,
@@ -3055,7 +3061,7 @@
       "value": "Phone:"
     }
   ],
-  "store_locator.description.viewing_within": [
+  "store_locator.description.viewing_near_postal_code": [
     {
       "type": 0,
       "value": "Viewing stores within "
@@ -3065,8 +3071,26 @@
       "value": "distance"
     },
     {
+      "type": 1,
+      "value": "distanceUnit"
+    },
+    {
       "type": 0,
-      "value": " miles"
+      "value": " of "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": " in"
+    }
+  ],
+  "store_locator.description.viewing_near_your_location": [
+    {
+      "type": 0,
+      "value": "Viewing stores near your location"
     }
   ],
   "store_locator.dropdown.germany": [
@@ -3081,10 +3105,34 @@
       "value": "United States"
     }
   ],
+  "store_locator.error.agree_to_share_your_location": [
+    {
+      "type": 0,
+      "value": "Please agree to share your location"
+    }
+  ],
+  "store_locator.error.please_enter_a_postal_code": [
+    {
+      "type": 0,
+      "value": "Please enter a postal code."
+    }
+  ],
+  "store_locator.error.please_select_a_country": [
+    {
+      "type": 0,
+      "value": "Please select a country."
+    }
+  ],
   "store_locator.field.placeholder.enter_postal_code": [
     {
       "type": 0,
       "value": "Enter postal code"
+    }
+  ],
+  "store_locator.pagination.load_more": [
+    {
+      "type": 0,
+      "value": "Load More"
     }
   ],
   "store_locator.title": [

@@ -9,7 +9,6 @@ import React from 'react'
 import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
-import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
 import userEvent from '@testing-library/user-event'
 import {Accordion} from '@salesforce/retail-react-app/app/components/shared/ui'
 

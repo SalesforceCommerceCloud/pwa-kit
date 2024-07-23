@@ -1289,6 +1289,9 @@
   "store_locator.action.find": {
     "defaultMessage": "Find"
   },
+  "store_locator.action.select_a_country": {
+    "defaultMessage": "Select a country"
+  },
   "store_locator.action.use_my_location": {
     "defaultMessage": "Use My Location"
   },
@@ -1310,8 +1313,11 @@
   "store_locator.description.phone": {
     "defaultMessage": "Phone:"
   },
-  "store_locator.description.viewing_within": {
-    "defaultMessage": "Viewing stores within {distance} miles"
+  "store_locator.description.viewing_near_postal_code": {
+    "defaultMessage": "Viewing stores within {distance}{distanceUnit} of {postalCode} in"
+  },
+  "store_locator.description.viewing_near_your_location": {
+    "defaultMessage": "Viewing stores near your location"
   },
   "store_locator.dropdown.germany": {
     "defaultMessage": "Germany"
@@ -1319,8 +1325,20 @@
   "store_locator.dropdown.united_states": {
     "defaultMessage": "United States"
   },
+  "store_locator.error.agree_to_share_your_location": {
+    "defaultMessage": "Please agree to share your location"
+  },
+  "store_locator.error.please_enter_a_postal_code": {
+    "defaultMessage": "Please enter a postal code."
+  },
+  "store_locator.error.please_select_a_country": {
+    "defaultMessage": "Please select a country."
+  },
   "store_locator.field.placeholder.enter_postal_code": {
     "defaultMessage": "Enter postal code"
+  },
+  "store_locator.pagination.load_more": {
+    "defaultMessage": "Load More"
   },
   "store_locator.title": {
     "defaultMessage": "Find a Store"

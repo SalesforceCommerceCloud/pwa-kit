@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useState, createContext} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
+
+// Components
 import {
     Modal,
     ModalBody,
@@ -16,73 +17,60 @@ import {
     useBreakpointValue
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
-import {useSearchStores} from '@salesforce/commerce-sdk-react'
-import {
-    DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
-    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-    STORE_LOCATOR_DISTANCE
-} from '@salesforce/retail-react-app/app/constants'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {useForm} from 'react-hook-form'
 
-const StoreLocatorModal = ({isOpen, onClose = noop}) => {
-    const intl = useIntl()
+// Others
+import {
+    DEFAULT_STORE_LOCATOR_COUNTRY,
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+    STORE_LOCATOR_NUM_STORES_PER_LOAD
+} from '@salesforce/retail-react-app/app/constants'
+
+export const StoreLocatorContext = createContext()
+export const useStoreLocator = () => {
+    const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
+    const [automaticGeolocationHasFailed, setAutomaticGeolocationHasFailed] = useState(false)
+    const [userWantsToShareLocation, setUserWantsToShareLocation] = useState(false)
 
     const [searchStoresParams, setSearchStoresParams] = useState({
-        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY_CODE,
-        postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE
+        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+        postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
     })
 
-    const form = useForm({
-        mode: 'onChange',
-        reValidateMode: 'onChange',
-        defaultValues: {
-            countryCode: searchStoresParams.countryCode,
-            postalCode: searchStoresParams.postalCode
-        }
-    })
-    var {data: searchStoresData, isLoading} = useSearchStores({
-        parameters: {
-            countryCode: searchStoresParams.countryCode,
-            postalCode: searchStoresParams.postalCode,
-            locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE
-        }
-    })
-    const storesInfo = isLoading ? undefined : searchStoresData?.data || []
-
-    const submitForm = async (formData) => {
-        const {postalCode, countryCode} = formData
-        setSearchStoresParams({
-            postalCode: postalCode,
-            countryCode: countryCode
-        })
+    return {
+        userHasSetManualGeolocation,
+        setUserHasSetManualGeolocation,
+        automaticGeolocationHasFailed,
+        setAutomaticGeolocationHasFailed,
+        userWantsToShareLocation,
+        setUserWantsToShareLocation,
+        searchStoresParams,
+        setSearchStoresParams
     }
+}
 
+const StoreLocatorModal = ({isOpen, onClose}) => {
+    const storeLocator = useStoreLocator()
     const isDesktopView = useBreakpointValue({base: false, lg: true})
+
     return (
-        <>
+        <StoreLocatorContext.Provider value={storeLocator}>
             {isDesktopView ? (
                 <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
                     <ModalContent
-                        display={{base: 'none', lg: 'block'}}
                         position="absolute"
                         top="0"
                         right="0"
                         width="33.33%"
                         height="100vh"
+                        marginTop="0px"
+                        overflowY="auto"
                         borderLeft="1px solid"
                         borderColor="gray.200"
-                        marginTop="0px"
                     >
                         <ModalCloseButton onClick={onClose} />
-                        <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
-                            <StoreLocatorContent
-                                form={form}
-                                submitForm={submitForm}
-                                storesInfo={storesInfo}
-                                searchStoresParams={searchStoresParams}
-                            />
+                        <ModalBody pb={8} bg="white" paddingBottom={6} paddingTop={6}>
+                            <StoreLocatorContent />
                         </ModalBody>
                     </ModalContent>
                 </Modal>
@@ -93,28 +81,21 @@ const StoreLocatorModal = ({isOpen, onClose = noop}) => {
                         top="0"
                         right="0"
                         height="100vh"
-                        borderLeft="1px solid"
-                        borderColor="gray.200"
                         marginTop="0px"
                     >
                         <ModalCloseButton onClick={onClose} />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
-                            <StoreLocatorContent
-                                form={form}
-                                submitForm={submitForm}
-                                storesInfo={storesInfo}
-                                searchStoresParams={searchStoresParams}
-                            />
+                            <StoreLocatorContent />
                         </ModalBody>
                     </ModalContent>
                 </Modal>
             )}
-        </>
+        </StoreLocatorContext.Provider>
     )
 }
 
 StoreLocatorModal.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
+    isOpen: PropTypes.bool,
     onClose: PropTypes.func
 }
 

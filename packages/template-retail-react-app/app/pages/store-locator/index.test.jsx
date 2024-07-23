@@ -94,6 +94,11 @@ const mockStores = {
     total: 4
 }
 
+const mockNoStores = {
+    limit: 4,
+    total: 0
+}
+
 const MockedComponent = () => {
     return (
         <div>
@@ -105,21 +110,24 @@ const MockedComponent = () => {
 // Set up and clean up
 beforeEach(() => {
     jest.resetModules()
-    window.history.pushState({}, 'Reset Password', createPathWithDefaults('/store-locator'))
-    global.server.use(
-        rest.get('*/shopper-stores/v1/organizations/*', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockStores))
-        })
-    )
+    window.history.pushState({}, 'Store locator', createPathWithDefaults('/store-locator'))
 })
 afterEach(() => {
     jest.resetModules()
     localStorage.clear()
     jest.clearAllMocks()
-    window.history.pushState({}, 'Reset Password', createPathWithDefaults('/store-locator'))
 })
 
 test('Allows customer to go to store locator page', async () => {
+    global.server.use(
+        rest.get(
+            '*/shopper-stores/v1/organizations/v1/organizations/f_ecom_zzrf_001/store-search',
+            (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockStores))
+            }
+        )
+    )
+
     // render our test component
     const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
@@ -128,6 +136,33 @@ test('Allows customer to go to store locator page', async () => {
     await user.click(await screen.findByText('Find a Store'))
 
     await waitFor(() => {
+        expect(window.location.pathname).toBe('/uk/en-GB/store-locator')
+    })
+})
+
+test('Show no stores are found if there are no stores', async () => {
+    global.server.use(
+        rest.get(
+            '*/shopper-stores/v1/organizations/v1/organizations/f_ecom_zzrf_001/store-search',
+            (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockNoStores))
+            }
+        )
+    )
+
+    // render our test component
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await waitFor(() => {
+        const descriptionFindAStore = screen.getByText(/Find a Store/i)
+        const noLocationsInThisArea = screen.getByText(
+            /Sorry, there are no locations in this area/i
+        )
+        expect(descriptionFindAStore).toBeInTheDocument()
+        expect(noLocationsInThisArea).toBeInTheDocument()
+
         expect(window.location.pathname).toBe('/uk/en-GB/store-locator')
     })
 })
