@@ -75,7 +75,7 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                         <Button
                             variant="outline"
                             onClick={async () => {
-                                await googleSignIn.loginRedirect('google')
+                                await googleSignIn.loginRedirect('Google')
                             }}
                         >
                             <Text>

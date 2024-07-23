@@ -56,13 +56,13 @@ export const redirectToAuthURL = (
     proxy,
     idp,
     codeChallenge,
-    slasCallbackEndpoint,
+    redirect_uri,
     clientId,
     siteId,
     tenantId
 ) => {
     const params = new URLSearchParams({
-        redirect_uri: slasCallbackEndpoint,
+        redirect_uri: redirect_uri,
         client_id: clientId,
         code_challenge: codeChallenge,
         response_type: 'code',
@@ -70,7 +70,10 @@ export const redirectToAuthURL = (
         hint: idp
     })
 
-    const url = `${proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/authorize?${params.toString()}`
+    console.log('redirect uri: ', redirect_uri)
+
+    const url = `${proxy}/shopper/auth/v1/organizations/${tenantId}/oauth2/authorize?${params.toString()}`
+    console.log('THIS IS THE URL: ', url)
 
     window.location.assign(url)
 }

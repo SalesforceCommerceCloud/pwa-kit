@@ -43,7 +43,7 @@ export default function useGoogleSignIn() {
             proxy,
             idp,
             codeChallenge,
-            `${getAppOrigin()}${SLAS_CALLBACK_ENDPOINT}`,
+            `http://localhost:3000${SLAS_CALLBACK_ENDPOINT}`,
             clientId,
             siteId,
             tenantId

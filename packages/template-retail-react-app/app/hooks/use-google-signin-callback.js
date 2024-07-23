@@ -19,7 +19,7 @@ const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
  *
  * @returns {{authenticationError: String}} - The authentication error
  */
-const useIdpCallback = ({labels}) => {
+const useGoogleSignInCallback = ({labels}) => {
     const [params] = useSearchParams()
     const [authenticationError, setAuthenticationError] = useState(params.error_description)
     const auth = useAuthContext()
@@ -40,11 +40,11 @@ const useIdpCallback = ({labels}) => {
         auth.loginIDPUser({
             usid: params.usid,
             code: params.code,
-            redirectURI: `${getAppOrigin()}${SLAS_CALLBACK_ENDPOINT}`
+            redirectURI: `http://localhost:3000${SLAS_CALLBACK_ENDPOINT}`
         })
     }, [])
 
     return {authenticationError}
 }
 
-export default useIdpCallback
+export default useGoogleSignInCallback
