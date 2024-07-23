@@ -1,4 +1,9 @@
 ## v4.0.0-dev(Jul 4, 2024)
+
+### New Feature
+
+- Support product bundles [#1916](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1916/)
+
 ### Bug Fixes
 
 - Out of stock and low stock items are removed from cart and checkout as unavailable products [#1865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1865)
