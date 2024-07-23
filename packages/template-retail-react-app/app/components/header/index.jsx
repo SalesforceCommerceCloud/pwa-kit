@@ -41,7 +41,8 @@ import {
     HamburgerIcon,
     ChevronDownIcon,
     HeartIcon,
-    SignoutIcon
+    SignoutIcon,
+    StoreIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 
 import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account/constant'
@@ -49,6 +50,7 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 const IconButtonWithRegistration = withRegistration(IconButton)
 /**
  * The header is the main source for accessing
@@ -74,6 +76,7 @@ const Header = ({
     onLogoClick = noop,
     onMyCartClick = noop,
     onWishlistClick = noop,
+    onStoreLocatorClick = noop,
     ...props
 }) => {
     const intl = useIntl()
@@ -258,6 +261,18 @@ const Header = ({
                         {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
+                    {STORE_LOCATOR_IS_ENABLED && (
+                        <IconButton
+                            aria-label={intl.formatMessage({
+                                defaultMessage: 'Store Locator',
+                                id: 'header.button.assistive_msg.store_locator'
+                            })}
+                            icon={<StoreIcon />}
+                            {...styles.icons}
+                            variant="unstyled"
+                            onClick={onStoreLocatorClick}
+                        />
+                    )}
                     <IconButton
                         aria-label={intl.formatMessage(
                             {
@@ -291,6 +306,7 @@ Header.propTypes = {
     onMyAccountClick: PropTypes.func,
     onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,
+    onStoreLocatorClick: PropTypes.func,
     searchInputRef: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.shape({current: PropTypes.elementType})

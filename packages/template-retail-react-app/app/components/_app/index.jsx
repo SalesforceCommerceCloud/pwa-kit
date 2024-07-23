@@ -45,6 +45,7 @@ import {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-men
 import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
+import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
 
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
@@ -134,6 +135,11 @@ const App = (props) => {
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const {
+        isOpen: isOpenStoreLocator,
+        onOpen: onOpenStoreLocator,
+        onClose: onCloseStoreLocator
+    } = useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -341,6 +347,10 @@ const App = (props) => {
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
+                            <StoreLocatorModal
+                                isOpen={isOpenStoreLocator}
+                                onClose={onCloseStoreLocator}
+                            />
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <>
@@ -351,6 +361,7 @@ const App = (props) => {
                                             onMyCartClick={onCartClick}
                                             onMyAccountClick={onAccountClick}
                                             onWishlistClick={onWishlistClick}
+                                            onStoreLocatorClick={onOpenStoreLocator}
                                         >
                                             <HideOnDesktop>
                                                 <DrawerMenu
