@@ -577,6 +577,26 @@ class Auth {
     }
 
     /**
+     * A login method to handle the callback from an IDP.
+     */
+    async loginIDPUser(body: {code: string; usid: string; redirectURI: string}) {
+        return await this.queueRequest(() => {
+            const tokenBody = {
+                code: body.code,
+                grant_type: 'authorization_code_pkce',
+                redirect_uri: body.redirectURI,
+                code_verifier: localStorage.getItem('codeVerifier') || '',
+                client_id: '3a15f34e-fecd-4fcc-8235-86b70978e629',
+                channel_id: this.client.clientConfig.parameters.siteId,
+            }
+
+            console.log('DIS IS DA TOKENBODY: ,' + JSON.stringify(tokenBody))
+
+            return this.client.getAccessToken({body: tokenBody})
+        }, false)
+    }
+
+    /**
      * A wrapper method for commerce-sdk-isomorphic helper: logout.
      *
      */
