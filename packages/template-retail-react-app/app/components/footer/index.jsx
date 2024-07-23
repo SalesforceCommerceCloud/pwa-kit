@@ -30,6 +30,7 @@ import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
@@ -48,6 +49,25 @@ const Footer = ({...otherProps}) => {
         // Targeting the child element
         option: styles.localeDropdownOption
     })
+    const makeOurCompanyLinks = () => {
+        const links = []
+        if (STORE_LOCATOR_IS_ENABLED)
+            links.push({
+                href: '/store-locator',
+                text: intl.formatMessage({
+                    id: 'footer.link.store_locator',
+                    defaultMessage: 'Store Locator'
+                })
+            })
+        links.push({
+            href: '/',
+            text: intl.formatMessage({
+                id: 'footer.link.about_us',
+                defaultMessage: 'About Us'
+            })
+        })
+        return links
+    }
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
@@ -104,22 +124,7 @@ const Footer = ({...otherProps}) => {
                                     id: 'footer.column.our_company',
                                     defaultMessage: 'Our Company'
                                 })}
-                                links={[
-                                    {
-                                        href: '/',
-                                        text: intl.formatMessage({
-                                            id: 'footer.link.store_locator',
-                                            defaultMessage: 'Store Locator'
-                                        })
-                                    },
-                                    {
-                                        href: '/',
-                                        text: intl.formatMessage({
-                                            id: 'footer.link.about_us',
-                                            defaultMessage: 'About Us'
-                                        })
-                                    }
-                                ]}
+                                links={makeOurCompanyLinks()}
                             />
                             <Box>
                                 <Subscribe />

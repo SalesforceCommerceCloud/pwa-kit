@@ -3,6 +3,7 @@
 ### New Feature
 
 - Support product bundles [#1916](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1916/)
+- Add Store Locator [#1922](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1922)
 
 ### Bug Fixes
 

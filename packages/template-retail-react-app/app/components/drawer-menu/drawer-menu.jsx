@@ -46,8 +46,8 @@ import Link from '@salesforce/retail-react-app/app/components/link'
 // Icons
 import {
     BrandLogo,
-    LocationIcon,
     SignoutIcon,
+    StoreIcon,
     UserIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 
@@ -59,6 +59,7 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
 // values for depths 0 - 3, any depth deeper than that will use the default styling.
@@ -268,19 +269,21 @@ const DrawerMenu = ({
                                     </Link>
                                 )}
                             </Box>
-                            <Box {...styles.actionsItem}>
-                                <Link to={STORE_LOCATOR_HREF}>
-                                    <HStack>
-                                        <LocationIcon {...styles.icon} />{' '}
-                                        <Text>
-                                            {intl.formatMessage({
-                                                id: 'drawer_menu.link.store_locator',
-                                                defaultMessage: 'Store Locator'
-                                            })}
-                                        </Text>
-                                    </HStack>
-                                </Link>
-                            </Box>
+                            {STORE_LOCATOR_IS_ENABLED && (
+                                <Box {...styles.actionsItem}>
+                                    <Link to={STORE_LOCATOR_HREF}>
+                                        <HStack>
+                                            <StoreIcon {...styles.icon} />{' '}
+                                            <Text>
+                                                {intl.formatMessage({
+                                                    id: 'drawer_menu.link.store_locator',
+                                                    defaultMessage: 'Store Locator'
+                                                })}
+                                            </Text>
+                                        </HStack>
+                                    </Link>
+                                </Box>
+                            )}
                             {showLocaleSelector && (
                                 <Box>
                                     <LocaleSelector
