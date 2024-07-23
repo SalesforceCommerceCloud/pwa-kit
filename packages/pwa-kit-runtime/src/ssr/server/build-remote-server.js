@@ -705,29 +705,25 @@ export const RemoteServerFactory = {
                 },
                 onProxyRes: (proxyRes, req) => {
                     if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
-                        logger.error(
-                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`,
-                            {
-                                namespace: '_setupSlasPrivateClientProxy',
-                                additionalProperties: {statusCode: proxyRes.statusCode}
-                            }
-                        )
-                        logger.error(
-                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`,
-                            {namespace: '_setupSlasPrivateClientProxy'}
-                        )
-                        logger.error(
-                            `SLAS Private Client Proxy Request URL - ${req.protocol}://${req.get(
-                                'host'
-                            )}${req.originalUrl}`,
-                            {
-                                namespace: '_setupSlasPrivateClientProxy',
-                                additionalProperties: {
-                                    protocol: req.protocol,
-                                    originalUrl: req.originalUrl
+                        proxyRes.on('data', (data) => {
+                            const errorMessage = data.toString('utf-8')
+                            logger.error(
+                                `Failed to proxy SLAS Private Client request to ${
+                                    req.protocol
+                                }://${req.get('host')}${req.originalUrl} - HTTP ${
+                                    proxyRes.statusCode
                                 }
-                            }
-                        )
+                                ${errorMessage}`,
+                                {
+                                    namespace: '_SlasPrivateClientProxy',
+                                    additionalProperties: {
+                                        statusCode: proxyRes.statusCode,
+                                        protocol: req.protocol,
+                                        originalUrl: req.originalUrl
+                                    }
+                                }
+                            )
+                        })
                     }
                 }
             })
