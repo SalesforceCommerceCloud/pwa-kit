@@ -137,10 +137,6 @@ export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
         defaultMessage: 'Remove',
         id: 'confirmation_modal.remove_cart_item.action.remove'
     }),
-    primaryActionAriaLabel: defineMessage({
-        defaultMessage: 'Remove unavailable products',
-        id: 'confirmation_modal.remove_cart_item.assistive_msg.remove'
-    }),
     onPrimaryAction: noop
 }
 

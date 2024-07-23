@@ -700,15 +700,6 @@ describe('The Node SSR Environment', () => {
                 // twice for rendering pipeline because of the prepass step and one for http request logging
                 expect(console.log).toHaveBeenCalledTimes(3)
             }
-        },
-        {
-            description: `Server-Timing header is present in the response`,
-            req: {url: '/pwa/', query: {__server_timing: '1'}},
-            assertions: (res) => {
-                expect(res.headers['server-timing']).toContain('route-matching;dur=')
-                expect(res.headers['server-timing']).toContain('render-to-string;dur=')
-                expect(res.headers['server-timing']).toContain('total;dur=')
-            }
         }
     ]
 

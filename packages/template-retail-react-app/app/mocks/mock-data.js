@@ -2585,7 +2585,6 @@ export const mockProductSearch = {
                     id: '701644042615M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -2678,7 +2677,6 @@ export const mockProductSearch = {
                     id: '701643458486M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -2767,7 +2765,6 @@ export const mockProductSearch = {
                     id: '701644068363M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -2866,7 +2863,6 @@ export const mockProductSearch = {
                     id: '701643370795M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -2965,7 +2961,6 @@ export const mockProductSearch = {
                     id: '701643415441M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3060,7 +3055,6 @@ export const mockProductSearch = {
                     id: '701642867739M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3153,7 +3147,6 @@ export const mockProductSearch = {
                     id: '701643636341M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3236,7 +3229,6 @@ export const mockProductSearch = {
                     id: '701644025199M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3325,7 +3317,6 @@ export const mockProductSearch = {
                     id: '609717696058M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3415,7 +3406,6 @@ export const mockProductSearch = {
                     id: '701644443078M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3493,7 +3483,6 @@ export const mockProductSearch = {
                     id: '701643409730M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3570,7 +3559,6 @@ export const mockProductSearch = {
                     id: '701644067007M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3645,7 +3633,6 @@ export const mockProductSearch = {
                     id: '701644335403M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3744,7 +3731,6 @@ export const mockProductSearch = {
                     id: '701644389390M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3843,7 +3829,6 @@ export const mockProductSearch = {
                     id: '701642884316M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -3933,7 +3918,6 @@ export const mockProductSearch = {
                     id: '701643037605M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -4014,7 +3998,6 @@ export const mockProductSearch = {
                     id: '701642853091M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -4108,7 +4091,6 @@ export const mockProductSearch = {
                     id: '701644334888M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -4207,7 +4189,6 @@ export const mockProductSearch = {
                     id: '701644390969M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -4306,7 +4287,6 @@ export const mockProductSearch = {
                     id: '701641312872M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -4405,7 +4385,6 @@ export const mockProductSearch = {
                     id: '701643422135M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -4489,7 +4468,6 @@ export const mockProductSearch = {
                     id: '701643408177M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -4563,7 +4541,6 @@ export const mockProductSearch = {
                     id: '701643632923M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -4662,7 +4639,6 @@ export const mockProductSearch = {
                     id: '701643317851M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',
@@ -4762,7 +4738,6 @@ export const mockProductSearch = {
                     id: '609717701486M'
                 }
             ],
-            variants: [],
             variationAttributes: [
                 {
                     id: 'color',

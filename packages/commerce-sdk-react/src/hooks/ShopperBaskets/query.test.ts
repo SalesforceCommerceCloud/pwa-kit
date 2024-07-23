@@ -9,8 +9,7 @@ import {
     mockQueryEndpoint,
     renderHookWithProviders,
     waitAndExpectError,
-    waitAndExpectSuccess,
-    createQueryClient
+    waitAndExpectSuccess
 } from '../../test-utils'
 
 import {Argument} from '../types'
@@ -46,19 +45,6 @@ describe('Shopper Baskets query hooks', () => {
     afterEach(() => {
         expect(nock.pendingMocks()).toHaveLength(0)
     })
-    test.each(testCases)('`%s` has meta.displayName defined', async (queryName, data) => {
-        mockQueryEndpoint(basketsEndpoint, data)
-        const queryClient = createQueryClient()
-        const {result} = renderHookWithProviders(
-            () => {
-                return queries[queryName](OPTIONS)
-            },
-            {queryClient}
-        )
-        await waitAndExpectSuccess(() => result.current)
-        expect(queryClient.getQueryCache().getAll()[0].meta?.displayName).toBe(queryName)
-    })
-
     test.each(testCases)('`%s` returns data on success', async (queryName, data) => {
         mockQueryEndpoint(basketsEndpoint, data)
         const {result} = renderHookWithProviders(() => {

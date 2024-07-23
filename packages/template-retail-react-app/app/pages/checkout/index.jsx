@@ -170,6 +170,7 @@ const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const {formatMessage} = useIntl()
+    const productIds = basket?.productItems?.map(({productId}) => productId) ?? []
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const toast = useToast()
     const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
@@ -216,7 +217,7 @@ const CheckoutContainer = () => {
 
             <Checkout />
             <UnavailableProductConfirmationModal
-                productItems={basket?.productItems}
+                productIds={productIds}
                 handleUnavailableProducts={handleUnavailableProducts}
             />
         </CheckoutProvider>

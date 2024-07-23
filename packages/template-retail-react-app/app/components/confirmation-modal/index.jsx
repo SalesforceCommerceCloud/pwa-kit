@@ -25,15 +25,14 @@ const ConfirmationModal = ({
     dialogTitle = CONFIRMATION_DIALOG_DEFAULT_CONFIG.dialogTitle,
     confirmationMessage = CONFIRMATION_DIALOG_DEFAULT_CONFIG.confirmationMessage,
     primaryActionLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.primaryActionLabel,
-    primaryActionAriaLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.primaryActionAriaLabel,
     alternateActionLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.alternateActionLabel,
-    alternateActionAriaLabel = CONFIRMATION_DIALOG_DEFAULT_CONFIG.alternateActionAriaLabel,
     hideAlternateAction = false,
     onPrimaryAction = noop,
     onAlternateAction = noop,
     ...props
 }) => {
     const {formatMessage} = useIntl()
+
     const handleConfirmClick = () => {
         onPrimaryAction()
         props.onClose()
@@ -60,20 +59,11 @@ const ConfirmationModal = ({
 
                 <AlertDialogFooter>
                     {!hideAlternateAction ? (
-                        <Button
-                            variant="ghost"
-                            mr={3}
-                            aria-label={formatMessage(alternateActionAriaLabel)}
-                            onClick={handleAlternateActionClick}
-                        >
+                        <Button variant="ghost" mr={3} onClick={handleAlternateActionClick}>
                             {formatMessage(alternateActionLabel)}
                         </Button>
                     ) : null}
-                    <Button
-                        variant="solid"
-                        onClick={handleConfirmClick}
-                        aria-label={formatMessage(primaryActionAriaLabel)}
-                    >
+                    <Button variant="solid" onClick={handleConfirmClick}>
                         {formatMessage(primaryActionLabel)}
                     </Button>
                 </AlertDialogFooter>
@@ -108,17 +98,9 @@ ConfirmationModal.propTypes = {
      */
     primaryActionLabel: PropTypes.object,
     /**
-     * Button aria Label for primary action
-     */
-    primaryActionAriaLabel: PropTypes.object,
-    /**
      * Button Label for alternate or secondary action in confirmation modal
      */
     alternateActionLabel: PropTypes.object,
-    /**
-     * Button aria Label for alternate or secondary action in confirmation modal
-     */
-    alternateActionAriaLabel: PropTypes.object,
     /**
      * Action to execute if user selects primary action
      */

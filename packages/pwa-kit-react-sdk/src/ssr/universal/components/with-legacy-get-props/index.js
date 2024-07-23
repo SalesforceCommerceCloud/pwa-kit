@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {FetchStrategy} from '../fetch-strategy'
-import {PERFORMANCE_MARKS} from '../../../../utils/performance'
+import React from 'react'
 
 export const withLegacyGetProps = (Wrapped) => {
     /* istanbul ignore next */
@@ -28,35 +27,16 @@ export const withLegacyGetProps = (Wrapped) => {
             const {params} = match
 
             const components = [App, route.component]
-            const promises = components.map((c, i) => {
-                // getTemplateName is a promise and it's intentially not awaited here
-                // to avoid blocking the execution of the getProps function to maximize performance
-                // getTemplateName should be very fast, under 0.2ms
-                c.getTemplateName().then((templateName) => {
-                    res.__performanceTimer.mark(
-                        `${PERFORMANCE_MARKS.getProps}::${templateName}`,
-                        'start'
-                    )
-                })
-                return c.getProps
-                    ? c
-                          .getProps({
-                              req,
-                              res,
-                              params,
-                              location
-                          })
-                          .then((result) => {
-                              c.getTemplateName().then((templateName) => {
-                                  res.__performanceTimer.mark(
-                                      `${PERFORMANCE_MARKS.getProps}::${templateName}`,
-                                      'end'
-                                  )
-                              })
-                              return result
-                          })
+            const promises = components.map((c) =>
+                c.getProps
+                    ? c.getProps({
+                          req,
+                          res,
+                          params,
+                          location
+                      })
                     : Promise.resolve({})
-            })
+            )
 
             const [appProps, pageProps] = await Promise.all(promises)
             return {

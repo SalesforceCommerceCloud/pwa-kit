@@ -46,7 +46,6 @@ const ContactInfo = () => {
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
-    const transferBasket = useShopperBasketsMutation('transferBasket')
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -55,7 +54,6 @@ const ContactInfo = () => {
     })
 
     const fields = useLoginFields({form})
-    const emailRef = useRef()
 
     const [error, setError] = useState(null)
     const [showPasswordField, setShowPasswordField] = useState(false)
@@ -71,12 +69,6 @@ const ContactInfo = () => {
                 })
             } else {
                 await login.mutateAsync({username: data.email, password: data.password})
-
-                // Because we lazy load the basket there is no guarantee that a basket exists for the newly registered
-                // user, for this reason we must transfer the ownership of the previous basket to the logged in user.
-                await transferBasket.mutateAsync({
-                    parameters: {overrideExisting: true}
-                })
             }
             goToNextStep()
         } catch (error) {
@@ -98,9 +90,6 @@ const ContactInfo = () => {
             setError(null)
         }
         setShowPasswordField(!showPasswordField)
-        if (emailRef.current) {
-            emailRef.current.focus()
-        }
     }
 
     const onForgotPasswordClick = () => {
@@ -130,15 +119,9 @@ const ContactInfo = () => {
                 }
             }}
             editLabel={
-                customer.isRegistered
-                    ? formatMessage({
-                          defaultMessage: 'Sign Out',
-                          id: 'contact_info.action.sign_out'
-                      })
-                    : formatMessage({
-                          defaultMessage: 'Edit Contact Info',
-                          id: 'toggle_card.action.editContactInfo'
-                      })
+                customer.isRegistered ? (
+                    <FormattedMessage defaultMessage="Sign Out" id="contact_info.action.sign_out" />
+                ) : undefined
             }
         >
             <ToggleCardEdit>
@@ -153,7 +136,7 @@ const ContactInfo = () => {
                             )}
 
                             <Stack spacing={5} position="relative">
-                                <Field {...fields.email} inputRef={emailRef} />
+                                <Field {...fields.email} />
                                 {showPasswordField && (
                                     <Stack>
                                         <Field {...fields.password} />

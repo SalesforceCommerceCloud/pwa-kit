@@ -243,12 +243,7 @@ const Home = () => {
                                         >
                                             {feature.icon}
                                         </Flex>
-                                        <Text
-                                            as="h3"
-                                            color={'black'}
-                                            fontWeight={700}
-                                            fontSize={20}
-                                        >
+                                        <Text color={'black'} fontWeight={700} fontSize={20}>
                                             {intl.formatMessage(featureMessage.title)}
                                         </Text>
                                         <Text color={'black'}>

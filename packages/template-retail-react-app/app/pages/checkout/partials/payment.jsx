@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Box,
     Button,
@@ -141,11 +141,6 @@ const Payment = () => {
         }
     })
 
-    const billingAddressAriaLabel = defineMessage({
-        defaultMessage: 'Billing Address Form',
-        id: 'checkout_payment.label.billing_address_form'
-    })
-
     return (
         <ToggleCard
             id="step-3"
@@ -157,10 +152,6 @@ const Payment = () => {
             }
             disabled={appliedPayment == null}
             onEdit={() => goToStep(STEPS.PAYMENT)}
-            editLabel={formatMessage({
-                defaultMessage: 'Edit Payment Info',
-                id: 'toggle_card.action.editPaymentInfo'
-            })}
         >
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>
@@ -229,7 +220,6 @@ const Payment = () => {
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}
-                            formTitleAriaLabel={billingAddressAriaLabel}
                             hideSubmitButton
                         />
                     )}

@@ -16,11 +16,6 @@ import {Helmet} from 'react-helmet'
 import {ChunkExtractor} from '@loadable/server'
 import {StaticRouter as Router, matchPath} from 'react-router-dom'
 import serialize from 'serialize-javascript'
-import PropTypes from 'prop-types'
-import sprite from 'svg-sprite-loader/runtime/sprite.build'
-import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
-import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
@@ -33,9 +28,11 @@ import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
-import logger from '../../utils/logger-instance'
-
-import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
+import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
+import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import sprite from 'svg-sprite-loader/runtime/sprite.build'
+import PropTypes from 'prop-types'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -69,7 +66,7 @@ const logAndFormatError = (err) => {
         return {message: err.message, status: err.status, stack: err.stack}
     } else {
         const cause = err.stack || err.toString()
-        logger.error(cause, {namespace: 'react-rendering.render'})
+        console.error(cause)
         const safeMessage = 'Internal Server Error'
         return {message: safeMessage, status: 500, stack: err.stack}
     }
@@ -119,10 +116,6 @@ export const getLocationSearch = (req, opts = {}) => {
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
-    const includeServerTimingHeader = '__server_timing' in req.query
-    const shouldTrackPerformance = includeServerTimingHeader || process.env.SERVER_TIMING
-    res.__performanceTimer = new PerformanceTimer({enabled: shouldTrackPerformance})
-    res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'start')
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
@@ -142,7 +135,6 @@ export const render = async (req, res, next) => {
     }
 
     // Step 1 - Find the match.
-    res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'start')
     let route
     let match
 
@@ -154,12 +146,9 @@ export const render = async (req, res, next) => {
         }
         return !!match
     })
-    res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'end')
 
     // Step 2 - Get the component
-    res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'start')
     const component = await route.component.getComponent()
-    res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'end')
 
     // Step 3 - Init the app state
     const props = {
@@ -180,7 +169,6 @@ export const render = async (req, res, next) => {
         appState = {}
         appStateError = new errors.HTTPNotFound('Not found')
     } else {
-        res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'start')
         const ret = await AppConfig.initAppState({
             App: WrappedApp,
             component,
@@ -196,9 +184,8 @@ export const render = async (req, res, next) => {
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
         appStateError = ret.error
-        res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'end')
     }
-    res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToString, 'start')
+
     appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
 
     // Step 4 - Render the App
@@ -229,14 +216,6 @@ export const render = async (req, res, next) => {
     const {html, routerContext, error} = renderResult
     const redirectUrl = routerContext.url
     const status = (error && error.status) || res.statusCode
-
-    res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToString, 'end')
-    res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'end')
-    res.__performanceTimer.log()
-
-    if (includeServerTimingHeader) {
-        res.setHeader('Server-Timing', res.__performanceTimer.buildServerTimingHeader())
-    }
 
     if (redirectUrl) {
         res.redirect(302, redirectUrl)

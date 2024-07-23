@@ -11,7 +11,7 @@ import {Helmet} from 'react-helmet'
 import {CustomPropTypes, detectStorefrontPreview, getClientScript, proxyRequests} from './utils'
 import {useHistory} from 'react-router-dom'
 import type {LocationDescriptor} from 'history'
-import {useCommerceApi, useConfig} from '../../hooks'
+import {useCommerceApi} from '../../hooks'
 
 type GetToken = () => string | undefined | Promise<string | undefined>
 type ContextChangeHandler = () => void | Promise<void>
@@ -35,7 +35,6 @@ export const StorefrontPreview = ({
     const history = useHistory()
     const isHostTrusted = detectStorefrontPreview()
     const apiClients = useCommerceApi()
-    const {siteId} = useConfig()
 
     useEffect(() => {
         if (enabled && isHostTrusted) {
@@ -43,7 +42,6 @@ export const StorefrontPreview = ({
                 ...window.STOREFRONT_PREVIEW,
                 getToken,
                 onContextChange,
-                siteId,
                 experimentalUnsafeNavigate: (
                     path: LocationDescriptor<unknown>,
                     action: 'push' | 'replace' = 'push',
@@ -53,7 +51,7 @@ export const StorefrontPreview = ({
                 }
             }
         }
-    }, [enabled, getToken, onContextChange, siteId])
+    }, [enabled, getToken, onContextChange])
 
     useEffect(() => {
         if (enabled && isHostTrusted) {

@@ -45,11 +45,6 @@ export const useUserInfo = (
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
-    queryOptions.meta = {
-        displayName: 'useUserInfo',
-        ...queryOptions.meta
-    }
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
@@ -89,11 +84,6 @@ export const useWellknownOpenidConfiguration = (
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
-    queryOptions.meta = {
-        displayName: 'useWellknownOpenidConfiguration',
-        ...queryOptions.meta
-    }
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
@@ -132,11 +122,6 @@ export const useJwksUri = (
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
-
-    queryOptions.meta = {
-        displayName: 'useJwksUri',
-        ...queryOptions.meta
-    }
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.

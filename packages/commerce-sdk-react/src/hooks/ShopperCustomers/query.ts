@@ -85,11 +85,6 @@ export const useCustomer = (
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
-    queryOptions.meta = {
-        displayName: 'useCustomer',
-        ...queryOptions.meta
-    }
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
@@ -129,11 +124,6 @@ export const useCustomerAddress = (
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
-    queryOptions.meta = {
-        displayName: 'useCustomerAddress',
-        ...queryOptions.meta
-    }
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
@@ -172,12 +162,6 @@ export const useCustomerBaskets = (
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
-
-    queryOptions.meta = {
-        displayName: 'useCustomerBaskets',
-        ...queryOptions.meta
-    }
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
@@ -218,11 +202,6 @@ export const useCustomerOrders = (
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the option in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
-
-    queryOptions.meta = {
-        displayName: 'useCustomerOrders',
-        ...queryOptions.meta
-    }
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -268,11 +247,6 @@ export const useCustomerPaymentInstrument = (
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
-    queryOptions.meta = {
-        displayName: 'useCustomerPaymentInstrument',
-        ...queryOptions.meta
-    }
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
@@ -312,11 +286,6 @@ export const useCustomerProductLists = (
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
-    queryOptions.meta = {
-        displayName: 'useCustomerProductLists',
-        ...queryOptions.meta
-    }
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
@@ -355,11 +324,6 @@ export const useCustomerProductList = (
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
-
-    queryOptions.meta = {
-        displayName: 'useCustomerProductList',
-        ...queryOptions.meta
-    }
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -406,11 +370,6 @@ export const useCustomerProductListItem = (
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
-    queryOptions.meta = {
-        displayName: 'useCustomerProductListItem',
-        ...queryOptions.meta
-    }
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
@@ -449,11 +408,6 @@ export const usePublicProductListsBySearchTerm = (
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
-
-    queryOptions.meta = {
-        displayName: 'usePublicProductListsBySearchTerm',
-        ...queryOptions.meta
-    }
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
@@ -494,11 +448,6 @@ export const usePublicProductList = (
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
-    queryOptions.meta = {
-        displayName: 'usePublicProductList',
-        ...queryOptions.meta
-    }
-
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
@@ -537,11 +486,6 @@ export const useProductListItem = (
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
-
-    queryOptions.meta = {
-        displayName: 'useProductListItem',
-        ...queryOptions.meta
-    }
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
