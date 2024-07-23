@@ -1289,6 +1289,18 @@
   "toggle_card.action.edit": {
     "defaultMessage": "Edit"
   },
+  "toggle_card.action.editContactInfo": {
+    "defaultMessage": "Edit Contact Info"
+  },
+  "toggle_card.action.editPaymentInfo": {
+    "defaultMessage": "Edit Payment Info"
+  },
+  "toggle_card.action.editShippingAddress": {
+    "defaultMessage": "Edit Shipping Address"
+  },
+  "toggle_card.action.editShippingOptions": {
+    "defaultMessage": "Edit Shipping Options"
+  },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "Forgot Password?"
   },

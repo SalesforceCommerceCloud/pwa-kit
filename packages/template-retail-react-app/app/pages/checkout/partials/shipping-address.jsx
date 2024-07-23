@@ -118,6 +118,10 @@ export default function ShippingAddress() {
             isLoading={isLoading}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
+            editLabel={formatMessage({
+                defaultMessage: 'Edit Shipping Address',
+                id: 'toggle_card.action.editShippingAddress'
+            })}
         >
             <ToggleCardEdit>
                 <ShippingAddressSelection
