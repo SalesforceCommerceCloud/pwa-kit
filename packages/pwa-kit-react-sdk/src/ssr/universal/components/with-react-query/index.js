@@ -46,7 +46,7 @@ export const withReactQuery = (Wrapped, options = {}) => {
                     preloadedState = beforeHydrate(window.__PRELOADED_STATE__?.[STATE_KEY] || {})
                 } catch (e) {
                     logger.error('Client `beforeHydrate` failed', {
-                        namespace: 'WithReactQuery render',
+                        namespace: 'with-react-query.render',
                         additionalProperties: {error: e}
                     })
                 }

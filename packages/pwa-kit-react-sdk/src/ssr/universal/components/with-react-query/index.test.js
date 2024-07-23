@@ -78,7 +78,7 @@ describe('withReactQuery', function () {
         expect(logger.error).toHaveBeenCalledTimes(1)
         expect(logger.error).toHaveBeenCalledWith('Client `beforeHydrate` failed', {
             additionalProperties: {error: mockError},
-            namespace: 'WithReactQuery render'
+            namespace: 'with-react-query.render'
         })
     })
 
