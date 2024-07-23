@@ -12,13 +12,17 @@ import {
     redirectToAuthURL
 } from '@salesforce/retail-react-app/app/utils/idp-utils'
 
+// For testing purposes, hardcoding values here
 const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
+const clientId = '3a15f34e-fecd-4fcc-8235-86b70978e629'
+const tenantId = 'bgvn_stg'
+const proxy = 'https://sandbox-001.api.commercecloud.salesforce.com'
 
 /**
  * A hook that provides IDP auth functionality for the retail react app.
  */
 export default function useGoogleSignIn() {
-    const {clientId, organizationId, siteId, proxy} = useConfig()
+    const {siteId} = useConfig()
 
     /**
      * Starts the IDP login flow by redirecting the user to the IDP login page (Google, Facebook...)
@@ -42,7 +46,7 @@ export default function useGoogleSignIn() {
             `${getAppOrigin()}${SLAS_CALLBACK_ENDPOINT}`,
             clientId,
             siteId,
-            organizationId
+            tenantId
         )
     }
 

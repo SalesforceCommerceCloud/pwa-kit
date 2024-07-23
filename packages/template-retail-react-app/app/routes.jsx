@@ -36,6 +36,7 @@ const Checkout = loadable(() => import('./pages/checkout'), {
 })
 const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
+const IDPRedirect = loadable(() => import('./pages/idp-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {
     fallback
@@ -82,6 +83,11 @@ export const routes = [
     {
         path: '/callback',
         component: LoginRedirect,
+        exact: true
+    },
+    {
+        path: '/idp-callback',
+        component: IDPRedirect,
         exact: true
     },
     {

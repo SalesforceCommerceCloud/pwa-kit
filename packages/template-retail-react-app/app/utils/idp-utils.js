@@ -59,7 +59,7 @@ export const redirectToAuthURL = (
     slasCallbackEndpoint,
     clientId,
     siteId,
-    organizationId
+    tenantId
 ) => {
     const params = new URLSearchParams({
         redirect_uri: slasCallbackEndpoint,
