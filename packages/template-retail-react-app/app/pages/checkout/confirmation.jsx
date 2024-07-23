@@ -36,7 +36,6 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const onClient = typeof window !== 'undefined'
 
@@ -53,7 +52,6 @@ const CheckoutConfirmation = () => {
             enabled: !!orderNo && onClient
         }
     )
-    const {currency} = useCurrency()
     const itemIds = order?.productItems.map((item) => item.productId)
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
     const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
@@ -326,9 +324,7 @@ const CheckoutConfirmation = () => {
                                                                     <CartItemVariantAttributes
                                                                         includeQuantity
                                                                     />
-                                                                    <CartItemVariantPrice
-                                                                        currency={currency}
-                                                                    />
+                                                                    <CartItemVariantPrice />
                                                                 </Flex>
                                                             </Stack>
                                                         </Flex>

@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
-const logger = Object.freeze(createLogger({packageName: 'retail-react-app'}))
-export default logger
+const getShopperContext = ['organizationId', 'usid'] as const
+
+export default {
+    getShopperContext
+}

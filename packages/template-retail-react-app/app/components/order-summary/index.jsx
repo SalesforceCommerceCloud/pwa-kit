@@ -89,10 +89,7 @@ const CartItems = ({basket}) => {
                                         <Stack width="full" spacing={1} marginTop="-3px">
                                             <CartItemVariantName />
                                             <CartItemVariantAttributes includeQuantity />
-                                            <CartItemVariantPrice
-                                                baseDirection="row"
-                                                currency={basket?.currency}
-                                            />
+                                            <CartItemVariantPrice baseDirection="row" />
                                         </Stack>
                                     </Flex>
                                 </ItemVariantProvider>
@@ -133,23 +130,18 @@ const OrderSummary = ({
 
     return (
         <Stack data-testid="sf-order-summary" spacing={5}>
-            <Heading fontSize={fontSize} pt={1} id="order-summary-heading">
+            <Heading fontSize={fontSize} pt={1}>
                 <FormattedMessage
                     defaultMessage="Order Summary"
                     id="order_summary.heading.order_summary"
                 />
             </Heading>
 
-            <Stack
-                spacing={4}
-                align="flex-start"
-                role="region"
-                aria-labelledby="order-summary-heading"
-            >
+            <Stack spacing={4} align="flex-start">
                 {showCartItems && <CartItems basket={basket} />}
 
                 <Stack w="full">
-                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
+                    <Flex justify="space-between">
                         <Text fontWeight="bold" fontSize={fontSize}>
                             <FormattedMessage
                                 defaultMessage="Subtotal"
@@ -166,12 +158,7 @@ const OrderSummary = ({
                     </Flex>
 
                     {basket.orderPriceAdjustments?.map((adjustment) => (
-                        <Flex
-                            justify="space-between"
-                            key={adjustment.priceAdjustmentId}
-                            aria-live="polite"
-                            aria-atomic="true"
-                        >
+                        <Flex justify="space-between" key={adjustment.priceAdjustmentId}>
                             <Text fontSize={fontSize}>{adjustment.itemText}</Text>
                             <Text color="green.600" fontSize={fontSize}>
                                 <FormattedNumber
@@ -183,7 +170,7 @@ const OrderSummary = ({
                         </Flex>
                     ))}
 
-                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
+                    <Flex justify="space-between">
                         <Flex alignItems="center">
                             <Text lineHeight={1} fontSize={fontSize}>
                                 <FormattedMessage
@@ -239,7 +226,7 @@ const OrderSummary = ({
                         )}
                     </Flex>
 
-                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
+                    <Flex justify="space-between">
                         <Text fontSize={fontSize}>
                             <FormattedMessage defaultMessage="Tax" id="order_summary.label.tax" />
                         </Text>
@@ -268,7 +255,7 @@ const OrderSummary = ({
                 )}
 
                 <Stack spacing={4} w="full">
-                    <Flex w="full" justify="space-between" aria-live="polite" aria-atomic="true">
+                    <Flex w="full" justify="space-between">
                         {isEstimate ? (
                             <Text fontWeight="bold" fontSize={fontSize}>
                                 <FormattedMessage

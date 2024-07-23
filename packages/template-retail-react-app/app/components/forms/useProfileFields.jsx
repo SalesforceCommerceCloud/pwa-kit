@@ -24,7 +24,6 @@ export default function useProfileFields({
                 id: 'use_profile_fields.label.first_name'
             }),
             type: 'text',
-            autoComplete: 'given-name',
             defaultValue: '',
             rules: {
                 required: formatMessage({
@@ -43,7 +42,6 @@ export default function useProfileFields({
             }),
             type: 'text',
             defaultValue: '',
-            autoComplete: 'family-name',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your last name.',
@@ -59,7 +57,6 @@ export default function useProfileFields({
             placeholder: 'you@email.com',
             type: 'email',
             defaultValue: '',
-            autoComplete: 'email',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter a valid email address.',
@@ -77,7 +74,6 @@ export default function useProfileFields({
             }),
             defaultValue: '',
             type: 'tel',
-            autoComplete: 'tel',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter your phone number.',

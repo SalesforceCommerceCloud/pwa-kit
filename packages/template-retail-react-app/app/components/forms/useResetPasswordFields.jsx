@@ -25,7 +25,6 @@ export default function useResetPasswordFields({
             placeholder: 'you@email.com',
             defaultValue: '',
             type: 'email',
-            autoComplete: 'email',
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please enter a valid email address.',

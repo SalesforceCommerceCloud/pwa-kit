@@ -65,8 +65,6 @@ describe('catchAndLog', () => {
     test('error', () => {
         const error = jest.spyOn(console, 'error').mockImplementation(() => {})
         utils.catchAndLog()
-        expect(error).toHaveBeenCalledWith(
-            'pwa-kit-runtime.catchAndLog ERROR Uncaught exception:  {"stack":"(no error)"}'
-        )
+        expect(error).toHaveBeenCalledWith('Uncaught exception: ', '(no error)')
     })
 })

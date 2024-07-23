@@ -1,4 +1,4 @@
-## v3.1.0-dev (Jun 25, 2024)
+## v2.5.0-dev (Apr 17, 2024)
 
 ### Bug Fixes
 
@@ -52,14 +52,15 @@
 - Add explicit headers to cart modal [#1811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1811)
 - Add autocomplete to text input fields [#1840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1840)
 - Add error icon to error messages [#1839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1839)
+
 ### Performance Improvements
 
 - Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656) [#1673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1673)
 
 ### Bug Fixes
 
-- Fix seo component not settings keywords meta tag [#1762](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1762)
-- Fix RecommendedProducts' toggling of the favourite icon [#1861](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1861)
+-   Fix seo component not settings keywords meta tag [#1762](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1762)
+-   [a11y] Replace p tag with heading tags in cart page [#1818](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1818)
 
 
 ## v2.4.1 (Apr 17, 2024)

@@ -5,12 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryResult} from '@tanstack/react-query'
-import {ShopperLogin} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
-import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
+import {getCustomKeys, mergeOptions, omitNullableParameters, pick} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
+import paramKeysMap from './paramKeys'
 
 type Client = ApiClients['shopperLogin']
 
@@ -33,12 +33,14 @@ export const useUserInfo = (
     type Data = DataType<Client['getUserInfo']>
     const {shopperLogin: client} = useCommerceApi()
     const methodName = 'getUserInfo'
-    const requiredParameters = ShopperLogin.paramKeys[`${methodName}Required`]
+    const requiredParameters = ['organizationId'] as const
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperLogin.paramKeys[methodName])
+    // get param keys for the api from netOptions
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -75,12 +77,14 @@ export const useWellknownOpenidConfiguration = (
     type Data = DataType<Client['getWellknownOpenidConfiguration']>
     const {shopperLogin: client} = useCommerceApi()
     const methodName = 'getWellknownOpenidConfiguration'
-    const requiredParameters = ShopperLogin.paramKeys[`${methodName}Required`]
+    const requiredParameters = ['organizationId'] as const
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperLogin.paramKeys[methodName])
+    // get param keys for the api from netOptions
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
@@ -117,12 +121,14 @@ export const useJwksUri = (
     type Data = DataType<Client['getJwksUri']>
     const {shopperLogin: client} = useCommerceApi()
     const methodName = 'getJwksUri'
-    const requiredParameters = ShopperLogin.paramKeys[`${methodName}Required`]
+    const requiredParameters = ['organizationId'] as const
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperLogin.paramKeys[methodName])
+    // get param keys for the api from netOptions
+    const paramKeys = [...paramKeysMap[methodName], ...getCustomKeys(netOptions.parameters)]
+    const parameters = pick(netOptions.parameters, paramKeys)
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)

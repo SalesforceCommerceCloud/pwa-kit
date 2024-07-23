@@ -66,8 +66,7 @@ const Cart = () => {
         {
             parameters: {
                 ids: productIds,
-                allImages: true,
-                perPricebook: true
+                allImages: true
             }
         },
         {

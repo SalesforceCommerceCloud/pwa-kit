@@ -32,8 +32,7 @@ const MockedComponent = () => {
 test('renders product item name, attributes and price', async () => {
     renderWithProviders(<MockedComponent />)
 
-    // look for the element that has sole product name
-    expect(await screen.getByText(/apple ipod nano$/i)).toBeInTheDocument()
+    expect(await screen.getByText(/apple ipod nano/i)).toBeInTheDocument()
     expect(await screen.getByText(/color: green/i)).toBeInTheDocument()
-    expect(await screen.getByText(/memory size: 16 GB$/i)).toBeInTheDocument()
+    expect(await screen.getByText(/memory size: 16 GB/i)).toBeInTheDocument()
 })
