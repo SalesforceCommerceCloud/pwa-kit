@@ -630,6 +630,9 @@
   "header.button.assistive_msg.my_cart_with_num_items": {
     "defaultMessage": "My cart, number of items: {numItems}"
   },
+  "header.button.assistive_msg.store_locator": {
+    "defaultMessage": "Store Locator"
+  },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "Wishlist"
   },
@@ -1282,6 +1285,63 @@
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+  },
+  "store_locator.action.find": {
+    "defaultMessage": "Find"
+  },
+  "store_locator.action.select_a_country": {
+    "defaultMessage": "Select a country"
+  },
+  "store_locator.action.use_my_location": {
+    "defaultMessage": "Use My Location"
+  },
+  "store_locator.action.viewMore": {
+    "defaultMessage": "View More"
+  },
+  "store_locator.description.away": {
+    "defaultMessage": "away"
+  },
+  "store_locator.description.loading_locations": {
+    "defaultMessage": "Loading locations..."
+  },
+  "store_locator.description.no_locations": {
+    "defaultMessage": "Sorry, there are no locations in this area"
+  },
+  "store_locator.description.or": {
+    "defaultMessage": "Or"
+  },
+  "store_locator.description.phone": {
+    "defaultMessage": "Phone:"
+  },
+  "store_locator.description.viewing_near_postal_code": {
+    "defaultMessage": "Viewing stores within {distance}{distanceUnit} of {postalCode} in"
+  },
+  "store_locator.description.viewing_near_your_location": {
+    "defaultMessage": "Viewing stores near your location"
+  },
+  "store_locator.dropdown.germany": {
+    "defaultMessage": "Germany"
+  },
+  "store_locator.dropdown.united_states": {
+    "defaultMessage": "United States"
+  },
+  "store_locator.error.agree_to_share_your_location": {
+    "defaultMessage": "Please agree to share your location"
+  },
+  "store_locator.error.please_enter_a_postal_code": {
+    "defaultMessage": "Please enter a postal code."
+  },
+  "store_locator.error.please_select_a_country": {
+    "defaultMessage": "Please select a country."
+  },
+  "store_locator.field.placeholder.enter_postal_code": {
+    "defaultMessage": "Enter postal code"
+  },
+  "store_locator.pagination.load_more": {
+    "defaultMessage": "Load More"
+  },
+  "store_locator.title": {
+    "defaultMessage": "Find a Store"
   },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
