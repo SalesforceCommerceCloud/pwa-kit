@@ -43,6 +43,7 @@ const pkg = require('../package.json')
 const basicAuth = require('express-basic-auth')
 const fetch = require('cross-fetch')
 const {isolationTests} = require('./isolation-actions')
+const {createProxyMiddleware, responseInterceptor} = require('http-proxy-middleware')
 
 /**
  * Custom error class
@@ -290,6 +291,48 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
             realm: process.env.EXTERNAL_DOMAIN_NAME || 'echo-test'
         })
     )
+
+    app.use(
+        '/us',
+        createProxyMiddleware({
+            target: 'https://scaffold-pwa-us.mobify-storefront.com',
+            changeOrigin: true,
+            pathRewrite: {
+                '^/us': ''
+            },
+            secure: false,
+            selfHandleResponse: true,
+            on: {
+                proxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
+                    const response = responseBuffer.toString('utf8') // convert buffer to string
+                    return response
+                })
+            }
+        })
+    )
+
+    app.use(
+        '/ca',
+        createProxyMiddleware({
+            target: 'https://scaffold-pwa-ca.mobify-storefront.com',
+            changeOrigin: true,
+            pathRewrite: {
+                '^/ca': ''
+            },
+            secure: false,
+            selfHandleResponse: true,
+            on: {
+                proxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
+                    const response = responseBuffer.toString('utf8') // convert buffer to string
+                    return response
+                })
+            }
+        })
+    )
+    app.get('/', (req, res) => {
+        res.send('Click -> <a href="/ca">/ca</a><br/>Click -> <a href="/us">/us</a>')
+    })
+
     app.all('/auth*', echo)
     // All other paths/routes invoke echo directly
     app.all('/*', echo)
