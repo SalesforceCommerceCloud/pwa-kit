@@ -59,7 +59,7 @@ export const redirectToAuthURL = (
     redirect_uri,
     clientId,
     siteId,
-    tenantId
+    organizationId
 ) => {
     const params = new URLSearchParams({
         redirect_uri: redirect_uri,
@@ -72,8 +72,7 @@ export const redirectToAuthURL = (
 
     console.log('redirect uri: ', redirect_uri)
 
-    const url = `${proxy}/shopper/auth/v1/organizations/${tenantId}/oauth2/authorize?${params.toString()}`
-    console.log('THIS IS THE URL: ', url)
+    const url = `${proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/authorize?${params.toString()}`
 
     window.location.assign(url)
 }

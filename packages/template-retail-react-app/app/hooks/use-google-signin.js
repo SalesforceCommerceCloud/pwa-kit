@@ -14,15 +14,13 @@ import {
 
 // For testing purposes, hardcoding values here
 const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
-const clientId = '3a15f34e-fecd-4fcc-8235-86b70978e629'
-const tenantId = 'bgvn_stg'
-const proxy = 'http://localhost:3000/mobify/proxy/api'
+const clientId = '526281af-15ee-4339-8a12-1e18b959c02d'
 
 /**
  * A hook that provides IDP auth functionality for the retail react app.
  */
 export default function useGoogleSignIn() {
-    const {siteId} = useConfig()
+    const {siteId, proxy, organizationId} = useConfig()
 
     /**
      * Starts the IDP login flow by redirecting the user to the IDP login page (Google, Facebook...)
@@ -47,7 +45,7 @@ export default function useGoogleSignIn() {
             `http://localhost:3000${SLAS_CALLBACK_ENDPOINT}`,
             clientId,
             siteId,
-            tenantId
+            organizationId
         )
     }
 
