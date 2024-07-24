@@ -14,13 +14,12 @@ import {
 
 // For testing purposes, hardcoding values here
 const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
-const clientId = '526281af-15ee-4339-8a12-1e18b959c02d'
 
 /**
  * A hook that provides IDP auth functionality for the retail react app.
  */
 export default function useGoogleSignIn() {
-    const {siteId, proxy, organizationId} = useConfig()
+    const {siteId, proxy, organizationId, clientId} = useConfig()
 
     /**
      * Starts the IDP login flow by redirecting the user to the IDP login page (Google, Facebook...)
