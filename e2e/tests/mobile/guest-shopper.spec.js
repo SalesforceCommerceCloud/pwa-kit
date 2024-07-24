@@ -7,12 +7,18 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { getCreditCardExpiry } = require("../../scripts/utils.js");
+const {
+  generateUserCredentials,
+  getCreditCardExpiry,
+} = require("../../scripts/utils.js");
+
+const GUEST_USER_CREDENTIALS = generateUserCredentials();
 
 test("Guest shopper can checkout items as guest", async ({ page }) => {
+  // Home page
   await page.goto(config.RETAIL_APP_HOME);
 
-  await page.getByLabel("Menu").click();
+  await page.getByLabel("Menu", { exact: true }).click();
 
   // SSR nav loads top level categories as direct links so we wait till all sub-categories load in the accordion
   const categoryAccordion = page.locator(
@@ -28,26 +34,47 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await clothingNav.click();
 
-  await page.getByRole("link", { name: "Tops" }).click();
+  const topsLink = page.getByLabel('Womens').getByRole("link", { name: "Tops" })
+  await topsLink.click();
+  // Wait for the nav menu to close first
+  await topsLink.waitFor({state: 'hidden'})
 
   await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
 
-  await page.getByRole("link", { name: /Stripe Shell/i }).click();
+  // PLP
+  const productTile = page.getByRole("link", {
+    name: /Cotton Turtleneck Sweater/i,
+  });
+  await productTile.scrollIntoViewIfNeeded()
+  // selecting swatch
+  const productTileImg = productTile.locator("img");
+  await productTileImg.waitFor({state: 'visible'})
+  const initialSrc = await productTileImg.getAttribute("src");
+  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
 
+  await productTile.getByLabel(/Black/, { exact: true }).click();
+  // Make sure the image src has changed
+  await expect(async () => {
+    const newSrc = await productTileImg.getAttribute("src")
+    expect(newSrc).not.toBe(initialSrc)
+  }).toPass()
+  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
+  await productTile.click();
+
+  // PDP
   await expect(
-    page.getByRole("heading", { name: /Stripe Shell/i })
+    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
-
   await page.getByRole("radio", { name: "L", exact: true }).click();
 
-  await page.getByRole("button", { name: "+" }).click();
+  await page.locator("button[data-testid='quantity-increment']").click();
 
   // Selected Size and Color texts are broken into multiple elements on the page.
   // So we need to look at the page URL to verify selected variants
   const updatedPageURL = await page.url();
   const params = updatedPageURL.split("?")[1];
   expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ5YPA7/i);
+  expect(params).toMatch(/color=JJ169XX/i);
 
   await page.getByRole("button", { name: /Add to Cart/i }).click();
 
@@ -57,14 +84,16 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 
   await page.getByLabel("Close").click();
 
+  // Cart
   await page.getByLabel(/My cart/i).click();
 
   await expect(
-    page.getByRole("link", { name: /Stripe Shell/i })
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Proceed to Checkout" }).click();
 
+  // Check out
   await expect(
     page.getByRole("heading", { name: /Contact Info/i })
   ).toBeVisible();
@@ -82,13 +111,19 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     page.getByRole("heading", { name: /Shipping Address/i })
   ).toBeVisible();
 
-  await page.locator("input#firstName").fill("John");
-  await page.locator("input#lastName").fill("Doe");
-  await page.locator("input#phone").fill("8572068547");
-  await page.locator("input#address1").fill("5 Wall St.");
-  await page.locator("input#city").fill("Burlington");
-  await page.locator("select#stateCode").selectOption("MA");
-  await page.locator("input#postalCode").fill("01803");
+  await page.locator("input#firstName").fill(GUEST_USER_CREDENTIALS.firstName);
+  await page.locator("input#lastName").fill(GUEST_USER_CREDENTIALS.lastName);
+  await page.locator("input#phone").fill(GUEST_USER_CREDENTIALS.phone);
+  await page
+    .locator("input#address1")
+    .fill(GUEST_USER_CREDENTIALS.address.street);
+  await page.locator("input#city").fill(GUEST_USER_CREDENTIALS.address.city);
+  await page
+    .locator("select#stateCode")
+    .selectOption(GUEST_USER_CREDENTIALS.address.state);
+  await page
+    .locator("input#postalCode")
+    .fill(GUEST_USER_CREDENTIALS.address.zipcode);
 
   await page
     .getByRole("button", { name: /Continue to Shipping Method/i })
@@ -102,13 +137,15 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /Shipping & Gift Options/i })
   ).toBeVisible();
+  await page.waitForTimeout(2000);
 
-  await page.getByRole("button", { name: /Continue to Payment/i }).click();
+  const continueToPayment = page.getByRole("button", {
+    name: /Continue to Payment/i,
+  });
 
-  // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
-  const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']");
-
-  await expect(step2Card.getByRole("button", { name: /Edit/i })).toBeVisible();
+  if (continueToPayment.isEnabled()) {
+    await continueToPayment.click();
+  }
 
   await expect(page.getByRole("heading", { name: /Payment/i })).toBeVisible();
 
@@ -130,6 +167,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     .first()
     .click();
 
+  // Order confirmation
   const orderConfirmationHeading = page.getByRole("heading", {
     name: /Thank you for your order!/i,
   });
@@ -140,6 +178,6 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText(/2 Items/i)).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Stripe Shell/i })
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
 });

@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import proxy from 'http-proxy-middleware'
+import {createProxyMiddleware} from 'http-proxy-middleware'
 import {rewriteProxyRequestHeaders, rewriteProxyResponseHeaders} from '../ssr-proxying'
 import {proxyConfigs} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging} from './utils'
+import logger from '../logger-instance'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
@@ -21,6 +22,86 @@ export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
  * @type {RegExp}
  */
 const generalProxyPathRE = /^\/mobify\/proxy\/([^/]+)(\/.*)$/
+
+/**
+ * Apply proxy headers to a request that is being proxied.
+ *
+ * This function is intended to be called from within a proxy's
+ * onProxyReq method.
+ *
+ * For more details on the headers being applied,
+ * see ssr-proxying.js rewriteProxyRequestHeaders method
+ * @private
+ * @function
+ * @param proxyRequest {http.ClientRequest} the request that will be
+ * sent to the target host
+ * @param incomingRequest {http.IncomingMessage} the request made to
+ * this Express app that prompted the proxying
+ * @param caching {Boolean} true for a caching proxy, false for a standard proxy
+ * @param logging {Boolean} true to log operations
+ * @param proxyPath {String} the path being proxied (e.g. /mobify/proxy/base/
+ * or /mobify/caching/base/)
+ * @param targetHost {String} the target hostname (host+port)
+ * @param targetProtocol {String} the protocol to use to make requests to
+ * the target ('http' or 'https')
+ */
+export const applyProxyRequestHeaders = ({
+    proxyRequest,
+    incomingRequest,
+    caching = false,
+    logging = !isRemote() && verboseProxyLogging,
+    proxyPath,
+    targetHost,
+    targetProtocol
+}) => {
+    const url = incomingRequest.url
+    const headers = incomingRequest.headers
+    /* istanbul ignore next */
+    if (logging) {
+        logger.info(
+            `Proxy: request for ${proxyPath}${url} => ${targetProtocol}://${targetHost}/${url}`,
+            {
+                namespace: 'configureProxy.applyProxyRequestHeaders',
+                additionalProperties: {
+                    proxyPath,
+                    targetProtocol,
+                    targetHost,
+                    url
+                }
+            }
+        )
+    }
+
+    const newHeaders = rewriteProxyRequestHeaders({
+        caching,
+        headers,
+        headerFormat: 'http',
+        logging,
+        proxyPath,
+        targetHost,
+        targetProtocol
+    })
+
+    // Copy any new and updated headers to the proxyRequest
+    // using setHeader.
+    Object.entries(newHeaders).forEach(
+        // setHeader always replaces any current value.
+        ([key, value]) => proxyRequest.setHeader(key, value)
+    )
+
+    // Handle deletion of headers.
+    // Iterate over the keys of incomingRequest.headers - for every
+    // key, if the value is not present in newHeaders, we remove
+    // that value from proxyRequest's headers.
+    Object.keys(headers).forEach((key) => {
+        // We delete the header on any falsy value, since
+        // there's no use case where we supply an empty header
+        // value.
+        if (!newHeaders[key]) {
+            proxyRequest.removeHeader(key)
+        }
+    })
+}
 
 /**
  * Configure proxying for a path.
@@ -80,7 +161,14 @@ export const configureProxy = ({
         onError: (err, req, res) => {
             /* istanbul ignore next */
             if (!isRemote() && verboseProxyLogging) {
-                console.log(`Proxy: error ${err} for request ${proxyPath}/${req.url}`)
+                logger.error(`Proxy: error ${err} for request ${proxyPath}/${req.url}`, {
+                    namespace: 'configureProxy.onError',
+                    additionalProperties: {
+                        proxyPath,
+                        url: req.url,
+                        error: err
+                    }
+                })
             }
 
             res.writeHead(500, {
@@ -105,49 +193,29 @@ export const configureProxy = ({
          * this Express app that prompted the proxying
          */
         onProxyReq: (proxyRequest, incomingRequest) => {
-            const url = incomingRequest.url
-            /* istanbul ignore next */
-            if (!isRemote() && verboseProxyLogging) {
-                console.log(`Proxy: request for ${proxyPath}${url} => ${targetOrigin}/${url}`)
-            }
-
-            // Rewrite key headers.
-            const newHeaders = rewriteProxyRequestHeaders({
+            applyProxyRequestHeaders({
+                proxyRequest,
+                incomingRequest,
                 caching,
-                headers: incomingRequest.headers,
-                headerFormat: 'http',
-                logging: !isRemote() && verboseProxyLogging,
                 proxyPath,
                 targetHost,
                 targetProtocol
-            })
-
-            // Copy any new and updated headers to the proxyRequest
-            // using setHeader.
-            Object.entries(newHeaders).forEach(
-                // setHeader always replaces any current value.
-                ([key, value]) => proxyRequest.setHeader(key, value)
-            )
-
-            // Handle deletion of headers.
-            // Iterate over the keys of incomingRequest.headers - for every
-            // key, if the value is not present in newHeaders, we remove
-            // that value from proxyRequest's headers.
-            Object.keys(incomingRequest.headers).forEach((key) => {
-                // We delete the header on any falsy value, since
-                // there's no use case where we supply an empty header
-                // value.
-                if (!newHeaders[key]) {
-                    proxyRequest.removeHeader(key)
-                }
             })
         },
 
         onProxyRes: (proxyResponse, req) => {
             /* istanbul ignore next */
             if (!isRemote() && verboseProxyLogging) {
-                console.log(
-                    `Proxy: ${proxyResponse.statusCode} response from ${proxyPath}${req.url}`
+                logger.info(
+                    `Proxy: ${proxyResponse.statusCode} response from ${proxyPath}${req.url}`,
+                    {
+                        namespace: 'configureProxy.onProxyRes',
+                        additionalProperties: {
+                            statusCode: proxyResponse.statusCode,
+                            proxyPath,
+                            url: req.url
+                        }
+                    }
                 )
             }
 
@@ -190,7 +258,7 @@ export const configureProxy = ({
         target: targetOrigin
     }
 
-    const proxyFunc = proxy(config)
+    const proxyFunc = createProxyMiddleware(config)
 
     // For a standard proxy, we're done
     if (!caching) {

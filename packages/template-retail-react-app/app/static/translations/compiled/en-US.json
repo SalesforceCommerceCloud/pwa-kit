@@ -539,6 +539,12 @@
       "value": ")"
     }
   ],
+  "category_links.button_text": [
+    {
+      "type": 0,
+      "value": "Categories"
+    }
+  ],
   "cc_radio_group.action.remove": [
     {
       "type": 0,
@@ -651,6 +657,24 @@
     {
       "type": 0,
       "value": "Shipping"
+    }
+  ],
+  "checkout_confirmation.label.shipping.strikethrough.price": [
+    {
+      "type": 0,
+      "value": "Originally "
+    },
+    {
+      "type": 1,
+      "value": "originalPrice"
+    },
+    {
+      "type": 0,
+      "value": ", now "
+    },
+    {
+      "type": 1,
+      "value": "newPrice"
     }
   ],
   "checkout_confirmation.label.subtotal": [
@@ -819,6 +843,12 @@
       "value": "Credit Card"
     }
   ],
+  "checkout_payment.label.billing_address_form": [
+    {
+      "type": 0,
+      "value": "Billing Address Form"
+    }
+  ],
   "checkout_payment.label.same_as_shipping": [
     {
       "type": 0,
@@ -861,6 +891,18 @@
       "value": "Yes"
     }
   ],
+  "confirmation_modal.default.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "No, cancel action"
+    }
+  ],
+  "confirmation_modal.default.assistive_msg.yes": [
+    {
+      "type": 0,
+      "value": "Yes, confirm action"
+    }
+  ],
   "confirmation_modal.default.message.you_want_to_continue": [
     {
       "type": 0,
@@ -879,10 +921,40 @@
       "value": "No, keep item"
     }
   ],
+  "confirmation_modal.remove_cart_item.action.remove": [
+    {
+      "type": 0,
+      "value": "Remove"
+    }
+  ],
   "confirmation_modal.remove_cart_item.action.yes": [
     {
       "type": 0,
       "value": "Yes, remove item"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "No, keep item"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": [
+    {
+      "type": 0,
+      "value": "Remove unavailable products"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": [
+    {
+      "type": 0,
+      "value": "Yes, remove item"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": [
+    {
+      "type": 0,
+      "value": "Some items are no longer available online and will be removed from your cart."
     }
   ],
   "confirmation_modal.remove_cart_item.message.sure_to_remove": [
@@ -895,6 +967,12 @@
     {
       "type": 0,
       "value": "Confirm Remove Item"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.title.items_unavailable": [
+    {
+      "type": 0,
+      "value": "Items Unavailable"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.no": [
@@ -979,6 +1057,56 @@
     {
       "type": 0,
       "value": "Security code info"
+    }
+  ],
+  "display_price.assistive_msg.current_price": [
+    {
+      "type": 0,
+      "value": "current price "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "From current price "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price": [
+    {
+      "type": 0,
+      "value": "original price "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price_with_range": [
+    {
+      "type": 0,
+      "value": "From original price "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.label.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "From "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1637,10 +1765,20 @@
       "value": "Sale"
     }
   ],
-  "item_price.label.starting_at": [
+  "item_image.label.unavailable": [
     {
       "type": 0,
-      "value": "Starting at"
+      "value": "Unavailable"
+    }
+  ],
+  "item_variant.assistive_msg.quantity": [
+    {
+      "type": 0,
+      "value": "Quantity "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
     }
   ],
   "lCPCxk": [
@@ -2465,14 +2603,16 @@
       "value": " from wishlist"
     }
   ],
-  "product_tile.label.starting_at_price": [
+  "product_tile.badge.label.new": [
     {
       "type": 0,
-      "value": "Starting at "
-    },
+      "value": "New"
+    }
+  ],
+  "product_tile.badge.label.sale": [
     {
-      "type": 1,
-      "value": "price"
+      "type": 0,
+      "value": "Sale"
     }
   ],
   "product_view.button.add_set_to_cart": [
@@ -2533,12 +2673,6 @@
     {
       "type": 0,
       "value": "+"
-    }
-  ],
-  "product_view.label.starting_at_price": [
-    {
-      "type": 0,
-      "value": "Starting at"
     }
   ],
   "product_view.label.variant_type": [
@@ -2771,6 +2905,12 @@
       "value": "Continue to Shipping Method"
     }
   ],
+  "shipping_address.label.shipping_address_form": [
+    {
+      "type": 0,
+      "value": "Shipping Address Form"
+    }
+  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -2877,6 +3017,30 @@
       "value": "Edit"
     }
   ],
+  "toggle_card.action.editContactInfo": [
+    {
+      "type": 0,
+      "value": "Edit Contact Info"
+    }
+  ],
+  "toggle_card.action.editPaymentInfo": [
+    {
+      "type": 0,
+      "value": "Edit Payment Info"
+    }
+  ],
+  "toggle_card.action.editShippingAddress": [
+    {
+      "type": 0,
+      "value": "Edit Shipping Address"
+    }
+  ],
+  "toggle_card.action.editShippingOptions": [
+    {
+      "type": 0,
+      "value": "Edit Shipping Options"
+    }
+  ],
   "update_password_fields.button.forgot_password": [
     {
       "type": 0,
@@ -2904,15 +3068,7 @@
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "Please enter your "
-    },
-    {
-      "type": 1,
-      "value": "postalOrZip"
-    },
-    {
-      "type": 0,
-      "value": "."
+      "value": "Please enter your zip code."
     }
   ],
   "use_address_fields.error.please_select_your_address": [
@@ -2936,15 +3092,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "Please select your "
-    },
-    {
-      "type": 1,
-      "value": "stateOrProvince"
-    },
-    {
-      "type": 0,
-      "value": "."
+      "value": "Please select your state."
     }
   ],
   "use_address_fields.error.required": [

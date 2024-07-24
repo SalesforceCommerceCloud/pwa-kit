@@ -90,6 +90,10 @@ export const ShopperBasketsMutations = {
      */
     UpdateItemInBasket: 'updateItemInBasket',
     /**
+     * Updates multiple items in a basket.
+     */
+    UpdateItemsInBasket: 'updateItemsInBasket',
+    /**
      * This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for a specific taxable line item. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
      */
     AddTaxesForBasketItem: 'addTaxesForBasketItem',

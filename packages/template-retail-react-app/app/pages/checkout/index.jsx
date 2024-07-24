@@ -29,12 +29,18 @@ import OrderSummary from '@salesforce/retail-react-app/app/components/order-summ
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-skeleton'
-import {useUsid, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import {
+    API_ERROR_MESSAGE,
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
+} from '@salesforce/retail-react-app/app/constants'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {usid} = useUsid()
     const {step} = useCheckout()
     const [error, setError] = useState()
     const {data: basket} = useCurrentBasket()
@@ -51,11 +57,6 @@ const Checkout = () => {
         setIsLoading(true)
         try {
             const order = await createOrder({
-                // We send the SLAS usid via this header. This is required by ECOM to map
-                // Einstein events sent via the API with the finishOrder event fired by ECOM
-                // when an Order transitions from Created to New status.
-                // Without this, various order conversion metrics will not appear on reports and dashboards
-                headers: {_sfdc_customer_id: usid},
                 body: {basketId: basket.basketId}
             })
             navigate(`/checkout/confirmation/${order.orderNo}`)
@@ -163,6 +164,42 @@ const Checkout = () => {
 const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
+    const {formatMessage} = useIntl()
+    const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
+    const toast = useToast()
+    const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
+
+    const handleRemoveItem = async (product) => {
+        await removeItemFromBasketMutation.mutateAsync(
+            {
+                parameters: {basketId: basket.basketId, itemId: product.itemId}
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        status: 'success'
+                    })
+                },
+                onError: () => {
+                    toast({
+                        title: formatMessage(API_ERROR_MESSAGE),
+                        status: 'error'
+                    })
+                }
+            }
+        )
+    }
+    const handleUnavailableProducts = async (unavailableProductIds) => {
+        setIsDeletingUnavailableItem(true)
+        const productItems = basket?.productItems?.filter((item) =>
+            unavailableProductIds?.includes(item.productId)
+        )
+        for (let item of productItems) {
+            await handleRemoveItem(item)
+        }
+        setIsDeletingUnavailableItem(false)
+    }
 
     if (!customer || !customer.customerId || !basket || !basket.basketId) {
         return <CheckoutSkeleton />
@@ -170,7 +207,13 @@ const CheckoutContainer = () => {
 
     return (
         <CheckoutProvider>
+            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+
             <Checkout />
+            <UnavailableProductConfirmationModal
+                productItems={basket?.productItems}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
         </CheckoutProvider>
     )
 }

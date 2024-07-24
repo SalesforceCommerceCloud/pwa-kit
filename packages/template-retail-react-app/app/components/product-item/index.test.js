@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
+import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
 import {mockedCustomerProductListsDetails} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {screen} from '@testing-library/react'
@@ -32,7 +32,8 @@ const MockedComponent = () => {
 test('renders product item name, attributes and price', async () => {
     renderWithProviders(<MockedComponent />)
 
-    expect(await screen.getByText(/apple ipod nano/i)).toBeInTheDocument()
+    // look for the element that has sole product name
+    expect(await screen.getByText(/apple ipod nano$/i)).toBeInTheDocument()
     expect(await screen.getByText(/color: green/i)).toBeInTheDocument()
-    expect(await screen.getByText(/memory size: 16 GB/i)).toBeInTheDocument()
+    expect(await screen.getByText(/memory size: 16 GB$/i)).toBeInTheDocument()
 })

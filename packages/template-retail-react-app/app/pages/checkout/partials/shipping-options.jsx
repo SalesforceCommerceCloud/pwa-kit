@@ -45,7 +45,7 @@ export default function ShippingOptions() {
             }
         },
         {
-            enabled: Boolean(basket?.basketId) && step === STEPS.ShippingOptions
+            enabled: Boolean(basket?.basketId) && step === STEPS.SHIPPING_OPTIONS
         }
     )
 
@@ -90,6 +90,28 @@ export default function ShippingOptions() {
         shippingItem?.priceAfterItemDiscount || 0
     )
 
+    const freeLabel = formatMessage({
+        defaultMessage: 'Free',
+        id: 'checkout_confirmation.label.free'
+    })
+
+    let shippingPriceLabel = selectedMethodDisplayPrice
+    if (selectedMethodDisplayPrice !== shippingItem.price) {
+        const currentPrice =
+            selectedMethodDisplayPrice === 0 ? freeLabel : selectedMethodDisplayPrice
+
+        shippingPriceLabel = formatMessage(
+            {
+                defaultMessage: 'Originally {originalPrice}, now {newPrice}',
+                id: 'checkout_confirmation.label.shipping.strikethrough.price'
+            },
+            {
+                originalPrice: shippingItem.price,
+                newPrice: currentPrice
+            }
+        )
+    }
+
     // Note that this card is disabled when there is no shipping address as well as no shipping method.
     // We do this because we apply the default shipping method to the basket before checkout - so when
     // landing on checkout the first time will put you at the first step (contact info), but the shipping
@@ -105,6 +127,10 @@ export default function ShippingOptions() {
             isLoading={form.formState.isSubmitting}
             disabled={selectedShippingMethod == null || !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
+            editLabel={formatMessage({
+                defaultMessage: 'Edit Shipping Options',
+                id: 'toggle_card.action.editShippingOptions'
+            })}
         >
             <ToggleCardEdit>
                 <form
@@ -192,10 +218,10 @@ export default function ShippingOptions() {
                 <ToggleCardSummary>
                     <Flex justify="space-between" w="full">
                         <Text>{selectedShippingMethod.name}</Text>
-                        <Flex alignItems="center">
-                            <Text fontWeight="bold">
+                        <Flex alignItems="center" aria-label={shippingPriceLabel}>
+                            <Text fontWeight="bold" aria-hidden="true">
                                 {selectedMethodDisplayPrice === 0 ? (
-                                    'Free'
+                                    freeLabel
                                 ) : (
                                     <FormattedNumber
                                         value={selectedMethodDisplayPrice}
@@ -210,6 +236,7 @@ export default function ShippingOptions() {
                                     textDecoration="line-through"
                                     color="gray.600"
                                     marginLeft={1}
+                                    aria-hidden="true"
                                 >
                                     <FormattedNumber
                                         style="currency"

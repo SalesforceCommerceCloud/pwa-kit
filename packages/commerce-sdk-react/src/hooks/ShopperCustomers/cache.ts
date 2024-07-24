@@ -93,11 +93,16 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
                 {
                     queryKey: getCustomerProductLists.queryKey(parameters),
                     updater: createUpdateFunction((result: CustomerProductListResult) => {
-                        // Add new list to front of the lists.
-                        result.data.unshift(response)
+                        // if a user has no product list, data will not present in the response.
+                        if (!result.data) {
+                            result.data = [response]
+                        } else {
+                            // Add new list to front of the lists.
+                            result.data.unshift(response)
+                        }
+
                         result.limit++
                         result.total++
-
                         return result
                     })
                 },
@@ -276,7 +281,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         }
     },
     resetPassword: noop,
-    updateCustomer(customerId, {parameters}) {
+    updateCustomer(customerId, {parameters}, response) {
         // When we update a customer, we don't know what data has changed, so we must invalidate all
         // derivative endpoints. They conveniently all start with the same path as `getCustomer`,
         // but we do NOT want to invalidate `getCustomer` itself, we want to _update_ it. (Ideally,
@@ -288,7 +293,20 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         const isNotGetCustomer = ({queryKey}: Query) => typeof queryKey[path.length] !== 'object'
         const predicate = and(pathStartsWith(path), isNotGetCustomer)
         return {
-            update: [{queryKey: getCustomer.queryKey(parameters)}],
+            update: [
+                {
+                    queryKey: getCustomer.queryKey(parameters),
+                    updater: createUpdateFunction((customer: Customer) => {
+                        // The `updateCustomer` endpoint does not return exhaustive customer data. It
+                        // is missing data for `addresses` and `paymentInstruments`, to name a few. Here
+                        // we ensure that any customer data we have is preserved.
+                        return {
+                            ...customer,
+                            ...response
+                        }
+                    })
+                }
+            ],
             invalidate: [{predicate}]
         }
     },

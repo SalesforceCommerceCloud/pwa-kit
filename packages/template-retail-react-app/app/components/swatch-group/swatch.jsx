@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Button,
@@ -14,6 +14,7 @@ import {
     useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Link as RouteLink} from 'react-router-dom'
+import {useBreakpointValue} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 /**
  * The Swatch Component displays item inside `SwatchGroup`. For proper keyboard accessibility,
@@ -27,46 +28,45 @@ const Swatch = ({
     name,
     selected,
     isFocusable,
+    value,
+    handleSelect,
     variant = 'square'
 }) => {
     const styles = useMultiStyleConfig('SwatchGroup', {variant, disabled, selected})
-    /** Mimic the behavior of native radio inputs by using arrow keys to select prev/next value. */
-    const onKeyDown = (evt) => {
-        let sibling
-        // This is not a very react-y way implementation... ¯\_(ツ)_/¯
-        switch (evt.key) {
-            case 'ArrowUp':
-            case 'ArrowLeft':
-                evt.preventDefault()
-                sibling =
-                    evt.target.previousElementSibling || evt.target.parentElement.lastElementChild
-                break
-            case 'ArrowDown':
-            case 'ArrowRight':
-                evt.preventDefault()
-                sibling =
-                    evt.target.nextElementSibling || evt.target.parentElement.firstElementChild
-                break
-            default:
-                break
+    const isDesktop = useBreakpointValue({base: false, lg: true})
+    const [selectHandlers, setSelectHandlers] = useState({})
+
+    const onSelect = useCallback(
+        (e) => {
+            e.preventDefault()
+            handleSelect(value)
+        },
+        [handleSelect]
+    )
+
+    useEffect(() => {
+        if (!handleSelect) {
+            return
         }
-        sibling?.click()
-        sibling?.focus()
-    }
+
+        setSelectHandlers({
+            [isDesktop ? 'onMouseEnter' : 'onClick']: onSelect
+        })
+    }, [onSelect, isDesktop])
 
     return (
         <Button
             {...styles.swatch}
-            as={RouteLink}
+            as={href ? RouteLink : 'button'}
             to={href}
             aria-label={name}
             aria-checked={selected}
             variant="outline"
             role="radio"
-            onKeyDown={onKeyDown}
             // To mimic the behavior of native radio inputs, only one input should be focusable.
             // (The rest are selectable via arrow keys.)
             tabIndex={isFocusable ? 0 : -1}
+            {...(href ? {} : selectHandlers)}
         >
             <Center {...styles.swatchButton}>
                 {children}
@@ -115,7 +115,12 @@ Swatch.propTypes = {
     /**
      * Whether the swatch can receive tab focus
      */
-    isFocusable: PropTypes.bool
+    isFocusable: PropTypes.bool,
+    /**
+     * This function is called whenever the mouse enters the swatch on desktop or when clicked on mobile.
+     * The values is passed as the first argument.
+     */
+    handleSelect: PropTypes.func
 }
 
 export default Swatch

@@ -65,7 +65,25 @@ beforeEach(() => {
     global.server.use(
         // mock product details
         rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.json({data: [{id: '701642811398M'}]}))
+            return res(
+                ctx.json({
+                    data: [
+                        {
+                            id: '701643070725M',
+                            currency: 'GBP',
+                            name: 'Long Sleeve Crew Neck',
+                            pricePerUnit: 19.18,
+                            price: 19.18,
+                            inventory: {
+                                stockLevel: 10,
+                                orderable: true,
+                                backorder: false,
+                                preorderable: false
+                            }
+                        }
+                    ]
+                })
+            )
         }),
         // mock the available shipping methods
         rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
@@ -162,11 +180,13 @@ beforeEach(() => {
 
         // mock place order
         rest.post('*/orders', (req, res, ctx) => {
-            currentBasket = {
+            const response = {
+                ...currentBasket,
                 ...scapiOrderResponse,
-                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'}
+                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
+                status: 'created'
             }
-            return res(ctx.json(currentBasket))
+            return res(ctx.json(response))
         }),
 
         rest.get('*/baskets', (req, res, ctx) => {
@@ -272,11 +292,13 @@ test('Can proceed through checkout steps as guest', async () => {
 
         // mock place order
         rest.post('*/orders', (req, res, ctx) => {
-            currentBasket = {
+            const response = {
+                ...currentBasket,
                 ...scapiOrderResponse,
-                customerInfo: {...scapiOrderResponse.customerInfo, email: 'test@test.com'}
+                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
+                status: 'created'
             }
-            return res(ctx.json(currentBasket))
+            return res(ctx.json(response))
         }),
 
         rest.get('*/baskets', (req, res, ctx) => {
@@ -299,7 +321,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Verify cart products display
     await user.click(screen.getByText(/2 items in cart/i))
-    expect(await screen.findByText(/Long Sleeve Crew Neck/i)).toBeInTheDocument()
+    expect(await screen.findByText(/Long Sleeve Crew Neck$/i)).toBeInTheDocument()
 
     // Verify password field is reset if customer toggles login form
     const loginToggleButton = screen.getByText(/Already have an account\? Log in/i)
@@ -318,12 +340,15 @@ test('Can proceed through checkout steps as guest', async () => {
     await user.click(submitBtn)
 
     // Wait for next step to render
-    await waitFor(() =>
+    await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
-    )
+    })
 
     // Email should be displayed in previous step summary
     expect(screen.getByText('test@test.com')).toBeInTheDocument()
+
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
 
     // Fill out shipping address form and submit
     await user.type(screen.getByLabelText(/first name/i), 'Tester')
@@ -518,6 +543,8 @@ test('Can edit address during checkout as a registered customer', async () => {
         expect(screen.getByTestId('sf-shipping-address-edit-form')).not.toBeEmptyDOMElement()
     )
 
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
     expect(screen.getByLabelText(/first name/i)).toBeInTheDocument()
 
     // Edit and save the address
@@ -558,6 +585,9 @@ test('Can add address during checkout as a registered customer', async () => {
     })
     // Add address
     await user.click(screen.getByText(/add new address/i))
+
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
 
     const firstName = await screen.findByLabelText(/first name/i)
     await user.type(firstName, 'Test2')

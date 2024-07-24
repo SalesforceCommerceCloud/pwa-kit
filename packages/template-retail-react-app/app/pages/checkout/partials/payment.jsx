@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
     Box,
     Button,
@@ -109,9 +109,9 @@ const Payment = () => {
         // Using destructuring to remove properties from the object...
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
-        return updateBillingAddressForBasket({
+        return await updateBillingAddressForBasket({
             body: address,
-            parameters: {basketId: basket.basketId, shipmentId: 'me'}
+            parameters: {basketId: basket.basketId}
         })
     }
     const onPaymentRemoval = async () => {
@@ -141,6 +141,11 @@ const Payment = () => {
         }
     })
 
+    const billingAddressAriaLabel = defineMessage({
+        defaultMessage: 'Billing Address Form',
+        id: 'checkout_payment.label.billing_address_form'
+    })
+
     return (
         <ToggleCard
             id="step-3"
@@ -152,6 +157,10 @@ const Payment = () => {
             }
             disabled={appliedPayment == null}
             onEdit={() => goToStep(STEPS.PAYMENT)}
+            editLabel={formatMessage({
+                defaultMessage: 'Edit Payment Info',
+                id: 'toggle_card.action.editPaymentInfo'
+            })}
         >
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>
@@ -220,6 +229,7 @@ const Payment = () => {
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}
+                            formTitleAriaLabel={billingAddressAriaLabel}
                             hideSubmitButton
                         />
                     )}

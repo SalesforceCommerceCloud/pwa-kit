@@ -1,4 +1,38 @@
-## v1.3.0-dev (Dec 08, 2023)
+## v2.1.0-dev (Jun 25, 2024)
+- Add `meta.displayName` to queries. It can be used to identify queries in performance metrics or logs. [#1895](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1895)
+
+## v2.0.2 (Jul 12, 2024)
+- Updated StorefrontPreview component to make siteId available [#1874](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1874)
+
+## v2.0.1 (Jul 08, 2024)
+- Fix private slas proxy config for commerce api in provider [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
+- Fix `useCustomQuery` error handling [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
+- Fix `updateCustomer` squashing existing data [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
+- Fix `transferBasket` updating the wrong customer basket [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
+
+## v2.0.0 (Jun 25, 2024)
+- Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
+- Add Shopper Stores hooks [#1788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1788)
+- Add a helper method to add an item to either new or existing basket [#1677](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1677)
+- Add `updateItemsInBasket` mutation [#1852](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1852)
+- Upgrade to commerce-sdk-isomorphic v2.1.0 [#1852](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1852)
+
+## v1.4.2 (Apr 17, 2024)
+- Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
+
+## v1.4.1 (Apr 16, 2024)
+- Add missing params keys `allVariationProperties` and `perPricebook`  for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
+
+## v1.4.0 (Apr 15, 2024)
+
+- Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
+- Fix invalid query params warnings and allow custom query [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
+- Fix cannot read properties of undefined (reading 'unshift') [#1689](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1689)
+- Add Shopper SEO hook [#1688](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1688)
+- Update useLocalStorage implementation to be more responsive [#1703](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1703)
+- Storefront Preview: avoid stale cached Commerce API responses, whenever the Shopper Context is set [#1701](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1701)
+
+## v1.3.0 (Jan 19, 2024)
 
 - Add support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
 

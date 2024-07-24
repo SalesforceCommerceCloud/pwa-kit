@@ -256,6 +256,7 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     },
     transferBasket(customerId, {parameters}, response) {
         const {basketId} = response
+        const transferedTo = response?.customerInfo?.customerId
 
         return {
             // TODO: Convert invalidate to an update that removes the matching basket
@@ -266,8 +267,14 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ],
             update: [
                 {queryKey: getBasket.queryKey({...parameters, basketId})},
-                ...(customerId && basketId
-                    ? [updateCustomerBasketsQuery(customerId, {...parameters, basketId}, response)]
+                ...(transferedTo && basketId
+                    ? [
+                          updateCustomerBasketsQuery(
+                              transferedTo,
+                              {...parameters, basketId},
+                              response
+                          )
+                      ]
                     : [])
             ]
         }
@@ -313,6 +320,16 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
         }
     },
     updateItemInBasket(customerId, {parameters}, response) {
+        return {
+            update: [
+                {queryKey: getBasket.queryKey(parameters)},
+                ...(customerId
+                    ? [updateCustomerBasketsQuery(customerId, parameters, response)]
+                    : [])
+            ]
+        }
+    },
+    updateItemsInBasket(customerId, {parameters}, response) {
         return {
             update: [
                 {queryKey: getBasket.queryKey(parameters)},

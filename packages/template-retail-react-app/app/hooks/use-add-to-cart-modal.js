@@ -13,6 +13,7 @@ import {
     Box,
     Button,
     Flex,
+    Heading,
     Text,
     Modal,
     ModalHeader,
@@ -30,7 +31,7 @@ import RecommendedProducts from '@salesforce/retail-react-app/app/components/rec
 import {LockIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {
-    getDisplayPrice,
+    getPriceData,
     getDisplayVariationValues
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
@@ -83,15 +84,17 @@ export const AddToCartModal = () => {
                 bgColor="gray.50"
                 containerProps={{'data-testid': 'add-to-cart-modal'}}
             >
-                <ModalHeader paddingY="8" bgColor="white" fontSize="2xl" fontWeight="700">
-                    {intl.formatMessage(
-                        {
-                            defaultMessage:
-                                '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                            id: 'add_to_cart_modal.info.added_to_cart'
-                        },
-                        {quantity: numerOfItemsAdded}
-                    )}
+                <ModalHeader paddingY="8" bgColor="white">
+                    <Heading as="h1" fontSize="2xl">
+                        {intl.formatMessage(
+                            {
+                                defaultMessage:
+                                    '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                                id: 'add_to_cart_modal.info.added_to_cart'
+                            },
+                            {quantity: numerOfItemsAdded}
+                        )}
+                    </Heading>
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>
@@ -114,10 +117,7 @@ export const AddToCartModal = () => {
                                     viewType: 'small',
                                     selectedVariationAttributes: variant.variationValues
                                 })?.images?.[0]
-                                const {
-                                    basePrice: lineItemBasePrice,
-                                    discountPrice: lineItemDiscountPrice
-                                } = getDisplayPrice(product)
+                                const priceData = getPriceData(product, {quantity})
                                 const variationAttributeValues = getDisplayVariationValues(
                                     product.variationAttributes,
                                     variant.variationValues
@@ -142,7 +142,14 @@ export const AddToCartModal = () => {
                                             </Box>
 
                                             <Box>
-                                                <Text fontWeight="700">{product.name}</Text>
+                                                <Heading
+                                                    as="h2"
+                                                    fontSize="md"
+                                                    fontFamily="body"
+                                                    fontWeight="700"
+                                                >
+                                                    {product.name}
+                                                </Heading>
                                                 <Box
                                                     color="gray.600"
                                                     fontSize="sm"
@@ -170,13 +177,8 @@ export const AddToCartModal = () => {
 
                                         <Box flex="none" alignSelf="flex-end" fontWeight="600">
                                             <DisplayPrice
-                                                discountPriceProps={{as: 'p'}}
-                                                basePrice={lineItemBasePrice * quantity}
-                                                discountPrice={
-                                                    typeof lineItemDiscountPrice === 'number'
-                                                        ? lineItemDiscountPrice * quantity
-                                                        : null
-                                                }
+                                                priceData={priceData}
+                                                quantity={quantity}
                                                 currency={currency}
                                             />
                                         </Box>

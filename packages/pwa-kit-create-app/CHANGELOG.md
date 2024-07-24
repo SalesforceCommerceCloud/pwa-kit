@@ -1,5 +1,16 @@
-## v3.4.0-dev (Dec 08, 2023)
-<!-- RELEASE TASK: Is node 20 available on MRT? Delete the line saying it isn't! -->
+## v3.7.0-dev (Jun 25, 2024)
+
+- Update default Node.js version to v20. [#1867](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1867/files)
+
+## v3.6.0 (Jun 25, 2024)
+
+- Fix: 'Cannot use import statement outside a module' error in generated extensible project unit tests [#1821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1821)
+
+## v3.5.1 (Apr 15, 2024)
+
+- Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
+
+## v3.4.0 (Jan 19, 2024)
 
 - Add local development support for node 20 [#1612](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1612)
   - Support for node 20 is not yet available on Managed Runtime

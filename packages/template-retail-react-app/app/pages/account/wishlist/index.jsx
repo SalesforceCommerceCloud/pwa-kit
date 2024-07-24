@@ -16,12 +16,13 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 
 import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
 import {HeartIcon} from '@salesforce/retail-react-app/app/components/icons'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
+import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
 import WishlistPrimaryAction from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-secondary-button-group'
 
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 
 const numberOfSkeletonItems = 3
 
@@ -43,7 +44,13 @@ const AccountWishlist = () => {
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
 
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
-        {parameters: {ids: productIds?.join(','), allImages: true}},
+        {
+            parameters: {
+                ids: productIds?.join(','),
+                allImages: true,
+                perPricebook: true
+            }
+        },
         {enabled: productIds?.length > 0}
     )
 
@@ -60,6 +67,7 @@ const AccountWishlist = () => {
     const deleteCustomerProductListItem = useShopperCustomersMutation(
         'deleteCustomerProductListItem'
     )
+
     const {data: customer} = useCurrentCustomer()
 
     const handleSecondaryAction = async (itemId, promise) => {
@@ -73,6 +81,23 @@ const AccountWishlist = () => {
             setWishlistItemLoading(false)
             setSelectedItem(undefined)
         }
+    }
+
+    const handleUnavailableProducts = async (unavailableProductIds) => {
+        if (!unavailableProductIds.length) return
+        await Promise.all(
+            unavailableProductIds.map(async (id) => {
+                const item = wishListItems?.find((item) => {
+                    return item.productId.toString() === id.toString()
+                })
+                const parameters = {
+                    customerId: customer.customerId,
+                    itemId: item?.id,
+                    listId: wishListData?.id
+                }
+                await deleteCustomerProductListItem.mutateAsync({parameters})
+            })
+        )
     }
 
     const handleItemQuantityChanged = async (quantity, item) => {
@@ -197,6 +222,11 @@ const AccountWishlist = () => {
                         }
                     />
                 ))}
+
+            <UnavailableProductConfirmationModal
+                productItems={wishListData?.customerProductListItems}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
         </Stack>
     )
 }

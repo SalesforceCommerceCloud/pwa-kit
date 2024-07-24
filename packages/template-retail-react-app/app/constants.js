@@ -6,11 +6,13 @@
  */
 
 import {defineMessage} from 'react-intl'
+import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Global app defaults
 export const DEFAULT_LOCALE = 'en-US'
 export const DEFAULT_SITE_TITLE = 'Retail React App'
 export const MAX_CACHE_AGE = 60 * 15 // 15 min
+export const STALE_WHILE_REVALIDATE = 60 * 15 // 15 min
 
 // Constants used for product searching.
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
@@ -24,6 +26,14 @@ export const RECENT_SEARCH_LIMIT = 5
 export const RECENT_SEARCH_KEY = 'recent-search-key'
 export const RECENT_SEARCH_MIN_LENGTH = 3
 
+// Constants for product list page
+export const PRODUCT_LIST_IMAGE_VIEW_TYPE = 'large'
+export const PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID = 'color'
+
+// Constants for product tile page
+export const PRODUCT_TILE_IMAGE_VIEW_TYPE = 'large'
+export const PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID = 'color'
+
 // Constants for the Homepage's Shop Products section.
 export const HOME_SHOP_PRODUCTS_CATEGORY_ID = 'newarrivals'
 export const HOME_SHOP_PRODUCTS_LIMIT = 10
@@ -31,6 +41,26 @@ export const HOME_SHOP_PRODUCTS_LIMIT = 10
 // Constants for menu
 export const CAT_MENU_DEFAULT_NAV_SSR_DEPTH = 1
 export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
+
+// Default details of badge labels and the corresponding product custom properties that enable badges.
+export const PRODUCT_BADGE_DETAILS = [
+    {
+        propertyName: 'c_isNew',
+        label: defineMessage({
+            id: 'product_tile.badge.label.new',
+            defaultMessage: 'New'
+        }),
+        color: 'green'
+    },
+    {
+        propertyName: 'c_isSale',
+        label: defineMessage({
+            id: 'product_tile.badge.label.sale',
+            defaultMessage: 'Sale'
+        }),
+        color: 'yellow'
+    }
+]
 
 export const cssColorGroups = {
     beige: '#d3bca9',
@@ -120,3 +150,24 @@ export const SHIPPING_COUNTRY_CODES = [
 
 // Constant to Enable Active Data
 export const ACTIVE_DATA_ENABLED = false
+
+export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
+    dialogTitle: defineMessage({
+        defaultMessage: 'Items Unavailable',
+        id: 'confirmation_modal.remove_cart_item.title.items_unavailable'
+    }),
+    confirmationMessage: defineMessage({
+        defaultMessage:
+            'Some items are no longer available online and will be removed from your cart.',
+        id: 'confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability'
+    }),
+    primaryActionLabel: defineMessage({
+        defaultMessage: 'Remove',
+        id: 'confirmation_modal.remove_cart_item.action.remove'
+    }),
+    primaryActionAriaLabel: defineMessage({
+        defaultMessage: 'Remove unavailable products',
+        id: 'confirmation_modal.remove_cart_item.assistive_msg.remove'
+    }),
+    onPrimaryAction: noop
+}

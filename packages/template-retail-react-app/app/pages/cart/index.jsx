@@ -26,7 +26,7 @@ import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item/index'
+import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 
@@ -56,23 +56,23 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
-
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products} = useProducts(
+    const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             parameters: {
                 ids: productIds,
-                allImages: true
+                allImages: true,
+                perPricebook: true
             }
         },
         {
             enabled: Boolean(productIds),
             select: (result) => {
-                // Convert array into key/value object with key is the product id
                 return result?.data?.reduce((result, item) => {
                     const key = item.id
                     result[key] = item
@@ -81,9 +81,9 @@ const Cart = () => {
             }
         }
     )
+
     const {data: customer} = useCurrentCustomer()
     const {customerId, isRegistered} = customer
-
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
@@ -298,6 +298,18 @@ const Cart = () => {
             setSelectedItem(undefined)
         }
     }
+
+    const handleUnavailableProducts = async (unavailableProductIds) => {
+        const productItems = basket?.productItems?.filter((item) =>
+            unavailableProductIds?.includes(item.productId)
+        )
+
+        await Promise.all(
+            productItems.map(async (item) => {
+                await handleRemoveItem(item)
+            })
+        )
+    }
     /***************************** Update Cart **************************/
 
     /***************************** Update quantity **************************/
@@ -448,6 +460,9 @@ const Cart = () => {
                                                     ...productItem,
                                                     ...(products &&
                                                         products[productItem.productId]),
+                                                    isProductUnavailable: !isProductsLoading
+                                                        ? !products?.[productItem.productId]
+                                                        : undefined,
                                                     price: productItem.price,
                                                     quantity: localQuantity[productItem.itemId]
                                                         ? localQuantity[productItem.itemId]
@@ -536,7 +551,6 @@ const Cart = () => {
             >
                 <CartCta />
             </Box>
-
             <ConfirmationModal
                 {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
                 onPrimaryAction={() => {
@@ -544,6 +558,11 @@ const Cart = () => {
                 }}
                 onAlternateAction={() => {}}
                 {...modalProps}
+            />
+
+            <UnavailableProductConfirmationModal
+                productItems={basket?.productItems}
+                handleUnavailableProducts={handleUnavailableProducts}
             />
         </Box>
     )

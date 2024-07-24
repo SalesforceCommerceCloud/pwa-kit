@@ -29,6 +29,12 @@
       "value": "Ajouter une adresse"
     }
   ],
+  "account_addresses.info.address_removed": [
+    {
+      "type": 0,
+      "value": "Adresse supprimée"
+    }
+  ],
   "account_addresses.info.address_updated": [
     {
       "type": 0,
@@ -143,6 +149,24 @@
       "value": "Retour à l’historique des commandes"
     }
   ],
+  "account_order_detail.shipping_status.not_shipped": [
+    {
+      "type": 0,
+      "value": "Non expédiée"
+    }
+  ],
+  "account_order_detail.shipping_status.part_shipped": [
+    {
+      "type": 0,
+      "value": "Partiellement expédiée"
+    }
+  ],
+  "account_order_detail.shipping_status.shipped": [
+    {
+      "type": 0,
+      "value": "Expédiée"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,
@@ -200,7 +224,7 @@
   "account_order_history.label.shipped_to": [
     {
       "type": 0,
-      "value": "Expédié à : "
+      "value": "Expédiée à : "
     },
     {
       "type": 1,
@@ -217,36 +241,6 @@
     {
       "type": 0,
       "value": "Historique des commandes"
-    }
-  ],
-  "account_payment_methods.button.add_method": [
-    {
-      "type": 0,
-      "value": "Ajouter un mode de paiement"
-    }
-  ],
-  "account_payment_methods.description.add_method_for_faster_checkout": [
-    {
-      "type": 0,
-      "value": "Ajoutez un mode de paiement pour accélérer le checkout."
-    }
-  ],
-  "account_payment_methods.heading.no_saved_methods": [
-    {
-      "type": 0,
-      "value": "Aucun mode de paiement enregistré"
-    }
-  ],
-  "account_payment_methods.info.new_method_saved": [
-    {
-      "type": 0,
-      "value": "Nouveau mode de paiement enregistré"
-    }
-  ],
-  "account_payment_methods.title.payment_methods": [
-    {
-      "type": 0,
-      "value": "Modes de paiement"
     }
   ],
   "account_wishlist.button.continue_shopping": [
@@ -361,6 +355,12 @@
       "value": "Vous aimerez peut-être aussi"
     }
   ],
+  "auth_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Fermer le formulaire de connexion"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -419,10 +419,16 @@
       "value": "Réinitialisation du mot de passe"
     }
   ],
-  "card_payment_form.heading.new_payment_method": [
+  "carousel.button.scroll_left.assistive_msg": [
     {
       "type": 0,
-      "value": "Ajouter un nouveau mode de paiement"
+      "value": "Faire défiler le carrousel vers la gauche"
+    }
+  ],
+  "carousel.button.scroll_right.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Faire défiler le carrousel vers la droite"
     }
   ],
   "cart.info.removed_from_cart": [
@@ -471,12 +477,6 @@
     {
       "type": 0,
       "value": "C’est un cadeau."
-    }
-  ],
-  "cart_secondary_button_group.link_learn_more": [
-    {
-      "type": 0,
-      "value": "En savoir plus"
     }
   ],
   "cart_skeleton.heading.order_summary": [
@@ -779,6 +779,16 @@
       "value": "Salesforce ou ses affiliés. Tous droits réservés. Ceci est une boutique de démonstration uniquement. Les commandes NE SERONT PAS traitées."
     }
   ],
+  "checkout_header.link.assistive_msg.cart": [
+    {
+      "type": 0,
+      "value": "Retour au panier, nombre d’articles : "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
+    }
+  ],
   "checkout_header.link.cart": [
     {
       "type": 0,
@@ -821,6 +831,24 @@
       "value": "Paiement"
     }
   ],
+  "colorRefinements.label.hitCount": [
+    {
+      "type": 1,
+      "value": "colorLabel"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "colorHitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "confirmation_modal.default.action.no": [
     {
       "type": 0,
@@ -851,10 +879,22 @@
       "value": "Non, garder l’article"
     }
   ],
+  "confirmation_modal.remove_cart_item.action.remove": [
+    {
+      "type": 0,
+      "value": "Supprimer"
+    }
+  ],
   "confirmation_modal.remove_cart_item.action.yes": [
     {
       "type": 0,
       "value": "Oui, supprimer l’article"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": [
+    {
+      "type": 0,
+      "value": "Certains articles ne sont plus disponibles en ligne et seront supprimés de votre panier."
     }
   ],
   "confirmation_modal.remove_cart_item.message.sure_to_remove": [
@@ -867,6 +907,12 @@
     {
       "type": 0,
       "value": "Confirmer la suppression de l’article"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.title.items_unavailable": [
+    {
+      "type": 0,
+      "value": "Articles non disponibles"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.no": [
@@ -947,6 +993,12 @@
       "value": "Ce code à 4 chiffres se trouve sur le devant de votre carte."
     }
   ],
+  "credit_card_fields.tool_tip.security_code_aria_label": [
+    {
+      "type": 0,
+      "value": "Cryptogramme"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -977,12 +1029,6 @@
       "value": "Historique des commandes"
     }
   ],
-  "drawer_menu.button.payment_methods": [
-    {
-      "type": 0,
-      "value": "Modes de paiement"
-    }
-  ],
   "drawer_menu.link.about_us": [
     {
       "type": 0,
@@ -998,7 +1044,7 @@
   "drawer_menu.link.customer_support.contact_us": [
     {
       "type": 0,
-      "value": "Nous contacter"
+      "value": "Contactez-nous"
     }
   ],
   "drawer_menu.link.customer_support.shipping_and_returns": [
@@ -1096,7 +1142,7 @@
     },
     {
       "type": 0,
-      "value": ". Essayez de rechercher un produit ou cliquez sur "
+      "value": ". Essayez de rechercher un produit ou "
     },
     {
       "type": 1,
@@ -1138,7 +1184,7 @@
   "empty_search_results.link.contact_us": [
     {
       "type": 0,
-      "value": "Nous contacter"
+      "value": "Contactez-nous"
     }
   ],
   "empty_search_results.recommended_products.title.most_viewed": [
@@ -1151,6 +1197,18 @@
     {
       "type": 0,
       "value": "Meilleures ventes"
+    }
+  ],
+  "field.password.assistive_msg.hide_password": [
+    {
+      "type": 0,
+      "value": "Réinitialiser le mot de passe"
+    }
+  ],
+  "field.password.assistive_msg.show_password": [
+    {
+      "type": 0,
+      "value": "Afficher le mot de passe"
     }
   ],
   "footer.column.account": [
@@ -1180,13 +1238,13 @@
   "footer.link.contact_us": [
     {
       "type": 0,
-      "value": "Nous contacter"
+      "value": "Contactez-nous"
     }
   ],
   "footer.link.order_status": [
     {
       "type": 0,
-      "value": "État de la commande"
+      "value": "État des commandes"
     }
   ],
   "footer.link.privacy_policy": [
@@ -1234,13 +1292,13 @@
   "footer.subscribe.button.sign_up": [
     {
       "type": 0,
-      "value": "S'inscrire"
+      "value": "Inscrivez-vous"
     }
   ],
   "footer.subscribe.description.sign_up": [
     {
       "type": 0,
-      "value": "Abonnez-vous pour rester informé des meilleures offres"
+      "value": "Abonnez-vous pour rester au courant des meilleures offres"
     }
   ],
   "footer.subscribe.heading.first_to_know": [
@@ -1277,12 +1335,6 @@
     {
       "type": 0,
       "value": "Historique des commandes"
-    }
-  ],
-  "global.account.link.payment_methods": [
-    {
-      "type": 0,
-      "value": "Modes de paiement"
     }
   ],
   "global.account.link.wishlist": [
@@ -1335,6 +1387,12 @@
       "value": " à la liste de souhaits"
     }
   ],
+  "global.info.already_in_wishlist": [
+    {
+      "type": 0,
+      "value": "L’article figure déjà dans la liste de souhaits"
+    }
+  ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
@@ -1365,10 +1423,20 @@
       "value": "Mon compte"
     }
   ],
-  "header.button.assistive_msg.my_cart": [
+  "header.button.assistive_msg.my_account_menu": [
     {
       "type": 0,
-      "value": "Mon panier"
+      "value": "Ouvrir le menu du compte"
+    }
+  ],
+  "header.button.assistive_msg.my_cart_with_num_items": [
+    {
+      "type": 0,
+      "value": "Mon panier, nombre d’articles : "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
     }
   ],
   "header.button.assistive_msg.wishlist": [
@@ -1430,7 +1498,7 @@
   "home.features.description.cart_checkout": [
     {
       "type": 0,
-      "value": "Meilleures pratiques de commerce électronique pour le panier et l’expérience de checkout de l’acheteur."
+      "value": "Meilleures pratiques de commerce électronique pour l’expérience de panier et de checkout de l’acheteur."
     }
   ],
   "home.features.description.components": [
@@ -1508,7 +1576,7 @@
   "home.heading.here_to_help": [
     {
       "type": 0,
-      "value": "Nous sommes là pour vous"
+      "value": "Nous sommes là pour vous aider"
     }
   ],
   "home.heading.shop_products": [
@@ -1538,7 +1606,7 @@
   "home.link.contact_us": [
     {
       "type": 0,
-      "value": "Nous contacter"
+      "value": "Contactez-nous"
     }
   ],
   "home.link.get_started": [
@@ -1557,6 +1625,12 @@
     {
       "type": 0,
       "value": "React PWA Starter Store pour le retail"
+    }
+  ],
+  "icons.assistive_msg.lock": [
+    {
+      "type": 0,
+      "value": "Sécurisé"
     }
   ],
   "item_attributes.label.promotions": [
@@ -1581,10 +1655,28 @@
       "value": "Vente"
     }
   ],
+  "item_image.label.unavailable": [
+    {
+      "type": 0,
+      "value": "Non disponible"
+    }
+  ],
+  "item_price.label.starting_at": [
+    {
+      "type": 0,
+      "value": "À partir de"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,
       "value": "Sélectionnez toutes vos options ci-dessus"
+    }
+  ],
+  "list_menu.nav.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Navigation principale"
     }
   ],
   "locale_text.message.ar-SA": [
@@ -2097,10 +2189,22 @@
       "value": "Suivant"
     }
   ],
+  "pagination.link.next.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Page suivante"
+    }
+  ],
   "pagination.link.prev": [
     {
       "type": 0,
       "value": "Préc."
+    }
+  ],
+  "pagination.link.prev.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Page précédente"
     }
   ],
   "password_card.info.password_updated": [
@@ -2151,28 +2255,10 @@
       "value": "1 lettre majuscule"
     }
   ],
-  "payment_selection.button.save_and_continue": [
-    {
-      "type": 0,
-      "value": "Enregistrer et continuer"
-    }
-  ],
-  "payment_selection.heading.add_new_card": [
-    {
-      "type": 0,
-      "value": "Ajouter une nouvelle carte"
-    }
-  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "Carte de crédit"
-    }
-  ],
-  "payment_selection.message.select_payment_method": [
-    {
-      "type": 0,
-      "value": "Veuillez indiquer un mode de paiement."
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2184,7 +2270,7 @@
   "price_per_item.label.each": [
     {
       "type": 0,
-      "value": " pièce"
+      "value": "pièce"
     }
   ],
   "product_detail.accordion.button.product_detail": [
@@ -2220,7 +2306,7 @@
   "product_detail.recommended_products.title.complete_set": [
     {
       "type": 0,
-      "value": "Compléter l'ensemble"
+      "value": "Complétez l'ensemble"
     }
   ],
   "product_detail.recommended_products.title.might_also_like": [
@@ -2289,6 +2375,70 @@
       "value": "Filtrer"
     }
   ],
+  "product_list.refinements.button.assistive_msg.add_filter": [
+    {
+      "type": 0,
+      "value": "Ajouter un filtre : "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Ajouter un filtre : "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter": [
+    {
+      "type": 0,
+      "value": "Supprimer le filtre : "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Supprimer le filtre : "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "product_list.select.sort_by": [
     {
       "type": 0,
@@ -2299,10 +2449,66 @@
       "value": "sortOption"
     }
   ],
-  "product_tile.assistive_msg.wishlist": [
+  "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
-      "value": "Liste de souhaits"
+      "value": "Faire défiler les produits vers la gauche"
+    }
+  ],
+  "product_scroller.assistive_msg.scroll_right": [
+    {
+      "type": 0,
+      "value": "Faire défiler les produits vers la droite"
+    }
+  ],
+  "product_tile.assistive_msg.add_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Ajouter le/la "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " à la liste de souhaits"
+    }
+  ],
+  "product_tile.assistive_msg.remove_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Supprimer "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " de la liste de souhaits"
+    }
+  ],
+  "product_tile.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "À partir de "
+    },
+    {
+      "type": 1,
+      "value": "price"
+    }
+  ],
+  "product_view.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Ajouter le lot au panier"
+    }
+  ],
+  "product_view.button.add_set_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Ajouter le lot à la liste de souhaits"
     }
   ],
   "product_view.button.add_to_cart": [
@@ -2323,10 +2529,46 @@
       "value": "Mettre à jour"
     }
   ],
+  "product_view.label.assistive_msg.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "Décrémenter la quantité"
+    }
+  ],
+  "product_view.label.assistive_msg.quantity_increment": [
+    {
+      "type": 0,
+      "value": "Incrémenter la quantité"
+    }
+  ],
   "product_view.label.quantity": [
     {
       "type": 0,
       "value": "Quantité"
+    }
+  ],
+  "product_view.label.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "−"
+    }
+  ],
+  "product_view.label.quantity_increment": [
+    {
+      "type": 0,
+      "value": "+"
+    }
+  ],
+  "product_view.label.starting_at_price": [
+    {
+      "type": 0,
+      "value": "À partir de"
+    }
+  ],
+  "product_view.label.variant_type": [
+    {
+      "type": 1,
+      "value": "variantType"
     }
   ],
   "product_view.link.full_details": [
@@ -2375,6 +2617,12 @@
     {
       "type": 0,
       "value": "Appliquer"
+    }
+  ],
+  "promo_popover.assistive_msg.info": [
+    {
+      "type": 0,
+      "value": "Infos"
     }
   ],
   "promo_popover.heading.promo_applied": [
@@ -2533,6 +2781,12 @@
       "value": "Annuler"
     }
   ],
+  "selected_refinements.action.assistive_msg.clear_all": [
+    {
+      "type": 0,
+      "value": "Effacer tous les filtres"
+    }
+  ],
   "selected_refinements.action.clear_all": [
     {
       "type": 0,
@@ -2635,6 +2889,16 @@
       "value": "Voulez-vous vraiment vous déconnecter ? Vous devrez vous reconnecter pour poursuivre votre commande en cours."
     }
   ],
+  "swatch_group.selected.label": [
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " :"
+    }
+  ],
   "toggle_card.action.edit": [
     {
       "type": 0,
@@ -2668,15 +2932,7 @@
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "Veuillez indiquer votre "
-    },
-    {
-      "type": 1,
-      "value": "postalOrZip"
-    },
-    {
-      "type": 0,
-      "value": "."
+      "value": "Veuillez indiquer votre code postal."
     }
   ],
   "use_address_fields.error.please_select_your_address": [
@@ -2700,15 +2956,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "Veuillez sélectionner votre "
-    },
-    {
-      "type": 1,
-      "value": "stateOrProvince"
-    },
-    {
-      "type": 0,
-      "value": "."
+      "value": "Veuillez sélectionner votre État/province."
     }
   ],
   "use_address_fields.error.required": [
@@ -2727,6 +2975,12 @@
     {
       "type": 0,
       "value": "Adresse"
+    }
+  ],
+  "use_address_fields.label.address_form": [
+    {
+      "type": 0,
+      "value": "Formulaire d'adresse"
     }
   ],
   "use_address_fields.label.city": [
@@ -2780,7 +3034,7 @@
   "use_address_fields.label.state": [
     {
       "type": 0,
-      "value": "Province, département, etc."
+      "value": "État"
     }
   ],
   "use_address_fields.label.zipCode": [
@@ -3145,16 +3399,28 @@
       "value": "Nouveau mot de passe"
     }
   ],
+  "wishlist_primary_action.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Ajouter le lot au panier"
+    }
+  ],
   "wishlist_primary_action.button.add_to_cart": [
     {
       "type": 0,
       "value": "Ajouter au panier"
     }
   ],
-  "wishlist_primary_action.button.select_options": [
+  "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
-      "value": "Sélectionner des options"
+      "value": "Afficher tous les détails"
+    }
+  ],
+  "wishlist_primary_action.button.view_options": [
+    {
+      "type": 0,
+      "value": "Afficher les options"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [

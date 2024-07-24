@@ -9,7 +9,8 @@ import {
     mockQueryEndpoint,
     renderHookWithProviders,
     waitAndExpectError,
-    waitAndExpectSuccess
+    waitAndExpectSuccess,
+    createQueryClient
 } from '../../test-utils'
 import * as queries from './query'
 
@@ -28,8 +29,8 @@ const OPTIONS = {parameters: {campaignId: 'campaignId', ids: 'a,b'}}
 type TestMap = {[K in keyof Queries]: NonNullable<ReturnType<Queries[K]>['data']>}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
-    usePromotions: {count: 0, data: [], total: 0},
-    usePromotionsForCampaign: {count: 0, data: [], total: 0}
+    usePromotions: {limit: 0, data: [], total: 0},
+    usePromotionsForCampaign: {limit: 0, data: [], total: 0}
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>
@@ -45,6 +46,19 @@ describe('Shopper Promotions query hooks', () => {
         })
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(data)
+    })
+
+    test.each(testCases)('`%s` has meta.displayName defined', async (queryName, data) => {
+        mockQueryEndpoint(promotionsEndpoint, data)
+        const queryClient = createQueryClient()
+        const {result} = renderHookWithProviders(
+            () => {
+                return queries[queryName](OPTIONS)
+            },
+            {queryClient}
+        )
+        await waitAndExpectSuccess(() => result.current)
+        expect(queryClient.getQueryCache().getAll()[0].meta?.displayName).toBe(queryName)
     })
 
     test.each(testCases)('`%s` returns error on error', async (queryName) => {

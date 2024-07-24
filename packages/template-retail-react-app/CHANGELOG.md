@@ -1,5 +1,97 @@
-## v2.3.0-dev (Nov 8, 2023)
-<!-- RELEASE TASK: Is node 20 available on MRT? Delete the line saying it isn't! -->
+## v3.1.0-dev (Jun 25, 2024)
+
+### Bug Fixes
+
+- Update serialized query data via `beforeHydrate` to prevent data re-fetching on load [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)
+- A11y: Add aria-label to the address form based on the address type [#1904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1904)
+- A11y: Account Nav fixes [#1884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1884)
+- A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
+- Out of stock and low stock items are removed from cart and checkout as unavailable products [#1865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1865)
+- Fix infinity sign price on product tile [#1903](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1903)
+
+### Accessibility Improvements
+
+- Improve accessibility readout for strikethrough price on shipping options in checkout page [#1892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1892)
+- Ensure credit card informational tooltip on checkout page persists after the user is no longer hovering over it [#1890](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1890)
+
+## v3.0.2 (Jul 11, 2024)
+
+### Bug Fixes
+
+- Fix StorefrontPreview component add siteId query parameter to shopper context calls [#1891](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1891)
+
+### Accessibility improvements
+
+- Ensure that the email field on the checkout page receives focus after content updates [#1894](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1894)
+
+## v3.0.1 (Jul 9, 2024)
+
+### Bug Fixes
+
+- Fix basket transfer during checkout login [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
+
+## v3.0.0 (Jun 25, 2024)
+
+### Improvements
+
+- Product Tile Revamp
+  - Display different pricing for various products on Product tiles and PDP [#1760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1760)
+  - Display pricing for cart, checkout and wishlist page [#1796](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1796)
+  - Shows promotional callout message on Product List and Product Detail pages [#1786](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1786) [#1804](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1804)
+  - Display selectable swatch groups for attributes like color [#1773](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1773)
+  - Show badges [#1791](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1791)
+
+- Lazy basket creation [#1677](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1677)
+- Use `stale-while-revalidate` cache control directive [#1744](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1744)
+
+### Accessibility Improvements
+
+- Added live region support to components [#1825](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1825)
+- Replace p tag with heading tags in cart page [#1818](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1818)
+- Fix product tile img alt text [#1769](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1769)
+- Add aria-hidden to search icon [#1809](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1809)
+- Add explicit headers to cart modal [#1811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1811)
+- Add autocomplete to text input fields [#1840](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1840)
+- Add error icon to error messages [#1839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1839)
+
+### Performance Improvements
+
+- Make navigation components lazy load their categories [#1656](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1656) [#1673](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1673)
+
+### Bug Fixes
+
+- Fix seo component not settings keywords meta tag [#1762](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1762)
+- Fix RecommendedProducts' toggling of the favourite icon [#1861](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1861)
+
+
+## v2.4.1 (Apr 17, 2024)
+- Update dependency commerce-sdk-react to 1.4.1 to have access to all params keys for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
+
+## v2.4.0 (Apr 15, 2024)
+
+### New Feature
+
+- Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
+
+### Bug Fixes
+
+- Fix promo codes not being properly applied in cart [#1692](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1692)
+- Fix checkout shipping method fetching [#1693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1693)
+- Fix invalid query params warnings [#1655](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1655)
+- Fix internal server error on account pages [#1675](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1675)
+- Fix `product-item` component imports to ensure that it is overridable. [#1672](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1672)
+- Fix locale selector navigating back to default locale [#1670](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1670)
+- Fix handling of offline products on Cart, Checkout, Order History, and Wishlist pages [#1691](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1691)
+- Fix tracking of `viewSearch` event for Einstein analytics, in the case of no-search-results [#1702](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1702)
+- Remove invalid header `_sfdc_customer_id` due to recent MRT HTTP3 upgrade [#1731](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1731)
+
+## v2.3.1 (Jan 23, 2024)
+
+### Bug Fixes
+
+- Fix `extract-default-translations` script [#1647](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1647)
+
+## v2.3.0 (Jan 19, 2024)
 
 ### Accessibility improvements
 

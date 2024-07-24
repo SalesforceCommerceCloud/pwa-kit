@@ -50,7 +50,7 @@ module.exports = {
         '**/*.json'
     ],
     ssrParameters: {
-        ssrFunctionNodeVersion: '18.x',
+        ssrFunctionNodeVersion: '20.x',
         proxyConfigs: [
             {
                 host: 'kv7kzm78.api.commercecloud.salesforce.com',

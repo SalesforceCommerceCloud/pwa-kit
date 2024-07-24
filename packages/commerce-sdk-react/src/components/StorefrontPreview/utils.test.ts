@@ -5,8 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import type {DOMWindow, JSDOM} from 'jsdom'
+import {useCommerceApi} from '../../hooks'
+import {renderHookWithProviders} from '../../test-utils'
 import {getParentOrigin} from '../../utils'
-import {getClientScript, detectStorefrontPreview} from './utils'
+import {getClientScript, detectStorefrontPreview, proxyRequests} from './utils'
 
 const LOCALHOST_ORIGIN = 'http://localhost:4000'
 const RUNTIME_ADMIN_ORIGIN = 'https://runtime.commercecloud.com'
@@ -22,6 +24,8 @@ const mockTop = new Proxy({} as DOMWindow, {
         throw new Error(`window.top['${String(prop)}'] is not mocked.`)
     }
 })
+
+jest.mock('../../auth/index.ts')
 
 describe('Storefront Preview utils', () => {
     let originalLocation: string
@@ -90,6 +94,24 @@ describe('Storefront Preview utils', () => {
         test('returns false for non-trusted ancestor origin', () => {
             setAncestorOrigins(OTHER_ORIGIN)
             expect(detectStorefrontPreview()).toBe(false)
+        })
+    })
+
+    describe('proxyRequests', () => {
+        test('proxy handlers applied to all client methods', async () => {
+            const {result} = renderHookWithProviders(() => useCommerceApi())
+            const clients = result.current
+            const shopperBaskets = clients.shopperBaskets
+            const handlers = {apply: jest.fn()}
+
+            proxyRequests(clients, handlers)
+
+            await shopperBaskets.getBasket()
+            await shopperBaskets.getTaxesFromBasket()
+            await shopperBaskets.getPriceBooksForBasket()
+            await shopperBaskets.getShippingMethodsForShipment()
+
+            expect(handlers.apply).toHaveBeenCalledTimes(4)
         })
     })
 })

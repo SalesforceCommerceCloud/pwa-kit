@@ -40,9 +40,10 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 
 // Constants
 import {
-    MAX_CACHE_AGE,
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
-    HOME_SHOP_PRODUCTS_LIMIT
+    HOME_SHOP_PRODUCTS_LIMIT,
+    MAX_CACHE_AGE,
+    STALE_WHILE_REVALIDATE
 } from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
@@ -60,13 +61,20 @@ const Home = () => {
 
     const {res} = useServerContext()
     if (res) {
-        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
+        res.set(
+            'Cache-Control',
+            `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
+        )
     }
 
     const {data: productSearchResult, isLoading} = useProductSearch({
         parameters: {
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT
+            allImages: true,
+            allVariationProperties: true,
+            expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
+            limit: HOME_SHOP_PRODUCTS_LIMIT,
+            perPricebook: true,
+            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master']
         }
     })
 
@@ -248,7 +256,12 @@ const Home = () => {
                                         >
                                             {feature.icon}
                                         </Flex>
-                                        <Text color={'black'} fontWeight={700} fontSize={20}>
+                                        <Text
+                                            as="h3"
+                                            color={'black'}
+                                            fontWeight={700}
+                                            fontSize={20}
+                                        >
                                             {intl.formatMessage(featureMessage.title)}
                                         </Text>
                                         <Text color={'black'}>

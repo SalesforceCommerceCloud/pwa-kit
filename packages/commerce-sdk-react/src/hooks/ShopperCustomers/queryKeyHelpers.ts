@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ShopperCustomers} from 'commerce-sdk-isomorphic'
+import {ShopperCustomers} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
-import {pick} from '../utils'
+import {pickValidParams} from '../utils'
 
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperCustomers<{shortCode: string}>
@@ -126,34 +126,20 @@ export type QueryKeys = {
 // This is defined here, rather than `types.ts`, because it relies on `Client` and `QueryKeys`,
 // and making those generic would add too much complexity.
 type QueryKeyHelper<T extends keyof QueryKeys> = {
-    /**
-     * Reduces the given parameters (which may have additional, unknown properties) to an object
-     * containing *only* the properties required for an endpoint.
-     */
-    parameters: (params: Params<T>) => Params<T>
     /** Generates the path component of the query key for an endpoint. */
     path: (params: Params<T>) => ExcludeTail<QueryKeys[T]>
     /** Generates the full query key for an endpoint. */
     queryKey: (params: Params<T>) => QueryKeys[T]
 }
 
-export const getExternalProfile: QueryKeyHelper<'getExternalProfile'> = {
-    parameters: (params) =>
-        pick(params, ['organizationId', 'externalId', 'authenticationProviderId', 'siteId']),
-    path: (params) => [
-        '/commerce-sdk-react',
-        '/organizations/',
-        params.organizationId,
-        '/customers/external-profile'
-    ],
-    queryKey: (params: Params<'getExternalProfile'>) => [
-        ...getExternalProfile.path(params),
-        getExternalProfile.parameters(params)
-    ]
-}
+// TODO: Re-implement (and update description from RAML spec) when the endpoint exits closed beta.
+// export const getExternalProfile: QueryKeyHelper<'getExternalProfile'> = {
+//     queryKey: (params: Params<'getExternalProfile'>) => {
+//         return [...getExternalProfile.path(params), pickValidParams(params, ShopperCustomers.paramKeys.getExternalProfile)]
+//     }
+// }
 
 export const getCustomer: QueryKeyHelper<'getCustomer'> = {
-    parameters: (params) => pick(params, ['organizationId', 'customerId', 'siteId']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -161,14 +147,15 @@ export const getCustomer: QueryKeyHelper<'getCustomer'> = {
         '/customers/',
         params.customerId
     ],
-    queryKey: (params: Params<'getCustomer'>) => [
-        ...getCustomer.path(params),
-        getCustomer.parameters(params)
-    ]
+    queryKey: (params: Params<'getCustomer'>) => {
+        return [
+            ...getCustomer.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomer)
+        ]
+    }
 }
 
 export const getCustomerAddress: QueryKeyHelper<'getCustomerAddress'> = {
-    parameters: (params) => pick(params, ['organizationId', 'customerId', 'addressName', 'siteId']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -178,14 +165,14 @@ export const getCustomerAddress: QueryKeyHelper<'getCustomerAddress'> = {
         '/addresses/',
         params.addressName
     ],
-    queryKey: (params: Params<'getCustomerAddress'>) => [
-        ...getCustomerAddress.path(params),
-        getCustomerAddress.parameters(params)
-    ]
+    queryKey: (params: Params<'getCustomerAddress'>) => {
+        return [
+            ...getCustomerAddress.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerAddress)
+        ]
+    }
 }
-
 export const getCustomerBaskets: QueryKeyHelper<'getCustomerBaskets'> = {
-    parameters: (params) => pick(params, ['organizationId', 'customerId', 'siteId']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -194,25 +181,15 @@ export const getCustomerBaskets: QueryKeyHelper<'getCustomerBaskets'> = {
         params.customerId,
         '/baskets'
     ],
-    queryKey: (params: Params<'getCustomerBaskets'>) => [
-        ...getCustomerBaskets.path(params),
-        getCustomerBaskets.parameters(params)
-    ]
+    queryKey: (params: Params<'getCustomerBaskets'>) => {
+        return [
+            ...getCustomerBaskets.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerBaskets)
+        ]
+    }
 }
 
 export const getCustomerOrders: QueryKeyHelper<'getCustomerOrders'> = {
-    parameters: (params) =>
-        pick(params, [
-            'organizationId',
-            'customerId',
-            'crossSites',
-            'from',
-            'until',
-            'status',
-            'siteId',
-            'offset',
-            'limit'
-        ]),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -221,15 +198,15 @@ export const getCustomerOrders: QueryKeyHelper<'getCustomerOrders'> = {
         params.customerId,
         '/orders'
     ],
-    queryKey: (params: Params<'getCustomerOrders'>) => [
-        ...getCustomerOrders.path(params),
-        getCustomerOrders.parameters(params)
-    ]
+    queryKey: (params: Params<'getCustomerOrders'>) => {
+        return [
+            ...getCustomerOrders.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerOrders)
+        ]
+    }
 }
 
 export const getCustomerPaymentInstrument: QueryKeyHelper<'getCustomerPaymentInstrument'> = {
-    parameters: (params) =>
-        pick(params, ['organizationId', 'customerId', 'paymentInstrumentId', 'siteId']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -239,14 +216,15 @@ export const getCustomerPaymentInstrument: QueryKeyHelper<'getCustomerPaymentIns
         '/payment-instruments/',
         params.paymentInstrumentId
     ],
-    queryKey: (params: Params<'getCustomerPaymentInstrument'>) => [
-        ...getCustomerPaymentInstrument.path(params),
-        getCustomerPaymentInstrument.parameters(params)
-    ]
+    queryKey: (params: Params<'getCustomerPaymentInstrument'>) => {
+        return [
+            ...getCustomerPaymentInstrument.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerPaymentInstrument)
+        ]
+    }
 }
 
 export const getCustomerProductLists: QueryKeyHelper<'getCustomerProductLists'> = {
-    parameters: (params) => pick(params, ['organizationId', 'customerId', 'siteId']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -255,14 +233,15 @@ export const getCustomerProductLists: QueryKeyHelper<'getCustomerProductLists'> 
         params.customerId,
         '/product-lists'
     ],
-    queryKey: (params: Params<'getCustomerProductLists'>) => [
-        ...getCustomerProductLists.path(params),
-        getCustomerProductLists.parameters(params)
-    ]
+    queryKey: (params: Params<'getCustomerProductLists'>) => {
+        return [
+            ...getCustomerProductLists.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerProductLists)
+        ]
+    }
 }
 
 export const getCustomerProductList: QueryKeyHelper<'getCustomerProductList'> = {
-    parameters: (params) => pick(params, ['organizationId', 'customerId', 'listId', 'siteId']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -272,15 +251,15 @@ export const getCustomerProductList: QueryKeyHelper<'getCustomerProductList'> = 
         '/product-lists/',
         params.listId
     ],
-    queryKey: (params: Params<'getCustomerProductList'>) => [
-        ...getCustomerProductList.path(params),
-        getCustomerProductList.parameters(params)
-    ]
+    queryKey: (params: Params<'getCustomerProductList'>) => {
+        return [
+            ...getCustomerProductList.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerProductList)
+        ]
+    }
 }
 
 export const getCustomerProductListItem: QueryKeyHelper<'getCustomerProductListItem'> = {
-    parameters: (params) =>
-        pick(params, ['organizationId', 'customerId', 'listId', 'itemId', 'siteId']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -292,30 +271,34 @@ export const getCustomerProductListItem: QueryKeyHelper<'getCustomerProductListI
         '/items/',
         params.itemId
     ],
-    queryKey: (params: Params<'getCustomerProductListItem'>) => [
-        ...getCustomerProductListItem.path(params),
-        getCustomerProductListItem.parameters(params)
-    ]
+    queryKey: (params: Params<'getCustomerProductListItem'>) => {
+        return [
+            ...getCustomerProductListItem.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getCustomerProductListItem)
+        ]
+    }
 }
 
 export const getPublicProductListsBySearchTerm: QueryKeyHelper<'getPublicProductListsBySearchTerm'> =
     {
-        parameters: (params) =>
-            pick(params, ['organizationId', 'email', 'firstName', 'lastName', 'siteId']),
         path: (params) => [
             '/commerce-sdk-react',
             '/organizations/',
             params.organizationId,
             '/product-lists'
         ],
-        queryKey: (params: Params<'getPublicProductListsBySearchTerm'>) => [
-            ...getPublicProductListsBySearchTerm.path(params),
-            getPublicProductListsBySearchTerm.parameters(params)
-        ]
+        queryKey: (params: Params<'getPublicProductListsBySearchTerm'>) => {
+            return [
+                ...getPublicProductListsBySearchTerm.path(params),
+                pickValidParams(
+                    params,
+                    ShopperCustomers.paramKeys.getPublicProductListsBySearchTerm
+                )
+            ]
+        }
     }
 
 export const getPublicProductList: QueryKeyHelper<'getPublicProductList'> = {
-    parameters: (params) => pick(params, ['organizationId', 'listId', 'siteId']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -323,14 +306,15 @@ export const getPublicProductList: QueryKeyHelper<'getPublicProductList'> = {
         '/product-lists/',
         params.listId
     ],
-    queryKey: (params: Params<'getPublicProductList'>) => [
-        ...getPublicProductList.path(params),
-        getPublicProductList.parameters(params)
-    ]
+    queryKey: (params: Params<'getPublicProductList'>) => {
+        return [
+            ...getPublicProductList.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getPublicProductList)
+        ]
+    }
 }
 
 export const getProductListItem: QueryKeyHelper<'getProductListItem'> = {
-    parameters: (params) => pick(params, ['organizationId', 'listId', 'itemId', 'siteId']),
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
@@ -340,8 +324,10 @@ export const getProductListItem: QueryKeyHelper<'getProductListItem'> = {
         '/items/',
         params.itemId
     ],
-    queryKey: (params: Params<'getProductListItem'>) => [
-        ...getProductListItem.path(params),
-        getProductListItem.parameters(params)
-    ]
+    queryKey: (params: Params<'getProductListItem'>) => {
+        return [
+            ...getProductListItem.path(params),
+            pickValidParams(params, ShopperCustomers.paramKeys.getProductListItem)
+        ]
+    }
 }
