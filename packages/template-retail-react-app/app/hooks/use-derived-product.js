@@ -41,9 +41,13 @@ export const useDerivedProduct = (
     // variation attributes selected, but don't have a variant. We do this because the API
     // will sometimes return all the variants even if they are out of stock, but for other
     // products it won't.
+    // TODO: simplify logic
     const isOutOfStock =
         !stockLevel ||
-        (!isProductABundle && ((!variant) && Object.keys(variationParams).length === variationAttributes.length))
+        (!isProductABundle &&
+            !variant &&
+            Object.keys(variationParams).length === variationAttributes.length) ||
+        (!isProductABundle && !variant?.orderable)
     const unfulfillable = stockLevel < quantity
     const inventoryMessages = {
         [OUT_OF_STOCK]: intl.formatMessage({
