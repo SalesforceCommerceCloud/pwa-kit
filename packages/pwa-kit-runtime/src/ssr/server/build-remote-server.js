@@ -663,7 +663,7 @@ export const RemoteServerFactory = {
             let setupServer
 
             try {
-                setupServer = _r(setupServerFilePath)
+                setupServer = _require(setupServerFilePath)
             } catch (e) {
                 if (e.message && e.message.startsWith('Cannot find module')) {
                     // skip extensions that don't have a setup-server.js file
