@@ -104,6 +104,7 @@
     "source-map-loader": "^4.0.1",
     "speed-measure-webpack-plugin": "^1.5.0",
     "svg-sprite-loader": "^6.0.11",
+    "tsx": "^4.16.2",
     "validator": "^13.9.0",
     "webpack": "^5.76.3",
     "webpack-bundle-analyzer": "^4.8.0",

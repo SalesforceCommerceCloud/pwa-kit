@@ -138,6 +138,7 @@ export const DevServerMixin = {
         // TODO: typescript support for extensions
         // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
+        app.__extensions = extensions || []
 
         extensions.forEach((extension) => {
             const customizerPath = path.join(
