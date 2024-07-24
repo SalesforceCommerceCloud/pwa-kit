@@ -653,6 +653,9 @@ export const RemoteServerFactory = {
                 'setup-server.js'
             )
 
+            // Only eval when there are extensions
+            // this makes it slightly faster for projects that
+            // have no extensions
             if (!_require) {
                 _require = eval('require')
             }
