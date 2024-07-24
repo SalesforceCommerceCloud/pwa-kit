@@ -21,6 +21,7 @@ export const useDerivedProduct = (
     isProductPartOfBundle = false
 ) => {
     const showLoading = !product
+    const isProductABundle = product?.type?.bundle
     const stockLevel = product?.inventory?.stockLevel || 0
     const stepQuantity = product?.stepQuantity || 1
     const minOrderQuantity = stockLevel > 0 ? product?.minOrderQuantity || 1 : 0
@@ -42,7 +43,7 @@ export const useDerivedProduct = (
     // products it won't.
     const isOutOfStock =
         !stockLevel ||
-        (!variant && Object.keys(variationParams).length === variationAttributes.length)
+        (!isProductABundle && ((!variant) && Object.keys(variationParams).length === variationAttributes.length))
     const unfulfillable = stockLevel < quantity
     const inventoryMessages = {
         [OUT_OF_STOCK]: intl.formatMessage({
@@ -59,7 +60,7 @@ export const useDerivedProduct = (
     }
 
     // showInventoryMessage controls if add to cart button is disabled
-    const showInventoryMessage = variant && (isOutOfStock || unfulfillable)
+    const showInventoryMessage = (variant || isProductABundle) && (isOutOfStock || unfulfillable)
     const inventoryMessage =
         (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
         (unfulfillable && inventoryMessages[UNFULFILLABLE])
