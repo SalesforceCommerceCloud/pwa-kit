@@ -28,11 +28,7 @@ import {
 
 import {randomUUID} from 'crypto'
 import chalk from 'chalk'
-import esm from 'esm'
-
-// This allows us to dynamically import a module in both CommonJS and ESM format
-// Note: the package babel-node we are using for `npm start` doesn't work for dynamic imports
-const esmImport = esm(module)
+import tsx from 'tsx/cjs/api'
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -135,20 +131,37 @@ export const DevServerMixin = {
      * @private
      */
     _setupExtensions(app, options) {
-        // TODO: typescript support for extensions
         // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
         app.__extensions = extensions || []
 
         extensions.forEach((extension) => {
-            const customizerPath = path.join(
+            const setupServerFilePathBase = path.join(
                 options.projectDir,
                 'node_modules',
                 extension,
-                'setup-server.js'
+                'setup-server'
             )
-            const customizer = esmImport(customizerPath)
-            customizer.default({app, options})
+
+            let filePath
+            if (fs.existsSync(`${setupServerFilePathBase}.ts`)) {
+                filePath = `${setupServerFilePathBase}.ts`
+            } else if (fs.existsSync(`${setupServerFilePathBase}.js`)) {
+                filePath = `${setupServerFilePathBase}.js`
+            } else {
+                return
+            }
+
+            const setupServer = tsx.require(filePath, __filename)
+            if (!setupServer.default) {
+                console.warn(`Extension ${extension} does not have a default export. Skipping.`)
+                return
+            }
+            try {
+                setupServer.default({app, options})
+            } catch (e) {
+                console.error(`Error setting up extension ${extension}:`, e)
+            }
         })
     },
 

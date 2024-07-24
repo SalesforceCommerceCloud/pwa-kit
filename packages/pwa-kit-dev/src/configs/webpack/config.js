@@ -557,7 +557,7 @@ const requestProcessor =
         .build()
 
 // TODO: can we make this one config with multiple entries? would that dedupe the dependencies?
-const extensions = (pkg.mobify.app.extensions || []).map((extension) => {
+const extensions = (pkg.mobify?.app?.extensions || []).map((extension) => {
     return {
         name: 'extensions',
         target: 'node',

@@ -644,14 +644,24 @@ export const RemoteServerFactory = {
         const _r = eval('require')
         app.__extensions = extensions || []
         extensions.forEach((extension) => {
-            const extensionPath = path.join(
+            const setupServerFilePath = path.join(
                 options.buildDir,
                 'extensions',
                 extension,
                 'setup-server.js'
             )
-            const module = _r(extensionPath)
-            module.default({app, options})
+            const setupServer = _r(setupServerFilePath)
+
+            if (!setupServer.default) {
+                console.warn(`Extension ${extension} does not have a default export. Skipping.`)
+                return
+            }
+
+            try {
+                setupServer.default({app, options})
+            } catch (e) {
+                console.error(`Error setting up extension ${extension}:`, e)
+            }
         })
     },
 
