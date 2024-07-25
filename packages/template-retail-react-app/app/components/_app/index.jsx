@@ -126,7 +126,6 @@ const App = (props) => {
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
     const categories = flatten(categoriesTree || {}, 'categories')
-    const [isContextEnabled, setShopperContext] = useState(false)
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = getAppOrigin()
     const activeData = useActiveData()
