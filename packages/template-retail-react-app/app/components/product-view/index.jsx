@@ -116,7 +116,9 @@ const ProductView = forwardRef(
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
-            showImageGallery = true
+            showImageGallery = true,
+            setSelectedBundleQuantity = () => {},
+            selectedBundleParentQuantity = 0,
         },
         ref
     ) => {
@@ -310,6 +312,11 @@ const ProductView = forwardRef(
         // Other values can be added to this scope as required.
         if (typeof ref === 'function') {
             ref = ref.bind({validateOrderability: validateAndShowError})
+        }
+
+        // Set the quantity of bundle child in a product bundle to ensure availability messages appear
+        if(isProductPartOfBundle && quantity != selectedBundleParentQuantity * childOfBundleQuantity) {
+            setQuantity(selectedBundleParentQuantity * childOfBundleQuantity)
         }
 
         useEffect(() => {
@@ -516,6 +523,8 @@ const ProductView = forwardRef(
                                             // Set the Quantity of product to value of input if value number
                                             if (numberValue >= 0) {
                                                 setQuantity(numberValue)
+                                                if(isProductABundle)
+                                                    setSelectedBundleQuantity(numberValue)
                                             } else if (stringValue === '') {
                                                 // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
                                                 // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
@@ -527,6 +536,8 @@ const ProductView = forwardRef(
                                             const value = e.target.value
                                             if (parseInt(value) < 0 || value === '') {
                                                 setQuantity(minOrderQuantity)
+                                                if(isProductABundle)
+                                                    setSelectedBundleQuantity(minOrderQuantity)
                                             }
                                         }}
                                         onFocus={(e) => {
@@ -629,7 +640,9 @@ ProductView.propTypes = {
     setChildProductOrderability: PropTypes.func,
     onVariantSelected: PropTypes.func,
     validateOrderability: PropTypes.func,
-    showImageGallery: PropTypes.bool
+    showImageGallery: PropTypes.bool,
+    setSelectedBundleQuantity: PropTypes.func,
+    selectedBundleParentQuantity: PropTypes.number
 }
 
 export default ProductView

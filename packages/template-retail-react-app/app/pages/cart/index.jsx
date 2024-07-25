@@ -62,6 +62,8 @@ import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
+    // TODO: rename newProducts
+    const [newProducts, setNewProducts] = useState({})
     const {data: basket, isLoading} = useCurrentBasket()
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
@@ -83,6 +85,71 @@ const Cart = () => {
             }
         }
     )
+
+    let bundleChildVariantIds = []
+    basket?.productItems?.forEach((productItem) => {
+        productItem?.bundledProductItems?.forEach((childProduct) => {
+            bundleChildVariantIds.push(childProduct.productId)
+        })
+    })
+
+    const {data: bundleChildProductData} = useProducts(
+        {
+            parameters: {
+                ids: bundleChildVariantIds,
+                allImages: false,
+                expand: [
+                    'availability',
+                    'variations',
+                ],
+                select: '(data.(id,inventory))'
+            }
+        },
+        {
+            enabled: bundleChildVariantIds?.length > 0,
+            keepPreviousData: true, // TODO: potentially remove this line
+            select: (result) => {
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+
+    // TODO: update this comment
+    // Set up newProducts object where key is itemId and value is the product data
+    let updateState = {}
+    basket?.productItems?.forEach(productItem => {
+        // TODO: making deepcopy for now but think about reverting
+        let modifiedProductData = products?.[productItem?.productId]
+        if(modifiedProductData)
+            modifiedProductData = JSON.parse(JSON.stringify(products?.[productItem?.productId]))
+        
+        // calculate inventory for product bundles based on availability of children
+        if(productItem?.bundledProductItems) {
+            let lowestStockLevel = modifiedProductData?.inventory?.stockLevel || Number.MAX_SAFE_INTEGER
+            productItem?.bundledProductItems.forEach(bundleChild => {
+                lowestStockLevel = Math.min(
+                    lowestStockLevel,
+                    bundleChildProductData?.[bundleChild.productId]?.inventory?.stockLevel
+                )
+            })
+
+            if(modifiedProductData?.inventory) {
+                modifiedProductData.inventory = {
+                    ...modifiedProductData.inventory,
+                    stockLevel: lowestStockLevel
+                }
+            }
+        }
+        updateState[productItem.itemId] = modifiedProductData
+    })
+
+    // TODO: see if there's a better way to compare
+    if(JSON.stringify(newProducts) !== JSON.stringify(updateState))
+        setNewProducts({...updateState})
 
     const {data: customer} = useCurrentCustomer()
     const {customerId, isRegistered} = customer
@@ -386,7 +453,7 @@ const Cart = () => {
     }, DEBOUNCE_WAIT)
 
     const handleChangeItemQuantity = async (product, value) => {
-        const {stockLevel} = products[product.productId].inventory
+        const {stockLevel} = newProducts[product.itemId].inventory
 
         // Handle removing of the items when 0 is selected.
         if (value === 0) {
@@ -496,10 +563,10 @@ const Cart = () => {
                                                 }
                                                 product={{
                                                     ...productItem,
-                                                    ...(products &&
-                                                        products[productItem.productId]),
+                                                    ...(newProducts &&
+                                                        newProducts[productItem.itemId]),
                                                     isProductUnavailable: !isProductsLoading
-                                                        ? !products?.[productItem.productId]
+                                                        ? !newProducts?.[productItem.itemId]
                                                         : undefined,
                                                     price: productItem.price,
                                                     quantity: localQuantity[productItem.itemId]
