@@ -556,23 +556,65 @@ const requestProcessor =
         })
         .build()
 
-// TODO: can we make this one config with multiple entries? would that dedupe the dependencies?
-const extensions = (pkg.mobify?.app?.extensions || []).map((extension) => {
-    return {
-        name: 'extensions',
-        target: 'node',
-        mode,
-        entry: `${projectDir}/node_modules/${extension}/setup-server.js`,
-        output: {
-            path: `${buildDir}/extensions/${extension}`,
-            filename: 'setup-server.js',
-            libraryTarget: 'commonjs2'
-        },
-        optimization: {
-            minimize: false
-        }
-    }
-})
+const extensions =
+    mode === 'production'
+        ? (pkg.mobify?.app?.extensions || [])
+              .map((extension) => {
+                  const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/setup-server`
+                  const foundType = ['ts', 'js'].find((type) =>
+                      fs.existsSync(`${setupServerFilePathBase}.${type}`)
+                  )
+
+                  if (!foundType) {
+                      // no setup-server file found, early exit because it's optional
+                      return
+                  }
+
+                  const defaultTsConfig = {
+                      target: 'ES2020',
+                      module: 'commonjs',
+                      strict: true,
+                      esModuleInterop: true,
+                      skipLibCheck: true
+                  }
+                  let tsConfigFound = fse.existsSync(
+                      `${projectDir}/node_modules/${extension}/tsconfig.json`
+                  )
+                  return {
+                      name: 'extensions',
+                      target: 'node',
+                      mode,
+                      entry: setupServerFilePathBase,
+                      output: {
+                          path: `${buildDir}/extensions/${extension}`,
+                          filename: 'setup-server.js',
+                          libraryTarget: 'commonjs2'
+                      },
+                      resolve: {
+                          extensions: ['.ts', '.js']
+                      },
+                      module: {
+                          rules: [
+                              {
+                                  test: /\.ts?$/,
+                                  use: {
+                                      loader: findDepInStack('ts-loader'),
+                                      // No nothing if tsconfig.json is declared in the extension.
+                                      // Typescript will resolve to it magically.
+                                      // If no tsconfig.json is found, use the default options
+                                      ...(tsConfigFound ? {} : {compilerOptions: defaultTsConfig})
+                                  },
+                                  exclude: /node_modules/
+                              }
+                          ]
+                      },
+                      optimization: {
+                          minimize: false
+                      }
+                  }
+              })
+              .filter(Boolean)
+        : []
 
 module.exports = [client, ssr, renderer, clientOptional, requestProcessor, ...extensions]
     .filter(Boolean)
