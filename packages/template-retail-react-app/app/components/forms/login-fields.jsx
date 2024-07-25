@@ -15,7 +15,6 @@ const LoginFields = ({form, prefix = ''}) => {
     return (
         <Stack spacing={5}>
             <Field {...fields.email} />
-            <Field {...fields.password} />
         </Stack>
     )
 }

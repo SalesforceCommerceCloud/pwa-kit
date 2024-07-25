@@ -4595,6 +4595,20 @@
       "value": "]"
     }
   ],
+  "login_form.button.pwdless_sign_in": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥȧȧşşẇǿǿřḓŀḗḗşş Şīɠƞ Īƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,

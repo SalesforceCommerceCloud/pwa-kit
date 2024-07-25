@@ -2147,6 +2147,12 @@
       "value": "Login with Google"
     }
   ],
+  "login_form.button.pwdless_sign_in": [
+    {
+      "type": 0,
+      "value": "Passwordless Sign In"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,

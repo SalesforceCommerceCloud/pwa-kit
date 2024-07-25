@@ -83,6 +83,12 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.set('Cache-Control', `max-age=31536000`)
         res.send()
     })
+    app.post('/pwdless-login-callback', (req, res) => {
+        const callbackData = req.body
+        console.log('Received webhook: ', callbackData)
+
+        res.status(200).send('Webhook received')
+    })
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))

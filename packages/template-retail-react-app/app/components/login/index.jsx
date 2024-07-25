@@ -16,12 +16,15 @@ import {
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import useGoogleSignIn from '@salesforce/retail-react-app/app/hooks/use-google-signin'
+import usePasswordlessSignIn from '@salesforce/retail-react-app/app/hooks/use-passwordless-signin'
+import {useHistory} from 'react-router-dom'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
     const googleSignIn = useGoogleSignIn()
+    const passwordlessSignIn = usePasswordlessSignIn()
+    const history = useHistory()
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
@@ -48,7 +51,6 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                         </Alert>
                     )}
                     <Stack>
-                        <LoginFields form={form} />
 
                         <Box>
                             <Button variant="link" size="sm" onClick={clickForgotPassword}>
@@ -84,6 +86,18 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                                     id="login_form.button.google_sign_in"
                                 />
                             </Text>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={async () => {
+                                await passwordlessSignIn.authorizeCustomer('yunakim@salesforce.com')
+                                history.push('/pwdless-login-callback')
+                            }}
+                        >
+                            <FormattedMessage
+                                defaultMessage="Passwordless Sign In"
+                                id="login_form.button.pwdless_sign_in"
+                            />
                         </Button>
 
                         <Stack direction="row" spacing={1} justify="center">
