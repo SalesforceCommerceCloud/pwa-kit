@@ -16,7 +16,9 @@ import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
-    useShopperBasketsMutation
+    useShopperBasketsMutation,
+    useShopperContextsMutation,
+    useUsid
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
@@ -25,6 +27,7 @@ import {
     Center,
     Fade,
     Spinner,
+    Button,
     useDisclosure,
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -74,6 +77,7 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
+import {useShopperContext} from '@salesforce/commerce-sdk-react'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -122,6 +126,7 @@ const App = (props) => {
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
     const categories = flatten(categoriesTree || {}, 'categories')
+    const [isContextEnabled, setShopperContext] = useState(false)
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = getAppOrigin()
     const activeData = useActiveData()
@@ -187,7 +192,23 @@ const App = (props) => {
 
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
+    const {usid} = useUsid()
 
+    const createShopperContext = useShopperContextsMutation('createShopperContext')
+    const deleteShopperContext = useShopperContextsMutation('deleteShopperContext')
+    const updateShopperContext = useShopperContextsMutation('updateShopperContext')
+    const {data} = useShopperContext(
+        {
+            parameters: {
+                usid: usid,
+                siteId: site.id
+            }
+        },
+        {
+            enabled: !isServer
+        }
+    )
+    console.log('data', data)
     useEffect(() => {
         // update the basket currency if it doesn't match the current locale currency
         if (basket?.currency && basket?.currency !== currency) {
@@ -342,6 +363,59 @@ const App = (props) => {
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
                             <Box {...styles.headerWrapper}>
+                                <Button
+                                    colorScheme="teal"
+                                    variant="solid"
+                                    onClick={async () => {
+                                        await createShopperContext.mutate({
+                                            parameters: {
+                                                usid,
+                                                siteId: site.id
+                                            },
+                                            body: {
+                                                sourceCode: 'instagram-users'
+                                            }
+                                        })
+                                        // window.location.reload()
+                                    }}
+                                >
+                                    Create context
+                                </Button>
+                                <Button
+                                    colorScheme="red"
+                                    variant="solid"
+                                    onClick={async () => {
+                                        await deleteShopperContext.mutate({
+                                            parameters: {
+                                                usid,
+                                                siteId: site.id
+                                            }
+                                        })
+                                        // window.location.reload()
+                                    }}
+                                >
+                                    Delete context
+                                </Button>
+                                <Button
+                                    colorScheme="yellow"
+                                    variant="solid"
+                                    onClick={async () => {
+                                        await updateShopperContext.mutate({
+                                            parameters: {
+                                                usid,
+                                                siteId: site.id
+                                            },
+                                            body: {
+                                                customQualifiers: {
+                                                    test: 'test'
+                                                }
+                                            }
+                                        })
+                                        window.location.reload()
+                                    }}
+                                >
+                                    Update context
+                                </Button>
                                 {!isCheckout ? (
                                     <>
                                         <AboveHeader />
