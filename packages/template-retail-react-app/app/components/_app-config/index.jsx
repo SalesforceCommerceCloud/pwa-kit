@@ -50,6 +50,7 @@ const AppConfig = ({children, locals = {}}) => {
     const headers = {
         'correlation-id': correlationId
     }
+    const onClient = typeof window !== 'undefined'
 
     const commerceApiConfig = locals.appConfig.commerceAPI
 
@@ -58,15 +59,15 @@ const AppConfig = ({children, locals = {}}) => {
     // we can either do this here or update the proxy path in the app config
     // inside default.js
     // this endpoint is where commerce-sdk-react will send requests to
-    const proxy = getNamespace()
+
+    // only send the namespace to client side commerce-sdk-react
+    const proxy = onClient
         ? `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
         : `${appOrigin}${commerceApiConfig.proxyPath}`
 
     console.log(proxy)
 
-    const redirectURI = getNamespace()
-        ? `${appOrigin}${getNamespace()}/callback`
-        : `${appOrigin}/callback`
+    const redirectURI = `${appOrigin}/callback`
 
     return (
         <CommerceApiProvider
