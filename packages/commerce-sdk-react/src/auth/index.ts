@@ -586,7 +586,7 @@ class Auth {
                 grant_type: 'authorization_code_pkce',
                 redirect_uri: body.redirectURI,
                 code_verifier: localStorage.getItem('codeVerifier') || '',
-                client_id: '3a15f34e-fecd-4fcc-8235-86b70978e629',
+                client_id: this.client.clientConfig.parameters.clientId,
                 channel_id: this.client.clientConfig.parameters.siteId,
             }
 
