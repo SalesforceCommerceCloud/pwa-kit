@@ -6,7 +6,7 @@
  */
 /* istanbul ignore next */
 const extension = ({app}) => {
-    throw new error('extension will fail to initialize because of me')
+    throw new Error('extension will fail to initialize because of me')
 }
 
 module.exports = {
