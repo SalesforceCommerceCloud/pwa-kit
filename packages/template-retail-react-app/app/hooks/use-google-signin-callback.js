@@ -7,6 +7,7 @@
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import {useEffect, useState} from 'react'
 import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search-params'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 
 const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
 
@@ -39,7 +40,7 @@ const useGoogleSignInCallback = ({labels}) => {
         auth.loginIDPUser({
             usid: params.usid,
             code: params.code,
-            redirectURI: `http://localhost:3000${SLAS_CALLBACK_ENDPOINT}`
+            redirectURI: `${getAppOrigin()}${SLAS_CALLBACK_ENDPOINT}`
         })
     }, [])
 

@@ -590,7 +590,6 @@ class Auth {
                 channel_id: this.client.clientConfig.parameters.siteId,
             }
 
-            console.log('DIS IS DA TOKENBODY: ,' + JSON.stringify(tokenBody))
 
             return this.client.getAccessToken({body: tokenBody})
         }, false)

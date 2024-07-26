@@ -35,13 +35,12 @@ export default function useGoogleSignIn() {
         const codeChallenge = await generateCodeChallenge(codeVerifier)
 
         localStorage.setItem('codeVerifier', codeVerifier)
-        console.log('this is the code challenge', codeChallenge)
 
         redirectToAuthURL(
             proxy,
             idp,
             codeChallenge,
-            `http://localhost:3000${SLAS_CALLBACK_ENDPOINT}`,
+            `${getAppOrigin()}${SLAS_CALLBACK_ENDPOINT}`,
             clientId,
             siteId,
             organizationId
