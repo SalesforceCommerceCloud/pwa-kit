@@ -26,6 +26,9 @@ import {
 import fetch from 'cross-fetch'
 import Cookies from 'js-cookie'
 
+// Constants for storage keys
+const createStorageKey = (siteId, key) => `${siteId}_${key}`
+
 /**
  * An object containing the customer's login credentials.
  * @typedef {Object} CustomerCredentials
@@ -49,11 +52,12 @@ class Auth {
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
         this._storageCopy = this._onClient ? new LocalStorage() : new Map()
+        this.siteId = this._config.parameters.siteId
 
         // To store tokens as cookies
         // change the next line to
-        // this._storage = this._onClient ? new CookieStorage() : new Map()
-        this._storage = this._onClient ? new LocalStorage() : new Map()
+        // this._storage = this._onClient ? new CookieStorage(this.siteId) : new Map()
+        this._storage = this._onClient ? new LocalStorage(this.siteId) : new Map()
 
         const configOid = api._config.parameters.organizationId
         if (!this.oid) {
@@ -67,6 +71,10 @@ class Auth {
 
         this.login = this.login.bind(this)
         this.logout = this.logout.bind(this)
+    }
+
+    get storageKeyPrefix() {
+        return this._config.parameters.siteId
     }
 
     /**
@@ -87,15 +95,15 @@ class Auth {
     }
 
     get authToken() {
-        return this._storage.get(tokenStorageKey)
+        return this._storage.get(createStorageKey(this.storageKeyPrefix, tokenStorageKey))
     }
 
     set authToken(token) {
-        this._storage.set(tokenStorageKey, token)
+        this._storage.set(createStorageKey(this.storageKeyPrefix, tokenStorageKey), token)
     }
 
     get userType() {
-        return this._storage.get(refreshTokenRegisteredStorageKey)
+        return this._storage.get(createStorageKey(this.storageKeyPrefix, refreshTokenRegisteredStorageKey))
             ? Auth.USER_TYPE.REGISTERED
             : Auth.USER_TYPE.GUEST
     }
@@ -103,41 +111,41 @@ class Auth {
     get refreshToken() {
         const storageKey =
             this.userType === Auth.USER_TYPE.REGISTERED
-                ? refreshTokenRegisteredStorageKey
-                : refreshTokenGuestStorageKey
+                ? createStorageKey(this.storageKeyPrefix, refreshTokenRegisteredStorageKey)
+                : createStorageKey(this.storageKeyPrefix, refreshTokenGuestStorageKey)
         return this._storage.get(storageKey)
     }
 
     get usid() {
-        return this._storage.get(usidStorageKey)
+        return this._storage.get(createStorageKey(this.storageKeyPrefix, usidStorageKey))
     }
 
     set usid(usid) {
-        this._storage.set(usidStorageKey, usid)
+        this._storage.set(createStorageKey(this.storageKeyPrefix, usidStorageKey), usid)
     }
 
     get cid() {
-        return this._storage.get(cidStorageKey)
+        return this._storage.get(createStorageKey(this.storageKeyPrefix, cidStorageKey))
     }
 
     set cid(cid) {
-        this._storage.set(cidStorageKey, cid)
+        this._storage.set(createStorageKey(this.storageKeyPrefix, cidStorageKey), cid)
     }
 
     get encUserId() {
-        return this._storage.get(encUserIdStorageKey)
+        return this._storage.get(createStorageKey(this.storageKeyPrefix, encUserIdStorageKey))
     }
 
     set encUserId(encUserId) {
-        this._storage.set(encUserIdStorageKey, encUserId)
+        this._storage.set(createStorageKey(this.storageKeyPrefix, encUserIdStorageKey), encUserId)
     }
 
     get oid() {
-        return this._storage.get(oidStorageKey)
+        return this._storage.get(createStorageKey(this.storageKeyPrefix, oidStorageKey))
     }
 
     set oid(oid) {
-        this._storage.set(oidStorageKey, oid)
+        this._storage.set(createStorageKey(this.storageKeyPrefix, oidStorageKey), oid)
     }
 
     get isTokenValid() {
@@ -158,24 +166,26 @@ class Auth {
          * For hybrid deployments, We store a copy of the refresh_token
          * to update access_token whenever customer auth state changes on SFRA.
          */
-        if (type === Auth.USER_TYPE.REGISTERED) {
-            this._storage.set(refreshTokenRegisteredStorageKey, token, {
-                expires: REFRESH_TOKEN_COOKIE_AGE
-            })
-            this._storage.delete(refreshTokenGuestStorageKey)
+        const registeredKey = createStorageKey(this.storageKeyPrefix, refreshTokenRegisteredStorageKey)
+        const guestKey = createStorageKey(this.storageKeyPrefix, refreshTokenGuestStorageKey)
 
-            this._storageCopy.set(refreshTokenRegisteredStorageKey, token)
-            this._storageCopy.delete(refreshTokenGuestStorageKey)
+        if (type === Auth.USER_TYPE.REGISTERED) {
+            this._storage.set(registeredKey, token, { expires: REFRESH_TOKEN_COOKIE_AGE })
+            this._storage.delete(guestKey)
+
+            this._storageCopy.set(registeredKey, token)
+            this._storageCopy.delete(guestKey)
             return
         }
 
-        this._storage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
-        this._storage.delete(refreshTokenRegisteredStorageKey)
+        this._storage.set(guestKey, token, { expires: REFRESH_TOKEN_COOKIE_AGE })
+        this._storage.delete(registeredKey)
 
-        this._storageCopy.set(refreshTokenGuestStorageKey, token)
-        this._storageCopy.delete(refreshTokenRegisteredStorageKey)
+        this._storageCopy.set(guestKey, token)
+        this._storageCopy.delete(registeredKey)
     }
 
+    //TODO
     /**
      * Called with the details from the redirect page that _loginWithCredentials returns
      * I think it's best we leave it to developers on how and where to call from
@@ -190,6 +200,7 @@ class Auth {
         data.append('code_verifier', codeVerifier)
         data.append('client_id', this._config.parameters.clientId)
         data.append('redirect_uri', redirectUri)
+        data.append('channel_id', this._config.parameters.siteId)
 
         const options = {
             headers: {
@@ -403,7 +414,8 @@ class Auth {
                 client_id: this._config.parameters.clientId,
                 code_challenge: codeChallenge,
                 response_type: 'code',
-                hint: 'guest'
+                hint: 'guest',
+                channel_id: this._config.parameters.siteId
             }
         }
 
@@ -464,6 +476,7 @@ class Auth {
         data.append('grant_type', 'refresh_token')
         data.append('refresh_token', this.refreshToken)
         data.append('client_id', this._config.parameters.clientId)
+        data.append('client_id', this._config.parameters.siteId)
 
         const options = {
             headers: {
@@ -514,37 +527,49 @@ class Storage {
 }
 
 class CookieStorage extends Storage {
-    constructor(...args) {
+    constructor(siteId, ...args) {
         super(args)
         if (typeof document === 'undefined') {
             throw new Error('CookieStorage is not avaliable on the current environment.')
         }
+        this.siteId = siteId
     }
+
+    createStorageKey(key) {
+        return `${this.siteId}_${key}`
+    }
+
     set(key, value, options) {
-        Cookies.set(key, value, {secure: true, ...options})
+        Cookies.set(this.createStorageKey(key), value, {secure: true, ...options})
     }
     get(key) {
-        return Cookies.get(key)
+        return Cookies.get(this.createStorageKey(key))
     }
     delete(key) {
-        Cookies.remove(key)
+        Cookies.remove(this.createStorageKey(key))
     }
 }
 
 class LocalStorage extends Storage {
-    constructor(...args) {
+    constructor(siteId, ...args) {
         super(args)
         if (typeof window === 'undefined') {
             throw new Error('LocalStorage is not avaliable on the current environment.')
         }
+        this.siteId = siteId
     }
+
+    createStorageKey(key) {
+        return `${this.siteId}_${key}`
+    }
+
     set(key, value) {
-        window.localStorage.setItem(key, value)
+        window.localStorage.setItem(this.createStorageKey(key), value)
     }
     get(key) {
-        return window.localStorage.getItem(key)
+        return window.localStorage.getItem(this.createStorageKey(key))
     }
     delete(key) {
-        window.localStorage.removeItem(key)
+        window.localStorage.removeItem(this.createStorageKey(key))
     }
 }
