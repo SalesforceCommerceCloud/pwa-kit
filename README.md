@@ -78,6 +78,15 @@ delete(key) {
 Full example of the changes in the `auth.js` file:
 https://github.com/SalesforceCommerceCloud/pwa-kit/compare/949b8b3b7...534dab260
 
+#### Important Note:
+
+Implementing the `siteId` prefix for local storage keys and cookie names will effectively log out any existing customer sessions on the site. This includes registered logins and baskets for all users.
+
+#### Recommendation:
+
+- Established sites that do not need this change should avoid implementing it to prevent logging out existing users.
+- If a project decides to implement this change, be aware that the PWA will now look for tokens under a different cookie name, causing all existing users to be logged out.
+
 <div align="center">
 
 <h1>The Progressive Web App (PWA) Kit</h1>
