@@ -637,6 +637,13 @@ export const RemoteServerFactory = {
     },
 
     /**
+     * This function is called during server initialization.
+     *
+     * This function assumes that optionally, there is a `setup-server.js`
+     * file in each extension directory in the build.
+     *
+     * This file should export a default which is a function.
+     *
      * @private
      */
     _setupExtensions(app, options) {
