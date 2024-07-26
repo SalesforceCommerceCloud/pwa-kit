@@ -371,9 +371,7 @@ const App = (props) => {
                                                 usid,
                                                 siteId: site.id
                                             },
-                                            body: {
-                                                sourceCode: 'instagram-users'
-                                            }
+                                            body: {}
                                         })
                                         // window.location.reload()
                                     }}
