@@ -84,4 +84,14 @@ describe('extensions', () => {
                 expect(res.text).toBe('test')
             })
     })
+    test('can register multiple extensions', () => {
+        const app = RemoteServerFactory._createApp(opts())
+        expect(app.__extensions).toBeDefined()
+        return request(app)
+            .get('/another-extension')
+            .expect(200)
+            .then((res) => {
+                expect(res.text).toBe('test')
+            })
+    })
 })

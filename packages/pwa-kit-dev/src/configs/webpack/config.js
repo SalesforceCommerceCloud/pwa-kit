@@ -556,13 +556,15 @@ const requestProcessor =
         })
         .build()
 
+// This is the extensions for multi-extensibility feature in PWA Kit.
+// Don't mistake this with the concept of extensions for Webpack.
 const extensions =
     mode === 'production'
         ? (pkg.mobify?.app?.extensions || [])
               .map((extension) => {
                   const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/setup-server`
                   const foundType = ['ts', 'js'].find((type) =>
-                      fs.existsSync(`${setupServerFilePathBase}.${type}`)
+                      fse.existsSync(`${setupServerFilePathBase}.${type}`)
                   )
 
                   if (!foundType) {
