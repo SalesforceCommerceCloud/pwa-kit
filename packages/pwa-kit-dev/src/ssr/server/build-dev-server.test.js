@@ -64,8 +64,19 @@ const insecureFetch = (url, opts) => {
 
 const opts = (overrides = {}) => {
     const defaults = {
+        projectDir: testFixtures,
         buildDir: path.join(testFixtures, 'build'),
         mobify: {
+            app: {
+                extensions: [
+                    'ts-extension',
+                    'test-extension',
+                    'another-extension',
+                    'extension-with-bad-setup-server',
+                    'extension-with-setup-server-no-default-export',
+                    'extension-without-setup-server'
+                ]
+            },
             ssrEnabled: true,
             ssrOnly: ['main.js.map', 'ssr.js', 'ssr.js.map'],
             ssrShared: ['main.js', 'ssr-loader.js', 'worker.js'],
@@ -786,5 +797,18 @@ describe('SLAS private client proxy', () => {
         expect(() => {
             NoWebpackDevServerFactory._createApp(opts({useSLASPrivateClient: true}))
         }).toThrow()
+    })
+})
+
+describe('extensions', () => {
+    test('can register extensions properly via _setupExtensions', () => {
+        const app = NoWebpackDevServerFactory._createApp(opts())
+        expect(app.__extensions).toBeDefined()
+        return request(app)
+            .get('/test-extension')
+            .expect(200)
+            .then((res) => {
+                expect(res.text).toBe('test')
+            })
     })
 })
