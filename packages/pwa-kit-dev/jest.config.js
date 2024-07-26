@@ -25,5 +25,8 @@ module.exports = {
         '!scripts/version.js',
         '!src/ssr/server/test_fixtures/**',
         '!src/schemas/**'
-    ]
+    ],
+    moduleNameMapper: {
+        'tsx/cjs/api': '<rootDir>/node_modules/tsx/dist/cjs/api/index.cjs'
+    }
 }
