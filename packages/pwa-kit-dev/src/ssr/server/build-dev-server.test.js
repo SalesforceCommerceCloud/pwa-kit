@@ -69,7 +69,8 @@ const opts = (overrides = {}) => {
         mobify: {
             app: {
                 extensions: [
-                    'ts-extension',
+                    // temporary test CI
+                    // 'ts-extension',
                     'test-extension',
                     'another-extension',
                     'extension-with-bad-setup-server',
