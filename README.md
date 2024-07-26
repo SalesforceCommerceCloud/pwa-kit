@@ -8,6 +8,75 @@ Feel free to share this survey link with your colleagues, partners, or anyone wh
 
 Thank you for being a part of our community and for your continuous support! :raised_hands:
 
+## :warning: Planned API Changes :warning:
+
+### Shopper Context
+
+Starting July 31st 2024, all endpoints in the Shopper context API will require the `siteId` parameter for new customers. This field is marked as optional for backward compatibility and will be changed to mandatory tentatively by January 2025. You can read more about the planned change [here](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=Summary) in the notes section.
+
+### Shopper Login (SLAS)
+
+SLAS will soon require new tenants to pass `channel_id` as an argument for retrieving guest access tokens. You can read more about the planned change [here](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas.html#guest-tokens).
+
+Please be aware that existing tenants are on a temporary allow list and will see no immediate disruption to service.  We do ask that all users seek to adhere to the `channel_id` requirement before the end of August to enhance your security posture before the holiday peak season.
+
+### Summary of Changes for PWA Kit v2
+
+To comply with the planned API changes effective July 31st, 2024, you need to update your PWA Kit v2 projects. These changes involve adding the `channel_id` parameter for Shopper Login and optionally scoping your local storage keys and cookie names with the `siteId` prefix if your site uses multisite.
+
+**1. Update `auth.js` to Include `channel_id` in Calls to Shopper Login**
+
+Add the `channel_id` parameter in the appropriate functions for obtaining tokens.
+
+#### Example Changes:
+```diff
+// In the Auth class, add channel_id to the data in loginWithCredentials method
+data.append('channel_id', this._config.parameters.siteId)
+
+// In the refreshToken method, add channel_id to the data
+data.append('channel_id', this._config.parameters.siteId)
+```
+
+**2. Scope Local Storage Keys and Cookie Names per Site for Multisite Projects**
+
+For customers using multiple site IDs, it is recommended to scope your local storage keys and cookie names per site to avoid conflicts. This ensures that tokens from different sites (e.g., RefArch and RefArchGlobal) are not incorrectly used across sites.
+
+```diff
+// Add siteId parameter in LocalStorage and CookieStorage constructors
+constructor(siteId, ...args) {
+super(args);
+if (typeof window === 'undefined') {
+throw new Error('LocalStorage is not available in the current environment.');
+}
+this.siteId = siteId;
+}
+
+// Create storage key with siteId prefix
+createStorageKey(key) {
+return `${this.siteId}_${key}`;
+}
+
+// Set item in local storage with siteId prefix
+set(key, value) {
+window.localStorage.setItem(this.createStorageKey(key), value);
+}
+
+// Get item from local storage with siteId prefix
+get(key) {
+return window.localStorage.getItem(this.createStorageKey(key));
+}
+
+// Delete item from local storage with siteId prefix
+delete(key) {
+window.localStorage.removeItem(this.createStorageKey(key));
+}
+
+// Similar changes for CookieStorage
+```
+
+Full example of the changes in the `auth.js` file:
+https://github.com/SalesforceCommerceCloud/pwa-kit/compare/949b8b3b7...534dab260
+
 <div align="center">
 
 <h1>The Progressive Web App (PWA) Kit</h1>
