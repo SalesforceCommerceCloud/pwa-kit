@@ -11,7 +11,7 @@
 /* eslint-env node */
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const babelJest = require('babel-jest')
+const babelJest = require('babel-jest').default
 
 module.exports = babelJest.createTransformer({
     rootMode: 'upward'
