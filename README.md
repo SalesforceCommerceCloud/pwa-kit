@@ -24,51 +24,52 @@ Please be aware that existing tenants are on a temporary allow list and will see
 
 To comply with the planned API changes effective July 31st, 2024, you need to update your PWA Kit v2 projects. These changes involve adding the `channel_id` parameter for Shopper Login and optionally scoping your local storage keys and cookie names with the `siteId` prefix if your site uses multisite.
 
-**1. Update `auth.js` to Include `channel_id` in Calls to Shopper Login**
+#### 1. Update `auth.js` to Include `channel_id` in Calls to Shopper Login
 
 Add the `channel_id` parameter in the appropriate functions for obtaining tokens.
 
-#### Example Changes:
+##### Example Changes:
 ```diff
-// In the Auth class, add channel_id to the data in loginWithCredentials method
-data.append('channel_id', this._config.parameters.siteId)
+// In the Auth class, add channel_id to the data in _loginAsGuest method
+channel_id: this._config.parameters.siteId
 
 // In the refreshToken method, add channel_id to the data
 data.append('channel_id', this._config.parameters.siteId)
 ```
 
-**2. Scope Local Storage Keys and Cookie Names per Site for Multisite Projects**
+#### 2. Scope Local Storage Keys and Cookie Names per Site for Multisite Projects
 
 For customers using multiple site IDs, it is recommended to scope your local storage keys and cookie names per site to avoid conflicts. This ensures that tokens from different sites (e.g., RefArch and RefArchGlobal) are not incorrectly used across sites.
 
+##### Example Changes:
 ```diff
 // Add siteId parameter in LocalStorage and CookieStorage constructors
 constructor(siteId, ...args) {
-super(args);
-if (typeof window === 'undefined') {
-throw new Error('LocalStorage is not available in the current environment.');
-}
-this.siteId = siteId;
+    super(args)
+    if (typeof window === 'undefined') {
+        throw new Error('LocalStorage is not available in the current environment.')
+    }
+    this.siteId = siteId
 }
 
 // Create storage key with siteId prefix
 createStorageKey(key) {
-return `${this.siteId}_${key}`;
+    return `${this.siteId}_${key}`
 }
 
 // Set item in local storage with siteId prefix
 set(key, value) {
-window.localStorage.setItem(this.createStorageKey(key), value);
+    window.localStorage.setItem(this.createStorageKey(key), value)
 }
 
 // Get item from local storage with siteId prefix
 get(key) {
-return window.localStorage.getItem(this.createStorageKey(key));
+    return window.localStorage.getItem(this.createStorageKey(key))
 }
 
 // Delete item from local storage with siteId prefix
 delete(key) {
-window.localStorage.removeItem(this.createStorageKey(key));
+    window.localStorage.removeItem(this.createStorageKey(key))
 }
 
 // Similar changes for CookieStorage
