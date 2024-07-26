@@ -9,8 +9,10 @@
 const request = require('supertest')
 const app = require('./ssr')
 
+jest.useFakeTimers()
+
 describe('server', () => {
-    afterAll(() => app.server.close())
+    afterAll(() => app.server.close(), 30000)
     test('responds with HTML', () => {
         return request(app.server).get('/').expect(200).expect('Content-Type', /html/)
     })
