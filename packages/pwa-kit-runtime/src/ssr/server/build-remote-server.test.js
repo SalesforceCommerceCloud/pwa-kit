@@ -12,7 +12,13 @@ const opts = (overrides = {}) => {
         buildDir: './src/ssr/server/test_fixtures',
         mobify: {
             app: {
-                extensions: ['test-extension']
+                extensions: [
+                    'test-extension',
+                    'another-extension',
+                    'extension-with-bad-setup-server',
+                    'extension-with-setup-server-no-default-export',
+                    'extension-without-setup-server'
+                ]
             },
             ssrEnabled: true,
             ssrOnly: ['main.js.map', 'ssr.js', 'ssr.js.map'],
