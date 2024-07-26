@@ -32,5 +32,7 @@ module.exports = {
     transform: {
         '^.+\\.(js|jsx|ts|tsx)$': path.join(__dirname, 'jest-babel-transform.js')
     },
-    transformIgnorePatterns: ['<rootDir>/src/ssr/server/test_fixtures/node_modules/']
+    moduleNameMapper: {
+        'tsx/cjs/api': '<rootDir>/node_modules/tsx/dist/cjs/api/index.cjs'
+    }
 }
