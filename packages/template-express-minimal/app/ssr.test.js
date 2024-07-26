@@ -12,7 +12,7 @@ const app = require('./ssr')
 jest.useFakeTimers()
 
 describe('server', () => {
-    afterAll(() => app.server.close(), 30000)
+    afterAll(() => app.server.close())
     test('responds with HTML', () => {
         return request(app.server).get('/').expect(200).expect('Content-Type', /html/)
     })
