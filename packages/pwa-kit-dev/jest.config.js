@@ -39,5 +39,9 @@ module.exports = {
         'src/ssr/server/test_fixtures/node_modules/extension-with-setup-server-no-default-export/setup-server.js':
             '<rootDir>/src/ssr/server/test_fixtures/node_modules/extension-with-setup-server-no-default-export/setup-server.js'
     },
-    transformIgnorePatterns: ['<rootDir>/src/ssr/server/test_fixtures/node_modules/']
+    transformIgnorePatterns: [
+        '<rootDir>/node_modules/',
+        '<rootDir>/src/ssr/server/test_fixtures/node_modules/',
+        '/tsx/dist/cjs/api/index.cjs'
+    ]
 }
