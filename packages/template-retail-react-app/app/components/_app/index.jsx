@@ -371,7 +371,9 @@ const App = (props) => {
                                                 usid,
                                                 siteId: site.id
                                             },
-                                            body: {}
+                                            body: {
+                                                sourceCode: 'test'
+                                            }
                                         })
                                         // window.location.reload()
                                     }}
@@ -403,12 +405,10 @@ const App = (props) => {
                                                 siteId: site.id
                                             },
                                             body: {
-                                                customQualifiers: {
-                                                    test: 'test'
-                                                }
+                                                sourceCode: 'instagram'
                                             }
                                         })
-                                        window.location.reload()
+                                        // window.location.reload()
                                     }}
                                 >
                                     Update context

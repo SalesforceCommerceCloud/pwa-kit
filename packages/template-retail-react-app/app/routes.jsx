@@ -12,13 +12,14 @@
 // we don't want it to count toward coverage until we figure out how to cover the `functions`
 // metric for this file in its test.
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
+import {withRouter} from 'react-router-dom'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 
@@ -30,10 +31,10 @@ const Registration = loadable(() => import('./pages/registration'), {
 })
 const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
 const Account = loadable(() => import('./pages/account'), {fallback})
-const Cart = loadable(() => import('./pages/cart'), {fallback})
-const Checkout = loadable(() => import('./pages/checkout'), {
-    fallback
-})
+// const Cart = loadable(() => import('./pages/cart'), {fallback})
+// const Checkout = loadable(() => import('./pages/checkout'), {
+//     fallback
+// })
 const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
@@ -70,23 +71,13 @@ export const routes = [
         path: '/account',
         component: Account
     },
-    {
-        path: '/checkout',
-        component: Checkout,
-        exact: true
-    },
-    {
-        path: '/checkout/confirmation/:orderNo',
-        component: CheckoutConfirmation
-    },
+    // {
+    //     path: '/checkout/confirmation/:orderNo',
+    //     component: CheckoutConfirmation
+    // },
     {
         path: '/callback',
         component: LoginRedirect,
-        exact: true
-    },
-    {
-        path: '/cart',
-        component: Cart,
         exact: true
     },
     {
@@ -107,7 +98,22 @@ export const routes = [
     },
     {
         path: '*',
-        component: PageNotFound
+        component: withRouter((props) => {
+            const {location} = props
+            const urlParams = new URLSearchParams(location.search)
+
+            useEffect(() => {
+                const newURL = new URL(window.location)
+                if (!urlParams.has('redirected')) {
+                    newURL.searchParams.append('redirected', '1')
+                    window.location.href = newURL
+                }
+            }, [window.location.href])
+            if (urlParams.has('redirected')) {
+                return <PageNotFound {...props} />
+            }
+            return null
+        })
     }
 ]
 

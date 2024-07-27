@@ -15,7 +15,7 @@ module.exports = {
             showDefaults: true,
             interpretPlusSignAsSpace: false
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'RefArch',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -24,10 +24,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '574cf8f6-8536-4a39-acbb-8e7f1759f901',
-                organizationId: 'f_ecom_zzrf_023',
-                shortCode: 'kv7kzm78',
-                siteId: 'RefArchGlobal'
+                clientId: 'e7e22b7f-a904-4f3a-8022-49dbee696485',
+                organizationId: 'f_ecom_bjnl_prd',
+                shortCode: 'performance-001',
+                siteId: 'RefArch'
             }
         },
         einsteinAPI: {
@@ -44,8 +44,7 @@ module.exports = {
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
     ssrShared: [
         'static/ico/favicon.ico',
-        'static/robots.' +
-        'txt',
+        'static/robots.' + 'txt',
         '**/*.js',
         '**/*.js.map',
         '**/*.json'
@@ -54,11 +53,11 @@ module.exports = {
         ssrFunctionNodeVersion: '20.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'performance-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-023.dx.commercecloud.salesforce.com',
+                host: 'production-functional38-qa222.demandware.net',
                 path: 'ocapi'
             }
         ]
