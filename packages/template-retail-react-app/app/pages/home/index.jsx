@@ -91,12 +91,12 @@ const Home = () => {
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
 
-            <Link
+            {/* <Link
                 as={RouteLink}
-                to="/custom-url"
+                to="/gents"
             >
-                This is a custom page link!
-            </Link>
+                Go straight to "gents" vanity url
+            </Link> */}
 
             <Hero
                 title={intl.formatMessage({

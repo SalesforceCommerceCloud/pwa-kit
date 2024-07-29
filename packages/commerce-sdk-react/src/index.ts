@@ -9,3 +9,9 @@ export * from './hooks/types'
 export * from './hooks'
 
 export {CommerceApiProvider}
+
+export {
+    helpers as SlasHelpers,
+    ShopperLogin,
+    ShopperSeo
+} from 'commerce-sdk-isomorphic'

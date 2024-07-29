@@ -16,6 +16,7 @@ import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
+    useCommerceApi,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -77,10 +78,9 @@ import {Helmet} from 'react-helmet'
 
 import {useBlock} from '@salesforce/retail-react-app/app/hooks/use-block'
 import {useRouteContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/switch'
-import {ProductDetail} from '@salesforce/retail-react-app/app/routes'
+import {ProductDetail, ProductList} from '@salesforce/retail-react-app/app/routes'
 import {Redirect} from 'react-router-dom'
-
-const wait = (t) => new Promise((resolve) => setTimeout(resolve, t))
+import { response } from '@salesforce/retail-react-app/node_modules/msw/lib/index'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -136,6 +136,7 @@ const App = (props) => {
     const location = useLocation()
     const authModal = useAuthModal()
     const {site, locale, buildUrl} = useMultiSite()
+    const api = useCommerceApi()
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
@@ -198,38 +199,48 @@ const App = (props) => {
     const {routes, updateRoutes} = useRouteContext()
 
     useBlock(async (location) => {
-        const mappings = {
-            "/custom-url": {
-                resourceId: '25752986M',
-                resourceType: 'product'
-            },
-            "/product/TG786M": {
-                redirectUrl: {
-                    destinationId: '52416781M',
-                    destinationType: 'product'
+        
+        const urlSegment = location.pathname
+        console.log('useBlock: urlSegment: ', urlSegment)
+
+        const token = await getTokenWhenReady()
+        console.log('token: ', token)
+        // This is where we would be making a request to the SEO API's.
+        let urlMapping
+
+        try {
+            urlMapping = await api.shopperSeo.getUrlMapping({
+                parameters: {
+                    urlSegment
                 },
-                resourceId: 'mens',
-                resourceType: 'category'
-            }
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                throwOnBadResponse: true
+            })
+            console.log('urlMapping: ', urlMapping)
+        } catch(e) {
+            console.error(`Couldn't find mapping for given segement: ${urlSegment}`)
         }
 
-        // This is where we would be making a request to the SEO API's.
-        await wait(1000)
-        const response = mappings[location.pathname]
-
-        if (response) {
-            const isRedirect = !!response.redirectUrl
+        if (urlMapping) {
+            const isRedirect = !urlMapping.resourceType
             let Component
             let props
             if (isRedirect) {
                 Component = Redirect
                 props = {
-                    to: `/${response.redirectUrl.destinationType}/${response.redirectUrl.destinationId}`
+                    to: urlMapping.destinationUrl
                 }
             } else {
-                Component = ProductDetail
+                const resourceableComponents = {
+                    category: ProductList,
+                    product: ProductDetail
+                }
+
+                Component = resourceableComponents[urlMapping.resourceType]
                 props = {
-                    [`${response.resourceType}Id`]: response.resourceId
+                    [`${urlMapping.resourceType}Id`]: urlMapping.resourceId
                 }
             }
 

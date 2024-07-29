@@ -161,6 +161,7 @@ export const render = async (req, res, next) => {
         }
         return !!match
     })
+    console.log('match: ', match)
     res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'end')
 
     // Step 2 - Get the component

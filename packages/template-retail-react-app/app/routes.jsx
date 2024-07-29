@@ -17,6 +17,8 @@ import {Redirect} from 'react-router-dom'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
+import {SlasHelpers, ShopperLogin, ShopperSeo} from '@salesforce/commerce-sdk-react'
+
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
@@ -35,6 +37,7 @@ const fallback = <Skeleton height="75vh" width="100%" />
 // import PageNotFound from './pages/page-not-found'
 
 export const Home = loadable(() => import('./pages/home'), {fallback})
+const Cart = loadable(() => import('./pages/cart'), {fallback})
 export const ProductDetail = loadable(() => import('./pages/product-detail'), {
     fallback
 })
@@ -45,6 +48,7 @@ export const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 // Set the display names
 Home.displayName = 'Home'
+Cart.displayName = 'Cart'
 ProductDetail.displayName = 'ProductDetail'
 ProductList.displayName = 'ProductList'
 PageNotFound.displayName = 'PageNotFound'
@@ -66,6 +70,11 @@ export const routes = [
         component: ProductList
     },
     {
+        path: '/cart',
+        component: Cart,
+        exact: true
+    },
+    {
         path: '*',
         component: PageNotFound
     }
@@ -73,32 +82,58 @@ export const routes = [
 
 const componentNameMap = {
     'Home': Home,
+    'Cart': Cart,
     'ProductDetail': ProductDetail,
     'ProductList': ProductList,
-    'PageNotFount': PageNotFound
+    'PageNotFound': PageNotFound
 }
 
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+
 const getUrlMapping = async (urlSegment) => {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    
-    // DEVELOPER NOTE: We probably need to account for the site and locale prefixes if there are any.
-    const mappings = {
-        "/custom-url": {
-            resourceId: '25752986M',
-            resourceType: 'product'
+    // This is only being called on the server.
+    const appConfig = getConfig().app
+    const appOrigin = getAppOrigin()
+
+    const config = {
+        proxy: `${appOrigin}${appConfig.commerceAPI.proxyPath}`,
+        parameters: {
+            clientId: appConfig.commerceAPI.parameters.clientId,
+            organizationId: appConfig.commerceAPI.parameters.organizationId,
+            shortCode: appConfig.commerceAPI.parameters.shortCode,
+            siteId: 'RefArch',
+            locale: 'en-US',
+            currency: 'USD'
         },
-        "/product/TG786M": {
-            redirectUrl: {
-                destinationId: '52416781M',
-                destinationType: 'product'
-            },
-            resourceId: 'mens',
-            resourceType: 'category'
-        }
+        throwOnBadResponse: true
     }
-    // DEVELOPER NOTE: For now we are only simulating a valid response for a custom url, not an error, or a 
-    // redirect.
-    return mappings[urlSegment]
+
+    const slasClient = new ShopperLogin(config)
+    const shopperSeoClient = new ShopperSeo(config)
+
+    // Add auth then request to
+    const authResponse = await SlasHelpers.loginGuestUser(slasClient, {
+        redirectURI: `${appOrigin}/callback`
+    })
+    let mapping
+
+    try {
+        console.log(`Fetching SEO Mapping for segment: ${urlSegment}`)
+
+        mapping = await shopperSeoClient.getUrlMapping({
+            parameters: {
+                urlSegment
+            },
+            headers: {
+                authorization: `Bearer ${authResponse.access_token}`
+            }
+        })
+        console.log('mapping: ', mapping)
+    } catch(e){
+        console.error(`Couldn't find mapping for given segement: ${urlSegment}`)
+    }
+
+    return mapping
 }
 
 export default async (locals) => {
@@ -108,6 +143,7 @@ export default async (locals) => {
     if (!isServerSide) {
         // CLIENT!
 
+        // Router Deserialization
         let _routes = window.__CONFIG__.app.routes
         configuredRoutes = await Promise.all(_routes.map(async ({path, componentName, componentProps}) => {
             // DEVELOPER NOTE: We previously tried to dynamically load the component using the path to map to the 
@@ -136,16 +172,15 @@ export default async (locals) => {
             ignoredRoutes: ['/callback', '*']
         })
     } else {
-        debugger
         // SERVER!
-
         configuredRoutes = configureRoutes(routes, config, {
             ignoredRoutes: ['/callback', '*']
         })
 
         const mapping = await getUrlMapping(locals.originalUrl.split('?')[0])
         if (mapping) {
-            const isRedirect = !!mapping.redirectUrl
+            // Resource type is not defined for redirects with a URL destination
+            const isRedirect = !mapping.resourceType
 
             // DEVELOPER NOTE: Here is where you would use the resource type to assign the corrent component.
             
@@ -154,10 +189,14 @@ export default async (locals) => {
             if (isRedirect) {
                 Component = Redirect
                 props = {
-                    to: `/${mapping.redirectUrl.destinationType}/${mapping.redirectUrl.destinationId}`
+                    to: mapping.destinationUrl
                 }
             } else {
-                Component = ProductDetail
+                const resourceableComponents = {
+                    category: ProductList,
+                    product: ProductDetail
+                }
+                Component = resourceableComponents[mapping.resourceType]
                 props = {
                     [`${mapping.resourceType}Id`]: mapping.resourceId
                 }
@@ -173,6 +212,8 @@ export default async (locals) => {
                 }),
                 ...configuredRoutes
             ]
+
+            console.log('configuredRoutes: ', configuredRoutes)
         }
     }
 
