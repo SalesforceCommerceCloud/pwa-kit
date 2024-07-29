@@ -55,6 +55,7 @@ import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useQueryClient} from '@tanstack/react-query'
 
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
@@ -141,7 +142,7 @@ const App = (props) => {
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
-
+    const queryClient = useQueryClient()
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     const targetLocale = getTargetLocale({
@@ -299,19 +300,7 @@ const App = (props) => {
     }, [location])
 
     const refetchDataOnClient = () => {
-        console.log('history', history)
-        const currentPage = new URL(window?.location?.href)
-
-        if (currentPage.pathname.startsWith('/__pwa-kit/refresh')) {
-            console.warn('Data refresh already in process.')
-            return
-        }
-
-        history['replace'](
-            `/__pwa-kit/refresh?referrer=${encodeURIComponent(
-                currentPage.href.replace(currentPage.origin, '')
-            )}`
-        )
+        queryClient.invalidateQueries()
     }
 
     return (
