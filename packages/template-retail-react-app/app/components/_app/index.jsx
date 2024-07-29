@@ -248,10 +248,11 @@ const App = (props) => {
     }, [])
 
     useEffect(() => {
-        if (hydrated) {
+        console.log('isHydrated()', isHydrated())
+        if (isHydrated()) {
             refetchDataOnClient()
         }
-    }, [hydrated])
+    }, [])
 
     useEffect(() => {
         // Lets automatically close the mobile navigation when the
@@ -294,10 +295,9 @@ const App = (props) => {
     }
 
     useEffect(() => {
-        const hydrated = isHydrated()
-        console.log('hydrated', hydrated)
         trackPage()
     }, [location])
+
     const refetchDataOnClient = () => {
         console.log('history', history)
         const currentPage = new URL(window?.location?.href)
