@@ -430,6 +430,8 @@ export const respondFromBundle = ({req, res, path, redirect = 301}) => {
     // /mobify/bundle path
     const location = `${getBundleBaseUrl()}${assetPath}`
 
+    console.log(`Location: ${location}`)
+
     localDevLog(
         `Req ${res.locals.requestId}: redirecting ${assetPath} to ${location} (${workingRedirect})`
     )

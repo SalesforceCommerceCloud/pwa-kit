@@ -40,6 +40,7 @@ export const getNamespace = () => {
     // }
 
     let ssrNamespace = config?.ssrNamespace ? config.ssrNamespace : ''
+    console.log(`SSR Namespace: ${ssrNamespace}`)
     ssrNamespace = typeof ssrNamespace === 'function' ? namespace() : ssrNamespace
     return ssrNamespace
 
