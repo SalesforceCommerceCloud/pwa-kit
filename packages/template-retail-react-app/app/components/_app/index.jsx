@@ -63,7 +63,12 @@ import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import {
+    watchOnlineStatus,
+    flatten,
+    isServer,
+    isHydrated
+} from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -243,6 +248,12 @@ const App = (props) => {
     }, [])
 
     useEffect(() => {
+        if (hydrated) {
+            refetchDataOnClient()
+        }
+    }, [hydrated])
+
+    useEffect(() => {
         // Lets automatically close the mobile navigation when the
         // location path is changed.
         onClose()
@@ -283,8 +294,25 @@ const App = (props) => {
     }
 
     useEffect(() => {
+        const hydrated = isHydrated()
+        console.log('hydrated', hydrated)
         trackPage()
     }, [location])
+    const refetchDataOnClient = () => {
+        console.log('history', history)
+        const currentPage = new URL(window?.location?.href)
+
+        if (currentPage.pathname.startsWith('/__pwa-kit/refresh')) {
+            console.warn('Data refresh already in process.')
+            return
+        }
+
+        history['replace'](
+            `/__pwa-kit/refresh?referrer=${encodeURIComponent(
+                currentPage.href.replace(currentPage.origin, '')
+            )}`
+        )
+    }
 
     return (
         <Box className="sf-app" {...styles.container}>
@@ -366,14 +394,14 @@ const App = (props) => {
                                     colorScheme="teal"
                                     variant="solid"
                                     onClick={async () => {
-                                        await createShopperContext.mutate({
+                                        await createShopperContext.mutateAsync({
                                             parameters: {
                                                 usid,
                                                 siteId: site.id
                                             },
                                             body: {}
                                         })
-                                        // window.location.reload()
+                                        refetchDataOnClient()
                                     }}
                                 >
                                     Create context
@@ -382,13 +410,13 @@ const App = (props) => {
                                     colorScheme="red"
                                     variant="solid"
                                     onClick={async () => {
-                                        await deleteShopperContext.mutate({
+                                        await deleteShopperContext.mutateAsync({
                                             parameters: {
                                                 usid,
                                                 siteId: site.id
                                             }
                                         })
-                                        // window.location.reload()
+                                        refetchDataOnClient()
                                     }}
                                 >
                                     Delete context
@@ -397,18 +425,18 @@ const App = (props) => {
                                     colorScheme="yellow"
                                     variant="solid"
                                     onClick={async () => {
-                                        await updateShopperContext.mutate({
+                                        const test = await updateShopperContext.mutateAsync({
                                             parameters: {
                                                 usid,
                                                 siteId: site.id
                                             },
                                             body: {
-                                                customQualifiers: {
-                                                    test: 'test'
-                                                }
+                                                sourceCode: 'instagram'
                                             }
                                         })
-                                        window.location.reload()
+                                        console.log('test', test)
+                                        refetchDataOnClient()
+                                        // window.location.reload()
                                     }}
                                 >
                                     Update context
