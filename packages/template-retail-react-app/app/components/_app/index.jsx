@@ -55,6 +55,7 @@ import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useQueryClient} from '@tanstack/react-query'
 
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
@@ -63,7 +64,12 @@ import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import {
+    watchOnlineStatus,
+    flatten,
+    isServer,
+    isHydrated
+} from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -136,7 +142,7 @@ const App = (props) => {
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
-
+    const queryClient = useQueryClient()
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     const targetLocale = getTargetLocale({
@@ -243,6 +249,13 @@ const App = (props) => {
     }, [])
 
     useEffect(() => {
+        console.log('isHydrated()', isHydrated())
+        if (isHydrated()) {
+            refetchDataOnClient()
+        }
+    }, [])
+
+    useEffect(() => {
         // Lets automatically close the mobile navigation when the
         // location path is changed.
         onClose()
@@ -285,6 +298,10 @@ const App = (props) => {
     useEffect(() => {
         trackPage()
     }, [location])
+
+    const refetchDataOnClient = () => {
+        queryClient.invalidateQueries()
+    }
 
     return (
         <Box className="sf-app" {...styles.container}>
@@ -366,16 +383,14 @@ const App = (props) => {
                                     colorScheme="teal"
                                     variant="solid"
                                     onClick={async () => {
-                                        await createShopperContext.mutate({
+                                        await createShopperContext.mutateAsync({
                                             parameters: {
                                                 usid,
                                                 siteId: site.id
                                             },
-                                            body: {
-                                                sourceCode: 'test'
-                                            }
+                                            body: {}
                                         })
-                                        // window.location.reload()
+                                        refetchDataOnClient()
                                     }}
                                 >
                                     Create context
@@ -384,13 +399,13 @@ const App = (props) => {
                                     colorScheme="red"
                                     variant="solid"
                                     onClick={async () => {
-                                        await deleteShopperContext.mutate({
+                                        await deleteShopperContext.mutateAsync({
                                             parameters: {
                                                 usid,
                                                 siteId: site.id
                                             }
                                         })
-                                        // window.location.reload()
+                                        refetchDataOnClient()
                                     }}
                                 >
                                     Delete context
@@ -399,7 +414,7 @@ const App = (props) => {
                                     colorScheme="yellow"
                                     variant="solid"
                                     onClick={async () => {
-                                        await updateShopperContext.mutate({
+                                        const test = await updateShopperContext.mutateAsync({
                                             parameters: {
                                                 usid,
                                                 siteId: site.id
@@ -408,6 +423,7 @@ const App = (props) => {
                                                 sourceCode: 'instagram'
                                             }
                                         })
+                                        refetchDataOnClient()
                                         // window.location.reload()
                                     }}
                                 >
