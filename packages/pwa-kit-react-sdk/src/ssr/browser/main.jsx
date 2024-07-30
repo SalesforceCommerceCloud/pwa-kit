@@ -42,17 +42,21 @@ export const registerServiceWorker = (url) => {
     })
 }
 
+const getBaseName = () => {
+    return window.location.pathname.split('/')[1]
+}
+
 export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
 
-    const baseName = getNamespace() ? getNamespace() : '/'
-    console.log(`Namespace from main: ${getNamespace()}`)
-    console.log(`Basename from main: ${baseName}`)
+    // const baseName = getNamespace() ? getNamespace() : '/'
+    // console.log(`Namespace from main: ${getNamespace()}`)
+    // console.log(`Basename from main: ${baseName}`)
 
     return (
         <ServerContext.Provider value={{}}>
-            <Router ref={onHydrate} basename={baseName}>
+            <Router ref={onHydrate} basename={getBaseName()}>
                 <CorrelationIdProvider
                     correlationId={() => {
                         // If we are hydrating an error page use the server correlation id.

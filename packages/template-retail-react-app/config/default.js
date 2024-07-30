@@ -10,7 +10,8 @@ const sites = require('./sites.js')
 module.exports = {
     app: {
         url: {
-            site: 'path',
+            basePath: 'path',
+            site: 'none',
             locale: 'path',
             showDefaults: true,
             interpretPlusSignAsSpace: false

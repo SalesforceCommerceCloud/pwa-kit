@@ -21,6 +21,6 @@ import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-pa
 // This gets resolved before bundleBasePath can get the namespace from config client side
 // TODO: sNeed to do something here
 /* global __webpack_public_path__: writable */
-__webpack_public_path__ = `${bundleBasePath()}/development/`
+__webpack_public_path__ = `/local/mobify/bundle/development/`
 
 // __webpack_public_path__ = `/local/mobify/bundle/development/`

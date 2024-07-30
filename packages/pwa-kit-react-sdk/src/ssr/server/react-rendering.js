@@ -128,6 +128,8 @@ export const render = async (req, res, next) => {
 
     const [pathname] = req.originalUrl.split('?')
 
+    const basename = pathname.split('/')[1]
+
     const location = {
         pathname,
         search: getLocationSearch(req, {
@@ -160,7 +162,8 @@ export const render = async (req, res, next) => {
         res,
         App: WrappedApp,
         routes,
-        location
+        location,
+        basename
     }
     let appJSX = <OuterApp {...props} />
 
@@ -225,11 +228,11 @@ export const render = async (req, res, next) => {
     }
 }
 
-const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
+const OuterApp = ({req, res, error, App, appState, routes, routerContext, location, basename}) => {
     const AppConfig = getAppConfig()
     return (
         <ServerContext.Provider value={{req, res}}>
-            <Router location={location} context={routerContext}>
+            <Router location={location} context={routerContext} basename={basename}>
                 <CorrelationIdProvider
                     correlationId={res.locals.requestId}
                     resetOnPageChange={false}
