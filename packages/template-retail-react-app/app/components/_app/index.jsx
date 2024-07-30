@@ -248,12 +248,14 @@ const App = (props) => {
 
     const onAccountClick = () => {
         // Link to account page if registered; Header component will show auth modal for guest users
+        // does not include the namespace - react router seems to add it automatically here
         const path = buildUrl('/account')
         history.push(path)
     }
 
     const onWishlistClick = () => {
         // Link to wishlist page if registered; Header component will show auth modal for guest users
+                // does not include the namespace - react router seems to add it automatically here
         const path = buildUrl('/account/wishlist')
         history.push(path)
     }

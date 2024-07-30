@@ -42,6 +42,7 @@ export const registerServiceWorker = (url) => {
     })
 }
 
+// TODO - we may want to add some way to limit the possible basenames to what is set in some config file?
 const getBaseName = () => {
     return window.location.pathname.split('/')[1]
 }

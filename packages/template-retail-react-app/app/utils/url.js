@@ -177,6 +177,7 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
 
     // rebuild the url with new locale
     // we need buildUrl to add the namespace - react router does not add it automatically here
+    // because in places like footer.js, we update window.location directly rather than react router history
     const newUrl = buildUrl(
         `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,

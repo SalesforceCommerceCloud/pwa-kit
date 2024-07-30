@@ -19,6 +19,8 @@ const useNavigation = () => {
 
     const {site, locale: localeShortCode, buildUrl} = useMultiSite()
 
+    // TODO - does this need to be updated to remove the namespace???
+    // It doesn't seem we need to make changes here??
     return useCallback(
         /**
          *
