@@ -98,10 +98,7 @@ const Cart = () => {
             parameters: {
                 ids: bundleChildVariantIds,
                 allImages: false,
-                expand: [
-                    'availability',
-                    'variations',
-                ],
+                expand: ['availability', 'variations'],
                 select: '(data.(id,inventory))'
             }
         },
@@ -121,23 +118,24 @@ const Cart = () => {
     // TODO: update this comment
     // Set up newProducts object where key is itemId and value is the product data
     let updateState = {}
-    basket?.productItems?.forEach(productItem => {
+    basket?.productItems?.forEach((productItem) => {
         // TODO: making deepcopy for now but think about reverting
         let modifiedProductData = products?.[productItem?.productId]
-        if(modifiedProductData)
+        if (modifiedProductData)
             modifiedProductData = JSON.parse(JSON.stringify(products?.[productItem?.productId]))
-        
+
         // calculate inventory for product bundles based on availability of children
-        if(productItem?.bundledProductItems) {
-            let lowestStockLevel = modifiedProductData?.inventory?.stockLevel || Number.MAX_SAFE_INTEGER
-            productItem?.bundledProductItems.forEach(bundleChild => {
+        if (productItem?.bundledProductItems) {
+            let lowestStockLevel =
+                modifiedProductData?.inventory?.stockLevel || Number.MAX_SAFE_INTEGER
+            productItem?.bundledProductItems.forEach((bundleChild) => {
                 lowestStockLevel = Math.min(
                     lowestStockLevel,
                     bundleChildProductData?.[bundleChild.productId]?.inventory?.stockLevel
                 )
             })
 
-            if(modifiedProductData?.inventory) {
+            if (modifiedProductData?.inventory) {
                 modifiedProductData.inventory = {
                     ...modifiedProductData.inventory,
                     stockLevel: lowestStockLevel
@@ -148,7 +146,7 @@ const Cart = () => {
     })
 
     // TODO: see if there's a better way to compare
-    if(JSON.stringify(newProducts) !== JSON.stringify(updateState))
+    if (JSON.stringify(newProducts) !== JSON.stringify(updateState))
         setNewProducts({...updateState})
 
     const {data: customer} = useCurrentCustomer()

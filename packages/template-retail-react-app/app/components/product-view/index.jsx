@@ -118,7 +118,7 @@ const ProductView = forwardRef(
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
-            selectedBundleParentQuantity = 0,
+            selectedBundleParentQuantity = 1
         },
         ref
     ) => {
@@ -251,11 +251,13 @@ const ProductView = forwardRef(
                 addToWishlist(product, variant, quantity)
             }
 
+            // TODO: figure out how to get rid of the 'Out of Stock' message when updating cart using edit modal
+            // maybe utilize showLoading
             let disableButton = showInventoryMessage
             if (!disableButton && (isProductASet || isProductABundle) && childProductOrderability) {
                 // if any of the children are not orderable, it will disable the add to cart button
-                disableButton = Object.keys(childProductOrderability).some((productId) => {
-                    return !childProductOrderability[productId]
+                disableButton = Object.keys(childProductOrderability).some((itemId) => {
+                    return !childProductOrderability[itemId]
                 })
             }
 
@@ -315,7 +317,10 @@ const ProductView = forwardRef(
         }
 
         // Set the quantity of bundle child in a product bundle to ensure availability messages appear
-        if(isProductPartOfBundle && quantity != selectedBundleParentQuantity * childOfBundleQuantity) {
+        if (
+            isProductPartOfBundle &&
+            quantity != selectedBundleParentQuantity * childOfBundleQuantity
+        ) {
             setQuantity(selectedBundleParentQuantity * childOfBundleQuantity)
         }
 
@@ -346,7 +351,7 @@ const ProductView = forwardRef(
                 // when showInventoryMessage is true, it means child product is not orderable
                 setChildProductOrderability((previousState) => ({
                     ...previousState,
-                    [product.id]: !showInventoryMessage
+                    [product.itemId]: !showInventoryMessage
                 }))
             }
         }, [showInventoryMessage])
@@ -523,7 +528,7 @@ const ProductView = forwardRef(
                                             // Set the Quantity of product to value of input if value number
                                             if (numberValue >= 0) {
                                                 setQuantity(numberValue)
-                                                if(isProductABundle)
+                                                if (isProductABundle)
                                                     setSelectedBundleQuantity(numberValue)
                                             } else if (stringValue === '') {
                                                 // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
@@ -536,7 +541,7 @@ const ProductView = forwardRef(
                                             const value = e.target.value
                                             if (parseInt(value) < 0 || value === '') {
                                                 setQuantity(minOrderQuantity)
-                                                if(isProductABundle)
+                                                if (isProductABundle)
                                                     setSelectedBundleQuantity(minOrderQuantity)
                                             }
                                         }}

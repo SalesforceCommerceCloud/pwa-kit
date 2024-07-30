@@ -120,8 +120,10 @@ const ProductDetail = () => {
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
     let bundleChildVariantIds = ''
-    if(isProductABundle)
-        bundleChildVariantIds = Object.keys(childProductSelection)?.map(key => childProductSelection[key].variant.productId).join(',')
+    if (isProductABundle)
+        bundleChildVariantIds = Object.keys(childProductSelection)
+            ?.map((key) => childProductSelection[key].variant.productId)
+            .join(',')
 
     // TODO: potentially pull this out into a custom hook
     // TODO: rename productsData
@@ -130,10 +132,7 @@ const ProductDetail = () => {
             parameters: {
                 ids: bundleChildVariantIds,
                 allImages: false,
-                expand: [
-                    'availability',
-                    'variations',
-                ],
+                expand: ['availability', 'variations'],
                 select: '(data.(id,inventory,master))'
             }
         },
@@ -145,23 +144,23 @@ const ProductDetail = () => {
 
     // NOTE: this still references the same bundledProducts array,
     // so modifying transformedProduct.bundledProducts also modifies the one in product
-    let transformedProduct = product;
-    if(isProductABundle && productsData) {
+    let transformedProduct = product
+    if (isProductABundle && productsData) {
         // TODO: potentially swtich logic to loop through productsData
         product.bundledProducts.forEach((element, index) => {
             const childProduct = element.product
-            const matchingChildProduct = productsData.data.find(tempChild =>
-                tempChild.master.masterId === childProduct.id
+            const matchingChildProduct = productsData.data.find(
+                (tempChild) => tempChild.master.masterId === childProduct.id
             )
-            if(matchingChildProduct) {
+            if (matchingChildProduct) {
                 transformedProduct.bundledProducts[index] = {
-                    // TODO: you can get rid of element if you do 
+                    // TODO: you can get rid of element if you do
                     // transformedProduct.bundledProducts[index].product = {...}
                     ...element,
                     product: {
                         ...childProduct,
-                        inventory: matchingChildProduct.inventory,
-                    },
+                        inventory: matchingChildProduct.inventory
+                    }
                 }
             }
         })

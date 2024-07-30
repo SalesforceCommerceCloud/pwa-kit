@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {
     Modal,
@@ -26,26 +26,41 @@ import ImageGallery, {
 } from '@salesforce/retail-react-app/app/components/image-gallery'
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 
+// TODO: update this to handle inventory
+// TODO: figure out bug in bundle modal
+// where if price is for the total quantity instead of just 1
+// getting 'only 3 left!' message appears in parent bundle product view
+// also updating quantity and then changing variant doesn't work
+// in multiple cases
 /**
  * A Modal that contains Product View for product bundle
  */
 const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, ...props}) => {
     const productViewModalData = useProductViewModal(bundle)
     const {variationParams} = useDerivedProduct(bundle)
-
-    const childProductIds = productViewModalData.product?.bundledProductItems
-        ?.map(({productId}) => productId)
-        .join(',')
-    const {data: childProducts, isLoading} = useProducts(
-        {parameters: {ids: childProductIds, allImages: true}},
-        {enabled: Boolean(childProductIds)}
-    )
-
     const childProductRefs = useRef({})
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedChildProducts, setSelectedChildProducts] = useState([])
-
+    const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(productViewModalData?.product?.quantity)
     const trueIfMobile = useBreakpointValue({base: true, lg: false})
+    const [childProductIds, setChildProductIds] = useState(productViewModalData.product?.bundledProductItems
+        ?.map(({productId}) => productId).join(',')
+    )
+
+    useEffect(() => {
+        const productIds = selectedChildProducts.map(({ variant }) => ( variant.productId )).join(',')
+        if(productIds?.length > 0 && productIds !== childProductIds) {
+            setChildProductIds(productIds)
+        }
+    }, [selectedChildProducts])
+
+    const {data: childProducts, isLoading} = useProducts(
+        {parameters: {ids: childProductIds, allImages: true}},
+        {
+            enabled: Boolean(childProductIds), 
+            keepPreviousData: true,
+        }
+    )
 
     return (
         <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
@@ -90,6 +105,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                         )
                                     }}
                                     childProductOrderability={childProductOrderability}
+                                    setSelectedBundleQuantity={setSelectedBundleQuantity}
                                     {...props}
                                 />
                             </Box>
@@ -108,9 +124,14 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                             // Do not use an arrow function as we are manipulating the functions scope.
                                             ref={function (ref) {
                                                 // Assign the "set" scope of the ref, this is how we access the internal validation.
-                                                childProductRefs.current[product.id] = {
-                                                    ref,
-                                                    validateOrderability: this.validateOrderability
+                                                const productIds = selectedChildProducts.map(({ variant }) => ( variant.productId ))
+                                                if(productIds.includes(product.id)) {
+                                                    childProductRefs.current[product.id] = {
+                                                        ref,
+                                                        validateOrderability: this.validateOrderability
+                                                    }
+                                                } else {
+                                                    delete childProductRefs.current[product.id]
                                                 }
                                             }}
                                             showImageGallery={false}
@@ -122,6 +143,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                                 setChildProductOrderability
                                             }
                                             childOfBundleQuantity={quantityPerBundle}
+                                            selectedBundleParentQuantity={selectedBundleQuantity}
                                             onVariantSelected={(product, variant, quantity) => {
                                                 setSelectedChildProducts((prev) => {
                                                     const newArray = prev.slice(0)

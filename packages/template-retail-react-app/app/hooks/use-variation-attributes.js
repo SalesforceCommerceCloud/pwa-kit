@@ -96,11 +96,26 @@ export const useVariationAttributes = (
     isProductPartOfSet = false,
     isProductPartOfBundle = false
 ) => {
+    // TODO: rename
+    const bundleVariantFlag = isProductPartOfBundle && product?.type?.variant
     const {variationAttributes = []} = product
     const location = useLocation()
     const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
 
     const existingParams = usePDPSearchParams(product.id)
+    const [allParams] = existingParams
+
+    // TODO: update doc comment to make more sense
+    // In the product bundles edit modal on the cart page, it uses variant ID as the key for query parameters,
+    // but this means whenever a new variant is selected, since the variants have different IDs, the old one
+    // is not overwritten, so we must override it manually
+    if (bundleVariantFlag) {
+        product?.variants?.forEach(({productId: variantId}) => {
+            if (variantId !== product.id && allParams.get(variantId)) {
+                allParams.delete(variantId)
+            }
+        })
+    }
 
     return useMemo(
         () =>
