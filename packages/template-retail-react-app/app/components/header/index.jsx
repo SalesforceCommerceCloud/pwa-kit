@@ -162,7 +162,10 @@ const Header = ({
                             id: 'header.button.assistive_msg.menu',
                             defaultMessage: 'Menu'
                         })}
-                        title="Opens a dialog"
+                        title={intl.formatMessage({
+                            id: 'header.button.assistive_msg.menu.open_dialog',
+                            defaultMessage: 'Opens a dialog'
+                        })}
                         icon={<HamburgerIcon />}
                         variant="unstyled"
                         display={{lg: 'none'}}
