@@ -21,11 +21,12 @@ const useMultiSite = () => {
     const {buildUrl: originalFn, site, locale} = context
 
     const buildUrl = useCallback(
-        (path, siteRef, localeRef) => {
+        (path, siteRef, localeRef, basename) => {
             return originalFn(
                 path,
                 siteRef ? siteRef : site?.alias || site?.id,
-                localeRef ? localeRef : locale?.alias || locale?.id
+                localeRef ? localeRef : locale?.alias || locale?.id,
+                basename
             )
         },
         [originalFn, site, locale]

@@ -110,11 +110,14 @@ export const getParamsFromPath = (path) => {
     const searchMatchForSite = search.match(searchMatcherForSite)
     const searchMatchForLocale = search.match(searchMatcherForLocale)
 
+    // extract baseName - will only be in the path
+    const baseRef =  pathMatch?.groups.basename
+
     // the value can only either in the path or search query param, there will be no overridden
     const siteRef = pathMatch?.groups.site || searchMatchForSite?.groups.site
 
     const localeRef = pathMatch?.groups.locale || searchMatchForLocale?.groups.locale
-    return {siteRef, localeRef}
+    return {baseRef, siteRef, localeRef}
 }
 
 /**
@@ -161,7 +164,9 @@ export const getConfigMatcher = (config) => {
     const searchPatternForSite = `site=(?<site>${sites.join('|')})`
     // prettier-ignore
     // eslint-disable-next-line
-    const pathPattern = `(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
+
+    // update this to include basename - basename capturing group should include all possible basenames
+    const pathPattern = `(?:\/(?<basename>abc))?(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
     // prettier-ignore
     const searchPatternForLocale = `locale=(?<locale>${locales.join('|')})`
     const pathMatcher = new RegExp(pathPattern)

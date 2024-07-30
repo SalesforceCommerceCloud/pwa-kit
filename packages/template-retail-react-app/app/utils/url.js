@@ -131,8 +131,19 @@ export const searchUrlBuilder = (searchTerm) => '/search?q=' + encodeURIComponen
  */
 export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     const location = opts.location ? opts.location : window.location
-    let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
+    let {baseRef, siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
     let {pathname, search} = location
+
+    console.log(`Pathname 1: ${pathname}`)
+    console.log(`Base Ref: ${baseRef}`)
+    console.log(`Site Ref: ${siteRef} | Locale Ref: ${localeRef}`)
+
+    // pathname here is the full pathname /abc/site/locale/etc?queryparam
+
+    // we need to remove the basename if it is present
+    if (baseRef) {
+        pathname = pathname.replace(`/${baseRef}`, '')
+    }
 
     // sanitize the site from current url if existing
     if (siteRef) {
@@ -144,6 +155,9 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         pathname = pathname.replace(`/${localeRef}`, '')
         search = search.replace(`locale=${localeRef}`, '')
     }
+
+    console.log(`Pathname 2: ${pathname}`)
+
     // remove ending any &
     search = search.replace(/&$/, '')
 
@@ -161,14 +175,19 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
     const site = getSiteByReference(siteRef)
     const locale = getLocaleByReference(site, shortCode)
 
-    // rebuild the url with new locale,
+    // rebuild the url with new locale
+    // we need buildUrl to add the namespace - react router does not add it automatically here
     const newUrl = buildUrl(
         `${pathname}${Array.from(queryString).length !== 0 ? `?${queryString}` : ''}`,
         // By default, as for home page, when the values of site and locale belongs to the default site,
         // they will be not shown in the url just
         site.alias || site.id,
-        locale?.alias || locale?.id
+        locale?.alias || locale?.id,
+        baseRef
     )
+
+    console.log(`New URL: ${newUrl}`)
+
     return newUrl
 }
 
@@ -208,12 +227,15 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
         (localeConfig === urlPartPositions.PATH && showDefaultsConfig) ||
         (localeConfig === urlPartPositions.PATH && !showDefaultsConfig && !isDefaultLocale)
 
-    return (path, site, locale) => {
+    // this is the function that is stored in locals.buildUrl
+    // this is called in many places as buildUrl for our multisite implementation
+    return (path, site, locale, basename) => {
         const isHomeWithDefaultSiteAndLocale =
             path === HOME_HREF &&
             (defaultSite.id === site || (defaultSite.alias && defaultSite.alias === site)) &&
             (defaultLocale.id === locale || (defaultLocale.alias && defaultLocale.alias === locale))
 
+        const basePath = basename ? `/${basename}` : ''
         const sitePath = pathSite && site && !isHomeWithDefaultSiteAndLocale ? `/${site}` : ''
         const localePath =
             pathLocale && locale && !isHomeWithDefaultSiteAndLocale ? `/${locale}` : ''
@@ -226,7 +248,7 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
             queryLocale && locale && searchParams.append('locale', locale)
             queryString = `?${searchParams.toString()}`
         }
-        return `${sitePath}${localePath}${path}${queryString}`
+        return `${basePath}${sitePath}${localePath}${path}${queryString}`
     }
 }
 

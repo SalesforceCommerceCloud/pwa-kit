@@ -11,7 +11,7 @@ module.exports = {
     app: {
         url: {
             basePath: 'path',
-            site: 'none',
+            site: 'path',
             locale: 'path',
             showDefaults: true,
             interpretPlusSignAsSpace: false
