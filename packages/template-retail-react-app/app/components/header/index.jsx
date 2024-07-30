@@ -106,6 +106,7 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
+    const popoverTriggerRef = useRef(null)
     const {
         derivedData: {totalItems},
         data: basket
@@ -143,6 +144,14 @@ const Header = ({
         }, 100)
     }
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Tab' && event.shiftKey && isAccountMenuOpen) {
+            // Prevent default behavior to keep focus on the popup trigger
+            event.preventDefault()
+            popoverTriggerRef.current.focus()
+        }
+    }
+
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
@@ -153,6 +162,7 @@ const Header = ({
                             id: 'header.button.assistive_msg.menu',
                             defaultMessage: 'Menu'
                         })}
+                        title="Opens a dialog"
                         icon={<HamburgerIcon />}
                         variant="unstyled"
                         display={{lg: 'none'}}
@@ -206,6 +216,8 @@ const Header = ({
                                     {...getAccountMenuButtonProps()}
                                     onMouseOver={onAccountMenuOpen}
                                     onMouseLeave={handleIconsMouseLeave}
+                                    ref={popoverTriggerRef}
+                                    onKeyDown={handleKeyDown}
                                 />
                             </PopoverTrigger>
 
