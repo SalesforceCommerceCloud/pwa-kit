@@ -13,7 +13,8 @@ module.exports = {
             site: 'none',
             locale: 'none',
             showDefaults: false,
-            interpretPlusSignAsSpace: false
+            interpretPlusSignAsSpace: false,
+            seoUrlMapping: true
         },
         defaultSite: 'RefArch',
         siteAliases: {

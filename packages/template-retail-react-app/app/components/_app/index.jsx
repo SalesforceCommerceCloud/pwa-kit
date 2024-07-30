@@ -72,6 +72,8 @@ import {
     DEFAULT_LOCALE,
     ACTIVE_DATA_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
@@ -80,7 +82,6 @@ import {useBlock} from '@salesforce/retail-react-app/app/hooks/use-block'
 import {useRouteContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/switch'
 import {ProductDetail, ProductList} from '@salesforce/retail-react-app/app/routes'
 import {Redirect} from 'react-router-dom'
-import { response } from '@salesforce/retail-react-app/node_modules/msw/lib/index'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -142,6 +143,7 @@ const App = (props) => {
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const config = getConfig()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -199,7 +201,13 @@ const App = (props) => {
     const {routes, updateRoutes} = useRouteContext()
 
     useBlock(async (location) => {
-        
+        const seoUrlMappingEnabled = !!config?.app?.url?.seoUrlMapping
+        // const seoUrlMappingEnabled = true
+
+        if (!seoUrlMappingEnabled) {
+            // Don't block if seo url mapping is not enabled.
+            return false
+        }
         const urlSegment = location.pathname
         console.log('useBlock: urlSegment: ', urlSegment)
 

@@ -140,6 +140,8 @@ export default async (locals) => {
     const config = getConfig()
     let configuredRoutes = []
 
+    const seoUrlMappingEnabled = !!config?.app?.url?.seoUrlMapping
+
     if (!isServerSide) {
         // CLIENT!
 
@@ -177,43 +179,48 @@ export default async (locals) => {
             ignoredRoutes: ['/callback', '*']
         })
 
-        const mapping = await getUrlMapping(locals.originalUrl.split('?')[0])
-        if (mapping) {
-            // Resource type is not defined for redirects with a URL destination
-            const isRedirect = !mapping.resourceType
+        if (seoUrlMappingEnabled) {
+            const mapping = await getUrlMapping(locals.originalUrl.split('?')[0])
+            if (mapping) {
+                // Resource type is not defined for redirects with a URL destination
+                const isRedirect = !mapping.resourceType
 
-            // DEVELOPER NOTE: Here is where you would use the resource type to assign the corrent component.
-            
-            let Component
-            let props
-            if (isRedirect) {
-                Component = Redirect
-                props = {
-                    to: mapping.destinationUrl
+                // Set the type. 301/302/307
+                // locals.res.status = mapping.type
+
+                // DEVELOPER NOTE: Here is where you would use the resource type to assign the corrent component.
+                
+                let Component
+                let props
+                if (isRedirect) {
+                    Component = Redirect
+                    props = {
+                        to: mapping.destinationUrl
+                    }
+                } else {
+                    const resourceableComponents = {
+                        category: ProductList,
+                        product: ProductDetail
+                    }
+                    Component = resourceableComponents[mapping.resourceType]
+                    props = {
+                        [`${mapping.resourceType}Id`]: mapping.resourceId
+                    }
                 }
-            } else {
-                const resourceableComponents = {
-                    category: ProductList,
-                    product: ProductDetail
-                }
-                Component = resourceableComponents[mapping.resourceType]
-                props = {
-                    [`${mapping.resourceType}Id`]: mapping.resourceId
-                }
+
+                configuredRoutes = [
+                    ...configureRoutes([{
+                        path: locals.originalUrl.split('?')[0],
+                        component: Component,
+                        props
+                    }], config, {
+                        ignoredRoutes: []
+                    }),
+                    ...configuredRoutes
+                ]
+
+                console.log('configuredRoutes: ', configuredRoutes)
             }
-
-            configuredRoutes = [
-                ...configureRoutes([{
-                    path: locals.originalUrl.split('?')[0],
-                    component: Component,
-                    props
-                }], config, {
-                    ignoredRoutes: []
-                }),
-                ...configuredRoutes
-            ]
-
-            console.log('configuredRoutes: ', configuredRoutes)
         }
     }
 
