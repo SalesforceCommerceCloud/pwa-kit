@@ -7,6 +7,10 @@
         {
             "name": "dw.shop.shopper_context.beforePUT",
             "script": "./cartridge/scripts/hooks/createShopperContext"
+        },
+        {
+            "name": "dw.system.request.onRequest",
+            "script": "./cartridge/scripts/hooks/request/onRequest"
         }
     ]
 }

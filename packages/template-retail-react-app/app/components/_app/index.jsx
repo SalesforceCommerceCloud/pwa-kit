@@ -272,8 +272,7 @@ const App = (props) => {
     }
 
     const onCartClick = () => {
-        const path = buildUrl('/cart')
-        history.push(path)
+        history.push('/cart')
 
         // Close the drawer.
         onClose()
@@ -379,56 +378,63 @@ const App = (props) => {
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
                             <Box {...styles.headerWrapper}>
-                                <Button
-                                    colorScheme="teal"
-                                    variant="solid"
-                                    onClick={async () => {
-                                        await createShopperContext.mutateAsync({
-                                            parameters: {
-                                                usid,
-                                                siteId: site.id
-                                            },
-                                            body: {}
-                                        })
-                                        refetchDataOnClient()
-                                    }}
-                                >
-                                    Create context
-                                </Button>
-                                <Button
-                                    colorScheme="red"
-                                    variant="solid"
-                                    onClick={async () => {
-                                        await deleteShopperContext.mutateAsync({
-                                            parameters: {
-                                                usid,
-                                                siteId: site.id
-                                            }
-                                        })
-                                        refetchDataOnClient()
-                                    }}
-                                >
-                                    Delete context
-                                </Button>
-                                <Button
-                                    colorScheme="yellow"
-                                    variant="solid"
-                                    onClick={async () => {
-                                        const test = await updateShopperContext.mutateAsync({
-                                            parameters: {
-                                                usid,
-                                                siteId: site.id
-                                            },
-                                            body: {
-                                                sourceCode: 'instagram'
-                                            }
-                                        })
-                                        refetchDataOnClient()
-                                        // window.location.reload()
-                                    }}
-                                >
-                                    Update context
-                                </Button>
+                                <Box bg="#fff">
+                                    <Button
+                                        colorScheme="teal"
+                                        variant="solid"
+                                        onClick={async () => {
+                                            await createShopperContext.mutateAsync({
+                                                parameters: {
+                                                    usid,
+                                                    siteId: site.id
+                                                },
+                                                body: {
+                                                    sourceCode: 'test'
+                                                }
+                                            })
+                                            refetchDataOnClient()
+                                            document.cookie = `shopper_context_${site.id}=1`
+                                        }}
+                                    >
+                                        Create context
+                                    </Button>
+                                    <Button
+                                        colorScheme="red"
+                                        variant="solid"
+                                        onClick={async () => {
+                                            await deleteShopperContext.mutateAsync({
+                                                parameters: {
+                                                    usid,
+                                                    siteId: site.id
+                                                }
+                                            })
+                                            refetchDataOnClient()
+                                            document.cookie = `shopper_context_${site.id}=0`
+                                        }}
+                                    >
+                                        Delete context
+                                    </Button>
+                                    <Button
+                                        colorScheme="yellow"
+                                        variant="solid"
+                                        onClick={async () => {
+                                            const test = await updateShopperContext.mutateAsync({
+                                                parameters: {
+                                                    usid,
+                                                    siteId: site.id
+                                                },
+                                                body: {
+                                                    sourceCode: 'instagram'
+                                                }
+                                            })
+                                            refetchDataOnClient()
+                                            document.cookie = `shopper_context_${site.id}=1`
+                                            // window.location.reload()
+                                        }}
+                                    >
+                                        Update context
+                                    </Button>
+                                </Box>
                                 {!isCheckout ? (
                                     <>
                                         <AboveHeader />

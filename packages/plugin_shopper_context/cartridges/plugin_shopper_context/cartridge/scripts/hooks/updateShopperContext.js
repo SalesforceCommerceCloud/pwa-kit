@@ -4,7 +4,7 @@
 var Status = require('dw/system/Status');
 var { validateContext } = require('*/cartridge/scripts/helpers/utils');
 var Logger = require('dw/system/Logger');
-var log = Logger.getLogger('plugin_slas', 'plugin_slas.config');
+var log = Logger.getLogger('plugin_shopper_context', 'plugin_shopper_context.beforePATCH');
 
 exports.beforePATCH = function (usid, siteId, shopperContext) {
     var clientId = request.clientId;
