@@ -5,9 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import useConfig from '@salesforce/commerce-sdk-react/hooks/useConfig'
-import {
-    redirectToAuthURL
-} from '@salesforce/retail-react-app/app/utils/passwordless-utils'
+import {redirectToAuthURL} from '@salesforce/retail-react-app/app/utils/passwordless-utils'
 
 // For testing purposes, hardcoding values here
 const callback_uri = 'http://localhost:3000/pwdless-login-callback'
@@ -26,7 +24,6 @@ export default function usePasswordlessSignIn() {
      * @param {String} user_id the Identity Provider to use for login
      */
     const authorizeCustomer = async (user_id) => {
-
         redirectToAuthURL(
             proxy,
             callback_uri,

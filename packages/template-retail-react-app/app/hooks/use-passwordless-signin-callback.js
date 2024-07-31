@@ -6,10 +6,6 @@
  */
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import {useEffect, useState} from 'react'
-import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search-params'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-
-const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
 
 /**
  * A hook that handles the IDP callback
@@ -19,32 +15,30 @@ const SLAS_CALLBACK_ENDPOINT = '/idp-callback'
  *
  * @returns {{authenticationError: String}} - The authentication error
  */
-const useGoogleSignInCallback = ({labels}) => {
-    const [params] = useSearchParams()
-    const [authenticationError, setAuthenticationError] = useState(params.error_description)
+const usePasswordlessSignInCallback = ({token, labels}) => {
+    const [authenticationError, setAuthenticationError] = useState()
     const auth = useAuthContext()
 
-    useEffect(() => {
+    const handleButtonClick = () => {
         // If there is an error in the URL, we don't need to do anything else
         if (authenticationError) {
             return
         }
 
         // We need to make sure we have the usid and code in the URL
-        if (!params.usid || !params.code) {
+        if (!token) {
             setAuthenticationError(labels?.missingParameters)
 
             return
         }
+        console.log('ellloooo')
 
-        auth.loginIDPUser({
-            usid: params.usid,
-            code: params.code,
-            redirectURI: `${getAppOrigin()}${SLAS_CALLBACK_ENDPOINT}`
+        auth.loginPasswordlessUser({
+            pwdless_login_token: token
         })
-    }, [])
+    }
 
-    return {authenticationError}
+    return {handleButtonClick, authenticationError}
 }
 
-export default useGoogleSignInCallback
+export default usePasswordlessSignInCallback

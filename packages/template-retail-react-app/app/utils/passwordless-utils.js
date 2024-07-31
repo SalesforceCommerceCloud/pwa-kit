@@ -26,7 +26,6 @@ export const redirectToAuthURL = (
     clientId,
     clientSecret
 ) => {
-
     const encodedAuth = btoa(`${clientId}:${clientSecret}`)
     const urlEncodedBody = new URLSearchParams({
         callback_uri: callback_uri,
@@ -35,22 +34,21 @@ export const redirectToAuthURL = (
         user_id: user_id
     })
 
-
     const url = `${proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/passwordless/login`
 
     fetch(url, {
         method: 'POST',
         headers: {
-            'Authorization': `Basic ${encodedAuth}`,
+            Authorization: `Basic ${encodedAuth}`,
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: urlEncodedBody.toString()
     })
-    .then(response => {
-        console.log(response.text())
-    })
-    .then(data => {
-        console.log('Success: ', data)
-    })
-    .catch(error => console.error('Error: ', error))
+        .then((response) => {
+            console.log(response.text())
+        })
+        .then((data) => {
+            console.log('Success: ', data)
+        })
+        .catch((error) => console.error('Error: ', error))
 }

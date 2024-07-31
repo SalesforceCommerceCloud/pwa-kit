@@ -51,7 +51,6 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                         </Alert>
                     )}
                     <Stack>
-
                         <Box>
                             <Button variant="link" size="sm" onClick={clickForgotPassword}>
                                 <FormattedMessage

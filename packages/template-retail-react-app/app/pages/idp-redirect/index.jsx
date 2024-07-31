@@ -10,10 +10,10 @@
 
 import React, {useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import useGoogleSignInCallback from '../../hooks/use-google-signin-callback'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import useNavigation from '../../hooks/use-navigation'
-import {useLocation } from 'react-router-dom'
+import useGoogleSignInCallback from '@salesforce/retail-react-app/app/hooks/use-google-signin-callback'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {useLocation} from 'react-router-dom'
 // Chakra
 import {
     Box,
