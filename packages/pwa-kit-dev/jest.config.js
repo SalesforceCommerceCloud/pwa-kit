@@ -41,7 +41,7 @@ module.exports = {
     },
     transformIgnorePatterns: [
         '<rootDir>/node_modules/',
-        '<rootDir>/src/ssr/server/test_fixtures/node_modules/',
+        '!<rootDir>/src/ssr/server/test_fixtures/node_modules/',
         '/tsx/dist/cjs/api/index.cjs'
     ]
 }
