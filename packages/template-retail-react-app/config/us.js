@@ -5,7 +5,7 @@ module.exports = {
     ...defaultConfig,
     app: {
         url: {
-            site: 'path',
+            site: 'none',
             locale: 'path',
             showDefaults: true,
             interpretPlusSignAsSpace: false

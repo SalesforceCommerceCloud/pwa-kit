@@ -61,11 +61,13 @@ const AppConfig = ({children, locals = {}}) => {
     // this endpoint is where commerce-sdk-react will send requests to
 
     // exclude the namespace in MRT server. include it for local and for client
-    // const proxy = isRemote() && !onClient
-    //     ? `${appOrigin}${commerceApiConfig.proxyPath}`
-    //     : `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
 
-    const proxy = `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
+    const proxy = !onClient
+        ? `${appOrigin}${commerceApiConfig.proxyPath}`
+        : `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
+
+    // TODO: need to have the client namespace included in the local server side calls
+    // const proxy = `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
 
     console.log(`Proxy: ${proxy}`)
 

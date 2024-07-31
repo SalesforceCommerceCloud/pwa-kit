@@ -165,8 +165,11 @@ export const getConfigMatcher = (config) => {
     // prettier-ignore
     // eslint-disable-next-line
 
+    // Allowed basenames! Make this configurabke
+    const basenames = 'us|ca'
+
     // update this to include basename - basename capturing group should include all possible basenames
-    const pathPattern = `(?:\/(?<basename>abc))?(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
+    const pathPattern = `(?:\/(?<basename>${basenames}))?(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
     // prettier-ignore
     const searchPatternForLocale = `locale=(?<locale>${locales.join('|')})`
     const pathMatcher = new RegExp(pathPattern)
