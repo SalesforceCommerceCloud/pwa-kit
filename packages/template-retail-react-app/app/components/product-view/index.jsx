@@ -256,8 +256,8 @@ const ProductView = forwardRef(
             let disableButton = showInventoryMessage
             if (!disableButton && (isProductASet || isProductABundle) && childProductOrderability) {
                 // if any of the children are not orderable, it will disable the add to cart button
-                disableButton = Object.keys(childProductOrderability).some((itemId) => {
-                    return !childProductOrderability[itemId]
+                disableButton = Object.keys(childProductOrderability).some((key) => {
+                    return !childProductOrderability[key]
                 })
             }
 
@@ -348,10 +348,11 @@ const ProductView = forwardRef(
 
         useEffect(() => {
             if (isProductPartOfBundle || isProductPartOfSet) {
+                const key = product.itemId ?? product.id
                 // when showInventoryMessage is true, it means child product is not orderable
                 setChildProductOrderability((previousState) => ({
                     ...previousState,
-                    [product.itemId]: !showInventoryMessage
+                    [key]: !showInventoryMessage
                 }))
             }
         }, [showInventoryMessage])
