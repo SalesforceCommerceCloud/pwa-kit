@@ -3175,6 +3175,20 @@
       "value": "]"
     }
   ],
+  "header.button.assistive_msg.menu.open_dialog": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿƥḗḗƞş ȧȧ ḓīȧȧŀǿǿɠ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "header.button.assistive_msg.my_account": [
     {
       "type": 0,

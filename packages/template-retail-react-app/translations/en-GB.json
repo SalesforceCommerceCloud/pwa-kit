@@ -621,6 +621,9 @@
   "header.button.assistive_msg.menu": {
     "defaultMessage": "Menu"
   },
+  "header.button.assistive_msg.menu.open_dialog": {
+    "defaultMessage": "Opens a dialog"
+  },
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "My account"
   },
