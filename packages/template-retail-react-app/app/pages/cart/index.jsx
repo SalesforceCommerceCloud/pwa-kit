@@ -336,7 +336,7 @@ const Cart = () => {
             // We only update the parent bundle when the quantity changes
             // Since top level bundles don't have variants
             if (bundle.quantity !== bundleQuantity) {
-                itemsToBeUpdated.push({
+                itemsToBeUpdated.unshift({
                     itemId: bundle.itemId,
                     productId: bundle.productId,
                     quantity: bundleQuantity

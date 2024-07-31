@@ -68,8 +68,11 @@ export const getUpdateBundleChildArray = (bundle, childProductSelections) => {
     const itemsToBeUpdated = []
     bundle?.bundledProductItems?.forEach((bundleChild) => {
         const childSelection = childProductSelections?.find(
-            (childProduct) => childProduct.product.id === bundleChild.productId
+            (childProduct) =>
+                childProduct.product?.id === bundleChild.productId ||
+                childProduct.product?.itemId === bundleChild.itemId
         )
+
         // only update the item if the selected variant is different then what's in the current bundle
         if (childSelection && childSelection.variant?.productId !== bundleChild.productId) {
             itemsToBeUpdated.push({
