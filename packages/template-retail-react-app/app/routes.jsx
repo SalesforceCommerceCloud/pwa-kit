@@ -20,6 +20,9 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
 
+// import SeoUrlMapping from '@salesforce/retail-react-app/app/components/seo-url-mapping'
+
+
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Pages
@@ -43,7 +46,7 @@ const ProductList = loadable(() => import('./pages/product-list'), {
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
-const PageNotFound = loadable(() => import('./pages/page-not-found'))
+// const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 export const routes = [
     {
@@ -104,11 +107,18 @@ export const routes = [
     {
         path: '/account/wishlist',
         component: Wishlist
-    },
-    {
-        path: '*',
-        component: PageNotFound
     }
+    // ,
+    // {
+    //     // NOTE: Having the fallback here doesn't work well with redirects E.g. if I want to redirect /categories/mens to something else,
+    //     // it won't make it to this SeoUrlMapping component fallback.
+    //     path: '*',
+    //     component: SeoUrlMapping
+    // }
+    // {
+    //     path: '*',
+    //     component: PageNotFound
+    // }
 ]
 
 export default () => {

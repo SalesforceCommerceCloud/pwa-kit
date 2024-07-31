@@ -106,7 +106,7 @@ const ProductList = (props) => {
     // Using destructuring to omit properties; we must rename `isLoading` because we use a different
     // `isLoading` later in this function.
     // eslint-disable-next-line react/prop-types, @typescript-eslint/no-unused-vars
-    const {isLoading: _unusedIsLoading, staticContext, ...rest} = props
+    const {isLoading: _unusedIsLoading, staticContext, resourceId, ...rest} = props
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
@@ -129,8 +129,8 @@ const ProductList = (props) => {
     let searchQuery = urlParams.get('q')
     const isSearch = !!searchQuery
 
-    if (params.categoryId) {
-        searchParams._refine.push(`cgid=${params.categoryId}`)
+    if (resourceId || params.categoryId) {
+        searchParams._refine.push(`cgid=${resourceId || params.categoryId}`)
     }
 
     /**************** Mutation Actions ****************/
@@ -168,11 +168,11 @@ const ProductList = (props) => {
     const {error, data: category} = useCategory(
         {
             parameters: {
-                id: params.categoryId
+                id: resourceId || params.categoryId
             }
         },
         {
-            enabled: !isSearch && !!params.categoryId
+            enabled: !isSearch && !!(resourceId || params.categoryId)
         }
     )
 
@@ -352,7 +352,7 @@ const ProductList = (props) => {
         if (isSearch) {
             navigate(`/search?${stringifySearchParams(searchParamsCopy)}`)
         } else {
-            navigate(`/category/${params.categoryId}?${stringifySearchParams(searchParamsCopy)}`)
+            navigate(`/category/${(resourceId || params.categoryId)}?${stringifySearchParams(searchParamsCopy)}`)
         }
     }
 
@@ -364,7 +364,7 @@ const ProductList = (props) => {
         }
         const newPath = isSearch
             ? `/search?${stringifySearchParams(newSearchParams)}`
-            : `/category/${params.categoryId}?${stringifySearchParams(newSearchParams)}`
+            : `/category/${(resourceId || params.categoryId)}?${stringifySearchParams(newSearchParams)}`
 
         navigate(newPath)
     }

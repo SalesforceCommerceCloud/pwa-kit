@@ -149,6 +149,62 @@ const options = {
         data?.queries?.forEach(updateQueryTimeStamp)
 
         return data
+    },
+    seedCache: async (queryClient) => {
+    
+        // Mapping
+        await queryClient.prefetchQuery({
+            queryKey: [
+                "/commerce-sdk-react",
+                "/organizations/",
+                "f_ecom_zzrf_001",
+                "/url-mapping",
+                {
+                  "organizationId": "f_ecom_zzrf_001",
+                  "urlSegment": "/category/top-seller",
+                  "siteId": "RefArch",
+                  "locale": "en-US"
+                }
+              ],
+            queryFn: async () => {
+                // NOTE: This is where we'll have to manually get the API... login... call the seo url mapping
+                // endpoint... and then return the data. So that is not ideal and we might be dealing with 
+                // multiple logins.
+                return {
+                    "copySourceParams": false,
+                    "destinationUrl": "/s/RefArch/new%20arrivals/?lang=en_US",
+                    "resourceId": "newarrivals",
+                    "resourceType": "category",
+                    "statusCode": "301"
+                }
+            },
+        })
+
+        // Redirect
+        await queryClient.prefetchQuery({
+            queryKey: [
+                "/commerce-sdk-react",
+                "/organizations/",
+                "f_ecom_zzrf_001",
+                "/url-mapping",
+                {
+                  "organizationId": "f_ecom_zzrf_001",
+                  "urlSegment": "/category/mens",
+                  "siteId": "RefArch",
+                  "locale": "en-US"
+                }
+              ],
+            queryFn: async () => {
+                // NOTE: This is where we'll have to manually get the API... login... call the seo url mapping
+                // endpoint... and then return the data. So that is not ideal and we might be dealing with 
+                // multiple logins.
+                return {
+                    "copySourceParams": false,
+                    "destinationUrl": "/category/womens",
+                    "statusCode": "301"
+                }
+            },
+        })
     }
 }
 

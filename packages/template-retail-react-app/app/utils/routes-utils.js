@@ -5,8 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import React from 'react'
 import {getSites} from '@salesforce/retail-react-app/app/utils/site-utils'
 import {urlPartPositions} from '@salesforce/retail-react-app/app/constants'
+import SeoUrlMapping from '@salesforce/retail-react-app/app/components/seo-url-mapping'
+
 
 /**
  * Construct literal routes based on url config
@@ -107,5 +110,17 @@ export const configureRoutes = (routes = [], config, {ignoredRoutes = []}) => {
         }
         return res
     }, [])
+
+    // If Seo Url mapping is enabled add the
+    if (true) {
+        // console.log('SeoUrlMapping: ', SeoUrlMapping)
+        const allRoutes = [...outputRoutes]
+
+        outputRoutes = [{
+            path: '*',
+            component: () => <SeoUrlMapping routes={allRoutes} />
+        }]
+    }
+
     return outputRoutes
 }

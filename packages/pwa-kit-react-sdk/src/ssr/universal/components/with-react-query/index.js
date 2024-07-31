@@ -30,7 +30,7 @@ export const withReactQuery = (Wrapped, options = {}) => {
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
     const queryClientConfig = options.queryClientConfig
     const beforeHydrate = options.beforeHydrate || passthrough
-
+    const seedCache = options.seedCache || passthrough
     /**
      * @private
      */
@@ -68,9 +68,13 @@ export const withReactQuery = (Wrapped, options = {}) => {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient(queryClientConfig))
 
+            await seedCache(queryClient)
+            // console.log('dehydrate(queryClient): ', dehydrate(queryClient))
+
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'start')
             // Use `ssrPrepass` to collect all uses of `useQuery`.
             await ssrPrepass(appJSX)
+            console.log('dehydrate(queryClient): ', dehydrate(queryClient))
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'end')
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
