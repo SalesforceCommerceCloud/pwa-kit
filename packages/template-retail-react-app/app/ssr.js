@@ -62,7 +62,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'img-src': [
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
-                        'test.phased-launch-testing.com'
+                        '*.phased-launch-testing.com'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
