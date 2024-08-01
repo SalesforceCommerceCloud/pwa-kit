@@ -1,0 +1,47 @@
+name: 'Changelog Check'
+description: 'Check if changelog is updated for the changed packages'
+inputs:
+  github_token:
+    description: 'GitHub token'
+    required: true
+  event_before:
+    description: 'Previous SHA before the push'
+    required: true
+  github_sha:
+    description: 'Current SHA after the push'
+    required: true
+  pr_number:
+    description: 'Pull request number'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Fetch PR labels
+      id: fetch_labels
+      run: |
+        PR_LABELS=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
+          jq -r '.[].name')
+        echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
+
+    - name: Check if changelog is updated
+      run: |
+        CHANGED_FILES=$(git diff --name-only ${{ inputs.event_before }} ${{ inputs.github_sha }})
+        PACKAGES=("commerce-sdk-react" "pwa-kit-dev" "template-express-minimal" "template-typescript-minimal" "internal-lib-build" "pwa-kit-react-sdk" "template-mrt-reference-app" "test-commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-runtime" "template-retail-react-app")
+        SKIP_CHANGELOG_LABEL="skip changelog"
+
+        for PACKAGE in "${PACKAGES[@]}"; do
+          if echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/"; then
+            if ! echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/changelog.md"; then
+              if ! echo "$PR_LABELS" | grep -q "$SKIP_CHANGELOG_LABEL"; then
+                echo "Changelog.md was not updated for package $PACKAGE. Please update the changelog or add 'skip changelog' label to the pull request."
+                exit 1
+              fi
+            fi
+          fi
+        done
+      shell: bash

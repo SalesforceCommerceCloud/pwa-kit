@@ -34,23 +34,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Check if changelog is updated
-        run: |
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          PACKAGES=("commerce-sdk-react" "pwa-kit-dev" "template-express-minimal" "template-typescript-minimal" "internal-lib-build" "pwa-kit-react-sdk" "template-mrt-reference-app" "test-commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-runtime" "template-retail-react-app")
-          SKIP_CHANGELOG_LABEL="skip changelog"
-
-          for PACKAGE in "${PACKAGES[@]}"; do
-            if echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/"; then
-              if ! echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/changelog.md"; then
-                if ! echo "${{ github.event.pull_request.labels[*] }}" | grep -q "$SKIP_CHANGELOG_LABEL"; then
-                  echo "Changelog.md was not updated for package $PACKAGE. Please update the changelog or add 'skip changelog' label to the pull request."
-                  exit 1
-                fi
-              fi
-            fi
-          done
-      shell: bash
+      - name: Changelog Check
+        uses: ./.github/actions/changelog-check
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          event_before: ${{ github.event.before }}
+          github_sha: ${{ github.sha }}
+          pr_number: ${{ github.event.pull_request.number }}
 
   pwa-kit:
     needs: changelog-check
