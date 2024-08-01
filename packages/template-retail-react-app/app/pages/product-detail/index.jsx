@@ -66,12 +66,6 @@ const ProductDetail = () => {
     const navigate = useNavigation()
     const customerId = useCustomerId()
 
-    /****************************** Sets and Bundles *********************************/
-    const [childProductSelection, setChildProductSelection] = useState({})
-    const [childProductOrderability, setChildProductOrderability] = useState({})
-    const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(1)
-    const childProductRefs = React.useRef({})
-
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
@@ -117,17 +111,34 @@ const ProductDetail = () => {
         }
     )
 
+    // Note: Since category needs id from product detail, it can't be server side rendered atm
+    // until we can do dependent query on server
+    const {
+        data: category,
+        isError: isCategoryError,
+        error: categoryError
+    } = useCategory({
+        parameters: {
+            id: product?.primaryCategoryId,
+            levels: 1
+        }
+    })
+
+    /****************************** Sets and Bundles *********************************/
+    const [childProductSelection, setChildProductSelection] = useState({})
+    const [childProductOrderability, setChildProductOrderability] = useState({})
+    const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(1)
+    const childProductRefs = React.useRef({})
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
+
     let bundleChildVariantIds = ''
     if (isProductABundle)
         bundleChildVariantIds = Object.keys(childProductSelection)
             ?.map((key) => childProductSelection[key].variant.productId)
             .join(',')
 
-    // TODO: potentially pull this out into a custom hook
-    // TODO: rename productsData
-    const {data: productsData} = useProducts(
+    const {data: bundleChildrenData} = useProducts(
         {
             parameters: {
                 ids: bundleChildVariantIds,
@@ -142,44 +153,22 @@ const ProductDetail = () => {
         }
     )
 
-    // NOTE: this still references the same bundledProducts array,
-    // so modifying transformedProduct.bundledProducts also modifies the one in product
-    let transformedProduct = product
-    if (isProductABundle && productsData) {
-        // TODO: potentially swtich logic to loop through productsData
-        product.bundledProducts.forEach((element, index) => {
-            const childProduct = element.product
-            const matchingChildProduct = productsData.data.find(
-                (tempChild) => tempChild.master.masterId === childProduct.id
+    if (isProductABundle && bundleChildrenData) {
+        // Loop through the bundle children and update the inventory for variant selection
+        product.bundledProducts.forEach(({ product: childProduct }, index) => {
+            const matchingChildProduct = bundleChildrenData.data.find(
+                (bundleChild) => bundleChild.master.masterId === childProduct.id
             )
             if (matchingChildProduct) {
-                transformedProduct.bundledProducts[index] = {
-                    // TODO: you can get rid of element if you do
-                    // transformedProduct.bundledProducts[index].product = {...}
-                    ...element,
-                    product: {
-                        ...childProduct,
-                        inventory: matchingChildProduct.inventory
-                    }
+                product.bundledProducts[index].product = {
+                    ...childProduct,
+                    inventory: matchingChildProduct.inventory
                 }
             }
         })
     }
 
     const comboProduct = isProductASet || isProductABundle ? normalizeSetBundleProduct(product) : {}
-
-    // Note: Since category needs id from product detail, it can't be server side rendered atm
-    // until we can do dependent query on server
-    const {
-        data: category,
-        isError: isCategoryError,
-        error: categoryError
-    } = useCategory({
-        parameters: {
-            id: product?.primaryCategoryId,
-            levels: 1
-        }
-    })
 
     /**************** Error Handling ****************/
 

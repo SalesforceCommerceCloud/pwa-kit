@@ -62,8 +62,6 @@ import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
-    // TODO: rename newProducts
-    const [newProducts, setNewProducts] = useState({})
     const {data: basket, isLoading} = useCurrentBasket()
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
@@ -86,7 +84,18 @@ const Cart = () => {
         }
     )
 
-    let bundleChildVariantIds = []
+    const {data: customer} = useCurrentCustomer()
+    const {customerId, isRegistered} = customer
+
+    /***************** Product Bundles ************************/
+
+    // We use the `products` object to reference products by itemId instead of productId
+    // Since with product bundles, even though the parent productId is the same,
+    // variant selection of the bundle children can be different,
+    // and require unique references to each product bundle
+    const [productsByItemId, setProductsByItemId] = useState({})
+
+    const bundleChildVariantIds = []
     basket?.productItems?.forEach((productItem) => {
         productItem?.bundledProductItems?.forEach((childProduct) => {
             bundleChildVariantIds.push(childProduct.productId)
@@ -104,7 +113,7 @@ const Cart = () => {
         },
         {
             enabled: bundleChildVariantIds?.length > 0,
-            keepPreviousData: true, // TODO: potentially remove this line
+            keepPreviousData: true,
             select: (result) => {
                 return result?.data?.reduce((result, item) => {
                     const key = item.id
@@ -115,19 +124,15 @@ const Cart = () => {
         }
     )
 
-    // TODO: update this comment
-    // Set up newProducts object where key is itemId and value is the product data
-    let updateState = {}
+    // Seting up productsByItemId state where key is itemId and value is the product data
+    const updateProductsByItemId = {}
     basket?.productItems?.forEach((productItem) => {
-        // TODO: making deepcopy for now but think about reverting
-        let modifiedProductData = products?.[productItem?.productId]
-        if (modifiedProductData)
-            modifiedProductData = JSON.parse(JSON.stringify(products?.[productItem?.productId]))
+        let currentProduct = products?.[productItem?.productId]
 
         // calculate inventory for product bundles based on availability of children
         if (productItem?.bundledProductItems) {
             let lowestStockLevel =
-                modifiedProductData?.inventory?.stockLevel || Number.MAX_SAFE_INTEGER
+                currentProduct?.inventory?.stockLevel || Number.MAX_SAFE_INTEGER
             productItem?.bundledProductItems.forEach((bundleChild) => {
                 lowestStockLevel = Math.min(
                     lowestStockLevel,
@@ -135,22 +140,21 @@ const Cart = () => {
                 )
             })
 
-            if (modifiedProductData?.inventory) {
-                modifiedProductData.inventory = {
-                    ...modifiedProductData.inventory,
+            if (currentProduct?.inventory) {
+                // make a deepcopy so we don't modify the underlying reference
+                currentProduct = JSON.parse(JSON.stringify(products?.[productItem?.productId]))
+                currentProduct.inventory = {
+                    ...currentProduct.inventory,
                     stockLevel: lowestStockLevel
                 }
             }
         }
-        updateState[productItem.itemId] = modifiedProductData
+        updateProductsByItemId[productItem.itemId] = currentProduct
     })
 
-    // TODO: see if there's a better way to compare
-    if (JSON.stringify(newProducts) !== JSON.stringify(updateState))
-        setNewProducts({...updateState})
+    if (JSON.stringify(productsByItemId) !== JSON.stringify(updateProductsByItemId))
+        setProductsByItemId({...updateProductsByItemId})
 
-    const {data: customer} = useCurrentCustomer()
-    const {customerId, isRegistered} = customer
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
@@ -451,7 +455,7 @@ const Cart = () => {
     }, DEBOUNCE_WAIT)
 
     const handleChangeItemQuantity = async (product, value) => {
-        const {stockLevel} = newProducts[product.itemId].inventory
+        const {stockLevel} = productsByItemId[product.itemId].inventory
 
         // Handle removing of the items when 0 is selected.
         if (value === 0) {
@@ -561,10 +565,10 @@ const Cart = () => {
                                                 }
                                                 product={{
                                                     ...productItem,
-                                                    ...(newProducts &&
-                                                        newProducts[productItem.itemId]),
+                                                    ...(productsByItemId &&
+                                                        productsByItemId[productItem.itemId]),
                                                     isProductUnavailable: !isProductsLoading
-                                                        ? !newProducts?.[productItem.itemId]
+                                                        ? !productsByItemId?.[productItem.itemId]
                                                         : undefined,
                                                     price: productItem.price,
                                                     quantity: localQuantity[productItem.itemId]

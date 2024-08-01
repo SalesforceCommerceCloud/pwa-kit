@@ -119,18 +119,11 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                             key={i}
                                             // Do not use an arrow function as we are manipulating the functions scope.
                                             ref={function (ref) {
-                                                const productIds = selectedChildProducts.map(
-                                                    ({variant}) => variant.productId
-                                                )
-                                                if (productIds.includes(product.id)) {
-                                                    // Assign the "set" scope of the ref, this is how we access the internal validation.
-                                                    childProductRefs.current[product.id] = {
-                                                        ref,
-                                                        validateOrderability:
-                                                            this.validateOrderability
-                                                    }
-                                                } else {
-                                                    delete childProductRefs.current[product.id]
+                                                // Assign the "set" scope of the ref, this is how we access the internal validation.
+                                                childProductRefs.current[product.itemId] = {
+                                                    ref,
+                                                    validateOrderability:
+                                                        this.validateOrderability
                                                 }
                                             }}
                                             showImageGallery={false}

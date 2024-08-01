@@ -251,8 +251,6 @@ const ProductView = forwardRef(
                 addToWishlist(product, variant, quantity)
             }
 
-            // TODO: figure out how to get rid of the 'Out of Stock' message when updating cart using edit modal
-            // maybe utilize showLoading
             let disableButton = showInventoryMessage
             if (!disableButton && (isProductASet || isProductABundle) && childProductOrderability) {
                 // if any of the children are not orderable, it will disable the add to cart button
