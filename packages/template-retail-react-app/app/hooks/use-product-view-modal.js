@@ -53,7 +53,7 @@ export const useProductViewModal = (initialProduct) => {
     )
 
     useEffect(() => {
-        setProduct(currentProduct)
+        if (currentProduct) setProduct(currentProduct)
     }, [currentProduct])
 
     const cleanUpVariantParams = () => {

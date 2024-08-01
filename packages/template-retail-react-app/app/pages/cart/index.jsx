@@ -131,8 +131,7 @@ const Cart = () => {
 
         // calculate inventory for product bundles based on availability of children
         if (productItem?.bundledProductItems) {
-            let lowestStockLevel =
-                currentProduct?.inventory?.stockLevel || Number.MAX_SAFE_INTEGER
+            let lowestStockLevel = currentProduct?.inventory?.stockLevel || Number.MAX_SAFE_INTEGER
             productItem?.bundledProductItems.forEach((bundleChild) => {
                 lowestStockLevel = Math.min(
                     lowestStockLevel,

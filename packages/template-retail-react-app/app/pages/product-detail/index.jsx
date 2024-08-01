@@ -155,7 +155,7 @@ const ProductDetail = () => {
 
     if (isProductABundle && bundleChildrenData) {
         // Loop through the bundle children and update the inventory for variant selection
-        product.bundledProducts.forEach(({ product: childProduct }, index) => {
+        product.bundledProducts.forEach(({product: childProduct}, index) => {
             const matchingChildProduct = bundleChildrenData.data.find(
                 (bundleChild) => bundleChild.master.masterId === childProduct.id
             )

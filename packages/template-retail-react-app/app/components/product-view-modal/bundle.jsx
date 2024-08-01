@@ -122,8 +122,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                                 // Assign the "set" scope of the ref, this is how we access the internal validation.
                                                 childProductRefs.current[product.itemId] = {
                                                     ref,
-                                                    validateOrderability:
-                                                        this.validateOrderability
+                                                    validateOrderability: this.validateOrderability
                                                 }
                                             }}
                                             showImageGallery={false}
