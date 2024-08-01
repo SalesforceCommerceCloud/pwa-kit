@@ -27,6 +27,7 @@ runs:
           "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
           jq -r '.[].name')
         echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
+      shell: bash
 
     - name: Check if changelog is updated
       run: |
