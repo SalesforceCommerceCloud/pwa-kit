@@ -24,5 +24,6 @@ module.exports = {
             lines: 85,
             statements: 85
         }
-    }
+    },
+    testEnvironment: 'jsdom'
 }

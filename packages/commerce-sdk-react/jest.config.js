@@ -19,5 +19,6 @@ module.exports = {
             statements: 0
         }
     },
-    collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}']
+    collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
+    testEnvironment: 'jest-environment-jsdom-global'
 }

@@ -357,6 +357,8 @@ export const RemoteServerFactory = {
         // processing.
         this._setupCommonMiddleware(app, options)
 
+        this._setupExtensions(app, options)
+
         this._addStaticAssetServing(app)
         this._addDevServerGarbageCollection(app)
         return app
@@ -631,6 +633,64 @@ export const RemoteServerFactory = {
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
             })
+        })
+    },
+
+    /**
+     * This function is called during server initialization.
+     *
+     * This function assumes that optionally, there is a `setup-server.js`
+     * file in each extension directory in the build.
+     *
+     * This file should export a default which is a function.
+     *
+     * @private
+     */
+    _setupExtensions(app, options) {
+        const extensions = options.mobify?.app?.extensions || []
+        app.__extensions = extensions || []
+
+        let _require
+
+        extensions.forEach((extension) => {
+            const setupServerFilePath = path.join(
+                options.buildDir,
+                'extensions',
+                extension,
+                'setup-server.js'
+            )
+
+            // Only eval when there are extensions
+            // this makes it slightly faster for projects that
+            // have no extensions
+            if (!_require) {
+                _require = eval('require')
+            }
+
+            let setupServer
+
+            try {
+                setupServer = _require(setupServerFilePath)
+            } catch (e) {
+                if (e.message && e.message.startsWith('Cannot find module')) {
+                    // skip extensions that don't have a setup-server.js file
+                    return
+                }
+
+                console.error(`Error loading extension ${extension}:`, e)
+                throw e
+            }
+
+            if (!setupServer.default) {
+                console.warn(`Extension ${extension} does not have a default export. Skipping.`)
+                return
+            }
+
+            try {
+                setupServer.default({app, options})
+            } catch (e) {
+                console.error(`Error setting up extension ${extension}:`, e)
+            }
         })
     },
 

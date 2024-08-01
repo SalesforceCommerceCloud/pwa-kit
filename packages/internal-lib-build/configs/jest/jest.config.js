@@ -29,8 +29,9 @@ module.exports = {
         '/node_modules/',
         '/vendor/'
     ],
-    testEnvironment: 'jest-environment-jsdom-global',
+    testEnvironment: 'node',
     testEnvironmentOptions: {
         resources: 'usable'
-    }
+    },
+    testTimeout: 30000
 }

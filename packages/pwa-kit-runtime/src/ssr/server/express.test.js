@@ -1060,10 +1060,6 @@ describe('SLAS private client proxy', () => {
         process.env = savedEnvironment
     })
 
-    afterAll(() => {
-        proxyApp.close()
-    })
-
     test('should not create proxy by default', () => {
         const app = RemoteServerFactory._createApp(opts())
         return request(app).get('/mobify/slas/private').expect(404)
@@ -1074,7 +1070,7 @@ describe('SLAS private client proxy', () => {
         return request(app).get('/mobify/slas/private').expect(501)
     })
 
-    test('does not insert client secret if request not for /oauth2/token', async () => {
+    test('does not insert client secret if request not for /oauth2/token', () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
         const app = RemoteServerFactory._createApp(
@@ -1094,16 +1090,16 @@ describe('SLAS private client proxy', () => {
             })
         )
 
-        return await request(app)
+        return request(app)
             .get('/mobify/slas/private/somePath')
             .then((response) => {
                 expect(response.body.authorization).toBeUndefined()
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
                 expect(response.body['x-mobify']).toBe('true')
             })
-    }, 15000)
+    })
 
-    test('inserts client secret if request is for /oauth2/token', async () => {
+    test('inserts client secret if request is for /oauth2/token', () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
         const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
@@ -1125,12 +1121,12 @@ describe('SLAS private client proxy', () => {
             })
         )
 
-        return await request(app)
+        return request(app)
             .get('/mobify/slas/private/oauth2/token')
             .then((response) => {
                 expect(response.body.authorization).toBe(`Basic ${encodedCredentials}`)
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
                 expect(response.body['x-mobify']).toBe('true')
             })
-    }, 15000)
+    })
 })
