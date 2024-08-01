@@ -469,10 +469,10 @@ describe('product bundles', () => {
         })
 
         // Set product bundle quantity selection to 4
-        const input = screen.getByRole('spinbutton', {name: /quantity/i})
-        input.focus()
-        fireEvent.change(input, {target: {value: '4'}})
-        fireEvent.keyDown(input, {key: 'Enter', code: 'Enter', charCode: 13})
+        const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
+        quantityInput.focus()
+        fireEvent.change(quantityInput, {target: {value: '4'}})
+        fireEvent.keyDown(quantityInput, {key: 'Enter', code: 'Enter', charCode: 13})
 
         await waitFor(() => {
             expect(screen.getByRole('spinbutton', {name: /quantity/i})).toHaveValue('4')
