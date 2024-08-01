@@ -4,12 +4,6 @@ inputs:
   github_token:
     description: 'GitHub token'
     required: true
-  event_before:
-    description: 'Previous SHA before the push'
-    required: true
-  github_sha:
-    description: 'Current SHA after the push'
-    required: true
   pr_number:
     description: 'Pull request number'
     required: true
@@ -19,6 +13,8 @@ runs:
   steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch full history to access all commits
 
     - name: Fetch PR labels
       id: fetch_labels
@@ -31,19 +27,19 @@ runs:
 
     - name: Debugging Info
       run: |
-        echo "Event before: ${{ inputs.event_before }}"
-        echo "Current SHA: ${{ inputs.github_sha }}"
+        echo "Event before: ${{ github.event.before }}"
+        echo "Current SHA: ${{ github.sha }}"
         echo "PR labels: $PR_LABELS"
       shell: bash
 
     - name: Check if changelog is updated
       run: |
-        if [ -z "${{ inputs.event_before }}" ] || [ -z "${{ inputs.github_sha }}" ]; then
+        if [ -z "${{ github.event.before }}" ] || [ -z "${{ github.sha }}" ]; then
           echo "Error: SHA values are missing or invalid."
           exit 1
         fi
 
-        CHANGED_FILES=$(git diff --name-only ${{ inputs.event_before }} ${{ inputs.github_sha }})
+        CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
         echo "Changed files: $CHANGED_FILES"
         
         PACKAGES=("commerce-sdk-react" "pwa-kit-dev" "template-express-minimal" "template-typescript-minimal" "internal-lib-build" "pwa-kit-react-sdk" "template-mrt-reference-app" "test-commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-runtime" "template-retail-react-app")

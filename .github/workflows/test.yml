@@ -38,8 +38,6 @@ jobs:
         uses: ./.github/actions/changelog-check
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          event_before: ${{ github.event.before }}
-          github_sha: ${{ github.sha }}
           pr_number: ${{ github.event.pull_request.number }}
 
   pwa-kit:
