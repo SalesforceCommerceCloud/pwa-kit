@@ -29,9 +29,23 @@ runs:
         echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
       shell: bash
 
+    - name: Debugging Info
+      run: |
+        echo "Event before: ${{ inputs.event_before }}"
+        echo "Current SHA: ${{ inputs.github_sha }}"
+        echo "PR labels: $PR_LABELS"
+      shell: bash
+
     - name: Check if changelog is updated
       run: |
+        if [ -z "${{ inputs.event_before }}" ] || [ -z "${{ inputs.github_sha }}" ]; then
+          echo "Error: SHA values are missing or invalid."
+          exit 1
+        fi
+
         CHANGED_FILES=$(git diff --name-only ${{ inputs.event_before }} ${{ inputs.github_sha }})
+        echo "Changed files: $CHANGED_FILES"
+        
         PACKAGES=("commerce-sdk-react" "pwa-kit-dev" "template-express-minimal" "template-typescript-minimal" "internal-lib-build" "pwa-kit-react-sdk" "template-mrt-reference-app" "test-commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-runtime" "template-retail-react-app")
         SKIP_CHANGELOG_LABEL="skip changelog"
 
