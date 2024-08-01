@@ -3459,6 +3459,28 @@
       "value": " left!"
     }
   ],
+  "use_product.message.inventory_remaining_for_product": [
+    {
+      "type": 0,
+      "value": "Only "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": " left for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "!"
+    }
+  ],
   "use_product.message.out_of_stock": [
     {
       "type": 0,

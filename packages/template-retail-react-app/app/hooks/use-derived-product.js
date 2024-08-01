@@ -26,7 +26,9 @@ export const useDerivedProduct = (
     const stepQuantity = product?.stepQuantity || 1
     const minOrderQuantity = stockLevel > 0 ? product?.minOrderQuantity || 1 : 0
     const initialQuantity = product?.quantity || product?.minOrderQuantity || 1
-
+    
+    // used for product bundles when there are multiple products
+    const lowestStockLevelProduct = product?.inventory?.lowestStockLevelProduct
     const intl = useIntl()
     const variant = useVariant(product, isProductPartOfSet, isProductPartOfBundle)
     const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
@@ -53,13 +55,21 @@ export const useDerivedProduct = (
             defaultMessage: 'Out of stock',
             id: 'use_product.message.out_of_stock'
         }),
-        [UNFULFILLABLE]: intl.formatMessage(
-            {
-                defaultMessage: 'Only {stockLevel} left!',
-                id: 'use_product.message.inventory_remaining'
-            },
-            {stockLevel}
-        )
+        [UNFULFILLABLE]: lowestStockLevelProduct
+            ? intl.formatMessage(
+                  {
+                      defaultMessage: 'Only {stockLevel} left for {productName}!',
+                      id: 'use_product.message.inventory_remaining_for_product'
+                  },
+                  {stockLevel, productName: lowestStockLevelProduct}
+              )
+            : intl.formatMessage(
+                  {
+                      defaultMessage: 'Only {stockLevel} left!',
+                      id: 'use_product.message.inventory_remaining'
+                  },
+                  {stockLevel}
+              )
     }
 
     // showInventoryMessage controls if add to cart button is disabled

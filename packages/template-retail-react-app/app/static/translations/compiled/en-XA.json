@@ -7411,6 +7411,36 @@
       "value": "]"
     }
   ],
+  "use_product.message.inventory_remaining_for_product": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿƞŀẏ "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": " ŀḗḗƒŧ ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "!"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "use_product.message.out_of_stock": [
     {
       "type": 0,

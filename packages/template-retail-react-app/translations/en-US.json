@@ -1498,6 +1498,9 @@
   "use_product.message.inventory_remaining": {
     "defaultMessage": "Only {stockLevel} left!"
   },
+  "use_product.message.inventory_remaining_for_product": {
+    "defaultMessage": "Only {stockLevel} left for {productName}!"
+  },
   "use_product.message.out_of_stock": {
     "defaultMessage": "Out of stock"
   },
