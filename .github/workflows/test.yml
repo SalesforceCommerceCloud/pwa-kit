@@ -28,6 +28,28 @@ env:
   RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
 
 jobs:
+  check-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check for Changelog update
+        id: changelog
+        run: |
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
+          PACKAGES=("commerce-sdk-react" "pwa-kit-dev" "template-express-minimal" "template-typescript-minimal" "internal-lib-build" "pwa-kit-react-sdk" "template-mrt-reference-app" "test-commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-runtime" "template-retail-react-app")
+          for PACKAGE in "${PACKAGES[@]}"; do
+            if echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/"; then
+              if ! echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/changelog.md"; then
+                if ! echo "${{ github.event.pull_request.labels }}" | grep -q "skip changelog"; then
+                  echo "Changelog.md was not updated for package $PACKAGE. Please update the changelog or add 'skip changelog' label to the pull request."
+                  exit 1
+                fi
+              fi
+            fi
+          done
+
   pwa-kit:
     strategy:
       fail-fast: false
