@@ -42,10 +42,10 @@ runs:
         CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
         echo "Changed files: $CHANGED_FILES"
         
-        PACKAGES=("commerce-sdk-react" "pwa-kit-dev" "template-express-minimal" "template-typescript-minimal" "internal-lib-build" "pwa-kit-react-sdk" "template-mrt-reference-app" "test-commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-runtime" "template-retail-react-app")
-        SKIP_CHANGELOG_LABEL="skip changelog"
+        PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
+        SKIP_CHANGELOG_LABEL="skip changelog" 
 
-        for PACKAGE in "${PACKAGES[@]}"; do
+        for PACKAGE in "${PUBLIC_PACKAGES[@]}"; do
           if echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/"; then
             if ! echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/changelog.md"; then
               if ! echo "$PR_LABELS" | grep -q "$SKIP_CHANGELOG_LABEL"; then
