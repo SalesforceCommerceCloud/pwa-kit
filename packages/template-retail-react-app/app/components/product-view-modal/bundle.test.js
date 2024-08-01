@@ -50,7 +50,7 @@ beforeEach(() => {
                     ...mockProductBundleWithVariants.data[1].inventory,
                     stockLevel: 0
                 }
-            } else if(req.url.toString().includes('701643473908M')) {
+            } else if (req.url.toString().includes('701643473908M')) {
                 mockProductBundleWithVariants.data[1].inventory = {
                     ...mockProductBundleWithVariants.data[1].inventory,
                     stockLevel: 1
@@ -135,7 +135,6 @@ test('bundle product view modal disables update button when child is out of stoc
     })
 
     screen.logTestingPlaygroundURL()
-
 })
 
 test('bundle product view modal disables update button when quantity exceeds child inventory', async () => {
@@ -156,7 +155,7 @@ test('bundle product view modal disables update button when quantity exceeds chi
     const updateBtn = screen.getByRole('button', {name: /update/i})
     const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
     let sizeSelectBtn = within(swingTankProductView).getByLabelText('L')
-    
+
     await waitFor(() => {
         expect(productViews).toHaveLength(4)
         expect(swingTankProductView).toBeInTheDocument()
@@ -164,7 +163,7 @@ test('bundle product view modal disables update button when quantity exceeds chi
         expect(quantityInput).toBeInTheDocument()
         expect(updateBtn).toBeEnabled()
     })
-    
+
     // Set product bundle quantity selection to 4
     quantityInput.focus()
     fireEvent.change(quantityInput, {target: {value: '4'}})

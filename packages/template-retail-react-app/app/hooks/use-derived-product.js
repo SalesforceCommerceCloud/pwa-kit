@@ -26,7 +26,7 @@ export const useDerivedProduct = (
     const stepQuantity = product?.stepQuantity || 1
     const minOrderQuantity = stockLevel > 0 ? product?.minOrderQuantity || 1 : 0
     const initialQuantity = product?.quantity || product?.minOrderQuantity || 1
-    
+
     // used for product bundles when there are multiple products
     const lowestStockLevelProduct = product?.inventory?.lowestStockLevelProduct
     const intl = useIntl()
