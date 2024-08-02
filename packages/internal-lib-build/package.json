@@ -1,6 +1,6 @@
 {
   "name": "internal-lib-build",
-  "version": "3.6.0-dev",
+  "version": "3.7.0-dev",
   "private": true,
   "description": "Build tools for *libraries* in the monorepo",
   "bugs": {
@@ -60,7 +60,7 @@
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.6.0-dev",
+    "@salesforce/pwa-kit-dev": "3.7.0-dev",
     "npm-packlist": "^4.0.0",
     "typescript": "4.9.5"
   },

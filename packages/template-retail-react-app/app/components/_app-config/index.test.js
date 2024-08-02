@@ -52,6 +52,7 @@ describe('AppConfig', () => {
 
     test('renders', async () => {
         const locals = {
+            site: mockConfig.app.sites[0],
             appConfig: mockConfig.app
         }
         const {container} = render(

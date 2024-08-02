@@ -50,6 +50,35 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
+
+/**
+ * Search bar for the header.
+ *
+ * The search bar is a simple input field with a search icon.
+ * It can be used to search for products or navigate to a
+ * specific page.
+ *
+ * @param props {object} the component props
+ * @returns {Element} the search bar element
+ */
+const SearchBar = (props) => {
+    const styles = useMultiStyleConfig('Header')
+    const intl = useIntl()
+    const placeholder = intl.formatMessage({
+        id: 'header.field.placeholder.search_for_products',
+        defaultMessage: 'Search for products...'
+    })
+    return (
+        <Box {...styles.searchContainer}>
+            <Search
+                aria-label={placeholder}
+                placeholder={placeholder}
+                {...styles.search}
+                {...props}
+            />
+        </Box>
+    )
+}
 /**
  * The header is the main source for accessing
  * navigation, search, basket, and other
@@ -77,6 +106,7 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
+    const popoverTriggerRef = useRef(null)
     const {
         derivedData: {totalItems},
         data: basket
@@ -114,10 +144,13 @@ const Header = ({
         }, 100)
     }
 
-    const placeholder = intl.formatMessage({
-        id: 'header.field.placeholder.search_for_products',
-        defaultMessage: 'Search for products...'
-    })
+    const handleKeyDown = (event) => {
+        if (event.key === 'Tab' && event.shiftKey && isAccountMenuOpen) {
+            // Prevent default behavior to keep focus on the popup trigger
+            event.preventDefault()
+            popoverTriggerRef.current.focus()
+        }
+    }
 
     return (
         <Box {...styles.container} {...props}>
@@ -128,6 +161,10 @@ const Header = ({
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.menu',
                             defaultMessage: 'Menu'
+                        })}
+                        title={intl.formatMessage({
+                            id: 'header.button.assistive_msg.menu.open_dialog',
+                            defaultMessage: 'Opens a dialog'
                         })}
                         icon={<HamburgerIcon />}
                         variant="unstyled"
@@ -146,13 +183,7 @@ const Header = ({
                         onClick={onLogoClick}
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
-                    <Box {...styles.searchContainer}>
-                        <Search
-                            aria-label={placeholder}
-                            placeholder={placeholder}
-                            {...styles.search}
-                        />
-                    </Box>
+                    {isDesktop && <SearchBar />}
                     <IconButtonWithRegistration
                         icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
@@ -188,6 +219,8 @@ const Header = ({
                                     {...getAccountMenuButtonProps()}
                                     onMouseOver={onAccountMenuOpen}
                                     onMouseLeave={handleIconsMouseLeave}
+                                    ref={popoverTriggerRef}
+                                    onKeyDown={handleKeyDown}
                                 />
                             </PopoverTrigger>
 
@@ -204,7 +237,7 @@ const Header = ({
                             >
                                 <PopoverArrow />
                                 <PopoverHeader>
-                                    <Text>
+                                    <Text as="h2" fontSize="l" fontFamily="body" fontWeight="700">
                                         {intl.formatMessage({
                                             defaultMessage: 'My Account',
                                             id: 'header.popover.title.my_account'
@@ -212,23 +245,34 @@ const Header = ({
                                     </Text>
                                 </PopoverHeader>
                                 <PopoverBody>
-                                    <Stack spacing={0} as="nav" data-testid="account-detail-nav">
-                                        {navLinks.map((link) => {
-                                            const LinkIcon = link.icon
-                                            return (
-                                                <Button
-                                                    key={link.name}
-                                                    as={Link}
-                                                    to={`/account${link.path}`}
-                                                    useNavLink={true}
-                                                    variant="menu-link"
-                                                    leftIcon={<LinkIcon boxSize={5} />}
-                                                >
-                                                    {intl.formatMessage(messages[link.name])}
-                                                </Button>
-                                            )
-                                        })}
-                                    </Stack>
+                                    <Box as="nav">
+                                        <Stack spacing={0} as="ul" data-testid="account-detail-nav">
+                                            {navLinks.map((link) => {
+                                                const LinkIcon = link.icon
+                                                return (
+                                                    <Box
+                                                        key={link.name}
+                                                        position="relative"
+                                                        as="li"
+                                                        listStyleType="none"
+                                                    >
+                                                        <Button
+                                                            as={Link}
+                                                            to={`/account${link.path}`}
+                                                            useNavLink={true}
+                                                            variant="menu-link"
+                                                            leftIcon={<LinkIcon boxSize={5} />}
+                                                            width="100%"
+                                                        >
+                                                            {intl.formatMessage(
+                                                                messages[link.name]
+                                                            )}
+                                                        </Button>
+                                                    </Box>
+                                                )
+                                            })}
+                                        </Stack>
+                                    </Box>
                                 </PopoverBody>
                                 <PopoverFooter onClick={onSignoutClick} cursor="pointer">
                                     <Divider colorScheme="gray" />
@@ -278,6 +322,7 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMyCartClick}
                     />
+                    {!isDesktop && <SearchBar />}
                 </Flex>
             </Box>
         </Box>

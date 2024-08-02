@@ -1,7 +1,36 @@
-## v2.0.0-dev (May 21, 2024)
-- Upgrade to commerce-sdk-isomorphic v2.0.0 [#1794](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1794)
+## v2.1.0-dev (Jun 25, 2024)
+- Add `meta.displayName` to queries. It can be used to identify queries in performance metrics or logs. [#1895](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1895)
+- Upgrade to commerce-sdk-isomorphic v3.0.0 [#1914](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1914)
+
+### :warning: Planned API Changes :warning:
+#### Shopper Context
+
+Starting July 31st 2024, all endpoints in the Shopper context API will require the `siteId` parameter for new customers. This field is marked as optional for backward compatibility and will be changed to mandatory tentatively by January 2025. You can read more about the planned change [here](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=Summary) in the notes section.
+
+#### Shopper Login (SLAS)
+
+SLAS will soon require new tenants to pass `channel_id` as an argument for retrieving guest access tokens. You can read more about the planned change [here](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas.html#guest-tokens).
+
+Please be aware that existing tenants are on a temporary allow list and will see no immediate disruption to service.  We do ask that all users seek to adhere to the `channel_id` requirement before the end of August to enhance your security posture before the holiday peak season.
+
+In practice, we recommend:
+- For customers using the SLAS helpers with a private client, it is recommended to upgrade to `v3.0.0` of the `commerce-sdk-react`.
+
+## v2.0.2 (Jul 12, 2024)
+- Updated StorefrontPreview component to make siteId available [#1874](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1874)
+
+## v2.0.1 (Jul 08, 2024)
+- Fix private slas proxy config for commerce api in provider [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
+- Fix `useCustomQuery` error handling [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
+- Fix `updateCustomer` squashing existing data [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
+- Fix `transferBasket` updating the wrong customer basket [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
+
+## v2.0.0 (Jun 25, 2024)
 - Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
 - Add Shopper Stores hooks [#1788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1788)
+- Add a helper method to add an item to either new or existing basket [#1677](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1677)
+- Add `updateItemsInBasket` mutation [#1852](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1852)
+- Upgrade to commerce-sdk-isomorphic v2.1.0 [#1852](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1852)
 
 ## v1.4.2 (Apr 17, 2024)
 - Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)

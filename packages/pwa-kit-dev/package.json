@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/pwa-kit-dev",
-  "version": "3.6.0-dev",
+  "version": "3.7.0-dev",
   "description": "Build tools for pwa-kit",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-dev#readme",
   "bugs": {
@@ -58,7 +58,7 @@
     "@loadable/server": "^5.15.3",
     "@loadable/webpack-plugin": "^5.15.2",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
-    "@salesforce/pwa-kit-runtime": "3.6.0-dev",
+    "@salesforce/pwa-kit-runtime": "3.7.0-dev",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "archiver": "1.3.0",
@@ -121,7 +121,7 @@
     "@types/node": "~16.0.3",
     "@types/node-fetch": "~2.6.3",
     "@types/validator": "~13.7.14",
-    "internal-lib-build": "3.6.0-dev",
+    "internal-lib-build": "3.7.0-dev",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
     "superagent": "^6.1.0",

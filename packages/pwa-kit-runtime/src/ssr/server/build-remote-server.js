@@ -11,8 +11,7 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE,
-    SLAS_CUSTOM_PROXY_PATH
+    NO_CACHE
 } from './constants'
 import {
     catchAndLog,
@@ -40,10 +39,16 @@ import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
+import {
+    proxyBasePath,
+    bundleBasePath,
+    healthCheckPath,
+    slasPrivateProxyPath
+} from '../../utils/ssr-namespace-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
-import {morganStream} from '../../utils/morgan-stream'
+import logger from '../../utils/logger-instance'
 import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
@@ -208,6 +213,13 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    _isBundleOrProxyPath(url) {
+        return url.startsWith(proxyBasePath) || url.startsWith(bundleBasePath)
+    },
+
+    /**
+     * @private
+     */
     _getSlasEndpoint(options) {
         if (!options.useSLASPrivateClient) return undefined
         const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
@@ -227,24 +239,49 @@ export const RemoteServerFactory = {
      */
 
     _setupLogging(app) {
+        const morganLoggerFormat = function (tokens, req, res) {
+            const contentLength = tokens.res(req, res, 'content-length')
+            return [
+                `(${res.locals.requestId})`,
+                tokens.method(req, res),
+                tokens.url(req, res),
+                tokens.status(req, res),
+                tokens['response-time'](req, res),
+                'ms',
+                contentLength && `- ${contentLength}`
+            ].join(' ')
+        }
+
+        // Morgan stream for logging status codes less than 400
         app.use(
-            expressLogging(
-                function (tokens, req, res) {
-                    const contentLength = tokens.res(req, res, 'content-length')
-                    return [
-                        `(${res.locals.requestId})`,
-                        tokens.method(req, res),
-                        tokens.url(req, res),
-                        tokens.status(req, res),
-                        tokens['response-time'](req, res),
-                        'ms',
-                        contentLength && `- ${contentLength}`
-                    ].join(' ')
+            expressLogging(morganLoggerFormat, {
+                skip: function (req, res) {
+                    return res.statusCode >= 400
                 },
-                {
-                    stream: morganStream
+                stream: {
+                    write: (message) => {
+                        logger.info(message, {
+                            namespace: 'httprequest'
+                        })
+                    }
                 }
-            )
+            })
+        )
+
+        // Morgan stream for logging status codes 400 and above
+        app.use(
+            expressLogging(morganLoggerFormat, {
+                skip: function (req, res) {
+                    return res.statusCode < 400
+                },
+                stream: {
+                    write: (message) => {
+                        logger.error(message, {
+                            namespace: 'httprequest'
+                        })
+                    }
+                }
+            })
         )
     },
 
@@ -257,7 +294,9 @@ export const RemoteServerFactory = {
             const correlationId = req.headers['x-correlation-id']
             const requestId = correlationId ? correlationId : req.headers['x-apigateway-event']
             if (!requestId) {
-                console.error('Both x-correlation-id and x-apigateway-event headers are missing')
+                logger.error('Both x-correlation-id and x-apigateway-event headers are missing', {
+                    namespace: '_setRequestId'
+                })
                 next()
                 return
             }
@@ -430,7 +469,7 @@ export const RemoteServerFactory = {
         const processIncomingRequest = (req, res) => {
             const options = req.app.options
             // If the request is for a proxy or bundle path, do nothing
-            if (req.originalUrl.startsWith('/mobify/')) {
+            if (this._isBundleOrProxyPath(req.originalUrl)) {
                 return
             }
 
@@ -553,7 +592,7 @@ export const RemoteServerFactory = {
                     // different types of the 'req' object, and will
                     // always contain the original full path.
                     /* istanbul ignore else */
-                    if (!req.originalUrl.startsWith('/mobify/')) {
+                    if (!this._isBundleOrProxyPath(req.originalUrl)) {
                         req.app.sendMetric(
                             'RequestTime',
                             Date.now() - locals.requestStart,
@@ -599,7 +638,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all('/mobify/proxy/*', (_, res) => {
+        app.all(`${proxyBasePath}/*`, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
@@ -611,7 +650,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _handleMissingSlasPrivateEnvVar(app) {
-        app.use(SLAS_CUSTOM_PROXY_PATH, (_, res) => {
+        app.use(slasPrivateProxyPath, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
@@ -626,28 +665,29 @@ export const RemoteServerFactory = {
         if (!options.useSLASPrivateClient) {
             return
         }
-        localDevLog(`Proxying ${SLAS_CUSTOM_PROXY_PATH} to ${options.slasTarget}`)
+
+        localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
         if (!clientSecret) {
-            this._handleMissingSlasPrivateEnvVar(app)
+            this._handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath)
             return
         }
 
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
         app.use(
-            SLAS_CUSTOM_PROXY_PATH,
+            slasPrivateProxyPath,
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[SLAS_CUSTOM_PROXY_PATH]: ''},
+                pathRewrite: {[slasPrivateProxyPath]: ''},
                 onProxyReq: (proxyRequest, incomingRequest) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
-                        proxyPath: SLAS_CUSTOM_PROXY_PATH,
+                        proxyPath: slasPrivateProxyPath,
                         targetHost: options.slasHostName,
                         targetProtocol: 'https'
                     })
@@ -665,16 +705,28 @@ export const RemoteServerFactory = {
                 },
                 onProxyRes: (proxyRes, req) => {
                     if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
-                        console.error(
-                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`
+                        logger.error(
+                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`,
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {statusCode: proxyRes.statusCode}
+                            }
                         )
-                        console.error(
-                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`
+                        logger.error(
+                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`,
+                            {namespace: '_setupSlasPrivateClientProxy'}
                         )
-                        console.error(
+                        logger.error(
                             `SLAS Private Client Proxy Request URL - ${req.protocol}://${req.get(
                                 'host'
-                            )}${req.originalUrl}`
+                            )}${req.originalUrl}`,
+                            {
+                                namespace: '_setupSlasPrivateClientProxy',
+                                additionalProperties: {
+                                    protocol: req.protocol,
+                                    originalUrl: req.originalUrl
+                                }
+                            }
                         )
                     }
                 }
@@ -686,7 +738,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupHealthcheck(app) {
-        app.get('/mobify/ping', (_, res) =>
+        app.get(`${healthCheckPath}`, (_, res) =>
             res.set('cache-control', NO_CACHE).sendStatus(200).end()
         )
     },
@@ -1053,10 +1105,13 @@ const prepNonProxyRequest = (req, res, next) => {
             if (header && header.toLowerCase() !== SET_COOKIE && value) {
                 setHeader.call(this, header, value)
             } /* istanbul ignore else */ else if (!remote) {
-                console.warn(
+                logger.warn(
                     `Req ${res.locals.requestId}: ` +
                         `Cookies cannot be set on responses sent from ` +
-                        `the SSR Server. Discarding "Set-Cookie: ${value}"`
+                        `the SSR Server. Discarding "Set-Cookie: ${value}"`,
+                    {
+                        namespace: 'RemoteServerFactory.prepNonProxyRequest'
+                    }
                 )
             }
         }

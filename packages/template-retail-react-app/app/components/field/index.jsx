@@ -18,7 +18,11 @@ import {
     Select,
     Checkbox
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {VisibilityIcon, VisibilityOffIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {
+    VisibilityIcon,
+    VisibilityOffIcon,
+    AlertIcon
+} from '@salesforce/retail-react-app/app/components/icons'
 import {useIntl} from 'react-intl'
 
 const Field = ({
@@ -32,9 +36,11 @@ const Field = ({
     placeholder,
     inputProps,
     control,
+    autoComplete,
     defaultValue,
     helpText,
-    children
+    children,
+    inputRef
 }) => {
     const intl = useIntl()
     const [hidePassword, setHidePassword] = useState(true)
@@ -50,6 +56,7 @@ const Field = ({
           })
     const inputType =
         type === 'password' && hidePassword ? 'password' : type === 'password' ? 'text' : type
+
     return (
         <Controller
             name={name}
@@ -70,11 +77,15 @@ const Field = ({
                                 type
                             ) && (
                                 <Input
-                                    ref={ref}
+                                    ref={(node) => {
+                                        ref(node)
+                                        if (inputRef) inputRef.current = node
+                                    }}
                                     onChange={onChange}
                                     value={value}
                                     type={inputType}
                                     placeholder={placeholder}
+                                    autoComplete={autoComplete}
                                     {..._inputProps}
                                 />
                             )}
@@ -131,7 +142,10 @@ const Field = ({
                         </InputGroup>
 
                         {error && type !== 'hidden' && (
-                            <FormErrorMessage color="red.600">{error.message}</FormErrorMessage>
+                            <FormErrorMessage color="red.600">
+                                <AlertIcon aria-hidden="true" mr={2} />
+                                {error.message}
+                            </FormErrorMessage>
                         )}
 
                         {helpText}
@@ -145,6 +159,7 @@ const Field = ({
 Field.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
+    autoComplete: PropTypes.string,
     formLabel: PropTypes.any,
     type: PropTypes.oneOf([
         'text',
@@ -165,7 +180,8 @@ Field.propTypes = {
     control: PropTypes.object,
     defaultValue: PropTypes.any,
     helpText: PropTypes.any,
-    children: PropTypes.any
+    children: PropTypes.any,
+    inputRef: PropTypes.object
 }
 
 export default Field

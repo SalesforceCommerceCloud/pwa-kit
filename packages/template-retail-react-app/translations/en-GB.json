@@ -204,6 +204,9 @@
   "cart_title.title.cart_num_of_items": {
     "defaultMessage": "Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
   },
+  "category_links.button_text": {
+    "defaultMessage": "Categories"
+  },
   "cc_radio_group.action.remove": {
     "defaultMessage": "Remove"
   },
@@ -260,6 +263,9 @@
   },
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "Shipping"
+  },
+  "checkout_confirmation.label.shipping.strikethrough.price": {
+    "defaultMessage": "Originally {originalPrice}, now {newPrice}"
   },
   "checkout_confirmation.label.subtotal": {
     "defaultMessage": "Subtotal"
@@ -319,6 +325,9 @@
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "Credit Card"
   },
+  "checkout_payment.label.billing_address_form": {
+    "defaultMessage": "Billing Address Form"
+  },
   "checkout_payment.label.same_as_shipping": {
     "defaultMessage": "Same as shipping address"
   },
@@ -334,6 +343,12 @@
   "confirmation_modal.default.action.yes": {
     "defaultMessage": "Yes"
   },
+  "confirmation_modal.default.assistive_msg.no": {
+    "defaultMessage": "No, cancel action"
+  },
+  "confirmation_modal.default.assistive_msg.yes": {
+    "defaultMessage": "Yes, confirm action"
+  },
   "confirmation_modal.default.message.you_want_to_continue": {
     "defaultMessage": "Are you sure you want to continue?"
   },
@@ -347,6 +362,15 @@
     "defaultMessage": "Remove"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
+    "defaultMessage": "Yes, remove item"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.no": {
+    "defaultMessage": "No, keep item"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": {
+    "defaultMessage": "Remove unavailable products"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": {
     "defaultMessage": "Yes, remove item"
   },
   "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
@@ -404,6 +428,21 @@
   },
   "credit_card_fields.tool_tip.security_code_aria_label": {
     "defaultMessage": "Security code info"
+  },
+  "display_price.assistive_msg.current_price": {
+    "defaultMessage": "current price {currentPrice}"
+  },
+  "display_price.assistive_msg.current_price_with_range": {
+    "defaultMessage": "From current price {currentPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price": {
+    "defaultMessage": "original price {listPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price_with_range": {
+    "defaultMessage": "From original price {listPrice}"
+  },
+  "display_price.label.current_price_with_range": {
+    "defaultMessage": "From {currentPrice}"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"
@@ -582,6 +621,9 @@
   "header.button.assistive_msg.menu": {
     "defaultMessage": "Menu"
   },
+  "header.button.assistive_msg.menu.open_dialog": {
+    "defaultMessage": "Opens a dialog"
+  },
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "My account"
   },
@@ -699,8 +741,8 @@
     "defaultMessage": "Unavailable",
     "description": "A unavailable badge placed on top of a product image"
   },
-  "item_price.label.starting_at": {
-    "defaultMessage": "Starting at"
+  "item_variant.assistive_msg.quantity": {
+    "defaultMessage": "Quantity {quantity}"
   },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
@@ -1063,8 +1105,11 @@
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
   },
-  "product_tile.label.starting_at_price": {
-    "defaultMessage": "Starting at {price}"
+  "product_tile.badge.label.new": {
+    "defaultMessage": "New"
+  },
+  "product_tile.badge.label.sale": {
+    "defaultMessage": "Sale"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
@@ -1095,9 +1140,6 @@
   },
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"
-  },
-  "product_view.label.starting_at_price": {
-    "defaultMessage": "Starting at"
   },
   "product_view.label.variant_type": {
     "defaultMessage": "{variantType}"
@@ -1196,6 +1238,9 @@
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
   },
+  "shipping_address.label.shipping_address_form": {
+    "defaultMessage": "Shipping Address Form"
+  },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
@@ -1246,6 +1291,18 @@
   },
   "toggle_card.action.edit": {
     "defaultMessage": "Edit"
+  },
+  "toggle_card.action.editContactInfo": {
+    "defaultMessage": "Edit Contact Info"
+  },
+  "toggle_card.action.editPaymentInfo": {
+    "defaultMessage": "Edit Payment Info"
+  },
+  "toggle_card.action.editShippingAddress": {
+    "defaultMessage": "Edit Shipping Address"
+  },
+  "toggle_card.action.editShippingOptions": {
+    "defaultMessage": "Edit Shipping Options"
   },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "Forgot Password?"

@@ -6,10 +6,17 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
-import {Box, Fade, Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Box,
+    Fade,
+    Flex,
+    Stack,
+    Text,
+    VisuallyHidden
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
@@ -25,7 +32,7 @@ import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Hooks
-import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -45,6 +52,8 @@ const ProductItem = ({
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
+    const {currency: activeCurrency} = useCurrency()
+    const intl = useIntl()
     return (
         <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
             <ItemVariantProvider variant={product}>
@@ -58,7 +67,10 @@ const ProductItem = ({
                                 <CartItemVariantAttributes />
                                 <HideOnDesktop>
                                     <Box marginTop={2}>
-                                        <CartItemVariantPrice align="left" />
+                                        <CartItemVariantPrice
+                                            align="left"
+                                            currency={activeCurrency}
+                                        />
                                     </Box>
                                 </HideOnDesktop>
                             </Stack>
@@ -99,10 +111,22 @@ const ProductItem = ({
                                             }
                                         }}
                                     />
+                                    <VisuallyHidden role="status">
+                                        {product?.name}
+                                        {intl.formatMessage(
+                                            {
+                                                id: 'item_variant.assistive_msg.quantity',
+                                                defaultMessage: 'Quantity {quantity}'
+                                            },
+                                            {
+                                                quantity: product?.quantity
+                                            }
+                                        )}
+                                    </VisuallyHidden>
                                 </Stack>
                                 <Stack>
                                     <HideOnMobile>
-                                        <CartItemVariantPrice />
+                                        <CartItemVariantPrice currency={activeCurrency} />
                                     </HideOnMobile>
                                     <Box display={['none', 'block', 'block', 'block']}>
                                         {primaryAction}
