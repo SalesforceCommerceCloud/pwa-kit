@@ -1527,6 +1527,12 @@
       "value": "Menu"
     }
   ],
+  "header.button.assistive_msg.menu.open_dialog": [
+    {
+      "type": 0,
+      "value": "Opens a dialog"
+    }
+  ],
   "header.button.assistive_msg.my_account": [
     {
       "type": 0,
