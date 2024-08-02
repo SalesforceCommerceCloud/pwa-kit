@@ -28,7 +28,7 @@ export const useDerivedProduct = (
     const initialQuantity = product?.quantity || product?.minOrderQuantity || 1
 
     // used for product bundles when there are multiple products
-    const lowestStockLevelProduct = product?.inventory?.lowestStockLevelProduct
+    const lowestStockLevelProductName = product?.inventory?.lowestStockLevelProductName
     const intl = useIntl()
     const variant = useVariant(product, isProductPartOfSet, isProductPartOfBundle)
     const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
@@ -55,13 +55,13 @@ export const useDerivedProduct = (
             defaultMessage: 'Out of stock',
             id: 'use_product.message.out_of_stock'
         }),
-        [UNFULFILLABLE]: lowestStockLevelProduct
+        [UNFULFILLABLE]: lowestStockLevelProductName
             ? intl.formatMessage(
                   {
                       defaultMessage: 'Only {stockLevel} left for {productName}!',
                       id: 'use_product.message.inventory_remaining_for_product'
                   },
-                  {stockLevel, productName: lowestStockLevelProduct}
+                  {stockLevel, productName: lowestStockLevelProductName}
               )
             : intl.formatMessage(
                   {

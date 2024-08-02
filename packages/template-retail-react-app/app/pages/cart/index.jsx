@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -105,7 +105,7 @@ const Cart = () => {
     const {data: bundleChildProductData} = useProducts(
         {
             parameters: {
-                ids: bundleChildVariantIds,
+                ids: bundleChildVariantIds?.join(','),
                 allImages: false,
                 expand: ['availability', 'variations'],
                 select: '(data.(id,inventory))'
@@ -125,37 +125,39 @@ const Cart = () => {
     )
 
     // Seting up productsByItemId state where key is itemId and value is the product data
-    const updateProductsByItemId = {}
-    basket?.productItems?.forEach((productItem) => {
-        let currentProduct = products?.[productItem?.productId]
+    useEffect(() => {
+        const updateProductsByItemId = {}
+        basket?.productItems?.forEach((productItem) => {
+            let currentProduct = products?.[productItem?.productId]
 
-        // calculate inventory for product bundles based on availability of children
-        if (productItem?.bundledProductItems) {
-            let lowestStockLevel = currentProduct?.inventory?.stockLevel || Number.MAX_SAFE_INTEGER
-            let productWithLowestInventory = ''
-            productItem?.bundledProductItems.forEach((bundleChild) => {
-                const bundleChildStockLevel =
-                    bundleChildProductData?.[bundleChild.productId]?.inventory?.stockLevel
-                lowestStockLevel = Math.min(lowestStockLevel, bundleChildStockLevel)
-                if (lowestStockLevel === bundleChildStockLevel)
-                    productWithLowestInventory = bundleChild.productName
-            })
+            // calculate inventory for product bundles based on availability of children
+            if (productItem?.bundledProductItems && bundleChildProductData) {
+                let lowestStockLevel =
+                    currentProduct?.inventory?.stockLevel || Number.MAX_SAFE_INTEGER
+                let productWithLowestInventory = ''
+                productItem?.bundledProductItems.forEach((bundleChild) => {
+                    const bundleChildStockLevel =
+                        bundleChildProductData?.[bundleChild.productId]?.inventory?.stockLevel
+                    lowestStockLevel = Math.min(lowestStockLevel, bundleChildStockLevel)
+                    if (lowestStockLevel === bundleChildStockLevel)
+                        productWithLowestInventory = bundleChild.productName
+                })
 
-            if (currentProduct?.inventory) {
-                // make a deepcopy so we don't modify the underlying reference
-                currentProduct = JSON.parse(JSON.stringify(products?.[productItem?.productId]))
-                currentProduct.inventory = {
-                    ...currentProduct.inventory,
-                    stockLevel: lowestStockLevel,
-                    lowestStockLevelProduct: productWithLowestInventory
+                if (currentProduct?.inventory) {
+                    currentProduct = {
+                        ...currentProduct,
+                        inventory: {
+                            ...currentProduct.inventory,
+                            stockLevel: lowestStockLevel,
+                            lowestStockLevelProductName: productWithLowestInventory
+                        }
+                    }
                 }
             }
-        }
-        updateProductsByItemId[productItem.itemId] = currentProduct
-    })
-
-    if (JSON.stringify(productsByItemId) !== JSON.stringify(updateProductsByItemId))
+            updateProductsByItemId[productItem.itemId] = currentProduct
+        })
         setProductsByItemId({...updateProductsByItemId})
+    }, [basket, products, bundleChildProductData])
 
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
