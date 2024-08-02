@@ -25,21 +25,30 @@ runs:
         echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
       shell: bash
 
+    - name: Get Base Branch SHA
+      id: get_base_sha
+      run: |
+        BASE_SHA=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ inputs.pr_number }}" | \
+          jq -r '.base.sha')
+        echo "BASE_SHA=${BASE_SHA}" >> $GITHUB_ENV
+      shell: bash
+
     - name: Debugging Info
       run: |
-        echo "Event before: ${{ github.event.before }}"
+        echo "Base SHA: ${{ env.BASE_SHA }}"
         echo "Current SHA: ${{ github.sha }}"
         echo "PR labels: $PR_LABELS"
       shell: bash
 
     - name: Check if changelog is updated
       run: |
-        if [ -z "${{ github.event.before }}" ] || [ -z "${{ github.sha }}" ]; then
+        if [ -z "${{ env.BASE_SHA }}" ] || [ -z "${{ github.sha }}" ]; then
           echo "Error: SHA values are missing or invalid."
           exit 1
         fi
 
-        CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+        CHANGED_FILES=$(git diff --name-only ${{ env.BASE_SHA }} ${{ github.sha }})
         echo "Changed files: $CHANGED_FILES"
         
         PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
