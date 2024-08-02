@@ -23,6 +23,7 @@ import 'focus-visible/dist/focus-visible'
 import theme from '@salesforce/retail-react-app/app/theme'
 import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
 import {
+    resolveBasePathFromUrl,
     resolveSiteFromUrl,
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
@@ -62,12 +63,12 @@ const AppConfig = ({children, locals = {}}) => {
 
     // exclude the namespace in MRT server. include it for local and for client
 
-    const proxy = !onClient
-        ? `${appOrigin}${commerceApiConfig.proxyPath}`
-        : `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
+    // const proxy = !onClient
+    //     ? `${appOrigin}${commerceApiConfig.proxyPath}`
+    //     : `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
 
     // TODO: need to have the client namespace included in the local server side calls
-    // const proxy = `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
+    const proxy = `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
 
     console.log(`Proxy: ${proxy}`)
 
@@ -105,6 +106,7 @@ AppConfig.restore = (locals = {}) => {
             : `${window.location.pathname}${window.location.search}`
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
+    const basePath = resolveBasePathFromUrl(path)
 
     const {app: appConfig} = getConfig()
     const apiConfig = {
@@ -115,6 +117,7 @@ AppConfig.restore = (locals = {}) => {
     apiConfig.parameters.siteId = site.id
 
     locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
+    locals.basePath = basePath
     locals.site = site
     locals.locale = locale
     locals.appConfig = appConfig

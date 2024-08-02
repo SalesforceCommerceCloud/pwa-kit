@@ -43,9 +43,12 @@ export const registerServiceWorker = (url) => {
 }
 
 // TODO - we may want to add some way to limit the possible basenames to what is set in some config file?
-const getBaseName = () => {
-    return window.location.pathname.split('/')[1]
-}
+// const getBaseName = () => {
+//     // check the basepath to see if it's allowed. if no match, return a default basepath
+//     const incomingBaseName = window.location.pathname.split('/')[1]
+
+//     return incomingBaseName
+// }
 
 export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
@@ -54,6 +57,14 @@ export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     // const baseName = getNamespace() ? getNamespace() : '/'
     // console.log(`Namespace from main: ${getNamespace()}`)
     // console.log(`Basename from main: ${baseName}`)
+
+    const getBaseName = () => {
+        console.log(`Locals: ${locals}`)
+        // this should not return a '/'. it should be an empty string or an actual basepath (ie. /example)
+        return locals.basePath
+    }
+
+    console.log(`locals.basePath: ${getBaseName()}`)
 
     return (
         <ServerContext.Provider value={{}}>

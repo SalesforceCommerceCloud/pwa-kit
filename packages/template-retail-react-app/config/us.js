@@ -8,7 +8,13 @@ module.exports = {
             site: 'none',
             locale: 'path',
             showDefaults: true,
-            interpretPlusSignAsSpace: false
+            interpretPlusSignAsSpace: false,
+
+            // Set of allowed base paths. A base path is the first part of the pathname for an
+            // app page. ie www.example.com/basePath/category/...
+            // can be overridden for individual environments via that environment's config file
+            basePaths: ['/us'], // empty by default. can set additional allowed basePaths here
+            defaultBasePath: '/us' // empty by default. set this to /basePath to add a default basePath
         },
         defaultSite: 'RefArch',
         siteAliases: {

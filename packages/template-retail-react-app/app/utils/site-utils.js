@@ -8,6 +8,49 @@
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 
+const removeLeadingSlashFromBasePath = (basePath) => {
+    if (!basePath) return ''
+
+    let path = basePath
+    if(path.substring(0,1) == '/') {
+        path = path.substring(1);
+    }
+    return path
+}
+
+export const resolveBasePathFromUrl = (url) => {
+    if (!url) {
+        throw new Error('URL is required to find a basePath.')
+    }
+    const {baseRef} = getParamsFromPath(url)
+    return getBasePathByReference(baseRef)
+}
+
+export const getBasePathByReference = (basePathRef) => {
+    const urlConfig = getUrlConfig()
+    const basePaths = urlConfig.basePaths ? urlConfig.basePaths : []
+
+    console.log(`BasePathRef: ${basePathRef}`)
+    console.log(`BasePath array: ${basePaths}`)
+
+    let basePath = basePaths.find((basePath) =>
+        removeLeadingSlashFromBasePath(basePath)
+        === removeLeadingSlashFromBasePath(basePathRef))
+
+    console.log(`BasePath from array: ${removeLeadingSlashFromBasePath(basePath)}`)
+
+    // if basePath is '/', treat it the same as ''
+    if (basePath && basePath != '/') {
+        return removeLeadingSlashFromBasePath(basePath)
+    }
+
+    // if basePath is '/', treat it the same as ''.
+    basePath = urlConfig.defaultBasePath && urlConfig.defaultBasePath != '/' ? urlConfig.defaultBasePath : ''
+
+    console.log(`BasePath: ${removeLeadingSlashFromBasePath(basePath)}`)
+    return removeLeadingSlashFromBasePath(basePath)
+}
+
 /**
  * This functions takes an url and returns a site object,
  * an error will be thrown if no url is passed in or no site is found
@@ -143,6 +186,9 @@ export const getConfigMatcher = (config) => {
         throw new Error('Config is not defined.')
     }
 
+    // const urlConfig = getUrlConfig()
+    // const basePaths = urlConfig.basePaths ? urlConfig.basePaths : []
+
     const allSites = getSites()
     const siteIds = []
     const siteAliases = []
@@ -165,11 +211,8 @@ export const getConfigMatcher = (config) => {
     // prettier-ignore
     // eslint-disable-next-line
 
-    // Allowed basenames! Make this configurabke
-    const basenames = 'us|ca'
-
-    // update this to include basename - basename capturing group should include all possible basenames
-    const pathPattern = `(?:\/(?<basename>${basenames}))?(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
+    // find any basename here - we validate basename afterward. see getBasePathByReference
+    const pathPattern = `(?:\/(?<basename>[a-zA-Z0-9-]+))?(?:\/(?<site>${sites.join('|')}))?(?:\/(?<locale>${locales.join("|")}))?(?!\\w)`
     // prettier-ignore
     const searchPatternForLocale = `locale=(?<locale>${locales.join('|')})`
     const pathMatcher = new RegExp(pathPattern)

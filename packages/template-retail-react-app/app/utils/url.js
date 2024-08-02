@@ -7,6 +7,7 @@
 
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {
+    getBasePathByReference,
     getLocaleByReference,
     getParamsFromPath,
     getDefaultSite,
@@ -172,8 +173,11 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         })
     }
 
+    const basePath = getBasePathByReference(baseRef)
     const site = getSiteByReference(siteRef)
     const locale = getLocaleByReference(site, shortCode)
+
+    console.log(`BasePath in Locale Res: ${basePath}`)
 
     // rebuild the url with new locale
     // we need buildUrl to add the namespace - react router does not add it automatically here
@@ -184,7 +188,7 @@ export const getPathWithLocale = (shortCode, buildUrl, opts = {}) => {
         // they will be not shown in the url just
         site.alias || site.id,
         locale?.alias || locale?.id,
-        baseRef
+        basePath
     )
 
     console.log(`New URL: ${newUrl}`)

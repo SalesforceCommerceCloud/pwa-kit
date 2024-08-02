@@ -130,6 +130,8 @@ export const render = async (req, res, next) => {
 
     const basename = pathname.split('/')[1]
 
+    // console.log(`locals.basePath: ${res.locals.basePath}`)
+
     const location = {
         pathname,
         search: getLocationSearch(req, {
@@ -230,9 +232,14 @@ export const render = async (req, res, next) => {
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location, basename}) => {
     const AppConfig = getAppConfig()
+    const getBaseName = () => {
+        console.log(`locals.basePath: ${res.locals.basePath}`)
+        // this should not return a '/'. it should be an empty string or an actual basepath (ie. /example)
+        return res.locals.basePath
+     }
     return (
         <ServerContext.Provider value={{req, res}}>
-            <Router location={location} context={routerContext} basename={basename}>
+            <Router location={location} context={routerContext} basename={getBaseName()}>
                 <CorrelationIdProvider
                     correlationId={res.locals.requestId}
                     resetOnPageChange={false}
