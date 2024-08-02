@@ -10,7 +10,7 @@ const sh = require('shelljs')
 const fs = require('fs')
 const os = require('os')
 const tar = require('tar')
-// test
+
 sh.set('-e')
 sh.config.silent = false
 
