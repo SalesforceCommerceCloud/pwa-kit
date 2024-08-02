@@ -96,6 +96,8 @@ export const useDerivedProduct = (
         variationParams,
         setQuantity,
         variant,
-        stockLevel
+        stockLevel,
+        isOutOfStock,
+        unfulfillable
     }
 }

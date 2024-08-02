@@ -3487,6 +3487,16 @@
       "value": "Out of stock"
     }
   ],
+  "use_product.message.out_of_stock_for_product": [
+    {
+      "type": 0,
+      "value": "Out of stock for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
   "use_profile_fields.error.required_email": [
     {
       "type": 0,

@@ -7455,6 +7455,24 @@
       "value": "]"
     }
   ],
+  "use_product.message.out_of_stock_for_product": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿŭŭŧ ǿǿƒ şŧǿǿƈķ ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "use_profile_fields.error.required_email": [
     {
       "type": 0,
