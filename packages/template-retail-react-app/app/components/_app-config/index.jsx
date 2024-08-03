@@ -106,7 +106,6 @@ AppConfig.restore = (locals = {}) => {
             : `${window.location.pathname}${window.location.search}`
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
-    const basePath = resolveBasePathFromUrl(path)
 
     const {app: appConfig} = getConfig()
     const apiConfig = {
@@ -117,7 +116,6 @@ AppConfig.restore = (locals = {}) => {
     apiConfig.parameters.siteId = site.id
 
     locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
-    locals.basePath = basePath
     locals.site = site
     locals.locale = locale
     locals.appConfig = appConfig
@@ -131,6 +129,15 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
         site: locals.site,
         locale: locals.locale
     }
+}
+
+AppConfig.getBasePath = (locals = {}) => {
+    const path =
+        typeof window === 'undefined'
+            ? locals.originalUrl
+            : `${window.location.pathname}${window.location.search}`
+
+    return resolveBasePathFromUrl(path)
 }
 
 AppConfig.propTypes = {

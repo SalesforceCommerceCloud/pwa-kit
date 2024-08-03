@@ -58,17 +58,17 @@ export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     // console.log(`Namespace from main: ${getNamespace()}`)
     // console.log(`Basename from main: ${baseName}`)
 
-    const getBaseName = () => {
-        console.log(`Locals: ${locals}`)
-        // this should not return a '/'. it should be an empty string or an actual basepath (ie. /example)
-        return locals.basePath
-    }
+    // const getBaseName = () => {
+    //     console.log(`Locals: ${locals}`)
+    //     // this should not return a '/'. it should be an empty string or an actual basepath (ie. /example)
+    //     return locals.basePath
+    // }
 
-    console.log(`locals.basePath: ${getBaseName()}`)
+    // console.log(`locals.basePath: ${getBaseName()}`)
 
     return (
         <ServerContext.Provider value={{}}>
-            <Router ref={onHydrate} basename={getBaseName()}>
+            <Router ref={onHydrate} basename={AppConfig.getBasePath(locals)}>
                 <CorrelationIdProvider
                     correlationId={() => {
                         // If we are hydrating an error page use the server correlation id.

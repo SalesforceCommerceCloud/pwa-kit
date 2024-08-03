@@ -67,6 +67,20 @@ class AppConfig extends React.Component {
     }
 
     /**
+     * Returns a base path to be included in all URLs.
+     * For example, www.example.com/basepath/category/...
+     *
+     * @param locals - res.locals on the server, an empty object as a substitute on
+     *    the client.
+     *
+     * @return string - the base path
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    static getBasePath(locals) {
+        return ''
+    }
+
+    /**
      * This class is a React Component in order to provide this hook, which lets
      * you set up context Providers for a state-management library such as Redux.
      */
