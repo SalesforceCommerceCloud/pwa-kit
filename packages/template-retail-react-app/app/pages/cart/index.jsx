@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect} from 'react'
+import React, {useState, useMemo} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -93,7 +93,6 @@ const Cart = () => {
     // Since with product bundles, even though the parent productId is the same,
     // variant selection of the bundle children can be different,
     // and require unique references to each product bundle
-    const [productsByItemId, setProductsByItemId] = useState({})
 
     const bundleChildVariantIds = []
     basket?.productItems?.forEach((productItem) => {
@@ -125,7 +124,7 @@ const Cart = () => {
     )
 
     // Seting up productsByItemId state where key is itemId and value is the product data
-    useEffect(() => {
+    const productsByItemId = useMemo(() => {
         const updateProductsByItemId = {}
         basket?.productItems?.forEach((productItem) => {
             let currentProduct = products?.[productItem?.productId]
@@ -157,7 +156,7 @@ const Cart = () => {
             }
             updateProductsByItemId[productItem.itemId] = currentProduct
         })
-        setProductsByItemId({...updateProductsByItemId})
+        return updateProductsByItemId
     }, [basket, products, bundleChildProductData])
 
     /*****************Basket Mutation************************/

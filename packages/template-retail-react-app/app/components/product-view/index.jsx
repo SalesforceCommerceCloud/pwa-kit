@@ -155,11 +155,10 @@ const ProductView = forwardRef(
         const isProductASet = product?.type.set
         const isProductABundle = product?.type.bundle
         const errorContainerRef = useRef(null)
-        const [disableButton, setDisableButton] = useState(false)
-        const [customInventoryMessage, setCustomInventoryMessage] = useState('')
 
-        useEffect(() => {
+        const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
+            let currentInventoryMsg = ''
             if (
                 !shouldDisableButton &&
                 (isProductASet || isProductABundle) &&
@@ -175,7 +174,6 @@ const ProductView = forwardRef(
                 if (unavailableChildProductKey) {
                     const unavailableChildProduct =
                         childProductOrderability[unavailableChildProductKey]
-                    let currentInventoryMsg = ''
                     if (unavailableChildProduct.unfulfillable) {
                         currentInventoryMsg = intl.formatMessage(
                             {
@@ -197,12 +195,9 @@ const ProductView = forwardRef(
                             {productName: unavailableChildProduct.productName}
                         )
                     }
-                    setCustomInventoryMessage(currentInventoryMsg)
-                } else {
-                    setCustomInventoryMessage('')
                 }
             }
-            setDisableButton(shouldDisableButton)
+            return {disableButton: shouldDisableButton, customInventoryMessage: currentInventoryMsg}
         }, [showInventoryMessage, childProductOrderability])
 
         const validateAndShowError = (opts = {}) => {

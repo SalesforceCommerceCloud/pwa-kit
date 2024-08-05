@@ -48,7 +48,7 @@ export const useDerivedProduct = (
         (!isProductABundle &&
             !variant &&
             Object.keys(variationParams).length === variationAttributes.length) ||
-        (!isProductABundle && !variant?.orderable)
+        (!isProductABundle && variant && !variant.orderable)
     const unfulfillable = stockLevel < quantity
     const inventoryMessages = {
         [OUT_OF_STOCK]: intl.formatMessage({

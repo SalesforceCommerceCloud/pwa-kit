@@ -39,16 +39,14 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
         productViewModalData?.product?.quantity
     )
     const trueIfMobile = useBreakpointValue({base: true, lg: false})
-    const [childProductIds, setChildProductIds] = useState(
-        productViewModalData.product?.bundledProductItems?.map(({productId}) => productId).join(',')
-    )
 
-    useEffect(() => {
-        const productIds = selectedChildProducts.map(({variant}) => variant.productId).join(',')
-        if (productIds?.length > 0 && productIds !== childProductIds) {
-            setChildProductIds(productIds)
-        }
-    }, [selectedChildProducts])
+    let childProductIds = productViewModalData.product?.bundledProductItems
+        ?.map(({productId}) => productId)
+        .join(',')
+    let productIds = selectedChildProducts.map(({variant}) => variant.productId).join(',')
+    if (productIds?.length > 0 && productIds !== childProductIds) {
+        childProductIds = productIds
+    }
 
     const {data: childProducts, isLoading} = useProducts(
         {parameters: {ids: childProductIds, allImages: true}},
