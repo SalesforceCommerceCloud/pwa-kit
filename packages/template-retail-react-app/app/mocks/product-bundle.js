@@ -1647,7 +1647,7 @@ export const mockGetBundleChildrenProducts = [
             id: 'inventory_m',
             orderable: true,
             preorderable: false,
-            stockLevel: 96
+            stockLevel: 3
         },
         longDescription:
             'This relaxed fit tank with a ribbed inset is a perfect way to update your wardrobe for a new season.',
