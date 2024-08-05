@@ -397,7 +397,7 @@ const ProductView = forwardRef(
                     }
                 }))
             }
-        }, [showInventoryMessage])
+        }, [showInventoryMessage, inventoryMessage])
 
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>

@@ -88,12 +88,6 @@ const Cart = () => {
     const {customerId, isRegistered} = customer
 
     /***************** Product Bundles ************************/
-
-    // We use the `products` object to reference products by itemId instead of productId
-    // Since with product bundles, even though the parent productId is the same,
-    // variant selection of the bundle children can be different,
-    // and require unique references to each product bundle
-
     const bundleChildVariantIds = []
     basket?.productItems?.forEach((productItem) => {
         productItem?.bundledProductItems?.forEach((childProduct) => {
@@ -123,7 +117,10 @@ const Cart = () => {
         }
     )
 
-    // Seting up productsByItemId state where key is itemId and value is the product data
+    // We use the `products` object to reference products by itemId instead of productId
+    // Since with product bundles, even though the parent productId is the same,
+    // variant selection of the bundle children can be different,
+    // and require unique references to each product bundle
     const productsByItemId = useMemo(() => {
         const updateProductsByItemId = {}
         basket?.productItems?.forEach((productItem) => {
