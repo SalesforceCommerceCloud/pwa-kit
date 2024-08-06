@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useRef, useEffect} from 'react'
+import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {
     Modal,
@@ -43,7 +43,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     let childProductIds = productViewModalData.product?.bundledProductItems
         ?.map(({productId}) => productId)
         .join(',')
-    let productIds = selectedChildProducts.map(({variant}) => variant.productId).join(',')
+    const productIds = selectedChildProducts.map(({variant}) => variant.productId).join(',')
     if (productIds?.length > 0 && productIds !== childProductIds) {
         childProductIds = productIds
     }

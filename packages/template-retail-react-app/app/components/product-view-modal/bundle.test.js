@@ -45,12 +45,14 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundle))
         }),
         rest.get('*/products', (req, res, ctx) => {
-            if (req.url.toString().includes('701643473915M')) {
+            const swingTankBlackMediumVariantId = '701643473915M'
+            const swingTankBlackLargeVariantId = '701643473908M'
+            if (req.url.toString().includes(swingTankBlackMediumVariantId)) {
                 mockProductBundleWithVariants.data[1].inventory = {
                     ...mockProductBundleWithVariants.data[1].inventory,
                     stockLevel: 0
                 }
-            } else if (req.url.toString().includes('701643473908M')) {
+            } else if (req.url.toString().includes(swingTankBlackLargeVariantId)) {
                 mockProductBundleWithVariants.data[1].inventory = {
                     ...mockProductBundleWithVariants.data[1].inventory,
                     stockLevel: 1
