@@ -46,9 +46,7 @@ ProductViewModal.propTypes = {
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     product: PropTypes.object,
-    isLoading: PropTypes.bool,
-    actionButtons: PropTypes.node,
-    onModalClose: PropTypes.func
+    isLoading: PropTypes.bool
 }
 
 export default ProductViewModal

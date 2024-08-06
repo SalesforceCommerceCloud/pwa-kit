@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -28,6 +28,7 @@ import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empt
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
+import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 
 // Hooks
@@ -57,6 +58,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
@@ -84,8 +86,79 @@ const Cart = () => {
 
     const {data: customer} = useCurrentCustomer()
     const {customerId, isRegistered} = customer
+
+    /***************** Product Bundles ************************/
+    const bundleChildVariantIds = []
+    basket?.productItems?.forEach((productItem) => {
+        productItem?.bundledProductItems?.forEach((childProduct) => {
+            bundleChildVariantIds.push(childProduct.productId)
+        })
+    })
+
+    const {data: bundleChildProductData} = useProducts(
+        {
+            parameters: {
+                ids: bundleChildVariantIds?.join(','),
+                allImages: false,
+                expand: ['availability', 'variations'],
+                select: '(data.(id,inventory))'
+            }
+        },
+        {
+            enabled: bundleChildVariantIds?.length > 0,
+            keepPreviousData: true,
+            select: (result) => {
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+
+    // We use the `products` object to reference products by itemId instead of productId
+    // Since with product bundles, even though the parent productId is the same,
+    // variant selection of the bundle children can be different,
+    // and require unique references to each product bundle
+    const productsByItemId = useMemo(() => {
+        const updateProductsByItemId = {}
+        basket?.productItems?.forEach((productItem) => {
+            let currentProduct = products?.[productItem?.productId]
+
+            // calculate inventory for product bundles based on availability of children
+            if (productItem?.bundledProductItems && bundleChildProductData) {
+                let lowestStockLevel =
+                    currentProduct?.inventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+                let productWithLowestInventory = ''
+                productItem?.bundledProductItems.forEach((bundleChild) => {
+                    const bundleChildStockLevel =
+                        bundleChildProductData?.[bundleChild.productId]?.inventory?.stockLevel ??
+                        Number.MAX_SAFE_INTEGER
+                    lowestStockLevel = Math.min(lowestStockLevel, bundleChildStockLevel)
+                    if (lowestStockLevel === bundleChildStockLevel)
+                        productWithLowestInventory = bundleChild.productName
+                })
+
+                if (currentProduct?.inventory) {
+                    currentProduct = {
+                        ...currentProduct,
+                        inventory: {
+                            ...currentProduct.inventory,
+                            stockLevel: lowestStockLevel,
+                            lowestStockLevelProductName: productWithLowestInventory
+                        }
+                    }
+                }
+            }
+            updateProductsByItemId[productItem.itemId] = currentProduct
+        })
+        return updateProductsByItemId
+    }, [basket, products, bundleChildProductData])
+
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
+    const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
         'updateShippingMethodForShipment'
@@ -257,6 +330,41 @@ const Cart = () => {
         }
     }
 
+    const handleUpdateBundle = async (bundle, bundleQuantity, childProducts) => {
+        // close the modal before handle the change
+        onClose()
+
+        try {
+            setCartItemLoading(true)
+            const itemsToBeUpdated = getUpdateBundleChildArray(bundle, childProducts)
+
+            // We only update the parent bundle when the quantity changes
+            // Since top level bundles don't have variants
+            if (bundle.quantity !== bundleQuantity) {
+                itemsToBeUpdated.unshift({
+                    itemId: bundle.itemId,
+                    productId: bundle.productId,
+                    quantity: bundleQuantity
+                })
+            }
+
+            if (itemsToBeUpdated.length) {
+                await updateItemsInBasketMutation.mutateAsync({
+                    method: 'PATCH',
+                    parameters: {
+                        basketId: basket.basketId
+                    },
+                    body: itemsToBeUpdated
+                })
+            }
+        } catch {
+            showError()
+        } finally {
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
+        }
+    }
+
     const handleIsAGiftChange = async (product, checked) => {
         try {
             const previousVal = localIsGiftItems[product.itemId]
@@ -348,7 +456,7 @@ const Cart = () => {
     }, DEBOUNCE_WAIT)
 
     const handleChangeItemQuantity = async (product, value) => {
-        const {stockLevel} = products[product.productId].inventory
+        const stockLevel = productsByItemId?.[product.itemId]?.inventory?.stockLevel ?? 1
 
         // Handle removing of the items when 0 is selected.
         if (value === 0) {
@@ -436,7 +544,7 @@ const Cart = () => {
                                     {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem
-                                                key={productItem.productId}
+                                                key={productItem.itemId}
                                                 index={idx}
                                                 secondaryActions={
                                                     <CartSecondaryButtonGroup
@@ -458,10 +566,10 @@ const Cart = () => {
                                                 }
                                                 product={{
                                                     ...productItem,
-                                                    ...(products &&
-                                                        products[productItem.productId]),
+                                                    ...(productsByItemId &&
+                                                        productsByItemId[productItem.itemId]),
                                                     isProductUnavailable: !isProductsLoading
-                                                        ? !products?.[productItem.productId]
+                                                        ? !productsByItemId?.[productItem.itemId]
                                                         : undefined,
                                                     price: productItem.price,
                                                     quantity: localQuantity[productItem.itemId]
@@ -482,7 +590,7 @@ const Cart = () => {
                                     })}
                                 </Stack>
                                 <Box>
-                                    {isOpen && (
+                                    {isOpen && !selectedItem.bundledProductItems && (
                                         <ProductViewModal
                                             isOpen={isOpen}
                                             onOpen={onOpen}
@@ -490,6 +598,17 @@ const Cart = () => {
                                             product={selectedItem}
                                             updateCart={(variant, quantity) =>
                                                 handleUpdateCart(variant, quantity)
+                                            }
+                                        />
+                                    )}
+                                    {isOpen && selectedItem.bundledProductItems && (
+                                        <BundleProductViewModal
+                                            isOpen={isOpen}
+                                            onOpen={onOpen}
+                                            onClose={onClose}
+                                            product={selectedItem}
+                                            updateCart={(product, quantity, childProducts) =>
+                                                handleUpdateBundle(product, quantity, childProducts)
                                             }
                                         />
                                     )}

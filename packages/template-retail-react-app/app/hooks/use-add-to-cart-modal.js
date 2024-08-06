@@ -61,7 +61,9 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    const {product, itemsAdded = []} = data || {}
+    const {product, itemsAdded = [], selectedQuantity} = data || {}
+    const isProductABundle = product?.type.bundle
+
     const intl = useIntl()
     const {
         data: basket = {},
@@ -69,11 +71,17 @@ export const AddToCartModal = () => {
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
     const {currency, productSubTotal} = basket
-    const numerOfItemsAdded = itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
+    const numberOfItemsAdded = isProductABundle
+        ? selectedQuantity
+        : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
     if (!isOpen) {
         return null
     }
+
+    const bundleImage = findImageGroupBy(product.imageGroups, {
+        viewType: 'small'
+    })?.images?.[0]
 
     return (
         <Modal size={size} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
@@ -92,7 +100,7 @@ export const AddToCartModal = () => {
                                     '{quantity} {quantity, plural, one {item} other {items}} added to cart',
                                 id: 'add_to_cart_modal.info.added_to_cart'
                             },
-                            {quantity: numerOfItemsAdded}
+                            {quantity: numberOfItemsAdded}
                         )}
                     </Heading>
                 </ModalHeader>
@@ -112,79 +120,164 @@ export const AddToCartModal = () => {
                             borderColor="gray.200"
                             borderStyle="solid"
                         >
-                            {itemsAdded.map(({product, variant, quantity}, index) => {
-                                const image = findImageGroupBy(product.imageGroups, {
-                                    viewType: 'small',
-                                    selectedVariationAttributes: variant.variationValues
-                                })?.images?.[0]
-                                const priceData = getPriceData(product, {quantity})
-                                const variationAttributeValues = getDisplayVariationValues(
-                                    product.variationAttributes,
-                                    variant.variationValues
-                                )
+                            {isProductABundle && (
+                                <Flex
+                                    key={product.id}
+                                    justifyContent="space-between"
+                                    paddingBottom={4}
+                                    borderBottomWidth={{base: '1px', lg: '0px'}}
+                                    borderColor="gray.200"
+                                    borderStyle="solid"
+                                    data-testid="product-added"
+                                >
+                                    <Flex gridGap="4">
+                                        <Box w="24" flex="none">
+                                            <AspectRatio ratio="1">
+                                                <img src={bundleImage.link} alt={bundleImage.alt} />
+                                            </AspectRatio>
+                                        </Box>
 
-                                return (
-                                    <Flex
-                                        key={variant.productId}
-                                        justifyContent="space-between"
-                                        marginBottom={index < itemsAdded - 1 ? 0 : 4}
-                                        paddingBottom={4}
-                                        borderBottomWidth={{base: '1px', lg: '0px'}}
-                                        borderColor="gray.200"
-                                        borderStyle="solid"
-                                        data-testid="product-added"
-                                    >
-                                        <Flex gridGap="4">
-                                            <Box w="24" flex="none">
-                                                <AspectRatio ratio="1">
-                                                    <img src={image.link} alt={image.alt} />
-                                                </AspectRatio>
+                                        <Box>
+                                            <Text fontWeight="700">{product.name}</Text>
+                                            <Box color="gray.600" fontSize="sm" fontWeight="400">
+                                                <Text>
+                                                    {intl.formatMessage({
+                                                        defaultMessage: 'Qty',
+                                                        id: 'add_to_cart_modal.label.quantity'
+                                                    })}
+                                                    : {numberOfItemsAdded}
+                                                </Text>
                                             </Box>
+                                            <Flex
+                                                flexDirection="column"
+                                                justifyContent="space-between"
+                                                marginTop={4}
+                                                gridGap={4}
+                                            >
+                                                {itemsAdded.map(({product, variant, quantity}) => {
+                                                    const variationAttributeValues =
+                                                        getDisplayVariationValues(
+                                                            product.variationAttributes,
+                                                            variant.variationValues
+                                                        )
+                                                    return (
+                                                        <Box key={variant.productId}>
+                                                            <Text
+                                                                color="gray.700"
+                                                                fontWeight="700"
+                                                                fontSize="sm"
+                                                            >
+                                                                {product.name}{' '}
+                                                                {quantity > 1
+                                                                    ? `(${quantity})`
+                                                                    : ''}
+                                                            </Text>
+                                                            <Box
+                                                                color="gray.600"
+                                                                fontSize="sm"
+                                                                fontWeight="500"
+                                                            >
+                                                                {Object.entries(
+                                                                    variationAttributeValues
+                                                                ).map(([name, value]) => {
+                                                                    return (
+                                                                        <Text key={value}>
+                                                                            {name}: {value}
+                                                                        </Text>
+                                                                    )
+                                                                })}
+                                                            </Box>
+                                                        </Box>
+                                                    )
+                                                })}
+                                            </Flex>
+                                        </Box>
+                                    </Flex>
 
-                                            <Box>
-                                                <Heading
-                                                    as="h2"
-                                                    fontSize="md"
-                                                    fontFamily="body"
-                                                    fontWeight="700"
-                                                >
-                                                    {product.name}
-                                                </Heading>
-                                                <Box
-                                                    color="gray.600"
-                                                    fontSize="sm"
-                                                    fontWeight="400"
-                                                >
-                                                    {Object.entries(variationAttributeValues).map(
-                                                        ([name, value]) => {
+                                    <Box flex="none" alignSelf="flex-end" fontWeight="600">
+                                        <Text>
+                                            {intl.formatNumber(product.price * numberOfItemsAdded, {
+                                                style: 'currency',
+                                                currency: currency
+                                            })}
+                                        </Text>
+                                    </Box>
+                                </Flex>
+                            )}
+                            {!isProductABundle &&
+                                itemsAdded.map(({product, variant, quantity}, index) => {
+                                    const image = findImageGroupBy(product.imageGroups, {
+                                        viewType: 'small',
+                                        selectedVariationAttributes: variant.variationValues
+                                    })?.images?.[0]
+                                    const priceData = getPriceData(product, {quantity})
+                                    const variationAttributeValues = getDisplayVariationValues(
+                                        product.variationAttributes,
+                                        variant.variationValues
+                                    )
+
+                                    return (
+                                        <Flex
+                                            key={variant.productId}
+                                            justifyContent="space-between"
+                                            marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                                            paddingBottom={4}
+                                            borderBottomWidth={{base: '1px', lg: '0px'}}
+                                            borderColor="gray.200"
+                                            borderStyle="solid"
+                                            data-testid="product-added"
+                                        >
+                                            <Flex gridGap="4">
+                                                <Box w="24" flex="none">
+                                                    <AspectRatio ratio="1">
+                                                        <img src={image.link} alt={image.alt} />
+                                                    </AspectRatio>
+                                                </Box>
+
+                                                <Box>
+                                                    <Heading
+                                                        as="h2"
+                                                        fontSize="md"
+                                                        fontFamily="body"
+                                                        fontWeight="700"
+                                                    >
+                                                        {product.name}
+                                                    </Heading>
+                                                    <Box
+                                                        color="gray.600"
+                                                        fontSize="sm"
+                                                        fontWeight="400"
+                                                    >
+                                                        {Object.entries(
+                                                            variationAttributeValues
+                                                        ).map(([name, value]) => {
                                                             return (
                                                                 <Text key={value}>
                                                                     {name}: {value}
                                                                 </Text>
                                                             )
-                                                        }
-                                                    )}
-                                                    <Text>
-                                                        {intl.formatMessage({
-                                                            defaultMessage: 'Qty',
-                                                            id: 'add_to_cart_modal.label.quantity'
                                                         })}
-                                                        : {quantity}
-                                                    </Text>
+                                                        <Text>
+                                                            {intl.formatMessage({
+                                                                defaultMessage: 'Qty',
+                                                                id: 'add_to_cart_modal.label.quantity'
+                                                            })}
+                                                            : {quantity}
+                                                        </Text>
+                                                    </Box>
                                                 </Box>
+                                            </Flex>
+
+                                            <Box flex="none" alignSelf="flex-end" fontWeight="600">
+                                                <DisplayPrice
+                                                    priceData={priceData}
+                                                    quantity={quantity}
+                                                    currency={currency}
+                                                />
                                             </Box>
                                         </Flex>
-
-                                        <Box flex="none" alignSelf="flex-end" fontWeight="600">
-                                            <DisplayPrice
-                                                priceData={priceData}
-                                                quantity={quantity}
-                                                currency={currency}
-                                            />
-                                        </Box>
-                                    </Flex>
-                                )
-                            })}
+                                    )
+                                })}
                         </Box>
                         <Box
                             display={['none', 'none', 'none', 'block']}
