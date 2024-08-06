@@ -3,6 +3,8 @@
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ *
+ * @jest-environment node
  */
 
 import fse from 'fs-extra'
@@ -39,10 +41,6 @@ jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
-
-/**
- * @jest-environment node
- */
 
 /**
  * An HTTPS.Agent that allows self-signed certificates
