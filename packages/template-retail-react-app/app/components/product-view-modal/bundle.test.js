@@ -135,8 +135,6 @@ test('bundle product view modal disables update button when child is out of stoc
         expect(updateBtn).toBeDisabled()
         expect(screen.getByText('Out of stock')).toBeInTheDocument()
     })
-
-    screen.logTestingPlaygroundURL()
 })
 
 test('bundle product view modal disables update button when quantity exceeds child inventory', async () => {
