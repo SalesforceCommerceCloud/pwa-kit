@@ -131,7 +131,7 @@ export const escapeRegexChars = (str) => str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,
  * @returns stringified HTML Node
  */
 export const boldString = (str, substr) => {
-    return str.replace(RegExp(escapeRegexChars(substr.trim()), 'gi'), '<b>$&</b>')
+    return str?.replace(RegExp(escapeRegexChars(substr.trim()), 'gi'), '<b>$&</b>')
 }
 
 /**

@@ -25,6 +25,7 @@ const WishlistPrimaryAction = () => {
     const {formatMessage} = useIntl()
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
+    const isProductABundle = variant?.type?.bundle
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -123,6 +124,18 @@ const WishlistPrimaryAction = () => {
                 </Button>
             )
         }
+    } else if (isProductABundle) {
+        return (
+            <Button
+                as={Link}
+                href={`/product/${variant.id}`}
+                w={'full'}
+                variant={'solid'}
+                _hover={{textDecoration: 'none'}}
+            >
+                {buttonText.viewFullDetails}
+            </Button>
+        )
     } else {
         if (isMasterProduct) {
             return (
