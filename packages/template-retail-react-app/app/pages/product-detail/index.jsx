@@ -18,6 +18,7 @@ import {
 import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     useProduct,
+    useProducts,
     useCategory,
     useShopperCustomersMutation,
     useShopperBasketsMutation,
@@ -65,11 +66,6 @@ const ProductDetail = () => {
     const navigate = useNavigation()
     const customerId = useCustomerId()
 
-    /****************************** Sets and Bundles *********************************/
-    const [childProductSelection, setChildProductSelection] = useState({})
-    const [childProductOrderability, setChildProductOrderability] = useState({})
-    const childProductRefs = React.useRef({})
-
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
@@ -114,9 +110,6 @@ const ProductDetail = () => {
             keepPreviousData: true
         }
     )
-    const isProductASet = product?.type.set
-    const isProductABundle = product?.type.bundle
-    const comboProduct = isProductASet || isProductABundle ? normalizeSetBundleProduct(product) : {}
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
@@ -130,6 +123,52 @@ const ProductDetail = () => {
             levels: 1
         }
     })
+
+    /****************************** Sets and Bundles *********************************/
+    const [childProductSelection, setChildProductSelection] = useState({})
+    const [childProductOrderability, setChildProductOrderability] = useState({})
+    const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(1)
+    const childProductRefs = React.useRef({})
+    const isProductASet = product?.type.set
+    const isProductABundle = product?.type.bundle
+
+    let bundleChildVariantIds = ''
+    if (isProductABundle)
+        bundleChildVariantIds = Object.keys(childProductSelection)
+            ?.map((key) => childProductSelection[key].variant.productId)
+            .join(',')
+
+    const {data: bundleChildrenData} = useProducts(
+        {
+            parameters: {
+                ids: bundleChildVariantIds,
+                allImages: false,
+                expand: ['availability', 'variations'],
+                select: '(data.(id,inventory,master))'
+            }
+        },
+        {
+            enabled: bundleChildVariantIds?.length > 0,
+            keepPreviousData: true
+        }
+    )
+
+    if (isProductABundle && bundleChildrenData) {
+        // Loop through the bundle children and update the inventory for variant selection
+        product.bundledProducts.forEach(({product: childProduct}, index) => {
+            const matchingChildProduct = bundleChildrenData.data.find(
+                (bundleChild) => bundleChild.master.masterId === childProduct.id
+            )
+            if (matchingChildProduct) {
+                product.bundledProducts[index].product = {
+                    ...childProduct,
+                    inventory: matchingChildProduct.inventory
+                }
+            }
+        })
+    }
+
+    const comboProduct = isProductASet || isProductABundle ? normalizeSetBundleProduct(product) : {}
 
     /**************** Error Handling ****************/
 
@@ -436,6 +475,7 @@ const ProductDetail = () => {
                             isWishlistLoading={isWishlistLoading}
                             validateOrderability={handleChildProductValidation}
                             childProductOrderability={childProductOrderability}
+                            setSelectedBundleQuantity={setSelectedBundleQuantity}
                         />
 
                         <hr />
@@ -460,6 +500,7 @@ const ProductDetail = () => {
                                             isProductPartOfSet={isProductASet}
                                             isProductPartOfBundle={isProductABundle}
                                             childOfBundleQuantity={childQuantity}
+                                            selectedBundleParentQuantity={selectedBundleQuantity}
                                             addToCart={
                                                 isProductASet
                                                     ? (variant, quantity) =>

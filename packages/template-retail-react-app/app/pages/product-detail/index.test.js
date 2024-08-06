@@ -301,6 +301,34 @@ describe('product bundles', () => {
             rest.get('*/products/:productId', (req, res, ctx) => {
                 return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundle))
             }),
+            rest.get('*/products', (req, res, ctx) => {
+                let inventoryLevel = 0
+                let bundleChildVariantId = '701643473915M'
+                if (req.url.toString().includes('701643473908M')) {
+                    bundleChildVariantId = '701643473908M'
+                    inventoryLevel = 3
+                }
+                const bundleChildVariantData = {
+                    data: [
+                        {
+                            id: bundleChildVariantId,
+                            inventory: {
+                                ats: inventoryLevel,
+                                backorderable: false,
+                                id: 'inventory_m',
+                                orderable: false,
+                                preorderable: false,
+                                stockLevel: inventoryLevel
+                            },
+                            master: {
+                                masterId: '25565139M',
+                                orderable: true
+                            }
+                        }
+                    ]
+                }
+                return res(ctx.delay(0), ctx.status(200), ctx.json(bundleChildVariantData))
+            }),
             // For adding items to basket
             rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
                 const basketWithBundle = {
@@ -384,6 +412,71 @@ describe('product bundles', () => {
         childProducts.forEach((child) => {
             const heroImage = within(child).getAllByRole('img')[0]
             expect(heroImage.getAttribute('loading')).toBe('lazy')
+        })
+    })
+
+    test('add to cart button is disabled when child is out of stock', async () => {
+        renderWithProviders(<MockedComponent />)
+        await waitFor(() => {
+            expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
+        })
+        const childProducts = screen.getAllByTestId('child-product')
+        expect(childProducts).toHaveLength(3)
+
+        const swingTankProduct = childProducts[1]
+        const colorSelectionBtn = within(swingTankProduct).getByLabelText('Black')
+        const sizeSelectionBtn = within(swingTankProduct).getByLabelText('M')
+
+        expect(swingTankProduct).toBeInTheDocument()
+        expect(colorSelectionBtn).toBeInTheDocument()
+        expect(sizeSelectionBtn).toBeInTheDocument()
+
+        fireEvent.click(colorSelectionBtn)
+        fireEvent.click(sizeSelectionBtn)
+
+        await waitFor(() => {
+            expect(screen.getByText('Out of stock')).toBeInTheDocument()
+            const addBundleToCartBtn = screen.getByRole('button', {name: /add bundle to cart/i})
+            expect(addBundleToCartBtn).toBeInTheDocument()
+            expect(addBundleToCartBtn).toBeDisabled()
+        })
+    })
+
+    test('add to cart button is disabled when quantity exceeds child stock level', async () => {
+        renderWithProviders(<MockedComponent />)
+        await waitFor(() => {
+            expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
+        })
+        const childProducts = screen.getAllByTestId('child-product')
+        expect(childProducts).toHaveLength(3)
+
+        const swingTankProduct = childProducts[1]
+        const colorSelectionBtn = within(swingTankProduct).getByLabelText('Black')
+        const sizeSelectionBtn = within(swingTankProduct).getByLabelText('L')
+
+        expect(swingTankProduct).toBeInTheDocument()
+        expect(colorSelectionBtn).toBeInTheDocument()
+        expect(sizeSelectionBtn).toBeInTheDocument()
+
+        fireEvent.click(colorSelectionBtn)
+        fireEvent.click(sizeSelectionBtn)
+
+        const addBundleToCartBtn = screen.getByRole('button', {name: /add bundle to cart/i})
+
+        await waitFor(() => {
+            expect(addBundleToCartBtn).toBeInTheDocument()
+            expect(addBundleToCartBtn).toBeEnabled()
+        })
+
+        // Set product bundle quantity selection to 4
+        const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
+        quantityInput.focus()
+        fireEvent.change(quantityInput, {target: {value: '4'}})
+
+        await waitFor(() => {
+            expect(screen.getByRole('spinbutton', {name: /quantity/i})).toHaveValue('4')
+            expect(screen.getByText('Only 3 left!')).toBeInTheDocument()
+            expect(addBundleToCartBtn).toBeDisabled()
         })
     })
 })

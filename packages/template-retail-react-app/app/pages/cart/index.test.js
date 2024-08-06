@@ -560,6 +560,9 @@ describe('Product bundles', () => {
                 return res(ctx.delay(0), ctx.json(mockProductBundle))
             }),
             rest.get('*/products', (req, res, ctx) => {
+                if (req.url.toString().includes('test-bundle')) {
+                    return res(ctx.delay(0), ctx.json({data: [{...mockProductBundle}]}))
+                }
                 return res(ctx.delay(0), ctx.json({data: [...mockGetBundleChildrenProducts]}))
             }),
             rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
@@ -580,7 +583,41 @@ describe('Product bundles', () => {
                     ]
                 }
                 return res(ctx.json(updatedBasket))
-            })
+            }),
+            rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {})
+        )
+    })
+
+    test('displays inventory message when incrementing quantity above available stock', async () => {
+        renderWithProviders(<Cart />)
+
+        await waitFor(
+            async () => {
+                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+                expect(screen.getAllByText(/women's clothing test bundle/i)[0]).toBeInTheDocument()
+                expect(
+                    screen.getByText(/Sleeveless Pleated Floral Front Blouse/i)
+                ).toBeInTheDocument()
+                expect(screen.getByText(/swing tank/i)).toBeInTheDocument()
+                expect(screen.getByText(/pull on neutral pant/i)).toBeInTheDocument()
+            },
+            {timeout: 10000}
+        )
+
+        // Change quantity for bundle to 4, swing tank only has 3 in stock
+        // so availability message should show up
+        const quantityElement = screen.getByRole('spinbutton', {id: 'quantity'})
+        expect(quantityElement).toBeInTheDocument()
+        expect(quantityElement).toHaveValue('1')
+        quantityElement.focus()
+        fireEvent.change(quantityElement, {target: {value: '4'}})
+
+        await waitFor(
+            () => {
+                expect(quantityElement).toHaveValue('4')
+                expect(screen.getByText(/only 3 left for swing tank!/i)).toBeInTheDocument()
+            },
+            {timeout: 10000}
         )
     })
 

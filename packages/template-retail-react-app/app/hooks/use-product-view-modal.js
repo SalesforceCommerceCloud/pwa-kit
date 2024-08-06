@@ -28,7 +28,7 @@ export const useProductViewModal = (initialProduct) => {
     const [product, setProduct] = useState(initialProduct)
     const variant = useVariant(product)
 
-    const {isFetching} = useProduct(
+    const {data: currentProduct, isFetching} = useProduct(
         {parameters: {id: (variant || product)?.productId}},
         {
             placeholderData: initialProduct,
@@ -43,9 +43,6 @@ export const useProductViewModal = (initialProduct) => {
                 }
                 return data
             },
-            onSuccess: (data) => {
-                setProduct(data)
-            },
             onError: () => {
                 toast({
                     title: intl.formatMessage(API_ERROR_MESSAGE),
@@ -54,6 +51,11 @@ export const useProductViewModal = (initialProduct) => {
             }
         }
     )
+
+    useEffect(() => {
+        if (currentProduct) setProduct(currentProduct)
+    }, [currentProduct])
+
     const cleanUpVariantParams = () => {
         const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
         const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)

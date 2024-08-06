@@ -32,20 +32,29 @@ import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, ...props}) => {
     const productViewModalData = useProductViewModal(bundle)
     const {variationParams} = useDerivedProduct(bundle)
-
-    const childProductIds = productViewModalData.product?.bundledProductItems
-        ?.map(({productId}) => productId)
-        .join(',')
-    const {data: childProducts, isLoading} = useProducts(
-        {parameters: {ids: childProductIds, allImages: true}},
-        {enabled: Boolean(childProductIds)}
-    )
-
     const childProductRefs = useRef({})
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedChildProducts, setSelectedChildProducts] = useState([])
-
+    const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(
+        productViewModalData?.product?.quantity
+    )
     const trueIfMobile = useBreakpointValue({base: true, lg: false})
+
+    let childProductIds = productViewModalData.product?.bundledProductItems
+        ?.map(({productId}) => productId)
+        .join(',')
+    const productIds = selectedChildProducts.map(({variant}) => variant.productId).join(',')
+    if (productIds?.length > 0 && productIds !== childProductIds) {
+        childProductIds = productIds
+    }
+
+    const {data: childProducts, isLoading} = useProducts(
+        {parameters: {ids: childProductIds, allImages: true}},
+        {
+            enabled: Boolean(childProductIds),
+            keepPreviousData: true
+        }
+    )
 
     return (
         <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
@@ -90,6 +99,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                         )
                                     }}
                                     childProductOrderability={childProductOrderability}
+                                    setSelectedBundleQuantity={setSelectedBundleQuantity}
                                     {...props}
                                 />
                             </Box>
@@ -108,7 +118,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                             // Do not use an arrow function as we are manipulating the functions scope.
                                             ref={function (ref) {
                                                 // Assign the "set" scope of the ref, this is how we access the internal validation.
-                                                childProductRefs.current[product.id] = {
+                                                childProductRefs.current[product.itemId] = {
                                                     ref,
                                                     validateOrderability: this.validateOrderability
                                                 }
@@ -122,6 +132,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                                 setChildProductOrderability
                                             }
                                             childOfBundleQuantity={quantityPerBundle}
+                                            selectedBundleParentQuantity={selectedBundleQuantity}
                                             onVariantSelected={(product, variant, quantity) => {
                                                 setSelectedChildProducts((prev) => {
                                                     const newArray = prev.slice(0)

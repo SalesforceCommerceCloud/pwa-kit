@@ -116,7 +116,9 @@ const ProductView = forwardRef(
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
-            showImageGallery = true
+            showImageGallery = true,
+            setSelectedBundleQuantity = () => {},
+            selectedBundleParentQuantity = 1
         },
         ref
     ) => {
@@ -142,7 +144,9 @@ const ProductView = forwardRef(
             variationParams,
             variationAttributes,
             stockLevel,
-            stepQuantity
+            stepQuantity,
+            isOutOfStock,
+            unfulfillable
         } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
@@ -151,6 +155,50 @@ const ProductView = forwardRef(
         const isProductASet = product?.type.set
         const isProductABundle = product?.type.bundle
         const errorContainerRef = useRef(null)
+
+        const {disableButton, customInventoryMessage} = useMemo(() => {
+            let shouldDisableButton = showInventoryMessage
+            let currentInventoryMsg = ''
+            if (
+                !shouldDisableButton &&
+                (isProductASet || isProductABundle) &&
+                childProductOrderability
+            ) {
+                // if any of the children are not orderable, it will disable the add to cart button
+                const unavailableChildProductKey = Object.keys(childProductOrderability).find(
+                    (key) => {
+                        return childProductOrderability[key].showInventoryMessage
+                    }
+                )
+                shouldDisableButton = !!unavailableChildProductKey
+                if (unavailableChildProductKey) {
+                    const unavailableChildProduct =
+                        childProductOrderability[unavailableChildProductKey]
+                    if (unavailableChildProduct.unfulfillable) {
+                        currentInventoryMsg = intl.formatMessage(
+                            {
+                                defaultMessage: 'Only {stockLevel} left for {productName}!',
+                                id: 'use_product.message.inventory_remaining_for_product'
+                            },
+                            {
+                                stockLevel: unavailableChildProduct.stockLevel,
+                                productName: unavailableChildProduct.productName
+                            }
+                        )
+                    }
+                    if (unavailableChildProduct.isOutOfStock) {
+                        currentInventoryMsg = intl.formatMessage(
+                            {
+                                defaultMessage: 'Out of stock for {productName}',
+                                id: 'use_product.message.out_of_stock_for_product'
+                            },
+                            {productName: unavailableChildProduct.productName}
+                        )
+                    }
+                }
+            }
+            return {disableButton: shouldDisableButton, customInventoryMessage: currentInventoryMsg}
+        }, [showInventoryMessage, childProductOrderability])
 
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
@@ -249,14 +297,6 @@ const ProductView = forwardRef(
                 addToWishlist(product, variant, quantity)
             }
 
-            let disableButton = showInventoryMessage
-            if ((isProductASet || isProductABundle) && childProductOrderability) {
-                // if any of the children are not orderable, it will disable the add to cart button
-                disableButton = Object.keys(childProductOrderability).some((productId) => {
-                    return !childProductOrderability[productId]
-                })
-            }
-
             // child product of bundles do not have add to cart button
             if ((addToCart || updateCart) && !isProductPartOfBundle) {
                 buttons.push(
@@ -312,6 +352,14 @@ const ProductView = forwardRef(
             ref = ref.bind({validateOrderability: validateAndShowError})
         }
 
+        // Set the quantity of bundle child in a product bundle to ensure availability messages appear
+        if (
+            isProductPartOfBundle &&
+            quantity != selectedBundleParentQuantity * childOfBundleQuantity
+        ) {
+            setQuantity(selectedBundleParentQuantity * childOfBundleQuantity)
+        }
+
         useEffect(() => {
             if (isAddToCartModalOpen) {
                 onAddToCartModalClose()
@@ -336,13 +384,20 @@ const ProductView = forwardRef(
 
         useEffect(() => {
             if (isProductPartOfBundle || isProductPartOfSet) {
+                const key = product.itemId ?? product.id
                 // when showInventoryMessage is true, it means child product is not orderable
                 setChildProductOrderability((previousState) => ({
                     ...previousState,
-                    [product.id]: !showInventoryMessage
+                    [key]: {
+                        showInventoryMessage,
+                        isOutOfStock,
+                        unfulfillable,
+                        stockLevel,
+                        productName: product?.name
+                    }
                 }))
             }
-        }, [showInventoryMessage])
+        }, [showInventoryMessage, inventoryMessage])
 
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
@@ -516,6 +571,8 @@ const ProductView = forwardRef(
                                             // Set the Quantity of product to value of input if value number
                                             if (numberValue >= 0) {
                                                 setQuantity(numberValue)
+                                                if (isProductABundle)
+                                                    setSelectedBundleQuantity(numberValue)
                                             } else if (stringValue === '') {
                                                 // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
                                                 // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
@@ -527,6 +584,8 @@ const ProductView = forwardRef(
                                             const value = e.target.value
                                             if (parseInt(value) < 0 || value === '') {
                                                 setQuantity(minOrderQuantity)
+                                                if (isProductABundle)
+                                                    setSelectedBundleQuantity(minOrderQuantity)
                                             }
                                         }}
                                         onFocus={(e) => {
@@ -567,10 +626,17 @@ const ProductView = forwardRef(
                         </VStack>
 
                         <Box>
-                            {!showLoading && showInventoryMessage && (
+                            {!showLoading && showInventoryMessage && !customInventoryMessage && (
                                 <Fade in={true}>
                                     <Text color="orange.600" fontWeight={600} marginBottom={8}>
                                         {inventoryMessage}
+                                    </Text>
+                                </Fade>
+                            )}
+                            {!showLoading && customInventoryMessage && (
+                                <Fade in={true}>
+                                    <Text color="orange.600" fontWeight={600} marginBottom={8}>
+                                        {customInventoryMessage}
                                     </Text>
                                 </Fade>
                             )}
@@ -629,7 +695,9 @@ ProductView.propTypes = {
     setChildProductOrderability: PropTypes.func,
     onVariantSelected: PropTypes.func,
     validateOrderability: PropTypes.func,
-    showImageGallery: PropTypes.bool
+    showImageGallery: PropTypes.bool,
+    setSelectedBundleQuantity: PropTypes.func,
+    selectedBundleParentQuantity: PropTypes.number
 }
 
 export default ProductView

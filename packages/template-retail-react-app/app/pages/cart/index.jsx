@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -86,6 +86,76 @@ const Cart = () => {
 
     const {data: customer} = useCurrentCustomer()
     const {customerId, isRegistered} = customer
+
+    /***************** Product Bundles ************************/
+    const bundleChildVariantIds = []
+    basket?.productItems?.forEach((productItem) => {
+        productItem?.bundledProductItems?.forEach((childProduct) => {
+            bundleChildVariantIds.push(childProduct.productId)
+        })
+    })
+
+    const {data: bundleChildProductData} = useProducts(
+        {
+            parameters: {
+                ids: bundleChildVariantIds?.join(','),
+                allImages: false,
+                expand: ['availability', 'variations'],
+                select: '(data.(id,inventory))'
+            }
+        },
+        {
+            enabled: bundleChildVariantIds?.length > 0,
+            keepPreviousData: true,
+            select: (result) => {
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+
+    // We use the `products` object to reference products by itemId instead of productId
+    // Since with product bundles, even though the parent productId is the same,
+    // variant selection of the bundle children can be different,
+    // and require unique references to each product bundle
+    const productsByItemId = useMemo(() => {
+        const updateProductsByItemId = {}
+        basket?.productItems?.forEach((productItem) => {
+            let currentProduct = products?.[productItem?.productId]
+
+            // calculate inventory for product bundles based on availability of children
+            if (productItem?.bundledProductItems && bundleChildProductData) {
+                let lowestStockLevel =
+                    currentProduct?.inventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+                let productWithLowestInventory = ''
+                productItem?.bundledProductItems.forEach((bundleChild) => {
+                    const bundleChildStockLevel =
+                        bundleChildProductData?.[bundleChild.productId]?.inventory?.stockLevel ??
+                        Number.MAX_SAFE_INTEGER
+                    lowestStockLevel = Math.min(lowestStockLevel, bundleChildStockLevel)
+                    if (lowestStockLevel === bundleChildStockLevel)
+                        productWithLowestInventory = bundleChild.productName
+                })
+
+                if (currentProduct?.inventory) {
+                    currentProduct = {
+                        ...currentProduct,
+                        inventory: {
+                            ...currentProduct.inventory,
+                            stockLevel: lowestStockLevel,
+                            lowestStockLevelProductName: productWithLowestInventory
+                        }
+                    }
+                }
+            }
+            updateProductsByItemId[productItem.itemId] = currentProduct
+        })
+        return updateProductsByItemId
+    }, [basket, products, bundleChildProductData])
+
     /*****************Basket Mutation************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
@@ -271,7 +341,7 @@ const Cart = () => {
             // We only update the parent bundle when the quantity changes
             // Since top level bundles don't have variants
             if (bundle.quantity !== bundleQuantity) {
-                itemsToBeUpdated.push({
+                itemsToBeUpdated.unshift({
                     itemId: bundle.itemId,
                     productId: bundle.productId,
                     quantity: bundleQuantity
@@ -386,7 +456,7 @@ const Cart = () => {
     }, DEBOUNCE_WAIT)
 
     const handleChangeItemQuantity = async (product, value) => {
-        const {stockLevel} = products[product.productId].inventory
+        const stockLevel = productsByItemId?.[product.itemId]?.inventory?.stockLevel ?? 1
 
         // Handle removing of the items when 0 is selected.
         if (value === 0) {
@@ -496,10 +566,10 @@ const Cart = () => {
                                                 }
                                                 product={{
                                                     ...productItem,
-                                                    ...(products &&
-                                                        products[productItem.productId]),
+                                                    ...(productsByItemId &&
+                                                        productsByItemId[productItem.itemId]),
                                                     isProductUnavailable: !isProductsLoading
-                                                        ? !products?.[productItem.productId]
+                                                        ? !productsByItemId?.[productItem.itemId]
                                                         : undefined,
                                                     price: productItem.price,
                                                     quantity: localQuantity[productItem.itemId]

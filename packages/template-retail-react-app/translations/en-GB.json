@@ -1501,8 +1501,14 @@
   "use_product.message.inventory_remaining": {
     "defaultMessage": "Only {stockLevel} left!"
   },
+  "use_product.message.inventory_remaining_for_product": {
+    "defaultMessage": "Only {stockLevel} left for {productName}!"
+  },
   "use_product.message.out_of_stock": {
     "defaultMessage": "Out of stock"
+  },
+  "use_product.message.out_of_stock_for_product": {
+    "defaultMessage": "Out of stock for {productName}"
   },
   "use_profile_fields.error.required_email": {
     "defaultMessage": "Please enter a valid email address."
