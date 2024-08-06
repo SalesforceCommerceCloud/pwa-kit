@@ -402,7 +402,7 @@ const ProductView = forwardRef(
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
                 {/* Basic information etc. title, price, breadcrumb*/}
-                <p>Hello World</p>
+                <p>Hello World 2</p>
                 <Box display={['block', 'block', 'block', 'none']}>
                     <ProductViewHeader
                         name={product?.name}
