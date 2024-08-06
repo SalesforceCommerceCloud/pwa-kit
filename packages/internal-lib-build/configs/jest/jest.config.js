@@ -29,7 +29,7 @@ module.exports = {
         '/node_modules/',
         '/vendor/'
     ],
-    testEnvironment: 'jsdom',
+    testEnvironment: 'jest-environment-jsdom-global',
     testEnvironmentOptions: {
         resources: 'usable'
     }

@@ -14,7 +14,7 @@ module.exports = {
     // jsdom isn't accessible so we need to use this
     // 3rd party test environment wrapper. When we
     // upgrade to jest 28, we can revert back to jsdom.
-    testEnvironment: 'jsdom',
+    testEnvironment: 'jest-environment-jsdom-global',
     testPathIgnorePatterns: ['node_modules', 'build'],
     moduleNameMapper: {
         '\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
