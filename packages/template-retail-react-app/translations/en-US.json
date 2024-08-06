@@ -722,7 +722,7 @@
     "defaultMessage": "Read docs"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "The Salesforce CC React PWA Starter Store for Retail"
+    "defaultMessage": "The React PWA Starter Store for Retail"
   },
   "icons.assistive_msg.lock": {
     "defaultMessage": "Secure"
