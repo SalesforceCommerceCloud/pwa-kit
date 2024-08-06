@@ -3,8 +3,6 @@
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- *
- * @jest-environment node
  */
 
 import fse from 'fs-extra'
@@ -36,6 +34,9 @@ import {
 import {randomUUID} from 'crypto'
 
 // Mock static assets (require path is relative to the 'ssr' directory)
+/**
+ * @jest-environment node
+ */
 const mockStaticAssets = {}
 jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
 
