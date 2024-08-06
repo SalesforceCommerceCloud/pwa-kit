@@ -1,3 +1,4 @@
+## v3.0.0-preview.0 (Aug 06, 2024)
 ## v2.1.0-dev (Jun 25, 2024)
 - Add `meta.displayName` to queries. It can be used to identify queries in performance metrics or logs. [#1895](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1895)
 - Upgrade to commerce-sdk-isomorphic v3.0.0 [#1914](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1914)
