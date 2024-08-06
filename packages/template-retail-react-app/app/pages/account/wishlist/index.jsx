@@ -137,7 +137,7 @@ const AccountWishlist = () => {
         return isValidChange
     }
 
-    const hasWishlistItems = wishListItems?.length > 0
+    const hasWishlistItems = Object.keys(wishListItems ?? {}).length > 0
     const isPageLoading = hasWishlistItems ? isProductsLoading : isWishListLoading
 
     return (
