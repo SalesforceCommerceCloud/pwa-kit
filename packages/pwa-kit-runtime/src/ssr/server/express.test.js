@@ -41,6 +41,10 @@ const TEST_PORT = 3444
 const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
 
 /**
+ * @jest-environment node
+ */
+
+/**
  * An HTTPS.Agent that allows self-signed certificates
  * @type {module:https.Agent}
  */
