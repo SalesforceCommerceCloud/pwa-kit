@@ -106,7 +106,7 @@ const ProductItem = ({
                                                 )
                                             } else if (stringValue === '') {
                                                 // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
-                                                // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
+                                                // User will not be able to add '' quantity to the cart due to the add to cart button enablement rules
                                                 setQuantity(stringValue)
                                             }
                                         }}

@@ -1771,6 +1771,12 @@
       "value": "quantity"
     }
   ],
+  "item_attributes.label.selected_options": [
+    {
+      "type": 0,
+      "value": "Selected Options"
+    }
+  ],
   "item_image.label.sale": [
     {
       "type": 0,
@@ -2627,6 +2633,18 @@
       "value": "Sale"
     }
   ],
+  "product_view.button.add_bundle_to_cart": [
+    {
+      "type": 0,
+      "value": "Add Bundle to Cart"
+    }
+  ],
+  "product_view.button.add_bundle_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Add Bundle to Wishlist"
+    }
+  ],
   "product_view.button.add_set_to_cart": [
     {
       "type": 0,
@@ -3447,10 +3465,42 @@
       "value": " left!"
     }
   ],
+  "use_product.message.inventory_remaining_for_product": [
+    {
+      "type": 0,
+      "value": "Only "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": " left for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "!"
+    }
+  ],
   "use_product.message.out_of_stock": [
     {
       "type": 0,
       "value": "Out of stock"
+    }
+  ],
+  "use_product.message.out_of_stock_for_product": [
+    {
+      "type": 0,
+      "value": "Out of stock for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "use_profile_fields.error.required_email": [
