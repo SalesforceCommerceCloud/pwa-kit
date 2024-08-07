@@ -16,23 +16,6 @@ runs:
       with:
         fetch-depth: 0  # Fetch full history to access all commits
 
-    - name: Fetch PR labels
-      id: fetch_labels
-      run: |
-        PR_LABELS=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
-          "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
-          jq -r '.[].name')
-        echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Exit early if skip changelog label is present
-      run: |
-        if echo "${{ env.PR_LABELS }}" | grep -q "skip changelog"; then
-          echo "Skip changelog label is present. Exiting successfully."
-          exit 0
-        fi
-      shell: bash
-
     - name: Get Base Branch SHA
       id: get_base_sha
       run: |
@@ -70,7 +53,20 @@ runs:
         echo "Base SHA: ${{ env.BASE_SHA }}"
         echo "Current SHA: ${{ github.sha }}"
         echo "Merge Base: ${{ env.MERGE_BASE }}"
-        echo "PR labels: $PR_LABELS"
+      shell: bash
+
+    - name: Fetch PR labels and check for skip changelog
+      id: fetch_and_check_labels
+      run: |
+        PR_LABELS=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
+          jq -r '.[].name')
+        echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
+
+        if echo "${PR_LABELS}" | grep -q "skip changelog"; then
+          echo "Skip changelog label is present. Exiting successfully."
+          exit 0
+        fi
       shell: bash
 
     - name: Check if changelog is updated
@@ -83,7 +79,6 @@ runs:
         echo "Changed files: $CHANGED_FILES"
         
         PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
-        SKIP_CHANGELOG_LABEL="skip changelog" 
 
         for PACKAGE in "${PUBLIC_PACKAGES[@]}"; do
           if echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/"; then
