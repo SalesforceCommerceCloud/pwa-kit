@@ -30,7 +30,6 @@ env:
 jobs:
   changelog-check:
     runs-on: ubuntu-latest
-    if: env.DEVELOP != 'true' && env.RELEASE != 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
