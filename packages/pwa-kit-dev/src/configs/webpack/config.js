@@ -448,16 +448,17 @@ const kebabToLowerCamelCase = (str) => {
 const buildVirtualModuleConfig = (extensions = []) => {
     // NOTES: 
     // 1. Virtual module key can't start with '@'.
-    const config = extensions.reduce((acc, curr) => ({
-        ...acc,
-        [`${projectDir}/${curr}`]: fse.readFileSync(resolve(projectDir, 'node_modules', curr, 'setup-app.js'), 'utf8')
-    }), {})
+    // const config = extensions.reduce((acc, curr) => ({
+    //     ...acc,
+    //     [`${projectDir}/${curr}`]: fse.readFileSync(resolve(projectDir, 'node_modules', curr, 'setup-app.js'), 'utf8')
+    // }), {})
 
+    const config = {}
     // Push on the custom module that exports all of the extensions.
     config['/Users/bchypak/Projects/pwa-kit/packages/template-typescript-minimal/app/extensions'] = `
 
             // All Extensions
-            ${extensions.map((extension) => `import ${kebabToUpperCamelCase(extension.split('\/')[1])} from '${projectDir}/${extension}'`).join('\n')}
+            ${extensions.map((extension) => `import ${kebabToUpperCamelCase(extension.split('\/')[1])} from '${extension}/setup-app'`).join('\n')}
 
             export default {
                 ${extensions.map((extension) => `${kebabToLowerCamelCase(extension.split('\/')[1])}: ${kebabToUpperCamelCase(extension.split('\/')[1])}`).join(',\n')}

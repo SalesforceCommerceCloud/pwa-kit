@@ -1,6 +1,13 @@
-// import loadable from '@loadable/component'
-// const StoreFinderPage = loadable(() => import('/Users/bchypak/Projects/pwa-kit/packages/extension-store-finder/pages/store-finder-page'))
-import StoreFinderPage from '/Users/bchypak/Projects/pwa-kit/packages/extension-store-finder/pages/store-finder-page'
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+import loadable from '@loadable/component'
+
+const StoreFinderPage = loadable(() => import('./pages/store-finder-page'))
 
 export default (App) => {
     App.initialRoutes = [
