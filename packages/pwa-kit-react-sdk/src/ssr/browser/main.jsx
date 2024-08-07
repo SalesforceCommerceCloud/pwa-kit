@@ -8,16 +8,22 @@
 import React, {useRef} from 'react'
 import {hydrateRoot} from 'react-dom/client'
 import {BrowserRouter as Router} from 'react-router-dom'
+import {loadableReady} from '@loadable/component'
+import PropTypes from 'prop-types'
+
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
-import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
-import PropTypes from 'prop-types'
 import logger from '../../utils/logger-instance'
 
+const Extensions = {}
+
+// The above line will be replaced with `import Extensions from './extensions'` in a webpack loader.
+console.log('Main')
+console.log('Extensions: ', Extensions)
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
     return Promise.resolve().then(() => {
@@ -79,6 +85,7 @@ OuterApp.propTypes = {
     locals: PropTypes.object,
     onHydrate: PropTypes.func
 }
+
 /* istanbul ignore next */
 export const start = () => {
     const AppConfig = getAppConfig()
@@ -100,6 +107,8 @@ export const start = () => {
     // this to set up, eg. Redux stores.
     const locals = {}
 
+    // TODO: Make sure we get all the extensions and load them up.
+
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
 
@@ -113,10 +122,16 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
+    // Initialize all the react app extensions.
+    Object.entries(Extensions).forEach(([name, initializer]) => {
+        console.log(`Initializing the ${name} extension for CSR.`)
+        initializer(App)
+    })
+
     const props = {
         error: window.__ERROR__,
         locals: locals,
-        routes: getRoutes(locals),
+        routes: getRoutes(locals, App.initialRoutes), // NOTE: Make getRoutes needs to handle getting all the routes including those in the extensions?
         WrappedApp: routeComponent(App, false, locals)
     }
 

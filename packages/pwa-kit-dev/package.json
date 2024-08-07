@@ -113,6 +113,7 @@
     "webpack-hot-middleware": "^2.25.3",
     "webpack-hot-server-middleware": "^0.6.1",
     "webpack-notifier": "^1.15.0",
+    "webpack-virtual-modules": "^0.6.2",
     "ws": "^8.13.0"
   },
   "devDependencies": {

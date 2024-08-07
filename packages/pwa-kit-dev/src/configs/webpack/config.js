@@ -22,6 +22,9 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+import VirtualModulesPlugin from 'webpack-virtual-modules'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -37,6 +40,7 @@ const INSPECT = process.execArgv.some((arg) => /^--inspect(?:-brk)?(?:$|=)/.test
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
+const appConfig = getConfig()
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -235,6 +239,8 @@ const baseConfig = (target) => {
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
+                    mode === development && new VirtualModulesPlugin(virtualModulesConfig),
+
                     sdkReplacementPlugin(),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
@@ -297,6 +303,14 @@ const withChunking = (config) => {
             minimize: mode === production,
             splitChunks: {
                 cacheGroups: {
+                    extensions: {
+                        test: (module) => {
+                            // console.log('test extension: ', module?.context, ' - ', module?.context?.match?.(/(node_modules\/.+\/\w+-extension)|(packages\/\w+-extension)/))
+                            return module?.context?.match?.(/(node_modules\/.+\/\w+-extension)|(packages\/\w+-extension)/)
+                        },
+                        name: 'extensions',
+                        chunks: 'all'
+                    },
                     vendor: {
                         // Three scenarios that we'd like to chunk vendor.js:
                         // 1. The package is in node_modules
@@ -317,6 +331,7 @@ const withChunking = (config) => {
                             ) {
                                 return false
                             }
+
                             return module?.context?.match?.(/(node_modules)|(packages\/(.*)dist)/)
                         },
                         name: 'vendor',
@@ -412,11 +427,60 @@ const enableReactRefresh = (config) => {
     }
 }
 
+const kebabToUpperCamelCase = (str) => {
+    return str
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join('');
+}
+
+const kebabToLowerCamelCase = (str) => {
+    return str
+        .split('-')
+        .map((word, index) => 
+            index === 0 
+                ? word.toLowerCase() 
+                : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join('');
+}
+
+const buildVirtualModuleConfig = (extensions = []) => {
+    // NOTES: 
+    // 1. Virtual module key can't start with '@'.
+    const config = extensions.reduce((acc, curr) => ({
+        ...acc,
+        [`${projectDir}/${curr}`]: fse.readFileSync(resolve(projectDir, 'node_modules', curr, 'setup-app.js'), 'utf8')
+    }), {})
+
+    // Push on the custom module that exports all of the extensions.
+    config['/Users/bchypak/Projects/pwa-kit/packages/template-typescript-minimal/app/extensions'] = `
+
+            // All Extensions
+            ${extensions.map((extension) => `import ${kebabToUpperCamelCase(extension.split('\/')[1])} from '${projectDir}/${extension}'`).join('\n')}
+
+            export default {
+                ${extensions.map((extension) => `${kebabToLowerCamelCase(extension.split('\/')[1])}: ${kebabToUpperCamelCase(extension.split('\/')[1])}`).join(',\n')}
+            }
+        `
+
+    return config
+}
+
+const virtualModulesConfig = buildVirtualModuleConfig(appConfig.app.extensions)
+console.log('virtualModulesConfig: ', virtualModulesConfig)
 const client =
     entryPointExists(['app', 'main']) &&
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
+
+            // Add extensions to the main entry point
+            config.module.rules.push({
+                test: /browser\/main/,
+                loader: `/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/src/configs/webpack/loaders/extension-loader.js`
+            })
+
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
@@ -426,8 +490,13 @@ const client =
                 entry: {
                     main: getAppEntryPoint()
                 },
+                output: {
+                    ...config.output,
+                    filename: '[name].js'
+                },
                 plugins: [
                     ...config.plugins,
+                    // virtualModules1,
                     new LoadablePlugin({writeToDisk: true}),
                     analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
                 ].filter(Boolean),
@@ -469,6 +538,11 @@ const renderer =
     fse.existsSync(resolve(projectDir, 'node_modules', '@salesforce', 'pwa-kit-react-sdk')) &&
     baseConfig('node')
         .extend((config) => {
+            // Add extensions to the react renderer
+            config.module.rules.push({
+                test: /server\/react-rendering/,
+                loader: `/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/src/configs/webpack/loaders/extension-loader.js`
+            })
             return {
                 ...config,
                 // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
@@ -482,11 +556,12 @@ const renderer =
                     // We want to split the build on local development to reduce memory usage.
                     // It is required to have a single entry point for the remote server.
                     // See pwa-kit-runtime/ssr/server/build-remote-server.js render method.
-                    filename: mode === development ? '[name]-server.js' : 'server-renderer.js',
+                    filename: 'server-renderer.js',
                     libraryTarget: 'commonjs2'
                 },
                 plugins: [
                     ...config.plugins,
+                    // virtualModules2,
                     staticFolderCopyPlugin,
                     // Keep this on the slowest-to-build item - the server-side bundle.
                     new WebpackNotifierPlugin({
@@ -556,70 +631,15 @@ const requestProcessor =
         })
         .build()
 
-// This is the extensions for multi-extensibility feature in PWA Kit.
-// Don't mistake this with the concept of extensions for Webpack.
-const extensions =
-    mode === 'production'
-        ? (pkg.mobify?.app?.extensions || [])
-              .map((extension) => {
-                  const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/setup-server`
-                  const foundType = ['ts', 'js'].find((type) =>
-                      fse.existsSync(`${setupServerFilePathBase}.${type}`)
-                  )
 
-                  if (!foundType) {
-                      // no setup-server file found, early exit because it's optional
-                      return
-                  }
-
-                  const defaultTsConfig = {
-                      target: 'ES2020',
-                      module: 'commonjs',
-                      strict: true,
-                      esModuleInterop: true,
-                      skipLibCheck: true
-                  }
-                  let tsConfigFound = fse.existsSync(
-                      `${projectDir}/node_modules/${extension}/tsconfig.json`
-                  )
-                  return {
-                      name: 'extensions',
-                      target: 'node',
-                      mode,
-                      entry: setupServerFilePathBase,
-                      output: {
-                          path: `${buildDir}/extensions/${extension}`,
-                          filename: 'setup-server.js',
-                          libraryTarget: 'commonjs2'
-                      },
-                      resolve: {
-                          extensions: ['.ts', '.js']
-                      },
-                      module: {
-                          rules: [
-                              {
-                                  test: /\.ts?$/,
-                                  use: {
-                                      loader: findDepInStack('ts-loader'),
-                                      // No nothing if tsconfig.json is declared in the extension.
-                                      // Typescript will resolve to it magically.
-                                      // If no tsconfig.json is found, use the default options
-                                      ...(tsConfigFound ? {} : {compilerOptions: defaultTsConfig})
-                                  },
-                                  exclude: /node_modules/
-                              }
-                          ]
-                      },
-                      optimization: {
-                          minimize: false
-                      }
-                  }
-              })
-              .filter(Boolean)
-        : []
-
-module.exports = [client, ssr, renderer, clientOptional, requestProcessor, ...extensions]
+module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
     .filter(Boolean)
     .map((config) => {
         return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)
     })
+
+// module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
+//     .filter(Boolean)
+//     .map((config) => {
+//         return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)
+//     })

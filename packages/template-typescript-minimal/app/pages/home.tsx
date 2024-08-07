@@ -6,6 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
+import {Link} from 'react-router-dom'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
@@ -18,7 +19,6 @@ const style = `
 body {
     background: linear-gradient(-45deg, #e73c7e, #23a6d5, #ee7752);
     background-size: 400% 400%;
-    animation: gradient 10s ease 5;
     height: 100vh;
 }
 @keyframes gradient {
@@ -130,6 +130,9 @@ const Home = ({value}: Props) => {
                             <br />
                             <br />
                             Client-side JS works if this counter increments: {counter}
+                            <br />
+                            <br />
+                            App Extensions work if you can navigate to these links: <Link to="/sample-page">sample page</Link>, <Link to="/store-finder-page">store finder page</Link>.
                             <br />
                             <br />
                             <b>You can mix-and-match JS and TS</b>

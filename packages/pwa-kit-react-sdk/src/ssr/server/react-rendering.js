@@ -35,6 +35,11 @@ import logger from '../../utils/logger-instance'
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import PropTypes from 'prop-types'
 
+const Extensions = {}
+
+console.log('Server Rendering')
+console.log('Extensions: ', Extensions)
+
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
 
@@ -117,13 +122,22 @@ export const getLocationSearch = (req, opts = {}) => {
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
+    // Initialize all the react app extensions.
+    Object.entries(Extensions).forEach(([name, initializer]) => {
+        console.log(`Initializing the ${name} extension for SSR.`)
+        initializer(App)
+    })
+
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
 
     AppConfig.restore(res.locals)
 
-    const routes = getRoutes(res.locals)
+    // NOTE: Below isn't going to work exactly as written as the "initialRoutes" aren't routable components.
+    const initialRoutes = (App?.initialRoutes || [])
+    
+    const routes = getRoutes(res.locals, initialRoutes)
     const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname] = req.originalUrl.split('?')
@@ -259,7 +273,10 @@ const renderToString = (jsx, extractor) =>
 
 const renderApp = (args) => {
     const {req, res, appStateError, appJSX, appState, config} = args
-    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
+    // console.log('BUNDLES_PATH: ', BUNDLES_PATH, getAssetUrl())
+    
+    const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl(), entrypoints: ['main']})
+    // const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl(), entrypoints: ['extensions', 'main']})
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
     const prettyPrint = 'mobify_pretty' in req.query || '__pretty_print' in req.query
@@ -291,12 +308,14 @@ const renderApp = (args) => {
     let bundles = []
     /* istanbul ignore next */
     if (extractor) {
+        debugger
         bundles = extractor.getScriptElements().map((el) =>
             React.cloneElement(el, {
                 ...el.props,
                 ...scriptProps
             })
         )
+        // console.log('bundles: ', bundles)
     }
 
     const helmet = Helmet.renderStatic()

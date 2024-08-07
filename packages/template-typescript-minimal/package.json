@@ -21,6 +21,8 @@
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
     "@salesforce/pwa-kit-runtime": "4.0.0-dev",
+    "@salesforce/extension-sample": "1.0.0-dev",
+    "@salesforce/extension-store-finder": "1.0.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "@types/loadable__component": "~5.13.4",
     "@types/react": "~18.2.0",
@@ -38,7 +40,8 @@
   "mobify": {
     "app":{
       "extensions": [
-        "test-extension"
+        "@salesforce/extension-sample",
+        "@salesforce/extension-store-finder"
       ]
     },
     "ssrEnabled": true,
