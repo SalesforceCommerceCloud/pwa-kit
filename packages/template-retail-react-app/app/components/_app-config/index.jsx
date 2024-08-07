@@ -132,6 +132,19 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
 }
 
 AppConfig.getBasePath = (locals = {}) => {
+    // in addition to config file, allow setting ssrNamespace via env variables
+    // default reads from the ssrNamespace so it's the same as /mobify
+    // must be backwards compatible
+    // leave it up to Canada Goose to implement how they handle many namespace -> 1 environment
+
+    // Projects can set any basepath they want pages to have here
+    // return '/checkout'
+
+    // This method takes the first path part and compares it to a list of
+    // allowed base paths defined in the config.
+    // If the base paths are not one of the allowed paths, it returns a
+    // default base path, also defined in the config, instead
+
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl
