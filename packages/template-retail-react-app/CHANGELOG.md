@@ -1,6 +1,6 @@
-## v4.0.0-dev(Jul 4, 2024)
+## v4.0.0 (Aug 7, 2024)
 
-### New Feature
+### New Features
 
 - Support product bundles [#1916](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1916/)
 - Add Store Locator [#1922](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1922)
