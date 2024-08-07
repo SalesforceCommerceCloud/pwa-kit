@@ -6,10 +6,7 @@
  */
 
 import {useEffect, useState} from 'react'
-import {
-    rebuildPathWithParams,
-    removeQueryParamsFromPath
-} from '@salesforce/retail-react-app/app/utils/url'
+import {removeQueryParamsFromPath} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -31,8 +28,8 @@ export const useProductViewModal = (initialProduct) => {
     const [product, setProduct] = useState(initialProduct)
     const variant = useVariant(product)
 
-    const {isFetching} = useProduct(
-        {parameters: {id: variant?.productId}},
+    const {data: currentProduct, isFetching} = useProduct(
+        {parameters: {id: (variant || product)?.productId}},
         {
             placeholderData: initialProduct,
             select: (data) => {
@@ -46,9 +43,6 @@ export const useProductViewModal = (initialProduct) => {
                 }
                 return data
             },
-            onSuccess: (data) => {
-                setProduct(data)
-            },
             onError: () => {
                 toast({
                     title: intl.formatMessage(API_ERROR_MESSAGE),
@@ -57,6 +51,11 @@ export const useProductViewModal = (initialProduct) => {
             }
         }
     )
+
+    useEffect(() => {
+        if (currentProduct) setProduct(currentProduct)
+    }, [currentProduct])
+
     const cleanUpVariantParams = () => {
         const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
         const updatedParams = removeQueryParamsFromPath(`${location.search}`, paramToRemove)
@@ -72,18 +71,6 @@ export const useProductViewModal = (initialProduct) => {
             cleanUpVariantParams()
         }
     }, [])
-
-    useEffect(() => {
-        if (variant) {
-            const {variationValues} = variant
-            // update the url with the new product id and variation values when the variant changes
-            const updatedUrl = rebuildPathWithParams(`${location.pathname}${location.search}`, {
-                ...variationValues,
-                pid: variant.productId
-            })
-            history.replace(updatedUrl)
-        }
-    }, [variant])
 
     return {
         product,

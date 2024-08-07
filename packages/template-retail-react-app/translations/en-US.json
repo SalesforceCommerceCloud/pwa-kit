@@ -736,6 +736,9 @@
   "item_attributes.label.quantity": {
     "defaultMessage": "Quantity: {quantity}"
   },
+  "item_attributes.label.selected_options": {
+    "defaultMessage": "Selected Options"
+  },
   "item_image.label.sale": {
     "defaultMessage": "Sale",
     "description": "A sale badge placed on top of a product image"
@@ -1113,6 +1116,12 @@
   },
   "product_tile.badge.label.sale": {
     "defaultMessage": "Sale"
+  },
+  "product_view.button.add_bundle_to_cart": {
+    "defaultMessage": "Add Bundle to Cart"
+  },
+  "product_view.button.add_bundle_to_wishlist": {
+    "defaultMessage": "Add Bundle to Wishlist"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
@@ -1492,8 +1501,14 @@
   "use_product.message.inventory_remaining": {
     "defaultMessage": "Only {stockLevel} left!"
   },
+  "use_product.message.inventory_remaining_for_product": {
+    "defaultMessage": "Only {stockLevel} left for {productName}!"
+  },
   "use_product.message.out_of_stock": {
     "defaultMessage": "Out of stock"
+  },
+  "use_product.message.out_of_stock_for_product": {
+    "defaultMessage": "Out of stock for {productName}"
   },
   "use_profile_fields.error.required_email": {
     "defaultMessage": "Please enter a valid email address."

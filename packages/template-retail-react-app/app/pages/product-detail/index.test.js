@@ -22,6 +22,11 @@ import {
     productsForEinstein
 } from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
 import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+import {
+    mockProductBundle,
+    basketWithProductBundle,
+    bundleProductItemsForPDP
+} from '@salesforce/retail-react-app/app/mocks/product-bundle'
 
 jest.setTimeout(60000)
 
@@ -220,7 +225,7 @@ describe('product set', () => {
             // Seems like rendering the modal takes a bit more time
             {timeout: 10000}
         )
-    }, 30000)
+    })
 
     test('add the set to cart with error messages', async () => {
         renderWithProviders(<MockedComponent />)
@@ -283,6 +288,195 @@ describe('Recommended Products', () => {
             expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
             expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
             expect(screen.getAllByText(/Summer Bomber Jacket/)).toHaveLength(3)
+        })
+    })
+})
+
+describe('product bundles', () => {
+    let hasUpdatedBundleChildren = false
+    beforeEach(() => {
+        hasUpdatedBundleChildren = false
+        global.server.use(
+            // Use product bundle instead of product set
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundle))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                let inventoryLevel = 0
+                let bundleChildVariantId = '701643473915M'
+                if (req.url.toString().includes('701643473908M')) {
+                    bundleChildVariantId = '701643473908M'
+                    inventoryLevel = 3
+                }
+                const bundleChildVariantData = {
+                    data: [
+                        {
+                            id: bundleChildVariantId,
+                            inventory: {
+                                ats: inventoryLevel,
+                                backorderable: false,
+                                id: 'inventory_m',
+                                orderable: false,
+                                preorderable: false,
+                                stockLevel: inventoryLevel
+                            },
+                            master: {
+                                masterId: '25565139M',
+                                orderable: true
+                            }
+                        }
+                    ]
+                }
+                return res(ctx.delay(0), ctx.status(200), ctx.json(bundleChildVariantData))
+            }),
+            // For adding items to basket
+            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
+                const basketWithBundle = {
+                    ...basketWithProductBundle,
+                    productItems: bundleProductItemsForPDP
+                }
+                return res(ctx.json(basketWithBundle))
+            }),
+            // Follow up call to update child bundle variant selections
+            rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
+                hasUpdatedBundleChildren = true
+                return res(ctx.json(basketWithProductBundle))
+            })
+        )
+    })
+
+    test('renders multi-product layout', async () => {
+        renderWithProviders(<MockedComponent />)
+
+        await waitFor(() => {
+            expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+        })
+    })
+
+    test('add the bundle to cart successfully', async () => {
+        const urlPathAfterSelectingAllVariants = `uk/en-GB/product/test-bundle?${new URLSearchParams(
+            {
+                '25592770M': 'color=JJGN9A0&size=006',
+                '25565139M': 'color=JJ169XX&size=9SM',
+                '25565094M': 'color=JJ0CZXX&size=9XS'
+            }
+        )}`
+        window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
+
+        // Initial basket is necessary to add items to it
+        const initialBasket = {basketId: 'valid_id'}
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+
+        await waitFor(() => {
+            expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
+            expect(hasUpdatedBundleChildren).toBe(false)
+        })
+
+        const buttons = await screen.findAllByText(/add bundle to cart/i)
+        fireEvent.click(buttons[0])
+
+        await waitFor(
+            () => {
+                const modal = screen.getByTestId('add-to-cart-modal')
+                expect(within(modal).getByText(/1 item added to cart/i)).toBeInTheDocument()
+                expect(hasUpdatedBundleChildren).toBe(true)
+            },
+            // Seems like rendering the modal takes a bit more time
+            {timeout: 10000}
+        )
+    })
+
+    test('add the bundle to cart with error messages', async () => {
+        renderWithProviders(<MockedComponent />)
+
+        await waitFor(() => {
+            expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
+        })
+
+        const buttons = await screen.findAllByText(/add bundle to cart/i)
+        fireEvent.click(buttons[0])
+
+        await waitFor(() => {
+            // Show error when users have not selected all the variants yet
+            // 1 error for each child product
+            const errorMessages = screen.getAllByText(/Please select all your options above/i)
+            expect(errorMessages).toHaveLength(3)
+        })
+    })
+
+    test('child product images are lazy loaded', async () => {
+        renderWithProviders(<MockedComponent />)
+
+        const childProducts = await screen.findAllByTestId('child-product')
+
+        childProducts.forEach((child) => {
+            const heroImage = within(child).getAllByRole('img')[0]
+            expect(heroImage.getAttribute('loading')).toBe('lazy')
+        })
+    })
+
+    test('add to cart button is disabled when child is out of stock', async () => {
+        renderWithProviders(<MockedComponent />)
+        await waitFor(() => {
+            expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
+        })
+        const childProducts = screen.getAllByTestId('child-product')
+        expect(childProducts).toHaveLength(3)
+
+        const swingTankProduct = childProducts[1]
+        const colorSelectionBtn = within(swingTankProduct).getByLabelText('Black')
+        const sizeSelectionBtn = within(swingTankProduct).getByLabelText('M')
+
+        expect(swingTankProduct).toBeInTheDocument()
+        expect(colorSelectionBtn).toBeInTheDocument()
+        expect(sizeSelectionBtn).toBeInTheDocument()
+
+        fireEvent.click(colorSelectionBtn)
+        fireEvent.click(sizeSelectionBtn)
+
+        await waitFor(() => {
+            expect(screen.getByText('Out of stock')).toBeInTheDocument()
+            const addBundleToCartBtn = screen.getByRole('button', {name: /add bundle to cart/i})
+            expect(addBundleToCartBtn).toBeInTheDocument()
+            expect(addBundleToCartBtn).toBeDisabled()
+        })
+    })
+
+    test('add to cart button is disabled when quantity exceeds child stock level', async () => {
+        renderWithProviders(<MockedComponent />)
+        await waitFor(() => {
+            expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
+        })
+        const childProducts = screen.getAllByTestId('child-product')
+        expect(childProducts).toHaveLength(3)
+
+        const swingTankProduct = childProducts[1]
+        const colorSelectionBtn = within(swingTankProduct).getByLabelText('Black')
+        const sizeSelectionBtn = within(swingTankProduct).getByLabelText('L')
+
+        expect(swingTankProduct).toBeInTheDocument()
+        expect(colorSelectionBtn).toBeInTheDocument()
+        expect(sizeSelectionBtn).toBeInTheDocument()
+
+        fireEvent.click(colorSelectionBtn)
+        fireEvent.click(sizeSelectionBtn)
+
+        const addBundleToCartBtn = screen.getByRole('button', {name: /add bundle to cart/i})
+
+        await waitFor(() => {
+            expect(addBundleToCartBtn).toBeInTheDocument()
+            expect(addBundleToCartBtn).toBeEnabled()
+        })
+
+        // Set product bundle quantity selection to 4
+        const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
+        quantityInput.focus()
+        fireEvent.change(quantityInput, {target: {value: '4'}})
+
+        await waitFor(() => {
+            expect(screen.getByRole('spinbutton', {name: /quantity/i})).toHaveValue('4')
+            expect(screen.getByText('Only 3 left!')).toBeInTheDocument()
+            expect(addBundleToCartBtn).toBeDisabled()
         })
     })
 })
