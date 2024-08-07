@@ -39,6 +39,10 @@ runs:
         BASE_SHA=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
           "https://api.github.com/repos/${{ github.repository }}/pulls/${{ inputs.pr_number }}" | \
           jq -r '.base.sha')
+        if [ -z "$BASE_SHA" ]; then
+          echo "Error: Unable to fetch base SHA."
+          exit 1
+        fi
         echo "BASE_SHA=${BASE_SHA}" >> $GITHUB_ENV
       shell: bash
 
@@ -50,16 +54,32 @@ runs:
         fi
       shell: bash
 
+    - name: Find merge base
+      id: find_merge_base
+      run: |
+        MERGE_BASE=$(git merge-base ${{ env.BASE_SHA }} ${{ github.sha }})
+        if [ -z "$MERGE_BASE" ]; then
+          echo "Error: Unable to find merge base."
+          exit 1
+        fi
+        echo "MERGE_BASE=${MERGE_BASE}" >> $GITHUB_ENV
+      shell: bash
+
     - name: Debugging Info
       run: |
         echo "Base SHA: ${{ env.BASE_SHA }}"
         echo "Current SHA: ${{ github.sha }}"
+        echo "Merge Base: ${{ env.MERGE_BASE }}"
         echo "PR labels: $PR_LABELS"
       shell: bash
 
     - name: Check if changelog is updated
       run: |
-        CHANGED_FILES=$(git diff --name-only ${{ env.BASE_SHA }} ${{ github.sha }})
+        CHANGED_FILES=$(git diff --name-only ${{ env.MERGE_BASE }} ${{ github.sha }})
+        if [ -z "$CHANGED_FILES" ]; then
+          echo "No changed files detected."
+          exit 0
+        fi
         echo "Changed files: $CHANGED_FILES"
         
         PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
@@ -68,11 +88,9 @@ runs:
         for PACKAGE in "${PUBLIC_PACKAGES[@]}"; do
           if echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/"; then
             if ! echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/changelog.md"; then
-              if ! echo "$PR_LABELS" | grep -q "$SKIP_CHANGELOG_LABEL"; then
-                echo "Changelog.md was not updated for package $PACKAGE. Please update the changelog or add 'skip changelog' label to the pull request."
+              echo "Changelog.md was not updated for package $PACKAGE. Please update the changelog or add 'skip changelog' label to the PR."
                 exit 1
               fi
             fi
-          fi
         done
       shell: bash
