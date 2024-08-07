@@ -89,8 +89,8 @@ runs:
           if echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/"; then
             if ! echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/changelog.md"; then
               echo "Changelog.md was not updated for package $PACKAGE. Please update the changelog or add 'skip changelog' label to the PR."
-                exit 1
-              fi
+              exit 1
             fi
+          fi
         done
       shell: bash
