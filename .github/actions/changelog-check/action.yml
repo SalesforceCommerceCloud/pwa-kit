@@ -60,10 +60,10 @@ runs:
       run: |
         PR_LABELS=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
           "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
-          jq -r '.[].name')
+          jq -r '.[].name | @sh' | tr '\n' ' ')
         echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
 
-        if echo "${PR_LABELS}" | grep -q "skip changelog"; then
+        if echo "${PR_LABELS}" | grep -q "'skip changelog'"; then
           echo "Skip changelog label is present."
           echo "SKIP_CHANGELOG_LABEL_FOUND=true" >> $GITHUB_ENV
         else
