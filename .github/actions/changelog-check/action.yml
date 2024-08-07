@@ -16,6 +16,23 @@ runs:
       with:
         fetch-depth: 0  # Fetch full history to access all commits
 
+    - name: Fetch initial PR labels
+      id: fetch_labels_initial
+      run: |
+        PR_LABELS=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
+          jq -r '.[].name')
+        echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Exit early if skip changelog label is present initially
+      run: |
+        if echo "${{ env.PR_LABELS }}" | grep -q "skip changelog"; then
+          echo "Skip changelog label is present initially. Exiting successfully."
+          exit 0
+        fi
+      shell: bash
+
     - name: Get Base Branch SHA
       id: get_base_sha
       run: |
@@ -48,25 +65,30 @@ runs:
         echo "MERGE_BASE=${MERGE_BASE}" >> $GITHUB_ENV
       shell: bash
 
+    - name: Fetch updated PR labels
+      id: fetch_labels_updated
+      run: |
+        PR_LABELS_UPDATED=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
+          jq -r '.[].name')
+        echo "PR_LABELS_UPDATED=${PR_LABELS_UPDATED}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Exit early if skip changelog label is present after update
+      run: |
+        if echo "${{ env.PR_LABELS_UPDATED }}" | grep -q "skip changelog"; then
+          echo "Skip changelog label is present after update. Exiting successfully."
+          exit 0
+        fi
+      shell: bash
+
     - name: Debugging Info
       run: |
         echo "Base SHA: ${{ env.BASE_SHA }}"
         echo "Current SHA: ${{ github.sha }}"
         echo "Merge Base: ${{ env.MERGE_BASE }}"
-      shell: bash
-
-    - name: Fetch PR labels and check for skip changelog
-      id: fetch_and_check_labels
-      run: |
-        PR_LABELS=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
-          "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
-          jq -r '.[].name')
-        echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
-
-        if echo "${PR_LABELS}" | grep -q "skip changelog"; then
-          echo "Skip changelog label is present. Exiting successfully."
-          exit 0
-        fi
+        echo "Initial PR labels: $PR_LABELS"
+        echo "Updated PR labels: $PR_LABELS_UPDATED"
       shell: bash
 
     - name: Check if changelog is updated
