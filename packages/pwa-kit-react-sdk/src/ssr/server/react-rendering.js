@@ -35,10 +35,8 @@ import logger from '../../utils/logger-instance'
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import PropTypes from 'prop-types'
 
+// NOTE: This values is replaces via a loader. Looking at ways to replace this loader.
 const Extensions = {}
-
-console.log('Server Rendering')
-console.log('Extensions: ', Extensions)
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -122,11 +120,7 @@ export const getLocationSearch = (req, opts = {}) => {
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
-    // Initialize all the react app extensions.
-    Object.entries(Extensions).forEach(([name, initializer]) => {
-        console.log(`Initializing the ${name} extension for SSR.`)
-        initializer(App)
-    })
+    
 
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
@@ -137,9 +131,16 @@ export const render = async (req, res, next) => {
     // NOTE: Below isn't going to work exactly as written as the "initialRoutes" aren't routable components.
     const initialRoutes = (App?.initialRoutes || [])
     
-    const routes = getRoutes(res.locals, initialRoutes)
     const WrappedApp = routeComponent(App, false, res.locals)
 
+    // Initialize all the react app extensions.
+    Object.entries(Extensions).forEach(([name, initializer]) => {
+        console.log(`Initializing the ${name} extension for SSR.`)
+        initializer(WrappedApp)
+    })
+
+    const routes = getRoutes(res.locals, WrappedApp.getRoutes())
+    
     const [pathname] = req.originalUrl.split('?')
 
     const location = {

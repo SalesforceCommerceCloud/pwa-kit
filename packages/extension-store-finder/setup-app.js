@@ -10,12 +10,11 @@ import loadable from '@loadable/component'
 const StoreFinderPage = loadable(() => import('./pages/store-finder-page'))
 
 export default (App) => {
-    App.initialRoutes = [
+    App.addRoutes([
         {
             exact: true,
             path: '/store-finder-page',
             component: StoreFinderPage
-        },
-        ...(App.initialRoutes || [])
-    ]
+        }
+    ])
 }

@@ -122,17 +122,18 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
+    const WrappedApp = routeComponent(App, false, locals)
     // Initialize all the react app extensions.
     Object.entries(Extensions).forEach(([name, initializer]) => {
         console.log(`Initializing the ${name} extension for CSR.`)
-        initializer(App)
+        initializer(WrappedApp)
     })
 
     const props = {
         error: window.__ERROR__,
         locals: locals,
-        routes: getRoutes(locals, App.initialRoutes), // NOTE: Make getRoutes needs to handle getting all the routes including those in the extensions?
-        WrappedApp: routeComponent(App, false, locals)
+        routes: getRoutes(locals, WrappedApp.getRoutes()), // NOTE: Make getRoutes needs to handle getting all the routes including those in the extensions?
+        WrappedApp
     }
 
     return Promise.resolve()

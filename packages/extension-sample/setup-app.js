@@ -10,14 +10,13 @@ import loadable from '@loadable/component'
 const SamplePage = loadable(() => import('./pages/sample-page'))
 
 export default (App) => {
-    App.initialRoutes = [
+    App.addRoutes([
         {
             exact: true,
             path: '/sample-page',
             component: SamplePage
-        },
-        ...(App.initialRoutes || [])
-    ]
+        }
+    ])
 }
 
 

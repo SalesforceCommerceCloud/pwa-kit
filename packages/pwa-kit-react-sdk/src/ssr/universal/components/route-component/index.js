@@ -385,6 +385,17 @@ export const routeComponent = (Wrapped, isPage, locals) => {
         preloadedProps: PropTypes.object
     }
 
+    // The application will have special static functions.
+    let initialRoutes = []
+    if (!isPage) {
+        RouteComponent.addRoutes = (routes) => {
+            initialRoutes = [...routes, ...initialRoutes]
+        }
+
+        RouteComponent.getRoutes = () => {
+            return initialRoutes
+        }
+    }
     const excludes = {
         shouldGetProps: true,
         getProps: true,
