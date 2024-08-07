@@ -1,0 +1,98 @@
+name: 'Changelog Check'
+description: 'Check if changelog is updated for the changed packages'
+inputs:
+  github_token:
+    description: 'GitHub token'
+    required: true
+  pr_number:
+    description: 'Pull request number'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch full history to access all commits
+
+    - name: Get Base Branch SHA
+      id: get_base_sha
+      run: |
+        BASE_SHA=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ inputs.pr_number }}" | \
+          jq -r '.base.sha')
+        if [ -z "$BASE_SHA" ]; then
+          echo "Error: Unable to fetch base SHA."
+          exit 1
+        fi
+        echo "BASE_SHA=${BASE_SHA}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Check if SHA values are valid
+      run: |
+        if [ -z "${{ env.BASE_SHA }}" ] || [ -z "${{ github.sha }}" ]; then
+          echo "Error: SHA values are missing or invalid."
+          exit 1
+        fi
+      shell: bash
+
+    - name: Find merge base
+      id: find_merge_base
+      run: |
+        MERGE_BASE=$(git merge-base ${{ env.BASE_SHA }} ${{ github.sha }})
+        if [ -z "$MERGE_BASE" ]; then
+          echo "Error: Unable to find merge base."
+          exit 1
+        fi
+        echo "MERGE_BASE=${MERGE_BASE}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Debugging Info
+      run: |
+        echo "Base SHA: ${{ env.BASE_SHA }}"
+        echo "Current SHA: ${{ github.sha }}"
+        echo "Merge Base: ${{ env.MERGE_BASE }}"
+      shell: bash
+
+    - name: Fetch PR labels and check for skip changelog
+      id: fetch_and_check_labels
+      run: |
+        PR_LABELS=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
+          jq -r '.[].name | @sh' | tr '\n' ' ')
+        echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
+
+        if echo "${PR_LABELS}" | grep -q "'skip changelog'"; then
+          echo "Skip changelog label is present."
+          echo "SKIP_CHANGELOG_LABEL_FOUND=true" >> $GITHUB_ENV
+        else
+          echo "SKIP_CHANGELOG_LABEL_FOUND=false" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Check if changelog is updated
+      run: |
+        if [ "${{ env.SKIP_CHANGELOG_LABEL_FOUND }}" == "true" ]; then
+          echo "Skipping changelog check as the 'skip changelog' label is present."
+          exit 0
+        fi
+
+        CHANGED_FILES=$(git diff --name-only ${{ env.MERGE_BASE }} ${{ github.sha }})
+        if [ -z "$CHANGED_FILES" ]; then
+          echo "No changed files detected."
+          exit 0
+        fi
+        echo "Changed files: $CHANGED_FILES"
+        
+        PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
+
+        for PACKAGE in "${PUBLIC_PACKAGES[@]}"; do
+          if echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/"; then
+            if ! echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/changelog.md"; then
+              echo "Changelog.md was not updated for package $PACKAGE. Please update the changelog or add 'skip changelog' label to the PR."
+              exit 1
+            fi
+          fi
+        done
+      shell: bash
