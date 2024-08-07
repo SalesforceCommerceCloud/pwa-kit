@@ -20,7 +20,6 @@
 - A11y: Account Nav fixes [#1884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1884)
 - A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
 - Add aria-label for Checkout's action buttons [#1906](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1906)
-- Fix the search bar element in the header to the correct order for Desktop and Mobile [#1910](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1910)
 - Avoid forced focus changes that are not user-initiated [#1940](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1940)
 
 ## v3.0.2 (Jul 11, 2024)
