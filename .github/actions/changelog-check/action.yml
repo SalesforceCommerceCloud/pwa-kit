@@ -25,6 +25,14 @@ runs:
         echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
       shell: bash
 
+    - name: Exit early if skip changelog label is present
+      run: |
+        if echo "${{ env.PR_LABELS }}" | grep -q "skip changelog"; then
+          echo "Skip changelog label is present. Exiting successfully."
+          exit 0
+        fi
+      shell: bash
+
     - name: Get Base Branch SHA
       id: get_base_sha
       run: |
@@ -32,6 +40,14 @@ runs:
           "https://api.github.com/repos/${{ github.repository }}/pulls/${{ inputs.pr_number }}" | \
           jq -r '.base.sha')
         echo "BASE_SHA=${BASE_SHA}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Check if SHA values are valid
+      run: |
+        if [ -z "${{ env.BASE_SHA }}" ] || [ -z "${{ github.sha }}" ]; then
+          echo "Error: SHA values are missing or invalid."
+          exit 1
+        fi
       shell: bash
 
     - name: Debugging Info
@@ -43,11 +59,6 @@ runs:
 
     - name: Check if changelog is updated
       run: |
-        if [ -z "${{ env.BASE_SHA }}" ] || [ -z "${{ github.sha }}" ]; then
-          echo "Error: SHA values are missing or invalid."
-          exit 1
-        fi
-
         CHANGED_FILES=$(git diff --name-only ${{ env.BASE_SHA }} ${{ github.sha }})
         echo "Changed files: $CHANGED_FILES"
         
