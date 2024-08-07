@@ -27,5 +27,6 @@ var CLIENT_REGISTRY = {
 
 module.exports = {
     CLIENT_REGISTRY: CLIENT_REGISTRY,
-    ALLOW_UNKNOWN_CLIENTS: false
+    SHORT_CODE: 'kv7kzm78',
+    ORGID: 'f_ecom_bdpx_dev'
 };

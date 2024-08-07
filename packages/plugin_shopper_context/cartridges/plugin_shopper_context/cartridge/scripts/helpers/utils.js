@@ -3,8 +3,6 @@
 /* global request */
 var Cookie = require('dw/web/Cookie');
 
-var { ALLOW_UNKNOWN_CLIENTS } = require('*/cartridge/scripts/config/constant');
-
 var {
     getClientRegistry
 } = require('*/cartridge/scripts/config/clientRegistry');
@@ -27,14 +25,10 @@ var {
 function validateContext(clientId, shopperContext) {
     const clientRegistry = getClientRegistry();
 
-    if (!clientRegistry[clientId]) {
-        // client not in the registry
-        // this means there will be no constraint on shopper context. Use this with caution if you
-        // are using shopperJWT to set context
-        return ALLOW_UNKNOWN_CLIENTS;
-    }
-
     const clientRules = clientRegistry[clientId];
+    if (!clientRules) {
+        return false;
+    }
     // validate shopperContext against the allowed attributes
     if (!clientRules.allowSourceCode && shopperContext.sourceCode) {
         return false;
