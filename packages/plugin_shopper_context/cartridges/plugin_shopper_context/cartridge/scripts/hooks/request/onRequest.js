@@ -22,13 +22,15 @@ var ACCESS_TOKEN_COOKIE_NAME = multiSiteSupportEnabled
 var ACCESS_TOKEN_COOKIE_NAME_2 = ACCESS_TOKEN_COOKIE_NAME + '_2';
 var { SHORT_CODE, ORGID } = require('*/cartridge/scripts/config/constant');
 var GET_SERVICE = 'plugin_shopper_context.generic.get';
+var SHOPPER_CONTEXT = 'shopper_context_RefArch';
 
 function isContextGuardActive() {
-    var contextGuardCookie = getCookie(CONTEXT_GUARD_COOKIE_NAME);
-    var activeContextGuard =
-        contextGuardCookie && contextGuardCookie.maxAge < 30 * 60;
-    removeCookie(CONTEXT_GUARD_COOKIE_NAME, response);
-    return activeContextGuard;
+    var isShopperContextChecked = getCookie(SHOPPER_CONTEXT);
+    // var contextGuardCookie = getCookie(CONTEXT_GUARD_COOKIE_NAME);
+    var hasContextSet =
+        (isShopperContextChecked && isShopperContextChecked.value === '0');
+    // removeCookie(CONTEXT_GUARD_COOKIE_NAME, response);
+    return hasContextSet;
 }
 /**
  * Returns the base URL
@@ -70,6 +72,13 @@ function getShopperContext(usid, token, siteId) {
 }
 
 exports.onRequest = function () {
+    var isShopperContextChecked = getCookie(SHOPPER_CONTEXT);
+    // clear out any context if there is no context detected
+    if (!isShopperContextChecked) {
+        session.setSourceCode(null);
+        return new Status(Status.OK);
+    }
+
     if (isContextGuardActive()) {
         return new Status(Status.OK);
     }
@@ -88,8 +97,8 @@ exports.onRequest = function () {
         if (context) {
             session.setSourceCode(context.sourceCode);
         }
-        cookiesToSet[CONTEXT_GUARD_COOKIE_NAME] = {
-            value: 1,
+        cookiesToSet[SHOPPER_CONTEXT] = {
+            value: 0,
             maxAge: CONTEXT_CHECK_COOKIE_AGE
         };
         setCookiesToResponse(cookiesToSet, response);

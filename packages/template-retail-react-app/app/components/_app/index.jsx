@@ -409,7 +409,7 @@ const App = (props) => {
                                                 }
                                             })
                                             refetchDataOnClient()
-                                            document.cookie = `shopper_context_${site.id}=0`
+                                            document.cookie = `shopper_context_${site.id}=; Max-Age=-99999999;`
                                         }}
                                     >
                                         Delete context
