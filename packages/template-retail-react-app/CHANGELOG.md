@@ -1,3 +1,8 @@
+## v4.1.0-dev (Aug 8, 2024)
+
+### Bug Fixes
+- The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
+
 ## v4.0.0 (Aug 7, 2024)
 
 ### New Features
