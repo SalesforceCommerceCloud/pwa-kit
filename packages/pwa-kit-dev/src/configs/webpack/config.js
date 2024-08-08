@@ -201,6 +201,7 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
+                        './build/extensions': `${projectDir}/build/extensions.js`,
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
@@ -449,7 +450,7 @@ const buildVirtualModuleConfig = (extensions = []) => {
     // NOTES: 
     // 1. Virtual module key can't start with '@'.
     return {
-        '/Users/bchypak/Projects/pwa-kit/packages/template-typescript-minimal/app/extensions': `
+        [`${projectDir}/build/extensions`]: `
 
             // All Extensions
             ${extensions.map((extension) => `import ${kebabToUpperCamelCase(extension.split('\/')[1])} from '${extension}/setup-app'`).join('\n')}
@@ -468,11 +469,13 @@ const client =
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
-
             // Add extensions to the main entry point
             config.module.rules.push({
                 test: /browser\/main/,
-                loader: `/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/src/configs/webpack/loaders/extension-loader.js`
+                loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
+                options: {
+                    projectDir,
+                }
             })
 
             return {
@@ -490,7 +493,6 @@ const client =
                 },
                 plugins: [
                     ...config.plugins,
-                    // virtualModules1,
                     new LoadablePlugin({writeToDisk: true}),
                     analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
                 ].filter(Boolean),
@@ -535,7 +537,10 @@ const renderer =
             // Add extensions to the react renderer
             config.module.rules.push({
                 test: /server\/react-rendering/,
-                loader: `/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/src/configs/webpack/loaders/extension-loader.js`
+                loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
+                options: {
+                    projectDir
+                }
             })
             return {
                 ...config,
@@ -555,7 +560,6 @@ const renderer =
                 },
                 plugins: [
                     ...config.plugins,
-                    // virtualModules2,
                     staticFolderCopyPlugin,
                     // Keep this on the slowest-to-build item - the server-side bundle.
                     new WebpackNotifierPlugin({
@@ -626,14 +630,41 @@ const requestProcessor =
         .build()
 
 
-module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
+const extensions =
+    mode === 'production' &&
+    baseConfig('web')
+        .extend(withChunking)
+        .extend((config) => {
+            const entryPoints = appConfig.app.extensions.map((extension) => {
+                return `${projectDir}/node_modules/${extension}/setup-app.js`
+            })
+
+            return {
+                ...config,
+                name: 'extensions',
+                // use source map to make debugging easier
+                devtool: mode === development ? 'source-map' : false,
+                entry: entryPoints,
+                output: {
+                    ...config.output,
+                    filename: 'extensions.js'
+                },
+                plugins: [
+                    ...config.plugins,
+                    new LoadablePlugin({writeToDisk: true}),
+                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
+                ].filter(Boolean),
+                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
+                performance: {
+                    hints: false
+                }
+            }
+        })
+        .extend(enableReactRefresh)
+        .build()
+
+module.exports = [extensions, client, ssr, renderer, clientOptional, requestProcessor]
     .filter(Boolean)
     .map((config) => {
         return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)
     })
-
-// module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
-//     .filter(Boolean)
-//     .map((config) => {
-//         return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)
-//     })
