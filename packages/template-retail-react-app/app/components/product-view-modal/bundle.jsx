@@ -25,6 +25,7 @@ import ImageGallery, {
     Skeleton as ImageGallerySkeleton
 } from '@salesforce/retail-react-app/app/components/image-gallery'
 import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import {useIntl} from 'react-intl'
 
 /**
  * A Modal that contains Product View for product bundle
@@ -56,10 +57,19 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
         }
     )
 
+    const intl = useIntl()
+    const label = intl.formatMessage(
+        {
+            defaultMessage: 'Edit modal for {productName}',
+            id: 'cart.product_edit_modal.product_label'
+        },
+        {productName: productViewModalData?.product?.name}
+    )
+
     return (
         <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
-            <ModalContent containerProps={{'data-testid': 'product-view-modal'}}>
+            <ModalContent containerProps={{'data-testid': 'product-view-modal'}} aria-label={label}>
                 <ModalCloseButton />
                 <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                     <Flex direction={['column', 'column', 'column', 'row']}>
