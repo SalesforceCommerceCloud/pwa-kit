@@ -1,4 +1,7 @@
-## v4.1.0 (Aug 8, 2024)
+## v4.0.1-dev(Aug 8, 2024)
+
+### Bug Fixes
+- The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
 
 ### Accessibility Improvements
 - Hide breadcrumb decorators from screen readers [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
