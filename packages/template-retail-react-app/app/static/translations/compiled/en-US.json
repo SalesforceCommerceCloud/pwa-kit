@@ -437,7 +437,7 @@
       "value": "Item removed from cart"
     }
   ],
-  "cart.product_edit_modal.product_label": [
+  "cart.product_edit_modal.modal_label": [
     {
       "type": 0,
       "value": "Edit modal for "

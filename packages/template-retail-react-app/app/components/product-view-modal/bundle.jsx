@@ -61,7 +61,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     const label = intl.formatMessage(
         {
             defaultMessage: 'Edit modal for {productName}',
-            id: 'cart.product_edit_modal.product_label'
+            id: 'cart.product_edit_modal.modal_label'
         },
         {productName: productViewModalData?.product?.name}
     )

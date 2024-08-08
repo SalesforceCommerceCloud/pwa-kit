@@ -28,7 +28,7 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     const label = intl.formatMessage(
         {
             defaultMessage: 'Edit modal for {productName}',
-            id: 'cart.product_edit_modal.product_label'
+            id: 'cart.product_edit_modal.modal_label'
         },
         {productName: productViewModalData?.product?.name}
     )
