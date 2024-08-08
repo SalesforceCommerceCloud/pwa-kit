@@ -1,3 +1,8 @@
+## v4.1.0 (Aug 8, 2024)
+
+### Accessibility Improvements
+- Hide breadcrumb decorators from screen readers [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
+
 ## v4.0.0-dev(Jul 4, 2024)
 
 ### New Feature
