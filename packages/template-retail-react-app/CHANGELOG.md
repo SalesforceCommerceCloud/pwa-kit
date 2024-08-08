@@ -4,7 +4,7 @@
 - The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
 
 ### Accessibility Improvements
-- Hide breadcrumb decorators from screen readers [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
+- Hide breadcrumb chevrons from screen readers [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
 - Add descriptive text for screen readers on product edit modal in cart page [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
 
 ## v4.0.0-dev(Jul 4, 2024)
