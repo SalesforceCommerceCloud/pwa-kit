@@ -118,11 +118,11 @@ describe('utils/ssr-server tests', () => {
 
         updatePackageMobify(baseMobify)
 
-        expect(getFullRequestURL(`${proxyBasePath}/base/somepath`)).toBe(
+        expect(getFullRequestURL(`${proxyBasePath()}/base/somepath`)).toBe(
             'https://www.merlinspotions.com/somepath'
         )
 
-        expect(getFullRequestURL(`${proxyBasePath}/base2/somepath`)).toBe(
+        expect(getFullRequestURL(`${proxyBasePath()}/base2/somepath`)).toBe(
             'https://api.merlinspotions.com/somepath'
         )
     })

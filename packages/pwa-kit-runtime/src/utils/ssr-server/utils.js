@@ -22,7 +22,7 @@ export const isRemote = () =>
     Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
 
 export const getBundleBaseUrl = () => {
-    return `${bundleBasePath}/${isRemote() ? process.env.BUNDLE_ID : 'development'}/`
+    return `${bundleBasePath()}/${isRemote() ? process.env.BUNDLE_ID : 'development'}/`
 }
 
 let QUIET = false
@@ -88,13 +88,13 @@ export const getHashForString = (text) => {
 export const getFullRequestURL = (url) => {
     // If it starts with a protocol (e.g. http(s)://, file://), then it's already a full URL
     if (/^[a-zA-Z]+:\/\//.test(url)) return url
-    const proxy = proxyConfigs.find(({path}) => url.startsWith(`${proxyBasePath}/${path}/`))
+    const proxy = proxyConfigs.find(({path}) => url.startsWith(`${(proxyBasePath())}/${path}/`))
     if (proxy) {
-        return url.replace(`${proxyBasePath}/${proxy.path}`, `${proxy.protocol}://${proxy.host}`)
+        return url.replace(`${proxyBasePath()}/${proxy.path}`, `${proxy.protocol}://${proxy.host}`)
     }
 
     throw new Error(
-        `Unable to fetch ${url}, relative paths must begin with ${proxyBasePath} followed by a configured proxy path.`
+        `Unable to fetch ${url}, relative paths must begin with ${proxyBasePath()} followed by a configured proxy path.`
     )
 }
 

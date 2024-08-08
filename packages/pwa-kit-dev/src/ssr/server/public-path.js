@@ -17,4 +17,6 @@
 import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 /* global __webpack_public_path__: writable */
-__webpack_public_path__ = `${bundleBasePath}/development/`
+// TODO - this needs to be revisited on local environments as this is set
+// before we are able to read from the config file
+__webpack_public_path__ = `${bundleBasePath()}/development/`

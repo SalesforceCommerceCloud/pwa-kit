@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import { getConfig } from './ssr-config'
+
 /**
  * This file defines the /mobify paths used to set up our Express endpoints.
  *
@@ -12,6 +14,8 @@
  * namespaced path. ie. /namespace/mobify/...
  */
 
+// The MOBIFY_PATH is defined separately in preparation for the future eventual removal or
+// replacement of the 'mobify' part of these paths
 const MOBIFY_PATH = '/mobify'
 const PROXY_PATH_BASE = `${MOBIFY_PATH}/proxy`
 const BUNDLE_PATH_BASE = `${MOBIFY_PATH}/bundle`
@@ -19,25 +23,14 @@ const CACHING_PATH_BASE = `${MOBIFY_PATH}/caching`
 const HEALTHCHECK_PATH = `${MOBIFY_PATH}/ping`
 const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
-/**
- * @private
- */
-const _getNamespace = () => {
-    // TODO - namespaces for /mobify path will be implemented at a later date.
-    // Returns an empty string for now.
-    // Below is an example of what this implementation might look like.
-    /*
-        let {namespace = ""} = getConfig()
-        namespace = typeof namespace === 'function' ? namespace() : namespace
-        return namespace
-    */
-    return ''
+// TODO - Allow projects to define this function?
+export const getNamespace = () => {
+    const config = getConfig()
+    return config?.envBasePath ? config.envBasePath : ''
 }
 
-export const ssrNamespace = _getNamespace()
-
-export const proxyBasePath = `${ssrNamespace}${PROXY_PATH_BASE}`
-export const bundleBasePath = `${ssrNamespace}${BUNDLE_PATH_BASE}`
-export const cachingBasePath = `${ssrNamespace}${CACHING_PATH_BASE}`
-export const healthCheckPath = `${ssrNamespace}${HEALTHCHECK_PATH}`
-export const slasPrivateProxyPath = `${ssrNamespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
+export const proxyBasePath = () => `${getNamespace()}${PROXY_PATH_BASE}`
+export const bundleBasePath = () => `${getNamespace()}${BUNDLE_PATH_BASE}`
+export const cachingBasePath = () => `${getNamespace()}${CACHING_PATH_BASE}`
+export const healthCheckPath = () => `${getNamespace()}${HEALTHCHECK_PATH}`
+export const slasPrivateProxyPath = () => `${getNamespace()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`

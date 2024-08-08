@@ -46,6 +46,12 @@ const AppConfig = ({children, locals = {}}) => {
 
     const appOrigin = getAppOrigin()
 
+    const proxy = !onClient
+        ? `${appOrigin}${commerceApiConfig.proxyPath}`
+        : `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
+
+    const redirectURI = `${appOrigin}/callback`
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -54,10 +60,10 @@ const AppConfig = ({children, locals = {}}) => {
             siteId={locals.site?.id}
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
-            redirectURI={`${appOrigin}/callback`}
-            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            redirectURI={redirectURI}
+            proxy={proxy}
             headers={headers}
-            OCAPISessionsURL={`${appOrigin}${proxyBasePath}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
+            OCAPISessionsURL={`${appOrigin}${proxyBasePath()}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
             {{#if answers.project.commerce.isSlasPrivate}}
             // Set 'enablePWAKitPrivateClient' to true use SLAS private client login flows.
