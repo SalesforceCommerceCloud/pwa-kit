@@ -87,9 +87,9 @@ runs:
         PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
 
         for PACKAGE in "${PUBLIC_PACKAGES[@]}"; do
-          if echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/"; then
-            if ! echo "$CHANGED_FILES" | grep -q "^packages/$PACKAGE/changelog.md"; then
-              echo "Changelog.md was not updated for package $PACKAGE. Please update the changelog or add 'skip changelog' label to the PR."
+          if echo "$CHANGED_FILES" | grep -i "^packages/$PACKAGE/"; then
+            if ! echo "$CHANGED_FILES" | grep -iq "^packages/$PACKAGE/CHANGELOG.md"; then
+              echo "CHANGELOG.md was not updated for package $PACKAGE. Please update the CHANGELOG.md or add 'skip changelog' label to the PR."
               exit 1
             fi
           fi
