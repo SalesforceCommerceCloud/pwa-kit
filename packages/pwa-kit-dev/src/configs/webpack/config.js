@@ -40,7 +40,8 @@ const INSPECT = process.execArgv.some((arg) => /^--inspect(?:-brk)?(?:$|=)/.test
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
-const appConfig = getConfig()
+const {app: appConfig} = getConfig()
+const {extensions = []} = appConfig
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -201,9 +202,17 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        '@salesforce/extension-sample/setup-app': `${projectDir}/node_modules/@salesforce/extension-sample/setup-app.js`,
-                        '@salesforce/extension-store-finder/setup-app': `${projectDir}/node_modules/@salesforce/extension-store-finder/setup-app.js`,
-
+                        // Create alias's for all the extensions as they are being imported from the SDK package and cannot be
+                        // resolved from that location.
+                        ...extensions.reduce((acc, extension) => ({
+                            ...acc,
+                            [`${extension}/setup-app`]: path.resolve(
+                                projectDir,
+                                'node_modules',
+                                `${extension}`,
+                                'setup-app.js'
+                            )
+                        }), {}),
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
