@@ -19,9 +19,7 @@ export const HideOnDesktop = ({children, ...rest}) => (
     </Box>
 )
 HideOnDesktop.propTypes = {
-    children: PropTypes.node,
-    display: PropTypes.object,
-    rest: PropTypes.object
+    children: PropTypes.node
 }
 
 /**
@@ -35,9 +33,7 @@ export const HideOnMobile = ({children, ...rest}) => (
     </Box>
 )
 HideOnMobile.propTypes = {
-    children: PropTypes.node,
-    display: PropTypes.object,
-    rest: PropTypes.object
+    children: PropTypes.node
 }
 
 export default {HideOnMobile, HideOnDesktop}
