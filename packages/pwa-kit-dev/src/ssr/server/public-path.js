@@ -21,8 +21,8 @@
  *
  * Resolve this to allow the local development server to use namespaces.
  *
- * import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
- * const getPublicPath = () => `${bundleBasePath()}/development/`
+ * import {getBundlePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+ * const getPublicPath = () => `${getBundlePath()}/development/`
  * console.log(getPublicPath())
  *
  * __webpack_public_path__ = getPublicPath()

@@ -29,8 +29,18 @@ export const getEnvBasePath = () => {
     return config?.envBasePath ? config.envBasePath : ''
 }
 
-export const proxyBasePath = () => `${getEnvBasePath()}${PROXY_PATH_BASE}`
-export const bundleBasePath = () => `${getEnvBasePath()}${BUNDLE_PATH_BASE}`
-export const cachingBasePath = () => `${getEnvBasePath()}${CACHING_PATH_BASE}`
-export const healthCheckPath = () => `${getEnvBasePath()}${HEALTHCHECK_PATH}`
-export const slasPrivateProxyPath = () => `${getEnvBasePath()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
+export const getProxyPath = () => `${getEnvBasePath()}${PROXY_PATH_BASE}`
+export const getBundlePath = () => `${getEnvBasePath()}${BUNDLE_PATH_BASE}`
+export const getCachingPath = () => `${getEnvBasePath()}${CACHING_PATH_BASE}`
+export const getHealthCheckPath = () => `${getEnvBasePath()}${HEALTHCHECK_PATH}`
+export const getSlasPrivateProxyPath = () => `${getEnvBasePath()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
+
+// Keeping these around as their removal might be a breaking change?
+/**  * @deprecated   */
+export const proxyBasePath = `${getEnvBasePath()}${PROXY_PATH_BASE}`
+export const bundleBasePath = `${getEnvBasePath()}${BUNDLE_PATH_BASE}`
+export const cachingBasePath = `${getEnvBasePath()}${CACHING_PATH_BASE}`
+export const healthCheckPath = `${getEnvBasePath()}${HEALTHCHECK_PATH}`
+export const slasPrivateProxyPath = `${getEnvBasePath()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
+
+

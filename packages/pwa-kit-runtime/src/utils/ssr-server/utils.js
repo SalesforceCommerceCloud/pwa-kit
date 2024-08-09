@@ -12,7 +12,7 @@
 
 import crypto from 'crypto'
 import {proxyConfigs} from '../ssr-shared'
-import {proxyBasePath, bundleBasePath} from '../ssr-namespace-paths'
+import {getProxyPath, getBundlePath} from '../ssr-namespace-paths'
 import logger from '../logger-instance'
 
 // TODO: Clean this up or provide a way to toggle
@@ -22,7 +22,7 @@ export const isRemote = () =>
     Object.prototype.hasOwnProperty.call(process.env, 'AWS_LAMBDA_FUNCTION_NAME')
 
 export const getBundleBaseUrl = () => {
-    return `${bundleBasePath()}/${isRemote() ? process.env.BUNDLE_ID : 'development'}/`
+    return `${getBundlePath()}/${isRemote() ? process.env.BUNDLE_ID : 'development'}/`
 }
 
 let QUIET = false
@@ -88,13 +88,13 @@ export const getHashForString = (text) => {
 export const getFullRequestURL = (url) => {
     // If it starts with a protocol (e.g. http(s)://, file://), then it's already a full URL
     if (/^[a-zA-Z]+:\/\//.test(url)) return url
-    const proxy = proxyConfigs.find(({path}) => url.startsWith(`${proxyBasePath()}/${path}/`))
+    const proxy = proxyConfigs.find(({path}) => url.startsWith(`${getProxyPath()}/${path}/`))
     if (proxy) {
-        return url.replace(`${proxyBasePath()}/${proxy.path}`, `${proxy.protocol}://${proxy.host}`)
+        return url.replace(`${getProxyPath()}/${proxy.path}`, `${proxy.protocol}://${proxy.host}`)
     }
 
     throw new Error(
-        `Unable to fetch ${url}, relative paths must begin with ${proxyBasePath()} followed by a configured proxy path.`
+        `Unable to fetch ${url}, relative paths must begin with ${getProxyPath()} followed by a configured proxy path.`
     )
 }
 
