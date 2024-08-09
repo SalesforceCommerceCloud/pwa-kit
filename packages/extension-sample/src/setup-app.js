@@ -7,14 +7,16 @@
 
 import loadable from '@loadable/component'
 
-const StoreFinderPage = loadable(() => import('./pages/store-finder-page'))
+const SamplePage = loadable(() => import('./pages/sample'))
 
 export default (App) => {
     App.addRoutes([
         {
             exact: true,
-            path: '/store-finder-page',
-            component: StoreFinderPage
+            path: '/sample-page',
+            component: SamplePage
         }
     ])
 }
+
+

@@ -309,14 +309,12 @@ const renderApp = (args) => {
     let bundles = []
     /* istanbul ignore next */
     if (extractor) {
-        debugger
         bundles = extractor.getScriptElements().map((el) =>
             React.cloneElement(el, {
                 ...el.props,
                 ...scriptProps
             })
         )
-        // console.log('bundles: ', bundles)
     }
 
     const helmet = Helmet.renderStatic()
@@ -363,6 +361,7 @@ const renderApp = (args) => {
     const helmetHeadTags = VALID_TAG_NAMES.map(
         (tag) => helmet[tag] && helmet[tag].toComponent()
     ).filter((tag) => tag)
+    console.log(...helmetHeadTags)
 
     const html = ReactDOMServer.renderToString(
         <Document

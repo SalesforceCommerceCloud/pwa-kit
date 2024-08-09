@@ -5,14 +5,24 @@
     "scripts": {
     },
     "peerDependencies": {
-        "@loadable/component": "^5.15.3",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+      "@ant-design/icons": "^5.4.0", 
+      "@loadable/component": "^5.15.3",
+      "antd": "^5.20.0",
+      "leaflet": "^1.9.4",
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "react-helmet": "^6.1.0",
+      "react-leaflet": "^4.2.1"
     },
     "devDependencies": {
+      "@ant-design/icons": "^5.4.0", 
       "@loadable/component": "^5.15.3",
+      "antd": "^5.20.0",
+      "leaflet": "^1.9.4",
       "react": "^18.2.0",
-      "react-dom": "^18.2.0"
+      "react-dom": "^18.2.0",
+      "react-helmet": "^6.1.0",
+      "react-leaflet": "^4.2.1"
     },
     "engines": {
       "node": "^16.11.0 || ^18.0.0 || ^20.0.0",

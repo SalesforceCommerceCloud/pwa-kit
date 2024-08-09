@@ -210,6 +210,7 @@ const baseConfig = (target) => {
                                 projectDir,
                                 'node_modules',
                                 `${extension}`,
+                                'src',
                                 'setup-app.js'
                             )
                         }), {}),
