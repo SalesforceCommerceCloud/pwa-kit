@@ -3,6 +3,9 @@
 ### Bug Fixes
 - The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
 
+### Accessibility Improvements
+- A11y: Fix search bar header element focus order [#1969](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1969)
+
 ## v4.0.0 (Aug 7, 2024)
 
 ### New Features
