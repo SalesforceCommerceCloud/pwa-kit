@@ -42,5 +42,3 @@ export const bundleBasePath = `${getEnvBasePath()}${BUNDLE_PATH_BASE}`
 export const cachingBasePath = `${getEnvBasePath()}${CACHING_PATH_BASE}`
 export const healthCheckPath = `${getEnvBasePath()}${HEALTHCHECK_PATH}`
 export const slasPrivateProxyPath = `${getEnvBasePath()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
-
-
