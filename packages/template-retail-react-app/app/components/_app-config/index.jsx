@@ -27,7 +27,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getNamespace, proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getEnvBasePath, proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
@@ -63,7 +63,7 @@ const AppConfig = ({children, locals = {}}) => {
     // as the namespace is omitted from MRT server side endpoints
     const proxy = !isLocalhost && !onClient
         ? `${appOrigin}${commerceApiConfig.proxyPath}`
-        : `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
+        : `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
 
     const redirectURI = `${appOrigin}/callback`
 

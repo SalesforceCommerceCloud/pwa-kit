@@ -24,13 +24,13 @@ const HEALTHCHECK_PATH = `${MOBIFY_PATH}/ping`
 const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
 // TODO - Allow projects to define this function?
-export const getNamespace = () => {
+export const getEnvBasePath = () => {
     const config = getConfig()
     return config?.envBasePath ? config.envBasePath : ''
 }
 
-export const proxyBasePath = () => `${getNamespace()}${PROXY_PATH_BASE}`
-export const bundleBasePath = () => `${getNamespace()}${BUNDLE_PATH_BASE}`
-export const cachingBasePath = () => `${getNamespace()}${CACHING_PATH_BASE}`
-export const healthCheckPath = () => `${getNamespace()}${HEALTHCHECK_PATH}`
-export const slasPrivateProxyPath = () => `${getNamespace()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
+export const proxyBasePath = () => `${getEnvBasePath()}${PROXY_PATH_BASE}`
+export const bundleBasePath = () => `${getEnvBasePath()}${BUNDLE_PATH_BASE}`
+export const cachingBasePath = () => `${getEnvBasePath()}${CACHING_PATH_BASE}`
+export const healthCheckPath = () => `${getEnvBasePath()}${HEALTHCHECK_PATH}`
+export const slasPrivateProxyPath = () => `${getEnvBasePath()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
