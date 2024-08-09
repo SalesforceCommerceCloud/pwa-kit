@@ -5,11 +5,13 @@ var Status = require('dw/system/Status');
 var Site = require('dw/system/Site');
 var {
     getCookie,
-    removeCookie,
     setCookiesToResponse
 } = require('*/cartridge/scripts/helpers/utils');
 var Fetch = require('*/cartridge/scripts/services/fetch');
 
+var slasAuthHelper = require('*/cartridge/scripts/helpers/slasAuthHelper');
+var slasAuthService = require('*/cartridge/scripts/services/SLASAuthService');
+var config = require('*/cartridge/scripts/config/SLASConfig');
 var currentSite = Site.getCurrent();
 var multiSiteSupportEnabled =
     currentSite.getCustomPreferenceValue('supportMultiSite');
@@ -28,7 +30,7 @@ function isContextGuardActive() {
     var isShopperContextChecked = getCookie(SHOPPER_CONTEXT);
     // var contextGuardCookie = getCookie(CONTEXT_GUARD_COOKIE_NAME);
     var hasContextSet =
-        (isShopperContextChecked && isShopperContextChecked.value === '0');
+        isShopperContextChecked && isShopperContextChecked.value === '0';
     // removeCookie(CONTEXT_GUARD_COOKIE_NAME, response);
     return hasContextSet;
 }
@@ -83,17 +85,51 @@ exports.onRequest = function () {
         return new Status(Status.OK);
     }
     var cookiesToSet = {};
-    var token_part_1 = getCookie(ACCESS_TOKEN_COOKIE_NAME);
-    var token_part_2 = getCookie(ACCESS_TOKEN_COOKIE_NAME_2);
-    var token = '';
+    var tokenData = {};
+    var guestRefreshTokenCookie = slasAuthHelper.getCookie(
+        config.REFRESH_TOKEN_COOKIE_NAME_GUEST
+    );
+    var registeredRefreshTokenCookie = slasAuthHelper.getCookie(
+        config.REFRESH_TOKEN_COOKIE_NAME_REGISTERED
+    );
+
+    var isNewGuestShopper =
+        !guestRefreshTokenCookie && !registeredRefreshTokenCookie;
+    if (isNewGuestShopper) {
+        if (config.USE_DWGST) {
+            tokenData = slasAuthHelper.getSLASAccessTokenForGuestSessionBridge(
+                session.generateGuestSessionSignature()
+            );
+        } else {
+            tokenData = slasAuthHelper.getSLASAccessTokenForGuestSessionBridge(
+                request.httpHeaders.get('x-is-session_id')
+            );
+        }
+    } else {
+        tokenData = slasAuthService.getAccessToken({
+            grant_type: config.GRANT_TYPE_REFRESH_TOKEN,
+            refresh_token: registeredRefreshTokenCookie
+                ? registeredRefreshTokenCookie.value
+                : guestRefreshTokenCookie.value
+        });
+    }
+    var refreshTokenCookieToSet = registeredRefreshTokenCookie
+        ? config.REFRESH_TOKEN_COOKIE_NAME_REGISTERED
+        : config.REFRESH_TOKEN_COOKIE_NAME_GUEST;
+    cookiesToSet[refreshTokenCookieToSet] = {
+        value: tokenData.refresh_token,
+        maxAge: tokenData.refresh_token_expires_in
+    };
+
     var usidCookieName = 'usid_' + currentSite.ID;
     var usid = getCookie(usidCookieName);
-    if (token_part_1 && token_part_2) {
-        token = token_part_1.value + token_part_2.value;
-    }
 
-    if (token) {
-        var context = getShopperContext(usid.value, token, currentSite.ID);
+    if (tokenData.access_token) {
+        var context = getShopperContext(
+            usid.value,
+            tokenData.access_token,
+            currentSite.ID
+        );
         if (context) {
             session.setSourceCode(context.sourceCode);
         }
