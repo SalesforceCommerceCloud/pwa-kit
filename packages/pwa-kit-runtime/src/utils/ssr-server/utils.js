@@ -88,7 +88,7 @@ export const getHashForString = (text) => {
 export const getFullRequestURL = (url) => {
     // If it starts with a protocol (e.g. http(s)://, file://), then it's already a full URL
     if (/^[a-zA-Z]+:\/\//.test(url)) return url
-    const proxy = proxyConfigs.find(({path}) => url.startsWith(`${(proxyBasePath())}/${path}/`))
+    const proxy = proxyConfigs.find(({path}) => url.startsWith(`${proxyBasePath()}/${path}/`))
     if (proxy) {
         return url.replace(`${proxyBasePath()}/${proxy.path}`, `${proxy.protocol}://${proxy.host}`)
     }

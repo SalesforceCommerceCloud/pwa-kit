@@ -61,9 +61,10 @@ const AppConfig = ({children, locals = {}}) => {
     // On localhost, we always want to include the namespace
     // On MRT, we only want to include the namespace on client side proxy requests
     // as the namespace is omitted from MRT server side endpoints
-    const proxy = !isLocalhost && !onClient
-        ? `${appOrigin}${commerceApiConfig.proxyPath}`
-        : `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
+    const proxy =
+        !isLocalhost && !onClient
+            ? `${appOrigin}${commerceApiConfig.proxyPath}`
+            : `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
 
     const redirectURI = `${appOrigin}/callback`
 
@@ -81,7 +82,9 @@ const AppConfig = ({children, locals = {}}) => {
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             // enablePWAKitPrivateClient={true}
-            OCAPISessionsURL={`${appOrigin}${proxyBasePath()}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
+            OCAPISessionsURL={`${appOrigin}${proxyBasePath()}/ocapi/s/${
+                locals.site?.id
+            }/dw/shop/v22_8/sessions`}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>

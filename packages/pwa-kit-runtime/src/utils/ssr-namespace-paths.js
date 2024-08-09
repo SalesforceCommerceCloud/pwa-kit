@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { getConfig } from './ssr-config'
+import {getConfig} from './ssr-config'
 
 /**
  * This file defines the /mobify paths used to set up our Express endpoints.
