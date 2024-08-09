@@ -9,14 +9,24 @@
  * This file is used to dynamically set the webpack public path used by HMR via the global webpack variable
  * __webpack_public_path__
  * See https://webpack.js.org/guides/public-path/
- *
- * Previously, we hard coded the public path in our webpack config to '/mobify/bundle/development/'
- * but we need something more dynamic to support namespaced /mobify paths.
  */
 
-import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-
 /* global __webpack_public_path__: writable */
-// TODO - this needs to be revisited on local environments as this is set
-// before we are able to read from the config file
-__webpack_public_path__ = `${bundleBasePath()}/development/`
+
+/**
+ * TODO - __webpack_public_path__ must be the first thing set on client side local environments
+ * for HMR to work!
+ * However, when this value needs to be set, window.__config__ is not yet hydrated so we
+ * do not have access to the base path
+ *
+ * Resolve this to allow the local development server to use namespaces.
+ *
+ * import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+ * const getPublicPath = () => `${bundleBasePath()}/development/`
+ * console.log(getPublicPath())
+ *
+ * __webpack_public_path__ = getPublicPath()
+ */
+
+// Setting this so that *.hot-update.json requests are resolving
+__webpack_public_path__ = '/mobify/bundle/development'

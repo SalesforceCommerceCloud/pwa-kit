@@ -56,8 +56,12 @@ const AppConfig = ({children, locals = {}}) => {
 
     const appOrigin = getAppOrigin()
 
-    // TODO - On local environments, we always want the namespace
-    const proxy = !onClient
+    const isLocalhost = appOrigin.includes('localhost')
+
+    // On localhost, we always want to include the namespace
+    // On MRT, we only want to include the namespace on client side proxy requests
+    // as the namespace is omitted from MRT server side endpoints
+    const proxy = !isLocalhost && !onClient
         ? `${appOrigin}${commerceApiConfig.proxyPath}`
         : `${appOrigin}${getNamespace()}${commerceApiConfig.proxyPath}`
 
