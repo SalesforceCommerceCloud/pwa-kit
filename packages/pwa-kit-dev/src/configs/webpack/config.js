@@ -201,7 +201,9 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
-                        './build/extensions': `${projectDir}/build/extensions.js`,
+                        '@salesforce/extension-sample/setup-app': `${projectDir}/node_modules/@salesforce/extension-sample/setup-app.js`,
+                        '@salesforce/extension-store-finder/setup-app': `${projectDir}/node_modules/@salesforce/extension-store-finder/setup-app.js`,
+
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
@@ -239,8 +241,6 @@ const baseConfig = (target) => {
                     }),
 
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
-
-                    mode === development && new VirtualModulesPlugin(virtualModulesConfig),
 
                     sdkReplacementPlugin(),
 
@@ -304,14 +304,6 @@ const withChunking = (config) => {
             minimize: mode === production,
             splitChunks: {
                 cacheGroups: {
-                    extensions: {
-                        test: (module) => {
-                            // console.log('test extension: ', module?.context, ' - ', module?.context?.match?.(/(node_modules\/.+\/\w+-extension)|(packages\/\w+-extension)/))
-                            return module?.context?.match?.(/(node_modules\/.+\/\w+-extension)|(packages\/\w+-extension)/)
-                        },
-                        name: 'extensions',
-                        chunks: 'all'
-                    },
                     vendor: {
                         // Three scenarios that we'd like to chunk vendor.js:
                         // 1. The package is in node_modules
@@ -446,24 +438,6 @@ const kebabToLowerCamelCase = (str) => {
         .join('');
 }
 
-const buildVirtualModuleConfig = (extensions = []) => {
-    // NOTES: 
-    // 1. Virtual module key can't start with '@'.
-    return {
-        [`${projectDir}/build/extensions`]: `
-
-            // All Extensions
-            ${extensions.map((extension) => `import ${kebabToUpperCamelCase(extension.split('\/')[1])} from '${extension}/setup-app'`).join('\n')}
-
-            export default {
-                ${extensions.map((extension) => `${kebabToLowerCamelCase(extension.split('\/')[1])}: ${kebabToUpperCamelCase(extension.split('\/')[1])}`).join(',\n')}
-            }
-        `
-    }
-}
-
-const virtualModulesConfig = buildVirtualModuleConfig(appConfig.app.extensions)
-
 const client =
     entryPointExists(['app', 'main']) &&
     baseConfig('web')
@@ -471,7 +445,7 @@ const client =
         .extend((config) => {
             // Add extensions to the main entry point
             config.module.rules.push({
-                test: /browser\/main/,
+                test: /universal\/extensions/,
                 loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
                 options: {
                     projectDir,
@@ -536,7 +510,7 @@ const renderer =
         .extend((config) => {
             // Add extensions to the react renderer
             config.module.rules.push({
-                test: /server\/react-rendering/,
+                test: /universal\/extensions/,
                 loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
                 options: {
                     projectDir
@@ -630,40 +604,7 @@ const requestProcessor =
         .build()
 
 
-const extensions =
-    mode === 'production' &&
-    baseConfig('web')
-        .extend(withChunking)
-        .extend((config) => {
-            const entryPoints = appConfig.app.extensions.map((extension) => {
-                return `${projectDir}/node_modules/${extension}/setup-app.js`
-            })
-
-            return {
-                ...config,
-                name: 'extensions',
-                // use source map to make debugging easier
-                devtool: mode === development ? 'source-map' : false,
-                entry: entryPoints,
-                output: {
-                    ...config.output,
-                    filename: 'extensions.js'
-                },
-                plugins: [
-                    ...config.plugins,
-                    new LoadablePlugin({writeToDisk: true}),
-                    analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
-                ].filter(Boolean),
-                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
-                performance: {
-                    hints: false
-                }
-            }
-        })
-        .extend(enableReactRefresh)
-        .build()
-
-module.exports = [extensions, client, ssr, renderer, clientOptional, requestProcessor]
+module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
     .filter(Boolean)
     .map((config) => {
         return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)

@@ -36,7 +36,7 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import PropTypes from 'prop-types'
 
 // NOTE: This values is replaces via a loader. Looking at ways to replace this loader.
-const Extensions = {}
+import Extensions from '../universal/extensions'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')

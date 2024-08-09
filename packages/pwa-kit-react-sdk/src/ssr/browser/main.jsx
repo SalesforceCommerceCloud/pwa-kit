@@ -19,11 +19,8 @@ import {getRoutes, routeComponent} from '../universal/components/route-component
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
 
-const Extensions = {}
+import Extensions from '../universal/extensions'
 
-// The above line will be replaced with `import Extensions from './extensions'` in a webpack loader.
-console.log('Main')
-console.log('Extensions: ', Extensions)
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
     return Promise.resolve().then(() => {
