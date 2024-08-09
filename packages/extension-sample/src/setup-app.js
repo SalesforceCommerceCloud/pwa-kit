@@ -5,10 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import React from 'react'
 import loadable from '@loadable/component'
 
 const SamplePage = loadable(() => import('./pages/sample'))
 
+/**
+ * 
+ */
 export default (App) => {
     App.addRoutes([
         {
@@ -17,6 +21,8 @@ export default (App) => {
             component: SamplePage
         }
     ])
+
+    return App
 }
 
 

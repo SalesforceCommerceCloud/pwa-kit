@@ -119,11 +119,16 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    const WrappedApp = routeComponent(App, false, locals)
+    let WrappedApp = routeComponent(App, false, locals)
     // Initialize all the react app extensions.
     Object.entries(Extensions).forEach(([name, initializer]) => {
         console.log(`Initializing the ${name} extension for CSR.`)
-        initializer(WrappedApp)
+        
+        WrappedApp = initializer(WrappedApp)
+
+        if (!WrappedApp) {
+            throw new Error(`App Extensions Violation: Extension 'name' failed to return App in 'setup-app.js'.`)
+        }
     })
 
     const props = {

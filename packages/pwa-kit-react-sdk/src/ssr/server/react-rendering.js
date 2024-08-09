@@ -120,23 +120,23 @@ export const getLocationSearch = (req, opts = {}) => {
  * @return {Promise}
  */
 export const render = async (req, res, next) => {
-    
-
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
 
     AppConfig.restore(res.locals)
 
-    // NOTE: Below isn't going to work exactly as written as the "initialRoutes" aren't routable components.
-    const initialRoutes = (App?.initialRoutes || [])
-    
-    const WrappedApp = routeComponent(App, false, res.locals)
+    let WrappedApp = routeComponent(App, false, res.locals)
 
     // Initialize all the react app extensions.
     Object.entries(Extensions).forEach(([name, initializer]) => {
         console.log(`Initializing the ${name} extension for SSR.`)
-        initializer(WrappedApp)
+        
+        WrappedApp = initializer(WrappedApp)
+
+        if (!WrappedApp) {
+            throw new Error(`App Extensions Violation: Extension 'name' failed to return App in 'setup-app.js'.`)
+        }
     })
 
     const routes = getRoutes(res.locals, WrappedApp.getRoutes())
@@ -361,7 +361,6 @@ const renderApp = (args) => {
     const helmetHeadTags = VALID_TAG_NAMES.map(
         (tag) => helmet[tag] && helmet[tag].toComponent()
     ).filter((tag) => tag)
-    console.log(...helmetHeadTags)
 
     const html = ReactDOMServer.renderToString(
         <Document

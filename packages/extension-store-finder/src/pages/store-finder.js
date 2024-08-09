@@ -56,7 +56,7 @@ const StoreFinder = () => {
     )
     setFilteredStores(filtered)
   }
-
+  
   return (
         <Layout>
             {/* <Helmet>

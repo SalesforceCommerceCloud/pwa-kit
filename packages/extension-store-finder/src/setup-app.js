@@ -6,9 +6,16 @@
  */
 
 import loadable from '@loadable/component'
+import withStyle from './components/with-style'
 
 const StoreFinderPage = loadable(() => import('./pages/store-finder'))
 
+const isServer = typeof window === "undefined"
+
+
+/**
+ * 
+ */
 export default (App) => {
     App.addRoutes([
         {
@@ -17,4 +24,6 @@ export default (App) => {
             component: StoreFinderPage
         }
     ])
+
+    return isServer ? withStyle(App) : App
 }
