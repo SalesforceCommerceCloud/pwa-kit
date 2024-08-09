@@ -1,4 +1,6 @@
-## v3.7.0-dev (Jun 25, 2024)
+## v3.8.0-dev (Aug 8, 2024)
+
+## v3.7.0 (Aug 7, 2024)
 
 - Update default Node.js version to v20. [#1867](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1867/files)
 
