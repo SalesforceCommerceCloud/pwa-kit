@@ -10,9 +10,6 @@ import withStyle from './components/with-style'
 
 const StoreFinderPage = loadable(() => import('./pages/store-finder'))
 
-const isServer = typeof window === "undefined"
-
-
 /**
  * 
  */
@@ -25,5 +22,5 @@ export default (App) => {
         }
     ])
 
-    return isServer ? withStyle(App) : App
+    return withStyle(App)
 }

@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import {createCache, extractStyle, StyleProvider,} from '@ant-design/cssinjs'
 import {Helmet} from 'react-helmet'
 
+const isServer = typeof window === 'undefined'
 const cache = createCache()
 
 // Private
@@ -30,34 +31,35 @@ const parseAttributes = (attributeString) => {
 const withStyle = (Wrapped) => {
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
-    
+   
     /**
      * @private
      */
-    class WithStyle extends React.Component {
+    const WithStyle = (props) => {
+        const [styleText, setStyleText] = useState(extractStyle(cache))
+        const regex = /<style([^>]*)>([\s\S]*?)<\/style>/gi
+        const matches = [...styleText.matchAll(regex)]
+        
+        useEffect(() => {
+            setStyleText(extractStyle(cache))
+        }, [])
 
-        render() {
-            const styleText = extractStyle(cache)
-            const regex = /<style([^>]*)>([\s\S]*?)<\/style>/gi
-            const matches = [...styleText.matchAll(regex)]
+        return (
+            <StyleProvider cache={cache}>
+                <Helmet>
+                    {
+                        matches.map((match, index) => {
+                            const rawAttributes = match[1].trim()
+                            const innerHTML = match[2].trim()
+                            const attributes = parseAttributes(rawAttributes)
 
-            return (
-                <StyleProvider cache={cache}>
-                    <Helmet>
-                        {
-                            matches.map((match, index) => {
-                                const rawAttributes = match[1].trim()
-                                const innerHTML = match[2].trim()
-                                const attributes = parseAttributes(rawAttributes)
-
-                                return <style {...attributes} key={`antd_${index}`}>{innerHTML}</style>
-                            })
-                        }
-                    </Helmet>
-                    <Wrapped {...this.props} />
-                </StyleProvider>
-            )
-        }
+                            return <style {...attributes} key={`antd_${index}`}>{innerHTML}</style>
+                        })
+                    }
+                </Helmet>
+                <Wrapped {...props} />
+            </StyleProvider>
+        )
     }
 
     WithStyle.displayName = `withStyle(${wrappedComponentName})`

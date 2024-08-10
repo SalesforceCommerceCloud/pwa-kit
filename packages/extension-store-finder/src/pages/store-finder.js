@@ -92,12 +92,10 @@ const StoreFinder = () => {
                         />
                     </Col>
                     <Col span={12}>
-                        {typeof window !== "undefined" && 
-                            <LoadableMapComponent 
-                                containerProps={{center: [40.748817, -73.985428], zoom: 2}} 
-                                markers={filteredStores.map((store, index) => ({name: store.name, text: store.address, position: store.coordinates, }))}
-                            />
-                        }
+                        <LoadableMapComponent 
+                            containerProps={{center: [40.748817, -73.985428], zoom: 2}} 
+                            markers={filteredStores.map((store, index) => ({name: store.name, text: store.address, position: store.coordinates, }))}
+                        />
                     </Col>
                 </Row>
             </Content>
