@@ -1,13 +1,15 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
 import React, {useState} from "react"
 import {Helmet} from 'react-helmet'
 import {Layout, Input, List, Card, Col, Row} from "antd"
 import {EnvironmentOutlined} from "@ant-design/icons"
+import LoadableMapComponent from '../components/loadable-map'
 // import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 // import "leaflet/dist/leaflet.css";
 // import L from "leaflet";
@@ -59,9 +61,9 @@ const StoreFinder = () => {
   
   return (
         <Layout>
-            {/* <Helmet>
+            <Helmet>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-            </Helmet> */}
+            </Helmet>
             <Header style={{ color: "white", fontSize: "24px", textAlign: "center" }}>
                 Store Finder
             </Header>
@@ -90,24 +92,12 @@ const StoreFinder = () => {
                         />
                     </Col>
                     <Col span={12}>
-                    {/* <MapContainer
-                    center={[40.748817, -73.985428]} // Default to New York coordinates
-                    zoom={2}
-                    style={{ height: "400px", width: "100%" }}
-                    >
-                    <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    />
-                    {filteredStores.map((store, index) => (
-                        <Marker key={index} position={store.coordinates}>
-                        <Popup>
-                            <strong>{store.name}</strong><br />
-                            {store.address}
-                        </Popup>
-                        </Marker>
-                    ))}
-                    </MapContainer> */}
+                        {typeof window !== "undefined" && 
+                            <LoadableMapComponent 
+                                containerProps={{center: [40.748817, -73.985428], zoom: 2}} 
+                                markers={filteredStores.map((store, index) => ({name: store.name, text: store.address, position: store.coordinates, }))}
+                            />
+                        }
                     </Col>
                 </Row>
             </Content>
