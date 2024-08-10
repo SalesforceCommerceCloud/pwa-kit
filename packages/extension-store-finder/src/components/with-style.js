@@ -53,7 +53,7 @@ const withStyle = (Wrapped) => {
                             const innerHTML = match[2].trim()
                             const attributes = parseAttributes(rawAttributes)
 
-                            return <style {...attributes} key={`antd_${index}`}>{innerHTML}</style>
+                            return <style key={`antd_${index}`} {...attributes}>{innerHTML}</style>
                         })
                     }
                 </Helmet>

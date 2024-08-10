@@ -49,17 +49,17 @@ const stores = [
  * @returns 
  */
 const StoreFinder = () => {
-  const [filteredStores, setFilteredStores] = useState(stores)
+    const [filteredStores, setFilteredStores] = useState(stores)
 
-  const handleSearch = (value) => {
-    const filtered = stores.filter((store) =>
-      store.name.toLowerCase().includes(value.toLowerCase()) ||
-      store.address.toLowerCase().includes(value.toLowerCase())
-    )
-    setFilteredStores(filtered)
-  }
-  
-  return (
+    const handleSearch = (value) => {
+        const filtered = stores.filter((store) =>
+        store.name.toLowerCase().includes(value.toLowerCase()) ||
+        store.address.toLowerCase().includes(value.toLowerCase())
+        )
+        setFilteredStores(filtered)
+    }
+
+    return (
         <Layout>
             <Helmet>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
