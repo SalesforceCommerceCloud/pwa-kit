@@ -13,7 +13,7 @@ const StoreFinderPage = loadable(() => import('./pages/store-finder'))
 /**
  * 
  */
-export default (App) => {
+export default ({App}) => {
     App.addRoutes([
         {
             exact: true,

@@ -24,8 +24,6 @@ import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-import VirtualModulesPlugin from 'webpack-virtual-modules'
-
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
@@ -448,24 +446,6 @@ const enableReactRefresh = (config) => {
             publicPath: '/mobify/bundle/development/'
         }
     }
-}
-
-const kebabToUpperCamelCase = (str) => {
-    return str
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join('');
-}
-
-const kebabToLowerCamelCase = (str) => {
-    return str
-        .split('-')
-        .map((word, index) => 
-            index === 0 
-                ? word.toLowerCase() 
-                : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        )
-        .join('');
 }
 
 const client =

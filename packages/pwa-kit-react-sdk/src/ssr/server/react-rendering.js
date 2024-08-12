@@ -132,7 +132,9 @@ export const render = async (req, res, next) => {
     Object.entries(Extensions).forEach(([name, initializer]) => {
         console.log(`Initializing the ${name} extension for SSR.`)
         
-        WrappedApp = initializer(WrappedApp)
+        WrappedApp = initializer({
+            App: WrappedApp
+        })
 
         if (!WrappedApp) {
             throw new Error(`App Extensions Violation: Extension 'name' failed to return App in 'setup-app.js'.`)

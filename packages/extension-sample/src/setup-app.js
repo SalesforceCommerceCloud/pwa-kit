@@ -13,7 +13,7 @@ const SamplePage = loadable(() => import('./pages/sample'))
 /**
  * 
  */
-export default (App) => {
+export default ({App}) => {
     App.addRoutes([
         {
             exact: true,

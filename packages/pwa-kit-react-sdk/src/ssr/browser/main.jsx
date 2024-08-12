@@ -124,7 +124,10 @@ export const start = () => {
     Object.entries(Extensions).forEach(([name, initializer]) => {
         console.log(`Initializing the ${name} extension for CSR.`)
         
-        WrappedApp = initializer(WrappedApp)
+        WrappedApp = initializer({
+            App: WrappedApp
+            // Pass in as an object so we have the option to widen the API so we include things like the AppConfig, Document, Error, etc.
+        })
 
         if (!WrappedApp) {
             throw new Error(`App Extensions Violation: Extension 'name' failed to return App in 'setup-app.js'.`)
