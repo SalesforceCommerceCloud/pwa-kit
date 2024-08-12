@@ -3,6 +3,7 @@
     "version": "1.0.0-dev",
     "private": false,
     "scripts": {
+      "build-css": "node ./scripts/getAntdCss.js"
     },
     "dependencies": {
       "@ant-design/cssinjs": "^1.21.0",
@@ -11,6 +12,7 @@
     "peerDependencies": {
       "@ant-design/icons": "^5.4.0", 
       "@loadable/component": "^5.15.3",
+      "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
       "antd": "^5.20.0",
       
       "leaflet": "^1.9.4",
@@ -21,6 +23,8 @@
     },
     "devDependencies": {
       "@ant-design/icons": "^5.4.0", 
+      "@ant-design/static-style-extract": "^1.0.2",
+      "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
       "@loadable/component": "^5.15.3",
       "antd": "^5.20.0",
       "leaflet": "^1.9.4",

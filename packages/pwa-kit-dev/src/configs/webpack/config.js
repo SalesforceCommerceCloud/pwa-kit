@@ -358,6 +358,26 @@ const staticFolderCopyPlugin = new CopyPlugin({
     ]
 })
 
+const extensionsStaticFolderCopyPlugin = new CopyPlugin({
+    patterns: [
+        {
+            from: path
+                .resolve(`node_modules/@salesforce/extension-sample/assets`)
+                .replace(/\\/g, '/'),
+            to: `static/extension-sample/`,
+            noErrorOnMissing: true
+        },
+        {
+            from: path
+                .resolve(`node_modules/@salesforce/extension-store-finder/assets`)
+                .replace(/\\/g, '/'),
+            to: `static/extension-store-finder/`,
+            noErrorOnMissing: true
+        }
+    ]
+})
+
+
 const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
@@ -545,6 +565,7 @@ const renderer =
                 plugins: [
                     ...config.plugins,
                     staticFolderCopyPlugin,
+                    extensionsStaticFolderCopyPlugin,
                     // Keep this on the slowest-to-build item - the server-side bundle.
                     new WebpackNotifierPlugin({
                         title: `PWA Kit Project: ${pkg.name}`,
@@ -579,6 +600,7 @@ const ssr = (() => {
                     plugins: [
                         ...config.plugins,
                         staticFolderCopyPlugin,
+                        extensionsStaticFolderCopyPlugin,
                         analyzeBundle && getBundleAnalyzerPlugin(SSR)
                     ].filter(Boolean)
                 }
