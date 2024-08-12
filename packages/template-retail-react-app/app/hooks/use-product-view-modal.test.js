@@ -92,30 +92,6 @@ describe('useProductViewModal hook', () => {
         })
     })
 
-    test("update product's related url param when the product content is shown", () => {
-        const history = createMemoryHistory()
-        history.push('/test/path?color=BLACKFB')
-
-        renderWithProviders(
-            <Router history={history}>
-                <IntlProvider
-                    locale={DEFAULT_LOCALE}
-                    defaultLocale={DEFAULT_LOCALE}
-                    messages={messages}
-                >
-                    <MockComponent product={mockProductDetail} />
-                </IntlProvider>
-            </Router>
-        )
-        const toggleButton = screen.getByText(/Toggle the content/)
-        fireEvent.click(toggleButton)
-        expect(history.location.pathname).toBe('/test/path')
-        const searchParams = new URLSearchParams(history.location.search)
-        expect(searchParams.get('color')).toBe('BLACKFB')
-        expect(searchParams.get('width')).toBe('V')
-        expect(searchParams.get('pid')).toBe('750518699578M')
-    })
-
     test("clean up product's related url param when unmounting product content", () => {
         const history = createMemoryHistory()
         history.push('/test/path')

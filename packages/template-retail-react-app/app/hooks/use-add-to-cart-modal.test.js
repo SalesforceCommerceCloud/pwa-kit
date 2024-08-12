@@ -13,6 +13,11 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import {screen} from '@testing-library/react'
 import {rest} from 'msw'
 import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {
+    mockProductBundle,
+    mockBundleItemsAdded
+} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -622,4 +627,46 @@ test('Do not render when isOpen is false', () => {
     )
 
     expect(queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
+})
+
+test('renders product bundle', () => {
+    const MOCK_DATA = {
+        product: mockProductBundle,
+        itemsAdded: mockBundleItemsAdded,
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByText(mockProductBundle.name)).toBeInTheDocument()
+    expect(screen.getByRole('dialog', {name: /1 item added to cart/i})).toBeInTheDocument()
+
+    // bundle data is displayed in 1 row
+    const numOfRowsRendered = screen.getAllByTestId('product-added').length
+    expect(numOfRowsRendered).toBe(1)
+
+    // modal displays product name of children and variant selection
+    mockBundleItemsAdded.forEach(({product, variant, quantity}) => {
+        const displayedName = quantity > 1 ? `${product.name} (${quantity})` : product.name
+        expect(screen.getByText(displayedName)).toBeInTheDocument()
+
+        const variationAttributeValues = getDisplayVariationValues(
+            product.variationAttributes,
+            variant.variationValues
+        )
+
+        // Looks for text displaying variant ('Color: Black' or 'Size: S') in modal
+        Object.entries(variationAttributeValues).forEach(([name, value]) => {
+            expect(screen.getAllByText(`${name}: ${value}`)[0]).toBeInTheDocument()
+        })
+    })
 })

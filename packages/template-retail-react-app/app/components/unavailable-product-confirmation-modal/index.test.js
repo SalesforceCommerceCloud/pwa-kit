@@ -113,9 +113,22 @@ describe('UnavailableProductConfirmationModal', () => {
             }
         ])
         const mockFunc = jest.fn()
+        const basket = {
+            productItems: [
+                {
+                    productId: '701642889830M',
+                    quantity: 2
+                },
+                // unavailable product
+                {
+                    productId: '701642889829M',
+                    quantity: 3
+                }
+            ]
+        }
         const {getByText, queryByText, queryByRole, user} = renderWithProviders(
             <UnavailableProductConfirmationModal
-                productIds={mockProductIds}
+                productItems={basket.productItems}
                 handleUnavailableProducts={mockFunc}
             />
         )

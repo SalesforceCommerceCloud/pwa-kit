@@ -1,18 +1,34 @@
-## v3.1.0-dev (Jun 25, 2024)
+## v4.1.0-dev (Aug 8, 2024)
+
+### Bug Fixes
+- The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
+
+### Accessibility Improvements
+- A11y: Fix search bar header element focus order [#1969](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1969)
+
+## v4.0.0 (Aug 7, 2024)
+
+### New Features
+
+- Support product bundles [#1916](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1916/)
+- Add Store Locator [#1922](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1922)
 
 ### Bug Fixes
 
 - Update serialized query data via `beforeHydrate` to prevent data re-fetching on load [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)
-- A11y: Add aria-label to the address form based on the address type [#1904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1904)
-- A11y: Account Nav fixes [#1884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1884)
-- A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
-- Out of stock and low stock items are removed from cart and checkout as unavailable products [#1865](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1865)
+- Out of stock and low stock items are removed from cart and checkout as unavailable products [#1881](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1881)
 - Fix infinity sign price on product tile [#1903](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1903)
+- Remove unecessary params from product search [#1873](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1873)
 
 ### Accessibility Improvements
 
 - Improve accessibility readout for strikethrough price on shipping options in checkout page [#1892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1892)
 - Ensure credit card informational tooltip on checkout page persists after the user is no longer hovering over it [#1890](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1890)
+- A11y: Add aria-label to the address form based on the address type [#1904](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1904)
+- A11y: Account Nav fixes [#1884](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1884)
+- A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
+- Add aria-label for Checkout's action buttons [#1906](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1906)
+- Avoid forced focus changes that are not user-initiated [#1940](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1940)
 
 ## v3.0.2 (Jul 11, 2024)
 
