@@ -30,7 +30,11 @@ const withStyle = (Wrapped) => {
                         flash of unstyled content. We stried inlining the style but it also doesn't work well 
                         with our rendering pattern.
                     */}
-                    <link rel="stylesheet" href={getAssetUrl('static/extension-store-finder/antd.min.css')} />
+                    {/* 
+                        NOTE: Update code to only load on css file based on current mode.
+                    */}
+                    <link rel="stylesheet" href={getAssetUrl('static/extension-store-finder/antd.dev.min.css')} />
+                    <link rel="stylesheet" href={getAssetUrl('static/extension-store-finder/antd.prod.min.css')} />
                 </Helmet>
                 <Wrapped {...props} />
             </StyleProvider>
