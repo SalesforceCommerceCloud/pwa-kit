@@ -11,17 +11,13 @@ var Fetch = require('*/cartridge/scripts/services/fetch');
 
 var slasAuthHelper = require('*/cartridge/scripts/helpers/slasAuthHelper');
 var slasAuthService = require('*/cartridge/scripts/services/SLASAuthService');
+if (!slasAuthHelper || !slasAuthHelper) {
+    throw new Error('Please include plugin_slas');
+}
 var config = require('*/cartridge/scripts/config/SLASConfig');
 var currentSite = Site.getCurrent();
-var multiSiteSupportEnabled =
-    currentSite.getCustomPreferenceValue('supportMultiSite');
 
 var CONTEXT_CHECK_COOKIE_AGE = 30 * 60;
-var CONTEXT_GUARD_COOKIE_NAME = 'cc-context-guard';
-var ACCESS_TOKEN_COOKIE_NAME = multiSiteSupportEnabled
-    ? 'cc-at_' + currentSite.ID
-    : 'cc-at';
-var ACCESS_TOKEN_COOKIE_NAME_2 = ACCESS_TOKEN_COOKIE_NAME + '_2';
 var { SHORT_CODE, ORGID } = require('*/cartridge/scripts/config/constant');
 var GET_SERVICE = 'plugin_shopper_context.generic.get';
 var SHOPPER_CONTEXT = 'shopper_context_RefArch';
@@ -74,6 +70,9 @@ function getShopperContext(usid, token, siteId) {
 }
 
 exports.onRequest = function () {
+    var dwsid = getCookie('dwsid');
+    // wait until session is bridge before starting to bridge shopper context
+    if (!dwsid) return;
     var isShopperContextChecked = getCookie(SHOPPER_CONTEXT);
     // clear out any context if there is no context detected
     if (!isShopperContextChecked) {

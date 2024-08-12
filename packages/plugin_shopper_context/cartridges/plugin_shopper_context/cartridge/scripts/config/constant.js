@@ -9,7 +9,7 @@ var CLIENT_REGISTRY = {
         allowSourceCode: true,
         allowCustomerGroupIds: false,
         allowEffectiveDateTime: false,
-        allowCustomQualifiers: false,
+        allowCustomQualifiers: true,
         allowAssignmentQualifiers: false,
         allowClientIp: false,
         allowGeoLocation: false
@@ -18,7 +18,7 @@ var CLIENT_REGISTRY = {
         allowSourceCode: true,
         allowCustomerGroupIds: false,
         allowEffectiveDateTime: false,
-        allowCustomQualifiers: false,
+        allowCustomQualifiers: true,
         allowAssignmentQualifiers: false,
         allowClientIp: false,
         allowGeoLocation: false
@@ -27,7 +27,7 @@ var CLIENT_REGISTRY = {
         allowSourceCode: true,
         allowCustomerGroupIds: false,
         allowEffectiveDateTime: false,
-        allowCustomQualifiers: false,
+        allowCustomQualifiers: true,
         allowAssignmentQualifiers: false,
         allowClientIp: false,
         allowGeoLocation: false
