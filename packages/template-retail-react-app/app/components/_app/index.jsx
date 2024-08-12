@@ -420,10 +420,12 @@ const App = (props) => {
                                                 siteId: site.id
                                             },
                                             body: {
-                                                sourceCode: 'instagram'
+                                                sourceCode: 'instagram',
+                                                customQualifiers: {
+                                                    vip: 'yes'
+                                                }
                                             }
                                         })
-                                        console.log('test', test)
                                         refetchDataOnClient()
                                         // window.location.reload()
                                     }}
