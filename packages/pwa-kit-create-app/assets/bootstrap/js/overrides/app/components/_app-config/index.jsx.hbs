@@ -51,8 +51,8 @@ const AppConfig = ({children, locals = {}}) => {
 
     const proxy =
         !isLocalhost && !onClient
-        ? `${appOrigin}${commerceApiConfig.proxyPath}`
-        : `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
+            ? `${appOrigin}${commerceApiConfig.proxyPath}`
+            : `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
 
     const redirectURI = `${appOrigin}/callback`
 
