@@ -7,14 +7,14 @@
     },
     "dependencies": {
       "@ant-design/cssinjs": "^1.21.0",
-      "hoist-non-react-statics": "^3.3.2"
+      "hoist-non-react-statics": "^3.3.2",
+      "@salesforce/pwa-kit-react-sdk": "4.0.0-dev"
     },
     "peerDependencies": {
       "@ant-design/icons": "^5.4.0", 
       "@loadable/component": "^5.15.3",
       "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
       "antd": "^5.20.0",
-      
       "leaflet": "^1.9.4",
       "react": "^18.2.0",
       "react-dom": "^18.2.0",

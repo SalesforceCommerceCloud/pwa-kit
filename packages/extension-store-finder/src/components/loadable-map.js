@@ -20,7 +20,7 @@ const LoadableMapComponent = (props) => {
     }, [])
 
     return (
-        <div style={{ height: '400px', width: '600px' }}>
+        <div style={{ height: '550px', width: '1000px' }}>
             {visible && <LoadableMap {...props}/>}
         </div>
     )
