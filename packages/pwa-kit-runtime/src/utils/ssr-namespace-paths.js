@@ -31,7 +31,7 @@ export const getEnvBasePath = () => {
     // we cannot memoize getEnvBasePath as it's value may change once
     // window.__config__ is hydrated
     const config = getConfig()
-    const basePath = config?.envBasePath ? config.envBasePath : ''
+    let basePath = config?.envBasePath ? config.envBasePath : ''
 
     if (typeof basePath !== 'string') {
         console.log('Invalid environment base path configuration. Using default base path.')
