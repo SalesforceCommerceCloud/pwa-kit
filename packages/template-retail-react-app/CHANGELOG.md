@@ -1,5 +1,7 @@
 ## v4.1.0-dev (Aug 8, 2024)
 
+- Add support for environment level base paths [#1970](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1970)
+
 ### Bug Fixes
 - The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
 
