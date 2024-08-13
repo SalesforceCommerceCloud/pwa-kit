@@ -48,6 +48,7 @@ import {
 import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account/constant'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 const IconButtonWithRegistration = withRegistration(IconButton)
@@ -185,7 +186,9 @@ const Header = ({
                         onClick={onLogoClick}
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
-                    {isDesktop && <SearchBar />}
+                    <HideOnMobile>
+                        <SearchBar />
+                    </HideOnMobile>
                     <IconButtonWithRegistration
                         icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
@@ -336,7 +339,9 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMyCartClick}
                     />
-                    {!isDesktop && <SearchBar />}
+                    <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
+                        <SearchBar />
+                    </HideOnDesktop>
                 </Flex>
             </Box>
         </Box>

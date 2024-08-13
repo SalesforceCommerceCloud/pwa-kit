@@ -901,6 +901,24 @@
       "value": "]"
     }
   ],
+  "cart.product_edit_modal.modal_label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗḓīŧ ḿǿǿḓȧȧŀ ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "cart.recommended_products.title.may_also_like": [
     {
       "type": 0,
