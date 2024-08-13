@@ -46,7 +46,9 @@ const AppConfig = ({children, locals = {}}) => {
 
     const appOrigin = getAppOrigin()
 
-    const proxy = !onClient
+    const isLocalhost = appOrigin.includes('localhost')
+
+    const proxy = !isLocalhost && !onClient
         ? `${appOrigin}${commerceApiConfig.proxyPath}`
         : `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
 
