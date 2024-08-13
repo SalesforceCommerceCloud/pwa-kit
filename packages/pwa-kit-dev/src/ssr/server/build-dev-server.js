@@ -158,8 +158,6 @@ export const DevServerMixin = {
             const clientConfig = config.find((cnf) => cnf.name === CLIENT)
             const hmrBasePath = `${getBundlePath()}/development/`
             clientConfig.output.publicPath = hmrBasePath
-
-            console.log(clientConfig)
         }
 
         app.__compiler = webpack(config)
