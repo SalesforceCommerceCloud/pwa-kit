@@ -23,10 +23,22 @@ const CACHING_PATH_BASE = `${MOBIFY_PATH}/caching`
 const HEALTHCHECK_PATH = `${MOBIFY_PATH}/ping`
 const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
-// TODO - Allow projects to define this function?
 export const getEnvBasePath = () => {
+    // getConfig is memoized on the server so we are not needing to make
+    // multiple reads of the config file
+    // on the client, this will initially not return anything as
+    // window.__config__ first needs to be hydrated
+    // we cannot memoize getEnvBasePath as it's value may change once
+    // window.__config__ is hydrated
     const config = getConfig()
-    return config?.envBasePath ? config.envBasePath : ''
+    const basePath = config?.envBasePath ? config.envBasePath : ''
+
+    if (typeof basePath !== 'string') {
+        console.log('Invalid environment base path configuration. Using default base path.')
+        basePath = ''
+    }
+
+    return basePath
 }
 
 export const getProxyPath = () => `${getEnvBasePath()}${PROXY_PATH_BASE}`
@@ -37,6 +49,7 @@ export const getSlasPrivateProxyPath = () => `${getEnvBasePath()}${SLAS_PRIVATE_
 
 // Keeping these around as their removal might be a breaking change?
 /**  * @deprecated   */
+export const ssrNamespace = getEnvBasePath()
 export const proxyBasePath = `${getEnvBasePath()}${PROXY_PATH_BASE}`
 export const bundleBasePath = `${getEnvBasePath()}${BUNDLE_PATH_BASE}`
 export const cachingBasePath = `${getEnvBasePath()}${CACHING_PATH_BASE}`
