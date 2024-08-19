@@ -8,7 +8,11 @@ var {
     setCookiesToResponse
 } = require('*/cartridge/scripts/helpers/utils');
 var Fetch = require('*/cartridge/scripts/services/fetch');
-
+var Logger = require('dw/system/Logger');
+var log = Logger.getLogger(
+    'plugin_shopper_context',
+    'plugin_shopper_context.onRequest'
+);
 var slasAuthHelper = require('*/cartridge/scripts/helpers/slasAuthHelper');
 var slasAuthService = require('*/cartridge/scripts/services/SLASAuthService');
 if (!slasAuthHelper || !slasAuthHelper) {
@@ -19,8 +23,10 @@ var currentSite = Site.getCurrent();
 
 var CONTEXT_CHECK_COOKIE_AGE = 30 * 60;
 var { SHORT_CODE, ORGID } = require('*/cartridge/scripts/config/constant');
+const { removeCookie } = require('../../helpers/utils');
 var GET_SERVICE = 'plugin_shopper_context.generic.get';
 var SHOPPER_CONTEXT = 'shopper_context_RefArch';
+var SHOPPER_CONTEXT_CUSTOM_NAME = 'shopper_context_custom_name';
 
 function isContextGuardActive() {
     var isShopperContextChecked = getCookie(SHOPPER_CONTEXT);
@@ -74,9 +80,20 @@ exports.onRequest = function () {
     // wait until session is bridge before starting to bridge shopper context
     if (!dwsid) return;
     var isShopperContextChecked = getCookie(SHOPPER_CONTEXT);
+    var shopperContextCustomQualifierProps = [];
+
     // clear out any context if there is no context detected
     if (!isShopperContextChecked) {
         session.setSourceCode(null);
+        var customNameCookie = getCookie(SHOPPER_CONTEXT_CUSTOM_NAME);
+        if (customNameCookie) {
+            var propName = JSON.parse(customNameCookie.value);
+            for (var qualifier of propName) {
+                session.custom[qualifier] = null;
+            }
+            removeCookie(SHOPPER_CONTEXT_CUSTOM_NAME, response);
+        }
+
         return new Status(Status.OK);
     }
 
@@ -85,6 +102,7 @@ exports.onRequest = function () {
     }
     var cookiesToSet = {};
     var tokenData = {};
+    var ocapiSessionBridgeCookies = {};
     var guestRefreshTokenCookie = slasAuthHelper.getCookie(
         config.REFRESH_TOKEN_COOKIE_NAME_GUEST
     );
@@ -111,6 +129,12 @@ exports.onRequest = function () {
                 ? registeredRefreshTokenCookie.value
                 : guestRefreshTokenCookie.value
         });
+        /* Refresh token logins are not supported by session-bridge endpoint.
+            So we use OCAPI session bridge to manually bridge sessions between SLAS and ECOM. */
+        // ocapiSessionBridgeCookies = slasAuthHelper.getOCAPISessionBridgeCookies(
+        //     tokenData.access_token,
+        //     request.httpRemoteAddress
+        // );
     }
     var refreshTokenCookieToSet = registeredRefreshTokenCookie
         ? config.REFRESH_TOKEN_COOKIE_NAME_REGISTERED
@@ -121,21 +145,41 @@ exports.onRequest = function () {
     };
 
     var usidCookieName = 'usid_' + currentSite.ID;
-    var usid = getCookie(usidCookieName);
-
+    var usid = tokenData.usid;
     if (tokenData.access_token) {
         var context = getShopperContext(
-            usid.value,
+            usid,
             tokenData.access_token,
             currentSite.ID
         );
         if (context) {
-            session.setSourceCode(context.sourceCode);
+            try {
+                session.setSourceCode(context.sourceCode);
+                if (context.customQualifiers) {
+                    for (var qualifier in context.customQualifiers) {
+                        shopperContextCustomQualifierProps.push(qualifier);
+                        session.custom[qualifier] =
+                            context.customQualifiers[qualifier];
+                    }
+                }
+                cookiesToSet[SHOPPER_CONTEXT] = {
+                    value: 0,
+                    maxAge: CONTEXT_CHECK_COOKIE_AGE
+                };
+                cookiesToSet[SHOPPER_CONTEXT_CUSTOM_NAME] = {
+                    value: JSON.stringify(shopperContextCustomQualifierProps),
+                    maxAge: 30 * 60
+                };
+            } catch (err) {
+                log.error('Something wrong setting context. Please try again.');
+            }
         }
-        cookiesToSet[SHOPPER_CONTEXT] = {
-            value: 0,
-            maxAge: CONTEXT_CHECK_COOKIE_AGE
+
+        cookiesToSet[usidCookieName] = {
+            value: tokenData.usid,
+            maxAge: 30 * 60
         };
+
         setCookiesToResponse(cookiesToSet, response);
     }
 

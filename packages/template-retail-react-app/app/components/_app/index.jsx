@@ -388,9 +388,7 @@ const App = (props) => {
                                                     usid,
                                                     siteId: site.id
                                                 },
-                                                body: {
-                                                    sourceCode: 'test'
-                                                }
+                                                body: {}
                                             })
                                             refetchDataOnClient()
                                             document.cookie = `shopper_context_${site.id}=1`
@@ -424,7 +422,10 @@ const App = (props) => {
                                                     siteId: site.id
                                                 },
                                                 body: {
-                                                    sourceCode: 'instagram'
+                                                    sourceCode: 'instagram',
+                                                    customQualifiers: {
+                                                        vip: 'yes'
+                                                    }
                                                 }
                                             })
                                             refetchDataOnClient()
