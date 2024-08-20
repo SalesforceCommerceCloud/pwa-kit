@@ -64,6 +64,7 @@ const AppConfig = ({children}) => {
             shortCode="12345678"
             locale="en-US"
             currency="USD"
+            cookieTtl={1800} // TODO: implement default value
         >
             {children}
         </CommerceApiProvider>
@@ -130,7 +131,7 @@ To help reduce boilerplate code for managing shopper authentication, by default,
 Commerce-react-sdk supports both public and private flow of the [Authorization for Shopper APIs](https://developer.salesforce.com/docs/commerce/commerce-api/guide/authorization-for-shopper-apis.html) guide._
 You can choose to use either public or private slas to login. By default, public flow is enabled.
 
-#### How private SLAS works
+### How private SLAS works
 This section assumes you read and understand how [private SLAS](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-private-client.html) flow works
 
 To enable private slas flow, you need to pass your secret into the CommercerProvider via clientSecret prop.
@@ -225,6 +226,10 @@ const MyComponent = ({children}) => {
     return <CommerceApiProvider fetchedToken="xxxxxxxxxxxx">{children}</CommerceApiProvider>
 }
 ```
+
+### Cookie TTL
+
+TODO: Add information about setting cookie TTL
 
 ## Hooks
 

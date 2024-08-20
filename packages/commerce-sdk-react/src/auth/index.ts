@@ -38,6 +38,7 @@ interface AuthConfig extends ApiClientConfigParams {
     clientSecret?: string
     silenceWarnings?: boolean
     logger: Logger
+    cookieTtl?: number
 }
 
 interface JWTHeaders {
@@ -178,6 +179,7 @@ class Auth {
     private clientSecret: string
     private silenceWarnings: boolean
     private logger: Logger
+    private cookieTtl: number | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -226,6 +228,10 @@ class Auth {
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
         this.logger = config.logger
+
+        // TODO: add check where if user increases cookie TTL past acceptable value
+        // we log a warning and set it to default
+        this.cookieTtl = config.cookieTtl
 
         /*
          * There are 2 ways to enable SLAS private client mode.
@@ -379,7 +385,8 @@ class Auth {
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
 
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: res.refresh_token_expires_in
+            // TODO: This is where we set this expiration
+            expires: this.cookieTtl ?? res.refresh_token_expires_in
         })
     }
 
