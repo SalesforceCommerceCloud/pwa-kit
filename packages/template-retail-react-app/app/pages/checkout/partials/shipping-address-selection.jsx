@@ -275,7 +275,6 @@ const ShippingAddressSelection = ({
         // Don't render anything yet, to make sure values like hasSavedAddresses are correct
         return null
     }
-    console.log('hasSavedAddresses', hasSavedAddresses)
     return (
         <form onSubmit={form.handleSubmit(submitForm)}>
             <Stack spacing={4}>
