@@ -47,6 +47,11 @@ export const useGiftCertificate = (
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)
 
+    queryOptions.meta = {
+        displayName: 'useGiftCertificate',
+        ...queryOptions.meta
+    }
+
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
     return useQuery<Client, Options, Data>(

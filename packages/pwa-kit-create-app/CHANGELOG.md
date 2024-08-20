@@ -1,4 +1,13 @@
-## v3.6.0-dev (Apr 17, 2024)
+## v3.8.0-dev (Aug 8, 2024)
+
+## v3.7.0 (Aug 7, 2024)
+
+- Update default Node.js version to v20. [#1867](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1867/files)
+
+## v3.6.0 (Jun 25, 2024)
+
+- Fix: 'Cannot use import statement outside a module' error in generated extensible project unit tests [#1821](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1821)
+
 ## v3.5.1 (Apr 15, 2024)
 
 - Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)

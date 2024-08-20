@@ -13,6 +13,7 @@ import {useIntl} from 'react-intl'
 import LocaleSelector from '@salesforce/retail-react-app/app/components/locale-selector'
 import NestedAccordion from '@salesforce/retail-react-app/app/components/nested-accordion'
 import SocialIcons from '@salesforce/retail-react-app/app/components/social-icons'
+
 // Components
 import {
     Box,
@@ -45,8 +46,8 @@ import Link from '@salesforce/retail-react-app/app/components/link'
 // Icons
 import {
     BrandLogo,
-    LocationIcon,
     SignoutIcon,
+    StoreIcon,
     UserIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 
@@ -58,6 +59,7 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
 // values for depths 0 - 3, any depth deeper than that will use the default styling.
@@ -81,8 +83,15 @@ const STORE_LOCATOR_HREF = '/store-locator'
  * main usage is to navigate from one category to the next, but also homes links to
  * support, log in and out actions, as support links.
  */
-const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop}) => {
-    const itemsKey = 'categories'
+const DrawerMenu = ({
+    root,
+    itemsKey,
+    itemsCountKey,
+    isOpen,
+    onClose = noop,
+    onLogoClick = noop,
+    itemComponent
+}) => {
     const intl = useIntl()
     const {isRegistered} = useCustomerType()
     const navigate = useNavigation()
@@ -139,6 +148,7 @@ const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop}) => {
                                     <NestedAccordion
                                         allowMultiple={true}
                                         item={root}
+                                        itemsCountKey={itemsCountKey}
                                         itemsKey={itemsKey}
                                         itemsFilter="c_showInMenu"
                                         fontSizes={FONT_SIZES}
@@ -167,6 +177,7 @@ const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop}) => {
                                             )
                                         }
                                         urlBuilder={categoryUrlBuilder}
+                                        itemComponent={itemComponent}
                                     />
                                 </Fade>
                             ) : (
@@ -258,19 +269,21 @@ const DrawerMenu = ({root, isOpen, onClose = noop, onLogoClick = noop}) => {
                                     </Link>
                                 )}
                             </Box>
-                            <Box {...styles.actionsItem}>
-                                <Link to={STORE_LOCATOR_HREF}>
-                                    <HStack>
-                                        <LocationIcon {...styles.icon} />{' '}
-                                        <Text>
-                                            {intl.formatMessage({
-                                                id: 'drawer_menu.link.store_locator',
-                                                defaultMessage: 'Store Locator'
-                                            })}
-                                        </Text>
-                                    </HStack>
-                                </Link>
-                            </Box>
+                            {STORE_LOCATOR_IS_ENABLED && (
+                                <Box {...styles.actionsItem}>
+                                    <Link to={STORE_LOCATOR_HREF}>
+                                        <HStack>
+                                            <StoreIcon {...styles.icon} />{' '}
+                                            <Text>
+                                                {intl.formatMessage({
+                                                    id: 'drawer_menu.link.store_locator',
+                                                    defaultMessage: 'Store Locator'
+                                                })}
+                                            </Text>
+                                        </HStack>
+                                    </Link>
+                                </Box>
+                            )}
                             {showLocaleSelector && (
                                 <Box>
                                     <LocaleSelector
@@ -399,7 +412,19 @@ DrawerMenu.propTypes = {
     /**
      * Function called when the drawer logo is clicked.
      */
-    onLogoClick: PropTypes.func
+    onLogoClick: PropTypes.func,
+    /**
+     * Customize the property representing the items.
+     */
+    itemsKey: PropTypes.string,
+    /**
+     * Cusomtize the property representing the items count.
+     */
+    itemsCountKey: PropTypes.string,
+    /**
+     * Component to be rendered for each individual menu item.
+     */
+    itemComponent: PropTypes.elementType
 }
 
-export default DrawerMenu
+export {DrawerMenu}

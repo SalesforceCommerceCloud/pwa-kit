@@ -11,8 +11,7 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE,
-    SLAS_CUSTOM_PROXY_PATH
+    NO_CACHE
 } from './constants'
 import {
     catchAndLog,
@@ -40,6 +39,12 @@ import {RESOLVED_PROMISE} from './express'
 import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
+import {
+    proxyBasePath,
+    bundleBasePath,
+    healthCheckPath,
+    slasPrivateProxyPath
+} from '../../utils/ssr-namespace-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
@@ -203,6 +208,13 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _strictSSL(options) {
         return true
+    },
+
+    /**
+     * @private
+     */
+    _isBundleOrProxyPath(url) {
+        return url.startsWith(proxyBasePath) || url.startsWith(bundleBasePath)
     },
 
     /**
@@ -459,7 +471,7 @@ export const RemoteServerFactory = {
         const processIncomingRequest = (req, res) => {
             const options = req.app.options
             // If the request is for a proxy or bundle path, do nothing
-            if (req.originalUrl.startsWith('/mobify/')) {
+            if (this._isBundleOrProxyPath(req.originalUrl)) {
                 return
             }
 
@@ -582,7 +594,7 @@ export const RemoteServerFactory = {
                     // different types of the 'req' object, and will
                     // always contain the original full path.
                     /* istanbul ignore else */
-                    if (!req.originalUrl.startsWith('/mobify/')) {
+                    if (!this._isBundleOrProxyPath(req.originalUrl)) {
                         req.app.sendMetric(
                             'RequestTime',
                             Date.now() - locals.requestStart,
@@ -628,7 +640,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all('/mobify/proxy/*', (_, res) => {
+        app.all(`${proxyBasePath}/*`, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
@@ -698,7 +710,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _handleMissingSlasPrivateEnvVar(app) {
-        app.use(SLAS_CUSTOM_PROXY_PATH, (_, res) => {
+        app.use(slasPrivateProxyPath, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
@@ -713,28 +725,29 @@ export const RemoteServerFactory = {
         if (!options.useSLASPrivateClient) {
             return
         }
-        localDevLog(`Proxying ${SLAS_CUSTOM_PROXY_PATH} to ${options.slasTarget}`)
+
+        localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
         if (!clientSecret) {
-            this._handleMissingSlasPrivateEnvVar(app)
+            this._handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath)
             return
         }
 
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
         app.use(
-            SLAS_CUSTOM_PROXY_PATH,
+            slasPrivateProxyPath,
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[SLAS_CUSTOM_PROXY_PATH]: ''},
+                pathRewrite: {[slasPrivateProxyPath]: ''},
                 onProxyReq: (proxyRequest, incomingRequest) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
-                        proxyPath: SLAS_CUSTOM_PROXY_PATH,
+                        proxyPath: slasPrivateProxyPath,
                         targetHost: options.slasHostName,
                         targetProtocol: 'https'
                     })
@@ -785,7 +798,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupHealthcheck(app) {
-        app.get('/mobify/ping', (_, res) =>
+        app.get(`${healthCheckPath}`, (_, res) =>
             res.set('cache-control', NO_CACHE).sendStatus(200).end()
         )
     },

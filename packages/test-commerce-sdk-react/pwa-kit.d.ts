@@ -10,3 +10,4 @@
 declare module '@salesforce/pwa-kit-react-sdk/ssr/browser/main'
 declare module '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 declare module '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+declare module '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'

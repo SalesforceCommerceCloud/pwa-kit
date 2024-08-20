@@ -37,7 +37,7 @@ const Breadcrumb = ({categories, ...rest}) => {
         <ChakraBreadcrumb
             className="sf-breadcrumb"
             {...styles.container}
-            separator={<ChevronRightIcon {...styles.icon} />}
+            separator={<ChevronRightIcon {...styles.icon} aria-hidden="true" />}
             {...rest}
         >
             {categories.map((category) => (

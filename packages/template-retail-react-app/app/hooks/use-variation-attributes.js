@@ -14,7 +14,7 @@ import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-var
 // Utils
 import {updateSearchParams} from '@salesforce/retail-react-app/app/utils/url'
 import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp-search-params'
-
+import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
 /**
  * Return the first image in the `swatch` type image group for a given
  * variation value of a product.
@@ -23,21 +23,15 @@ import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp
  * @param {Object} variationValue
  * @returns {Object} image
  */
-const getVariantValueSwatch = (product, variationValue) => {
+export const getVariantValueSwatch = (product, variationValue) => {
     const {imageGroups = []} = product
 
-    const imageGroup = imageGroups
-        .filter(({viewType}) => viewType === 'swatch')
-        .find(({variationAttributes = []}) => {
-            const colorAttribute = variationAttributes.find(({id}) => id === 'color')
-            const colorValues = colorAttribute?.values || []
-
-            // A single image can represent multiple variation values, so we only need
-            // ensure the variation values appears in once of the images represented values.
-            return colorValues.some(({value}) => value === variationValue.value)
-        })
-
-    return imageGroup?.images?.[0]
+    return filterImageGroups(imageGroups, {
+        viewType: 'swatch',
+        variationValues: {
+            ['color']: variationValue.value
+        }
+    })?.[0]?.images?.[0]
 }
 
 /**
@@ -48,16 +42,17 @@ const getVariantValueSwatch = (product, variationValue) => {
  * @param {Object} location
  * @returns {String} a product url for the current variation value.
  */
-const buildVariantValueHref = ({
+export const buildVariantValueHref = ({
     pathname,
     existingParams,
     newParams,
     productId,
-    isProductPartOfSet
+    isProductPartOfSet,
+    isProductPartOfBundle
 }) => {
     const [allParams, productParams] = existingParams
 
-    if (isProductPartOfSet) {
+    if (isProductPartOfSet || isProductPartOfBundle) {
         updateSearchParams(productParams, newParams)
         allParams.set(productId, productParams.toString())
     } else {
@@ -76,7 +71,7 @@ const buildVariantValueHref = ({
  * @param {Object} variationParams
  * @returns
  */
-const isVariantValueOrderable = (product, variationParams) => {
+export const isVariantValueOrderable = (product, variationParams) => {
     return product.variants
         .filter(({variationValues}) =>
             Object.keys(variationParams).every(
@@ -96,12 +91,28 @@ const isVariantValueOrderable = (product, variationParams) => {
  * @returns {Array} a decorated variation attributes list.
  *
  */
-export const useVariationAttributes = (product = {}, isProductPartOfSet = false) => {
+export const useVariationAttributes = (
+    product = {},
+    isProductPartOfSet = false,
+    isProductPartOfBundle = false
+) => {
     const {variationAttributes = []} = product
     const location = useLocation()
-    const variationParams = useVariationParams(product, isProductPartOfSet)
-
+    const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
     const existingParams = usePDPSearchParams(product.id)
+    const isBundleChildVariant = isProductPartOfBundle && product?.type?.variant
+
+    // In the product bundle edit modal on the cart page, the variant ID of each bundle child is used as a key
+    // for query parameters, so when a new variant is selected, a new query parameter is added since variants
+    // have different IDs. The old one is not overwritten with existing logic so we remove it here
+    if (isBundleChildVariant) {
+        const [allParams] = existingParams
+        product?.variants?.forEach(({productId: variantId}) => {
+            if (variantId !== product.id && allParams.get(variantId)) {
+                allParams.delete(variantId)
+            }
+        })
+    }
 
     return useMemo(
         () =>
@@ -127,7 +138,8 @@ export const useVariationAttributes = (product = {}, isProductPartOfSet = false)
                             existingParams,
                             newParams: params,
                             productId: product.id,
-                            isProductPartOfSet
+                            isProductPartOfSet,
+                            isProductPartOfBundle
                         }),
                         orderable: isVariantValueOrderable(product, params)
                     }

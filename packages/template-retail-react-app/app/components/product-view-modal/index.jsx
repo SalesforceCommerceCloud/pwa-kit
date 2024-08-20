@@ -16,16 +16,27 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
+import {useIntl} from 'react-intl'
 
 /**
  * A Modal that contains Product View
  */
 const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     const productViewModalData = useProductViewModal(product)
+
+    const intl = useIntl()
+    const label = intl.formatMessage(
+        {
+            defaultMessage: 'Edit modal for {productName}',
+            id: 'cart.product_edit_modal.modal_label'
+        },
+        {productName: productViewModalData?.product?.name}
+    )
+
     return (
         <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
-            <ModalContent containerProps={{'data-testid': 'product-view-modal'}}>
+            <ModalContent containerProps={{'data-testid': 'product-view-modal'}} aria-label={label}>
                 <ModalCloseButton />
                 <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                     <ProductView
@@ -46,9 +57,7 @@ ProductViewModal.propTypes = {
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     product: PropTypes.object,
-    isLoading: PropTypes.bool,
-    actionButtons: PropTypes.node,
-    onModalClose: PropTypes.func
+    isLoading: PropTypes.bool
 }
 
 export default ProductViewModal
