@@ -65,7 +65,11 @@ const ShippingAddressEditForm = ({
                 )}
 
                 <Stack spacing={6}>
-                    <AddressFields form={form} formTitleAriaLabel={formTitleAriaLabel} />
+                    <AddressFields
+                        form={form}
+                        formTitleAriaLabel={formTitleAriaLabel}
+                        isBillingAddress={isBillingAddress}
+                    />
 
                     {hasSavedAddresses && !hideSubmitButton ? (
                         <FormActionButtons
@@ -153,10 +157,13 @@ const ShippingAddressSelection = ({
             const {id, _type, ...selectedAddr} = selectedAddress
             return shallowEquals(address, selectedAddr)
         })
-
     const removeCustomerAddress = useShopperCustomersMutation('removeCustomerAddress')
 
     useEffect(() => {
+        if (isBillingAddress) {
+            form.reset({...selectedAddress})
+            return
+        }
         // Automatically select the customer's default/preferred shipping address
         if (customer.addresses) {
             const address = customer.addresses.find((addr) => addr.preferred === true)
@@ -268,7 +275,7 @@ const ShippingAddressSelection = ({
         // Don't render anything yet, to make sure values like hasSavedAddresses are correct
         return null
     }
-
+    console.log('hasSavedAddresses', hasSavedAddresses)
     return (
         <form onSubmit={form.handleSubmit(submitForm)}>
             <Stack spacing={4}>
@@ -372,9 +379,9 @@ const ShippingAddressSelection = ({
                     />
                 )}
 
-                {(customer.isGuest ||
-                    (hasSavedAddresses && isBillingAddress) ||
-                    (isEditingAddress && !selectedAddressId)) && (
+                {(customer?.isGuest ||
+                    (isEditingAddress && !selectedAddressId) ||
+                    isBillingAddress) && (
                     <ShippingAddressEditForm
                         title={formatMessage({
                             defaultMessage: 'Add New Address',
@@ -384,6 +391,7 @@ const ShippingAddressSelection = ({
                         toggleAddressEdit={toggleAddressEdit}
                         hideSubmitButton={hideSubmitButton}
                         form={form}
+                        isBillingAddress={isBillingAddress}
                         submitButtonLabel={submitButtonLabel}
                         formTitleAriaLabel={formTitleAriaLabel}
                     />
