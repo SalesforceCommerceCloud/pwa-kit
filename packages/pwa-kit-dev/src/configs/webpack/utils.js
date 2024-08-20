@@ -13,3 +13,19 @@ export const makeRegExp = (str, sep = path.sep) => {
     }
     return new RegExp(str)
 }
+
+export const kebabToUpperCamelCase = (str) =>
+    str
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join('')
+
+export const kebabToLowerCamelCase = (str) =>
+    str
+        .split('-')
+        .map((word, index) =>
+            index === 0
+                ? word.toLowerCase()
+                : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join('')

@@ -22,6 +22,7 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -37,6 +38,7 @@ const INSPECT = process.execArgv.some((arg) => /^--inspect(?:-brk)?(?:$|=)/.test
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
+const {app: appConfig} = getConfig()
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -209,6 +211,28 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
+                        // Create alias's for all the extensions as they are being imported from the SDK package and cannot be
+                        // resolved from that location.
+                        ...(appConfig?.extensions || []).reduce((acc, extension) => {
+                            // TODO: This is duplicate code, we should create a util for it.
+                            // NOTE: Wew wouldn't have to do this is our extensions were "built"
+                            const setupAppFilePathBase = `${projectDir}/node_modules/${extension}/src/setup-app`
+                            const foundType = ['ts', 'js'].find((type) =>
+                                fse.existsSync(`${setupAppFilePathBase}.${type}`)
+                            )
+
+                            if (!foundType) {
+                                // no setup-server file found, early exit because it's optional
+                                return acc
+                            }
+
+                            return {
+                                ...acc,
+                                [`${extension}/setup-app`]: path.resolve(
+                                    `${setupAppFilePathBase}.${foundType}`
+                                )
+                            }
+                        }, {}),
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
@@ -352,6 +376,26 @@ const staticFolderCopyPlugin = new CopyPlugin({
     ]
 })
 
+// TODO: Make this work with multiple application extensions.
+const extensionsStaticFolderCopyPlugin = new CopyPlugin({
+    patterns: [
+        {
+            from: path
+                .resolve(`node_modules/@salesforce/extension-sample/assets`)
+                .replace(/\\/g, '/'),
+            to: `static/extension-sample/`,
+            noErrorOnMissing: true
+        },
+        {
+            from: path
+                .resolve(`node_modules/@salesforce/extension-store-finder/assets`)
+                .replace(/\\/g, '/'),
+            to: `static/extension-store-finder/`,
+            noErrorOnMissing: true
+        }
+    ]
+})
+
 const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
@@ -428,6 +472,16 @@ const client =
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
+            // Add extensions to the main entry point
+            // TODO: Move this into base and harden it up
+            config.module.rules.push({
+                test: /universal\/extensions/,
+                loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
+                options: {
+                    projectDir
+                }
+            })
+
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
@@ -480,6 +534,16 @@ const renderer =
     fse.existsSync(resolve(projectDir, 'node_modules', '@salesforce', 'pwa-kit-react-sdk')) &&
     baseConfig('node')
         .extend((config) => {
+            // Add extensions to the react renderer
+            // TODO: Move this into base and harden it up
+            config.module.rules.push({
+                test: /universal\/extensions/,
+                loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
+                options: {
+                    projectDir
+                }
+            })
+
             return {
                 ...config,
                 // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
@@ -494,11 +558,13 @@ const renderer =
                     // It is required to have a single entry point for the remote server.
                     // See pwa-kit-runtime/ssr/server/build-remote-server.js render method.
                     filename: mode === development ? '[name]-server.js' : 'server-renderer.js',
+                    // filename: 'server-renderer.js',
                     libraryTarget: 'commonjs2'
                 },
                 plugins: [
                     ...config.plugins,
                     staticFolderCopyPlugin,
+                    extensionsStaticFolderCopyPlugin,
                     // Keep this on the slowest-to-build item - the server-side bundle.
                     new WebpackNotifierPlugin({
                         title: `PWA Kit Project: ${pkg.name}`,
@@ -571,7 +637,7 @@ const requestProcessor =
 // Don't mistake this with the concept of extensions for Webpack.
 const extensions =
     mode === 'production'
-        ? (pkg.mobify?.app?.extensions || [])
+        ? (appConfig?.extensions || [])
               .map((extension) => {
                   const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/setup-server`
                   const foundType = ['ts', 'js'].find((type) =>

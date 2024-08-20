@@ -6,6 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
+import {Link} from 'react-router-dom'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
@@ -130,6 +131,10 @@ const Home = ({value}: Props) => {
                             <br />
                             <br />
                             Client-side JS works if this counter increments: {counter}
+                            <br />
+                            <br />
+                            App Extensions work if you can navigate to this link:{' '}
+                            <Link to="/sample-page">sample page</Link>.
                             <br />
                             <br />
                             <b>You can mix-and-match JS and TS</b>

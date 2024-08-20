@@ -385,6 +385,19 @@ export const routeComponent = (Wrapped, isPage, locals) => {
         preloadedProps: PropTypes.object
     }
 
+    // The application will have special static functions.
+    // TODO: Maybe we should turn this into a HOC
+    let initialRoutes = []
+    if (!isPage) {
+        RouteComponent.addRoutes = (routes) => {
+            initialRoutes = [...routes, ...initialRoutes]
+        }
+
+        RouteComponent.getRoutes = () => {
+            return initialRoutes
+        }
+    }
+
     const excludes = {
         shouldGetProps: true,
         getProps: true,
@@ -402,7 +415,7 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  *
  * @private
  */
-export const getRoutes = (locals) => {
+export const getRoutes = (locals, initialRoutes = []) => {
     let _routes = routes
     if (typeof routes === 'function') {
         _routes = routes()
@@ -413,7 +426,7 @@ export const getRoutes = (locals) => {
         ..._routes,
         {path: '*', component: Throw404}
     ]
-    return allRoutes.map(({component, ...rest}) => {
+    return [...initialRoutes, ...allRoutes].map(({component, ...rest}) => {
         return {
             component: component ? routeComponent(component, true, locals) : component,
             ...rest

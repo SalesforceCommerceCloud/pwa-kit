@@ -7,16 +7,18 @@
 /* global __webpack_require__ */
 import React, {useRef} from 'react'
 import {hydrateRoot} from 'react-dom/client'
+import PropTypes from 'prop-types'
 import {BrowserRouter as Router} from 'react-router-dom'
+import {loadableReady} from '@loadable/component'
+
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
-import {loadableReady} from '@loadable/component'
 import {uuidv4} from '../../utils/uuidv4.client'
-import PropTypes from 'prop-types'
 import logger from '../../utils/logger-instance'
+import Extensions from '../universal/extensions'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -113,11 +115,29 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
+    let WrappedApp = routeComponent(App, false, locals)
+    // Initialize all the react app extensions.
+    // TODO: Make this a handler of sorts, maybe something like `initializeExtensions`
+    Object.entries(Extensions).forEach(([name, initializer]) => {
+        console.log(`Initializing the ${name} extension for CSR.`)
+
+        WrappedApp = initializer({
+            App: WrappedApp
+            // Pass in as an object so we have the option to widen the API so we include things like the AppConfig, Document, Error, etc.
+        })
+
+        if (!WrappedApp) {
+            throw new Error(
+                `App Extensions Violation: Extension 'name' failed to return App in 'setup-app.js'.`
+            )
+        }
+    })
+
     const props = {
         error: window.__ERROR__,
         locals: locals,
-        routes: getRoutes(locals),
-        WrappedApp: routeComponent(App, false, locals)
+        routes: getRoutes(locals, WrappedApp.getRoutes()),
+        WrappedApp
     }
 
     return Promise.resolve()

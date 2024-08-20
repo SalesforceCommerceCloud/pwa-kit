@@ -25,8 +25,9 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
-import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
+import Document from '../universal/components/_document'
+import Extensions from '../universal/extensions'
 import Throw404 from '../universal/components/throw-404'
 
 import {getAppConfig} from '../universal/compatibility'
@@ -34,7 +35,6 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import logger from '../../utils/logger-instance'
-
 import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
 
 const CWD = process.cwd()
@@ -129,8 +129,24 @@ export const render = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
-    const routes = getRoutes(res.locals)
-    const WrappedApp = routeComponent(App, false, res.locals)
+    let WrappedApp = routeComponent(App, false, res.locals)
+
+    // Initialize all the react app extensions.
+    Object.entries(Extensions).forEach(([name, initializer]) => {
+        console.log(`Initializing the ${name} extension for SSR.`)
+
+        WrappedApp = initializer({
+            App: WrappedApp
+        })
+
+        if (!WrappedApp) {
+            throw new Error(
+                `App Extensions Violation: Extension 'name' failed to return App in 'setup-app.js'.`
+            )
+        }
+    })
+
+    const routes = getRoutes(res.locals, WrappedApp.getRoutes())
 
     const [pathname] = req.originalUrl.split('?')
 
