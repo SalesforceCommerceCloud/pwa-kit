@@ -1,3 +1,4 @@
+## v3.8.0-nightly-20240820080310 (Aug 20, 2024)
 ## v3.8.0-dev (Aug 08, 2024)
 ## v3.7.0 (Aug 07, 2024)
 - Add `beforeHydrate` option to withReactQuery component [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)
