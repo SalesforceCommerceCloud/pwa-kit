@@ -27,3 +27,14 @@ export const SLAS_SECRET_PLACEHOLDER = '_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_S
 
 export const SLAS_SECRET_OVERRIDE_MSG =
     'You have enabled PWA Kit Private Client mode which gets the SLAS secret from your environment variable. The SLAS secret you have set in the Auth provider will be ignored.'
+
+// In seconds
+export const DEFAULT_EXPIRATION_TIME_GUEST_REFRESH_TOKEN = 2592000 // 30 days
+export const DEFAULT_EXPIRATION_TIME_REGISTIERED_REFRESH_TOKEN = 7776000 // 90 days
+
+export const EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_GUEST = `The provided expiration time value for guest refresh token exceeds the default value of ${DEFAULT_EXPIRATION_TIME_GUEST_REFRESH_TOKEN} seconds, the default value will be used instead`
+export const EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_REGISTERED = `The provided expiration time value for guest refresh token exceeds the default value of ${DEFAULT_EXPIRATION_TIME_REGISTIERED_REFRESH_TOKEN} seconds, the default value will be used instead`
+
+// Number of seconds in a day: 84600 = (24 hours * 60 minutes * 60 seconds)
+// days = seconds/84600
+export const SECONDS_TO_DAYS_RATIO = 84600

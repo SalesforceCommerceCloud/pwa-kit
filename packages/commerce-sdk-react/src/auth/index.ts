@@ -21,7 +21,12 @@ import {
     SLAS_PRIVATE_PROXY_PATH,
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
-    SLAS_SECRET_OVERRIDE_MSG
+    SLAS_SECRET_OVERRIDE_MSG,
+    DEFAULT_EXPIRATION_TIME_REGISTIERED_REFRESH_TOKEN,
+    DEFAULT_EXPIRATION_TIME_GUEST_REFRESH_TOKEN,
+    EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_GUEST,
+    EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_REGISTERED,
+    SECONDS_TO_DAYS_RATIO
 } from '../constant'
 
 import {Logger} from '../types'
@@ -38,6 +43,8 @@ interface AuthConfig extends ApiClientConfigParams {
     clientSecret?: string
     silenceWarnings?: boolean
     logger: Logger
+    // TODO: rename?
+    // expirationTimeGuestRefreshToken
     expirationTimeGuestToken?: number
     expirationTimeRegisteredToken?: number
 }
@@ -231,10 +238,23 @@ class Auth {
 
         this.logger = config.logger
 
-        // TODO: add check where if user increases cookie TTL past acceptable value
-        // we log a warning and set it to default
-        this.expirationTimeGuestToken = config.expirationTimeGuestToken
-        this.expirationTimeRegisteredToken = config.expirationTimeRegisteredToken
+        if (
+            config.expirationTimeGuestToken &&
+            config.expirationTimeGuestToken > DEFAULT_EXPIRATION_TIME_GUEST_REFRESH_TOKEN
+        ) {
+            this.logWarning(EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_GUEST)
+        } else {
+            this.expirationTimeGuestToken = config.expirationTimeGuestToken
+        }
+
+        if (
+            config.expirationTimeRegisteredToken &&
+            config.expirationTimeRegisteredToken > DEFAULT_EXPIRATION_TIME_REGISTIERED_REFRESH_TOKEN
+        ) {
+            this.logWarning(EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_REGISTERED)
+        } else {
+            this.expirationTimeRegisteredToken = config.expirationTimeRegisteredToken
+        }
 
         /*
          * There are 2 ways to enable SLAS private client mode.
@@ -386,13 +406,20 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-        const expirationTime = isGuest
+
+        let expirationTime = isGuest
             ? this.expirationTimeGuestToken
             : this.expirationTimeRegisteredToken
 
+        if (expirationTime) {
+            expirationTime = expirationTime / SECONDS_TO_DAYS_RATIO
+        } else {
+            expirationTime = res.refresh_token_expires_in / SECONDS_TO_DAYS_RATIO
+        }
+
         this.set(refreshTokenKey, res.refresh_token, {
-            // TODO: This is where we set this expiration
-            expires: expirationTime ?? res.refresh_token_expires_in
+            // expirationTime can be in days or as a Date object
+            expires: expirationTime
         })
     }
 
