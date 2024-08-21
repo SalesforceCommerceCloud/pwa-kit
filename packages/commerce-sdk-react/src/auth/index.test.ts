@@ -462,4 +462,23 @@ describe('Auth', () => {
         // @ts-expect-error read-only property
         utils.onClient = () => true
     })
+
+    test('logs warning when token expiration time exceeds the default', () => {
+        const consoleSpy = jest.spyOn(console, 'warn')
+        const modifiedConfig = {
+            ...config,
+            expirationTimeGuestToken: 10000000,
+            expirationTimeRegisteredToken: 10000000
+        }
+        new Auth(modifiedConfig)
+        expect(consoleSpy).toHaveBeenCalledTimes(2)
+        expect(consoleSpy).toHaveBeenNthCalledWith(
+            1,
+            'The provided expiration time for the guest refresh token exceeds the default value of 2592000 seconds. The default value will be used instead'
+        )
+        expect(consoleSpy).toHaveBeenNthCalledWith(
+            2,
+            'The provided expiration time for the registered user refresh token exceeds the default value of 7776000 seconds. The default value will be used instead'
+        )
+    })
 })
