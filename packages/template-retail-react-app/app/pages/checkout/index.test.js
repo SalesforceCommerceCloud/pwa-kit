@@ -498,8 +498,11 @@ test('Can proceed through checkout as registered customer', async () => {
     // Edit billing address
     const sameAsShippingBtn = screen.getByText(/same as shipping address/i)
     await user.click(sameAsShippingBtn)
+
     const firstNameInput = screen.getByLabelText(/first name/i)
     const lastNameInput = screen.getByLabelText(/last name/i)
+    expect(step3Content.queryByText(/Set as default/)).not.toBeInTheDocument()
+
     await user.clear(firstNameInput)
     await user.clear(lastNameInput)
     await user.type(firstNameInput, 'John')
@@ -519,7 +522,6 @@ test('Can proceed through checkout as registered customer', async () => {
 
     expect(step3Content.getByText('John Smith')).toBeInTheDocument()
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-    screen.logTestingPlaygroundURL()
 
     // Place the order
     await user.click(placeOrderBtn)
