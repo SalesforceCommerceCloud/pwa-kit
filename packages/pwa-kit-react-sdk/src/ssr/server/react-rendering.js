@@ -27,7 +27,7 @@ import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import App from '../universal/components/_app'
 import Document from '../universal/components/_document'
-import Extensions from '../universal/extensions'
+import extensions from '../universal/extensibility/extensions'
 import Throw404 from '../universal/components/throw-404'
 
 import {getAppConfig} from '../universal/compatibility'
@@ -129,15 +129,20 @@ export const render = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
+    const appExtensions = Object.entries(extensions).map(([name, Extension]) => {
+        console.log(`Instantiating ${name} extension.`)
+        const config = {} // Here we'll use a utility to get the config for this specific application extension
+        return new Extension()
+    })
+
+    res.locals.appExtensions = appExtensions
+
     let WrappedApp = routeComponent(App, false, res.locals)
 
     // Initialize all the react app extensions.
-    Object.entries(Extensions).forEach(([name, initializer]) => {
-        console.log(`Initializing the ${name} extension for SSR.`)
-
-        WrappedApp = initializer({
-            App: WrappedApp
-        })
+    appExtensions.forEach((appExtension) => {
+        console.log(`Extending the App using the ${appExtension.getName()} extension.`)
+        WrappedApp = appExtension.extendApp(WrappedApp)
 
         if (!WrappedApp) {
             throw new Error(
@@ -146,7 +151,7 @@ export const render = async (req, res, next) => {
         }
     })
 
-    const routes = getRoutes(res.locals, WrappedApp.getRoutes())
+    const routes = getRoutes(res.locals)
 
     const [pathname] = req.originalUrl.split('?')
 

@@ -18,7 +18,7 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
-import Extensions from '../universal/extensions'
+import extensions from '../universal/extensibility/extensions'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -116,15 +116,21 @@ export const start = () => {
     window.__HYDRATING__ = true
 
     let WrappedApp = routeComponent(App, false, locals)
+
+    const appExtensions = Object.entries(extensions).map(([name, Extension]) => {
+        console.log(`Instantiating ${name} extension.`)
+        const config = {}
+        return new Extension(config)
+    })
+
+    locals.appExtensions = appExtensions
+
     // Initialize all the react app extensions.
     // TODO: Make this a handler of sorts, maybe something like `initializeExtensions`
-    Object.entries(Extensions).forEach(([name, initializer]) => {
-        console.log(`Initializing the ${name} extension for CSR.`)
+    appExtensions.forEach((appExtension) => {
+        console.log(`Initializing the ${appExtension.getName()} extension for CSR.`)
 
-        WrappedApp = initializer({
-            App: WrappedApp
-            // Pass in as an object so we have the option to widen the API so we include things like the AppConfig, Document, Error, etc.
-        })
+        WrappedApp = appExtension.extendApp(WrappedApp)
 
         if (!WrappedApp) {
             throw new Error(
@@ -136,7 +142,7 @@ export const start = () => {
     const props = {
         error: window.__ERROR__,
         locals: locals,
-        routes: getRoutes(locals, WrappedApp.getRoutes()),
+        routes: getRoutes(locals),
         WrappedApp
     }
 

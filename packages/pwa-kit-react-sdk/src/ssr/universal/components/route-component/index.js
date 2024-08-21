@@ -385,19 +385,6 @@ export const routeComponent = (Wrapped, isPage, locals) => {
         preloadedProps: PropTypes.object
     }
 
-    // The application will have special static functions.
-    // TODO: Maybe we should turn this into a HOC
-    let initialRoutes = []
-    if (!isPage) {
-        RouteComponent.addRoutes = (routes) => {
-            initialRoutes = [...routes, ...initialRoutes]
-        }
-
-        RouteComponent.getRoutes = () => {
-            return initialRoutes
-        }
-    }
-
     const excludes = {
         shouldGetProps: true,
         getProps: true,
@@ -415,18 +402,25 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  *
  * @private
  */
-export const getRoutes = (locals, initialRoutes = []) => {
+export const getRoutes = (locals) => {
     let _routes = routes
+    let {appExtensions = []} = locals
     if (typeof routes === 'function') {
         _routes = routes()
     }
+
+    // Call the `extendRoutes` function for all the Application Extensions.
+    appExtensions.forEach((appExtension) => {
+        _routes = appExtension.extendRoutes(_routes)
+    })
+
     const allRoutes = [
         // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
         {path: '/__pwa-kit/refresh', component: Refresh},
         ..._routes,
         {path: '*', component: Throw404}
     ]
-    return [...initialRoutes, ...allRoutes].map(({component, ...rest}) => {
+    return allRoutes.map(({component, ...rest}) => {
         return {
             component: component ? routeComponent(component, true, locals) : component,
             ...rest

@@ -42,3 +42,30 @@ module.exports = function () {
             }
         `
 }
+
+// NOTE: It would be nice to have this loader run only for the ts file and output ts code. But for some reason,
+// I cannot get the loader to hook in at the right time because we are also using babel-loader.
+// import {ExtensionsMap, IApplicationExtension} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
+
+// // Extension Imports
+// ${extensions
+//     .map(
+//         (extension) =>
+//             `import ${kebabToUpperCamelCase(
+//                 extension.split('/')[1]
+//             )} from '${extension}/${APP_EXTENSION_CLIENT_ENTRY}'`
+//     )
+//     .join('\n')}
+
+// const extensions: ExtensionsMap<IApplicationExtension> = {
+//     ${extensions
+//         .map(
+//             (extension) =>
+//                 `${kebabToLowerCamelCase(
+//                     extension.split('/')[1]
+//                 )}: ${kebabToUpperCamelCase(extension.split('/')[1])}`
+//         )
+//         .join(',\n')}
+// }
+
+// export default extensions

@@ -475,7 +475,7 @@ const client =
             // Add extensions to the main entry point
             // TODO: Move this into base and harden it up
             config.module.rules.push({
-                test: /universal\/extensions/,
+                test: /universal\/extensibility\/extensions/,
                 loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
                 options: {
                     projectDir
@@ -537,7 +537,7 @@ const renderer =
             // Add extensions to the react renderer
             // TODO: Move this into base and harden it up
             config.module.rules.push({
-                test: /universal\/extensions/,
+                test: /universal\/extensibility\/extensions/,
                 loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
                 options: {
                     projectDir
