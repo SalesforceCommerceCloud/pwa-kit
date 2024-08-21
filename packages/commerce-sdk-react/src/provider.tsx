@@ -38,8 +38,8 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     clientSecret?: string
     silenceWarnings?: boolean
     logger?: Logger
-    expirationTimeGuestToken?: number
-    expirationTimeRegisteredToken?: number
+    expirationTimeGuestRefreshToken?: number
+    expirationTimeRegisteredRefreshToken?: number
 }
 
 /**
@@ -80,8 +80,8 @@ export const AuthContext = React.createContext({} as Auth)
                     enablePWAKitPrivateClient={true}
                     currency="USD"
                     logger={logger}
-                    expirationTimeGuestToken={2592000}
-                    expirationTimeRegisteredToken={7776000}
+                    expirationTimeGuestRefreshToken={2592000}
+                    expirationTimeRegisteredRefreshToken={7776000}
                 >
                     {children}
                 </CommerceApiProvider>
@@ -120,8 +120,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         logger,
-        expirationTimeGuestToken,
-        expirationTimeRegisteredToken
+        expirationTimeGuestRefreshToken,
+        expirationTimeRegisteredRefreshToken
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -190,8 +190,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientSecret,
             silenceWarnings,
             logger: configLogger,
-            expirationTimeGuestToken,
-            expirationTimeRegisteredToken
+            expirationTimeGuestRefreshToken,
+            expirationTimeRegisteredRefreshToken
         })
     }, [
         clientId,
@@ -207,8 +207,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         configLogger,
-        expirationTimeGuestToken,
-        expirationTimeRegisteredToken
+        expirationTimeGuestRefreshToken,
+        expirationTimeRegisteredRefreshToken
     ])
 
     // Initialize the session

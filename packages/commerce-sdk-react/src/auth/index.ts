@@ -43,10 +43,8 @@ interface AuthConfig extends ApiClientConfigParams {
     clientSecret?: string
     silenceWarnings?: boolean
     logger: Logger
-    // TODO: rename?
-    // expirationTimeGuestRefreshToken
-    expirationTimeGuestToken?: number
-    expirationTimeRegisteredToken?: number
+    expirationTimeGuestRefreshToken?: number
+    expirationTimeRegisteredRefreshToken?: number
 }
 
 interface JWTHeaders {
@@ -187,8 +185,8 @@ class Auth {
     private clientSecret: string
     private silenceWarnings: boolean
     private logger: Logger
-    private expirationTimeGuestToken: number | undefined
-    private expirationTimeRegisteredToken: number | undefined
+    private expirationTimeGuestRefreshToken: number | undefined
+    private expirationTimeRegisteredRefreshToken: number | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -239,21 +237,22 @@ class Auth {
         this.logger = config.logger
 
         if (
-            config.expirationTimeGuestToken &&
-            config.expirationTimeGuestToken > DEFAULT_EXPIRATION_TIME_GUEST_REFRESH_TOKEN
+            config.expirationTimeGuestRefreshToken &&
+            config.expirationTimeGuestRefreshToken > DEFAULT_EXPIRATION_TIME_GUEST_REFRESH_TOKEN
         ) {
             this.logWarning(EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_GUEST)
         } else {
-            this.expirationTimeGuestToken = config.expirationTimeGuestToken
+            this.expirationTimeGuestRefreshToken = config.expirationTimeGuestRefreshToken
         }
 
         if (
-            config.expirationTimeRegisteredToken &&
-            config.expirationTimeRegisteredToken > DEFAULT_EXPIRATION_TIME_REGISTIERED_REFRESH_TOKEN
+            config.expirationTimeRegisteredRefreshToken &&
+            config.expirationTimeRegisteredRefreshToken >
+                DEFAULT_EXPIRATION_TIME_REGISTIERED_REFRESH_TOKEN
         ) {
             this.logWarning(EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_REGISTERED)
         } else {
-            this.expirationTimeRegisteredToken = config.expirationTimeRegisteredToken
+            this.expirationTimeRegisteredRefreshToken = config.expirationTimeRegisteredRefreshToken
         }
 
         /*
@@ -408,9 +407,10 @@ class Auth {
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
 
         let expirationTime = isGuest
-            ? this.expirationTimeGuestToken
-            : this.expirationTimeRegisteredToken
+            ? this.expirationTimeGuestRefreshToken
+            : this.expirationTimeRegisteredRefreshToken
 
+        // convert seconds to days
         if (expirationTime) {
             expirationTime = expirationTime / SECONDS_TO_DAYS_RATIO
         } else {

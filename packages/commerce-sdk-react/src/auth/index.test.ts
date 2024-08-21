@@ -467,8 +467,8 @@ describe('Auth', () => {
         const consoleSpy = jest.spyOn(console, 'warn')
         const modifiedConfig = {
             ...config,
-            expirationTimeGuestToken: 10000000,
-            expirationTimeRegisteredToken: 10000000
+            expirationTimeGuestRefreshToken: 10000000,
+            expirationTimeRegisteredRefreshToken: 10000000
         }
         new Auth(modifiedConfig)
         expect(consoleSpy).toHaveBeenCalledTimes(2)
