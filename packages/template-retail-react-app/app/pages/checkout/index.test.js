@@ -130,10 +130,10 @@ beforeEach(() => {
                 address1: '123 Main St',
                 city: 'Tampa',
                 countryCode: 'US',
-                firstName: 'Test',
-                fullName: 'Test McTester',
+                firstName: 'John',
+                fullName: 'John Smith',
                 id: '047b18d4aaaf4138f693a4b931',
-                lastName: 'McTester',
+                lastName: 'Smith',
                 phone: '(727) 555-1234',
                 postalCode: '33712',
                 stateCode: 'FL',
@@ -495,6 +495,16 @@ test('Can proceed through checkout as registered customer', async () => {
     const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
 
+    // Edit billing address
+    const sameAsShippingBtn = screen.getByText(/same as shipping address/i)
+    await user.click(sameAsShippingBtn)
+    const firstNameInput = screen.getByLabelText(/first name/i)
+    const lastNameInput = screen.getByLabelText(/last name/i)
+    await user.clear(firstNameInput)
+    await user.clear(lastNameInput)
+    await user.type(firstNameInput, 'John')
+    await user.type(lastNameInput, 'Smith')
+
     // Move to final review step
     await user.click(screen.getByText(/review order/i))
 
@@ -507,7 +517,9 @@ test('Can proceed through checkout as registered customer', async () => {
     expect(step3Content.getByText('•••• 5454')).toBeInTheDocument()
     expect(step3Content.getByText('1/2030')).toBeInTheDocument()
 
+    expect(step3Content.getByText('John Smith')).toBeInTheDocument()
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
+    screen.logTestingPlaygroundURL()
 
     // Place the order
     await user.click(placeOrderBtn)
