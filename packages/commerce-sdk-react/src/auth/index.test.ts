@@ -386,12 +386,16 @@ describe('Auth', () => {
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
 
-    test('dnt flag is set correctly', async () => {
-        const auth = new Auth({...config, defaultDnt: true})
+    test.each([
+        {defaultDnt: true, expected: {dnt: true}},
+        {defaultDnt: false, expected: {dnt: false}},
+        {defaultDnt: undefined, expected: {}}
+    ])('dnt flag is set correctly', async ({defaultDnt, expected}) => {
+        const auth = new Auth({...config, defaultDnt})
         await auth.loginGuestUser()
         expect(helpers.loginGuestUser).toHaveBeenCalledWith(
             expect.anything(),
-            expect.objectContaining({dnt: true})
+            expect.objectContaining(expected)
         )
     })
 
