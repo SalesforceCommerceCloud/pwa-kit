@@ -129,27 +129,15 @@ export const render = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
-    // appExtensions = getAppExtensionInstances()
-    const appExtensions = Object.entries(extensions).map(([name, Extension]) => {
-        logger.info(
-            `Instantiating ${name} extension.`,
-            {namespace: 'render'}
-        )
-        const config = {} // TODO: This is where we'll be assigning the application extension config object.
-        return new Extension(config)
-    })
-
-    res.locals.appExtensions = appExtensions
+    // Use locals to thread the application extensions through the rendering pipeline.
+    res.locals.appExtensions = extensions
 
     let WrappedApp = routeComponent(App, false, res.locals)
 
     // Initialize all the react app extensions.
-    appExtensions.forEach((appExtension) => {
-        logger.info(
-            `${appExtension.getName()}: Extending React application.`,
-            {namespace: 'render'}
-        )        
-        WrappedApp = appExtension.extendApp(WrappedApp)
+    extensions.forEach((extension) => {
+        logger.info(`${extension.getName()}: Extending React application.`, {namespace: 'render'})
+        WrappedApp = extension.extendApp(WrappedApp)
 
         if (!WrappedApp) {
             throw new Error(

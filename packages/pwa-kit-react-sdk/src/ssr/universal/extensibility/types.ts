@@ -9,10 +9,6 @@ import React from 'react'
 
 export type ExtensionClass<T extends IApplicationExtension> = new (...args: any[]) => T
 
-export type ExtensionsMap<T extends IApplicationExtension> = {
-    [key: string]: ExtensionClass<T>;
-};
-
 // TODO: Move this somewhere closer to the router code.
 export interface IRouteConfig {
     path: string;
