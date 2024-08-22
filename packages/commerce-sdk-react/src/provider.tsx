@@ -38,6 +38,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     clientSecret?: string
     silenceWarnings?: boolean
     logger?: Logger
+    defaultDnt?: boolean
     expirationTimeGuestRefreshToken?: number
     expirationTimeRegisteredRefreshToken?: number
 }
@@ -120,6 +121,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         logger,
+        defaultDnt,
         expirationTimeGuestRefreshToken,
         expirationTimeRegisteredRefreshToken
     } = props
@@ -190,6 +192,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientSecret,
             silenceWarnings,
             logger: configLogger,
+            defaultDnt,
             expirationTimeGuestRefreshToken,
             expirationTimeRegisteredRefreshToken
         })
@@ -228,7 +231,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 locale,
                 currency,
                 silenceWarnings,
-                logger: configLogger
+                logger: configLogger,
+                defaultDnt
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>

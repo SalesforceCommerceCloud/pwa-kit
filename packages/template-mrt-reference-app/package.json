@@ -41,6 +41,7 @@
     },
     "ssrOnly": [
       "ssr.js",
+      "ssr.js.map",
       "node_modules/**/*.*"
     ],
     "ssrShared": [

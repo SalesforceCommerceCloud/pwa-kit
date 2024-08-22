@@ -386,6 +386,19 @@ describe('Auth', () => {
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
 
+    test.each([
+        {defaultDnt: true, expected: {dnt: true}},
+        {defaultDnt: false, expected: {dnt: false}},
+        {defaultDnt: undefined, expected: {}}
+    ])('dnt flag is set correctly', async ({defaultDnt, expected}) => {
+        const auth = new Auth({...config, defaultDnt})
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUser).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining(expected)
+        )
+    })
+
     test('loginGuestUser with slas private', async () => {
         const auth = new Auth(configSLASPrivate)
         await auth.loginGuestUser()
