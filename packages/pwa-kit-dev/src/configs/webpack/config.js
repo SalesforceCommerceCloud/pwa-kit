@@ -23,6 +23,7 @@ import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {buildAliases} from '../../utils/extensibility-utils'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -213,26 +214,27 @@ const baseConfig = (target) => {
                     alias: {
                         // Create alias's for all the extensions as they are being imported from the SDK package and cannot be
                         // resolved from that location.
-                        ...(appConfig?.extensions || []).reduce((acc, extension) => {
-                            // TODO: This is duplicate code, we should create a util for it.
-                            // NOTE: Wew wouldn't have to do this is our extensions were "built"
-                            const setupAppFilePathBase = `${projectDir}/node_modules/${extension}/src/setup-app`
-                            const foundType = ['ts', 'js'].find((type) =>
-                                fse.existsSync(`${setupAppFilePathBase}.${type}`)
-                            )
+                        ...buildAliases(appConfig?.extensions),
+                        // ...(appConfig?.extensions || []).reduce((acc, extension) => {
+                        //     // TODO: This is duplicate code, we should create a util for it.
+                        //     // NOTE: Wew wouldn't have to do this is our extensions were "built"
+                        //     const setupAppFilePathBase = `${projectDir}/node_modules/${extension}/src/setup-app`
+                        //     const foundType = ['ts', 'js'].find((type) =>
+                        //         fse.existsSync(`${setupAppFilePathBase}.${type}`)
+                        //     )
 
-                            if (!foundType) {
-                                // no setup-server file found, early exit because it's optional
-                                return acc
-                            }
+                        //     if (!foundType) {
+                        //         // no setup-server file found, early exit because it's optional
+                        //         return acc
+                        //     }
 
-                            return {
-                                ...acc,
-                                [`${extension}/setup-app`]: path.resolve(
-                                    `${setupAppFilePathBase}.${foundType}`
-                                )
-                            }
-                        }, {}),
+                        //     return {
+                        //         ...acc,
+                        //         [`${extension}/setup-app`]: path.resolve(
+                        //             `${setupAppFilePathBase}.${foundType}`
+                        //         )
+                        //     }
+                        // }, {}),
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
