@@ -65,7 +65,7 @@ export const features = [
                 id: 'home.features.description.cart_checkout'
             }
         }),
-        icon: <BasketIcon />
+        icon: <BasketIcon aria-hidden="true" />
     },
     {
         message: defineMessages({
@@ -79,7 +79,7 @@ export const features = [
                 id: 'home.features.description.einstein_recommendations'
             }
         }),
-        icon: <LikeIcon />
+        icon: <LikeIcon aria-hidden="true" />
     },
     {
         message: defineMessages({
@@ -90,7 +90,7 @@ export const features = [
                 id: 'home.features.description.my_account'
             }
         }),
-        icon: <AccountIcon />
+        icon: <AccountIcon aria-hidden="true" />
     },
     {
         message: defineMessages({
@@ -104,7 +104,7 @@ export const features = [
                 id: 'home.features.description.shopper_login'
             }
         }),
-        icon: <PlugIcon />
+        icon: <PlugIcon aria-hidden="true" />
     },
     {
         message: defineMessages({
@@ -118,7 +118,7 @@ export const features = [
                 id: 'home.features.description.components'
             }
         }),
-        icon: <DashboardIcon />
+        icon: <DashboardIcon aria-hidden="true" />
     },
     {
         message: defineMessages({
@@ -129,6 +129,6 @@ export const features = [
                 id: 'home.features.description.wishlist'
             }
         }),
-        icon: <HeartIcon />
+        icon: <HeartIcon aria-hidden="true" />
     }
 ]
