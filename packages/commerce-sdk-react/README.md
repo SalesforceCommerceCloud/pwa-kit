@@ -64,7 +64,6 @@ const AppConfig = ({children}) => {
             shortCode="12345678"
             locale="en-US"
             currency="USD"
-            cookieTtl={1800} // TODO: implement default value
         >
             {children}
         </CommerceApiProvider>
@@ -227,9 +226,32 @@ const MyComponent = ({children}) => {
 }
 ```
 
-### Cookie TTL
+### Customization of Refresh Token Expiration Time
 
-TODO: Add information about setting cookie TTL
+Users can customize the expiration time of the guest and registered user refresh tokens by passing in the `expirationTimeGuestRefreshToken` and `expirationTimeRegisteredRefreshToken` props in the provider in seconds. 
+
+The default expiration time for these tokens are 30 days (2592000 seconds) for guest refresh tokens and 90 days (7776000 seconds) for registered refresh tokens provided by SLAS. If a user passes in a value that exceeds these default values, the user will be prompted with a warning and the default values will be used instead.
+
+```js
+const AppConfig = ({children}) => {
+    return (
+        <CommerceApiProvider
+            clientId="12345678-1234-1234-1234-123412341234"
+            organizationId="f_ecom_aaaa_001"
+            proxy="localhost:3000/mobify/proxy/api"
+            redirectURI="localhost:3000/callback"
+            siteId="RefArch"
+            shortCode="12345678"
+            locale="en-US"
+            currency="USD"
+            expirationTimeGuestRefreshToken={1296000} // 15 days
+            expirationTimeRegisteredRefreshToken={3888000} // 45 days
+        >
+            {children}
+        </CommerceApiProvider>
+    )
+}
+```
 
 ## Hooks
 
