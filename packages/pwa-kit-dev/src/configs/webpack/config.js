@@ -383,25 +383,16 @@ const staticFolderCopyPlugin = new CopyPlugin({
     ]
 })
 
-// TODO: Make this work with multiple application extensions.
-const extensionsStaticFolderCopyPlugin = new CopyPlugin({
-    patterns: [
-        {
-            from: path
-                .resolve(`node_modules/@salesforce/extension-sample/assets`)
-                .replace(/\\/g, '/'),
-            to: `static/extension-sample/`,
-            noErrorOnMissing: true
-        },
-        {
-            from: path
-                .resolve(`node_modules/@salesforce/extension-store-finder/assets`)
-                .replace(/\\/g, '/'),
-            to: `static/extension-store-finder/`,
-            noErrorOnMissing: true
-        }
-    ]
-})
+const extensionsStaticFolderCopyPlugin = (() =>
+    new CopyPlugin({
+        patterns: (appConfig?.extensions || []).map((extension) => {
+            return {
+                from: path.resolve(`node_modules/${extension}/assets`).replace(/\\/g, '/'),
+                to: `static/${extension.replaceAll('/', '_')}/`,
+                noErrorOnMissing: true
+            }
+        })
+    }))()
 
 const ruleForBabelLoader = (babelPlugins) => {
     return {
