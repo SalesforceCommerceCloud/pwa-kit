@@ -13,6 +13,7 @@ import withRedBorder from './components/with-red-border'
 
 const SamplePage = loadable(() => import('./pages/sample'))
 
+const defaultPath: string = '/sample-page'
 class Sample implements IApplicationExtension {
     private config: IConfig;
 
@@ -32,7 +33,7 @@ class Sample implements IApplicationExtension {
         return [
             {
                 exact: true,
-                path: `/${this.config?.path || 'sample-page'}`,
+                path: this.config?.path || defaultPath,
                 component: SamplePage
             },
             ...routes

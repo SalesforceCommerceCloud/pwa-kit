@@ -129,10 +129,11 @@ export const render = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
+    // appExtensions = getAppExtensionInstances()
     const appExtensions = Object.entries(extensions).map(([name, Extension]) => {
         console.log(`Instantiating ${name} extension.`)
         const config = {} // Here we'll use a utility to get the config for this specific application extension
-        return new Extension()
+        return new Extension(config)
     })
 
     res.locals.appExtensions = appExtensions

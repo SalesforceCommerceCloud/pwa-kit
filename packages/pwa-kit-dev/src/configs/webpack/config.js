@@ -301,6 +301,13 @@ const baseConfig = (target) => {
                             use: {
                                 loader: findDepInStack('source-map-loader')
                             }
+                        },
+                        {
+                            test: /universal\/extensibility\/extensions/,
+                            loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
+                            options: {
+                                projectDir
+                            }
                         }
                     ].filter(Boolean)
                 }
@@ -472,16 +479,6 @@ const client =
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
-            // Add extensions to the main entry point
-            // TODO: Move this into base and harden it up
-            config.module.rules.push({
-                test: /universal\/extensibility\/extensions/,
-                loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
-                options: {
-                    projectDir
-                }
-            })
-
             return {
                 ...config,
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
@@ -534,16 +531,6 @@ const renderer =
     fse.existsSync(resolve(projectDir, 'node_modules', '@salesforce', 'pwa-kit-react-sdk')) &&
     baseConfig('node')
         .extend((config) => {
-            // Add extensions to the react renderer
-            // TODO: Move this into base and harden it up
-            config.module.rules.push({
-                test: /universal\/extensibility\/extensions/,
-                loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
-                options: {
-                    projectDir
-                }
-            })
-
             return {
                 ...config,
                 // Must be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
