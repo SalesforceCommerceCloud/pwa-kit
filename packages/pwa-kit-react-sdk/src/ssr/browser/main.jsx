@@ -118,8 +118,11 @@ export const start = () => {
     let WrappedApp = routeComponent(App, false, locals)
 
     const appExtensions = Object.entries(extensions).map(([name, Extension]) => {
-        console.log(`Instantiating ${name} extension.`)
-        const config = {}
+        logger.info(
+            `Instantiating ${name} extension.`,
+            {namespace: 'start'}
+        )
+        const config = {} // TODO: This is where we'll be assigning the application extension config object.
         return new Extension(config)
     })
 
@@ -128,8 +131,10 @@ export const start = () => {
     // Initialize all the react app extensions.
     // TODO: Make this a handler of sorts, maybe something like `initializeExtensions`
     appExtensions.forEach((appExtension) => {
-        console.log(`Initializing the ${appExtension.getName()} extension for CSR.`)
-
+        logger.info(
+            `${appExtension.getName()}: Extending React application.`,
+            {namespace: 'start'}
+        )
         WrappedApp = appExtension.extendApp(WrappedApp)
 
         if (!WrappedApp) {

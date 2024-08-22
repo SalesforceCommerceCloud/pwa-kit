@@ -131,8 +131,11 @@ export const render = async (req, res, next) => {
 
     // appExtensions = getAppExtensionInstances()
     const appExtensions = Object.entries(extensions).map(([name, Extension]) => {
-        console.log(`Instantiating ${name} extension.`)
-        const config = {} // Here we'll use a utility to get the config for this specific application extension
+        logger.info(
+            `Instantiating ${name} extension.`,
+            {namespace: 'render'}
+        )
+        const config = {} // TODO: This is where we'll be assigning the application extension config object.
         return new Extension(config)
     })
 
@@ -142,7 +145,10 @@ export const render = async (req, res, next) => {
 
     // Initialize all the react app extensions.
     appExtensions.forEach((appExtension) => {
-        console.log(`Extending the App using the ${appExtension.getName()} extension.`)
+        logger.info(
+            `${appExtension.getName()}: Extending React application.`,
+            {namespace: 'render'}
+        )        
         WrappedApp = appExtension.extendApp(WrappedApp)
 
         if (!WrappedApp) {
