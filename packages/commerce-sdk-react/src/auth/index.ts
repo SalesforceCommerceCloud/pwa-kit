@@ -38,6 +38,7 @@ interface AuthConfig extends ApiClientConfigParams {
     clientSecret?: string
     silenceWarnings?: boolean
     logger: Logger
+    defaultDnt?: boolean
 }
 
 interface JWTHeaders {
@@ -178,6 +179,7 @@ class Auth {
     private clientSecret: string
     private silenceWarnings: boolean
     private logger: Logger
+    private defaultDnt: boolean | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -226,6 +228,8 @@ class Auth {
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
         this.logger = config.logger
+
+        this.defaultDnt = config.defaultDnt
 
         /*
          * There are 2 ways to enable SLAS private client mode.
@@ -453,7 +457,10 @@ class Auth {
                     () =>
                         helpers.refreshAccessToken(
                             this.client,
-                            {refreshToken},
+                            {
+                                refreshToken,
+                                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt})
+                            },
                             {
                                 clientSecret: this.clientSecret
                             }
@@ -503,12 +510,19 @@ class Auth {
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
-            {...(usid && {usid})},
+            {
+                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...(usid && {usid})
+            },
             {clientSecret: this.clientSecret}
         ] as const
         const guestPublicArgs = [
             this.client,
-            {redirectURI: this.redirectURI, ...(usid && {usid})}
+            {
+                redirectURI: this.redirectURI,
+                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...(usid && {usid})
+            }
         ] as const
         const callback = this.clientSecret
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
@@ -566,6 +580,7 @@ class Auth {
             },
             {
                 redirectURI,
+                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
                 ...(usid && {usid})
             }
         )
