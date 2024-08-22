@@ -67,7 +67,8 @@ const ProfileCard = () => {
     const {isRegistered, customerId} = customer
 
     const updateCustomerMutation = useShopperCustomersMutation('updateCustomer')
-
+    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const logout = useAuthHelper(AuthHelpers.Logout)
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
@@ -106,7 +107,8 @@ const ProfileCard = () => {
                         // updated email. This will lead to issues where you change your email but end
                         // up not being able to login since 'login' will no longer match the email.
                         email: values.email,
-                        login: values.email
+                        login: values.email,
+                        currentPassword: 'pass'
                     }
                 },
                 {
@@ -119,6 +121,12 @@ const ProfileCard = () => {
                             }),
                             status: 'success',
                             isClosable: true
+                        })
+
+                        // logout.mutate()
+                        login.mutate({
+                            username: values.email,
+                            password: 'pass'
                         })
                         headingRef?.current?.focus()
                     }
