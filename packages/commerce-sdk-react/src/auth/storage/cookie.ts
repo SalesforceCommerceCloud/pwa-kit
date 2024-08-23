@@ -30,9 +30,8 @@ export class CookieStorage extends BaseStorage {
         })
     }
     get(key: string) {
-        const suffixedKey = this.getSuffixedKey(key)
+        const suffixedKey = key == 'dwsid' ? key : this.getSuffixedKey(key)
         let value = Cookies.get(suffixedKey) || ''
-
         if (value) {
             // Some values, like the access token, may be split
             // across multiple keys to fit under ECOM cookie size
@@ -49,7 +48,7 @@ export class CookieStorage extends BaseStorage {
         return value
     }
     delete(key: string, options?: Cookies.CookieAttributes) {
-        const suffixedKey = this.getSuffixedKey(key)
+        const suffixedKey = key == 'dwsid' ? key : this.getSuffixedKey(key)
 
         Cookies.remove(suffixedKey, {
             ...getDefaultCookieAttributes(),

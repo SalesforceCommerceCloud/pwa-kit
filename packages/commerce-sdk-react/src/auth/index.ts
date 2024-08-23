@@ -70,6 +70,7 @@ type AuthDataKeys =
     | 'refresh_token_guest'
     | 'refresh_token_registered'
     | 'access_token_sfra'
+    | 'dwsid'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -157,6 +158,10 @@ const DATA_MAP: AuthDataMap = {
     access_token_sfra: {
         storageType: 'cookie',
         key: 'cc-at'
+    },
+    dwsid: {
+        storageType: 'cookie',
+        key: 'dwsid'
     }
 }
 
@@ -361,6 +366,12 @@ class Auth {
 
     private clearSFRAAuthToken() {
         const {key, storageType} = DATA_MAP['access_token_sfra']
+        const store = this.stores[storageType]
+        store.delete(key)
+    }
+
+    private clearECOMSession() {
+        const {key, storageType} = DATA_MAP['dwsid']
         const store = this.stores[storageType]
         store.delete(key)
     }
@@ -586,7 +597,7 @@ class Auth {
         )
         this.handleTokenResponse(token, isGuest)
         if (onClient() && this.OCAPISessionsURL) {
-            void this.createOCAPISession()
+            void this.clearECOMSession()
         }
         return token
     }
