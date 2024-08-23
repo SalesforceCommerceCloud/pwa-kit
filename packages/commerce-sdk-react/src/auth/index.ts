@@ -33,6 +33,13 @@ import {Logger} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
+
+export type OverrideStorageTTLOptions = {
+    accessToken?: number
+    refreshTokenGuest?: number
+    refreshTokenRegistered?: number
+}
+
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
@@ -44,10 +51,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
-    // TODO: rename these
-    expirationTimeGuestRefreshToken?: number
-    expirationTimeRegisteredRefreshToken?: number
-    overrideAccessTokenTTL?: number
+    overrideStorageTTL?: OverrideStorageTTLOptions
 }
 
 interface JWTHeaders {
@@ -189,8 +193,8 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
-    private expirationTimeGuestRefreshToken: number | undefined
-    private expirationTimeRegisteredRefreshToken: number | undefined
+    private overrideStorageTTL: OverrideStorageTTLOptions | undefined
+
     private currentRefreshToken: string
 
     constructor(config: AuthConfig) {
@@ -243,23 +247,27 @@ class Auth {
 
         this.defaultDnt = config.defaultDnt
 
+        this.overrideStorageTTL = {}
+
         if (
-            config.expirationTimeGuestRefreshToken &&
-            config.expirationTimeGuestRefreshToken > DEFAULT_EXPIRATION_TIME_GUEST_REFRESH_TOKEN
+            config.overrideStorageTTL?.refreshTokenGuest &&
+            config.overrideStorageTTL.refreshTokenGuest >
+                DEFAULT_EXPIRATION_TIME_GUEST_REFRESH_TOKEN
         ) {
             this.logWarning(EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_GUEST)
         } else {
-            this.expirationTimeGuestRefreshToken = config.expirationTimeGuestRefreshToken
+            this.overrideStorageTTL.refreshTokenGuest = config.overrideStorageTTL?.refreshTokenGuest
         }
 
         if (
-            config.expirationTimeRegisteredRefreshToken &&
-            config.expirationTimeRegisteredRefreshToken >
+            config.overrideStorageTTL?.refreshTokenRegistered &&
+            config.overrideStorageTTL.refreshTokenRegistered >
                 DEFAULT_EXPIRATION_TIME_REGISTIERED_REFRESH_TOKEN
         ) {
             this.logWarning(EXPIRATION_TIME_EXCEEDS_DEFAULT_WARNING_MSG_REGISTERED)
         } else {
-            this.expirationTimeRegisteredRefreshToken = config.expirationTimeRegisteredRefreshToken
+            this.overrideStorageTTL.refreshTokenRegistered =
+                config.overrideStorageTTL?.refreshTokenRegistered
         }
 
         this.currentRefreshToken = ''
@@ -340,9 +348,12 @@ class Auth {
     /**
      * Used to validate JWT token expiration.
      */
-    private isTokenExpired(token: string) {
+    private isTokenExpired(token: string, overrideTTL?: number) {
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
-        const validTimeSeconds = exp - iat - 60
+        let validTimeSeconds = exp - iat - 60
+        if (overrideTTL && overrideTTL < validTimeSeconds) {
+            validTimeSeconds = overrideTTL
+        }
         const tokenAgeSeconds = Date.now() / 1000 - iat
         return validTimeSeconds <= tokenAgeSeconds
     }
@@ -414,14 +425,13 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-
         let expirationTime
 
         if (this.currentRefreshToken !== res.refresh_token) {
             this.currentRefreshToken = res.refresh_token
             const providedExpirationTime = isGuest
-                ? this.expirationTimeGuestRefreshToken
-                : this.expirationTimeRegisteredRefreshToken
+                ? this.overrideStorageTTL?.refreshTokenGuest
+                : this.overrideStorageTTL?.refreshTokenRegistered
 
             // orginally in seconds, we must convert into days
             expirationTime =
@@ -493,7 +503,10 @@ class Auth {
         }
         const accessToken = this.getAccessToken()
 
-        if (accessToken && !this.isTokenExpired(accessToken)) {
+        if (
+            accessToken &&
+            !this.isTokenExpired(accessToken, this.overrideStorageTTL?.accessToken)
+        ) {
             return this.data
         }
         const refreshTokenRegistered = this.get('refresh_token_registered')

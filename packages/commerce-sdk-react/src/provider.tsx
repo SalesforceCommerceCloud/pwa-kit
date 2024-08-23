@@ -24,6 +24,7 @@ import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {Logger} from './types'
 import {MOBIFY_PATH, SLAS_PRIVATE_PROXY_PATH} from './constant'
+import {OverrideStorageTTLOptions} from './auth'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
@@ -39,8 +40,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger?: Logger
     defaultDnt?: boolean
-    expirationTimeGuestRefreshToken?: number
-    expirationTimeRegisteredRefreshToken?: number
+    overrideStorageTTL?: OverrideStorageTTLOptions
 }
 
 /**
@@ -81,8 +81,11 @@ export const AuthContext = React.createContext({} as Auth)
                     enablePWAKitPrivateClient={true}
                     currency="USD"
                     logger={logger}
-                    expirationTimeGuestRefreshToken={2592000}
-                    expirationTimeRegisteredRefreshToken={7776000}
+                    overrideStorageTTL={{
+                        accessToken: 1740
+                        refreshTokenGuest: 2592000
+                        refreshTokenRegistered: 7776000
+                    }}
                 >
                     {children}
                 </CommerceApiProvider>
@@ -122,8 +125,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         silenceWarnings,
         logger,
         defaultDnt,
-        expirationTimeGuestRefreshToken,
-        expirationTimeRegisteredRefreshToken
+        overrideStorageTTL
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -193,8 +195,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             silenceWarnings,
             logger: configLogger,
             defaultDnt,
-            expirationTimeGuestRefreshToken,
-            expirationTimeRegisteredRefreshToken
+            overrideStorageTTL
         })
     }, [
         clientId,
@@ -210,8 +211,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         configLogger,
-        expirationTimeGuestRefreshToken,
-        expirationTimeRegisteredRefreshToken
+        overrideStorageTTL
     ])
 
     // Initialize the session
@@ -232,7 +232,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 currency,
                 silenceWarnings,
                 logger: configLogger,
-                defaultDnt
+                defaultDnt,
+                overrideStorageTTL
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>
