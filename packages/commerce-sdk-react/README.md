@@ -232,7 +232,7 @@ Users can customize the expiration time of the guest and registered user refresh
 
 The default expiration time for these tokens are 30 days (2592000 seconds) for guest refresh tokens and 90 days (7776000 seconds) for registered refresh tokens provided by SLAS. If a user passes in a value that exceeds these default values, the user will be prompted with a warning and the default values will be used instead.
 
-```js
+```jsx
 const AppConfig = ({children}) => {
     return (
         <CommerceApiProvider

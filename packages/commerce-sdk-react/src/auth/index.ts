@@ -44,8 +44,10 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
+    // TODO: rename these
     expirationTimeGuestRefreshToken?: number
     expirationTimeRegisteredRefreshToken?: number
+    overrideAccessTokenTTL?: number
 }
 
 interface JWTHeaders {
@@ -189,6 +191,7 @@ class Auth {
     private defaultDnt: boolean | undefined
     private expirationTimeGuestRefreshToken: number | undefined
     private expirationTimeRegisteredRefreshToken: number | undefined
+    private currentRefreshToken: string
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -258,6 +261,8 @@ class Auth {
         } else {
             this.expirationTimeRegisteredRefreshToken = config.expirationTimeRegisteredRefreshToken
         }
+
+        this.currentRefreshToken = ''
 
         /*
          * There are 2 ways to enable SLAS private client mode.
@@ -410,20 +415,23 @@ class Auth {
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
 
-        let expirationTime = isGuest
-            ? this.expirationTimeGuestRefreshToken
-            : this.expirationTimeRegisteredRefreshToken
+        let expirationTime
 
-        // convert seconds to days
-        if (expirationTime) {
-            expirationTime = expirationTime / SECONDS_TO_DAYS_RATIO
-        } else {
-            expirationTime = res.refresh_token_expires_in / SECONDS_TO_DAYS_RATIO
+        if (this.currentRefreshToken !== res.refresh_token) {
+            this.currentRefreshToken = res.refresh_token
+            const providedExpirationTime = isGuest
+                ? this.expirationTimeGuestRefreshToken
+                : this.expirationTimeRegisteredRefreshToken
+
+            // orginally in seconds, we must convert into days
+            expirationTime =
+                (providedExpirationTime ?? res.refresh_token_expires_in) / SECONDS_TO_DAYS_RATIO
         }
 
+        // TODO: should this also be moved in the conditional?
         this.set(refreshTokenKey, res.refresh_token, {
             // expirationTime can be in days or as a Date object
-            expires: expirationTime
+            ...(expirationTime && {expires: expirationTime})
         })
     }
 
