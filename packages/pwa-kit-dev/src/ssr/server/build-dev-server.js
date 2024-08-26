@@ -153,7 +153,7 @@ export const DevServerMixin = {
             config = require(projectWebpackPath)
         }
 
-        const clientConfig = config.find((cnf) => cnf.name === CLIENT)
+        const clientConfig = config.find((cfg) => cfg.name === CLIENT)
 
         // We update HMR basePath on the clientConfig here since it needs to happen before HMR is started
         if (clientConfig && process.env.HMR !== 'false') {
