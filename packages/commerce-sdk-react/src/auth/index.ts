@@ -39,6 +39,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
+    sessionTimeout?: number
 }
 
 interface JWTHeaders {
@@ -70,6 +71,7 @@ type AuthDataKeys =
     | 'refresh_token_guest'
     | 'refresh_token_registered'
     | 'access_token_sfra'
+    | 'session_timeout'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -157,6 +159,10 @@ const DATA_MAP: AuthDataMap = {
     access_token_sfra: {
         storageType: 'cookie',
         key: 'cc-at'
+    },
+    session_timeout: {
+        storageType: 'local',
+        key: 'session_timeout'
     }
 }
 
@@ -180,6 +186,7 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
+    private sessionTimeout: number | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -260,6 +267,54 @@ class Auth {
               config.clientSecret || ''
 
         this.silenceWarnings = config.silenceWarnings || false
+
+        // TODO: add check for upper limit & add warning
+        if (config.sessionTimeout && config.sessionTimeout > 0) {
+            this.sessionTimeout = config.sessionTimeout
+            void this.handleSessionTimeout()
+        }
+    }
+
+    private handleSessionTimeout = async () => {
+        if (!this.sessionTimeout) {
+            return
+        }
+
+        let shouldSetTimeout = true
+        if (this.get('session_timeout')) {
+            const localStorageTimeout = Number(this.get('session_timeout'))
+            if (Date.now() > localStorageTimeout) {
+                const isGuest = Boolean(this.get('refresh_token_guest'))
+                if (isGuest) {
+                    this.clearStorage()
+                    await this.loginGuestUser()
+                } else {
+                    await this.logout()
+                }
+            } else {
+                shouldSetTimeout = false
+            }
+        }
+
+        if (shouldSetTimeout) {
+            this.set('session_timeout', (Date.now() + this.sessionTimeout).toString())
+            this.initSessionTimeoutCallback()
+        }
+    }
+
+    private initSessionTimeoutCallback = () => {
+        if (!this.get('session_timeout')) {
+            return
+        }
+
+        let timeRemaining = Number(this.get('session_timeout')) - Date.now()
+        if (timeRemaining < 0) {
+            timeRemaining = 0
+        }
+
+        setTimeout(() => {
+            void this.handleSessionTimeout()
+        }, timeRemaining)
     }
 
     get(name: AuthDataKeys) {
