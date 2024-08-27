@@ -18,7 +18,7 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
-import {getBundlePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getBundlePath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'

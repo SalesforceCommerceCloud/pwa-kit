@@ -19,7 +19,7 @@ import open from 'open'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
-import {getBundlePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getBundlePath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 import {
     SERVER,
     CLIENT,

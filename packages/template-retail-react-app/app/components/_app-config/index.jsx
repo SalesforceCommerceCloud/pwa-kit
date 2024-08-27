@@ -27,7 +27,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath, getProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getEnvBasePath, getProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 

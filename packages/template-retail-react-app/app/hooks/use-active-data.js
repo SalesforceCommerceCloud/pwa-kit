@@ -6,7 +6,7 @@
  */
 /*global dw*/
 import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 const useActiveData = () => {

@@ -12,7 +12,7 @@
 
 import crypto from 'crypto'
 import {proxyConfigs} from '../ssr-shared'
-import {getProxyPath, getBundlePath} from '../ssr-namespace-paths'
+import {getProxyPath, getBundlePath} from '../ssr-paths'
 import logger from '../logger-instance'
 
 // TODO: Clean this up or provide a way to toggle

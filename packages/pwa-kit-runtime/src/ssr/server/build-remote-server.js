@@ -44,7 +44,7 @@ import {
     getBundlePath,
     getHealthCheckPath,
     getSlasPrivateProxyPath
-} from '../../utils/ssr-namespace-paths'
+} from '../../utils/ssr-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'

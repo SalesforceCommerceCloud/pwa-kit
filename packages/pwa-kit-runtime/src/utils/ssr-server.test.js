@@ -46,7 +46,7 @@ import {
     APPLICATION_OCTET_STREAM
 } from '../ssr/server/constants'
 
-import {getProxyPath} from './ssr-namespace-paths'
+import {getProxyPath} from './ssr-paths'
 
 const baseMobify = {
     ssrEnabled: true,
