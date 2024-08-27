@@ -10,16 +10,9 @@ const sites = require('./sites.js')
 module.exports = {
     app: {
         url: {
-            site: 'path',
-            locale: 'path',
-            showDefaults: true,
-            interpretPlusSignAsSpace: false
+            locale: 'none'
         },
         defaultSite: 'RefArch',
-        siteAliases: {
-            RefArch: 'us',
-            RefArchGlobal: 'global'
-        },
         sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
