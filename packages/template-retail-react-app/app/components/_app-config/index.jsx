@@ -50,23 +50,13 @@ const AppConfig = ({children, locals = {}}) => {
     const headers = {
         'correlation-id': correlationId
     }
-    const onClient = typeof window !== 'undefined'
 
     const commerceApiConfig = locals.appConfig.commerceAPI
 
     const appOrigin = getAppOrigin()
 
-    const isLocalhost = appOrigin.includes('localhost')
-
-    // On localhost, we always want to include the namespace
-    // On MRT, we only want to include the namespace on client side proxy requests
-    // as the namespace is omitted from MRT server side endpoints
-    const proxy =
-        !isLocalhost && !onClient
-            ? `${appOrigin}${commerceApiConfig.proxyPath}`
-            : `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
-
     const redirectURI = `${appOrigin}/callback`
+    const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
 
     return (
         <CommerceApiProvider
