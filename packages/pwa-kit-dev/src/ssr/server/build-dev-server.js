@@ -153,14 +153,6 @@ export const DevServerMixin = {
             config = require(projectWebpackPath)
         }
 
-        const clientConfig = config.find((cfg) => cfg.name === CLIENT)
-
-        // We update HMR basePath on the clientConfig here since it needs to happen before HMR is started
-        if (clientConfig && process.env.HMR !== 'false') {
-            const hmrBasePath = `${getBundlePath()}/development/`
-            clientConfig.output.publicPath = hmrBasePath
-        }
-
         app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
         app.__isInitialBuild = true
