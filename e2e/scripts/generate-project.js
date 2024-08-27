@@ -21,11 +21,14 @@ const main = async (opts) => {
     let cliResponsesJsonArr = JSON.parse(project);
     cliResponsesJsonArr.forEach((item) => {
       cliResponses.push({
-        expectedPrompt: item.expectedPrompt,
+        expectedPrompt: new RegExp(
+            item.expectedPrompt,
+            "i"
+        ),
         response: item.response
       })
-      console.log(`  Expected Prompt: ${item.expectedPrompt}`);
-      console.log(`  Response: ${item.response}`);
+      //console.log(`  Expected Prompt: ${item.expectedPrompt}`);
+      //console.log(`  Response: ${item.response}`);
     });
   } catch (err) {
     console.log("Errrrrrrrrrrrrrrrrrrrrr="+cliResponses);
