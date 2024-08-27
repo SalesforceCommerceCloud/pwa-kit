@@ -4,51 +4,37 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {getEnvBasePath, getProxyPath, getBundlePath} from './ssr-namespace-paths'
-import {getConfig} from './ssr-config'
+import {
+    proxyBasePath,
+    bundleBasePath,
+    cachingBasePath,
+    healthCheckPath,
+    slasPrivateProxyPath,
+    ssrNamespace
+} from './ssr-namespace-paths'
 
-jest.mock('./ssr-config', () => {
-    return {
-        getConfig: jest.fn()
-    }
-})
-
-const mockConfig = {
-    envBasePath: '/test'
-}
-
-describe('environment base path tests', () => {
-    beforeEach(() => {
-        jest.resetModules()
-        jest.resetAllMocks()
+describe('ssr-namespace-paths tests', () => {
+    test('proxyBasePath is correctly set', () => {
+        expect(proxyBasePath).toBe('/mobify/proxy')
     })
 
-    test('basePath is returned from config', () => {
-        getConfig.mockImplementation(() => mockConfig)
-        expect(getEnvBasePath()).toBe('/test')
+    test('bundleBasePath is correctly set', () => {
+        expect(bundleBasePath).toBe('/mobify/bundle')
     })
 
-    test('basePath is included in proxy path', () => {
-        getConfig.mockImplementation(() => mockConfig)
-        expect(getProxyPath()).toBe('/test/mobify/proxy')
+    test('cachingBasePath is correctly set', () => {
+        expect(cachingBasePath).toBe('/mobify/caching')
     })
 
-    test('basePath is included in bundle path', () => {
-        getConfig.mockImplementation(() => mockConfig)
-        expect(getBundlePath()).toBe('/test/mobify/bundle')
+    test('healthCheckPath is correctly set', () => {
+        expect(healthCheckPath).toBe('/mobify/ping')
     })
 
-    test('basePath is set to empty string if there is no config', () => {
-        getConfig.mockImplementation(() => {})
-        expect(getEnvBasePath()).toBe('')
+    test('slasPrivateProxyPath is correctly set', () => {
+        expect(slasPrivateProxyPath).toBe('/mobify/slas/private')
     })
 
-    test('basePath is set to empty string if envBasePath is not a string', () => {
-        getConfig.mockImplementation(() => {
-            return {
-                envBasePath: () => {}
-            }
-        })
-        expect(getEnvBasePath()).toBe('')
+    test('ssrNamespace is an empty string', () => {
+        expect(ssrNamespace).toBe('')
     })
 })
