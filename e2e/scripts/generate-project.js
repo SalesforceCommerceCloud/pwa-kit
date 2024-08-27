@@ -57,6 +57,7 @@ program.description(
   `Generate a retail-react-app project using the key <project-key>`
 );
 
+/*
 program.addArgument(
   new Argument("<project-key>", "project key").choices([
     "retail-app-demo",
@@ -65,6 +66,7 @@ program.addArgument(
     "retail-app-private-client",
   ])
 );
+ */
 
 program.parse(process.argv);
 
