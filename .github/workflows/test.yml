@@ -99,12 +99,12 @@ jobs:
           {
             expectedPrompt: /Do you wish to set up a phased headless rollout?/i,
             response: "${{ github.event.inputs.hybrid }}",
-          },
+          }
           ]' > generator-responses.json
       - name: Generate new project
         run: |
-        cat generator-responses.json
-        #node e2e/scripts/generate-project.js "$(cat myjson.json)"
+          cat generator-responses.json
+          #node e2e/scripts/generate-project.js "$(cat myjson.json)"
 
 
 
