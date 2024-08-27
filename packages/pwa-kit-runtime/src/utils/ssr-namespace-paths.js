@@ -16,9 +16,9 @@ const CACHING_PATH_BASE = `${MOBIFY_PATH}/caching`
 const HEALTHCHECK_PATH = `${MOBIFY_PATH}/ping`
 const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
-// The following variables were introduced in v3.6,
+// The following variables were introduced in v3.7,
 // before the env base path feature was fully implemented.
-// In v3.7, we added the env base path support and the implementation has
+// In v3.8, we added the env base path support and the implementation has
 // changed from using static variables to functions.
 // Thus, we deprecate the following variables to avoid breaking change.
 // We will remove the deprecation in future major releases.
