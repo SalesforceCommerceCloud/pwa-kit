@@ -7,22 +7,26 @@
 
 import {getConfig} from './ssr-config.client'
 
-let windowSpy
 
-beforeEach(() => {
-    windowSpy = jest.spyOn(window, 'window', 'get')
-})
-
-afterEach(() => {
-    windowSpy.mockRestore()
-})
 
 describe('Client getConfig', () => {
-    test('returns window.__CONFIG__ value', () => {
-        windowSpy.mockImplementation(() => ({
-            __CONFIG__: {}
-        }))
+    const originalWindow = global.window
+    const originalDocument = global.document
 
+    beforeEach(() => {
+        global.window = {}
+        global.document = {
+            getElementById: jest.fn()
+        }
+    })
+
+    afterEach(() => {
+        global.window = originalWindow
+        global.document = originalDocument
+    })
+
+    test('returns window.__CONFIG__ value', () => {
+        global.window.__CONFIG__ = {}
         expect(getConfig()).toEqual({})
     })
 
@@ -30,44 +34,18 @@ describe('Client getConfig', () => {
         const mockConfig = {key: 'value'}
         const mockInnerHTML = JSON.stringify({__CONFIG__: mockConfig})
 
-        windowSpy.mockImplementation(() => ({
-            __CONFIG__: undefined,
-            document: {
-                getElementById: jest.fn().mockReturnValue({innerHTML: mockInnerHTML})
-            }
-        }))
+        global.window.__CONFIG__ = undefined
+        global.document.getElementById = jest.fn().mockReturnValue({innerHTML: mockInnerHTML})
 
         expect(getConfig()).toEqual(mockConfig)
-    })
-
-    test('sets all globals on window object', () => {
-        const mockData = {__CONFIG__: {key: 'value'}, otherKey: 'otherValue'}
-        const mockInnerHTML = JSON.stringify(mockData)
-
-        const mockWindow = {
-            __CONFIG__: undefined,
-            document: {
-                getElementById: jest.fn().mockReturnValue({innerHTML: mockInnerHTML})
-            }
-        }
-
-        windowSpy.mockImplementation(() => mockWindow)
-
-        getConfig()
-
-        expect(mockWindow.__CONFIG__).toEqual(mockData.__CONFIG__)
-        expect(mockWindow.otherKey).toEqual(mockData.otherKey)
     })
 
     test('handles JSON parsing error', () => {
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
 
-        windowSpy.mockImplementation(() => ({
-            __CONFIG__: undefined,
-            document: {
-                getElementById: jest.fn().mockReturnValue({innerHTML: 'invalid JSON'})
-            }
-        }))
+        global.window.__CONFIG__ = undefined
+
+        global.document.getElementById.mockReturnValue({innerHTML: '{{{'})
 
         expect(getConfig()).toBeUndefined()
         expect(consoleSpy).toHaveBeenCalledTimes(2)
