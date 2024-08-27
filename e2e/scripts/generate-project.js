@@ -16,9 +16,17 @@ const main = async (opts) => {
     console.log(program.helpInformation());
     process.exit(1);
   }
-  let cliResponses;
+  let cliResponses=[];
   try {
-    cliResponses = JSON.parse(project);
+    let cliResponsesJsonArr = JSON.parse(project);
+    cliResponsesJsonArr.forEach((item) => {
+      cliResponses.push({
+        expectedPrompt: item.expectedPrompt,
+        response: item.response
+      })
+      console.log(`  Expected Prompt: ${item.expectedPrompt}`);
+      console.log(`  Response: ${item.response}`);
+    });
   } catch (err) {
     console.log("Errrrrrrrrrrrrrrrrrrrrr="+cliResponses);
     //not a json
@@ -29,7 +37,10 @@ const main = async (opts) => {
     await mkdirIfNotExists(config.GENERATED_PROJECTS_DIR);
     // TODO: Update script to setup local verdaccio npm repo to allow running 'npx @salesforce/pwa-kit-create-app' to generate apps
     let generateAppCommand;
-    if (!cliResponses) {
+    if (cliResponses.length > 0 ) {
+      const outputDir = `${config.GENERATED_PROJECTS_DIR}/my-retail-react-app'`;
+      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
+    } else {
       const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
       generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
       const preset = config.PRESET[project];
@@ -38,9 +49,6 @@ const main = async (opts) => {
       }
       console.log("***********generateAppCommand:"+generateAppCommand);
       cliResponses = config.CLI_RESPONSES[project];
-    } else {
-      const outputDir = `${config.GENERATED_PROJECTS_DIR}/my-retail-react-app'`;
-      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
     }
 
     return await runGeneratorWithResponses(generateAppCommand, cliResponses);
