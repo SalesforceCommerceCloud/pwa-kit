@@ -98,4 +98,4 @@ jobs:
       - name: Generate new project
         run: |
           cat generator-responses.json
-          # node e2e/scripts/generate-project.js "$(cat generator-responses.json)"
+          node e2e/scripts/generate-project.js "$(cat generator-responses.json)"
