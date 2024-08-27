@@ -24,12 +24,6 @@ const HEALTHCHECK_PATH = `${MOBIFY_PATH}/ping`
 const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
 export const getEnvBasePath = () => {
-    // getConfig is memoized on the server so we are not needing to make
-    // multiple reads of the config file
-    // on the client, this will initially not return anything as
-    // window.__config__ first needs to be hydrated
-    // we cannot memoize getEnvBasePath as it's value may change once
-    // window.__config__ is hydrated
     const config = getConfig()
     let basePath = config?.envBasePath || ''
 
@@ -38,7 +32,7 @@ export const getEnvBasePath = () => {
         basePath = ''
     }
 
-    return basePath
+    return basePath.replace(/\/$/, '')
 }
 
 export const getProxyPath = () => `${getEnvBasePath()}${PROXY_PATH_BASE}`
