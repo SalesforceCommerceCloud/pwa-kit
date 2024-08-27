@@ -47,11 +47,39 @@ export const getCachingPath = () => `${getEnvBasePath()}${CACHING_PATH_BASE}`
 export const getHealthCheckPath = () => `${getEnvBasePath()}${HEALTHCHECK_PATH}`
 export const getSlasPrivateProxyPath = () => `${getEnvBasePath()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
 
-// Keeping these around as their removal might be a breaking change?
-/**  * @deprecated   */
-export const ssrNamespace = getEnvBasePath()
-export const proxyBasePath = `${getEnvBasePath()}${PROXY_PATH_BASE}`
-export const bundleBasePath = `${getEnvBasePath()}${BUNDLE_PATH_BASE}`
-export const cachingBasePath = `${getEnvBasePath()}${CACHING_PATH_BASE}`
-export const healthCheckPath = `${getEnvBasePath()}${HEALTHCHECK_PATH}`
-export const slasPrivateProxyPath = `${getEnvBasePath()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
+// The following variables were introduced in v3.6,
+// before the env base path feature was fully implemented.
+// In v3.7, we added the env base path support and the implementation has
+// changed from using static variables to functions.
+// Thus, we deprecate the following variables to avoid breaking change.
+// We will remove the deprecation in future major releases.
+/**
+ * @deprecated Use getProxyPath() instead.
+ */
+export const proxyBasePath = PROXY_PATH_BASE
+
+/**
+ * @deprecated Use getBundlePath() instead.
+ */
+export const bundleBasePath = BUNDLE_PATH_BASE
+
+/**
+ * @deprecated Use getCachingPath() instead.
+ */
+export const cachingBasePath = CACHING_PATH_BASE
+
+/**
+ * @deprecated Use getHealthCheckPath() instead.
+ */
+export const healthCheckPath = HEALTHCHECK_PATH
+
+/**
+ * @deprecated Use getSlasPrivateProxyPath() instead.
+ */
+export const slasPrivateProxyPath = SLAS_PRIVATE_CLIENT_PROXY_PATH
+
+/**
+ * @deprecated This variable is no longer used. This variable has always been an empty string.
+ * Use getEnvBasePath() instead.
+ */
+export const ssrNamespace = ''

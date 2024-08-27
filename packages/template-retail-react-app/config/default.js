@@ -61,5 +61,6 @@ module.exports = {
                 path: 'ocapi'
             }
         ]
-    }
+    },
+    envBasePath: '/test'
 }
