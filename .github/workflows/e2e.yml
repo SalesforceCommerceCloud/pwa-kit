@@ -50,6 +50,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # Based on PWA setup_ubuntu script but with extra tests cut out
+      - name: Setup PWA dependencies
+        #working-directory: './pwa'
+        run: |-
+          # Install system dependencies
+          sudo apt-get update -yq
+          sudo apt-get install python2 python3-pip time -yq
+          sudo pip install -U pip setuptools
+          sudo pip install awscli==1.18.85 datadog==0.40.1
+
+          # Install node dependencies
+          node ./scripts/gtime.js monorepo_install npm ci
+
+          # Install PWA dependencies
+          npm ci
+        shell: bash
+
       - name: Build project generator inputs
         run: |
           echo '[
