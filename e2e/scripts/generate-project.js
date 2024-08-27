@@ -27,8 +27,6 @@ const main = async (opts) => {
         ),
         response: item.response
       })
-      //console.log(`  Expected Prompt: ${item.expectedPrompt}`);
-      //console.log(`  Response: ${item.response}`);
     });
   } catch (err) {
     console.log("Errrrrrrrrrrrrrrrrrrrrr="+cliResponses);

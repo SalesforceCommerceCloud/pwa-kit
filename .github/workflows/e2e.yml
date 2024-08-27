@@ -110,6 +110,38 @@ jobs:
             {
               "expectedPrompt": "Do you wish to use template extensibility?",
               "response": "${{ env.EXTEND_VALUE }}\n"
+            },
+            {
+              "expectedPrompt": "What is the name of your Project?",
+              "response": "${{ github.event.inputs.name }}\n"
+            },
+            {
+              "expectedPrompt": "What is the URL for your Commerce Cloud instance?",
+              "response": "${{ github.event.inputs.instanceUrl }}\n"
+            },
+            {
+              "expectedPrompt": "What is your SLAS Client ID?",
+              "response": "${{ github.event.inputs.clientId }}\n"
+            },
+            {
+              "expectedPrompt": "Is your SLAS client private?",
+              "response":"${{ env.IS_PRIVATE_CLIENT_VALUE }}\n"
+            },
+            {
+              "expectedPrompt": "What is your Site ID in Business Manager?",
+              "response": "${{ github.event.inputs.siteId }}\n"
+            },
+            {
+              "expectedPrompt": "What is your Commerce API organization ID in Business Manager?",
+              "response": "${{ github.event.inputs.orgId }}\n"
+            },
+            {
+              "expectedPrompt": "What is your Commerce API short code in Business Manager?",
+              "response": "${{ github.event.inputs.shortCode }}\n"
+            },
+            {
+              "expectedPrompt": "Do you wish to set up a phased headless rollout?",
+              "response": "${{ env.HYBRID_VALUE }}\n"
             }
           ]' > generator-responses.json
 
@@ -118,3 +150,24 @@ jobs:
           cat generator-responses.json
           node e2e/scripts/generate-project.js "$(jq -c . generator-responses.json)"
         shell: bash
+
+      - name: Build Generated PWA
+        working-directory: ./generated-projects/my-retail-react-app
+        run: |-
+          npm ci
+          npm run build
+        shell: bash
+
+      - name: Create MRT credentials file
+        uses: "./.github/actions/create_mrt"
+        with:
+          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+
+      - name: Push Bundle to MRT (E2E Test PWA Kit)
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "../generated-projects/retail-app-no-ext"
+          TARGET: e2e-tests-pwa-kit
+          FLAGS: --wait
+
