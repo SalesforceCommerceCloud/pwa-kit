@@ -41,7 +41,7 @@ const main = async (opts) => {
     // TODO: Update script to setup local verdaccio npm repo to allow running 'npx @salesforce/pwa-kit-create-app' to generate apps
     let generateAppCommand;
     if (cliResponses.length > 0 ) {
-      const outputDir = `${config.GENERATED_PROJECTS_DIR}/my-retail-react-app'`;
+      const outputDir = `${config.GENERATED_PROJECTS_DIR}/my-retail-react-app`;
       generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
       console.log("***********generateAppCommand:"+generateAppCommand);
     } else {
