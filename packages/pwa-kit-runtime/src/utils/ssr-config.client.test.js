@@ -27,52 +27,52 @@ describe('Client getConfig', () => {
     })
 
     test('parses config from mobify-data element when window.__CONFIG__ is not available', () => {
-        const mockConfig = { key: 'value' };
-        const mockInnerHTML = JSON.stringify({ __CONFIG__: mockConfig });
+        const mockConfig = {key: 'value'}
+        const mockInnerHTML = JSON.stringify({__CONFIG__: mockConfig})
 
         windowSpy.mockImplementation(() => ({
             __CONFIG__: undefined,
             document: {
-                getElementById: jest.fn().mockReturnValue({ innerHTML: mockInnerHTML })
+                getElementById: jest.fn().mockReturnValue({innerHTML: mockInnerHTML})
             }
-        }));
+        }))
 
-        expect(getConfig()).toEqual(mockConfig);
-    });
+        expect(getConfig()).toEqual(mockConfig)
+    })
 
     test('sets all globals on window object', () => {
-        const mockData = { __CONFIG__: { key: 'value' }, otherKey: 'otherValue' };
-        const mockInnerHTML = JSON.stringify(mockData);
+        const mockData = {__CONFIG__: {key: 'value'}, otherKey: 'otherValue'}
+        const mockInnerHTML = JSON.stringify(mockData)
 
         const mockWindow = {
             __CONFIG__: undefined,
             document: {
-                getElementById: jest.fn().mockReturnValue({ innerHTML: mockInnerHTML })
+                getElementById: jest.fn().mockReturnValue({innerHTML: mockInnerHTML})
             }
-        };
+        }
 
-        windowSpy.mockImplementation(() => mockWindow);
+        windowSpy.mockImplementation(() => mockWindow)
 
-        getConfig();
+        getConfig()
 
-        expect(mockWindow.__CONFIG__).toEqual(mockData.__CONFIG__);
-        expect(mockWindow.otherKey).toEqual(mockData.otherKey);
-    });
+        expect(mockWindow.__CONFIG__).toEqual(mockData.__CONFIG__)
+        expect(mockWindow.otherKey).toEqual(mockData.otherKey)
+    })
 
     test('handles JSON parsing error', () => {
-        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
 
         windowSpy.mockImplementation(() => ({
             __CONFIG__: undefined,
             document: {
-                getElementById: jest.fn().mockReturnValue({ innerHTML: 'invalid JSON' })
+                getElementById: jest.fn().mockReturnValue({innerHTML: 'invalid JSON'})
             }
-        }));
+        }))
 
-        expect(getConfig()).toBeUndefined();
-        expect(consoleSpy).toHaveBeenCalledTimes(2);
-        expect(consoleSpy).toHaveBeenCalledWith('Unable to parse server-side rendered config.');
+        expect(getConfig()).toBeUndefined()
+        expect(consoleSpy).toHaveBeenCalledTimes(2)
+        expect(consoleSpy).toHaveBeenCalledWith('Unable to parse server-side rendered config.')
 
-        consoleSpy.mockRestore();
-    });
-});
+        consoleSpy.mockRestore()
+    })
+})
