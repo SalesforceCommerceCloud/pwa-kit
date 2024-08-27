@@ -103,7 +103,7 @@ jobs:
             },
             {
               "expectedPrompt": "/Do you wish to use template extensibility?/i",
-              "response": "$extend_value\n"
+              "response": \"$extend_value\n\"
             },
             {
               "expectedPrompt": "/What is the name of your Project?/i",
@@ -119,7 +119,7 @@ jobs:
             },
             {
               "expectedPrompt": "/Is your SLAS client private?/i",
-              "response": "$isPrivateClient_value\n"
+              "response": \"$isPrivateClient_value\n\"
             },
             {
               "expectedPrompt": "/What is your Site ID in Business Manager?/i",
@@ -135,7 +135,7 @@ jobs:
             },
             {
               "expectedPrompt": "/Do you wish to set up a phased headless rollout?/i",
-              "response": "$hybrid_value\n"
+              "response": \"$hybrid_value\n\"
             }
           ]' > generator-responses.json
 
