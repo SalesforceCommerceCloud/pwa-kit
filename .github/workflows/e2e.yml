@@ -47,6 +47,34 @@ jobs:
   pwa-kit:
     runs-on: ubuntu-latest
     steps:
+      - name: Convert boolean to integer and assign to environment variable
+        run: |
+          extend_input="${{ github.event.inputs.extend }}"
+          if [ "$extend_input" = "true" ]; then
+           extend_value=2
+          else
+           extend_value=1
+          fi
+          
+          isPrivateClient_input="${{ github.event.inputs.isPrivateClient }}"
+          if [ "$isPrivateClient_input" = "true" ]; then
+            isPrivateClient_value=2
+          else
+            isPrivateClient_value=1
+          fi
+          
+          hybrid_input="${{ github.event.inputs.hybrid }}"
+          if [ "$hybrid_input" = "true" ]; then
+            hybrid_value=1
+          else
+            hybrid_value=2
+          fi
+
+          # Assign hybrid_value to an environment variable
+          echo "EXTEND_VALUE=$extend_value" >> $GITHUB_ENV 
+          echo "IS_PRIVATE_CLIENT_VALUE=$isPrivateClient_value" >> $GITHUB_ENV 
+          echo "HYBRID_VALUE=$hybrid_value" >> $GITHUB_ENV 
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -72,30 +100,9 @@ jobs:
           npm ci
         shell: bash
 
+      -
       - name: Build project generator inputs
         run: |
-          
-          extend_input="${{ github.event.inputs.extend }}"
-          if [ "$extend_input" = "true" ]; then
-            extend_value=2
-          else
-            extend_value=1
-          fi
-          
-          isPrivateClient_input="${{ github.event.inputs.isPrivateClient }}"
-          if [ "$isPrivateClient_input" = "true" ]; then
-            isPrivateClient_value=2
-          else
-            isPrivateClient_value=1
-          fi
-          
-          hybrid_input="${{ github.event.inputs.hybrid }}"
-          if [ "$hybrid_input" = "true" ]; then
-            hybrid_value=2
-          else
-            hybrid_value=1
-          fi
-          
           echo '[
             {
               "expectedPrompt": "/Choose a project preset to get started:/i",
@@ -103,11 +110,11 @@ jobs:
             },
             {
               "expectedPrompt": "/Do you wish to use template extensibility?/i",
-              "response": \"$extend_value\n\"
+              "response": "${{ github.event.inputs.name }}\n"
             },
             {
               "expectedPrompt": "/What is the name of your Project?/i",
-              "response": "${{ github.event.inputs.name }}\n"
+              "response": "${{ env.EXTEND_VALUE }}\n"
             },
             {
               "expectedPrompt": "/What is the URL for your Commerce Cloud instance?/i",
@@ -119,7 +126,7 @@ jobs:
             },
             {
               "expectedPrompt": "/Is your SLAS client private?/i",
-              "response": \"$isPrivateClient_value\n\"
+              "response":"${{ env.IS_PRIVATE_CLIENT_VALUE }}\n"
             },
             {
               "expectedPrompt": "/What is your Site ID in Business Manager?/i",
@@ -135,7 +142,7 @@ jobs:
             },
             {
               "expectedPrompt": "/Do you wish to set up a phased headless rollout?/i",
-              "response": \"$hybrid_value\n\"
+              "response": "${{ env.HYBRID_VALUE }}\n"
             }
           ]' > generator-responses.json
 
