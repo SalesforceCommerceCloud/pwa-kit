@@ -596,7 +596,7 @@ class Auth {
             }
         )
         this.handleTokenResponse(token, isGuest)
-        if (onClient() && this.OCAPISessionsURL) {
+        if (onClient()) {
             void this.clearECOMSession()
         }
         return token
