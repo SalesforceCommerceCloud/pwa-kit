@@ -6,6 +6,7 @@
  */
 
 import {getConfig} from './ssr-config'
+import logger from './logger-instance'
 
 /**
  * This file defines the /mobify paths used to set up our Express endpoints.
@@ -28,7 +29,7 @@ export const getEnvBasePath = () => {
     let basePath = config?.envBasePath || ''
 
     if (typeof basePath !== 'string') {
-        console.log('Invalid environment base path configuration. No base path is applied.')
+        logger.warn('Invalid envBasePath configuration. No base path is applied.')
         basePath = ''
     }
 
