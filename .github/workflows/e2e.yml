@@ -116,5 +116,5 @@ jobs:
       - name: Generate new project
         run: |
           cat generator-responses.json
-          node e2e/scripts/generate-project.js "retail-app-ext"
+          node e2e/scripts/generate-project.js retail-app-ext
         shell: bash
