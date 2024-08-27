@@ -109,11 +109,11 @@ jobs:
             },
             {
               "expectedPrompt": "/Do you wish to use template extensibility?/i",
-              "response": "${{ github.event.inputs.name }}\n"
+              "response": "${{ env.EXTEND_VALUE }}\n"
             },
             {
               "expectedPrompt": "/What is the name of your Project?/i",
-              "response": "${{ env.EXTEND_VALUE }}\n"
+              "response": "${{ github.event.inputs.name }}\n"
             },
             {
               "expectedPrompt": "/What is the URL for your Commerce Cloud instance?/i",
