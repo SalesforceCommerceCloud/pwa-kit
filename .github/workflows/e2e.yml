@@ -74,16 +74,7 @@ jobs:
 
       - name: Build project generator inputs
         run: |
-          echo '[
-            {
-              "expectedPrompt": "Choose a project preset to get started",
-              "response": "1\n"
-            },
-            {
-              "expectedPrompt": "Do you wish to use template extensibility",
-              "response": "1"
-            }
-          ]' > generator-responses.json
+          echo '[{"expectedPrompt": "Choose a project preset to get started","response": "1\n"},{"expectedPrompt": "Do you wish to use template extensibility","response": "1"}]' > generator-responses.json
 
       - name: Generate new project
         run: |
