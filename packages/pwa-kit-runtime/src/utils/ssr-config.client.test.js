@@ -7,8 +7,6 @@
 
 import {getConfig} from './ssr-config.client'
 
-
-
 describe('Client getConfig', () => {
     const originalWindow = global.window
     const originalDocument = global.document

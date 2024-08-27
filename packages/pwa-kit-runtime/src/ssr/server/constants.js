@@ -9,7 +9,7 @@ export const BUILD = 'build'
 export const STATIC_ASSETS = 'static_assets'
 
 /**
- * @deprecated Use ssr-paths getProxyPath() instead  
+ * @deprecated Use ssr-paths getProxyPath() instead
  * */
 export const PROXY_PATH_PREFIX = '/mobify/proxy'
 
