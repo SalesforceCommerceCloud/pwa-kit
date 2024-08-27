@@ -28,7 +28,7 @@ export const getEnvBasePath = () => {
     let basePath = config?.envBasePath || ''
 
     if (typeof basePath !== 'string') {
-        console.log('Invalid environment base path configuration. Using default base path.')
+        console.log('Invalid environment base path configuration. No base path is applied.')
         basePath = ''
     }
 
