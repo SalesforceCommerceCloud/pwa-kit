@@ -100,7 +100,6 @@ jobs:
           npm ci
         shell: bash
 
-      -
       - name: Build project generator inputs
         run: |
           echo '[
