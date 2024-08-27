@@ -152,7 +152,7 @@ jobs:
         shell: bash
 
       - name: Build Generated PWA
-        working-directory: ./generated-projects/my-retail-react-app
+        working-directory: ../generated-projects/my-retail-react-app
         run: |-
           npm ci
           npm run build
@@ -167,7 +167,7 @@ jobs:
       - name: Push Bundle to MRT (E2E Test PWA Kit)
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/retail-app-no-ext"
-          TARGET: e2e-tests-pwa-kit
+          CWD: "../generated-projects/my-retail-react-app"
+          TARGET: hyperforce
           FLAGS: --wait
 
