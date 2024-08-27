@@ -23,32 +23,32 @@ const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 // Thus, we deprecate the following variables to avoid breaking change.
 // We will remove the deprecation in future major releases.
 /**
- * @deprecated Use getProxyPath() instead.
+ * @deprecated Use getProxyPath() instead. Import from @salesforce/pwa-kit-runtime/utils/ssr-paths
  */
 export const proxyBasePath = PROXY_PATH_BASE
 
 /**
- * @deprecated Use getBundlePath() instead.
+ * @deprecated Use getBundlePath() instead. Import from @salesforce/pwa-kit-runtime/utils/ssr-paths
  */
 export const bundleBasePath = BUNDLE_PATH_BASE
 
 /**
- * @deprecated Use getCachingPath() instead.
+ * @deprecated Use getCachingPath() instead. Import from @salesforce/pwa-kit-runtime/utils/ssr-paths
  */
 export const cachingBasePath = CACHING_PATH_BASE
 
 /**
- * @deprecated Use getHealthCheckPath() instead.
+ * @deprecated Use getHealthCheckPath() instead. Import from @salesforce/pwa-kit-runtime/utils/ssr-paths
  */
 export const healthCheckPath = HEALTHCHECK_PATH
 
 /**
- * @deprecated Use getSlasPrivateProxyPath() instead.
+ * @deprecated Use getSlasPrivateProxyPath() instead. Import from @salesforce/pwa-kit-runtime/utils/ssr-paths
  */
 export const slasPrivateProxyPath = SLAS_PRIVATE_CLIENT_PROXY_PATH
 
 /**
  * @deprecated This variable is no longer used. This variable has always been an empty string.
- * Use getEnvBasePath() instead.
+ * Use getEnvBasePath() instead. Import from @salesforce/pwa-kit-runtime/utils/ssr-paths
  */
 export const ssrNamespace = ''
