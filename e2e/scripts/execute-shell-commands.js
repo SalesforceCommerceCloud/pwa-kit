@@ -12,7 +12,10 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
   const child = exec(cmd);
   return new Promise((resolve, reject) => {
     let expectedPrompt, response;
+
     if (cliResponses && cliResponses.length) {
+      console.log("***************length:"+cliResponses.length);
+      console.log(JSON.stringify(cliResponses, null, 2));
       ({ expectedPrompt, response } = cliResponses.shift());
     }
 
