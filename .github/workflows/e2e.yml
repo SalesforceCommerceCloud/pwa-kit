@@ -25,7 +25,7 @@ on:
       clientId:
         type: string
         description: clientId
-        default: "987fc116-d30c-4537-93cb-c2bd433c3b5a"
+        default: "cfa08695-89e9-4519-ab9e-d2a99cb0bea8"
       siteId:
         type: string
         description: siteId
@@ -33,7 +33,7 @@ on:
       isPrivateClient:
         type: boolean
         description: isPrivateClient
-        default: false
+        default: true
       hybrid:
         type: boolean
         description: hybrid
