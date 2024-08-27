@@ -22,7 +22,9 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
     }
 
     child.stdout.on("data", (data) => {
+      console.log("***************data:"+data);
       if (isPrompt(data, expectedPrompt)) {
+        console.log("***************response:"+response);
         child.stdin.write(response);
         if (cliResponses.length > 0) {
           ({ expectedPrompt, response } = cliResponses.shift());
