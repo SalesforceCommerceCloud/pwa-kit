@@ -9,27 +9,27 @@ on:
       name:
         type: string
         description: name
-        default: 'scaffold-pwa'
+        default: "scaffold-pwa"
       instanceUrl:
         type: string
         description: instanceUrl
-        default: 'https://zzrf-002.dx.commercecloud.salesforce.com'
+        default: "https://zzrf-002.dx.commercecloud.salesforce.com"
       orgId:
         type: string
         description: orgId
-        default: 'f_ecom_zzrf_002'
+        default: "f_ecom_zzrf_002"
       shortCode:
         type: string
         description: shortCode
-        default: 'kv7kzm78'
+        default: "kv7kzm78"
       clientId:
         type: string
         description: clientId
-        default: '987fc116-d30c-4537-93cb-c2bd433c3b5a'
+        default: "987fc116-d30c-4537-93cb-c2bd433c3b5a"
       siteId:
         type: string
         description: siteId
-        default: 'RefArch'
+        default: "RefArch"
       isPrivateClient:
         type: boolean
         description: isPrivateClient
@@ -76,44 +76,12 @@ jobs:
         run: |
           echo '[
             {
-              "expectedPrompt": "/Choose a project preset to get started:/i",
+              "expectedPrompt": "Choose a project preset to get started",
               "response": "1\n"
             },
             {
-              "expectedPrompt": "/Do you wish to use template extensibility?/i",
-              "response": "${{ github.event.inputs.extend }}"
-            },
-            {
-              "expectedPrompt": "/What is the name of your Project?/i",
-              "response": "${{ github.event.inputs.name }}"
-            },
-            {
-              "expectedPrompt": "/What is the URL for your Commerce Cloud instance?/i",
-              "response": "${{ github.event.inputs.instanceUrl }}"
-            },
-            {
-              "expectedPrompt": "/What is your SLAS Client ID?/i",
-              "response": "${{ github.event.inputs.clientId }}"
-            },
-            {
-              "expectedPrompt": "/Is your SLAS client private?/i",
-              "response": "${{ github.event.inputs.isPrivateClient }}"
-            },
-            {
-              "expectedPrompt": "/What is your Site ID in Business Manager?/i",
-              "response": "${{ github.event.inputs.siteId }}"
-            },
-            {
-              "expectedPrompt": "/What is your Commerce API organization ID in Business Manager?/i",
-              "response": "${{ github.event.inputs.orgId }}"
-            },
-            {
-              "expectedPrompt": "/What is your Commerce API short code in Business Manager?/i",
-              "response": "${{ github.event.inputs.shortCode }}"
-            },
-            {
-              "expectedPrompt": "/Do you wish to set up a phased headless rollout?/i",
-              "response": "${{ github.event.inputs.hybrid }}"
+              "expectedPrompt": "Do you wish to use template extensibility",
+              "response": "1"
             }
           ]' > generator-responses.json
 
