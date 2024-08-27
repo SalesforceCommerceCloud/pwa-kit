@@ -33,7 +33,6 @@ interface AuthConfig extends ApiClientConfigParams {
     proxy: string
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
-    OCAPISessionsURL?: string
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
@@ -180,7 +179,6 @@ class Auth {
     private pendingToken: Promise<TokenResponse> | undefined
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
-    private OCAPISessionsURL: string
     private clientSecret: string
     private silenceWarnings: boolean
     private logger: Logger
@@ -229,8 +227,6 @@ class Auth {
         this.redirectURI = config.redirectURI
 
         this.fetchedToken = config.fetchedToken || ''
-
-        this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
         this.logger = config.logger
 
@@ -411,9 +407,6 @@ class Auth {
             .then(async () => {
                 const token = await fn()
                 this.handleTokenResponse(token, isGuest)
-                if (onClient() && this.OCAPISessionsURL) {
-                    void this.createOCAPISession()
-                }
                 // Q: Why don't we just return token? Why re-construct the same object again?
                 // A: because a user could open multiple tabs and the data in memory could be out-dated
                 // We must always grab the data from the storage (cookie/localstorage) directly
@@ -614,26 +607,6 @@ class Auth {
         })
         this.clearStorage()
         return await this.loginGuestUser()
-    }
-
-    /**
-     * Make a post request to the OCAPI /session endpoint to bridge the session.
-     *
-     * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
-     * This cookie is used on SFRA, and it allows shoppers to navigate between SFRA and
-     * this PWA site seamlessly; this is often used to enable hybrid deployment.
-     *
-     * (Note: this method is client side only, b/c MRT doesn't support set-cookie header right now)
-     *
-     * @returns {Promise}
-     */
-    createOCAPISession() {
-        return fetch(this.OCAPISessionsURL, {
-            method: 'POST',
-            headers: {
-                Authorization: 'Bearer ' + this.get('access_token')
-            }
-        })
     }
 
     /**
