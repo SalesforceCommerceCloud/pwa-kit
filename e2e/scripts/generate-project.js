@@ -32,20 +32,15 @@ const main = async (opts) => {
       const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
       const preset = config.PRESET[project];
       if (preset) {
-        generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`
+        generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`;
       }
-      cliResponses = config.CLI_RESPONSES[project]
-    }
-    else {
+      cliResponses = config.CLI_RESPONSES[project];
+    } else {
       const outputDir = `${config.GENERATED_PROJECTS_DIR}/my-retail-react-app'`;
       generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
-      cliResponses = project;
     }
 
-    return await runGeneratorWithResponses(
-        generateAppCommand,
-        cliResponses
-    );
+    return await runGeneratorWithResponses(generateAppCommand, cliResponses);
   } catch (err) {
     // Generator failed to create project
     console.log("Generator failed to create project", err);
