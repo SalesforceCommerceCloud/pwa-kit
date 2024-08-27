@@ -20,20 +20,29 @@ const main = async (opts) => {
   try {
     // Explicitly create outputDir because generator runs into permissions issue when generating no-ext projects.
     await mkdirIfNotExists(config.GENERATED_PROJECTS_DIR);
-    const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
     // TODO: Update script to setup local verdaccio npm repo to allow running 'npx @salesforce/pwa-kit-create-app' to generate apps
-    let generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
-    const preset = config.PRESET[project];
-
-    if (preset) {
-      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`
+    let generateAppCommand;
+    let cliResponses = config.CLI_RESPONSES[project];
+    if (typeof project === 'string') {
+      const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
+      const preset = config.PRESET[project];
+      if (preset) {
+        generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`
+      }
+      cliResponses = config.CLI_RESPONSES[project]
     }
-    
-    const stdout = await runGeneratorWithResponses(
-      generateAppCommand,
-      config.CLI_RESPONSES[project]
+    else if (typeof project === 'object' && project !== null) {
+      const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project.name}`;
+      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
+      cliResponses = project;
+    } else {
+      throw new Error("Invalid argument to run the project generator")
+    }
+
+    return await runGeneratorWithResponses(
+        generateAppCommand,
+        cliResponses
     );
-    return stdout;
   } catch (err) {
     // Generator failed to create project
     console.log("Generator failed to create project", err);
