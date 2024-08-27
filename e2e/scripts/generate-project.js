@@ -32,6 +32,7 @@ const main = async (opts) => {
     let generateAppCommand;
     if (!cliResponses) {
       const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
+      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
       const preset = config.PRESET[project];
       if (preset) {
         generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`;
