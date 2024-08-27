@@ -29,3 +29,5 @@ export const SLAS_SECRET_OVERRIDE_MSG =
     'You have enabled PWA Kit Private Client mode which gets the SLAS secret from your environment variable. The SLAS secret you have set in the Auth provider will be ignored.'
 
 export const SERVER_AFFINITY_HEADER_KEY = 'sfdc_dwsid'
+
+export const EXCLUDE_COOKIE_SUFFIX = ['dwsid']
