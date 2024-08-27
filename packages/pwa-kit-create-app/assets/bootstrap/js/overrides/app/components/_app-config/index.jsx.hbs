@@ -41,20 +41,13 @@ const AppConfig = ({children, locals = {}}) => {
     const headers = {
         'correlation-id': correlationId
     }
-    const onClient = typeof window !== 'undefined'
 
     const commerceApiConfig = locals.appConfig.commerceAPI
 
     const appOrigin = getAppOrigin()
 
-    const isLocalhost = appOrigin.includes('localhost')
-
-    const proxy =
-        !isLocalhost && !onClient
-            ? `${appOrigin}${commerceApiConfig.proxyPath}`
-            : `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
-
     const redirectURI = `${appOrigin}/callback`
+    const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
 
     return (
         <CommerceApiProvider
