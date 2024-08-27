@@ -74,6 +74,28 @@ jobs:
 
       - name: Build project generator inputs
         run: |
+          
+          extend_input="${{ github.event.inputs.extend }}"
+          if [ "$extend_input" = "true" ]; then
+            extend_value=2
+          else
+            extend_value=1
+          fi
+          
+          isPrivateClient_input="${{ github.event.inputs.isPrivateClient }}"
+          if [ "$isPrivateClient_input" = "true" ]; then
+            isPrivateClient_value=2
+          else
+            isPrivateClient_value=1
+          fi
+          
+          hybrid_input="${{ github.event.inputs.hybrid }}"
+          if [ "$hybrid_input" = "true" ]; then
+            hybrid_value=2
+          else
+            hybrid_value=1
+          fi
+          
           echo '[
             {
               "expectedPrompt": "/Choose a project preset to get started:/i",
@@ -81,39 +103,39 @@ jobs:
             },
             {
               "expectedPrompt": "/Do you wish to use template extensibility?/i",
-              "response": "${{ github.event.inputs.extend }}"
+              "response": "${{ github.event.inputs.extend_value }}\n"
             },
             {
               "expectedPrompt": "/What is the name of your Project?/i",
-              "response": "${{ github.event.inputs.name }}"
+              "response": "${{ github.event.inputs.name }}\n"
             },
             {
               "expectedPrompt": "/What is the URL for your Commerce Cloud instance?/i",
-              "response": "${{ github.event.inputs.instanceUrl }}"
+              "response": "${{ github.event.inputs.instanceUrl }}\n"
             },
             {
               "expectedPrompt": "/What is your SLAS Client ID?/i",
-              "response": "${{ github.event.inputs.clientId }}"
+              "response": "${{ github.event.inputs.clientId }}\n"
             },
             {
               "expectedPrompt": "/Is your SLAS client private?/i",
-              "response": "${{ github.event.inputs.isPrivateClient }}"
+              "response": "${{ github.event.inputs.isPrivateClient_value }}"
             },
             {
               "expectedPrompt": "/What is your Site ID in Business Manager?/i",
-              "response": "${{ github.event.inputs.siteId }}"
+              "response": "${{ github.event.inputs.siteId }}\n"
             },
             {
               "expectedPrompt": "/What is your Commerce API organization ID in Business Manager?/i",
-              "response": "${{ github.event.inputs.orgId }}"
+              "response": "${{ github.event.inputs.orgId }}\n"
             },
             {
               "expectedPrompt": "/What is your Commerce API short code in Business Manager?/i",
-              "response": "${{ github.event.inputs.shortCode }}"
+              "response": "${{ github.event.inputs.shortCode }}\n"
             },
             {
               "expectedPrompt": "/Do you wish to set up a phased headless rollout?/i",
-              "response": "${{ github.event.inputs.hybrid }}"
+              "response": "${{ github.event.inputs.hybrid_value }}\n"
             }
           ]' > generator-responses.json
 
