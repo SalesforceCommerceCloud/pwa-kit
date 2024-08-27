@@ -74,7 +74,48 @@ jobs:
 
       - name: Build project generator inputs
         run: |
-          echo '[{"expectedPrompt": "Choose a project preset to get started","response": "1\n"},{"expectedPrompt": "Do you wish to use template extensibility","response": "1"}]' > generator-responses.json
+          echo '[
+            {
+              "expectedPrompt": "/Choose a project preset to get started:/i",
+              "response": "1\n"
+            },
+            {
+              "expectedPrompt": "/Do you wish to use template extensibility?/i",
+              "response": "${{ github.event.inputs.extend }}"
+            },
+            {
+              "expectedPrompt": "/What is the name of your Project?/i",
+              "response": "${{ github.event.inputs.name }}"
+            },
+            {
+              "expectedPrompt": "/What is the URL for your Commerce Cloud instance?/i",
+              "response": "${{ github.event.inputs.instanceUrl }}"
+            },
+            {
+              "expectedPrompt": "/What is your SLAS Client ID?/i",
+              "response": "${{ github.event.inputs.clientId }}"
+            },
+            {
+              "expectedPrompt": "/Is your SLAS client private?/i",
+              "response": "${{ github.event.inputs.isPrivateClient }}"
+            },
+            {
+              "expectedPrompt": "/What is your Site ID in Business Manager?/i",
+              "response": "${{ github.event.inputs.siteId }}"
+            },
+            {
+              "expectedPrompt": "/What is your Commerce API organization ID in Business Manager?/i",
+              "response": "${{ github.event.inputs.orgId }}"
+            },
+            {
+              "expectedPrompt": "/What is your Commerce API short code in Business Manager?/i",
+              "response": "${{ github.event.inputs.shortCode }}"
+            },
+            {
+              "expectedPrompt": "/Do you wish to set up a phased headless rollout?/i",
+              "response": "${{ github.event.inputs.hybrid }}"
+            }
+          ]' > generator-responses.json
 
       - name: Generate new project
         run: |
