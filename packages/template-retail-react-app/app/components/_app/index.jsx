@@ -16,7 +16,10 @@ import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
-    useShopperBasketsMutation
+    useShopperBasketsMutation,
+    useShopperContext,
+    useShopperContextsMutation,
+    useUsid
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
@@ -25,6 +28,7 @@ import {
     Center,
     Fade,
     Spinner,
+    Button,
     useDisclosure,
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -52,6 +56,7 @@ import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useQueryClient} from '@tanstack/react-query'
 
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
@@ -60,7 +65,12 @@ import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {watchOnlineStatus, flatten, isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import {
+    watchOnlineStatus,
+    flatten,
+    isServer,
+    isHydrated
+} from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -69,7 +79,8 @@ import {
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE,
-    ACTIVE_DATA_ENABLED
+    ACTIVE_DATA_ENABLED,
+    SHOPPER_CONTEXT_QUERY_PARAMS,
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -132,7 +143,7 @@ const App = (props) => {
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
-
+    const queryClient = useQueryClient()
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {
         isOpen: isOpenStoreLocator,
@@ -227,6 +238,30 @@ const App = (props) => {
         })
     }, [])
 
+    const {usid} = useUsid()
+    // TODO: Handle creating a new shopper context if there isn't one already assigned to the current 
+    const createShopperContext = useShopperContextsMutation('createShopperContext')
+    const deleteShopperContext = useShopperContextsMutation('deleteShopperContext')
+    const updateShopperContext = useShopperContextsMutation('updateShopperContext')
+    const {data} = useShopperContext(
+        {
+            parameters: {
+                usid: usid,
+                siteId: site.id
+            }
+        },
+        {
+            enabled: !isServer
+        }
+    )
+
+    useEffect(() => {
+        console.log('isHydrated()', isHydrated())
+        if (isHydrated()) {
+            refetchDataOnClient()
+        }
+    }, [])
+
     useEffect(() => {
         // Lets automatically close the mobile navigation when the
         // location path is changed.
@@ -270,6 +305,10 @@ const App = (props) => {
     useEffect(() => {
         trackPage()
     }, [location])
+
+    const refetchDataOnClient = () => {
+        queryClient.invalidateQueries()
+    }
 
     return (
         <Box className="sf-app" {...styles.container}>
@@ -322,7 +361,7 @@ const App = (props) => {
                             <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
                             {/* Urls for all localized versions of this page (including current page)
-                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
+                                For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
                             {site.l10n?.supportedLocales.map((locale) => (
                                 <link
                                     rel="alternate"
@@ -350,6 +389,59 @@ const App = (props) => {
                                 onClose={onCloseStoreLocator}
                             />
                             <Box {...styles.headerWrapper}>
+                                <Button
+                                    colorScheme="teal"
+                                    variant="solid"
+                                    onClick={async () => {
+                                        await createShopperContext.mutateAsync({
+                                            parameters: {
+                                                usid,
+                                                siteId: site.id
+                                            },
+                                            body: {}
+                                        })
+                                        refetchDataOnClient()
+                                    }}
+                                >
+                                    Create context
+                                </Button>
+                                <Button
+                                    colorScheme="red"
+                                    variant="solid"
+                                    onClick={async () => {
+                                        await deleteShopperContext.mutateAsync({
+                                            parameters: {
+                                                usid,
+                                                siteId: site.id
+                                            }
+                                        })
+                                        refetchDataOnClient()
+                                    }}
+                                >
+                                    Delete context
+                                </Button>
+                                <Button
+                                    colorScheme="yellow"
+                                    variant="solid"
+                                    onClick={async () => {
+                                        const test = await updateShopperContext.mutateAsync({
+                                            parameters: {
+                                                usid,
+                                                siteId: site.id
+                                            },
+                                            body: {
+                                                sourceCode: 'instagram',
+                                                customQualifiers: {
+                                                    vip: 'yes'
+                                                }
+                                            }
+                                        })
+                                        refetchDataOnClient()
+                                        // window.location.reload()
+                                    }}
+                                >
+                                    Update context
+                                </Button>
                                 {!isCheckout ? (
                                     <>
                                         <AboveHeader />
@@ -359,7 +451,6 @@ const App = (props) => {
                                             onMyCartClick={onCartClick}
                                             onMyAccountClick={onAccountClick}
                                             onWishlistClick={onWishlistClick}
-                                            onStoreLocatorClick={onOpenStoreLocator}
                                         >
                                             <HideOnDesktop>
                                                 <DrawerMenu
