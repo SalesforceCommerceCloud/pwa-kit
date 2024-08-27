@@ -20,6 +20,8 @@ const main = async (opts) => {
   try {
     cliResponses = JSON.parse(project);
   } catch (err) {
+    console.log("Errrrrrrrrrrrrrrrrrrrrr="+cliResponses);
+    cliResponses = undefined;
     //not a json
   }
 
