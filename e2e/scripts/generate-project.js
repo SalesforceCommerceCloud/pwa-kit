@@ -43,6 +43,7 @@ const main = async (opts) => {
     if (cliResponses.length > 0 ) {
       const outputDir = `${config.GENERATED_PROJECTS_DIR}/my-retail-react-app'`;
       generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
+      console.log("***********generateAppCommand:"+generateAppCommand);
     } else {
       const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
       generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
