@@ -29,7 +29,7 @@ runs:
       shell: bash
       run: |
         use_extensibility_input="${{ github.event.inputs.use_extensibility }}"
-        if [ "$extend_input" = "true" ]; then
+        if [ "use_extensibility_input" = "true" ]; then
          use_extensibility_value=2
         else
          use_extensibility_value=1
