@@ -461,9 +461,7 @@ class Auth {
                 ? true
                 : dw_dnt === '0'
                 ? false
-                : this.defaultDnt !== undefined
-                ? this.defaultDnt
-                : false
+                : this.defaultDnt || false
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -529,9 +527,7 @@ class Auth {
                 ? true
                 : dw_dnt === '0'
                 ? false
-                : this.defaultDnt !== undefined
-                ? this.defaultDnt
-                : false
+                : this.defaultDnt || false
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
@@ -602,9 +598,7 @@ class Auth {
                 ? true
                 : dw_dnt === '0'
                 ? false
-                : this.defaultDnt !== undefined
-                ? this.defaultDnt
-                : false
+                : this.defaultDnt || false
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
