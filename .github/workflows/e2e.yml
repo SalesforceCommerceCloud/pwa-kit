@@ -58,9 +58,9 @@ jobs:
           
           isPrivateClient_input="${{ github.event.inputs.isPrivateClient }}"
           if [ "$isPrivateClient_input" = "true" ]; then
-            isPrivateClient_value=2
-          else
             isPrivateClient_value=1
+          else
+            isPrivateClient_value=2
           fi
           
           hybrid_input="${{ github.event.inputs.hybrid }}"
