@@ -16,6 +16,7 @@ import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
+import {applyAppExtensions} from '../universal/extensibility/utils'
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
 import extensions from '../universal/extensibility/extensions'
@@ -121,16 +122,7 @@ export const start = () => {
     locals.appExtensions = extensions
 
     // Initialize all the react app extensions.
-    extensions.forEach((extension) => {
-        logger.info(`${extension.getName()}: Extending React application.`, {namespace: 'start'})
-        WrappedApp = extension.extendApp(WrappedApp)
-
-        if (!WrappedApp) {
-            throw new Error(
-                `App Extensions Violation: Extension 'name' failed to return App in 'setup-app.js'.`
-            )
-        }
-    })
+    WrappedApp = applyAppExtensions(WrappedApp)
 
     const props = {
         error: window.__ERROR__,

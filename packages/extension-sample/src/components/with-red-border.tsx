@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import hoistNonReactStatic from 'hoist-non-react-statics'
+// import hoistNonReactStatic from 'hoist-non-react-statics'
 
 // Define a type for the HOC props
 type WithRedBorderProps = React.ComponentPropsWithoutRef<any>;
@@ -21,7 +21,7 @@ const withRedBorder = <P extends object>(WrappedComponent: React.ComponentType<P
     )
   }
 
-  hoistNonReactStatic(WithRedBorder, WrappedComponent)
+  // hoistNonReactStatic(WithRedBorder, WrappedComponent)
   
   return WithRedBorder
 }

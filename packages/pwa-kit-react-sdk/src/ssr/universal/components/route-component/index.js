@@ -402,7 +402,7 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  *
  * @private
  */
-export const getRoutes = (locals) => {
+export const getRoutes = (locals = {}) => {
     let _routes = routes
     let {appExtensions = []} = locals
     if (typeof routes === 'function') {

@@ -7,6 +7,7 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const p = require('path')
+const fs = require('fs')
 const program = require('commander')
 const sh = require('shelljs')
 const {execSync: _execSync} = require('child_process')
@@ -34,7 +35,11 @@ const main = () => {
             `${babel} --config-file ${babelConfig} src -x ".js",".jsx",".ts",".tsx" --ignore "**/test_fixtures/*","*.test.js","test.js" --out-dir dist --copy-files`
         )
         execSync(`node ${prepareDist}`)
-        execSync(`npx tsc`)
+
+        // Conditionally run tsc if a typescript config exists. We typically do this to extract types from our SDK.
+        if (fs.existsSync('tsconfig.json')) {
+            execSync(`npx tsc`)
+        }
     })
 
     program

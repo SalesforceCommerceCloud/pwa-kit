@@ -23,6 +23,7 @@ import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {getAssetUrl} from '../universal/utils'
+import {applyAppExtensions} from '../universal/extensibility/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import App from '../universal/components/_app'
@@ -135,16 +136,7 @@ export const render = async (req, res, next) => {
     let WrappedApp = routeComponent(App, false, res.locals)
 
     // Initialize all the react app extensions.
-    extensions.forEach((extension) => {
-        logger.info(`${extension.getName()}: Extending React application.`, {namespace: 'render'})
-        WrappedApp = extension.extendApp(WrappedApp)
-
-        if (!WrappedApp) {
-            throw new Error(
-                `App Extensions Violation: Extension 'name' failed to return App in 'setup-app.js'.`
-            )
-        }
-    })
+    WrappedApp = applyAppExtensions(WrappedApp)
 
     const routes = getRoutes(res.locals)
 

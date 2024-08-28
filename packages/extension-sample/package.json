@@ -9,7 +9,6 @@
     },
     "peerDependencies": {
       "@loadable/component": "^5.15.3",
-      "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
       "react": "^18.2.0",
       "react-dom": "^18.2.0"
     },
