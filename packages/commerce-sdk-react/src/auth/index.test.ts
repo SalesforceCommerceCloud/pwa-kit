@@ -387,11 +387,20 @@ describe('Auth', () => {
     })
 
     test.each([
-        {defaultDnt: true, expected: {dnt: true}},
-        {defaultDnt: false, expected: {dnt: false}},
-        {defaultDnt: undefined, expected: {}}
-    ])('dnt flag is set correctly', async ({defaultDnt, expected}) => {
+        // When user has not selected DNT pref
+        {defaultDnt: true, dw_dnt: undefined, expected: {dnt: true}},
+        {defaultDnt: false, dw_dnt: undefined, expected: {dnt: false}},
+        {defaultDnt: undefined, dw_dnt: undefined, expected: {}},
+        // When user has selected DNT, the dw_dnt cookie sets dnt
+        {defaultDnt: true, dw_dnt: '0', expected: {dnt: false}},
+        {defaultDnt: false, dw_dnt: '1', expected: {dnt: true}},
+        {defaultDnt: false, dw_dnt: '0', expected: {dnt: false}}
+    ])('dnt flag is set correctly', async ({defaultDnt, dw_dnt, expected}) => {
         const auth = new Auth({...config, defaultDnt})
+        if (dw_dnt) {
+            // @ts-expect-error private method
+            auth.set('dw_dnt', dw_dnt)
+        }
         await auth.loginGuestUser()
         expect(helpers.loginGuestUser).toHaveBeenCalledWith(
             expect.anything(),

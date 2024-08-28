@@ -461,7 +461,9 @@ class Auth {
                 ? true
                 : dw_dnt === '0'
                 ? false
-                : this.defaultDnt || false
+                : this.defaultDnt !== undefined
+                ? this.defaultDnt
+                : undefined
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -473,7 +475,7 @@ class Auth {
                             this.client,
                             {
                                 refreshToken,
-                                ...{dnt: dntPref}
+                                ...(dntPref !== undefined && {dnt: dntPref})
                             },
                             {
                                 clientSecret: this.clientSecret
@@ -527,12 +529,14 @@ class Auth {
                 ? true
                 : dw_dnt === '0'
                 ? false
-                : this.defaultDnt || false
+                : this.defaultDnt !== undefined
+                ? this.defaultDnt
+                : undefined
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
             {
-                ...{dnt: dntPref},
+                ...(dntPref !== undefined && {dnt: dntPref}),
                 ...(usid && {usid})
             },
             {clientSecret: this.clientSecret}
@@ -541,7 +545,7 @@ class Auth {
             this.client,
             {
                 redirectURI: this.redirectURI,
-                ...{dnt: dntPref},
+                ...(dntPref !== undefined && {dnt: dntPref}),
                 ...(usid && {usid})
             }
         ] as const
@@ -598,7 +602,9 @@ class Auth {
                 ? true
                 : dw_dnt === '0'
                 ? false
-                : this.defaultDnt || false
+                : this.defaultDnt !== undefined
+                ? this.defaultDnt
+                : undefined
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
@@ -608,7 +614,7 @@ class Auth {
             },
             {
                 redirectURI,
-                ...{dnt: dntPref},
+                ...(dntPref !== undefined && {dnt: dntPref}),
                 ...(usid && {usid})
             }
         )
