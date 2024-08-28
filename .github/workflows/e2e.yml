@@ -30,6 +30,10 @@ on:
         type: string
         description: Site Id
         default: "RefArch"
+      mrt_target_env:
+        type: string
+        description: MRT Targent Environment
+        default: "hyperforce"
       is_private_client:
         type: boolean
         description: Is Private Client?
@@ -38,10 +42,6 @@ on:
         type: boolean
         description: Setup Phased Headless rollout?
         default: false
-      mrt_target_env:
-        type: string
-        description: MRT Targent Environment
-        default: "hyperforce"
 
 jobs:
   pwa-kit:
