@@ -30,4 +30,6 @@ export const SLAS_SECRET_OVERRIDE_MSG =
 
 export const SERVER_AFFINITY_HEADER_KEY = 'sfdc_dwsid'
 
+// commerce-sdk-react namespaces cookies with siteID as suffixes to allow multisite setups.
+// However some cookies are set and used outside of PWA Kit and must not be modified with suffixes.
 export const EXCLUDE_COOKIE_SUFFIX = ['dwsid']
