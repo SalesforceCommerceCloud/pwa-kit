@@ -65,9 +65,9 @@ jobs:
           
           hybrid_input="${{ github.event.inputs.hybrid }}"
           if [ "$hybrid_input" = "true" ]; then
-            hybrid_value=1
-          else
             hybrid_value=2
+          else
+            hybrid_value=1
           fi
 
           # Assign hybrid_value to an environment variable
