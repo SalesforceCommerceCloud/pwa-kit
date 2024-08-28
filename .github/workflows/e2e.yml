@@ -1,5 +1,5 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
-on:my-retail-react-app
+on:
   workflow_dispatch:
     inputs:
       use_extensibility:
