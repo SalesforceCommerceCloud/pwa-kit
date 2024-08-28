@@ -79,13 +79,26 @@ jobs:
           npm ci
         shell: bash
 
+      - name: Generate app
+        uses: "./.github/actions/generate_app"
+        with:
+          extend: ${{ github.event.inputs.extend }}
+          name: ${{ github.event.inputs.name }}
+          instanceUrl: ${{ github.event.inputs.instanceUrl }}
+          orgId: ${{ github.event.inputs.orgId }}
+          shortCode: ${{ github.event.inputs.shortCode }}
+          clientId: ${{ github.event.inputs.clientId }}
+          siteId: ${{ github.event.inputs.siteId }}
+          isPrivateClient: ${{ github.event.inputs.isPrivateClient }}
+          hybrid: ${{ github.event.inputs.hybrid }}
+
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-       - name: Push Bundle to MRT (E2E Test PWA Kit)
+      - name: Push Bundle to MRT (E2E Test PWA Kit)
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "../generated-projects/my-retail-react-app"
