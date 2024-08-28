@@ -52,7 +52,7 @@ jobs:
           url="${{ github.event.inputs.instanceUrl }}"
           hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
           echo "Hostname: $hostname"
-          echo "HOSTNAME: $hostname" >> $GITHUB_ENV 
+          echo "HOSTNAME=$hostname" >> $GITHUB_ENV 
 
       - name: Checkout
         uses: actions/checkout@v3
