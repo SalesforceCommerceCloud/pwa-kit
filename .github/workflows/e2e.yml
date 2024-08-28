@@ -38,42 +38,21 @@ on:
         type: boolean
         description: hybrid
         default: false
-env:
-  IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
-  DEVELOP: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && (github.head_ref || github.ref_name) == 'develop' }}
-  RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
+      mrtTargetEnv:
+        type: string
+        description: mrtTargetEnv
+        default: "hyperforce"
 
 jobs:
   pwa-kit:
     runs-on: ubuntu-latest
     steps:
-      - name: Convert boolean to integer and assign to environment variable
-        run: |
-          extend_input="${{ github.event.inputs.extend }}"
-          if [ "$extend_input" = "true" ]; then
-           extend_value=2
-          else
-           extend_value=1
-          fi
-          
-          isPrivateClient_input="${{ github.event.inputs.isPrivateClient }}"
-          if [ "$isPrivateClient_input" = "true" ]; then
-            isPrivateClient_value=1
-          else
-            isPrivateClient_value=2
-          fi
-          
-          hybrid_input="${{ github.event.inputs.hybrid }}"
-          if [ "$hybrid_input" = "true" ]; then
-            hybrid_value=2
-          else
-            hybrid_value=1
-          fi
-
-          # Assign hybrid_value to an environment variable
-          echo "EXTEND_VALUE=$extend_value" >> $GITHUB_ENV 
-          echo "IS_PRIVATE_CLIENT_VALUE=$isPrivateClient_value" >> $GITHUB_ENV 
-          echo "HYBRID_VALUE=$hybrid_value" >> $GITHUB_ENV 
+      - name: Set environment variable
+        run: |      
+          url="${{ github.event.inputs.instanceUrl }}"
+          hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
+          echo "Hostname: $hostname"
+          echo "HOSTNAME: $hostname" >> $GITHUB_ENV 
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -100,63 +79,18 @@ jobs:
           npm ci
         shell: bash
 
-      - name: Build project generator inputs
-        run: |
-          echo '[
-            {
-              "expectedPrompt": "Choose a project preset to get started:",
-              "response": "1\n"
-            },
-            {
-              "expectedPrompt": "Do you wish to use template extensibility?",
-              "response": "${{ env.EXTEND_VALUE }}\n"
-            },
-            {
-              "expectedPrompt": "What is the name of your Project?",
-              "response": "${{ github.event.inputs.name }}\n"
-            },
-            {
-              "expectedPrompt": "What is the URL for your Commerce Cloud instance?",
-              "response": "${{ github.event.inputs.instanceUrl }}\n"
-            },
-            {
-              "expectedPrompt": "What is your SLAS Client ID?",
-              "response": "${{ github.event.inputs.clientId }}\n"
-            },
-            {
-              "expectedPrompt": "Is your SLAS client private?",
-              "response":"${{ env.IS_PRIVATE_CLIENT_VALUE }}\n"
-            },
-            {
-              "expectedPrompt": "What is your Site ID in Business Manager?",
-              "response": "${{ github.event.inputs.siteId }}\n"
-            },
-            {
-              "expectedPrompt": "What is your Commerce API organization ID in Business Manager?",
-              "response": "${{ github.event.inputs.orgId }}\n"
-            },
-            {
-              "expectedPrompt": "What is your Commerce API short code in Business Manager?",
-              "response": "${{ github.event.inputs.shortCode }}\n"
-            },
-            {
-              "expectedPrompt": "Do you wish to set up a phased headless rollout?",
-              "response": "${{ env.HYBRID_VALUE }}\n"
-            }
-          ]' > generator-responses.json
-
-      - name: Generate new project
-        run: |
-          cat generator-responses.json
-          node e2e/scripts/generate-project.js "$(jq -c . generator-responses.json)"
-        shell: bash
-
-      - name: Build Generated PWA
-        working-directory: ../generated-projects/my-retail-react-app
-        run: |-
-          npm ci
-          npm run build
-        shell: bash
+      - name: Generate app
+        uses: "./.github/actions/generate_app"
+        with:
+          extend: ${{ github.event.inputs.extend }}
+          name: ${{ github.event.inputs.name }}
+          instanceUrl: ${{ github.event.inputs.instanceUrl }}
+          orgId: ${{ github.event.inputs.orgId }}
+          shortCode: ${{ github.event.inputs.shortCode }}
+          clientId: ${{ github.event.inputs.clientId }}
+          siteId: ${{ github.event.inputs.siteId }}
+          isPrivateClient: ${{ github.event.inputs.isPrivateClient }}
+          hybrid: ${{ github.event.inputs.hybrid }}
 
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
@@ -164,7 +98,7 @@ jobs:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      - name: Push Bundle to MRT (E2E Test PWA Kit)
+       - name: Push Bundle to MRT (E2E Test PWA Kit)
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "../generated-projects/my-retail-react-app"
