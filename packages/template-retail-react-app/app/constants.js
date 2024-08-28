@@ -149,7 +149,7 @@ export const SHIPPING_COUNTRY_CODES = [
 ]
 
 // Constant to Enable Active Data
-export const ACTIVE_DATA_ENABLED = false
+export const ACTIVE_DATA_ENABLED = true
 
 export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     dialogTitle: defineMessage({

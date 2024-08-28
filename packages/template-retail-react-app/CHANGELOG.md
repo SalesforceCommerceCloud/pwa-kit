@@ -13,6 +13,9 @@
 - Add descriptive text for screen readers on product edit modal in cart page [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
 - A11y: Fix search bar header element focus order [#1969](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1969)
 
+### Other Features
+- PWA Kit projects have Active Data tracking set to "true" by default.
+
 ## v4.0.0 (Aug 7, 2024)
 
 ### New Features
