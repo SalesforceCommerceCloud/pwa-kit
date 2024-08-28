@@ -1,37 +1,30 @@
 name: generate_app
-  inputs:
-    extend:
-      type: boolean
-      description: extend
-    name:
-      type: string
-      description: name
-    instanceUrl:
-      type: string
-      description: instanceUrl
-    orgId:
-      type: string
-      description: orgId
-    shortCode:
-      type: string
-      description: shortCode
-    clientId:
-      type: string
-      description: clientId
-    siteId:
-      type: string
-      description: siteId
-    isPrivateClient:
-      type: boolean
-      description: isPrivateClient
-    hybrid:
-      type: boolean
-      description: hybrid
+inputs:
+  extend:
+    description: extend
+  name:
+    description: name
+  instanceUrl:
+    description: instanceUrl
+  orgId:
+    description: orgId
+  shortCode:
+    description: shortCode
+  clientId:
+    description: clientId
+  siteId:
+    description: siteId
+  isPrivateClient:
+    description: isPrivateClient
+  hybrid:
+    description: hybrid
 
+description: Generate
 runs:
   using: composite
   steps:
     - name: Parse input values
+      shell: bash
       run: |
         extend_input="${{ github.event.inputs.extend }}"
         if [ "$extend_input" = "true" ]; then
@@ -57,60 +50,61 @@ runs:
         fi
         echo "HYBRID_VALUE=$hybrid_value" >> $GITHUB_ENV]
 
-      - name: Build project generator inputs
-        run: |
-          echo '[
-            {
-              "expectedPrompt": "Choose a project preset to get started:",
-              "response": "1\n"
-            },
-            {
-              "expectedPrompt": "Do you wish to use template extensibility?",
-              "response": "${{ env.EXTEND_VALUE }}\n"
-            },
-            {
-              "expectedPrompt": "What is the name of your Project?",
-              "response": "${{ github.event.inputs.name }}\n"
-            },
-            {
-              "expectedPrompt": "What is the URL for your Commerce Cloud instance?",
-              "response": "${{ github.event.inputs.instanceUrl }}\n"
-            },
-            {
-              "expectedPrompt": "What is your SLAS Client ID?",
-              "response": "${{ github.event.inputs.clientId }}\n"
-            },
-            {
-              "expectedPrompt": "Is your SLAS client private?",
-              "response":"${{ env.IS_PRIVATE_CLIENT_VALUE }}\n"
-            },
-            {
-              "expectedPrompt": "What is your Site ID in Business Manager?",
-              "response": "${{ github.event.inputs.siteId }}\n"
-            },
-            {
-              "expectedPrompt": "What is your Commerce API organization ID in Business Manager?",
-              "response": "${{ github.event.inputs.orgId }}\n"
-            },
-            {
-              "expectedPrompt": "What is your Commerce API short code in Business Manager?",
-              "response": "${{ github.event.inputs.shortCode }}\n"
-            },
-            {
-              "expectedPrompt": "Do you wish to set up a phased headless rollout?",
-              "response": "${{ env.HYBRID_VALUE }}\n"
-            }
-          ]' > generator-responses.json
+    - name: Build project generator inputs
+      shell: bash
+      run: |
+        echo '[
+          {
+            "expectedPrompt": "Choose a project preset to get started:",
+            "response": "1\n"
+          },
+          {
+            "expectedPrompt": "Do you wish to use template extensibility?",
+            "response": "${{ env.EXTEND_VALUE }}\n"
+          },
+          {
+            "expectedPrompt": "What is the name of your Project?",
+            "response": "${{ github.event.inputs.name }}\n"
+          },
+          {
+            "expectedPrompt": "What is the URL for your Commerce Cloud instance?",
+            "response": "${{ github.event.inputs.instanceUrl }}\n"
+          },
+          {
+            "expectedPrompt": "What is your SLAS Client ID?",
+            "response": "${{ github.event.inputs.clientId }}\n"
+          },
+          {
+            "expectedPrompt": "Is your SLAS client private?",
+            "response":"${{ env.IS_PRIVATE_CLIENT_VALUE }}\n"
+          },
+          {
+            "expectedPrompt": "What is your Site ID in Business Manager?",
+            "response": "${{ github.event.inputs.siteId }}\n"
+          },
+          {
+            "expectedPrompt": "What is your Commerce API organization ID in Business Manager?",
+            "response": "${{ github.event.inputs.orgId }}\n"
+          },
+          {
+            "expectedPrompt": "What is your Commerce API short code in Business Manager?",
+            "response": "${{ github.event.inputs.shortCode }}\n"
+          },
+          {
+            "expectedPrompt": "Do you wish to set up a phased headless rollout?",
+            "response": "${{ env.HYBRID_VALUE }}\n"
+          }
+        ]' > generator-responses.json
 
-      - name: Generate new project
-        run: |
-          cat generator-responses.json
-          node e2e/scripts/generate-project.js "$(jq -c . generator-responses.json)"
-        shell: bash
+    - name: Generate new project
+      run: |
+        cat generator-responses.json
+        node e2e/scripts/generate-project.js "$(jq -c . generator-responses.json)"
+      shell: bash
 
-      - name: Build Generated PWA
-        working-directory: ../generated-projects/my-retail-react-app
-        run: |-
-          npm ci
-          npm run build
-        shell: bash
+    - name: Build Generated PWA
+      working-directory: ../generated-projects/my-retail-react-app
+      run: |-
+        npm ci
+        npm run build
+      shell: bash
