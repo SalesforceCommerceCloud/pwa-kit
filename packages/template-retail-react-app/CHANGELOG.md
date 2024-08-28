@@ -4,6 +4,11 @@
 
 ### Bug Fixes
 - The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
+- Remove save/edit billing action in checkout page for the registered user [#1976](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1976)
+
+### Accessibility Improvements
+- [a11y] Hide svg from screenreader as they are decorative on homepage [#1980](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1980) 
+
 
 ### Accessibility Improvements
 - Hide breadcrumb chevrons from screen readers [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
