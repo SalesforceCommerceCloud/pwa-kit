@@ -9,6 +9,8 @@
 const request = require('supertest')
 const app = require('./ssr')
 
+jest.useFakeTimers()
+
 describe('server', () => {
     afterAll(() => app.server.close())
     test('responds with HTML', () => {

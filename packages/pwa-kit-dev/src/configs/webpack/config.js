@@ -567,7 +567,69 @@ const requestProcessor =
         })
         .build()
 
-module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
+// This is the extensions for multi-extensibility feature in PWA Kit.
+// Don't mistake this with the concept of extensions for Webpack.
+const extensions =
+    mode === 'production'
+        ? (pkg.mobify?.app?.extensions || [])
+              .map((extension) => {
+                  const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/setup-server`
+                  const foundType = ['ts', 'js'].find((type) =>
+                      fse.existsSync(`${setupServerFilePathBase}.${type}`)
+                  )
+
+                  if (!foundType) {
+                      // no setup-server file found, early exit because it's optional
+                      return
+                  }
+
+                  const defaultTsConfig = {
+                      target: 'ES2020',
+                      module: 'commonjs',
+                      strict: true,
+                      esModuleInterop: true,
+                      skipLibCheck: true
+                  }
+                  let tsConfigFound = fse.existsSync(
+                      `${projectDir}/node_modules/${extension}/tsconfig.json`
+                  )
+                  return {
+                      name: 'extensions',
+                      target: 'node',
+                      mode,
+                      entry: setupServerFilePathBase,
+                      output: {
+                          path: `${buildDir}/extensions/${extension}`,
+                          filename: 'setup-server.js',
+                          libraryTarget: 'commonjs2'
+                      },
+                      resolve: {
+                          extensions: ['.ts', '.js']
+                      },
+                      module: {
+                          rules: [
+                              {
+                                  test: /\.ts?$/,
+                                  use: {
+                                      loader: findDepInStack('ts-loader'),
+                                      // No nothing if tsconfig.json is declared in the extension.
+                                      // Typescript will resolve to it magically.
+                                      // If no tsconfig.json is found, use the default options
+                                      ...(tsConfigFound ? {} : {compilerOptions: defaultTsConfig})
+                                  },
+                                  exclude: /node_modules/
+                              }
+                          ]
+                      },
+                      optimization: {
+                          minimize: false
+                      }
+                  }
+              })
+              .filter(Boolean)
+        : []
+
+module.exports = [client, ssr, renderer, clientOptional, requestProcessor, ...extensions]
     .filter(Boolean)
     .map((config) => {
         return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)

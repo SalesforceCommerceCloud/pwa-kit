@@ -1,6 +1,6 @@
 {
   "name": "internal-lib-build",
-  "version": "3.8.0-dev",
+  "version": "4.0.0-dev",
   "private": true,
   "description": "Build tools for *libraries* in the monorepo",
   "bugs": {
@@ -43,14 +43,14 @@
     "@babel/runtime": "^7.21.0",
     "@babel/runtime-corejs2": "^7.21.0",
     "@babel/traverse": "^7.23.2",
-    "babel-jest": "^26.6.3",
+    "babel-jest": "^27.1.0",
     "babel-loader": "^8.3.0",
     "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
     "babel-plugin-formatjs": "10.4.0",
     "commander": "^9.5.0",
-    "jest": "^26.6.3",
-    "jest-environment-jsdom": "^26.6.2",
-    "jest-environment-jsdom-global": "^2.0.4",
+    "jest": "^27.1.0",
+    "jest-environment-jsdom": "^27.1.0",
+    "jest-environment-jsdom-global": "^3.0.0",
     "jest-fetch-mock": "^2.1.2",
     "prettier": "^2.8.6",
     "raf": "^3.4.1",
@@ -60,7 +60,7 @@
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.8.0-dev",
+    "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "npm-packlist": "^4.0.0",
     "typescript": "4.9.5"
   },

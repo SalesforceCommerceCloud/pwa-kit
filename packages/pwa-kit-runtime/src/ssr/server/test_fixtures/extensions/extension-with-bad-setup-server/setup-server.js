@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2024, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+/* istanbul ignore next */
+const extension = ({app}) => {
+    throw new Error('extension will fail to initialize because of me')
+}
+
+module.exports = {
+    default: extension
+}

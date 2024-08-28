@@ -29,6 +29,7 @@ import {
 
 import {randomUUID} from 'crypto'
 import chalk from 'chalk'
+import tsx from 'tsx/cjs/api'
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -124,6 +125,44 @@ export const DevServerMixin = {
         proxyConfigs.forEach((config) => {
             app.use(config.proxyPath, config.proxy)
             app.use(config.cachingPath, config.cachingProxy)
+        })
+    },
+
+    /**
+     * @private
+     */
+    _setupExtensions(app, options) {
+        // TODO: support extensions options array syntax i.e. ['extension-a', {}]
+        const extensions = options.mobify?.app?.extensions || []
+        app.__extensions = extensions || []
+
+        extensions.forEach((extension) => {
+            const setupServerFilePathBase = path.join(
+                options.projectDir,
+                'node_modules',
+                extension,
+                'setup-server'
+            )
+
+            let filePath
+            if (fs.existsSync(`${setupServerFilePathBase}.ts`)) {
+                filePath = `${setupServerFilePathBase}.ts`
+            } else if (fs.existsSync(`${setupServerFilePathBase}.js`)) {
+                filePath = `${setupServerFilePathBase}.js`
+            } else {
+                return
+            }
+
+            const setupServer = tsx.require(filePath, __filename)
+            if (!setupServer.default) {
+                console.warn(`Extension ${extension} does not have a default export. Skipping.`)
+                return
+            }
+            try {
+                setupServer.default({app, options})
+            } catch (e) {
+                console.error(`Error setting up extension ${extension}:`, e)
+            }
         })
     },
 

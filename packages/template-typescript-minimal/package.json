@@ -1,6 +1,6 @@
 {
   "name": "typescript-minimal",
-  "version": "3.8.0-dev",
+  "version": "4.0.0-dev",
   "private": true,
   "scripts": {
     "build": "pwa-kit-dev build",
@@ -18,9 +18,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "3.8.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "3.8.0-dev",
-    "@salesforce/pwa-kit-runtime": "3.8.0-dev",
+    "@salesforce/pwa-kit-dev": "4.0.0-dev",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
+    "@salesforce/pwa-kit-runtime": "4.0.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "@types/loadable__component": "~5.13.4",
     "@types/react": "~18.2.0",
@@ -36,6 +36,11 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
+    "app":{
+      "extensions": [
+        "test-extension"
+      ]
+    },
     "ssrEnabled": true,
     "ssrOnly": [
       "ssr.js",
