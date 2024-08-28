@@ -38,10 +38,6 @@ on:
         type: boolean
         description: Setup Phased Headless rollout?
         default: false
-      project_dir:
-        type: string
-        description: Project Directory
-        default: my-retail-react-app
       mrt_target_env:
         type: string
         description: MRT Targent Environment
@@ -52,11 +48,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set environment variable
-        run: |      
+        run: |
+          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV 
           url="${{ github.event.inputs.instance_url }}"
           hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
           echo "Hostname: $hostname"
-          echo "HOSTNAME=$hostname" >> $GITHUB_ENV 
+          echo "HOSTNAME=$hostname" >> $GITHUB_ENV
+          
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -95,7 +93,7 @@ jobs:
           site_id: ${{ github.event.inputs.site_id }}
           is_private_client: ${{ github.event.inputs.is_private_client }}
           setup_hybrid: ${{ github.event.inputs.setup_hybrid }}
-          project_dir: ${{ github.event.inputs.project_dir }}
+          project_dir: ${{ env.PROJECT_DIR }}
 
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
@@ -106,7 +104,7 @@ jobs:
       - name: Push Bundle to MRT (E2E Test PWA Kit)
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/${{ github.event.inputs.project_dir }}"
-          TARGET: hyperforce
+          CWD: "../generated-projects/${{ env.PROJECT_DIR }}"
+          TARGET: ${{ github.event.inputs.mrt_target_env }}
           FLAGS: --wait
 
