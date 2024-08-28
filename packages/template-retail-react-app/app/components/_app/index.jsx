@@ -239,11 +239,12 @@ const App = (props) => {
     }, [])
 
     const {usid} = useUsid()
-    // TODO: Handle creating a new shopper context if there isn't one already assigned to the current 
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const deleteShopperContext = useShopperContextsMutation('deleteShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
-    const {data} = useShopperContext(
+    // TODO: Handle creating a new shopper context if there isn't one already assigned to the current 
+    // Move to hooks
+    const {data: shopperContext} = useShopperContext(
         {
             parameters: {
                 usid: usid,
@@ -252,8 +253,38 @@ const App = (props) => {
         },
         {
             enabled: !isServer
+            //onError: () => 
         }
     )
+    console.log('shopperContext', shopperContext)
+    // TODO: if it doesn't exist should we create it here?
+
+    useEffect(async () => {
+        // update the shopper context if the query string contains one or more of the relevant query parameters
+        const queryParams = new URLSearchParams(location.search);
+        const shopperContextQueryParams = Object.values(SHOPPER_CONTEXT_QUERY_PARAMS).some(key => queryParams.has(key))
+    
+        console.log('Query Params', queryParams)
+        console.log('Has Shopper Context Query Params',hasShopperContextQueryParams);
+        if (hasShopperContextQueryParams) {
+            const payload = {
+                parameters: {usid, siteId: site.id},
+                body: {
+                    // sourceCode: string
+                    // effectiveDateTime: string
+                }
+            }
+            if (shopperContext) {
+                console.log('updating shoppercontext')
+                await updateShopperContext.mutateAsync(payload)
+            } else {
+                console.log('creating shoppercontext')
+                await createShopperContext.mutateAsync(payload)
+            }
+            // Need to refresh so the data on the page updates
+            refetchDataOnClient()
+        }
+    }, [location.search])
 
     useEffect(() => {
         console.log('isHydrated()', isHydrated())

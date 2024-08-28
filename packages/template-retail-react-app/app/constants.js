@@ -201,3 +201,12 @@ export const STORE_LOCATOR_DISTANCE = 100
 export const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
 export const STORE_LOCATOR_DISTANCE_UNIT = 'km'
 export const STORE_LOCATOR_IS_ENABLED = true
+
+// Constants for shopper context
+export const SHOPPER_CONTEXT_QUERY_PARAMS = {
+    SOURCE_CODE: 'sourceCode',
+    EFFECTIVE_DATE_TIME: 'effectiveDateTime',
+    CUSTOM_QUALIFIERS: 'customQualifiers',
+    ASSIGNMENT_QUALIFIERS: 'assignmentQualifiers',
+    CUSTOMER_GROUP_ID: 'customerGroupIds',
+}
