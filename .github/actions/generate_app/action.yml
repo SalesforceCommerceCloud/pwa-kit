@@ -1,23 +1,25 @@
 name: generate_app
 inputs:
-  extend:
-    description: extend
-  name:
-    description: name
-  instanceUrl:
-    description: instanceUrl
-  orgId:
-    description: orgId
-  shortCode:
-    description: shortCode
-  clientId:
-    description: clientId
-  siteId:
-    description: siteId
-  isPrivateClient:
-    description: isPrivateClient
-  hybrid:
-    description: hybrid
+  use_extensibility:
+    description: Use Extensibility?
+  project_name:
+    description: Project Name
+  instance_url:
+    description: Instance Url
+  org_id:
+    description: Org Id
+  short_code:
+    description: Short Code
+  client_id:
+    description: Client Id
+  site_id:
+    description: Site Id
+  is_private_client:
+    description: Is Private Client?
+  setup_hybrid:
+    description: Setup Phased Headless rollout?
+  project_dir:
+    description: Project Directory
 
 description: Generate
 runs:
@@ -26,29 +28,29 @@ runs:
     - name: Parse input values
       shell: bash
       run: |
-        extend_input="${{ github.event.inputs.extend }}"
+        use_extensibility_input="${{ github.event.inputs.use_extensibility }}"
         if [ "$extend_input" = "true" ]; then
-         extend_value=2
+         use_extensibility_value=2
         else
-         extend_value=1
+         use_extensibility_value=1
         fi
-        echo "EXTEND_VALUE=$extend_value" >> $GITHUB_ENV 
+        echo "USE_EXTENSIBILITY_VALUE=$extend_value" >> $GITHUB_ENV 
         
-        isPrivateClient_input="${{ github.event.inputs.isPrivateClient }}"
+        is_private_client_input="${{ github.event.inputs.is_private_client }}"
         if [ "$isPrivateClient_input" = "true" ]; then
-          isPrivateClient_value=1
+         is_private_client_value=1
         else
-          isPrivateClient_value=2
+          is_private_client_value=2
         fi
-        echo "IS_PRIVATE_CLIENT_VALUE=$isPrivateClient_value" >> $GITHUB_ENV
+        echo "IS_PRIVATE_CLIENT_VALUE=$is_private_client_value" >> $GITHUB_ENV
         
-        hybrid_input="${{ github.event.inputs.hybrid }}"
-        if [ "$hybrid_input" = "true" ]; then
-          hybrid_value=2
+        setup_hybrid_input="${{ github.event.inputs.setup_hybrid }}"
+        if [ "$setup_hybrid_input" = "true" ]; then
+          setup_hybrid_value=2
         else
-          hybrid_value=1
+          setup_hybrid_value=1
         fi
-        echo "HYBRID_VALUE=$hybrid_value" >> $GITHUB_ENV]
+        echo "SETUP_HYBRID_VALUE=$hybrid_value" >> $GITHUB_ENV]
 
     - name: Build project generator inputs
       shell: bash
@@ -60,19 +62,19 @@ runs:
           },
           {
             "expectedPrompt": "Do you wish to use template extensibility?",
-            "response": "${{ env.EXTEND_VALUE }}\n"
+            "response": "${{ env.USE_EXTENSIBILITY_VALUE }}\n"
           },
           {
             "expectedPrompt": "What is the name of your Project?",
-            "response": "${{ github.event.inputs.name }}\n"
+            "response": "${{ github.event.inputs.project_name }}\n"
           },
           {
             "expectedPrompt": "What is the URL for your Commerce Cloud instance?",
-            "response": "${{ github.event.inputs.instanceUrl }}\n"
+            "response": "${{ github.event.inputs.instance_url }}\n"
           },
           {
             "expectedPrompt": "What is your SLAS Client ID?",
-            "response": "${{ github.event.inputs.clientId }}\n"
+            "response": "${{ github.event.inputs.client_id }}\n"
           },
           {
             "expectedPrompt": "Is your SLAS client private?",
@@ -80,19 +82,19 @@ runs:
           },
           {
             "expectedPrompt": "What is your Site ID in Business Manager?",
-            "response": "${{ github.event.inputs.siteId }}\n"
+            "response": "${{ github.event.inputs.site_id }}\n"
           },
           {
             "expectedPrompt": "What is your Commerce API organization ID in Business Manager?",
-            "response": "${{ github.event.inputs.orgId }}\n"
+            "response": "${{ github.event.inputs.org_id }}\n"
           },
           {
             "expectedPrompt": "What is your Commerce API short code in Business Manager?",
-            "response": "${{ github.event.inputs.shortCode }}\n"
+            "response": "${{ github.event.inputs.short_code }}\n"
           },
           {
             "expectedPrompt": "Do you wish to set up a phased headless rollout?",
-            "response": "${{ env.HYBRID_VALUE }}\n"
+            "response": "${{ env.SETUP_HYBRID_VALUE }}\n"
           }
         ]' > generator-responses.json
 
@@ -103,7 +105,7 @@ runs:
       shell: bash
 
     - name: Build Generated PWA
-      working-directory: ../generated-projects/my-retail-react-app
+      working-directory: ../generated-projects/${{ github.event.inputs.project_dir }}
       run: |-
         npm ci
         npm run build

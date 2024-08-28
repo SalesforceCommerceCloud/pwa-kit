@@ -1,46 +1,50 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
-on:
+on:my-retail-react-app
   workflow_dispatch:
     inputs:
-      extend:
+      use_extensibility:
         type: boolean
-        description: extend
+        description: Use Extensibility?
         default: true
-      name:
+      project_name:
         type: string
-        description: name
+        description: Project Name
         default: "scaffold-pwa"
-      instanceUrl:
+      instance_url:
         type: string
-        description: instanceUrl
+        description: Instance Url
         default: "https://zzrf-002.dx.commercecloud.salesforce.com"
-      orgId:
+      org_id:
         type: string
-        description: orgId
+        description: Org Id
         default: "f_ecom_zzrf_002"
-      shortCode:
+      short_code:
         type: string
-        description: shortCode
+        description: Short Code
         default: "kv7kzm78"
-      clientId:
+      client_id:
         type: string
-        description: clientId
+        description: Client Id
         default: "cfa08695-89e9-4519-ab9e-d2a99cb0bea8"
-      siteId:
+      site_id:
         type: string
-        description: siteId
+        description: Site Id
         default: "RefArch"
-      isPrivateClient:
+      is_private_client:
         type: boolean
-        description: isPrivateClient
+        description: Is Private Client?
         default: true
-      hybrid:
+      setup_hybrid:
         type: boolean
-        description: hybrid
+        description: Setup Phased Headless rollout?
         default: false
-      mrtTargetEnv:
+      project_dir:
         type: string
-        description: mrtTargetEnv
+        description: Project Directory
+        default: my-retail-react-app
+      mrt_target_env:
+        type: string
+        description: MRT Targent Environment
         default: "hyperforce"
 
 jobs:
@@ -49,7 +53,7 @@ jobs:
     steps:
       - name: Set environment variable
         run: |      
-          url="${{ github.event.inputs.instanceUrl }}"
+          url="${{ github.event.inputs.instance_url }}"
           hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
           echo "Hostname: $hostname"
           echo "HOSTNAME=$hostname" >> $GITHUB_ENV 
@@ -82,15 +86,16 @@ jobs:
       - name: Generate app
         uses: "./.github/actions/generate_app"
         with:
-          extend: ${{ github.event.inputs.extend }}
-          name: ${{ github.event.inputs.name }}
-          instanceUrl: ${{ github.event.inputs.instanceUrl }}
-          orgId: ${{ github.event.inputs.orgId }}
-          shortCode: ${{ github.event.inputs.shortCode }}
-          clientId: ${{ github.event.inputs.clientId }}
-          siteId: ${{ github.event.inputs.siteId }}
-          isPrivateClient: ${{ github.event.inputs.isPrivateClient }}
-          hybrid: ${{ github.event.inputs.hybrid }}
+          use_extensibility: ${{ github.event.inputs.use_extensibility }}
+          project_name: ${{ github.event.inputs.project_name }}
+          instance_url: ${{ github.event.inputs.instance_url }}
+          org_id: ${{ github.event.inputs.org_id }}
+          short_code: ${{ github.event.inputs.short_code }}
+          client_id: ${{ github.event.inputs.client_id }}
+          site_id: ${{ github.event.inputs.site_id }}
+          is_private_client: ${{ github.event.inputs.is_private_client }}
+          setup_hybrid: ${{ github.event.inputs.setup_hybrid }}
+          project_dir: ${{ github.event.inputs.project_dir }}
 
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
@@ -101,7 +106,7 @@ jobs:
       - name: Push Bundle to MRT (E2E Test PWA Kit)
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/my-retail-react-app"
+          CWD: "../generated-projects/${{ github.event.inputs.project_dir }}"
           TARGET: hyperforce
           FLAGS: --wait
 
