@@ -70,6 +70,7 @@ type AuthDataKeys =
     | 'refresh_token_guest'
     | 'refresh_token_registered'
     | 'access_token_sfra'
+    | 'dw_dnt'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -157,6 +158,10 @@ const DATA_MAP: AuthDataMap = {
     access_token_sfra: {
         storageType: 'cookie',
         key: 'cc-at'
+    },
+    dw_dnt: {
+        storageType: 'cookie',
+        key: 'dw_dnt'
     }
 }
 
@@ -448,6 +453,17 @@ class Auth {
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
+
+        // If user has set their DNT preference, read the cookie, if not, use the default DNT pref. If the default DNT pref has not been set, default to false.
+        const dw_dnt = this.get('dw_dnt')
+        const dntPref =
+            dw_dnt === '1'
+                ? true
+                : dw_dnt === '0'
+                ? false
+                : this.defaultDnt !== undefined
+                ? this.defaultDnt
+                : false
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -459,7 +475,7 @@ class Auth {
                             this.client,
                             {
                                 refreshToken,
-                                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt})
+                                ...{dnt: dntPref}
                             },
                             {
                                 clientSecret: this.clientSecret
@@ -507,11 +523,20 @@ class Auth {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
+        const dw_dnt = this.get('dw_dnt')
+        const dntPref =
+            dw_dnt === '1'
+                ? true
+                : dw_dnt === '0'
+                ? false
+                : this.defaultDnt !== undefined
+                ? this.defaultDnt
+                : false
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
             {
-                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...{dnt: dntPref},
                 ...(usid && {usid})
             },
             {clientSecret: this.clientSecret}
@@ -520,7 +545,7 @@ class Auth {
             this.client,
             {
                 redirectURI: this.redirectURI,
-                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...{dnt: dntPref},
                 ...(usid && {usid})
             }
         ] as const
@@ -571,6 +596,15 @@ class Auth {
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
+        const dw_dnt = this.get('dw_dnt')
+        const dntPref =
+            dw_dnt === '1'
+                ? true
+                : dw_dnt === '0'
+                ? false
+                : this.defaultDnt !== undefined
+                ? this.defaultDnt
+                : false
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
@@ -580,7 +614,7 @@ class Auth {
             },
             {
                 redirectURI,
-                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...{dnt: dntPref},
                 ...(usid && {usid})
             }
         )
