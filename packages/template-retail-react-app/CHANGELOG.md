@@ -5,6 +5,10 @@
 - Remove save/edit billing action in checkout page for the registered user [#1976](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1976)
 
 ### Accessibility Improvements
+- [a11y] Hide svg from screenreader as they are decorative on homepage [#1980](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1980) 
+
+
+### Accessibility Improvements
 - Hide breadcrumb chevrons from screen readers [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
 - Add descriptive text for screen readers on product edit modal in cart page [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
 - A11y: Fix search bar header element focus order [#1969](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1969)
