@@ -6,7 +6,7 @@
  */
 const { runGeneratorWithResponses } = require("./execute-shell-commands.js");
 const config = require("../config.js");
-const { program, Argument } = require("commander");
+const { program} = require("commander");
 const { mkdirIfNotExists } = require("./utils.js");
 
 const main = async (opts) => {
@@ -57,31 +57,42 @@ const main = async (opts) => {
   }
 };
 
-program.description(
-  `Generate a retail-react-app project using the key <project-key> or the json <project-config>`
-);
-
-
-program.addArgument(
-  new Argument("[project-key]", "project key").choices([
-    "retail-app-demo",
-    "retail-app-ext",
-    "retail-app-no-ext",
-    "retail-app-private-client",
-  ])
-).addArgument(
-  new Argument("[project-config]", "project config as JSON string").argParser(
-      (value) => {
-        try {
-          return JSON.parse(value);
-        } catch (e) {
-          throw new Error('Invalid JSON array string');
+// Define the program with description and arguments
+program
+    .description(
+        'Generate a retail-react-app project using the key <project-key> or the JSON <project-config>'
+    )
+    .option(
+        '--project-key <key>',
+        'Project key',
+        (value) => {
+          const validKeys = [
+            'retail-app-demo',
+            'retail-app-ext',
+            'retail-app-no-ext',
+            'retail-app-private-client',
+          ];
+          if (!validKeys.includes(value)) {
+            throw new Error('Invalid project key.');
+          }
+          return value;
         }
-      })
-)
-.action((projectKey, projectConfig) => {
-  // Call the main function with parsed options
-  main({ projectKey, projectConfig });
-});
+    )
+    .option(
+        '--project-config <config>',
+        'Project config as JSON string',
+        (value) => {
+          try {
+            return JSON.parse(value);
+          } catch (e) {
+            throw new Error('Invalid JSON string.');
+          }
+        }
+    )
+    .action((options) => {
+      // Call the main function with parsed options
+      main(options);
+    });
+
 
 program.parse(process.argv);
