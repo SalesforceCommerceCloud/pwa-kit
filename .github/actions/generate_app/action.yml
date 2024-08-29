@@ -28,6 +28,7 @@ runs:
     - name: Parse input values
       shell: bash
       run: |
+        echo "The input variable is: ${{ github.event.inputs.project_dir }}"
         use_extensibility_input="${{ github.event.inputs.use_extensibility }}"
         if [ "use_extensibility_input" = "true" ]; then
          use_extensibility_value=2
