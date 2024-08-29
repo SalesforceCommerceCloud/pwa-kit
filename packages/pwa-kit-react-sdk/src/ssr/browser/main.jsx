@@ -44,10 +44,11 @@ export const registerServiceWorker = (url) => {
 export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
+    const basepath = AppConfig.getBasePath({req: undefined, res: undefined})
 
     return (
         <ServerContext.Provider value={{}}>
-            <Router ref={onHydrate}>
+            <Router ref={onHydrate} basename={basepath}>
                 <CorrelationIdProvider
                     correlationId={() => {
                         // If we are hydrating an error page use the server correlation id.

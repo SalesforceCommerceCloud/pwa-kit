@@ -247,9 +247,10 @@ export const render = async (req, res, next) => {
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
+    const basepath = AppConfig.getBasePath({req, res})
     return (
         <ServerContext.Provider value={{req, res}}>
-            <Router location={location} context={routerContext}>
+            <Router location={location} context={routerContext} basename={basepath}>
                 <CorrelationIdProvider
                     correlationId={res.locals.requestId}
                     resetOnPageChange={false}
