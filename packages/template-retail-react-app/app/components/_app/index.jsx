@@ -246,20 +246,18 @@ const App = (props) => {
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
     // TODO: Handle creating a new shopper context if there isn't one already assigned to the current 
     // Move to hooks
-    const {data: shopperContext} = useShopperContext(
-        {
-            parameters: {
-                usid: usid,
-                siteId: site.id
-            }
-        },
-        {
-            enabled: !isServer
-            //onError: () => 
+    const {data: shopperContext} = useShopperContext({
+        parameters: {usid: usid, siteId: site.id}
+    },
+    {
+        enabled: !isServer,
+        onError: async () => {
+            console.log("Got error from useShopperContext")
+            await createShopperContext.mutateAsync({parameters: { usid, siteId: site.id }, body: {}})
         }
+    }
     )
     console.log('shopperContext', shopperContext)
-    // TODO: if it doesn't exist should we create it here?
 
     useEffect(async () => {
         // update the shopper context if the query string contains one or more of the relevant query parameters
