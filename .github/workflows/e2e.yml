@@ -53,8 +53,8 @@ jobs:
           url="${{ github.event.inputs.instance_url }}"
           hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
           echo "Hostname: $hostname"
+          echo "projectDir: $PROJECT_DIR"
           echo "HOSTNAME=$hostname" >> $GITHUB_ENV
-          
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -80,6 +80,9 @@ jobs:
           # Install PWA dependencies
           npm ci
         shell: bash
+
+      - name: Verify $GITHUB_ENV
+        run: cat $GITHUB_ENV
 
       - name: Generate app
         uses: "./.github/actions/generate_app"
