@@ -1,0 +1,16 @@
+name: test
+inputs:
+  name:
+    description: Setup Phased Headless rollout?
+  proj_directory:
+    description: Project Directory
+
+description: Test
+runs:
+  using: composite
+  steps:
+    - name: Parse input values
+      shell: bash
+      run: |
+        echo "The input variable1 is: ${{ github.event.inputs.name }}"
+        echo "The input variable2 is: ${{ github.event.inputs.proj_directory }}"
