@@ -80,7 +80,7 @@ import {
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE,
-    ACTIVE_DATA_ENABLED,
+    ACTIVE_DATA_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -242,16 +242,20 @@ const App = (props) => {
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const deleteShopperContext = useShopperContextsMutation('deleteShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
-    const {data: shopperContext} = useShopperContext({
-        parameters: {usid: usid, siteId: site.id}
-    },
-    {
-        enabled: !isServer,
-        onError: async () => {
-            console.log("Got error from useShopperContext")
-            await createShopperContext.mutateAsync({parameters: { usid, siteId: site.id }, body: {}})
+    const {data: shopperContext} = useShopperContext(
+        {
+            parameters: {usid: usid, siteId: site.id}
+        },
+        {
+            enabled: !isServer,
+            onError: async () => {
+                console.log('Got error from useShopperContext')
+                await createShopperContext.mutateAsync({
+                    parameters: {usid, siteId: site.id},
+                    body: {}
+                })
+            }
         }
-    }
     )
     console.log('shopperContext', shopperContext)
     const updateShopperContextObj = useShopperContextSearchParams()
@@ -259,7 +263,10 @@ const App = (props) => {
     useEffect(async () => {
         // update the shopper context if the query string contains the relevant search parameters
         console.log('updating shoppercontext', updateShopperContextObj)
-        await updateShopperContext.mutateAsync({parameters: { usid, siteId: site.id }, body: updateShopperContextObj})
+        await updateShopperContext.mutateAsync({
+            parameters: {usid, siteId: site.id},
+            body: updateShopperContextObj
+        })
         // Refresh to update the data on the page
         refetchDataOnClient()
     }, [location.search])
