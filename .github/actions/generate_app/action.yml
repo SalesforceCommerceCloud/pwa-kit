@@ -18,7 +18,7 @@ inputs:
     description: Is Private Client?
   setup_hybrid:
     description: Setup Phased Headless rollout?
-  proj_directory:
+  project_dir:
     description: Project Directory
 
 description: Generate
@@ -28,9 +28,7 @@ runs:
     - name: Parse input values
       shell: bash
       run: |
-        echo "The input variable1 is: ${{ github.event.inputs.project_name }}"
-        echo "The input variable2 is: ${{ github.event.inputs.proj_directory }}"
-        use_extensibility_input="${{ github.event.inputs.use_extensibility }}"
+        use_extensibility_input="${{ inputs.use_extensibility }}"
         if [ "use_extensibility_input" = "true" ]; then
          use_extensibility_value=2
         else
@@ -38,7 +36,7 @@ runs:
         fi
         echo "USE_EXTENSIBILITY_VALUE=$use_extensibility_value" >> $GITHUB_ENV 
         
-        is_private_client_input="${{ github.event.inputs.is_private_client }}"
+        is_private_client_input="${{ inputs.is_private_client }}"
         if [ "$isPrivateClient_input" = "true" ]; then
          is_private_client_value=1
         else
@@ -46,7 +44,7 @@ runs:
         fi
         echo "IS_PRIVATE_CLIENT_VALUE=$is_private_client_value" >> $GITHUB_ENV
         
-        setup_hybrid_input="${{ github.event.inputs.setup_hybrid }}"
+        setup_hybrid_input="${{ inputs.setup_hybrid }}"
         if [ "$setup_hybrid_input" = "true" ]; then
           setup_hybrid_value=2
         else
@@ -58,7 +56,7 @@ runs:
       shell: bash
       run: |
         echo '{
-         "projectDir":"${{ github.event.inputs.project_dir }}",
+         "projectDir":"${{ inputs.project_dir }}",
          "responses": [
             {
               "expectedPrompt": "Choose a project preset to get started:",
@@ -70,15 +68,15 @@ runs:
             },
             {
               "expectedPrompt": "What is the name of your Project?",
-              "response": "${{ github.event.inputs.project_name }}\n"
+              "response": "${{ inputs.project_name }}\n"
             },
             {
               "expectedPrompt": "What is the URL for your Commerce Cloud instance?",
-              "response": "${{ github.event.inputs.instance_url }}\n"
+              "response": "${{ inputs.instance_url }}\n"
             },
             {
               "expectedPrompt": "What is your SLAS Client ID?",
-              "response": "${{ github.event.inputs.client_id }}\n"
+              "response": "${{ inputs.client_id }}\n"
             },
             {
               "expectedPrompt": "Is your SLAS client private?",
@@ -86,15 +84,15 @@ runs:
             },
             {
               "expectedPrompt": "What is your Site ID in Business Manager?",
-              "response": "${{ github.event.inputs.site_id }}\n"
+              "response": "${{ inputs.site_id }}\n"
             },
             {
               "expectedPrompt": "What is your Commerce API organization ID in Business Manager?",
-              "response": "${{ github.event.inputs.org_id }}\n"
+              "response": "${{ inputs.org_id }}\n"
             },
             {
               "expectedPrompt": "What is your Commerce API short code in Business Manager?",
-              "response": "${{ github.event.inputs.short_code }}\n"
+              "response": "${{ inputs.short_code }}\n"
             },
             {
               "expectedPrompt": "Do you wish to set up a phased headless rollout?",
@@ -109,7 +107,7 @@ runs:
       shell: bash
 
     - name: Build Generated PWA
-      working-directory: ../generated-projects/"${{ github.event.inputs.project_dir }}"
+      working-directory: ../generated-projects/"${{ inputs.project_dir }}"
       run: |-
         npm ci
         npm run build
