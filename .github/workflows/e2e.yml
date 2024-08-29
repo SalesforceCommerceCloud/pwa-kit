@@ -49,13 +49,10 @@ jobs:
     steps:
       - name: Set environment variable
         run: |
-          project_dir=my-retail-react-app 
-          echo "PROJECT_DIR=$project_dir" >> $GITHUB_ENV
-          
+          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV
           url="${{ github.event.inputs.instance_url }}"
           hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
           echo "Hostname: $hostname"
-          echo "projectDir: $PROJECT_DIR"
           echo "HOSTNAME=$hostname" >> $GITHUB_ENV
 
       - name: Checkout
