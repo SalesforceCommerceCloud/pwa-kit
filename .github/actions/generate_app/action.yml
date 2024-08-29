@@ -2,6 +2,8 @@ name: generate_app
 inputs:
   use_extensibility:
     description: Use Extensibility?
+  project_name:
+    description: Project Name
   instance_url:
     description: Instance Url
   org_id:
@@ -26,7 +28,8 @@ runs:
     - name: Parse input values
       shell: bash
       run: |
-        echo "The input variable is: ${{ github.event.inputs.project_dir }}"
+        echo "The input variable1 is: ${{ github.event.inputs.project_name }}"
+        echo "The input variable2 is: ${{ github.event.inputs.project_dir }}"
         use_extensibility_input="${{ github.event.inputs.use_extensibility }}"
         if [ "use_extensibility_input" = "true" ]; then
          use_extensibility_value=2
@@ -67,7 +70,7 @@ runs:
             },
             {
               "expectedPrompt": "What is the name of your Project?",
-              "response": "scaffold-pwa\n"
+              "response": "${{ github.event.inputs.project_name }}\n"
             },
             {
               "expectedPrompt": "What is the URL for your Commerce Cloud instance?",
