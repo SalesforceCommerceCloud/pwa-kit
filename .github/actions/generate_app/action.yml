@@ -107,7 +107,7 @@ runs:
       shell: bash
 
     - name: Build Generated PWA
-      working-directory: ../generated-projects/"${{ inputs.project_dir }}"
+      working-directory: ../generated-projects/${{ inputs.project_dir }}
       run: |-
         npm ci
         npm run build
