@@ -87,7 +87,6 @@ jobs:
         uses: "./.github/actions/generate_app"
         with:
           use_extensibility: ${{ github.event.inputs.use_extensibility }}
-          project_name: ${{ github.event.inputs.project_name }}
           instance_url: ${{ github.event.inputs.instance_url }}
           org_id: ${{ github.event.inputs.org_id }}
           short_code: ${{ github.event.inputs.short_code }}
