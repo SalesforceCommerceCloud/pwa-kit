@@ -16,9 +16,7 @@ const runGeneratorWithResponses = (cmd, cliResponses = []) => {
     if (cliResponses && cliResponses.length) {
       console.log("***************length1:"+cliResponses.length);
       console.log(JSON.stringify(cliResponses, null, 2));
-      console.log("***************length2:"+cliResponses.length);
       ({ expectedPrompt, response } = cliResponses.shift());
-      console.log("***************length3:"+cliResponses.length);
     }
 
     child.stdout.on("data", (data) => {

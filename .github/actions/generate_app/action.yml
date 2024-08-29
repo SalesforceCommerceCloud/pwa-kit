@@ -55,48 +55,50 @@ runs:
     - name: Build project generator inputs
       shell: bash
       run: |
-        echo '[
-          {
-            "expectedPrompt": "Choose a project preset to get started:",
-            "response": "1\n"
-          },
-          {
-            "expectedPrompt": "Do you wish to use template extensibility?",
-            "response": "${{ env.USE_EXTENSIBILITY_VALUE }}\n"
-          },
-          {
-            "expectedPrompt": "What is the name of your Project?",
-            "response": "${{ github.event.inputs.project_name }}\n"
-          },
-          {
-            "expectedPrompt": "What is the URL for your Commerce Cloud instance?",
-            "response": "${{ github.event.inputs.instance_url }}\n"
-          },
-          {
-            "expectedPrompt": "What is your SLAS Client ID?",
-            "response": "${{ github.event.inputs.client_id }}\n"
-          },
-          {
-            "expectedPrompt": "Is your SLAS client private?",
-            "response":"${{ env.IS_PRIVATE_CLIENT_VALUE }}\n"
-          },
-          {
-            "expectedPrompt": "What is your Site ID in Business Manager?",
-            "response": "${{ github.event.inputs.site_id }}\n"
-          },
-          {
-            "expectedPrompt": "What is your Commerce API organization ID in Business Manager?",
-            "response": "${{ github.event.inputs.org_id }}\n"
-          },
-          {
-            "expectedPrompt": "What is your Commerce API short code in Business Manager?",
-            "response": "${{ github.event.inputs.short_code }}\n"
-          },
-          {
-            "expectedPrompt": "Do you wish to set up a phased headless rollout?",
-            "response": "${{ env.SETUP_HYBRID_VALUE }}\n"
-          }
-        ]' > generator-responses.json
+        echo '{
+         "projectDir":"${{ github.event.inputs.project_dir }}",
+         "responses": [
+            {
+              "expectedPrompt": "Choose a project preset to get started:",
+              "response": "1\n"
+            },
+            {
+              "expectedPrompt": "Do you wish to use template extensibility?",
+              "response": "${{ env.USE_EXTENSIBILITY_VALUE }}\n"
+            },
+            {
+              "expectedPrompt": "What is the name of your Project?",
+              "response": "${{ github.event.inputs.project_name }}\n"
+            },
+            {
+              "expectedPrompt": "What is the URL for your Commerce Cloud instance?",
+              "response": "${{ github.event.inputs.instance_url }}\n"
+            },
+            {
+              "expectedPrompt": "What is your SLAS Client ID?",
+              "response": "${{ github.event.inputs.client_id }}\n"
+            },
+            {
+              "expectedPrompt": "Is your SLAS client private?",
+              "response":"${{ env.IS_PRIVATE_CLIENT_VALUE }}\n"
+            },
+            {
+              "expectedPrompt": "What is your Site ID in Business Manager?",
+              "response": "${{ github.event.inputs.site_id }}\n"
+            },
+            {
+              "expectedPrompt": "What is your Commerce API organization ID in Business Manager?",
+              "response": "${{ github.event.inputs.org_id }}\n"
+            },
+            {
+              "expectedPrompt": "What is your Commerce API short code in Business Manager?",
+              "response": "${{ github.event.inputs.short_code }}\n"
+            },
+            {
+              "expectedPrompt": "Do you wish to set up a phased headless rollout?",
+              "response": "${{ env.SETUP_HYBRID_VALUE }}\n"
+            }
+        ] }' > generator-responses.json
 
     - name: Generate new project
       run: |

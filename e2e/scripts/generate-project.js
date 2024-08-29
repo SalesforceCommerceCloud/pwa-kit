@@ -17,8 +17,11 @@ const main = async (opts) => {
     process.exit(1);
   }
   let cliResponses=[];
+  let projectDir = project;
   try {
-    let cliResponsesJsonArr = JSON.parse(project);
+    let cliResponsesJson = JSON.parse(project);
+    projectDir = cliResponsesJson["projectDir"]
+    let cliResponsesJsonArr = cliResponsesJson["responses"];
     cliResponsesJsonArr.forEach((item) => {
       cliResponses.push({
         expectedPrompt: new RegExp(
@@ -36,20 +39,15 @@ const main = async (opts) => {
   try {
     // Explicitly create outputDir because generator runs into permissions issue when generating no-ext projects.
     await mkdirIfNotExists(config.GENERATED_PROJECTS_DIR);
+    const outputDir = `${config.GENERATED_PROJECTS_DIR}/${projectDir}`;
+    let generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
+    console.log("***********generateAppCommand:"+generateAppCommand);
     // TODO: Update script to setup local verdaccio npm repo to allow running 'npx @salesforce/pwa-kit-create-app' to generate apps
-    let generateAppCommand;
-    if (cliResponses.length > 0 ) {
-      const outputDir = `${config.GENERATED_PROJECTS_DIR}/my-retail-react-app`;
-      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
-      console.log("***********generateAppCommand:"+generateAppCommand);
-    } else {
-      const outputDir = `${config.GENERATED_PROJECTS_DIR}/${project}`;
-      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
+    if (cliResponses.length === 0 ) {
       const preset = config.PRESET[project];
       if (preset) {
         generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`;
       }
-      console.log("***********generateAppCommand:"+generateAppCommand);
       cliResponses = config.CLI_RESPONSES[project];
     }
 
