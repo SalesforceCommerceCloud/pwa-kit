@@ -18,7 +18,7 @@ inputs:
     description: Is Private Client?
   setup_hybrid:
     description: Setup Phased Headless rollout?
-  project_dir:
+  proj_directory:
     description: Project Directory
 
 description: Generate
@@ -29,7 +29,7 @@ runs:
       shell: bash
       run: |
         echo "The input variable1 is: ${{ github.event.inputs.project_name }}"
-        echo "The input variable2 is: ${{ github.event.inputs.project_dir }}"
+        echo "The input variable2 is: ${{ github.event.inputs.proj_directory }}"
         use_extensibility_input="${{ github.event.inputs.use_extensibility }}"
         if [ "use_extensibility_input" = "true" ]; then
          use_extensibility_value=2
