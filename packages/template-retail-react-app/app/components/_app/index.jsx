@@ -81,6 +81,8 @@ import {
     DEFAULT_LOCALE,
     ACTIVE_DATA_ENABLED,
     SHOPPER_CONTEXT_QUERY_PARAMS,
+    SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_QUERY_PARAMS,
+    SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_QUERY_PARAMS,
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -266,27 +268,27 @@ const App = (props) => {
         // TODO: Check if nested object has values or check beforehand if any of the query params are present
         console.log('Query Params', queryParams)
         console.log('Has Shopper Context Query Params',shopperContextQueryParams)
-        const getQueryParam = (key, isList = false) => queryParams.has(key) ? { [key]: !isList ? queryParams.get(key) : queryParams.getAll(key) } : {};
-
+        const getQueryParam = (key, isList = false) =>
+            queryParams.has(key) ? { [key]: isList ? queryParams.getAll(key) : queryParams.get(key) } : {};
         
-        const customQualifiers = {
-            ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOM_QUALIFIERS_DEVICE_TYPE),
-            ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOM_QUALIFIERS_IP_ADDRESS),
-            ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOM_QUALIFIERS_OPERATING_SYSTEM),
-        }
-        const assignmentQualifiers = {
-            ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.ASSIGNMENT_QUALIFIERS_STORE),
-        }
+        const arrayFields = [SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOMER_GROUP_IDS];
+        
+        const reduceParams = (keys) =>
+            keys.reduce((acc, key) => ({ ...acc, ...getQueryParam(key, arrayFields.includes(key)) }), {});
+        
+        const customQualifiers = reduceParams(Object.values(SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_QUERY_PARAMS));
+        const assignmentQualifiers = reduceParams(Object.values(SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_QUERY_PARAMS));
+        const shopperContextBody = reduceParams(Object.values(SHOPPER_CONTEXT_QUERY_PARAMS));
+        
         const payload = {
-            parameters: {usid, siteId: site.id},
+            parameters: { usid, siteId: site.id },
             body: {
-                ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.SOURCE_CODE),
-                ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.EFFECTIVE_DATE_TIME),
-                ...(Object.keys(customQualifiers).length > 0 && { customQualifiers }),
-                ...(Object.keys(assignmentQualifiers).length > 0 && { assignmentQualifiers }),
-                ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOMER_GROUP_IDS, true),
-            }
-        }
+                ...shopperContextBody,
+                ...(Object.keys(customQualifiers).length && { customQualifiers }),
+                ...(Object.keys(assignmentQualifiers).length && { assignmentQualifiers }),
+            },
+        };
+        
         console.log('updating shoppercontext', payload)
         await updateShopperContext.mutateAsync(payload)
         

@@ -206,9 +206,13 @@ export const STORE_LOCATOR_IS_ENABLED = true
 export const SHOPPER_CONTEXT_QUERY_PARAMS = {
     SOURCE_CODE: 'sourceCode',
     EFFECTIVE_DATE_TIME: 'effectiveDateTime',
-    CUSTOM_QUALIFIERS_DEVICE_TYPE: 'deviceType',
-    CUSTOM_QUALIFIERS_IP_ADDRESS: 'ipAddress',
-    CUSTOM_QUALIFIERS_OPERATING_SYSTEM: 'operatingSystem',
-    ASSIGNMENT_QUALIFIERS_STORE: 'store',
     CUSTOMER_GROUP_IDS: 'customerGroupIds',
+}
+export const SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_QUERY_PARAMS = {
+    DEVICE_TYPE: 'deviceType',
+    IP_ADDRESS: 'ipAddress',
+    OPERATING_SYSTEM: 'operatingSystem',
+}
+export const SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_QUERY_PARAMS = {
+    STORE: 'store'
 }
