@@ -60,19 +60,27 @@ const main = async (opts) => {
 };
 
 program.description(
-  `Generate a retail-react-app project using the key <project-key>`
+  `Generate a retail-react-app project using the key <project-key> or the json <project-config>`
 );
 
-/*
+
 program.addArgument(
-  new Argument("<project-key>", "project key").choices([
+  new Argument("[project-key]", "project key").choices([
     "retail-app-demo",
     "retail-app-ext",
     "retail-app-no-ext",
     "retail-app-private-client",
   ])
+).addArgument(
+  new Argument("[project-config]", "project config as JSON string").argParser(
+      (value) => {
+        try {
+          return JSON.parse(value);
+        } catch (e) {
+          throw new Error('Invalid JSON array string');
+        }
+      })
 );
- */
 
 program.parse(process.argv);
 
