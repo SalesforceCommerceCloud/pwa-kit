@@ -50,7 +50,7 @@ runs:
         else
           setup_hybrid_value=1
         fi
-        echo "SETUP_HYBRID_VALUE=$setup_hybrid_value" >> $GITHUB_ENV]
+        echo "SETUP_HYBRID_VALUE=$setup_hybrid_value" >> $GITHUB_ENV
 
     - name: Build project generator inputs
       shell: bash
