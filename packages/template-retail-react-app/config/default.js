@@ -15,7 +15,7 @@ module.exports = {
             showDefaults: true,
             interpretPlusSignAsSpace: false
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'RefArch',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -27,7 +27,7 @@ module.exports = {
                 clientId: '574cf8f6-8536-4a39-acbb-8e7f1759f901',
                 organizationId: 'f_ecom_zzrf_023',
                 shortCode: 'kv7kzm78',
-                siteId: 'RefArchGlobal'
+                siteId: 'RefArch'
             }
         },
         einsteinAPI: {

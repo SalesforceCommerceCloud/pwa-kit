@@ -263,27 +263,35 @@ const App = (props) => {
         // update the shopper context if the query string contains one or more of the relevant query parameters
         const queryParams = new URLSearchParams(location.search);
         const shopperContextQueryParams = Object.values(SHOPPER_CONTEXT_QUERY_PARAMS).some(key => queryParams.has(key))
-    
+        // TODO: Check if nested object has values or check beforehand if any of the query params are present
         console.log('Query Params', queryParams)
-        console.log('Has Shopper Context Query Params',hasShopperContextQueryParams);
-        if (hasShopperContextQueryParams) {
-            const payload = {
-                parameters: {usid, siteId: site.id},
-                body: {
-                    // sourceCode: string
-                    // effectiveDateTime: string
-                }
-            }
-            if (shopperContext) {
-                console.log('updating shoppercontext')
-                await updateShopperContext.mutateAsync(payload)
-            } else {
-                console.log('creating shoppercontext')
-                await createShopperContext.mutateAsync(payload)
-            }
-            // Need to refresh so the data on the page updates
-            refetchDataOnClient()
+        console.log('Has Shopper Context Query Params',shopperContextQueryParams)
+        const getQueryParam = (key, isList = false) => queryParams.has(key) ? { [key]: !isList ? queryParams.get(key) : queryParams.getAll(key) } : {};
+
+        
+        const customQualifiers = {
+            ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOM_QUALIFIERS_DEVICE_TYPE),
+            ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOM_QUALIFIERS_IP_ADDRESS),
+            ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOM_QUALIFIERS_OPERATING_SYSTEM),
         }
+        const assignmentQualifiers = {
+            ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.ASSIGNMENT_QUALIFIERS_STORE),
+        }
+        const payload = {
+            parameters: {usid, siteId: site.id},
+            body: {
+                ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.SOURCE_CODE),
+                ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.EFFECTIVE_DATE_TIME),
+                ...(Object.keys(customQualifiers).length > 0 && { customQualifiers }),
+                ...(Object.keys(assignmentQualifiers).length > 0 && { assignmentQualifiers }),
+                ...getQueryParam(SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOMER_GROUP_IDS, true),
+            }
+        }
+        console.log('updating shoppercontext', payload)
+        await updateShopperContext.mutateAsync(payload)
+        
+        // Need to refresh so the data on the page updates
+        refetchDataOnClient()
     }, [location.search])
 
     useEffect(() => {
