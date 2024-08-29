@@ -51,6 +51,9 @@ jobs:
         run: |
           echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV
 
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Generate app
         uses: "./.github/actions/test"
         with:
