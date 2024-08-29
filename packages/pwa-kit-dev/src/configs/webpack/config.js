@@ -18,6 +18,7 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
+import {getBundlePath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
@@ -119,18 +120,6 @@ const entryPointExists = (segments) => {
 
 const getAppEntryPoint = () => {
     return resolve('./', EXT_OVERRIDES_DIR_NO_SLASH, 'app', 'main')
-}
-
-const getPublicPathEntryPoint = () => {
-    return resolve(
-        projectDir,
-        'node_modules',
-        '@salesforce',
-        'pwa-kit-dev',
-        'ssr',
-        'server',
-        'public-path'
-    )
 }
 
 const findDepInStack = (pkg) => {
@@ -397,6 +386,7 @@ const enableReactRefresh = (config) => {
 
     const newRule = ruleForBabelLoader([require.resolve('react-refresh/babel')])
     const rules = findAndReplace(config.module.rules, (rule) => rule.id === 'babel-loader', newRule)
+    const hmrBasePath = `${getBundlePath()}/development/`
 
     return {
         ...config,
@@ -406,15 +396,14 @@ const enableReactRefresh = (config) => {
         },
         entry: {
             ...config.entry,
-            main: [
-                'webpack-hot-middleware/client?path=/__mrt/hmr',
-                getPublicPathEntryPoint(),
-                getAppEntryPoint()
-            ]
+            main: ['webpack-hot-middleware/client?path=/__mrt/hmr', getAppEntryPoint()]
+        },
+        output: {
+            ...config.output,
+            publicPath: hmrBasePath
         },
         plugins: [
             ...config.plugins,
-
             new webpack.HotModuleReplacementPlugin(),
             new ReactRefreshWebpackPlugin({
                 overlay: false
