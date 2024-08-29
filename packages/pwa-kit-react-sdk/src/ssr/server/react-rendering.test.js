@@ -52,6 +52,51 @@ jest.mock('../universal/compatibility', () => {
     }
 })
 
+jest.mock('../universal/extensibility/extensions', () => {
+    const React = require('react')
+
+    class PWAExtensionPage extends React.Component {
+        static getProps() {
+            return Promise.resolve()
+        }
+
+        static getTemplateName() {
+            return 'templateName'
+        }
+
+        render() {
+            return <div>This is a PWA Extension Page</div>
+        }
+    }
+
+    class PWAExtension {
+        getName() {
+            return 'pwa-extension'
+        }
+
+        extendApp(App) {
+            return (props) => (
+                <div>
+                    <h1>Extended Application</h1>
+                    <App {...props} />
+                </div>
+            )
+        }
+
+        extendRoutes(routes) {
+            return [
+                {
+                    path: '/pwa-extension',
+                    component: PWAExtensionPage
+                },
+                ...routes
+            ]
+        }
+    }
+
+    return [new PWAExtension()]
+})
+
 jest.mock('../universal/routes', () => {
     // TODO: Can these requires be converted to top-level imports?
     /* eslint-disable @typescript-eslint/no-var-requires */
@@ -707,6 +752,20 @@ describe('The Node SSR Environment', () => {
                 expect(res.headers['server-timing']).toContain('route-matching;dur=')
                 expect(res.headers['server-timing']).toContain('render-to-string;dur=')
                 expect(res.headers['server-timing']).toContain('total;dur=')
+            }
+        },
+        {
+            description: `Application Extensions are working`,
+            req: {url: '/pwa-extension'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                // Content from "ExtendApp" hoc
+                expect(html).toEqual(expect.stringContaining('<h1>Extended Application</h1>'))
+                // Content from new page added via "extendRoutes"
+                expect(html).toEqual(
+                    expect.stringContaining('<div>This is a PWA Extension Page</div>')
+                )
             }
         }
     ]

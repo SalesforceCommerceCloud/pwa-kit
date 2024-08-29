@@ -136,7 +136,7 @@ export const render = async (req, res, next) => {
     let WrappedApp = routeComponent(App, false, res.locals)
 
     // Initialize all the react app extensions.
-    WrappedApp = applyAppExtensions(WrappedApp)
+    WrappedApp = applyAppExtensions(WrappedApp, extensions)
 
     const routes = getRoutes(res.locals)
 

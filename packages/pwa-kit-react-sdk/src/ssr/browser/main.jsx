@@ -122,7 +122,7 @@ export const start = () => {
     locals.appExtensions = extensions
 
     // Initialize all the react app extensions.
-    WrappedApp = applyAppExtensions(WrappedApp)
+    WrappedApp = applyAppExtensions(WrappedApp, extensions)
 
     const props = {
         error: window.__ERROR__,

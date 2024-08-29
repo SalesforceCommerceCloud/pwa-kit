@@ -7,14 +7,14 @@
 
 import React from 'react'
 import {applyHOCs} from '../utils'
-import extensions from './extensions'
+import {IApplicationExtension} from './types'
 
 /**
  * Given the provided Application, apply all the App extensions to it.
  * 
  * @param App 
  */
-export const applyAppExtensions = (App: React.ComponentType): React.ComponentType  => {
+export const applyAppExtensions = (App: React.ComponentType, extensions: IApplicationExtension[]): React.ComponentType  => {
     const extendAppHocs = extensions.map(({extendApp}) => extendApp).filter(Boolean)
     
     return applyHOCs(App, extendAppHocs)
