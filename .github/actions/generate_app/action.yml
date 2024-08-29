@@ -103,7 +103,7 @@ runs:
     - name: Generate new project
       run: |
         cat generator-responses.json
-        node e2e/scripts/generate-project.js "$(jq -c . generator-responses.json)"
+        node e2e/scripts/generate-project.js --project-config "$(jq -c . generator-responses.json)"
       shell: bash
 
     - name: Build Generated PWA
