@@ -12,5 +12,5 @@ runs:
     - name: Parse input values
       shell: bash
       run: |
-        echo "The input variable1 is: ${{ github.event.inputs.name }}"
-        echo "The input variable2 is: ${{ github.event.inputs.proj_directory }}"
+        echo "The input variable1 is: ${{ inputs.name }}"
+        echo "The input variable2 is: ${{ inputs.proj_directory }}"
