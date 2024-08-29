@@ -58,7 +58,7 @@ jest.mock('../universal/routes', () => {
     const React = require('react')
     const PropTypes = require('prop-types')
     const errors = require('../universal/errors')
-    const {Redirect} = require('react-router-dom')
+    const {Redirect, Link} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
     const {useQuery} = require('@tanstack/react-query')
     const {useServerContext} = require('../universal/hooks')
@@ -88,7 +88,12 @@ jest.mock('../universal/routes', () => {
         }
 
         render() {
-            return <div>This is a PWA</div>
+            return (
+                <div>
+                    <div>This is a PWA</div>
+                    <Link to="/link">This is a link (for Router basepath testing)</Link>
+                </div>
+            )
         }
     }
 
@@ -667,6 +672,43 @@ describe('The Node SSR Environment', () => {
                 expect(html).toContain(
                     shouldIncludeErrorStack ? 'Error: ' : 'Internal Server Error'
                 )
+            }
+        },
+        {
+            description: `AppConfig getBasePath works correctly`,
+            req: {url: '/base/pwa'},
+            mocks: () => {
+                const AppConfig = getAppConfig()
+                jest.spyOn(AppConfig, 'getBasePath').mockImplementation(() => {
+                    return '/base'
+                })
+            },
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                const doc = parse(html)
+                const links = doc.querySelectorAll('a')
+                links.forEach(link => {
+                    const href = link.getAttribute('href')
+                    expect(href.startsWith('/base')).toBe(true)
+                })
+
+                expect(html).toContain('This is a PWA')
+            }
+        },
+        {
+            description: `AppConfig getBasePath works correctly when it is empty string`,
+            req: {url: '/pwa'},
+            mocks: () => {
+                const AppConfig = getAppConfig()
+                jest.spyOn(AppConfig, 'getBasePath').mockImplementation(() => {
+                    return ''
+                })
+            },
+            assertions: (res) => {
+                expect(res.statusCode).toBe(200)
+                const html = res.text
+                expect(html).toContain('This is a PWA')
             }
         },
         {

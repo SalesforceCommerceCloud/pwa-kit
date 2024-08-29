@@ -13,5 +13,6 @@ describe('The default AppConfig', () => {
         expect(AppConfig.restore({frozen: 'any values here'})).toBeUndefined()
         expect(AppConfig.freeze()).toBeUndefined()
         expect(AppConfig.extraGetPropsArgs()).toEqual({})
+        expect(AppConfig.getBasePath({})).toBe('')
     })
 })

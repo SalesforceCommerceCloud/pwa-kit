@@ -146,7 +146,13 @@ export const render = async (req, res, next) => {
     let route
     let match
 
-    routes.some((_route) => {
+    const basepath = AppConfig.getBasePath({req, res})?.replace(/\/$/, '') || ''
+    routes.some((r) => {
+        let _route = {...r}
+        if (basepath && _route?.path) {
+            _route.path = `${basepath}${_route.path}`
+        }
+
         const _match = matchPath(req.path, _route)
         if (_match) {
             match = _match
