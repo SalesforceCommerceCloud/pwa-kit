@@ -688,7 +688,7 @@ describe('The Node SSR Environment', () => {
                 const html = res.text
                 const doc = parse(html)
                 const links = doc.querySelectorAll('a')
-                links.forEach(link => {
+                links.forEach((link) => {
                     const href = link.getAttribute('href')
                     expect(href.startsWith('/base')).toBe(true)
                 })
