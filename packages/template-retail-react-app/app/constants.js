@@ -203,16 +203,16 @@ export const STORE_LOCATOR_DISTANCE_UNIT = 'km'
 export const STORE_LOCATOR_IS_ENABLED = true
 
 // Constants for shopper context
-export const SHOPPER_CONTEXT_QUERY_PARAMS = {
+export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
     SOURCE_CODE: 'sourceCode',
     EFFECTIVE_DATE_TIME: 'effectiveDateTime',
     CUSTOMER_GROUP_IDS: 'customerGroupIds',
 }
-export const SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_QUERY_PARAMS = {
+export const SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAMS = {
     DEVICE_TYPE: 'deviceType',
     IP_ADDRESS: 'ipAddress',
     OPERATING_SYSTEM: 'operatingSystem',
 }
-export const SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_QUERY_PARAMS = {
+export const SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS = {
     STORE: 'store'
 }

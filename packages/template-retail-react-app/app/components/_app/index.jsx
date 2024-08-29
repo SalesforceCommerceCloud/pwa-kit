@@ -57,6 +57,7 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useQueryClient} from '@tanstack/react-query'
+import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
 
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
@@ -80,9 +81,6 @@ import {
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE,
     ACTIVE_DATA_ENABLED,
-    SHOPPER_CONTEXT_QUERY_PARAMS,
-    SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_QUERY_PARAMS,
-    SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_QUERY_PARAMS,
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -244,8 +242,6 @@ const App = (props) => {
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const deleteShopperContext = useShopperContextsMutation('deleteShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
-    // TODO: Handle creating a new shopper context if there isn't one already assigned to the current 
-    // Move to hooks
     const {data: shopperContext} = useShopperContext({
         parameters: {usid: usid, siteId: site.id}
     },
@@ -258,39 +254,13 @@ const App = (props) => {
     }
     )
     console.log('shopperContext', shopperContext)
+    const updateShopperContextObj = useShopperContextSearchParams()
 
     useEffect(async () => {
-        // update the shopper context if the query string contains one or more of the relevant query parameters
-        const queryParams = new URLSearchParams(location.search);
-        const shopperContextQueryParams = Object.values(SHOPPER_CONTEXT_QUERY_PARAMS).some(key => queryParams.has(key))
-        // TODO: Check if nested object has values or check beforehand if any of the query params are present
-        console.log('Query Params', queryParams)
-        console.log('Has Shopper Context Query Params',shopperContextQueryParams)
-        const getQueryParam = (key, isList = false) =>
-            queryParams.has(key) ? { [key]: isList ? queryParams.getAll(key) : queryParams.get(key) } : {};
-        
-        const arrayFields = [SHOPPER_CONTEXT_QUERY_PARAMS.CUSTOMER_GROUP_IDS];
-        
-        const reduceParams = (keys) =>
-            keys.reduce((acc, key) => ({ ...acc, ...getQueryParam(key, arrayFields.includes(key)) }), {});
-        
-        const customQualifiers = reduceParams(Object.values(SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_QUERY_PARAMS));
-        const assignmentQualifiers = reduceParams(Object.values(SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_QUERY_PARAMS));
-        const shopperContextBody = reduceParams(Object.values(SHOPPER_CONTEXT_QUERY_PARAMS));
-        
-        const payload = {
-            parameters: { usid, siteId: site.id },
-            body: {
-                ...shopperContextBody,
-                ...(Object.keys(customQualifiers).length && { customQualifiers }),
-                ...(Object.keys(assignmentQualifiers).length && { assignmentQualifiers }),
-            },
-        };
-        
-        console.log('updating shoppercontext', payload)
-        await updateShopperContext.mutateAsync(payload)
-        
-        // Need to refresh so the data on the page updates
+        // update the shopper context if the query string contains the relevant search parameters
+        console.log('updating shoppercontext', updateShopperContextObj)
+        await updateShopperContext.mutateAsync({parameters: { usid, siteId: site.id }, body: updateShopperContextObj})
+        // Refresh to update the data on the page
         refetchDataOnClient()
     }, [location.search])
 
