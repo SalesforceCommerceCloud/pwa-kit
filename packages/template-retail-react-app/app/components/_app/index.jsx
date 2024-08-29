@@ -467,6 +467,7 @@ const App = (props) => {
                                             onMyCartClick={onCartClick}
                                             onMyAccountClick={onAccountClick}
                                             onWishlistClick={onWishlistClick}
+                                            onStoreLocatorClick={onOpenStoreLocator}
                                         >
                                             <HideOnDesktop>
                                                 <DrawerMenu

@@ -15,7 +15,7 @@ module.exports = {
             showDefaults: true,
             interpretPlusSignAsSpace: false
         },
-        defaultSite: 'RefArch',
+        defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -27,7 +27,7 @@ module.exports = {
                 clientId: '574cf8f6-8536-4a39-acbb-8e7f1759f901',
                 organizationId: 'f_ecom_zzrf_023',
                 shortCode: 'kv7kzm78',
-                siteId: 'RefArch'
+                siteId: 'RefArchGlobal'
             }
         },
         einsteinAPI: {
@@ -44,8 +44,7 @@ module.exports = {
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
     ssrShared: [
         'static/ico/favicon.ico',
-        'static/robots.',
-        'txt',
+        'static/robots.txt',
         '**/*.js',
         '**/*.js.map',
         '**/*.json'
