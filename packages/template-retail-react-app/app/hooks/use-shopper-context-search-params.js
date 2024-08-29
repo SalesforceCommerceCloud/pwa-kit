@@ -11,7 +11,8 @@ import {useLocation} from 'react-router-dom'
 import {
     SHOPPER_CONTEXT_SEARCH_PARAMS,
     SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAMS,
-    SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS
+    SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS,
+    SHOPPER_CONTEXT_ARRAY_FIELDS
 } from '@salesforce/retail-react-app/app/constants'
 
 /*
@@ -19,7 +20,7 @@ import {
  * to shopper context.
  */
 export const useShopperContextSearchParams = (
-    arraySearchParams = [SHOPPER_CONTEXT_SEARCH_PARAMS.CUSTOMER_GROUP_IDS]
+    arraySearchParams = SHOPPER_CONTEXT_ARRAY_FIELDS
 ) => {
     const {search} = useLocation()
     const searchParamsObj = new URLSearchParams(search)
