@@ -10,47 +10,45 @@ const { program, Argument } = require("commander");
 const { mkdirIfNotExists } = require("./utils.js");
 
 const main = async (opts) => {
-  const { args } = opts;
-  const [project] = args;
-  if (opts.args.length !== 1) {
+  const { projectKey, projectConfig } = opts;
+
+  if (!projectKey && !projectConfig) {
+    console.error('You must provide exactly one of <project-key> or <project-config>.');
     console.log(program.helpInformation());
     process.exit(1);
   }
-  let cliResponses=[];
-  let projectDir = project;
-  try {
-    let cliResponsesJson = JSON.parse(project);
-    projectDir = cliResponsesJson["projectDir"]
-    let cliResponsesJsonArr = cliResponsesJson["responses"];
-    cliResponsesJsonArr.forEach((item) => {
-      cliResponses.push({
-        expectedPrompt: new RegExp(
-            item.expectedPrompt,
-            "i"
-        ),
-        response: item.response
-      })
-    });
-  } catch (err) {
-    console.log("Errrrrrrrrrrrrrrrrrrrrr="+cliResponses);
-    //not a json
-  }
 
   try {
+    let cliResponses=[];
+    let projectDir=projectKey;
+    let preset;
+    if(projectKey) {
+      cliResponses = config.CLI_RESPONSES[projectKey];
+      preset = config.PRESET[projectKey];
+    }
+    else {
+      projectDir = projectConfig["projectDir"]
+      let cliResponsesJsonArr = projectConfig["responses"];
+      cliResponsesJsonArr.forEach((item) => {
+        cliResponses.push({
+          expectedPrompt: new RegExp(
+              item.expectedPrompt,
+              "i"
+          ),
+          response: item.response
+        })
+      });
+    }
+
     // Explicitly create outputDir because generator runs into permissions issue when generating no-ext projects.
     await mkdirIfNotExists(config.GENERATED_PROJECTS_DIR);
     const outputDir = `${config.GENERATED_PROJECTS_DIR}/${projectDir}`;
     let generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`;
     console.log("***********generateAppCommand:"+generateAppCommand);
     // TODO: Update script to setup local verdaccio npm repo to allow running 'npx @salesforce/pwa-kit-create-app' to generate apps
-    if (cliResponses.length === 0 ) {
-      const preset = config.PRESET[project];
-      if (preset) {
-        generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`;
-      }
-      cliResponses = config.CLI_RESPONSES[project];
+    if (preset) {
+      generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`;
     }
-
     return await runGeneratorWithResponses(generateAppCommand, cliResponses);
   } catch (err) {
     // Generator failed to create project
@@ -80,8 +78,10 @@ program.addArgument(
           throw new Error('Invalid JSON array string');
         }
       })
-);
+)
+.action((projectKey, projectConfig) => {
+  // Call the main function with parsed options
+  main({ projectKey, projectConfig });
+});
 
 program.parse(process.argv);
-
-main(program);
