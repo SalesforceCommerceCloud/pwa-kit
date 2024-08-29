@@ -1,9 +1,9 @@
 name: test
 inputs:
   name:
-    description: Setup Phased Headless rollout?
+    description: name
   proj_directory:
-    description: Project Directory
+    description: proj_directory
 
 description: Test
 runs:
