@@ -73,7 +73,7 @@ class AppConfig extends React.Component {
      * @param params.req - the Express.js request object (undefined on the client)
      * @param params.res - the Express.js response object (undefined on the client)
      *
-     * @return string - the base path
+     * @return string - the base path (no trailing slash)
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     static getBasePath({req, res}) {
