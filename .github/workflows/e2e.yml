@@ -49,7 +49,8 @@ jobs:
     steps:
       - name: Set environment variable
         run: |
-          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV 
+          
+          echo PROJECT_DIR=my-retail-react-app >> $GITHUB_ENV 
           url="${{ github.event.inputs.instance_url }}"
           hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
           echo "Hostname: $hostname"
