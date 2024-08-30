@@ -2,9 +2,11 @@ name: create_mrt_target
 description: Create MRT Environment
 inputs:
   project_name:
-    description: MRT Project Name
+    description: "MRT Project Name"
   target_name:
     description: "MRT Environment/Target Name"
+  mobify_api_key:
+    description: "Mobify user API key"
 
 runs:
   using: composite
@@ -15,7 +17,7 @@ runs:
         get_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/${{ inputs.target_name }}"
         
         response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$get_target_url" \
-            --header "Authorization: Bearer ${{ secrets.MOBIFY_CLIENT_API_KEY }}" \
+            --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
         
         http_status=$(echo $RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
         response_body=$(echo $RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
