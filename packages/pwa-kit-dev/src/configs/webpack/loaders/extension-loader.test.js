@@ -26,7 +26,7 @@ describe('Extenion Loader', () => {
     })
 
     test('Returns single file re-exporting all extensions configured.', () => {
-        expect(ExtensionLoader()).toEqual(`
+        expect(ExtensionLoader()).toBe(`
             /*
             * Copyright (c) 2024, salesforce.com, inc.
             * All rights reserved.
