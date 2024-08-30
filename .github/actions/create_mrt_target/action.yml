@@ -27,7 +27,7 @@ runs:
           exit 1
         elif [ "$http_status" -eq 200  ]; then
           echo "MRT environment already exists."
-        elif
+        else
           echo "Error: [Unexpected HTTP status: $http_status]"
           exit 1
         fi
