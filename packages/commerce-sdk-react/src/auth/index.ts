@@ -39,7 +39,6 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
-    sessionTimeout?: number
     customStorageValues?: {
         [key: string]: AuthStorageObject
     }
