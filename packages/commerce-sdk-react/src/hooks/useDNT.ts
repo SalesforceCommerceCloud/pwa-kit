@@ -30,14 +30,20 @@ const useDNT = (): dntInfo => {
     const dwDntValue = Cookies.get("dw_dnt")
     const dntCookieIsDefined = (dwDntValue !== "1" && dwDntValue !== "0")
     const [dntNotSet, setDntNotSet] = useState(dntCookieIsDefined)
-
-    const updateDNT = (newValue: boolean, timeUntilExpire: number | undefined) => {
+    const updateDNT = (newValue: boolean) => {
+        // Set the cookie once to include dnt in the access token and then again to set the expiry time
         Cookies.set("dw_dnt", String(Number(newValue)), {
-            ...getDefaultCookieAttributes(),
-            expires: timeUntilExpire
+            ...getDefaultCookieAttributes()
         })
         setDntNotSet(true)
         auth.refreshAccessToken()
+        if (auth.get("customer_type") == "registered") {
+            var daysUntilExpires = Number(auth.get("refresh_token_expires_in")) / 86400
+            Cookies.set("dw_dnt", String(Number(newValue)), {
+                ...getDefaultCookieAttributes(),
+                expires: daysUntilExpires
+            })
+        }
     }
 
     return {dntNotSet, updateDNT}

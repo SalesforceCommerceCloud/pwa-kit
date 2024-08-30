@@ -374,6 +374,7 @@ class Auth {
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
         this.set('expires_in', `${res.expires_in}`)
+        this.set('refresh_token_expires_in', res.refresh_token_expires_in)
         this.set('id_token', res.id_token)
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
