@@ -42,12 +42,13 @@ runs:
         
         response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$create_target_url" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
+        echo "$response"
         
         http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
         
         # Check if the HTTP status is not 200
         if [ "$http_status" -ne 200 ]; then
-          echo "Request failed with status code $HTTP_STATUS"
+          echo "Request failed with status code $http_status"
           exit 1
         fi
 
