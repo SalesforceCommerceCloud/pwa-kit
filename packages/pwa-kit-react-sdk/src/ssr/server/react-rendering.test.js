@@ -53,6 +53,7 @@ jest.mock('../universal/compatibility', () => {
 })
 
 jest.mock('../universal/extensibility/extensions', () => {
+    /* eslint-disable @typescript-eslint/no-var-requires */
     const React = require('react')
 
     class PWAExtensionPage extends React.Component {
@@ -69,18 +70,25 @@ jest.mock('../universal/extensibility/extensions', () => {
         }
     }
 
+    const withTitle = (WrappedComponent) => {
+        return class ComponentWithTitle extends React.Component {
+            render() {
+                return (
+                    <div>
+                        <h1>Extended Application</h1>
+                        <WrappedComponent {...this.props} />
+                    </div>
+                )
+            }
+        }
+    }
     class PWAExtension {
         getName() {
             return 'pwa-extension'
         }
 
         extendApp(App) {
-            return (props) => (
-                <div>
-                    <h1>Extended Application</h1>
-                    <App {...props} />
-                </div>
-            )
+            return withTitle(App)
         }
 
         extendRoutes(routes) {

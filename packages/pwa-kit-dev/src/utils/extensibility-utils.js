@@ -9,11 +9,26 @@ import path from 'path'
 import fs from 'fs-extra'
 
 const REACT_EXTENSIBILITY_FILE = 'setup-app'
-// const EXPRESS_EXTENSIBILITY_FILE = 'setup-server'
-
 const SUPPORTED_FILE_TYPES = ['.ts', '.js']
 
-export const buildAliases = (extensions = []) => {
+/**
+ * Given a list of extensions, returns an object where the key is the extensions
+ * app entry import string, and the value the path to the source file.
+ *
+ * @param {string[]} extensions - Array of possible file extensions.
+ * @returns {string|null} - The path of the first found file, or null if not found.
+ *
+ * @example
+ * const extensions = ['@salesforce/extension-store-finder', '@salesforce/extension-checkout']
+ *
+ * buildAliases(extensions)
+ * // Output
+ * {
+ *     ['@salesforce/extension-store-finder/setup-app']: '/path/to/setup-app.ts',
+ *     ['@salesforce/extension-checkout/setup-app']: '/path/to/setup-app.ts',
+ * }
+ */
+export const buildAliases = (extensions) => {
     const projectDir = process.cwd()
 
     const aliases = extensions.reduce((acc, extension) => {
@@ -42,6 +57,8 @@ export const buildAliases = (extensions = []) => {
 }
 
 /**
+ * @private
+ *
  * Returns the first file path found with a given set of extensions.
  *
  * @param {string} basePath - The base path of the file without extension.
@@ -49,17 +66,17 @@ export const buildAliases = (extensions = []) => {
  * @returns {string|null} - The path of the first found file, or null if not found.
  *
  * @example
- * const basePath = '/path/to/your/file';
- * const extensions = ['.js', '.json', '.txt'];
+ * const basePath = '/path/to/your/file'
+ * const extensions = ['.js', '.json', '.txt']
  *
- * const filePath = findFileWithExtension(basePath, extensions);
+ * const filePath = findFileWithExtension(basePath, extensions)
  * if (filePath) {
- *     console.log(`Found file: ${filePath}`);
+ *     console.log(`Found file: ${filePath}`)
  * } else {
- *     console.log('File not found.');
+ *     console.log('File not found.')
  * }
  */
-const findFileWithExtension = (basePath, extensions) => {
+export const findFileWithExtension = (basePath, extensions = []) => {
     for (const ext of extensions) {
         const filePath = path.format({...path.parse(basePath), base: undefined, ext})
         if (fs.existsSync(filePath)) {
