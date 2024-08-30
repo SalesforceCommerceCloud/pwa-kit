@@ -518,7 +518,6 @@ const renderer =
                     // It is required to have a single entry point for the remote server.
                     // See pwa-kit-runtime/ssr/server/build-remote-server.js render method.
                     filename: mode === development ? '[name]-server.js' : 'server-renderer.js',
-                    // filename: 'server-renderer.js',
                     libraryTarget: 'commonjs2'
                 },
                 plugins: [
