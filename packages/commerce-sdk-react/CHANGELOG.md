@@ -1,3 +1,6 @@
+## v3.1.0-nightly-20240830080200 (Aug 30, 2024)
+## v3.1.0-dev (Aug 30, 2024)
+## v3.8.0-nightly-20240830080200 (Aug 30, 2024)
 ## v3.1.0-dev (Aug 08, 2024)
 
 - Add `defaultDnt` to support setting the dnt flag for SLAS. Upgrade `commerce-sdk-isomorphic` to v3.1.1 [#1979](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1979)
