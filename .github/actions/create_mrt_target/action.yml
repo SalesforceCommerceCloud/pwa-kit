@@ -22,6 +22,7 @@ runs:
         
         echo "$response"
         http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+        echo "status=$http_status" >> $GITHUB_OUTPUT
         
         if [ "$http_status" -eq 404  ]; then
           echo "MRT environment not found, it will be created in the next step."
@@ -34,18 +35,18 @@ runs:
 
     - name: Create Target
       id: create_target
-      if: ${{ steps.get_target.outcome == 'success' }}
+      if: ${{ steps.get_target.outputs.status == '404' }}
       shell: bash
       run: |-
         create_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/"
         
-        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$get_target_url" \
+        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$create_target_url" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
         
-        http_status=$(echo $RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+        http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
         
         # Check if the HTTP status is not 200
-        if [ "$HTTP_STATUS" -ne 200 ]; then
+        if [ "$http_status" -ne 200 ]; then
           echo "Request failed with status code $HTTP_STATUS"
           exit 1
         fi
