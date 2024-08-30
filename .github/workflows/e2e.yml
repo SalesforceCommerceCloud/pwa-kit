@@ -33,7 +33,7 @@ on:
       mrt_target_env:
         type: string
         description: MRT Targent Environment
-        default: "hyperforce"
+        default: "test"
       is_private_client:
         type: boolean
         description: Is Private Client?
@@ -57,55 +57,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Create MRT Target
+        uses: "./.github/actions/create_mrt_target"
         with:
-          node-version: 18
-
-      # Based on PWA setup_ubuntu script but with extra tests cut out
-      - name: Setup PWA dependencies
-        #working-directory: './pwa'
-        run: |-
-          # Install system dependencies
-          sudo apt-get update -yq
-          sudo apt-get install python2 python3-pip time -yq
-          sudo pip install -U pip setuptools
-          sudo pip install awscli==1.18.85 datadog==0.40.1
-
-          # Install node dependencies
-          node ./scripts/gtime.js monorepo_install npm ci
-
-          # Install PWA dependencies
-          npm ci
-        shell: bash
-
-      - name: Verify $GITHUB_ENV
-        run: cat $GITHUB_ENV
-
-      - name: Generate app
-        uses: "./.github/actions/generate_app"
-        with:
-          use_extensibility: ${{ github.event.inputs.use_extensibility }}
           project_name: ${{ github.event.inputs.project_name }}
-          instance_url: ${{ github.event.inputs.instance_url }}
-          org_id: ${{ github.event.inputs.org_id }}
-          short_code: ${{ github.event.inputs.short_code }}
-          client_id: ${{ github.event.inputs.client_id }}
-          site_id: ${{ github.event.inputs.site_id }}
-          is_private_client: ${{ github.event.inputs.is_private_client }}
-          setup_hybrid: ${{ github.event.inputs.setup_hybrid }}
-          project_dir: ${{ env.PROJECT_DIR }}
-
-      - name: Create MRT credentials file
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push Bundle to MRT (E2E Test PWA Kit)
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "../generated-projects/${{ env.PROJECT_DIR }}"
-          TARGET: ${{ github.event.inputs.mrt_target_env }}
-          FLAGS: --wait
+          target_name: ${{ github.event.inputs.mrt_target_env }}
 

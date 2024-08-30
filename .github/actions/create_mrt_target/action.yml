@@ -1,0 +1,34 @@
+name: create_mrt_target
+description: Create MRT Environment
+inputs:
+  project_name:
+    description: MRT Project Name
+  target_name:
+    description: "MRT Environment/Target Name"
+
+runs:
+  using: composite
+  steps:
+    - name: Get Environment
+      shell: bash
+      run: |-
+        get_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/${{ inputs.target_name }}"
+        
+        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$get_target_url" \
+            --header "Authorization: Bearer ${{ secrets.MOBIFY_CLIENT_API_KEY }}" \
+        
+        http_status=$(echo $RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+        response_body=$(echo $RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+        
+        if [ "$http_status" -eq 404  ]; then
+          echo "MRT environment not found, it will be created in the next step."
+          exit 1
+        elif [ "$http_status" -eq 200  ]; then
+          echo "MRT environment already exists."
+        elif
+          echo "Error: [Unexpected HTTP status: $http_status]"
+          exit 1
+        fi
+        echo "$response_body"
+
+
