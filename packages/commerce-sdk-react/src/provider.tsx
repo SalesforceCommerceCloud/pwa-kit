@@ -24,6 +24,7 @@ import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {Logger} from './types'
 import {MOBIFY_PATH, SLAS_PRIVATE_PROXY_PATH} from './constant'
+import {AuthStorageObject} from './auth'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
@@ -39,7 +40,9 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger?: Logger
     defaultDnt?: boolean
-    sessionTimeout?: number
+    customStorageValues?: {
+        [key: string]: AuthStorageObject
+    }
 }
 
 /**
@@ -120,7 +123,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         silenceWarnings,
         logger,
         defaultDnt,
-        sessionTimeout
+        customStorageValues
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -190,7 +193,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             silenceWarnings,
             logger: configLogger,
             defaultDnt,
-            sessionTimeout
+            customStorageValues,
         })
     }, [
         clientId,
@@ -206,7 +209,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         configLogger,
-        sessionTimeout
+        customStorageValues
     ])
 
     // Initialize the session
@@ -228,7 +231,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 silenceWarnings,
                 logger: configLogger,
                 defaultDnt,
-                sessionTimeout
+                customStorageValues
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>

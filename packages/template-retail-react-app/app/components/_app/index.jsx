@@ -14,9 +14,13 @@ import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-dat
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useQuery} from '@tanstack/react-query'
 import {
+    AuthHelpers,
+    useAuthHelper,
     useAccessToken,
     useCategory,
-    useShopperBasketsMutation
+    useShopperBasketsMutation,
+    useAuthContext,
+    useCustomerType,
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
@@ -116,6 +120,43 @@ const ListMenuContentWithData = withCommerceSdkReact(
     }
 )
 
+const handleSessionTimeout = async ({auth, isGuest, sessionTimeout}) => {
+    let shouldSetTimeout = true
+    if (auth.getCustomValue('session_timeout')) {
+        const localStorageTimeout = Number(auth.getCustomValue('session_timeout'))
+        if (Date.now() > localStorageTimeout) {
+            if (isGuest) {
+                auth.clearStorage()
+                await auth.loginGuestUser()
+            } else {
+                await auth.logout()
+            }
+        } else {
+            shouldSetTimeout = false
+        }
+    }
+
+    if (shouldSetTimeout) {
+        auth.setCustomValue('session_timeout', (Date.now() + sessionTimeout).toString())
+        initSessionTimeoutCallback({auth, isGuest, sessionTimeout})
+    }
+}
+
+const initSessionTimeoutCallback = ({auth, isGuest, sessionTimeout}) => {
+    if (!auth.getCustomValue('session_timeout')) {
+        return
+    }
+
+    let timeRemaining = Number(auth.getCustomValue('session_timeout')) - Date.now()
+    if (timeRemaining < 0) {
+        timeRemaining = 0
+    }
+
+    setTimeout(() => {
+        void handleSessionTimeout({auth, isGuest, sessionTimeout})
+    }, timeRemaining)
+}
+
 const App = (props) => {
     const {children} = props
     const {data: categoriesTree} = useCategory({
@@ -132,6 +173,14 @@ const App = (props) => {
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
+
+    const {isGuest} = useCustomerType()
+    const auth = useAuthContext()
+
+    // const login = useAuthHelper(AuthHelpers.LoginGuestUser)
+    // const logout = useAuthHelper(AuthHelpers.Logout)
+
+    handleSessionTimeout({ auth, isGuest, sessionTimeout: 60000 })
 
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {
