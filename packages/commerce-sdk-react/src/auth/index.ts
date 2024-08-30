@@ -265,11 +265,11 @@ class Auth {
 
         this.silenceWarnings = config.silenceWarnings || false
 
-        if(config.customStorageValues) {
+        if (config.customStorageValues) {
             const dataMapKeys = Object.keys(DATA_MAP)
             this.customStorageValues = {}
-            Object.keys(config.customStorageValues).forEach(key => {
-                if(dataMapKeys.includes(key)) {
+            Object.keys(config.customStorageValues).forEach((key) => {
+                if (dataMapKeys.includes(key)) {
                     this.logWarning(
                         `Please choose a different name for ${key} as it is already used by the commerce-sdk-react package`
                     )
@@ -331,8 +331,8 @@ class Auth {
             store.delete(key)
         })
 
-        if(this.customStorageValues) {
-            Object.keys(this.customStorageValues).forEach(key => {
+        if (this.customStorageValues) {
+            Object.keys(this.customStorageValues).forEach((key) => {
                 this.deleteCustomValue(key)
             })
         }

@@ -193,7 +193,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             silenceWarnings,
             logger: configLogger,
             defaultDnt,
-            customStorageValues,
+            customStorageValues
         })
     }, [
         clientId,
