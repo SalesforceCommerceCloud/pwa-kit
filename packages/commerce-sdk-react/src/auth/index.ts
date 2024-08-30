@@ -387,6 +387,42 @@ class Auth {
         })
     }
 
+    async refreshAccessToken() {
+        const refreshTokenRegistered = this.get('refresh_token_registered')
+        const refreshTokenGuest = this.get('refresh_token_guest')
+        const refreshToken = refreshTokenRegistered || refreshTokenGuest
+        if (refreshToken) {
+            try {
+                return await this.queueRequest(
+                    () =>
+                        helpers.refreshAccessToken(
+                            this.client,
+                            {
+                                refreshToken,
+                                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt})
+                            },
+                            {
+                                clientSecret: this.clientSecret
+                            }
+                        ),
+                    !!refreshTokenGuest
+                )
+            } catch (error) {
+                // If the refresh token is invalid, we need to re-login the user
+                if (error instanceof Error && 'response' in error) {
+                    // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
+                    // We can't use `instanceof`, so instead we just check for the `response` property
+                    // and assume it is a fetch Response.
+                    const json = await (error['response'] as Response).json()
+                    if (json.message === 'invalid refresh_token') {
+                        // clean up storage and restart the login flow
+                        this.clearStorage()
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * This method queues the requests and handles the SLAS token response.
      *
@@ -448,39 +484,7 @@ class Auth {
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
-        const refreshTokenRegistered = this.get('refresh_token_registered')
-        const refreshTokenGuest = this.get('refresh_token_guest')
-        const refreshToken = refreshTokenRegistered || refreshTokenGuest
-        if (refreshToken) {
-            try {
-                return await this.queueRequest(
-                    () =>
-                        helpers.refreshAccessToken(
-                            this.client,
-                            {
-                                refreshToken,
-                                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt})
-                            },
-                            {
-                                clientSecret: this.clientSecret
-                            }
-                        ),
-                    !!refreshTokenGuest
-                )
-            } catch (error) {
-                // If the refresh token is invalid, we need to re-login the user
-                if (error instanceof Error && 'response' in error) {
-                    // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
-                    // We can't use `instanceof`, so instead we just check for the `response` property
-                    // and assume it is a fetch Response.
-                    const json = await (error['response'] as Response).json()
-                    if (json.message === 'invalid refresh_token') {
-                        // clean up storage and restart the login flow
-                        this.clearStorage()
-                    }
-                }
-            }
-        }
+        this.refreshAccessToken()
         return this.loginGuestUser()
     }
 
