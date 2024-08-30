@@ -11,7 +11,8 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Get Environment
+    - name: Get Traget
+      id: get_target
       shell: bash
       run: |-
         get_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/${{ inputs.target_name }}"
@@ -20,22 +21,84 @@ runs:
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
         
         echo "$response"
-        
         http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-        response_body=$(echo $response | sed -e 's/HTTPSTATUS\:.*//g')
-         
-         
-         echo "$http_status"
         
         if [ "$http_status" -eq 404  ]; then
           echo "MRT environment not found, it will be created in the next step."
-          exit 1
         elif [ "$http_status" -eq 200  ]; then
           echo "MRT environment already exists."
         else
           echo "Error: [Unexpected HTTP status: $http_status]"
           exit 1
         fi
-        echo "$response_body"
+
+    - name: Create Target
+      id: create_target
+      if: ${{ steps.get_target.outcome == 'success' }}
+      shell: bash
+      run: |-
+        create_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/"
+        
+        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$get_target_url" \
+            --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
+        
+        http_status=$(echo $RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+        
+        # Check if the HTTP status is not 200
+        if [ "$HTTP_STATUS" -ne 200 ]; then
+          echo "Request failed with status code $HTTP_STATUS"
+          exit 1
+        fi
+
+    - name: Wait For Target To Be Active
+      shell: bash
+      run: |-
+        get_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/${{ inputs.target_name }}"
+        
+        active_state="ACTIVE"
+        in_progess_state="CREATE_IN_PROGRESS"
+        max_attempts=5    # Number of attempts before timing out
+        sleep_duration=20  # Seconds between attempts
+        attempts=0
+
+        while [ $attempts -lt $max_attempts ]; do
+          # Fetch target
+          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$get_target_url" \
+          --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
+
+          # Extract the HTTP status code and body from the response
+          http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+          response_body=$(echo $response | sed -e 's/HTTPSTATUS\:.*//g')
+
+          if [ "$http_status" -ne 200 ]; then
+            echo "Request failed with status code $http_status"
+            exit 1
+          fi
+
+          # Extract the state from the response body
+          current_state=$(echo $response_body | jq -r '.state')
+
+          # Check if the state is as expected
+          if [ "$current_state" == "$active_state" ]; then
+            echo "Task is now in state: $current_state."
+            exit 0
+          elif [ "$current_state" != "$IN_PROGRESS_STATE" ]; then
+            echo "Task state is: $current_state, and is no longer in progress."
+            exit 1
+          fi
+        
+          # Increment the attempt counter
+          attempts=$((attempts + 1))
+        
+          # Sleep for the defined duration
+          echo "Task is still in state: $STATE. Attempt $ATTEMPTS of $MAX_ATTEMPTS. Waiting for $SLEEP_DURATION seconds..."
+          sleep $sleep_duration
+        done
+
+        # The task did not finish in the expected time
+        echo "Task did not become active within the expected time."
+        exit 1
+
+
 
 
