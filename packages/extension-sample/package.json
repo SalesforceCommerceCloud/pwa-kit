@@ -4,9 +4,6 @@
     "private": true,
     "scripts": {
     },
-    "dependencies": {
-      "hoist-non-react-statics": "^3.3.2"
-    },
     "peerDependencies": {
       "@loadable/component": "^5.15.3",
       "react": "^18.2.0",
