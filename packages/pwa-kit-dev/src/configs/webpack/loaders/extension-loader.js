@@ -6,6 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import dedent from 'dedent'
 import {kebabToUpperCamelCase} from '../utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
@@ -15,7 +16,7 @@ module.exports = function () {
     // string that is the npm package name.
     const {extensions = []} = getConfig()?.app || {}
 
-    return `
+    return dedent`
             /*
             * Copyright (c) 2024, salesforce.com, inc.
             * All rights reserved.
@@ -30,7 +31,7 @@ module.exports = function () {
                             extension.split('/')[1]
                         )} from '${extension}/${APP_EXTENSION_CLIENT_ENTRY}'`
                 )
-                .join('\n')}
+                .join('\n            ')}
             
             export default [
                 ${extensions
@@ -40,7 +41,7 @@ module.exports = function () {
                             extension.split('/')[1]
                         )}(${JSON.stringify(config)})`
                     })
-                    .join(',\n')}
+                    .join(',\n                ')}
             ]
         `
 }

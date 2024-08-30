@@ -28,7 +28,7 @@ const SUPPORTED_FILE_TYPES = ['.ts', '.js']
  *     ['@salesforce/extension-checkout/setup-app']: '/path/to/setup-app.ts',
  * }
  */
-export const buildAliases = (extensions) => {
+export const buildAliases = (extensions = []) => {
     const projectDir = process.cwd()
 
     const aliases = extensions.reduce((acc, extension) => {

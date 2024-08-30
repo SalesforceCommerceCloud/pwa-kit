@@ -7,6 +7,7 @@
 
 import ExtensionLoader from './extension-loader'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import dedent from 'dedent'
 
 const mockConfig = {
     app: {
@@ -26,7 +27,7 @@ describe('Extenion Loader', () => {
     })
 
     test('Returns single file re-exporting all extensions configured.', () => {
-        expect(ExtensionLoader()).toBe(`
+        expect(ExtensionLoader()).toBe(dedent`
             /*
             * Copyright (c) 2024, salesforce.com, inc.
             * All rights reserved.
@@ -35,11 +36,11 @@ describe('Extenion Loader', () => {
             */
             // Extension Imports
             import ExtensionThis from '@salesforce/extension-this/setup-app'
-import ExtensionThat from '@salesforce/extension-that/setup-app'
+            import ExtensionThat from '@salesforce/extension-that/setup-app'
 
             export default [
                 new ExtensionThis({}),
-new ExtensionThat({})
+                new ExtensionThat({})
             ]
         `)
     })

@@ -40,6 +40,7 @@ const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
 const {app: appConfig} = getConfig()
+const hasExtensions = appConfig?.extensions && appConfig?.extensions.length > 0
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -365,17 +366,6 @@ const staticFolderCopyPlugin = new CopyPlugin({
     ]
 })
 
-const extensionsStaticFolderCopyPlugin = (() =>
-    new CopyPlugin({
-        patterns: (appConfig?.extensions || []).map((extension) => {
-            return {
-                from: path.resolve(`node_modules/${extension}/assets`).replace(/\\/g, '/'),
-                to: `static/${extension.replaceAll('/', '_')}/`,
-                noErrorOnMissing: true
-            }
-        })
-    }))()
-
 const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
@@ -523,7 +513,6 @@ const renderer =
                 plugins: [
                     ...config.plugins,
                     staticFolderCopyPlugin,
-                    extensionsStaticFolderCopyPlugin,
                     // Keep this on the slowest-to-build item - the server-side bundle.
                     new WebpackNotifierPlugin({
                         title: `PWA Kit Project: ${pkg.name}`,
