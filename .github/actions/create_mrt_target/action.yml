@@ -19,8 +19,13 @@ runs:
         response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$get_target_url" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
         
+        echo "$response"
+        
         http_status=$(echo $RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
         response_body=$(echo $RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+         
+         
+         echo "$http_status"
         
         if [ "$http_status" -eq 404  ]; then
           echo "MRT environment not found, it will be created in the next step."
