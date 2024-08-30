@@ -62,4 +62,4 @@ jobs:
         with:
           project_name: ${{ github.event.inputs.project_name }}
           target_name: ${{ github.event.inputs.mrt_target_env }}
-
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
