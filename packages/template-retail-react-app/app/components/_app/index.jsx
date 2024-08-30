@@ -19,7 +19,7 @@ import {
     useAccessToken,
     useCategory,
     useShopperBasketsMutation,
-    useAuthContext,
+    useCustomStorage,
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -138,10 +138,10 @@ const App = (props) => {
     const styles = useStyleConfig('App')
 
     const {isGuest} = useCustomerType()
-    const auth = useAuthContext()
+    const auth = useCustomStorage()
 
-    // const login = useAuthHelper(AuthHelpers.LoginGuestUser)
-    // const logout = useAuthHelper(AuthHelpers.Logout)
+    const loginGuestUser = useAuthHelper(AuthHelpers.LoginGuestUser)
+    const logout = useAuthHelper(AuthHelpers.Logout)
 
     const handleSessionTimeout = async (sessionTimeout) => {
         let shouldSetTimeout = true
@@ -150,9 +150,9 @@ const App = (props) => {
             if (Date.now() > localStorageTimeout) {
                 if (isGuest) {
                     auth.clearStorage()
-                    await auth.loginGuestUser()
+                    await loginGuestUser.mutateAsync()
                 } else {
-                    await auth.logout()
+                    await logout.mutateAsync()
                 }
             } else {
                 shouldSetTimeout = false
@@ -180,6 +180,7 @@ const App = (props) => {
         }, timeRemaining)
     }
 
+    // timeout of 30 seconds for testing
     handleSessionTimeout(30000)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
