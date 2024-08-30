@@ -389,7 +389,7 @@ useCustomerId() => null | string
 ### `useCustomerType()`
 
 ```ts
-useCustomerId() => null | 'guest' | 'registered'
+useCustomerType() => null | 'guest' | 'registered'
 ```
 
 ### `useEncUserId()`
