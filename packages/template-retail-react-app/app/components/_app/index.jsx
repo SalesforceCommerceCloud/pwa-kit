@@ -249,7 +249,6 @@ const App = (props) => {
         {
             enabled: !isServer,
             onError: async () => {
-                console.log('Got error from useShopperContext')
                 await createShopperContext.mutateAsync({
                     parameters: {usid, siteId: site.id},
                     body: {}
@@ -260,15 +259,18 @@ const App = (props) => {
     console.log('shopperContext', shopperContext)
     const updateShopperContextObj = useShopperContextSearchParams()
 
-    useEffect(async () => {
-        // update the shopper context if the query string contains the relevant search parameters
-        console.log('updating shoppercontext', updateShopperContextObj)
-        await updateShopperContext.mutateAsync({
-            parameters: {usid, siteId: site.id},
-            body: updateShopperContextObj
-        })
-        // Refresh to update the data on the page
-        refetchDataOnClient()
+    useEffect(() => {
+        const executeShopperContextUpdate = async () => {
+            // update the shopper context if the query string contains the relevant search parameters
+            console.log('updating shoppercontext', updateShopperContextObj)
+            await updateShopperContext.mutateAsync({
+                parameters: {usid, siteId: site.id},
+                body: updateShopperContextObj
+            })
+            // Refresh to update the data on the page
+            refetchDataOnClient()
+        }
+        executeShopperContextUpdate()
     }, [location.search])
 
     useEffect(() => {
