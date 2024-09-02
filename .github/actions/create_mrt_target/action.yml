@@ -43,7 +43,9 @@ runs:
         create_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/"
         
         response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$create_target_url" \
-            --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
+            --header "Authorization: Bearer ${{ inputs.mobify_api_key }}") \
+            --header "Content-Type: application/json" \
+            --data "{\"name\": \"${{ inputs.target_name }}\", \"slug\": \"${{ inputs.target_name }}\"}")
         echo "$response"
         
         http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
