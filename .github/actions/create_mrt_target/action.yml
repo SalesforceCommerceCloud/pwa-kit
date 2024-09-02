@@ -64,8 +64,8 @@ runs:
         
         active_state="ACTIVE"
         in_progess_state="CREATE_IN_PROGRESS"
-        max_attempts=5    # Number of attempts before timing out
-        sleep_duration=20  # Seconds between attempts
+        max_attempts=10    # Number of attempts before timing out
+        sleep_duration=30  # Seconds between attempts
         attempts=0
 
         while [ $attempts -lt $max_attempts ]; do
