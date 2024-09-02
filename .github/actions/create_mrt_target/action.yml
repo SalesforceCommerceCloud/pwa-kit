@@ -11,7 +11,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Get Traget
+    - name: Get Target
       id: get_target
       shell: bash
       run: |-
@@ -87,10 +87,10 @@ runs:
 
           # Check if the state is as expected
           if [ "$current_state" == "$active_state" ]; then
-            echo "Task is now in state: $current_state."
+            echo "Target is now $current_state."
             exit 0
-          elif [ "$current_state" != "$IN_PROGRESS_STATE" ]; then
-            echo "Task state is: $current_state, and is no longer in progress."
+          elif [ "$current_state" != "$in_progess_state" ]; then
+            echo "Target state is: $current_state, and is no longer in progress."
             exit 1
           fi
         
@@ -98,12 +98,12 @@ runs:
           attempts=$((attempts + 1))
         
           # Sleep for the defined duration
-          echo "Task is still in state: $STATE. Attempt $ATTEMPTS of $MAX_ATTEMPTS. Waiting for $SLEEP_DURATION seconds..."
+          echo "Target is still in state: $current_state. Attempt $attempts of $max_attempts. Waiting for $sleep_duration seconds..."
           sleep $sleep_duration
         done
 
         # The task did not finish in the expected time
-        echo "Task did not become active within the expected time."
+        echo "Target did not become active within the expected time."
         exit 1
 
 
