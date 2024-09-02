@@ -26,8 +26,10 @@ runs:
         
         if [ "$http_status" -eq 404  ]; then
           echo "MRT environment not found, it will be created in the next step."
+          echo "status=404" >> $GITHUB_OUTPUT
         elif [ "$http_status" -eq 200  ]; then
           echo "MRT environment already exists."
+          echo "status=200" >> $GITHUB_OUTPUT
         else
           echo "Error: [Unexpected HTTP status: $http_status]"
           exit 1
