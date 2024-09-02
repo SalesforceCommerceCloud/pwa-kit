@@ -11,25 +11,29 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Initialize
+      shell: bash
+      run: |
+        set -e
+        API_BASE_URL="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target"
+
     - name: Get Target
       id: get_target
       shell: bash
       run: |-
-        get_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/${{ inputs.target_name }}"
-        
-        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$get_target_url" \
+        set -e
+        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$API_BASE_URL/${{ inputs.target_name }}" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
-        
-        echo "$response"
+
         http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
         echo "status=$http_status" >> $GITHUB_OUTPUT
-        
+
         if [ "$http_status" -eq 404  ]; then
           echo "MRT environment not found, it will be created in the next step."
         elif [ "$http_status" -eq 200  ]; then
           echo "MRT environment already exists."
         else
-          echo "Error: [Unexpected HTTP status: $http_status]"
+          echo "Error: Unexpected HTTP status: $http_status"
           exit 1
         fi
 
@@ -38,18 +42,15 @@ runs:
       if: ${{ steps.get_target.outputs.status == '404' }}
       shell: bash
       run: |-
-        create_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/"
-        
-        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$create_target_url" \
+        set -e
+        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$API_BASE_URL/" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
             --header "Content-Type: application/json" \
             --data "{\"name\": \"${{ inputs.target_name }}\", \"slug\": \"${{ inputs.target_name }}\"}")
-        echo "$response"
-        
+
         http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
         echo "status=$http_status" >> $GITHUB_OUTPUT
-        
-        # Check if the HTTP status is not 201
+
         if [ "$http_status" -ne 201 ]; then
           echo "Request failed with status code $http_status"
           exit 1
@@ -60,20 +61,15 @@ runs:
       if: ${{ steps.create_target.outputs.status == '201' }}
       shell: bash
       run: |-
-        get_target_url="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target/${{ inputs.target_name }}"
-        
-        active_state="ACTIVE"
-        in_progess_state="CREATE_IN_PROGRESS"
-        max_attempts=30    # Number of attempts before timing out
-        sleep_duration=30  # Seconds between attempts
+        set -e
+        max_attempts=30
+        sleep_duration=30
         attempts=0
 
         while [ $attempts -lt $max_attempts ]; do
-          # Fetch target
-          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$get_target_url" \
-          --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
+          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$API_BASE_URL/${{ inputs.target_name }}" \
+            --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
 
-          # Extract the HTTP status code and body from the response
           http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
           response_body=$(echo $response | sed -e 's/HTTPSTATUS\:.*//g')
 
@@ -82,30 +78,20 @@ runs:
             exit 1
           fi
 
-          # Extract the state from the response body
           current_state=$(echo $response_body | jq -r '.state')
 
-          # Check if the state is as expected
-          if [ "$current_state" == "$active_state" ]; then
-            echo "Target is now $current_state."
+          if [ "$current_state" == "ACTIVE" ]; then
+            echo "Target is now ACTIVE."
             exit 0
-          elif [ "$current_state" != "$in_progess_state" ]; then
-            echo "Target state is: $current_state, and is no longer in progress."
+          elif [ "$current_state" != "CREATE_IN_PROGRESS" ]; then
+            echo "Unexpected target state: $current_state."
             exit 1
           fi
-        
-          # Increment the attempt counter
+
           attempts=$((attempts + 1))
-        
-          # Sleep for the defined duration
-          echo "Target is still in state: $current_state. Attempt $attempts of $max_attempts. Waiting for $sleep_duration seconds..."
+          echo "Waiting for target to be ACTIVE. Attempt $attempts/$max_attempts."
           sleep $sleep_duration
         done
 
-        # The task did not finish in the expected time
         echo "Target did not become active within the expected time."
         exit 1
-
-
-
-
