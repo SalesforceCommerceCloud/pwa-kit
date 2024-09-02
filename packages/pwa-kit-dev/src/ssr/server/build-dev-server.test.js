@@ -62,35 +62,37 @@ const insecureFetch = (url, opts) => {
     })
 }
 
+const mobifyConfig = {
+    ssrEnabled: true,
+    ssrOnly: ['main.js.map', 'ssr.js', 'ssr.js.map'],
+    ssrShared: ['main.js', 'ssr-loader.js', 'worker.js'],
+    ssrParameters: {
+        proxyConfigs: [
+            {
+                protocol: 'https',
+                host: 'test.proxy.com',
+                path: 'base'
+            },
+            {
+                protocol: 'https',
+                // This is intentionally an unreachable host
+                host: '0.0.0.0',
+                path: 'base2'
+            },
+            {
+                protocol: 'https',
+                host: 'test.proxy.com',
+                path: 'base3',
+                caching: true
+            }
+        ]
+    }
+}
+
 const opts = (overrides = {}) => {
     const defaults = {
         buildDir: path.join(testFixtures, 'build'),
-        mobify: {
-            ssrEnabled: true,
-            ssrOnly: ['main.js.map', 'ssr.js', 'ssr.js.map'],
-            ssrShared: ['main.js', 'ssr-loader.js', 'worker.js'],
-            ssrParameters: {
-                proxyConfigs: [
-                    {
-                        protocol: 'https',
-                        host: 'test.proxy.com',
-                        path: 'base'
-                    },
-                    {
-                        protocol: 'https',
-                        // This is intentionally an unreachable host
-                        host: '0.0.0.0',
-                        path: 'base2'
-                    },
-                    {
-                        protocol: 'https',
-                        host: 'test.proxy.com',
-                        path: 'base3',
-                        caching: true
-                    }
-                ]
-            }
-        },
+        mobify: mobifyConfig,
         quiet: true,
         port: TEST_PORT,
         protocol: 'http',
@@ -101,6 +103,12 @@ const opts = (overrides = {}) => {
         ...overrides
     }
 }
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    return {
+        getConfig: () => mobifyConfig
+    }
+})
 
 describe('DevServer error handlers', () => {
     const expectServerErrorHandled = (error, times) => {
