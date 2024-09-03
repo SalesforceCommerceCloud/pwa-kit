@@ -179,7 +179,7 @@ class Auth {
     private clientSecret: string
     private silenceWarnings: boolean
     private logger: Logger
-    private defaultDnt: boolean | undefined
+    defaultDnt: boolean | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.

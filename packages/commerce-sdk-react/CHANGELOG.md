@@ -1,3 +1,6 @@
+## v3.2.0-dev (Sep 4, 2024)
+- Added useDNT hook to commerce-sdk-react [#1989](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1989)
+
 ## v3.1.0-dev (Aug 08, 2024)
 
 - Add `defaultDnt` to support setting the dnt flag for SLAS. Upgrade `commerce-sdk-isomorphic` to v3.1.1 [#1979](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1979)

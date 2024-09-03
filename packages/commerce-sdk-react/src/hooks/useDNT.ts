@@ -9,14 +9,9 @@ import useAuthContext from './useAuthContext'
 import {getDefaultCookieAttributes} from '../utils'
 import Cookies from 'js-cookie'
 
-interface dntUpdateInfo {
-    preference: boolean
-    expireOnBrowserClose?: boolean
-}
-
 interface useDntReturn {
-    dntNotSet: boolean | null
-    updateDNT: (obj: dntUpdateInfo) => Promise<void>
+    dntNotSet: boolean
+    updateDNT: (preference: boolean | null) => Promise<void>
 }
 
 /**
@@ -32,23 +27,23 @@ const useDNT = (): useDntReturn => {
     const dwDntValue = Cookies.get('dw_dnt')
     const dntCookieIsDefined = dwDntValue !== '1' && dwDntValue !== '0'
     const [dntNotSet, setDntNotSet] = useState(dntCookieIsDefined)
-    /*
-     * @param preference - A yes or no to whether or not the user WON'T be tracked
-     * @param expireOnBrowserClose - whether or not the DNT preference should expire when window is closed.
-     *                       Otherwise, DNT preference is set to the refresh token expiry date
-     */
-    const updateDNT = async (updateInfo: dntUpdateInfo) => {
-        const {preference, expireOnBrowserClose = false} = updateInfo
+
+    const updateDNT = async (preference: boolean | null) => {
+        let dntCookieVal = String(Number(preference))
+        // Use defaultDNT if defined. If not, use SLAS default DNT
+        if (preference === null)
+            dntCookieVal = auth.defaultDnt ? String(Number(auth.defaultDnt)) : '0'
+
         // Set the cookie once to include dnt in the access token and then again to set the expiry time
-        Cookies.set('dw_dnt', String(Number(preference)), {
+        Cookies.set('dw_dnt', dntCookieVal, {
             ...getDefaultCookieAttributes()
         })
         setDntNotSet(false)
         await auth.refreshAccessToken()
 
-        if (expireOnBrowserClose === false) {
+        if (preference !== null) {
             const daysUntilExpires = Number(auth.get('refresh_token_expires_in')) / 86400
-            Cookies.set('dw_dnt', String(Number(preference)), {
+            Cookies.set('dw_dnt', dntCookieVal, {
                 ...getDefaultCookieAttributes(),
                 expires: daysUntilExpires
             })
