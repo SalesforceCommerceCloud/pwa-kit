@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import ExtensionLoader from './extension-loader'
+import ExtensionLoader from './extensions-loader'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import dedent from 'dedent'
 

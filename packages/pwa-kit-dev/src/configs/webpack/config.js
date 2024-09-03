@@ -287,7 +287,7 @@ const baseConfig = (target) => {
                         },
                         {
                             test: /universal\/extensibility\/extensions/,
-                            loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extension-loader`,
+                            loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extensions-loader`,
                             options: {
                                 projectDir
                             }

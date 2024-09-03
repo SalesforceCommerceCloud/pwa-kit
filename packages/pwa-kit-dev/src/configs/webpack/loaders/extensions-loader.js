@@ -11,6 +11,17 @@ import {kebabToUpperCamelCase} from '../utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
 
+/**
+ * The `extensions-loader` is used to return all configured extensions for a given pwa-kit
+ * application. We use this loader as a simple way to determine what extension code in required in
+ * the application bundle, without this we would have to rely on other more complex ways of
+ * including application extensions in the bundle, like custom webpack entry points for extension.
+ *
+ * With this solution we can rely on the fact that all configured application extensions are concretely
+ * referenced in code and therefore will end up in the resultant bundle.
+ *
+ * @returns {string} The string representation of a module exporting all the named application extension modules.
+ */
 module.exports = function () {
     // NOTE: We need to account for extensions being tuples. Here we assume it's a simple
     // string that is the npm package name.
