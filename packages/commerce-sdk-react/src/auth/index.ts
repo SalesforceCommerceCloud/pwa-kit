@@ -361,6 +361,22 @@ class Auth {
         store.delete(key)
     }
 
+    /**
+     * Converts a duration in seconds to a JavaScript Date object or undefined.
+     *
+     * This function takes a number representing the number of seconds and returns
+     * a Date object that represents the current time plus the specified duration.
+     * If the input is `undefined`, it returns `undefined`.
+     *
+     * When used in conjunction with `js-cookie`, if the `expires` attribute is
+     * `undefined`, a session cookie is created. A session cookie is stored only
+     * for the duration of the browser session and is deleted when the browser is closed.
+     *
+     * @param {number | undefined} seconds - The number of seconds to add to the current time,
+     *                                        or `undefined` if no expiration number is provided.
+     * @returns {Date | undefined} - A Date object representing the expiration time, or `undefined`
+     *                                if the input is `undefined`.
+     */
     private convertSecondsToDate(seconds: number | undefined): Date | undefined {
         if (typeof seconds === 'number') {
             return new Date(Date.now() + seconds * 1000)
