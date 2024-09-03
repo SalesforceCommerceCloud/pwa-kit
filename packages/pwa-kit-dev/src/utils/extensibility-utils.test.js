@@ -11,15 +11,20 @@ import path from 'path'
 import * as extensionUtils from './extensibility-utils'
 
 describe('extensibilityUtils', () => {
+    const existingTSFile = path.join('mocked', 'path', 'exists.ts')
+    const existingJSFile = path.join('mocked', 'path', 'exists.js')
+    const existingFileWithoutExtension = path.join('mocked', 'path', 'exists')
+    const missingFileWithoutExtension = path.join('mocked', 'path', 'does-not-exists')
+
     beforeAll(() => {
         const spy = jest.spyOn(fs, 'existsSync')
 
         spy.mockImplementation((filePath) => {
-            if (filePath === '/mocked/path/exists.js') {
+            if (filePath === existingJSFile) {
                 return true
             }
 
-            if (filePath === '/mocked/path/exists.ts') {
+            if (filePath === existingTSFile) {
                 return true
             }
 
@@ -38,31 +43,31 @@ describe('extensibilityUtils', () => {
         ;[
             {
                 name: 'returns null if path exists but no files no files with provided file extensions.',
-                path: '/mocked/path/exists',
+                path: existingFileWithoutExtension,
                 fileExtensions: ['.mjs'],
                 expected: null
             },
             {
                 name: 'returns path if file is found with provided extension.',
-                path: '/mocked/path/exists',
+                path: existingFileWithoutExtension,
                 fileExtensions: ['.js'],
-                expected: '/mocked/path/exists.js'
+                expected: existingJSFile
             },
             {
                 name: 'returns path if file is found with mixed existing and non existing extensions.',
-                path: '/mocked/path/exists',
+                path: existingFileWithoutExtension,
                 fileExtensions: ['.mjs', '.ts'],
-                expected: '/mocked/path/exists.ts'
+                expected: existingTSFile
             },
             {
                 name: 'returns null if no file extensions are provided.',
-                path: '/mocked/path/exists',
+                path: existingFileWithoutExtension,
                 fileExtensions: undefined,
                 expected: null
             },
             {
                 name: 'returns null if no file extensions are provided.',
-                path: '/mocked/path/does-not-exists',
+                path: missingFileWithoutExtension,
                 fileExtensions: ['.js'],
                 expected: null
             }
