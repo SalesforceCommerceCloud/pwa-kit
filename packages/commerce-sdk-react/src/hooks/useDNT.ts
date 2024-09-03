@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -14,7 +14,7 @@ import Cookies from 'js-cookie'
  */
 interface dntInfo {
     dntNotSet: boolean | null,
-    updateDNT: (newValue: boolean, timeUntilExpire: number | undefined) => void
+    updateDNT: (newValue: boolean) => void
 }
 
 /**
@@ -35,7 +35,7 @@ const useDNT = (): dntInfo => {
         Cookies.set("dw_dnt", String(Number(newValue)), {
             ...getDefaultCookieAttributes()
         })
-        setDntNotSet(true)
+        setDntNotSet(false)
         auth.refreshAccessToken()
         if (auth.get("customer_type") == "registered") {
             var daysUntilExpires = Number(auth.get("refresh_token_expires_in")) / 86400
