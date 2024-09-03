@@ -92,14 +92,26 @@ describe('extensibilityUtils', () => {
                 name: 'returns an defined object with correct mapping when application extensions are provided',
                 extensions: ['@extension-good'],
                 expected: {
-                    '@extension-good/setup-app': `${process.cwd()}/node_modules/@extension-good/src/setup-app.ts`
+                    '@extension-good/setup-app': path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@extension-good',
+                        'src',
+                        'setup-app.ts'
+                    )
                 }
             },
             {
                 name: 'returns an defined object with correct mapping when application extensions are provided including a bad extension',
                 extensions: ['@extension-bad', '@extension-good'],
                 expected: {
-                    '@extension-good/setup-app': `${process.cwd()}/node_modules/@extension-good/src/setup-app.ts`
+                    '@extension-good/setup-app': path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@extension-good',
+                        'src',
+                        'setup-app.ts'
+                    )
                 }
             }
         ].forEach((testCase) => {
