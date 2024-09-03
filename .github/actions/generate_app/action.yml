@@ -37,7 +37,7 @@ runs:
         echo "USE_EXTENSIBILITY_VALUE=$use_extensibility_value" >> $GITHUB_ENV 
         
         is_private_client_input="${{ inputs.is_private_client }}"
-        if [ "$isPrivateClient_input" = "true" ]; then
+        if [ "$is_private_client_input" = "true" ]; then
          is_private_client_value=1
         else
           is_private_client_value=2
