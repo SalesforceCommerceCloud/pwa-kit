@@ -36,7 +36,7 @@ export class CookieStorage extends BaseStorage {
     }
     /**
      * Converts an expiration time from seconds to a `Date` object.
-     *`The js-cookie` library interprets the `expires` number as days from the current time, whereas the number
+     * The `js-cookie` library interprets the `expires` number as days from the current time, whereas the number
      * provided by SCAPI is in seconds. So, we convert the `expires` number in seconds to a `Date` object to ensure
      * we use the correct cookie expiration time.
      *
@@ -56,7 +56,9 @@ export class CookieStorage extends BaseStorage {
         }
 
         if (expires !== undefined) {
-            console.warn('Invalid "expires" option provided. It must be a number (in seconds) or a Date object.')
+            console.warn(
+                'Invalid "expires" option provided. It must be a number (in seconds) or a Date object.'
+            )
         }
 
         // If expires is undefined, it results in a session cookie
