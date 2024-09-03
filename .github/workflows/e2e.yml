@@ -123,7 +123,7 @@ jobs:
                 ]
               }'
           )
-          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" --request PATCH "https://cloud.mobify.com/api/projects/${{ github.event.inputs.name }}/target/${{ github.event.inputs.mrt_target_env }}/" \
+          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" --request PATCH "https://cloud.mobify.com/api/projects/${{ github.event.inputs.project_name }}/target/${{ github.event.inputs.mrt_target_env }}/" \
           --header "Authorization: Bearer ${{ secrets.MOBIFY_CLIENT_API_KEY }}" \
           --header "Content-Type: application/json" \
           --data "$json_data")
