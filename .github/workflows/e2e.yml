@@ -49,6 +49,7 @@ jobs:
     steps:
       - name: Set environment variable
         run: |
+          set -e
           echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV 
           url="${{ github.event.inputs.instance_url }}"
           hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
@@ -65,6 +66,7 @@ jobs:
 
       - name: Setup PWA dependencies
         run: |-
+          set -e
           sudo apt-get update -yq && sudo apt-get install --no-install-recommends python2 python3-pip time -yq
           sudo pip install -U pip setuptools
           sudo pip install awscli==1.18.85 datadog==0.40.1
@@ -107,19 +109,31 @@ jobs:
           FLAGS: --wait
 
       - name: Add proxy config on MRT
+        shell: bash
         run: |
-          curl --location --request PATCH "https://cloud.mobify.com/api/projects/${{ github.event.inputs.name }}/target/${{ github.event.inputs.mrt_target_env }}/" \
+          set -e
+          json_data=$(
+            jq -n \
+              --arg shortCode "${{ github.event.inputs.short_code }}" \
+              --arg hostname "${{ env.HOSTNAME }}" \
+              '{
+                ssr_proxy_configs: [
+                  { path: "api", host: ($shortCode + ".api.commercecloud.salesforce.com") },
+                  { path: "ocapi", host: $hostname }
+                ]
+              }'
+          )
+          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" --request PATCH "https://cloud.mobify.com/api/projects/${{ github.event.inputs.name }}/target/${{ github.event.inputs.mrt_target_env }}/" \
           --header "Authorization: Bearer ${{ secrets.MOBIFY_CLIENT_API_KEY }}" \
-          --header 'Content-Type: application/json' \
-          --data '{
-              "ssr_proxy_configs": [
-                  {
-                      "path": "api",
-                      "host": "'"${{ github.event.inputs.shortCode }}.api.commercecloud.salesforce.com"'"
-                  },
-                  {
-                      "path": "ocapi",
-                      "host": "'"${{ env.HOSTNAME }}"'"
-                  }
-              ]
-          }'
+          --header "Content-Type: application/json" \
+          --data "$json_data")
+
+          http_status=$(echo "$response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+          response_body=$(echo "$response" | sed -e 's/HTTPSTATUS\:.*//g')
+          if [ "$http_status" -ne 200 ]; then
+            echo "Request failed with status code $http_status"
+            echo "Response body: $response_body"
+            exit 1
+          else
+            echo "Proxy configuration added successfully."
+          fi
