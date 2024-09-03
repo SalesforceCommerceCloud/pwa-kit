@@ -37,7 +37,7 @@ export class CookieStorage extends BaseStorage {
     /**
      * Converts an expiration time from seconds to a `Date` object.
      * The `js-cookie` library interprets the `expires` number as days from the current time, whereas the number
-     * provided by SCAPI is in seconds. So, we convert the `expires` number in seconds to a `Date` object to ensure
+     * provided by SCAPI is in seconds. We convert the `expires` number in seconds to a `Date` object to ensure
      * we use the correct cookie expiration time.
      *
      * @param expires - The expiration time for the cookie (in seconds or as a Date object)
