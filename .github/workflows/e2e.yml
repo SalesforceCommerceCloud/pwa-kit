@@ -44,7 +44,7 @@ on:
         default: false
 
 jobs:
-  pwa-kit:
+  setup-pwa-kit:
     runs-on: ubuntu-latest
     steps:
       - name: Set environment variable
@@ -105,3 +105,21 @@ jobs:
           CWD: "../generated-projects/${{ env.PROJECT_DIR }}"
           TARGET: ${{ github.event.inputs.mrt_target_env }}
           FLAGS: --wait
+
+      - name: Add proxy config on MRT
+        run: |
+          curl --location --request PATCH "https://cloud.mobify.com/api/projects/${{ github.event.inputs.name }}/target/${{ github.event.inputs.mrt_target_env }}/" \
+          --header "Authorization: Bearer ${{ secrets.MOBIFY_CLIENT_API_KEY }}" \
+          --header 'Content-Type: application/json' \
+          --data '{
+              "ssr_proxy_configs": [
+                  {
+                      "path": "api",
+                      "host": "'"${{ github.event.inputs.shortCode }}.api.commercecloud.salesforce.com"'"
+                  },
+                  {
+                      "path": "ocapi",
+                      "host": "'"${{ env.HOSTNAME }}"'"
+                  }
+              ]
+          }'
