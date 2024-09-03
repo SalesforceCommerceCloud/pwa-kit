@@ -14,10 +14,6 @@ const {execSync: _execSync} = require('child_process')
 
 sh.set('-e')
 
-// In some projects we use the TypeScript compiler, this array indicates which
-// projects should have `tsc` executed.
-const USE_TSC = ['pwa-kit-react-sdk']
-
 const execSync = (cmd, opts) => {
     const defaults = {stdio: 'inherit'}
     return _execSync(cmd, {...defaults, ...opts})
@@ -42,9 +38,6 @@ const main = () => {
 
         // Conditionally run tsc if a typescript config exists. We typically do this to extract types from our SDK.
         const productDir = process.cwd().split(p.sep).at(-1)
-        if (USE_TSC.includes(productDir) && fs.existsSync('tsconfig.json')) {
-            execSync(`npx tsc`)
-        }
     })
 
     program

@@ -22,7 +22,7 @@
     "storefront-preview"
   ],
   "scripts": {
-    "build": "cross-env NODE_ENV=production internal-lib-build build",
+    "build": "cross-env NODE_ENV=production internal-lib-build build & tsc",
     "build:watch": "nodemon --watch 'src/**' --exec 'npm run build'",
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
