@@ -48,10 +48,7 @@ jobs:
       - name: Set environment variable
         run: |
           set -e
-          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV 
-          url="${{ github.event.inputs.instance_url }}"
-          hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
-          echo "HOSTNAME=$hostname" >> $GITHUB_ENV
+          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -60,7 +57,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
+          cache: "npm"
 
       - name: Setup PWA dependencies
         run: |-
@@ -107,31 +104,9 @@ jobs:
           FLAGS: --wait
 
       - name: Add proxy config on MRT
-        shell: bash
-        run: |
-          set -e
-          json_data=$(
-            jq -n \
-              --arg shortCode "${{ github.event.inputs.short_code }}" \
-              --arg hostname "${{ env.HOSTNAME }}" \
-              '{
-                ssr_proxy_configs: [
-                  { path: "api", host: ($shortCode + ".api.commercecloud.salesforce.com") },
-                  { path: "ocapi", host: $hostname }
-                ]
-              }'
-          )
-          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" --request PATCH "https://cloud.mobify.com/api/projects/${{ github.event.inputs.project_name }}/target/${{ github.event.inputs.mrt_target_env }}/" \
-          --header "Authorization: Bearer ${{ secrets.MOBIFY_CLIENT_API_KEY }}" \
-          --header "Content-Type: application/json" \
-          --data "$json_data")
-
-          http_status=$(echo "$response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-          response_body=$(echo "$response" | sed -e 's/HTTPSTATUS\:.*//g')
-          if [ "$http_status" -ne 200 ]; then
-            echo "Request failed with status code $http_status"
-            echo "Response body: $response_body"
-            exit 1
-          else
-            echo "Proxy configuration added successfully."
-          fi
+        uses: "./.github/actions/add_proxy_configs"
+        with:
+          project_slug: ${{ github.event.inputs.project_name }}
+          target_slug: ${{ github.event.inputs.mrt_target_env }}
+          config_file: "../generated-projects/${{ env.PROJECT_DIR }}/config/default.js"
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
