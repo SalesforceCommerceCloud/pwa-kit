@@ -14,7 +14,7 @@ import Cookies from 'js-cookie'
  */
 interface dntInfo {
     dntNotSet: boolean | null
-    updateDNT: (newValue: boolean) => Promise<void>
+    updateDNT: (newValue: boolean, expireOnWindowClose?: boolean) => Promise<void>
 }
 
 /**
@@ -30,14 +30,20 @@ const useDNT = (): dntInfo => {
     const dwDntValue = Cookies.get('dw_dnt')
     const dntCookieIsDefined = dwDntValue !== '1' && dwDntValue !== '0'
     const [dntNotSet, setDntNotSet] = useState(dntCookieIsDefined)
-    const updateDNT = async (newValue: boolean) => {
+    /*
+     * @param newValue - A yes or no to whether or not the user WON'T be tracked
+     * @param expireOnWindowClose - whether or not the DNT preference should expire when window is closed.
+     *                       Otherwise, DNT preference is set to the refresh token expiry date
+     */
+    const updateDNT = async (newValue: boolean, expireOnWindowClose = false) => {
         // Set the cookie once to include dnt in the access token and then again to set the expiry time
         Cookies.set('dw_dnt', String(Number(newValue)), {
             ...getDefaultCookieAttributes()
         })
         setDntNotSet(false)
         await auth.refreshAccessToken()
-        if (auth.get('customer_type') == 'registered') {
+
+        if (expireOnWindowClose === false) {
             const daysUntilExpires = Number(auth.get('refresh_token_expires_in')) / 86400
             Cookies.set('dw_dnt', String(Number(newValue)), {
                 ...getDefaultCookieAttributes(),

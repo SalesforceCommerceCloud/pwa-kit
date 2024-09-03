@@ -46,7 +46,7 @@ describe('useDNT tests', () => {
         })
     })
 
-    it('dw_dnt cookie with expiry time based on refresh token if customer is registered', async () => {
+    it('dw_dnt cookie with expiry time based on refresh token when expireOnWindowClose not given', async () => {
         renderHookWithProviders(() => {
             const {dntNotSet, updateDNT} = useDNT()
             dntNotSet // Just to pass linting
@@ -60,6 +60,23 @@ describe('useDNT tests', () => {
             expect(mockCookiesSet).toHaveBeenNthCalledWith(2, 'dw_dnt', '1', {
                 ...getDefaultCookieAttributes(),
                 expires: 90
+            })
+        })
+    })
+
+    it('dw_dnt cookie with expiry time based on window when expireOnWindowClose is true', async () => {
+        renderHookWithProviders(() => {
+            const {dntNotSet, updateDNT} = useDNT()
+            dntNotSet // Just to pass linting
+            useEffect(() => {
+                void (async () => {
+                    await updateDNT(true, true)
+                })()
+            }, [])
+        })
+        await waitFor(() => {
+            expect(mockCookiesSet).toHaveBeenNthCalledWith(1, 'dw_dnt', '1', {
+                ...getDefaultCookieAttributes()
             })
         })
     })
