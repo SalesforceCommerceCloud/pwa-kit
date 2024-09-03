@@ -15,14 +15,14 @@ runs:
       shell: bash
       run: |
         set -e
-        API_BASE_URL="https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target"
+        echo "TARGET_API_BASE_URL=https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target" >> $GITHUB_ENV
 
     - name: Get Target
       id: get_target
       shell: bash
       run: |-
         set -e
-        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$API_BASE_URL/${{ inputs.target_name }}" \
+        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/${{ inputs.target_name }}" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
 
         http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
@@ -43,7 +43,7 @@ runs:
       shell: bash
       run: |-
         set -e
-        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$API_BASE_URL/" \
+        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
             --header "Content-Type: application/json" \
             --data "{\"name\": \"${{ inputs.target_name }}\", \"slug\": \"${{ inputs.target_name }}\"}")
@@ -67,7 +67,7 @@ runs:
         attempts=0
 
         while [ $attempts -lt $max_attempts ]; do
-          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$API_BASE_URL/${{ inputs.target_name }}" \
+          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/${{ inputs.target_name }}" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
 
           http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
