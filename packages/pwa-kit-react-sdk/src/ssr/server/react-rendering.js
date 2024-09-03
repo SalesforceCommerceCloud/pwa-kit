@@ -146,7 +146,7 @@ export const render = async (req, res, next) => {
     let route
     let match
 
-    const basepath = AppConfig.getBasePath({req, res})?.replace(/\/$/, '') || ''
+    const basepath = AppConfig.getBasePath?.({req, res})?.replace(/\/$/, '') || ''
     routes.some((r) => {
         let _route = {...r}
         if (basepath && _route?.path) {
@@ -253,7 +253,7 @@ export const render = async (req, res, next) => {
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
-    const basepath = AppConfig.getBasePath({req, res})
+    const basepath = AppConfig.getBasePath?.({req, res}) || ''
     return (
         <ServerContext.Provider value={{req, res}}>
             <Router location={location} context={routerContext} basename={basepath}>
