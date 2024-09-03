@@ -1,3 +1,6 @@
+## v4.2.0-dev (Sep 4, 2024)
+- Added useDNT hook to commerce-sdk-react [#1989](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1989)
+
 ## v4.1.0-dev (Aug 8, 2024)
 
 ### Bug Fixes
