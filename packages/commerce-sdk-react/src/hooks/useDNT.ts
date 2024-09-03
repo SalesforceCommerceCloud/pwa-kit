@@ -9,12 +9,14 @@ import useAuthContext from './useAuthContext'
 import {getDefaultCookieAttributes} from '../utils'
 import Cookies from 'js-cookie'
 
-/**
- * @group Shopper Authentication helpers
- */
-interface dntInfo {
+interface dntUpdateInfo {
+    preference: boolean
+    expireOnBrowserClose?: boolean
+}
+
+interface useDntReturn {
     dntNotSet: boolean | null
-    updateDNT: (newValue: boolean, expireOnWindowClose?: boolean) => Promise<void>
+    updateDNT: (obj: dntUpdateInfo) => Promise<void>
 }
 
 /**
@@ -24,28 +26,29 @@ interface dntInfo {
  * @category Shopper Authentication
  *
  */
-const useDNT = (): dntInfo => {
+const useDNT = (): useDntReturn => {
     const auth = useAuthContext()
 
     const dwDntValue = Cookies.get('dw_dnt')
     const dntCookieIsDefined = dwDntValue !== '1' && dwDntValue !== '0'
     const [dntNotSet, setDntNotSet] = useState(dntCookieIsDefined)
     /*
-     * @param newValue - A yes or no to whether or not the user WON'T be tracked
-     * @param expireOnWindowClose - whether or not the DNT preference should expire when window is closed.
+     * @param preference - A yes or no to whether or not the user WON'T be tracked
+     * @param expireOnBrowserClose - whether or not the DNT preference should expire when window is closed.
      *                       Otherwise, DNT preference is set to the refresh token expiry date
      */
-    const updateDNT = async (newValue: boolean, expireOnWindowClose = false) => {
+    const updateDNT = async (updateInfo: dntUpdateInfo) => {
+        const {preference, expireOnBrowserClose = false} = updateInfo
         // Set the cookie once to include dnt in the access token and then again to set the expiry time
-        Cookies.set('dw_dnt', String(Number(newValue)), {
+        Cookies.set('dw_dnt', String(Number(preference)), {
             ...getDefaultCookieAttributes()
         })
         setDntNotSet(false)
         await auth.refreshAccessToken()
 
-        if (expireOnWindowClose === false) {
+        if (expireOnBrowserClose === false) {
             const daysUntilExpires = Number(auth.get('refresh_token_expires_in')) / 86400
-            Cookies.set('dw_dnt', String(Number(newValue)), {
+            Cookies.set('dw_dnt', String(Number(preference)), {
                 ...getDefaultCookieAttributes(),
                 expires: daysUntilExpires
             })

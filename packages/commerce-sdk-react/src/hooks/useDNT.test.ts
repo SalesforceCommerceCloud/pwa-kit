@@ -22,9 +22,9 @@ describe('useDNT tests', () => {
     beforeEach(() => {
         mockedUseAuthContext.mockReturnValueOnce({
             refreshAccessToken: jest.fn(),
-            get: (something: string) => {
-                if (something === 'customer_type') return 'registered'
-                if (something === 'refresh_token_expires_in') return 7776000
+            get: (param: string) => {
+                if (param === 'customer_type') return 'registered'
+                if (param === 'refresh_token_expires_in') return 7776000
             }
         })
         Cookies.get = jest.fn().mockImplementationOnce(() => '1')
@@ -37,7 +37,9 @@ describe('useDNT tests', () => {
 
             useEffect(() => {
                 void (async () => {
-                    await updateDNT(true)
+                    await updateDNT({
+                        preference: true
+                    })
                 })()
             }, [])
         })
@@ -46,13 +48,15 @@ describe('useDNT tests', () => {
         })
     })
 
-    it('dw_dnt cookie with expiry time based on refresh token when expireOnWindowClose not given', async () => {
+    it('dw_dnt cookie with expiry time based on refresh token when expireOnBrowserClose not given', async () => {
         renderHookWithProviders(() => {
             const {dntNotSet, updateDNT} = useDNT()
             dntNotSet // Just to pass linting
             useEffect(() => {
                 void (async () => {
-                    await updateDNT(true)
+                    await updateDNT({
+                        preference: true
+                    })
                 })()
             }, [])
         })
@@ -64,13 +68,16 @@ describe('useDNT tests', () => {
         })
     })
 
-    it('dw_dnt cookie with expiry time based on window when expireOnWindowClose is true', async () => {
+    it('dw_dnt cookie with expiry time based on window when expireOnBrowserClose is true', async () => {
         renderHookWithProviders(() => {
             const {dntNotSet, updateDNT} = useDNT()
             dntNotSet // Just to pass linting
             useEffect(() => {
                 void (async () => {
-                    await updateDNT(true, true)
+                    await updateDNT({
+                        preference: true,
+                        expireOnBrowserClose: true
+                    })
                 })()
             }, [])
         })
@@ -87,7 +94,9 @@ describe('useDNT tests', () => {
             dntNotSet // Just to pass linting
             useEffect(() => {
                 void (async () => {
-                    await updateDNT(false)
+                    await updateDNT({
+                        preference: false
+                    })
                 })()
             }, [])
         })
@@ -113,7 +122,9 @@ describe('useDNT tests', () => {
             dntNotSet // Just to pass linting
             useEffect(() => {
                 void (async () => {
-                    await updateDNT(true)
+                    await updateDNT({
+                        preference: true
+                    })
                 })()
             }, [])
         })
@@ -135,9 +146,9 @@ describe('useDNT tests', () => {
     it('dntNotSet should be true if dw_dnt cookie is not defined', () => {
         mockedUseAuthContext.mockReturnValueOnce({
             refreshAccessToken: jest.fn(),
-            get: (something: string) => {
-                if (something === 'customer_type') return 'registered'
-                if (something === 'refresh_token_expires_in') return 7776000
+            get: (preference: string) => {
+                if (preference === 'customer_type') return 'registered'
+                if (preference === 'refresh_token_expires_in') return 7776000
             }
         })
         Cookies.get = jest.fn().mockImplementationOnce(() => undefined)

@@ -23,7 +23,10 @@ const UseDntHook = () => {
             style={buttonStyle}
             onClick={() => {
                 void (async () => {
-                    await updateDNT(true)
+                    await updateDNT({
+                        preference: true,
+                        expireOnBrowserClose: true
+                    })
                 })()
                 setDisplayButton(false)
             }}
