@@ -485,7 +485,7 @@ class Auth {
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
-        this.refreshAccessToken()
+        await this.refreshAccessToken()
         return this.loginGuestUser()
     }
 
