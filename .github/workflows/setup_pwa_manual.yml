@@ -1,4 +1,4 @@
-name: SalesforceCommerceCloud/pwa-kit/e2e
+name: SalesforceCommerceCloud/pwa-kit/setup_pwa_manual
 on:
   workflow_dispatch:
     inputs:
