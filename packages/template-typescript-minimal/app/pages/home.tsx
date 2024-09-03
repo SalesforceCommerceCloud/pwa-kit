@@ -133,10 +133,6 @@ const Home = ({value}: Props) => {
                             Client-side JS works if this counter increments: {counter}
                             <br />
                             <br />
-                            App Extensions work if you can navigate to this link:{' '}
-                            <Link to="/sample-page">sample page</Link>.
-                            <br />
-                            <br />
                             <b>You can mix-and-match JS and TS</b>
                             <br />
                             <br />
