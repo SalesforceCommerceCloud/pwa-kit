@@ -1,0 +1,137 @@
+name: SalesforceCommerceCloud/pwa-kit/e2e
+on:
+  workflow_dispatch:
+    inputs:
+      use_extensibility:
+        type: boolean
+        description: Use Extensibility?
+        default: true
+      project_name:
+        type: string
+        description: Project Name
+        default: "scaffold-pwa"
+      instance_url:
+        type: string
+        description: Instance Url
+        default: "https://zzrf-002.dx.commercecloud.salesforce.com"
+      org_id:
+        type: string
+        description: Org Id
+        default: "f_ecom_zzrf_002"
+      short_code:
+        type: string
+        description: Short Code
+        default: "kv7kzm78"
+      client_id:
+        type: string
+        description: Client Id
+      site_id:
+        type: string
+        description: Site Id
+        default: "RefArch"
+      mrt_target_env:
+        type: string
+        description: MRT Targent Environment
+      is_private_client:
+        type: boolean
+        description: Is Private Client?
+        default: true
+      setup_hybrid:
+        type: boolean
+        description: Setup Phased Headless rollout?
+        default: false
+
+jobs:
+  setup-pwa-kit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set environment variable
+        run: |
+          set -e
+          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV 
+          url="${{ github.event.inputs.instance_url }}"
+          hostname=$(echo "$url" | awk -F '://' '{split($2, parts, "/"); print parts[1]}')
+          echo "HOSTNAME=$hostname" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Setup PWA dependencies
+        run: |-
+          set -e
+          sudo apt-get update -yq && sudo apt-get install --no-install-recommends python2 python3-pip time -yq
+          sudo pip install -U pip setuptools
+          sudo pip install awscli==1.18.85 datadog==0.40.1
+          node ./scripts/gtime.js monorepo_install npm ci
+          npm ci
+        shell: bash
+
+      - name: Generate app
+        uses: "./.github/actions/generate_app"
+        with:
+          use_extensibility: ${{ github.event.inputs.use_extensibility }}
+          project_name: ${{ github.event.inputs.project_name }}
+          instance_url: ${{ github.event.inputs.instance_url }}
+          org_id: ${{ github.event.inputs.org_id }}
+          short_code: ${{ github.event.inputs.short_code }}
+          client_id: ${{ github.event.inputs.client_id }}
+          site_id: ${{ github.event.inputs.site_id }}
+          is_private_client: ${{ github.event.inputs.is_private_client }}
+          setup_hybrid: ${{ github.event.inputs.setup_hybrid }}
+          project_dir: ${{ env.PROJECT_DIR }}
+
+      - name: Create MRT credentials file
+        uses: "./.github/actions/create_mrt"
+        with:
+          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+
+      - name: Create MRT Target
+        uses: "./.github/actions/create_mrt_target"
+        with:
+          project_name: ${{ github.event.inputs.project_name }}
+          target_name: ${{ github.event.inputs.mrt_target_env }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+
+      - name: Push Bundle to MRT (E2E Test PWA Kit)
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "../generated-projects/${{ env.PROJECT_DIR }}"
+          TARGET: ${{ github.event.inputs.mrt_target_env }}
+          FLAGS: --wait
+
+      - name: Add proxy config on MRT
+        shell: bash
+        run: |
+          set -e
+          json_data=$(
+            jq -n \
+              --arg shortCode "${{ github.event.inputs.short_code }}" \
+              --arg hostname "${{ env.HOSTNAME }}" \
+              '{
+                ssr_proxy_configs: [
+                  { path: "api", host: ($shortCode + ".api.commercecloud.salesforce.com") },
+                  { path: "ocapi", host: $hostname }
+                ]
+              }'
+          )
+          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" --request PATCH "https://cloud.mobify.com/api/projects/${{ github.event.inputs.project_name }}/target/${{ github.event.inputs.mrt_target_env }}/" \
+          --header "Authorization: Bearer ${{ secrets.MOBIFY_CLIENT_API_KEY }}" \
+          --header "Content-Type: application/json" \
+          --data "$json_data")
+
+          http_status=$(echo "$response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+          response_body=$(echo "$response" | sed -e 's/HTTPSTATUS\:.*//g')
+          if [ "$http_status" -ne 200 ]; then
+            echo "Request failed with status code $http_status"
+            echo "Response body: $response_body"
+            exit 1
+          else
+            echo "Proxy configuration added successfully."
+          fi
