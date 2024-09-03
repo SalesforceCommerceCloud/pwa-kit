@@ -38,9 +38,7 @@ const useDNT = (): dntInfo => {
         setDntNotSet(false)
         await auth.refreshAccessToken()
         if (auth.get('customer_type') == 'registered') {
-            console.log('(JEREMY) this is being hit')
             const daysUntilExpires = Number(auth.get('refresh_token_expires_in')) / 86400
-            console.log('(JEREMY) dayUntilExpires: ', daysUntilExpires)
             Cookies.set('dw_dnt', String(Number(newValue)), {
                 ...getDefaultCookieAttributes(),
                 expires: daysUntilExpires
