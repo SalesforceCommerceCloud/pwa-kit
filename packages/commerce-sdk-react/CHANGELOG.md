@@ -1,3 +1,6 @@
+## v3.0.1 (Sep 03, 2024)
+- Fix Cookie `expires` time [#1993](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1993)
+
 ## v3.0.0 (Aug 07, 2024)
 - Add `meta.displayName` to queries. It can be used to identify queries in performance metrics or logs. [#1895](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1895)
 - Upgrade to commerce-sdk-isomorphic v3.0.0 [#1914](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1914)

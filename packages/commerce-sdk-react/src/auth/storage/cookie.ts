@@ -24,10 +24,45 @@ export class CookieStorage extends BaseStorage {
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = this.getSuffixedKey(key)
-        Cookies.set(suffixedKey, value, {
-            ...getDefaultCookieAttributes(),
-            ...options
-        })
+        const defaultAttributes = getDefaultCookieAttributes()
+
+        const cookieOptions = {
+            ...defaultAttributes,
+            ...options,
+            expires: this.convertSecondsToDate(options?.expires)
+        }
+
+        Cookies.set(suffixedKey, value, cookieOptions)
+    }
+    /**
+     * Converts an expiration time from seconds to a `Date` object.
+     * The `js-cookie` library interprets the `expires` number as days from the current time, whereas the number
+     * provided by SCAPI is in seconds. So, we convert the `expires` number in seconds to a `Date` object to ensure
+     * we use the correct cookie expiration time.
+     *
+     * @param expires - The expiration time for the cookie (in seconds or as a Date object)
+     * @returns A Date instance for the cookie expiration time, or `undefined` for session cookies
+     *
+     * @private
+     */
+    private convertSecondsToDate(expires: number | Date | undefined): Date | undefined {
+        if (typeof expires === 'number') {
+            // Convert seconds to a Date instance
+            return new Date(Date.now() + expires * 1000)
+        }
+
+        if (expires instanceof Date) {
+            return expires
+        }
+
+        if (expires !== undefined) {
+            console.warn(
+                'Invalid "expires" option provided. It must be a number (in seconds) or a Date object.'
+            )
+        }
+
+        // If expires is undefined, it results in a session cookie
+        return undefined
     }
     get(key: string) {
         const suffixedKey = this.getSuffixedKey(key)
