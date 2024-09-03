@@ -4,17 +4,31 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useDNT} from '@salesforce/commerce-sdk-react'
 import Json from '../components/Json'
+const buttonStyle = {
+    backgroundColor: '#007bff', /* Blue background color */
+    color: 'white', /* White text color */
+};
 
 const UseDntHook = () => {
+    const [displayButton, setDisplayButton] = useState(false)
     const {dntNotSet, updateDNT} = useDNT()
     useEffect(() => {
-        updateDNT(true)
-    })
+        if (dntNotSet)
+            setDisplayButton(true)
+    }, [])
 
-    return dntNotSet ? <div> DNT not set </div> : <div> DNT is successfully set </div>
+    return (
+        displayButton ? <button style={buttonStyle} onClick={() => {
+            updateDNT(true)
+            setDisplayButton(false)
+        }} >DNT cookie is not set, click this button to update DNT</button> : <div>
+            DNT cookie is successfully set
+        </div>
+
+    )
 }
 
 UseDntHook.getTemplateName = () => 'UseDntHook'
