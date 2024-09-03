@@ -361,6 +361,13 @@ class Auth {
         store.delete(key)
     }
 
+    private convertSecondsToDate(seconds: number | undefined): Date | undefined {
+        if (typeof seconds === 'number') {
+            return new Date(Date.now() + seconds * 1000)
+        }
+        return undefined
+    }
+
     /**
      * This method stores the TokenResponse object retrived from SLAS, and
      * store the data in storage.
@@ -377,9 +384,10 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+        const expiresDate = this.convertSecondsToDate(res.refresh_token_expires_in)
 
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: res.refresh_token_expires_in
+            expires: expiresDate
         })
     }
 
