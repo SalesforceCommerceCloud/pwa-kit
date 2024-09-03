@@ -47,7 +47,7 @@ describe('useDNT tests', () => {
         })
     })
 
-    it('dw_dnt cookie with expiry time based on refresh token when expireOnBrowserClose not given', async () => {
+    it('dw_dnt cookie with expiry time based on refresh token when preference given', async () => {
         renderHookWithProviders(() => {
             const {dntNotSet, updateDNT} = useDNT()
             dntNotSet // Just to pass linting
@@ -65,7 +65,7 @@ describe('useDNT tests', () => {
         })
     })
 
-    it('dw_dnt cookie is set to 0 when updateDNT(false)', async () => {
+    it('dw_dnt cookie is set to 0 when preference is false', async () => {
         renderHookWithProviders(() => {
             const {dntNotSet, updateDNT} = useDNT()
             dntNotSet // Just to pass linting
