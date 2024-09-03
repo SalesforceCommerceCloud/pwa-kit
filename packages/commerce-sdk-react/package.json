@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/commerce-sdk-react",
-  "version": "3.1.0-dev",
+  "version": "3.1.0-nightly-20240903080159",
   "description": "A library that provides react hooks for fetching data from Commerce Cloud",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/ecom-react-hooks#readme",
   "bugs": {
@@ -45,7 +45,7 @@
     "jwt-decode": "^4.0.0"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "3.8.0-dev",
+    "@salesforce/pwa-kit-dev": "3.8.0-nightly-20240903080159",
     "@tanstack/react-query": "^4.28.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
@@ -60,7 +60,7 @@
     "@types/react-helmet": "~6.1.6",
     "@types/react-router-dom": "~5.3.3",
     "cross-env": "^5.2.1",
-    "internal-lib-build": "3.8.0-dev",
+    "internal-lib-build": "3.8.0-nightly-20240903080159",
     "jsonwebtoken": "^9.0.0",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
