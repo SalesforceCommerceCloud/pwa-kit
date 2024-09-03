@@ -65,27 +65,6 @@ describe('useDNT tests', () => {
         })
     })
 
-    // it('dw_dnt cookie with expiry time based on window when expireOnBrowserClose is true', async () => {
-    //     renderHookWithProviders(() => {
-    //         const {dntNotSet, updateDNT} = useDNT()
-    //         dntNotSet // Just to pass linting
-    //         useEffect(() => {
-    //             void (async () => {
-    //                 await updateDNT({
-    //                     preference: true,
-    //                     expireOnBrowserClose: true
-    //                 })
-    //             })()
-    //         }, [])
-    //     })
-    //     await waitFor(() => {
-    //         expect(mockCookiesSet).toHaveBeenNthCalledWith(1, 'dw_dnt', '1', {
-    //             ...getDefaultCookieAttributes()
-    //         })
-    //         expect(mockCookiesSet).toHaveBeenCalledTimes(1)
-    //     })
-    // })
-
     it('dw_dnt cookie is set to 0 when updateDNT(false)', async () => {
         renderHookWithProviders(() => {
             const {dntNotSet, updateDNT} = useDNT()
