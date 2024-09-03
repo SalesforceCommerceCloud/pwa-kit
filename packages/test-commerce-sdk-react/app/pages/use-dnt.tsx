@@ -14,9 +14,7 @@ const UseDntHook = () => {
         updateDNT(true)
     })
 
-    return (
-        dntNotSet ? <div> DNT not set </div> : <div> DNT is successfully set </div> 
-    )
+    return dntNotSet ? <div> DNT not set </div> : <div> DNT is successfully set </div>
 }
 
 UseDntHook.getTemplateName = () => 'UseDntHook'
