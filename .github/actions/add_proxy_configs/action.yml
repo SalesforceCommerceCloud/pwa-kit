@@ -1,4 +1,4 @@
-name: create_mrt_target
+name: add_proxy_configs
 description: Create MRT Environment
 inputs:
   project_slug:
@@ -31,7 +31,8 @@ runs:
         # Set the output variable (escaping is handled by JSON.stringify)
         echo "proxy_config_json=$proxy_configs" >> $GITHUB_OUTPUT
 
-      - name: Add proxy config on MRT
+      - name: Add proxy configs on MRT
+        id: add_proxy_configs
         shell: bash
         run: |
           set -e
