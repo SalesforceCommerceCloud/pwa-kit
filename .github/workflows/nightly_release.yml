@@ -1,125 +1,121 @@
 name: SalesforceCommerceCloud/pwa-kit/nightly_release
 on:
   workflow_dispatch:
-  schedule:
-    # Run weekdays at 12am (PST) - cron uses UTC times
-    - cron: "0 8 * * 1-5"
+    inputs:
+      use_extensibility:
+        type: boolean
+        description: Use Extensibility?
+        default: true
+      project_name:
+        type: string
+        description: Project Name
+        default: "scaffold-pwa"
+      instance_url:
+        type: string
+        description: Instance Url
+        default: "https://zzrf-002.dx.commercecloud.salesforce.com"
+      org_id:
+        type: string
+        description: Org Id
+        default: "f_ecom_zzrf_002"
+      short_code:
+        type: string
+        description: Short Code
+        default: "kv7kzm78"
+      client_id:
+        type: string
+        description: Client Id
+      site_id:
+        type: string
+        description: Site Id
+        default: "RefArch"
+      mrt_target_env:
+        type: string
+        description: MRT Targent Environment
+      is_private_client:
+        type: boolean
+        description: Is Private Client?
+        default: true
+      setup_hybrid:
+        type: boolean
+        description: Setup Phased Headless rollout?
+        default: false
 
 jobs:
-  create_nightly_release:
+  setup-pwa-kit:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
+      - name: Initialize
+        id: initialize
+        run: |
+          set -e
+          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV
+
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-        
-      - name: Get Timestamp
-        run: |-
-          echo "release_timestamp=$(date +'%Y%m%d%H%M%S')" >> "$GITHUB_ENV"
 
-      - name: Get monorepo version
-        run: |-
-          version=`jq -r ".version" package.json | cut -d "-" -f 1`
-          echo "monorepo_version_base=$version" >> "$GITHUB_ENV"
-          version_major=`echo "$version" | cut -d "." -f 1`
-          echo "monorepo_version_major=$version_major" >> "$GITHUB_ENV"
-          echo "nightly_version=${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}" ?? "$GITHUB_ENV"
-
-      - name: Get nightly version
-        run:  echo "nightly_version=${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}" >> "$GITHUB_ENV"
-
-      - name: Get retail-react-app version
-        run: |-
-          version=`jq -r ".version" packages/template-retail-react-app/package.json | cut -d "-" -f 1`
-          echo "retail_app_version_base=$version" >> "$GITHUB_ENV"
-
-      - name: Get commerce-sdk-react version
-        run: |-
-          version=`jq -r ".version" packages/commerce-sdk-react/package.json | cut -d "-" -f 1`
-          echo "commerce_sdk_react_version_base=$version" >> "$GITHUB_ENV"
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Setup node
+        id: setup_node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: npm
+          cache: "npm"
 
-      - name: Install Monorepo Dependencies
+      - name: Setup PWA dependencies
+        id: setup_pwa_dependencies
         run: |-
-          # Install node dependencies
+          set -e
+          sudo apt-get update -yq && sudo apt-get install --no-install-recommends python2 python3-pip time -yq
+          sudo pip install -U pip setuptools
+          sudo pip install awscli==1.18.85 datadog==0.40.1
           node ./scripts/gtime.js monorepo_install npm ci
+          npm ci
+        shell: bash
 
-      - name: Update identity in git config
-        run: |-
-          git config --global user.name ${{ secrets.GIT_CONFIG_USERNAME }}
-          git config --global user.email ${{ secrets.GIT_CONFIG_EMAIL }}
-
-      - name: Create Release Branch
-        run: |-
-          git pull
-          git switch develop
-          git switch nightly-releases || git switch -c nightly-releases
-
-        # Pull all changes from develop and keep changes from develop in case of merge-conflicts
-      - name: Pull latest changes from develop
-        run: |-
-          git switch develop
-          git merge -s ours nightly-releases
-          git switch nightly-releases
-          git merge develop
-
-      - name: Bump version (monorepo)
-        run: |-
-          npm run bump-version -- "${{ env.nightly_version }}"
-
-      - name: Bump version (retail-react-app)
-        run: |-
-          npm run bump-version:retail-react-app -- "${{ env.retail_app_version_base }}-nightly-${{ env.release_timestamp }}"
-
-      - name: Bump version (commerce-sdk-react)
-        run: |-
-          npm run bump-version:commerce-sdk-react -- "${{ env.commerce_sdk_react_version_base }}-nightly-${{ env.release_timestamp }}"
-
-      - name: Push version changes to origin
-        run: |-
-          git commit -am "Release ${{ env.nightly_version }}"
-          git push --set-upstream origin nightly-releases
-
-      - name: Check Repository Clean
-        uses: "./.github/actions/check_clean"
-
-      - name: Publish to NPM
-        uses: "./.github/actions/publish_to_npm"
+      - name: Generate app
+        id: generate_app
+        uses: "./.github/actions/generate_app"
         with:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          use_extensibility: ${{ github.event.inputs.use_extensibility }}
+          project_name: ${{ github.event.inputs.project_name }}
+          instance_url: ${{ github.event.inputs.instance_url }}
+          org_id: ${{ github.event.inputs.org_id }}
+          short_code: ${{ github.event.inputs.short_code }}
+          client_id: ${{ github.event.inputs.client_id }}
+          site_id: ${{ github.event.inputs.site_id }}
+          is_private_client: ${{ github.event.inputs.is_private_client }}
+          setup_hybrid: ${{ github.event.inputs.setup_hybrid }}
+          project_dir: ${{ env.PROJECT_DIR }}
 
-      - name: Create git tag
-        run: |-
-          git tag v${{ env.nightly_version }}
-          git push origin --tags
-
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        uses: slackapi/slack-github-action@v1.23.0
+      - name: Create MRT credentials file
+        id: create_mrt_credentials
+        uses: "./.github/actions/create_mrt"
         with:
-          payload: |
-            {
-              "message": "Successfully released PWA Kit v${{ env.nightly_version }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v1.23.0
+      - name: Create MRT target
+        id: create_mrt_target
+        uses: "./.github/actions/create_mrt_target"
         with:
-          payload: |
-            {
-              "message": "Failed to release PWA Kit v${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }} (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          project_name: ${{ github.event.inputs.project_name }}
+          target_name: ${{ github.event.inputs.mrt_target_env }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+
+      - name: Push bundle to MRT
+        id: push_bundle
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "../generated-projects/${{ env.PROJECT_DIR }}"
+          TARGET: ${{ github.event.inputs.mrt_target_env }}
+          FLAGS: --wait
+
+      - name: Add proxy config on MRT
+        id: add_proxy_configs
+        uses: "./.github/actions/add_proxy_configs"
+        with:
+          project_slug: ${{ github.event.inputs.project_name }}
+          target_slug: ${{ github.event.inputs.mrt_target_env }}
+          config_file: "../generated-projects/${{ env.PROJECT_DIR }}/config/default.js"
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
