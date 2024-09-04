@@ -392,7 +392,9 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-        const expiresDate = this.convertSecondsToDate(res.refresh_token_expires_in)
+        const expiresDate = res.refresh_token_expires_in
+            ? this.convertSecondsToDate(res.refresh_token_expires_in)
+            : undefined
 
         this.set(refreshTokenKey, res.refresh_token, {
             expires: expiresDate
