@@ -18,7 +18,7 @@ const useStorageHelper = () => {
     const auth = useAuthContext()
 
     return {
-        clearStorage: auth.clearStorage
+        clearStorage: auth.clearStorage.bind(auth)
     }
 }
 
