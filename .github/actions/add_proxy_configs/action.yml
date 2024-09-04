@@ -15,6 +15,7 @@ runs:
   steps:
     - name: Read application config
       id: read_config
+      shell: bash
       run: |
         # Read the JSON object from the JavaScript file
         config=$(node -e "console.log(JSON.stringify(require('${{ inputs.config-path }}')))")
