@@ -17,19 +17,9 @@ runs:
       id: read_config
       shell: bash
       run: |
-        # Read the JSON object from the JavaScript file
+        # Read proxy configs from the default config file
         config=$(node -e "console.log(JSON.stringify(require('${{ inputs.config_file }}')))")
-
-        # Debugging line to check the config
-        echo "Config: $config"
-
-        # Extract the desired part of the JSON
         proxy_configs=$(echo "$config" | jq -c '.ssrParameters.proxyConfigs')
-
-        # Debugging line to check proxy_configs
-        echo "proxy_configs: $proxy_configs"
-
-        # Set the output variable (escaping is handled by JSON.stringify)
         echo "proxy_config_json=$(echo "$proxy_configs" | jq -R .)" >> $GITHUB_OUTPUT
 
     - name: Add proxy configs on MRT
