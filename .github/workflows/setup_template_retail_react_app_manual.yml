@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize
+        id: initialize
         shell: bash
         run: |
           set -e
@@ -17,15 +18,18 @@ jobs:
           echo "MRT_TARGET_NAME=$mrt_target_name" >> $GITHUB_ENV
 
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup node
+        id: setup_node
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: "npm"
 
       - name: Setup PWA dependencies
+        id: setup_pwa_dependencies
         run: |-
           set -e
           sudo apt-get update -yq && sudo apt-get install --no-install-recommends python2 python3-pip time -yq
@@ -36,19 +40,22 @@ jobs:
         shell: bash
 
       - name: Create MRT credentials file
+        id: create_mrt_credentials
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      - name: Create MRT Target
+      - name: Create MRT target
+        id: create_mrt_target
         uses: "./.github/actions/create_mrt_target"
         with:
           project_name: ${{ env.PROJECT_SLUG }}
           target_name: ${{ env.BRANCH_NAME }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      - name: Push Bundle to MRT
+      - name: Push bundle to MRT
+        id: push_bundle
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "packages/template-retail-react-app"
@@ -56,6 +63,7 @@ jobs:
           FLAGS: --wait
 
       - name: Add proxy config on MRT
+        id: add_proxy_configs
         uses: "./.github/actions/add_proxy_configs"
         with:
           project_slug: ${{ env.PROJECT_SLUG }}

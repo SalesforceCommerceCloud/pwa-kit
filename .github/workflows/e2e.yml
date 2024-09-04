@@ -45,21 +45,25 @@ jobs:
   setup-pwa-kit:
     runs-on: ubuntu-latest
     steps:
-      - name: Set environment variable
+      - name: Set environment variables
+        id: set_env_variables
         run: |
           set -e
           echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV
 
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup node
+        id: setup_node
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: "npm"
 
       - name: Setup PWA dependencies
+        id: setup_pwa_dependencies
         run: |-
           set -e
           sudo apt-get update -yq && sudo apt-get install --no-install-recommends python2 python3-pip time -yq
@@ -70,6 +74,7 @@ jobs:
         shell: bash
 
       - name: Generate app
+        id: generate_app
         uses: "./.github/actions/generate_app"
         with:
           use_extensibility: ${{ github.event.inputs.use_extensibility }}
@@ -84,19 +89,22 @@ jobs:
           project_dir: ${{ env.PROJECT_DIR }}
 
       - name: Create MRT credentials file
+        id: create_mrt_credentials
         uses: "./.github/actions/create_mrt"
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Create MRT Target
+        id: create_mrt_target
         uses: "./.github/actions/create_mrt_target"
         with:
           project_name: ${{ github.event.inputs.project_name }}
           target_name: ${{ github.event.inputs.mrt_target_env }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      - name: Push Bundle to MRT (E2E Test PWA Kit)
+      - name: Push Bundle to MRT
+        id: push_bundle
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "../generated-projects/${{ env.PROJECT_DIR }}"
@@ -104,6 +112,7 @@ jobs:
           FLAGS: --wait
 
       - name: Add proxy config on MRT
+        id: add_proxy_configs
         uses: "./.github/actions/add_proxy_configs"
         with:
           project_slug: ${{ github.event.inputs.project_name }}

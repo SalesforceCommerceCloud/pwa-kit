@@ -12,12 +12,13 @@ runs:
   using: composite
   steps:
     - name: Initialize
+      id: initialize
       shell: bash
       run: |
         set -e
         echo "TARGET_API_BASE_URL=https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target" >> $GITHUB_ENV
 
-    - name: Get Target
+    - name: Get target
       id: get_target
       shell: bash
       run: |-
@@ -37,7 +38,7 @@ runs:
           exit 1
         fi
 
-    - name: Create Target
+    - name: Create target
       id: create_target
       if: ${{ steps.get_target.outputs.status == '404' }}
       shell: bash
@@ -56,7 +57,7 @@ runs:
           exit 1
         fi
 
-    - name: Wait For Target To Be Active
+    - name: Wait for target to be active
       id: wait_for_target
       if: ${{ steps.create_target.outputs.status == '201' }}
       shell: bash

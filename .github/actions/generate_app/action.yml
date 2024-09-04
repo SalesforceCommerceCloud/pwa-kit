@@ -26,6 +26,7 @@ runs:
   using: composite
   steps:
     - name: Parse input values
+      id: parse_input
       shell: bash
       run: |
         use_extensibility_input="${{ inputs.use_extensibility }}"
@@ -53,6 +54,7 @@ runs:
         echo "SETUP_HYBRID_VALUE=$setup_hybrid_value" >> $GITHUB_ENV
 
     - name: Build project generator inputs
+      id: build_generator_inputs
       shell: bash
       run: |
         echo '{
@@ -100,13 +102,15 @@ runs:
             }
         ] }' > generator-responses.json
 
-    - name: Generate new project
+    - name: Generate project
+      id: generate_project
       run: |
         cat generator-responses.json
         node e2e/scripts/generate-project.js --project-config "$(jq -c . generator-responses.json)"
       shell: bash
 
-    - name: Build Generated PWA
+    - name: Build generated project
+      id: build_generated_project
       working-directory: ../generated-projects/${{ inputs.project_dir }}
       run: |-
         npm ci
