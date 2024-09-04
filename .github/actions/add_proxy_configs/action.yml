@@ -40,8 +40,7 @@ runs:
         response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" --request PATCH "https://cloud.mobify.com/api/projects/${{ inputs.project_slug }}/target/${{ inputs.target_slug }}/" \
         --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
         --header "Content-Type: application/json" \
-        --data '${{ steps.read_config.outputs.proxy_config_json }}')
-
+        --data "{\"ssr_proxy_configs\": ${steps.read_config.outputs.proxy_config_json}}")
         http_status=$(echo "$response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
         response_body=$(echo "$response" | sed -e 's/HTTPSTATUS\:.*//g')
         if [ "$http_status" -ne 200 ]; then
