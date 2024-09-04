@@ -10,6 +10,12 @@ import {
 } from '../../ssr/server/constants'
 import {defaultPwaKitSecurityHeaders} from './security'
 
+jest.mock('../ssr-config', () => {
+    return {
+        getConfig: () => {}
+    }
+})
+
 describe('Content-Security-Policy enforcement', () => {
     let res
 

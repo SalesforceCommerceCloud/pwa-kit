@@ -6,6 +6,12 @@
  */
 import {once, RemoteServerFactory} from './build-remote-server'
 
+jest.mock('../../utils/ssr-config', () => {
+    return {
+        getConfig: () => {}
+    }
+})
+
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
         const fn = jest.fn(() => ({test: 'test'}))
