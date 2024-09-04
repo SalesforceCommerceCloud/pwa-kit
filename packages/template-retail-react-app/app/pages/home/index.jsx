@@ -45,6 +45,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
+import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 /**
  * This is the home page for Retail React App.
@@ -56,6 +57,8 @@ const Home = () => {
     const intl = useIntl()
     const einstein = useEinstein()
     const {pathname} = useLocation()
+    const logout = useAuthHelper(AuthHelpers.Logout)
+
 
     const {res} = useServerContext()
     if (res) {
@@ -88,7 +91,11 @@ const Home = () => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
-
+            <button
+                onClick={async () => {
+                    await logout.mutateAsync()
+                }}
+            >logout</button>
             <Hero
                 title={intl.formatMessage({
                     defaultMessage: 'The React PWA Starter Store for Retail',

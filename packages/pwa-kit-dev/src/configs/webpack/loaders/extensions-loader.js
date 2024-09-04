@@ -10,6 +10,9 @@ import dedent from 'dedent'
 import {kebabToUpperCamelCase} from '../utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
+const APP_EXTENSION_PREFIX = 'extension'
+
+const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
 
 /**
  * The `extensions-loader` is used to return all configured extensions for a given pwa-kit
@@ -23,9 +26,22 @@ const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
 module.exports = function () {
-    // NOTE: We need to account for extensions being tuples. Here we assume it's a simple
-    // string that is the npm package name.
+    // TODO: We need to account for extensions being tuples. Here we assume it's a simple
+    // string that is the npm package name, the only expectation is that the package name starts with `extension-`,
+    // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the 
+    // extensions configuration array when we add support for the tupal config format.
     const {extensions = []} = getConfig()?.app || {}
+
+    // Ensure that only valid extension names are loaded.
+    const extensionDetails = extensions
+        .map((extension) => extension.match(nameRegex))
+        .filter(Boolean)
+        .map(([_, namespace, name]) => ({
+            instanceVariable: kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`),
+            modulePath: `${
+                namespace ? `@${namespace}/` : ''
+            }${APP_EXTENSION_PREFIX}-${name}/${APP_EXTENSION_CLIENT_ENTRY}`
+        }))
 
     return dedent`
             /*
@@ -35,22 +51,18 @@ module.exports = function () {
             * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
             */
             // Extension Imports
-            ${extensions
+            ${extensionDetails
                 .map(
-                    (extension) =>
-                        `import ${kebabToUpperCamelCase(
-                            extension.split('/')[1]
-                        )} from '${extension}/${APP_EXTENSION_CLIENT_ENTRY}'`
+                    ({instanceVariable, modulePath}) =>
+                        `import ${instanceVariable} from '${modulePath}'`
                 )
                 .join('\n            ')}
             
             export default [
-                ${extensions
-                    .map((extension) => {
+                ${extensionDetails
+                    .map(({instanceVariable}) => {
                         const config = {} // TODO: Parse config config here.
-                        return `new ${kebabToUpperCamelCase(
-                            extension.split('/')[1]
-                        )}(${JSON.stringify(config)})`
+                        return `new ${instanceVariable}(${JSON.stringify(config)})`
                     })
                     .join(',\n                ')}
             ]

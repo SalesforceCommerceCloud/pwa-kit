@@ -35,9 +35,6 @@ const main = () => {
             `${babel} --config-file ${babelConfig} src -x ".js",".jsx",".ts",".tsx" --ignore "**/test_fixtures/*","*.test.js","test.js" --out-dir dist --copy-files`
         )
         execSync(`node ${prepareDist}`)
-
-        // Conditionally run tsc if a typescript config exists. We typically do this to extract types from our SDK.
-        const productDir = process.cwd().split(p.sep).at(-1)
     })
 
     program

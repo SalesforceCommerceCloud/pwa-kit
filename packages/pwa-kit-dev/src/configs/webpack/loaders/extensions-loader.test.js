@@ -11,7 +11,12 @@ import dedent from 'dedent'
 
 const mockConfig = {
     app: {
-        extensions: ['@salesforce/extension-this', '@salesforce/extension-that']
+        extensions: [
+            '@salesforce/extension-this',
+            '@salesforce/extension-that',
+            '@companyx/extension-another',
+            'extension-this'
+        ]
     }
 }
 
@@ -35,12 +40,16 @@ describe('Extenion Loader', () => {
             * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
             */
             // Extension Imports
-            import ExtensionThis from '@salesforce/extension-this/setup-app'
-            import ExtensionThat from '@salesforce/extension-that/setup-app'
+            import SalesforceThis from '@salesforce/extension-this/setup-app'
+            import SalesforceThat from '@salesforce/extension-that/setup-app'
+            import CompanyxAnother from '@companyx/extension-another/setup-app'
+            import This from 'extension-this/setup-app'
 
             export default [
-                new ExtensionThis({}),
-                new ExtensionThat({})
+                new SalesforceThis({}),
+                new SalesforceThat({}),
+                new CompanyxAnother({}),
+                new This({})
             ]
         `)
     })

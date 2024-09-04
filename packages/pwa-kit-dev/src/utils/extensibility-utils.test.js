@@ -85,7 +85,7 @@ describe('extensibilityUtils', () => {
         ;[
             {
                 name: 'returns an empty object if undefined is passed',
-                extensions: [],
+                extensions: undefined,
                 expected: {}
             },
             {
