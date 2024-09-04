@@ -253,7 +253,7 @@ export const render = async (req, res, next) => {
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
-    const basepath = AppConfig.getBasePath?.({req, res}) || ''
+    const basepath = AppConfig.getBasePath?.({req, res})?.replace(/\/$/, '') || ''
     return (
         <ServerContext.Provider value={{req, res}}>
             <Router location={location} context={routerContext} basename={basepath}>

@@ -44,7 +44,7 @@ export const registerServiceWorker = (url) => {
 export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
-    const basepath = AppConfig.getBasePath?.({req: undefined, res: undefined}) || ''
+    const basepath = AppConfig.getBasePath?.({req, res})?.replace(/\/$/, '') || ''
 
     return (
         <ServerContext.Provider value={{}}>
