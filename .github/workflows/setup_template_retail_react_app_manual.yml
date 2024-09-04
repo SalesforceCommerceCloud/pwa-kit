@@ -51,7 +51,7 @@ jobs:
         uses: "./.github/actions/create_mrt_target"
         with:
           project_name: ${{ env.PROJECT_SLUG }}
-          target_name: ${{ env.BRANCH_NAME }}
+          target_name: ${{ env.MRT_TARGET_NAME }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push bundle to MRT
