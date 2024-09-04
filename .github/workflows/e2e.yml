@@ -1,55 +1,21 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
   workflow_dispatch:
-    inputs:
-      use_extensibility:
-        type: boolean
-        description: Use Extensibility?
-        default: true
-      project_name:
-        type: string
-        description: Project Name
-        default: "scaffold-pwa"
-      instance_url:
-        type: string
-        description: Instance Url
-        default: "https://zzrf-002.dx.commercecloud.salesforce.com"
-      org_id:
-        type: string
-        description: Org Id
-        default: "f_ecom_zzrf_002"
-      short_code:
-        type: string
-        description: Short Code
-        default: "kv7kzm78"
-      client_id:
-        type: string
-        description: Client Id
-      site_id:
-        type: string
-        description: Site Id
-        default: "RefArch"
-      mrt_target_env:
-        type: string
-        description: MRT Targent Environment
-      is_private_client:
-        type: boolean
-        description: Is Private Client?
-        default: true
-      setup_hybrid:
-        type: boolean
-        description: Setup Phased Headless rollout?
-        default: false
 
 jobs:
   setup-pwa-kit:
     runs-on: ubuntu-latest
     steps:
-      - name: Set environment variables
-        id: set_env_variables
+      - name: Initialize
+        id: initialize
+        shell: bash
         run: |
           set -e
-          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV
+          echo "PROJECT_SLUG=scaffold-pwa" >> $GITHUB_ENV 
+          branch_name="${GITHUB_REF##*/}"
+          # Trim using cut as MRT target name is limited to 19 chars
+          mrt_target_name=$(echo "$branch_name" | cut -c 1-19)
+          echo "MRT_TARGET_NAME=$mrt_target_name" >> $GITHUB_ENV
 
       - name: Checkout
         id: checkout
@@ -73,21 +39,6 @@ jobs:
           npm ci
         shell: bash
 
-      - name: Generate app
-        id: generate_app
-        uses: "./.github/actions/generate_app"
-        with:
-          use_extensibility: ${{ github.event.inputs.use_extensibility }}
-          project_name: ${{ github.event.inputs.project_name }}
-          instance_url: ${{ github.event.inputs.instance_url }}
-          org_id: ${{ github.event.inputs.org_id }}
-          short_code: ${{ github.event.inputs.short_code }}
-          client_id: ${{ github.event.inputs.client_id }}
-          site_id: ${{ github.event.inputs.site_id }}
-          is_private_client: ${{ github.event.inputs.is_private_client }}
-          setup_hybrid: ${{ github.event.inputs.setup_hybrid }}
-          project_dir: ${{ env.PROJECT_DIR }}
-
       - name: Create MRT credentials file
         id: create_mrt_credentials
         uses: "./.github/actions/create_mrt"
@@ -95,27 +46,27 @@ jobs:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      - name: Create MRT Target
+      - name: Create MRT target
         id: create_mrt_target
         uses: "./.github/actions/create_mrt_target"
         with:
-          project_name: ${{ github.event.inputs.project_name }}
-          target_name: ${{ github.event.inputs.mrt_target_env }}
+          project_name: ${{ env.PROJECT_SLUG }}
+          target_name: ${{ env.BRANCH_NAME }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      - name: Push Bundle to MRT
+      - name: Push bundle to MRT
         id: push_bundle
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/${{ env.PROJECT_DIR }}"
-          TARGET: ${{ github.event.inputs.mrt_target_env }}
+          CWD: "packages/template-retail-react-app"
+          TARGET: ${{ env.MRT_TARGET_NAME }}
           FLAGS: --wait
 
       - name: Add proxy config on MRT
         id: add_proxy_configs
         uses: "./.github/actions/add_proxy_configs"
         with:
-          project_slug: ${{ github.event.inputs.project_name }}
-          target_slug: ${{ github.event.inputs.mrt_target_env }}
-          config_file: "../generated-projects/${{ env.PROJECT_DIR }}/config/default.js"
+          project_slug: ${{ env.PROJECT_SLUG }}
+          target_slug: ${{ env.MRT_TARGET_NAME }}
+          config_file: "./packages/template-retail-react-app/config/default.js"
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
