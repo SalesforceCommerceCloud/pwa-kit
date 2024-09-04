@@ -70,6 +70,7 @@ type AuthDataKeys =
     | 'refresh_token_guest'
     | 'refresh_token_registered'
     | 'access_token_sfra'
+    | 'dw_dnt'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -157,6 +158,10 @@ const DATA_MAP: AuthDataMap = {
     access_token_sfra: {
         storageType: 'cookie',
         key: 'cc-at'
+    },
+    dw_dnt: {
+        storageType: 'cookie',
+        key: 'dw_dnt'
     }
 }
 
@@ -179,7 +184,7 @@ class Auth {
     private clientSecret: string
     private silenceWarnings: boolean
     private logger: Logger
-    defaultDnt: boolean | undefined
+    private defaultDnt: boolean | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.

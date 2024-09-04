@@ -9,24 +9,31 @@ import {waitFor} from '@testing-library/react'
 import Cookies from 'js-cookie'
 import useDNT from './useDNT'
 import useAuthContext from './useAuthContext'
+import useConfig from './useConfig'
 import {getDefaultCookieAttributes} from '../utils'
 import {renderHookWithProviders} from '../test-utils'
 
 jest.mock('js-cookie')
 jest.mock('./useAuthContext')
+jest.mock('./useConfig')
 jest.mock('../auth')
 const mockedUseAuthContext = useAuthContext as jest.MockedFunction<typeof Object>
+const mockedUseConfig = useConfig as jest.MockedFunction<typeof Object>
 const mockCookiesSet = jest.spyOn(Cookies, 'set')
 
 describe('useDNT tests', () => {
     beforeEach(() => {
         mockedUseAuthContext.mockReset()
+        mockedUseConfig.mockReset()
         mockedUseAuthContext.mockReturnValueOnce({
             refreshAccessToken: jest.fn(),
             get: (param: string) => {
                 if (param === 'customer_type') return 'registered'
                 if (param === 'refresh_token_expires_in') return 7776000
             }
+        })
+        mockedUseConfig.mockReturnValueOnce({
+            defaultDnt: true
         })
         Cookies.get = jest.fn().mockImplementationOnce(() => '1')
     })
@@ -90,9 +97,9 @@ describe('useDNT tests', () => {
             get: (something: string) => {
                 if (something === 'customer_type') return 'guest'
                 if (something === 'refresh_token_expires_in') return 2592000
-            },
-            defaultDnt: true
+            }
         })
+
         Cookies.get = jest.fn().mockImplementationOnce(() => '1')
         renderHookWithProviders(() => {
             const {dntNotSet, updateDNT} = useDNT()
@@ -113,12 +120,15 @@ describe('useDNT tests', () => {
 
     it('dw_dnt cookie value is SLAS default if preference is null and defaultDnt is not given', async () => {
         mockedUseAuthContext.mockReset()
+        mockedUseConfig.mockReset()
         mockedUseAuthContext.mockReturnValueOnce({
             refreshAccessToken: jest.fn(),
             get: (something: string) => {
                 if (something === 'customer_type') return 'guest'
                 if (something === 'refresh_token_expires_in') return 2592000
-            },
+            }
+        })
+        mockedUseConfig.mockReturnValueOnce({
             defaultDnt: undefined
         })
         Cookies.get = jest.fn().mockImplementationOnce(() => '1')
