@@ -19,9 +19,7 @@ import {
  * This hook will return all the location search params pertinant
  * to shopper context.
  */
-export const useShopperContextSearchParams = (
-    arraySearchParams = SHOPPER_CONTEXT_ARRAY_FIELDS
-) => {
+export const useShopperContextSearchParams = (arraySearchParams = SHOPPER_CONTEXT_ARRAY_FIELDS) => {
     const {search} = useLocation()
     const searchParamsObj = new URLSearchParams(search)
 
