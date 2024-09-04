@@ -13,29 +13,24 @@ on:
       instance_url:
         type: string
         description: Instance Url
-        default: "https://zzrf-002.dx.commercecloud.salesforce.com"
       org_id:
         type: string
         description: Org Id
-        default: "f_ecom_zzrf_002"
       short_code:
         type: string
         description: Short Code
-        default: "kv7kzm78"
       client_id:
         type: string
         description: Client Id
       site_id:
         type: string
         description: Site Id
-        default: "RefArch"
       mrt_target_env:
         type: string
         description: MRT Target Environment
       is_private_client:
         type: boolean
         description: Is Private Client?
-        default: true
       setup_hybrid:
         type: boolean
         description: Setup Phased Headless rollout?
