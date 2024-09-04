@@ -1,3 +1,6 @@
+## v4.0.1 (Sept 4, 2024)
+- Updated @salesforce/commerce-sdk-react to 3.0.1 to fix an issue with the expires attribute of cookies, ensuring it uses seconds instead of days [#1994](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1994)
+
 ## v4.0.0 (Aug 7, 2024)
 
 ### New Features

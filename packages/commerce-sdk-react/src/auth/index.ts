@@ -362,20 +362,19 @@ class Auth {
     }
 
     /**
-     * Converts a duration in seconds to a JavaScript Date object or undefined.
+     * Converts a duration in seconds to a JavaScript Date object.
      *
-     * This function takes a number representing the number of seconds and returns
-     * a Date object that represents the current time plus the specified duration.
-     * If the input is `undefined`, it returns `undefined`.
+     * This function takes a number representing seconds and returns a Date object
+     * for the current time plus the given duration. If the input is `undefined` or
+     * not a number, it returns `undefined`.
      *
-     * When used in conjunction with `js-cookie`, if the `expires` attribute is
-     * `undefined`, a session cookie is created. A session cookie is stored only
-     * for the duration of the browser session and is deleted when the browser is closed.
+     * When used with `js-cookie`, if `undefined` is passed for the `expires` cookie attribute,
+     * a session cookie is created, which expires when the browser is closed.
      *
      * @param {number | undefined} seconds - The number of seconds to add to the current time,
-     *                                        or `undefined` if no expiration number is provided.
-     * @returns {Date | undefined} - A Date object representing the expiration time, or `undefined`
-     *                                if the input is `undefined`.
+     *                                        or `undefined` to create a session cookie.
+     * @returns {Date | undefined} - A Date object for the expiration time, or `undefined`
+     *                                if the input is invalid.
      */
     private convertSecondsToDate(seconds: number | undefined): Date | undefined {
         if (typeof seconds === 'number') {
