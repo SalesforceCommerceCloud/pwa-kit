@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-pwa-kit:
+  setup-template-retail-react-app:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize
