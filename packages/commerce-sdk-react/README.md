@@ -404,6 +404,26 @@ useEncUserId() => {encUserId: String, getEncUserIdWhenReady: Promise}
 useUsid() => {usid: String, getUsidWhenReady: Promise}
 ```
 
+### `useStorageHelper()`
+
+This hook exposes helper functions to interact with data stored in local/cookie/memory storage
+
+Currently, the available helpers are:
+ * clearStorage: clears all data that the commerce-sdk-react sets in local/cookie storage
+
+```jsx
+import {useStorageHelper} from '@salesforce/commerce-sdk-react'
+
+const Example = (props) => {
+    // Typescript IDE intellisense for available options
+    const {clearStorage} = useStorageHelper()
+
+    clearStorage()
+
+    return (...)
+}
+```
+
 ## Roadmap
 
 -   Optimistic update support

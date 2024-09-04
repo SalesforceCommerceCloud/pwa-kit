@@ -24,7 +24,6 @@ import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {Logger} from './types'
 import {MOBIFY_PATH, SLAS_PRIVATE_PROXY_PATH} from './constant'
-
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
