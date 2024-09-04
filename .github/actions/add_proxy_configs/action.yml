@@ -31,22 +31,22 @@ runs:
         # Set the output variable (escaping is handled by JSON.stringify)
         echo "proxy_config_json=$proxy_configs" >> $GITHUB_OUTPUT
 
-      - name: Add proxy configs on MRT
-        id: add_proxy_configs
-        shell: bash
-        run: |
-          set -e
-          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" --request PATCH "https://cloud.mobify.com/api/projects/${{ inputs.project_slug }}/target/${{ inputs.target_slug }}/" \
-          --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
-          --header "Content-Type: application/json" \
-          --data '${{ steps.read_config.outputs.proxy_config_json }}')
+    - name: Add proxy configs on MRT
+      id: add_proxy_configs
+      shell: bash
+      run: |
+        set -e
+        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" --request PATCH "https://cloud.mobify.com/api/projects/${{ inputs.project_slug }}/target/${{ inputs.target_slug }}/" \
+        --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
+        --header "Content-Type: application/json" \
+        --data '${{ steps.read_config.outputs.proxy_config_json }}')
 
-          http_status=$(echo "$response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-          response_body=$(echo "$response" | sed -e 's/HTTPSTATUS\:.*//g')
-          if [ "$http_status" -ne 200 ]; then
-            echo "Request failed with status code $http_status"
-            echo "Response body: $response_body"
-            exit 1
-          else
-            echo "Proxy configuration added successfully."
-          fi
+        http_status=$(echo "$response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+        response_body=$(echo "$response" | sed -e 's/HTTPSTATUS\:.*//g')
+        if [ "$http_status" -ne 200 ]; then
+          echo "Request failed with status code $http_status"
+          echo "Response body: $response_body"
+          exit 1
+        else
+          echo "Proxy configuration added successfully."
+        fi
