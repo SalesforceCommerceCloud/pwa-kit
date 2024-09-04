@@ -18,7 +18,7 @@ runs:
       shell: bash
       run: |
         # Read the JSON object from the JavaScript file
-        config=$(node -e "console.log(JSON.stringify(require('${{ inputs.config-path }}')))")
+        config=$(node -e "console.log(JSON.stringify(require('${{ inputs.config_file }}')))")
 
         # Debugging line to check the config
         echo "Config: $config"
