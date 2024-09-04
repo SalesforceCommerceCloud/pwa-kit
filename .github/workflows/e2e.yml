@@ -103,6 +103,14 @@ jobs:
           target_name: ${{ github.event.inputs.mrt_target_env }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
+      - name: Push Bundle to MRT
+        id: push_bundle
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "../generated-projects/${{ env.PROJECT_DIR }}"
+          TARGET: ${{ github.event.inputs.mrt_target_env }}
+          FLAGS: --wait
+
       - name: Add proxy config on MRT
         id: add_proxy_configs
         uses: "./.github/actions/add_proxy_configs"
