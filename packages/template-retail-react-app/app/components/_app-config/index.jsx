@@ -71,12 +71,6 @@ const AppConfig = ({children, locals = {}}) => {
             // enablePWAKitPrivateClient={true}
             OCAPISessionsURL={`${appOrigin}${proxyBasePath}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
-            customStorageValues={{
-                session_timeout: {
-                    storageType: 'local',
-                    key: 'session_timeout'
-                }
-            }}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider theme={theme}>{children}</ChakraProvider>

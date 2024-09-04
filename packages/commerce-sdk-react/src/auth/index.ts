@@ -39,9 +39,6 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
-    customStorageValues?: {
-        [key: string]: AuthStorageObject
-    }
 }
 
 interface JWTHeaders {
@@ -74,13 +71,14 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'access_token_sfra'
 
-export type AuthStorageObject = {
-    storageType: StorageType
-    key: string
-    callback?: (storage: BaseStorage) => void
-}
-
-type AuthDataMap = Record<AuthDataKeys, AuthStorageObject>
+type AuthDataMap = Record<
+    AuthDataKeys,
+    {
+        storageType: StorageType
+        key: string
+        callback?: (storage: BaseStorage) => void
+    }
+>
 
 const isParentTrusted = isOriginTrusted(getParentOrigin())
 
@@ -182,7 +180,6 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
-    private customStorageValues: {[key: string]: AuthStorageObject} | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -263,21 +260,6 @@ class Auth {
               config.clientSecret || ''
 
         this.silenceWarnings = config.silenceWarnings || false
-
-        if (config.customStorageValues) {
-            const dataMapKeys = Object.keys(DATA_MAP)
-            this.customStorageValues = {}
-            Object.keys(config.customStorageValues).forEach((key) => {
-                if (dataMapKeys.includes(key)) {
-                    this.logWarning(
-                        `Please choose a different name for ${key} as it is already used by the commerce-sdk-react package`
-                    )
-                } else {
-                    // @ts-ignore TODO: fix this
-                    this.customStorageValues[key] = config.customStorageValues[key]
-                }
-            })
-        }
     }
 
     get(name: AuthDataKeys) {
@@ -293,48 +275,14 @@ class Auth {
         DATA_MAP[name].callback?.(storage)
     }
 
-    // TODO: potentially update `name` type to ensure its a key of the custom keys
-    // TODO: potentially implement more guardrails
-    getCustomValue(name: string) {
-        if (this.customStorageValues && this.customStorageValues[name]) {
-            const {key, storageType} = this.customStorageValues[name]
-            const storage = this.stores[storageType]
-            return storage.get(key)
-        }
-    }
-
-    setCustomValue(name: string, value: string, options?: unknown) {
-        if (this.customStorageValues && this.customStorageValues[name]) {
-            const {key, storageType} = this.customStorageValues[name]
-            const storage = this.stores[storageType]
-            storage.set(key, value, options)
-            this.customStorageValues[name].callback?.(storage)
-        }
-    }
-
-    deleteCustomValue(name: string) {
-        if (this.customStorageValues && this.customStorageValues[name]) {
-            const {key, storageType} = this.customStorageValues[name]
-            const storage = this.stores[storageType]
-            return storage.delete(key)
-        }
-    }
-
     clearStorage() {
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
         keys.forEach((keyName) => {
-            // TODO: potentially create private helper `delete` method
             const {key, storageType} = DATA_MAP[keyName]
             const store = this.stores[storageType]
             store.delete(key)
         })
-
-        if (this.customStorageValues) {
-            Object.keys(this.customStorageValues).forEach((key) => {
-                this.deleteCustomValue(key)
-            })
-        }
     }
 
     /**

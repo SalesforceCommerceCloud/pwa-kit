@@ -14,13 +14,9 @@ import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-dat
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useQuery} from '@tanstack/react-query'
 import {
-    AuthHelpers,
-    useAuthHelper,
     useAccessToken,
     useCategory,
-    useShopperBasketsMutation,
-    useCustomStorage,
-    useCustomerType
+    useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
@@ -136,52 +132,6 @@ const App = (props) => {
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
-
-    const {isGuest} = useCustomerType()
-    const auth = useCustomStorage()
-
-    const loginGuestUser = useAuthHelper(AuthHelpers.LoginGuestUser)
-    const logout = useAuthHelper(AuthHelpers.Logout)
-
-    const handleSessionTimeout = async (sessionTimeout) => {
-        let shouldSetTimeout = true
-        if (auth.getCustomValue('session_timeout')) {
-            const localStorageTimeout = Number(auth.getCustomValue('session_timeout'))
-            if (Date.now() > localStorageTimeout) {
-                if (isGuest) {
-                    auth.clearStorage()
-                    await loginGuestUser.mutateAsync()
-                } else {
-                    await logout.mutateAsync()
-                }
-            } else {
-                shouldSetTimeout = false
-            }
-        }
-
-        if (shouldSetTimeout) {
-            auth.setCustomValue('session_timeout', (Date.now() + sessionTimeout).toString())
-            initSessionTimeoutCallback(sessionTimeout)
-        }
-    }
-
-    const initSessionTimeoutCallback = (sessionTimeout) => {
-        if (!auth.getCustomValue('session_timeout')) {
-            return
-        }
-
-        let timeRemaining = Number(auth.getCustomValue('session_timeout')) - Date.now()
-        if (timeRemaining < 0) {
-            timeRemaining = 0
-        }
-
-        setTimeout(() => {
-            void handleSessionTimeout(sessionTimeout)
-        }, timeRemaining)
-    }
-
-    // timeout of 30 seconds for testing
-    handleSessionTimeout(30000)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {
