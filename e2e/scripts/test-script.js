@@ -10,7 +10,6 @@ const main = async (opts) => {
         process.exit(1);
     }
 
-    // Handle the arguments
     if (projectKey) {
         console.log('Project Key:', projectKey);
     }
@@ -18,7 +17,7 @@ const main = async (opts) => {
     if (projectConfig) {
         console.log('Project Config:', projectConfig);
     }
-    
+
 };
 
 // Define the program with description and arguments
