@@ -28,7 +28,7 @@ const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
 module.exports = function () {
     // TODO: We need to account for extensions being tuples. Here we assume it's a simple
     // string that is the npm package name, the only expectation is that the package name starts with `extension-`,
-    // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the 
+    // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the
     // extensions configuration array when we add support for the tupal config format.
     const {extensions = []} = getConfig()?.app || {}
 
