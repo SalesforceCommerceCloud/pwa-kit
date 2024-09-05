@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |-
         set -e
-        proxy_config_json=$(echo "${{ inputs.proxy_configs }}" | jq -R .)
+        proxy_config_json=$(echo "${{ inputs.proxy_configs }}" | jq -r .)
         response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/" \
           --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
           --header "Content-Type: application/json" \
