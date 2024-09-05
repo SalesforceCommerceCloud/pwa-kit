@@ -1,339 +1,50 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
   workflow_dispatch:
-  schedule:
-    # Run every day at 12am (PST) - cron uses UTC times
-    - cron: "0 8 * * *"
 
 jobs:
-  run-generator-demo:
-    strategy:
-      fail-fast: false
-      matrix:
-        # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [16, 18, 20]
-        npm: [8, 9, 10]
-        exclude: # node 16 is not compatible with npm 10
-          - node: 16
-            npm: 10
+  setup-template-retail-react-app:
     runs-on: ubuntu-latest
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Initialize
+        id: initialize
+        shell: bash
+        run: |
+          set -e
+          echo "PROJECT_ID=scaffold-pwa" >> $GITHUB_ENV 
+          branch_name="${GITHUB_REF##*/}"
+          # Trim using cut as MRT target name is limited to 19 chars
+          mrt_target_id=$(echo "$branch_name" | cut -c 1-19)
+          echo "MRT_TARGET_ID=mrt_target_id" >> $GITHUB_ENV
 
-      - name: Setup Node
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        id: setup_node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
-          cache: npm
+          node-version: 18
+          cache: "npm"
 
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
+      - name: Setup PWA dependencies
+        id: setup_pwa_dependencies
         run: |-
-          npm install -g npm@${{ matrix.npm }}
-
-      - name: Install Monorepo Dependencies
-        run: |-
-          # Install node dependencies
+          set -e
+          sudo apt-get update -yq && sudo apt-get install --no-install-recommends python2 python3-pip time -yq
+          sudo pip install -U pip setuptools
+          sudo pip install awscli==1.18.85 datadog==0.40.1
           node ./scripts/gtime.js monorepo_install npm ci
+          npm ci
+        shell: bash
 
-      - name: Generate Retail App Demo
-        uses: ./.github/actions/e2e_generate_app
+      - name: Deploy app
+        id: deploy_app
+        uses: "./.github/actions/deploy_app"
         with:
-          PROJECT_KEY: "retail-app-demo"
-
-      - name: Validate Generated Retail App Demo
-        uses: ./.github/actions/e2e_validate_generated_app
-        with:
-          PROJECT_KEY: "retail-app-demo"
-  run-generator-retail-app-no-ext:
-    strategy:
-      fail-fast: false
-      # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
-      max-parallel: 1
-      matrix:
-        node: [16, 18, 20]
-        npm: [8, 9, 10]
-        exclude: # node 16 is not compatible with npm 10
-          - node: 16
-            npm: 10
-    runs-on: ubuntu-latest
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-          cache: npm
-
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
-          npm install -g npm@${{ matrix.npm }}
-
-      - name: Install Monorepo Dependencies
-        run: |-
-          # Install node dependencies
-          node ./scripts/gtime.js monorepo_install npm ci
-
-      - name: Generate Retail App Without Extensibility
-        uses: ./.github/actions/e2e_generate_app
-        with:
-          PROJECT_KEY: "retail-app-no-ext"
-
-      - name: Validate Retail App Without Extensibility
-        uses: ./.github/actions/e2e_validate_generated_app
-        with:
-          PROJECT_KEY: "retail-app-no-ext"
-
-      - name: Create MRT credentials file
-        uses: "./.github/actions/create_mrt"
-        with:
+          project_id: ${{ env.project_id }}
+          target_id: ${{ env.mrt_target_id }}
+          project_dir: "packages/template-retail-react-app"
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push Bundle to MRT (E2E Test PWA Kit)
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "../generated-projects/retail-app-no-ext"
-          TARGET: e2e-tests-pwa-kit
-          FLAGS: --wait
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      - name: Run Playwright tests
-        run: npm run test:e2e
-  notify-slack-pwa-no-ext:
-    needs: [run-generator-retail-app-no-ext]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit no-ext E2E tests passed!"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit no-ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  run-generator-retail-app-ext:
-    # Run after the previous job completes irrespective of its result
-    if: ${{ always() }}
-    needs: [run-generator-retail-app-no-ext]
-    strategy:
-      fail-fast: false
-      # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
-      max-parallel: 1
-      matrix:
-        node: [16, 18, 20]
-        npm: [8, 9, 10]
-        exclude: # node 16 is not compatible with npm 10
-          - node: 16
-            npm: 10
-    runs-on: ubuntu-latest
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-          cache: npm
-
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
-          npm install -g npm@${{ matrix.npm }}
-
-      - name: Install Monorepo Dependencies
-        run: |-
-          # Install node dependencies
-          node ./scripts/gtime.js monorepo_install npm ci
-
-      - name: Generate Retail App With Extensibility
-        uses: ./.github/actions/e2e_generate_app
-        with:
-          PROJECT_KEY: "retail-app-ext"
-
-      - name: Validated Generated Retail App Demo
-        uses: ./.github/actions/e2e_validate_generated_app
-        with:
-          PROJECT_KEY: "retail-app-ext"
-
-      - name: Create MRT credentials file
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push Bundle to MRT (E2E Test PWA Kit)
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "../generated-projects/retail-app-ext"
-          TARGET: e2e-tests-pwa-kit
-          FLAGS: --wait
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      - name: Run Playwright tests
-        run: npm run test:e2e
-
-  notify-slack-pwa-ext:
-    needs: [run-generator-retail-app-ext]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit ext E2E tests passed!"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  run-generator-private-client:
-    strategy:
-      fail-fast: false
-      # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
-      max-parallel: 1
-      matrix:
-        # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [16, 18, 20]
-        npm: [8, 9, 10]
-        exclude: # node 16 is not compatible with npm 10
-          - node: 16
-            npm: 10
-    runs-on: ubuntu-latest
-    env:
-      # The "default" npm is the one that ships with a given version of node.
-      # For more: https://nodejs.org/en/download/releases/
-      # (We also use this env var for making sure a step runs once for the current node version)
-      # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
-          npm install -g npm@${{ matrix.npm }}
-
-      - name: Install Monorepo Dependencies
-        run: |-
-          # Install node dependencies
-          node ./scripts/gtime.js monorepo_install npm ci
-
-      - name: Generate Retail App Private Client
-        uses: ./.github/actions/e2e_generate_app
-        with:
-          PROJECT_KEY: "retail-app-private-client"
-
-      - name: Create MRT credentials file
-        uses: "./.github/actions/create_mrt"
-        with:
-          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push Bundle to MRT
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "../generated-projects/retail-app-private-client"
-          TARGET: e2e-pwa-kit-private
-          FLAGS: --wait
-
-      - name: Set Retail App Private Client Home
-        run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      - name: Run Playwright tests
-        run: npm run test:e2e
-
-  notify-slack-pwa-private-client:
-    needs: [run-generator-private-client]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit Private Client E2E tests passed!"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-private-client.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit Private Client E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
