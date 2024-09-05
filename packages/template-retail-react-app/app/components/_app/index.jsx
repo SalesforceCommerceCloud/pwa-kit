@@ -17,7 +17,6 @@ import {
     useAccessToken,
     useCategory,
     useShopperBasketsMutation,
-    useShopperContext,
     useShopperContextsMutation,
     useUsid
 } from '@salesforce/commerce-sdk-react'
@@ -56,7 +55,6 @@ import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useQueryClient} from '@tanstack/react-query'
 import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
 
 // HOCs
@@ -70,7 +68,6 @@ import {
     watchOnlineStatus,
     flatten,
     isServer,
-    isHydrated
 } from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
@@ -143,7 +140,6 @@ const App = (props) => {
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
-    const queryClient = useQueryClient()
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {
         isOpen: isOpenStoreLocator,
@@ -242,43 +238,7 @@ const App = (props) => {
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const deleteShopperContext = useShopperContextsMutation('deleteShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
-    const {data: shopperContext} = useShopperContext(
-        {
-            parameters: {usid: usid, siteId: site.id}
-        },
-        {
-            enabled: !isServer,
-            onError: async () => {
-                await createShopperContext.mutateAsync({
-                    parameters: {usid, siteId: site.id},
-                    body: {}
-                })
-            }
-        }
-    )
-    console.log('shopperContext', shopperContext)
-    const updateShopperContextObj = useShopperContextSearchParams()
-
-    useEffect(() => {
-        const executeShopperContextUpdate = async () => {
-            // update the shopper context if the query string contains the relevant search parameters
-            console.log('updating shoppercontext', updateShopperContextObj)
-            await updateShopperContext.mutateAsync({
-                parameters: {usid, siteId: site.id},
-                body: updateShopperContextObj
-            })
-            // Refresh to update the data on the page
-            refetchDataOnClient()
-        }
-        executeShopperContextUpdate()
-    }, [location.search])
-
-    useEffect(() => {
-        console.log('isHydrated()', isHydrated())
-        if (isHydrated()) {
-            refetchDataOnClient()
-        }
-    }, [])
+    useShopperContextSearchParams(site.id)
 
     useEffect(() => {
         // Lets automatically close the mobile navigation when the
@@ -323,10 +283,6 @@ const App = (props) => {
     useEffect(() => {
         trackPage()
     }, [location])
-
-    const refetchDataOnClient = () => {
-        queryClient.invalidateQueries()
-    }
 
     return (
         <Box className="sf-app" {...styles.container}>
