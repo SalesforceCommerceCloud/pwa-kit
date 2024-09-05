@@ -96,6 +96,6 @@ jobs:
         with:
           project_id: ${{ github.event.inputs.project_id }}
           target_id: ${{ github.event.inputs.mrt_target_id }}
-          project_dir: "../generated/${{ env.PROJECT_DIR }}"
+          project_dir: "../generated-projects/${{ env.PROJECT_DIR }}"
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
