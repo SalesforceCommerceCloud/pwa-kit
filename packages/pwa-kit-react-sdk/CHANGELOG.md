@@ -1,6 +1,7 @@
 ## v3.8.0-dev (Aug 08, 2024)
 
-- Add support for environment level base paths [#1970](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1970)
+- Add support for environment level base paths, a new configuration option `envBasePath` [#1970](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1970)
+- Add support for React Router level base paths, a new `getBasePath` method to the `AppConfig` component [#1988](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1988)
 
 ## v3.7.0 (Aug 07, 2024)
 - Add `beforeHydrate` option to withReactQuery component [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)

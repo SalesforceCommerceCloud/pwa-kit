@@ -146,7 +146,13 @@ export const render = async (req, res, next) => {
     let route
     let match
 
-    routes.some((_route) => {
+    const basepath = AppConfig.getBasePath?.({req, res})?.replace(/\/$/, '') || ''
+    routes.some((r) => {
+        let _route = {...r}
+        if (basepath && _route?.path) {
+            _route.path = `${basepath}${_route.path}`
+        }
+
         const _match = matchPath(req.path, _route)
         if (_match) {
             match = _match
@@ -158,7 +164,7 @@ export const render = async (req, res, next) => {
 
     // Step 2 - Get the component
     res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'start')
-    const component = await route.component.getComponent()
+    const component = match ? await route.component.getComponent() : Throw404
     res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'end')
 
     // Step 3 - Init the app state
@@ -247,9 +253,10 @@ export const render = async (req, res, next) => {
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
+    const basepath = AppConfig.getBasePath?.({req, res})?.replace(/\/$/, '') || ''
     return (
         <ServerContext.Provider value={{req, res}}>
-            <Router location={location} context={routerContext}>
+            <Router location={location} context={routerContext} basename={basepath}>
                 <CorrelationIdProvider
                     correlationId={res.locals.requestId}
                     resetOnPageChange={false}
