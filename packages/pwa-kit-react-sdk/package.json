@@ -2,6 +2,7 @@
   "name": "@salesforce/pwa-kit-react-sdk",
   "version": "4.0.0-dev",
   "description": "A library that supports the isomorphic React rendering pipeline for Commerce Cloud Managed Runtime apps",
+  "types": "dist/index.d.ts",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-react-sdk#readme",
   "bugs": {
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
@@ -21,7 +22,7 @@
     "storefront-preview"
   ],
   "scripts": {
-    "build": "cross-env NODE_ENV=production internal-lib-build build",
+    "build": "cross-env NODE_ENV=production internal-lib-build build & tsc",
     "build:watch": "nodemon --watch 'src/**' --exec 'npm run build'",
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
@@ -54,6 +55,9 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
+    "@types/hoist-non-react-statics": "~3.3.5",
+    "@types/react": "~18.2.0",
+    "@types/react-dom": "~18.2.1",
     "internal-lib-build": "4.0.0-dev",
     "node-html-parser": "^3.3.6",
     "nodemon": "^2.0.22",

@@ -22,6 +22,8 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {buildAliases} from '../../utils/extensibility-utils'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -37,6 +39,8 @@ const INSPECT = process.execArgv.some((arg) => /^--inspect(?:-brk)?(?:$|=)/.test
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
+const {app: appConfig} = getConfig()
+const hasExtensions = appConfig?.extensions && appConfig?.extensions.length > 0
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -209,6 +213,9 @@ const baseConfig = (target) => {
                         : {}),
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
+                        // Create alias's for all the extensions as they are being imported from the SDK package and cannot be
+                        // resolved from that location.
+                        ...buildAliases(appConfig?.extensions),
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
@@ -276,6 +283,13 @@ const baseConfig = (target) => {
                             enforce: 'pre',
                             use: {
                                 loader: findDepInStack('source-map-loader')
+                            }
+                        },
+                        {
+                            test: /universal\/extensibility\/extensions/,
+                            loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extensions-loader`,
+                            options: {
+                                projectDir
                             }
                         }
                     ].filter(Boolean)
@@ -571,7 +585,7 @@ const requestProcessor =
 // Don't mistake this with the concept of extensions for Webpack.
 const extensions =
     mode === 'production'
-        ? (pkg.mobify?.app?.extensions || [])
+        ? (appConfig?.extensions || [])
               .map((extension) => {
                   const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/setup-server`
                   const foundType = ['ts', 'js'].find((type) =>

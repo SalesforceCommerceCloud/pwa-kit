@@ -23,10 +23,12 @@ import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {getAssetUrl} from '../universal/utils'
+import {applyAppExtensions} from '../universal/extensibility/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
-import Document from '../universal/components/_document'
 import App from '../universal/components/_app'
+import Document from '../universal/components/_document'
+import extensions from '../universal/extensibility/extensions'
 import Throw404 from '../universal/components/throw-404'
 
 import {getAppConfig} from '../universal/compatibility'
@@ -34,7 +36,6 @@ import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import logger from '../../utils/logger-instance'
-
 import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
 
 const CWD = process.cwd()
@@ -129,8 +130,15 @@ export const render = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
+    // Use locals to thread the application extensions through the rendering pipeline.
+    res.locals.appExtensions = extensions
+
+    let WrappedApp = routeComponent(App, false, res.locals)
+
+    // Initialize all the react app extensions.
+    WrappedApp = applyAppExtensions(WrappedApp, extensions)
+
     const routes = getRoutes(res.locals)
-    const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname] = req.originalUrl.split('?')
 

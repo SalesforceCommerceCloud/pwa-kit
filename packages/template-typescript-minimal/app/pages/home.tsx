@@ -6,6 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
+import {Link} from 'react-router-dom'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'

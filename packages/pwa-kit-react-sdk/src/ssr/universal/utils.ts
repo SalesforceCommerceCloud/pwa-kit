@@ -4,11 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
 /**
  * @module progressive-web-sdk/ssr/universal/utils
  */
+
+// @ts-ignore
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
+// @ts-ignore
 import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import hoistNonReactStatics from 'hoist-non-react-statics'
 
 const onClient = typeof window !== 'undefined'
 
@@ -19,9 +24,10 @@ const onClient = typeof window !== 'undefined'
  * @function
  * @returns {string}
  */
-export const getAssetUrl = (path) => {
+export const getAssetUrl = (path: string) => {
     /* istanbul ignore next */
     const publicPath = onClient
+        // @ts-ignore
         ? `${window.Progressive.buildOrigin}`
         : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
     return path ? `${publicPath}${path}` : publicPath
@@ -47,9 +53,30 @@ export const getAssetUrl = (path) => {
  */
 export const getProxyConfigs = () => {
     const configs = onClient
+        // @ts-ignore
         ? (window.Progressive.ssrOptions || {}).proxyConfigs || []
+        // @ts-ignore
         : proxyConfigs
 
     // Clone to avoid accidental mutation of important configuration variables.
-    return configs.map((config) => ({...config}))
+    return configs.map((config: any) => ({...config}))
+}
+
+
+/**
+ * Applies a series of Higher-Order Components (HOCs) to a given React component.
+ *
+ * @template T - The type of the React component.
+ * @param {T} Component - The React component to which the HOCs will be applied.
+ * @param {Array<(component: T) => T>} hocs - An array of Higher-Order Components (HOCs) to apply to the component.
+ * @returns {T} - The React component wrapped with the provided HOCs.
+ */
+export const applyHOCs = <T extends React.ComponentType<any>>(
+    Component: T,
+    hocs: Array<(component: T) => T>
+): T => {
+    return hocs.reduce((AccumulatedComponent, hoc) => {
+        const WrappedComponent = hoc(AccumulatedComponent);
+        return hoistNonReactStatics(WrappedComponent, AccumulatedComponent) as T
+    }, Component)
 }
