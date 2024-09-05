@@ -25,10 +25,10 @@ runs:
       id: read_config
       shell: bash
       run: |
-        # Read proxy configs from the default config file
+        # Read proxy configs from the default config file using Node.js
         config=$(node -e "console.log(JSON.stringify(require('${{ inputs.project_dir }}/config/default.js')))")
-        proxy_configs=$(echo "$config" | jq -c '.ssrParameters.proxyConfigs')
-        echo "proxy_config_json=$(echo "$proxy_configs" | jq -R .)" >> $GITHUB_OUTPUT
+        # Extract proxyConfigs as a JSON string
+        echo "proxy_configs=$(echo "$config" | jq -c '.ssrParameters.proxyConfigs')" >> $GITHUB_OUTPUT
 
     - name: Create MRT target
       id: create_mrt_target
@@ -36,8 +36,9 @@ runs:
       with:
         project_id: ${{ inputs.project_id }}
         target_id: ${{ inputs.target_id }}
-        proxy_configs: ${{ steps.read_config.outputs.proxy_config_json }}
+        proxy_configs: ${{ steps.read_config.outputs.proxy_configs }}
         mobify_api_key: ${{ inputs.mobify_api_key }}
+
 
     - name: Push bundle to MRT
       id: push_bundle

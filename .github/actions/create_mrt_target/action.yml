@@ -46,16 +46,20 @@ runs:
       shell: bash
       run: |-
         set -e
+        proxy_config_json=$(echo "${{ inputs.proxy_configs }}" | jq -R .)
         response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/" \
-            --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
-            --header "Content-Type: application/json" \
-            --data "{\"name\": \"${{ inputs.target_id }}\", \"slug\": \"${{ inputs.target_id }}\", \"ssr_proxy_configs\": ${{ inputs.proxy_configs }}}")
-  
-        http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+          --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
+          --header "Content-Type: application/json" \
+          --data "{\"name\": \"${{ inputs.target_id }}\", \"slug\": \"${{ inputs.target_id }}\", \"ssr_proxy_configs\": $proxy_config_json}")
+
+        http_status=$(echo "$response" | sed -n 's/.*HTTPSTATUS://p')
+        response_body=$(echo "$response" | sed -e 's/HTTPSTATUS:.*//g')
+
         echo "status=$http_status" >> $GITHUB_OUTPUT
 
         if [ "$http_status" -ne 201 ]; then
           echo "Request failed with status code $http_status"
+          echo "Response Body: $response_body"
           exit 1
         fi
 
