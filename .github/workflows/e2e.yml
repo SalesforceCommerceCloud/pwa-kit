@@ -43,8 +43,8 @@ jobs:
         id: deploy_app
         uses: "./.github/actions/deploy_app"
         with:
-          project_id: ${{ env.project_id }}
-          target_id: ${{ env.mrt_target_id }}
+          project_id: ${{ env.PROJECT_ID }}
+          target_id: ${{ env.MRT_TARGET_ID }}
           project_dir: "./packages/template-retail-react-app"
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
