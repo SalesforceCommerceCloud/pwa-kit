@@ -7,7 +7,11 @@
 
 import {useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
-import {useUsid, useShopperContext, useShopperContextsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useUsid,
+    useShopperContext,
+    useShopperContextsMutation
+} from '@salesforce/commerce-sdk-react'
 import {isServer, isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 import {useQueryClient} from '@tanstack/react-query'
 
@@ -23,21 +27,19 @@ import {
  * This hook will set the shopper context when search params pertinant
  * to shopper context are present.
  */
-export const useShopperContextSearchParams = (siteId, arraySearchParams = SHOPPER_CONTEXT_ARRAY_FIELDS) => {
+export const useShopperContextSearchParams = (siteId) => {
     const {usid} = useUsid()
     const queryClient = useQueryClient()
     const {search} = useLocation()
-    const searchParamsObj = new URLSearchParams(search)
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
     const {data: shopperContext} = useShopperContext(
-        {
-            parameters: {usid, siteId}
-        },
+        {parameters: {usid, siteId}},
         {enabled: !isServer}
     )
     console.log('shopperContext', shopperContext)
-    const updatedShopperContext = getShopperContextSearchParams(searchParamsObj, arraySearchParams)
+    const updateShopperContextObj = getShopperContextSearchParams(search)
+
     const refetchDataOnClient = () => {
         queryClient.invalidateQueries()
     }
@@ -55,15 +57,16 @@ export const useShopperContextSearchParams = (siteId, arraySearchParams = SHOPPE
     }, [shopperContext])
 
     useEffect(() => {
+        console.warn('jinsu', search)
         const executeUpdateShopperContext = async () => {
             // update the shopper context if the query string contains the relevant search parameters
             await updateShopperContext.mutateAsync({
-                parameters: {usid, siteId: siteId},
-                body: updatedShopperContext
+                parameters: {usid, siteId},
+                body: updateShopperContextObj
             })
             // Refresh to update the data on the page
             refetchDataOnClient()
-            console.log('updated shopperContext', updatedShopperContext)
+            console.log('updated shopperContext', updateShopperContextObj)
         }
         executeUpdateShopperContext()
     }, [search])
@@ -76,7 +79,11 @@ export const useShopperContextSearchParams = (siteId, arraySearchParams = SHOPPE
     }, [])
 }
 
-export const getShopperContextSearchParams = (searchParamsObj, arraySearchParams = SHOPPER_CONTEXT_ARRAY_FIELDS) => {
+export const getShopperContextSearchParams = (
+    search,
+    arraySearchParams = SHOPPER_CONTEXT_ARRAY_FIELDS
+) => {
+    const searchParamsObj = new URLSearchParams(search)
     const getSearchParam = (key, isList = false) =>
         searchParamsObj.has(key)
             ? {[key]: isList ? searchParamsObj.getAll(key) : searchParamsObj.get(key)}

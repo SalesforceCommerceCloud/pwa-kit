@@ -19,6 +19,9 @@ import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import * as constants from '@salesforce/retail-react-app/app/constants'
 
 jest.mock('../../hooks/use-multi-site', () => jest.fn())
+jest.mock('../../hooks/use-shopper-context-search-params', () => ({
+    useShopperContextSearchParams: jest.fn()
+}))
 
 let windowSpy
 let originalValue

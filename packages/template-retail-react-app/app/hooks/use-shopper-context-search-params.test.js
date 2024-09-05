@@ -7,39 +7,98 @@
 
 import React from 'react'
 import {Router} from 'react-router'
+import {useShopperContext, useShopperContextsMutation} from '@salesforce/commerce-sdk-react'
 
-import {render} from '@testing-library/react'
+import {renderHook} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
+import {
+    useShopperContextSearchParams,
+    getShopperContextSearchParams
+} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
 
-const MockComponent = () => {
-    const params = useShopperContextSearchParams()
+const siteId = 'my-cool-site'
+const usid = 'test-usid'
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useUsid: jest.fn().mockReturnValue({usid}),
+        useShopperContext: jest.fn(),
+        useShopperContextsMutation: jest.fn()
+    }
+})
 
-    return (
-        <script data-testid="search-params" type="application/json">
-            {JSON.stringify(params)}
-        </script>
-    )
-}
+const createShopperContextMutateAsync = jest.fn()
+const updateShopperContextMutateAsync = jest.fn()
+useShopperContextsMutation.mockImplementation((param) => {
+    if (param === 'createShopperContext') {
+        return {mutateAsync: createShopperContextMutateAsync}
+    } else if (param === 'updateShopperContext') {
+        return {mutateAsync: updateShopperContextMutateAsync}
+    }
+})
 
-describe('The useShopperContextSearchParams', () => {
-    test('returns an empty object when no shopper context search params are present in the url.', () => {
+jest.mock('@tanstack/react-query', () => {
+    const invalidateQueries = jest.fn()
+    return {
+        useQueryClient: jest.fn(() => ({
+            invalidateQueries
+        }))
+    }
+})
+
+afterEach(() => {
+    jest.clearAllMocks()
+})
+
+describe('useShopperContextSearchParams', () => {
+    test('creates an empty shopper context when useShopperContext returns undefined', () => {
         const history = createMemoryHistory()
         history.push('/test/path')
+        const wrapper = ({children}) => <Router history={history}>{children}</Router>
 
-        const wrapper = render(
-            <Router history={history}>
-                <MockComponent />
-            </Router>
-        )
-
-        expect(wrapper.getByTestId('search-params').text).toBe('{}')
+        useShopperContext.mockReturnValue({data: undefined})
+        renderHook(() => useShopperContextSearchParams(siteId), {wrapper})
+        expect(useShopperContext).toHaveBeenCalledTimes(1)
+        expect(createShopperContextMutateAsync).toHaveBeenCalledWith({
+            parameters: {siteId, usid},
+            body: {}
+        })
     })
 
-    test('returns an object with the parsed search params.', () => {
+    test('does not create shopper context when useShopperContext returns data', () => {
         const history = createMemoryHistory()
-        history.push(
-            '/test/path?sourceCode=instagram&effectiveDateTime=2024-09-04T00:00:00Z' +
+        history.push('/test/path')
+        const wrapper = ({children}) => <Router history={history}>{children}</Router>
+
+        useShopperContext.mockReturnValue({data: {}})
+        renderHook(() => useShopperContextSearchParams(siteId), {wrapper})
+        expect(useShopperContext).toHaveBeenCalledTimes(1)
+        expect(createShopperContextMutateAsync).not.toHaveBeenCalled()
+    })
+
+    test('updates shopper context with the parsed search params', () => {
+        const history = createMemoryHistory()
+        history.push('/test/path?sourceCode=instagram&customerGroupIds=BigSpenders')
+        const wrapper = ({children}) => <Router history={history}>{children}</Router>
+
+        renderHook(() => useShopperContextSearchParams(siteId), {wrapper})
+        expect(updateShopperContextMutateAsync).toHaveBeenCalledWith({
+            parameters: {usid, siteId},
+            body: {sourceCode: 'instagram', customerGroupIds: ['BigSpenders']}
+        })
+    })
+})
+
+describe('getShopperContextSearchParams', () => {
+    test('returns an empty object when no shopper context search params are present in the search', () => {
+        const shopperContextObj = getShopperContextSearchParams('')
+        expect(shopperContextObj).toEqual({})
+    })
+
+    test('returns an object with the parsed search params', () => {
+        const shopperContextObj = getShopperContextSearchParams(
+            '?sourceCode=instagram&effectiveDateTime=2024-09-04T00:00:00Z' +
                 // Customer Group IDs
                 '&customerGroupIds=BigSpenders&customerGroupIds=MobileUsers' +
                 // Custom Qualifiers
@@ -48,13 +107,7 @@ describe('The useShopperContextSearchParams', () => {
                 '&store=boston'
         )
 
-        const wrapper = render(
-            <Router history={history}>
-                <MockComponent />
-            </Router>
-        )
-
-        expect(JSON.parse(wrapper.getByTestId('search-params').text)).toEqual({
+        expect(shopperContextObj).toEqual({
             sourceCode: 'instagram',
             effectiveDateTime: '2024-09-04T00:00:00Z',
             customQualifiers: {
