@@ -34,25 +34,28 @@ export const useShopperContextSearchParams = (siteId, arraySearchParams = SHOPPE
         {
             parameters: {usid, siteId}
         },
-        {
-            enabled: !isServer,
-            onError: async () => {
-                await createShopperContext.mutateAsync({
-                    parameters: {usid, siteId},
-                    body: {}
-                })
-            }
-        }
+        {enabled: !isServer}
     )
     console.log('shopperContext', shopperContext)
     const updatedShopperContext = getShopperContextSearchParams(searchParamsObj, arraySearchParams)
-    console.log('updatedshopperContext', updatedShopperContext)
     const refetchDataOnClient = () => {
         queryClient.invalidateQueries()
     }
 
     useEffect(() => {
-        const executeShopperContextUpdate = async (usid, siteId, updatedShopperContext) => {
+        const executeCreateShopperContext = async () => {
+            await createShopperContext.mutateAsync({
+                parameters: {usid, siteId},
+                body: {}
+            })
+        }
+        if (!shopperContext) {
+            executeCreateShopperContext()
+        }
+    }, [shopperContext])
+
+    useEffect(() => {
+        const executeUpdateShopperContext = async () => {
             // update the shopper context if the query string contains the relevant search parameters
             await updateShopperContext.mutateAsync({
                 parameters: {usid, siteId: siteId},
@@ -60,8 +63,9 @@ export const useShopperContextSearchParams = (siteId, arraySearchParams = SHOPPE
             })
             // Refresh to update the data on the page
             refetchDataOnClient()
+            console.log('updated shopperContext', updatedShopperContext)
         }
-        executeShopperContextUpdate(usid, siteId, updatedShopperContext)
+        executeUpdateShopperContext()
     }, [search])
 
     useEffect(() => {
