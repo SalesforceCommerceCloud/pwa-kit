@@ -15,7 +15,7 @@ jobs:
           branch_name="${GITHUB_REF##*/}"
           # Trim using cut as MRT target name is limited to 19 chars
           mrt_target_id=$(echo "$branch_name" | cut -c 1-19)
-          echo "MRT_TARGET_ID=mrt_target_id" >> $GITHUB_ENV
+          echo "MRT_TARGET_ID=$mrt_target_id" >> $GITHUB_ENV
 
       - name: Checkout
         id: checkout

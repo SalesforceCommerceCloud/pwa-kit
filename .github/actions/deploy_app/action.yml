@@ -28,7 +28,10 @@ runs:
         # Read proxy configs from the default config file using Node.js
         config=$(node -e "console.log(JSON.stringify(require('${{ inputs.project_dir }}/config/default.js')))")
         # Extract proxyConfigs as a JSON string
-        echo "proxy_configs=$(echo "$config" | jq -c '.ssrParameters.proxyConfigs')" >> $GITHUB_OUTPUT
+        temp=$(echo "$config" | jq -c '.ssrParameters.proxyConfigs')
+        echo "config=$temp"
+        echo "proxy_configs=$temp" >> $GITHUB_OUTPUT
+         
 
     - name: Create MRT target
       id: create_mrt_target
