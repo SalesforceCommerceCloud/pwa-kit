@@ -366,6 +366,21 @@ class Auth {
     }
 
     /**
+     * Converts a duration in seconds to a Date object.
+     * This function takes a number representing seconds and returns a Date object
+     * for the current time plus the given duration.
+     *
+     * @param {number} seconds - The number of seconds to add to the current time.
+     * @returns {Date} A Date object for the expiration time.
+     */
+    private convertSecondsToDate(seconds: number): Date {
+        if (typeof seconds !== 'number') {
+            throw new Error('The refresh_token_expires_in seconds parameter must be a number.')
+        }
+        return new Date(Date.now() + seconds * 1000)
+    }
+
+    /**
      * This method stores the TokenResponse object retrived from SLAS, and
      * store the data in storage.
      */
@@ -381,9 +396,12 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+        const expiresDate = res.refresh_token_expires_in
+            ? this.convertSecondsToDate(res.refresh_token_expires_in)
+            : undefined
 
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: res.refresh_token_expires_in
+            expires: expiresDate
         })
     }
 

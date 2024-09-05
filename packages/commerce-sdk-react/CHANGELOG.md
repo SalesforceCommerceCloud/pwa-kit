@@ -3,6 +3,9 @@
 - Add `defaultDnt` to support setting the dnt flag for SLAS. Upgrade `commerce-sdk-isomorphic` to v3.1.1 [#1979](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1979)
 - Add `useStorageHelper` hook [#1990](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1990)
 
+## v3.0.1 (Sep 04, 2024)
+- Fixed an issue where the `expires` attribute in cookies, ensuring it uses seconds instead of days. [#1994](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1994)
+
 ## v3.0.0 (Aug 07, 2024)
 - Add `meta.displayName` to queries. It can be used to identify queries in performance metrics or logs. [#1895](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1895)
 - Upgrade to commerce-sdk-isomorphic v3.0.0 [#1914](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1914)
