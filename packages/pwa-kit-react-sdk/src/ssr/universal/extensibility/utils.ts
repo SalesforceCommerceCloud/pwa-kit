@@ -11,12 +11,14 @@ import {IApplicationExtension} from './types'
 
 /**
  * Given the provided Application, apply all the App extensions to it.
- * 
- * @param App 
+ *
+ * @param App
  */
-export const applyAppExtensions = (App: React.ComponentType, extensions: IApplicationExtension[]): React.ComponentType  => {
+export const applyAppExtensions = (
+    App: React.ComponentType,
+    extensions: IApplicationExtension[]
+): React.ComponentType => {
     const extendAppHocs = extensions.map(({extendApp}) => extendApp).filter(Boolean)
-    
+
     return applyHOCs(App, extendAppHocs)
 }
-    
