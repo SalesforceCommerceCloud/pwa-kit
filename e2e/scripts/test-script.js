@@ -18,8 +18,7 @@ const main = async (opts) => {
     if (projectConfig) {
         console.log('Project Config:', projectConfig);
     }
-
-    // Add your main logic here
+    
 };
 
 // Define the program with description and arguments
