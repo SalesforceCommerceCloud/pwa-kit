@@ -404,7 +404,7 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  */
 export const getRoutes = (locals = {}) => {
     let _routes = routes
-    let {appExtensions = []} = locals
+    const {appExtensions = []} = locals
     if (typeof routes === 'function') {
         _routes = routes()
     }
