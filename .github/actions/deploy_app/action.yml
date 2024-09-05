@@ -34,8 +34,8 @@ runs:
       id: create_mrt_target
       uses: "./.github/actions/create_mrt_target"
       with:
-        project_name: ${{ inputs.project_id }}
-        target_name: ${{ inputs.target_id }}
+        project_id: ${{ inputs.project_id }}
+        target_id: ${{ inputs.target_id }}
         proxy_configs: ${{ steps.read_config.outputs.proxy_config_json }}
         mobify_api_key: ${{ inputs.mobify_api_key }}
 
