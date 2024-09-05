@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'// import hoistNonReactStatic from 'hoist-non-react-statics'
+import React from 'react'
 
 // Define a type for the HOC props
 type WithRedBorderProps = React.ComponentPropsWithoutRef<any>;

@@ -7,7 +7,6 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const p = require('path')
-const fs = require('fs')
 const program = require('commander')
 const sh = require('shelljs')
 const {execSync: _execSync} = require('child_process')
