@@ -6,9 +6,9 @@ on:
         type: boolean
         description: Use Extensibility?
         default: true
-      project_name:
+      project_id:
         type: string
-        description: Project Name
+        description: Project ID/Name
         default: "scaffold-pwa"
       instance_url:
         type: string
@@ -25,9 +25,9 @@ on:
       site_id:
         type: string
         description: Site Id
-      mrt_target_env:
+      mrt_target_id:
         type: string
-        description: MRT Target Environment
+        description: MRT Target ID/Name
       is_private_client:
         type: boolean
         description: Is Private Client?
@@ -73,7 +73,7 @@ jobs:
         uses: "./.github/actions/generate_app"
         with:
           use_extensibility: ${{ github.event.inputs.use_extensibility }}
-          project_name: ${{ github.event.inputs.project_name }}
+          project_id: ${{ github.event.inputs.project_id }}
           instance_url: ${{ github.event.inputs.instance_url }}
           org_id: ${{ github.event.inputs.org_id }}
           short_code: ${{ github.event.inputs.short_code }}
@@ -83,34 +83,12 @@ jobs:
           setup_hybrid: ${{ github.event.inputs.setup_hybrid }}
           project_dir: ${{ env.PROJECT_DIR }}
 
-      - name: Create MRT credentials file
-        id: create_mrt_credentials
-        uses: "./.github/actions/create_mrt"
+      - name: Deploy app
+        id: deploy_app
+        uses: "./.github/actions/deploy_app"
         with:
+          project_id: ${{ github.event.inputs.project_id }}
+          target_id: ${{ github.event.inputs.mrt_target_id }}
+          project_dir: ${{ env.PROJECT_DIR }}
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Create MRT target
-        id: create_mrt_target
-        uses: "./.github/actions/create_mrt_target"
-        with:
-          project_name: ${{ github.event.inputs.project_name }}
-          target_name: ${{ github.event.inputs.mrt_target_env }}
-          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-
-      - name: Push bundle to MRT
-        id: push_bundle
-        uses: "./.github/actions/push_to_mrt"
-        with:
-          CWD: "../generated-projects/${{ env.PROJECT_DIR }}"
-          TARGET: ${{ github.event.inputs.mrt_target_env }}
-          FLAGS: --wait
-
-      - name: Add proxy config on MRT
-        id: add_proxy_configs
-        uses: "./.github/actions/add_proxy_configs"
-        with:
-          project_slug: ${{ github.event.inputs.project_name }}
-          target_slug: ${{ github.event.inputs.mrt_target_env }}
-          config_file: "../generated-projects/${{ env.PROJECT_DIR }}/config/default.js"
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}

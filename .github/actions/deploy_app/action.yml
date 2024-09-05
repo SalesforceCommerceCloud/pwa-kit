@@ -1,0 +1,48 @@
+name: deploy_app
+description: Deploy application to MRT
+inputs:
+  project_id:
+    description: MRT Project ID
+  target_id:
+    description: MRT Target ID
+  project_dir:
+    description: Project Directory
+  mobify_user:
+    description: "Mobify user email"
+  mobify_api_key:
+    description: "Mobify user API key"
+runs:
+  using: composite
+  steps:
+    - name: Create MRT credentials file
+      id: create_mrt_credentials
+      uses: "./.github/actions/create_mrt"
+      with:
+        mobify_user: ${{ inputs.mobify_user }}
+        mobify_api_key: ${{ inputs.mobify_api_key }}
+
+    - name: Read application config
+      id: read_config
+      shell: bash
+      run: |
+        # Read proxy configs from the default config file
+        config=$(node -e "console.log(JSON.stringify(require('${{ inputs.project_dir }}/config/default.js')))")
+        proxy_configs=$(echo "$config" | jq -c '.ssrParameters.proxyConfigs')
+        echo "proxy_config_json=$(echo "$proxy_configs" | jq -R .)" >> $GITHUB_OUTPUT
+
+    - name: Create MRT target
+      id: create_mrt_target
+      uses: "./.github/actions/create_mrt_target"
+      with:
+        project_name: ${{ inputs.project_id }}
+        target_name: ${{ inputs.target_id }}
+        proxy_configs: ${{ steps.read_config.outputs.proxy_config_json }}
+        mobify_api_key: ${{ inputs.mobify_api_key }}
+
+    - name: Push bundle to MRT
+      id: push_bundle
+      uses: "./.github/actions/push_to_mrt"
+      with:
+        CWD: ${{ inputs.project_dir }}
+        TARGET: ${{ inputs.target_id }}
+        FLAGS: --wait

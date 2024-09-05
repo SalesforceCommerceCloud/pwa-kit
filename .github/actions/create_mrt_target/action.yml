@@ -1,10 +1,12 @@
 name: create_mrt_target
 description: Create MRT Environment
 inputs:
-  project_name:
-    description: "MRT Project Name"
-  target_name:
-    description: "MRT Environment/Target Name"
+  project_id:
+    description: "MRT Project ID"
+  target_id:
+    description: "MRT Target ID"
+  proxy_configs:
+    description: "Proxy Configs"
   mobify_api_key:
     description: "Mobify user API key"
 
@@ -16,14 +18,14 @@ runs:
       shell: bash
       run: |
         set -e
-        echo "TARGET_API_BASE_URL=https://cloud.mobify.com/api/projects/${{ inputs.project_name }}/target" >> $GITHUB_ENV
+        echo "TARGET_API_BASE_URL=https://cloud.mobify.com/api/projects/${{ inputs.project_id }}/target" >> $GITHUB_ENV
 
     - name: Get target
       id: get_target
       shell: bash
       run: |-
         set -e
-        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/${{ inputs.target_name }}" \
+        response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/${{ inputs.target_id }}" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
 
         http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
@@ -47,8 +49,8 @@ runs:
         response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}" \
             --header "Content-Type: application/json" \
-            --data "{\"name\": \"${{ inputs.target_name }}\", \"slug\": \"${{ inputs.target_name }}\"}")
-
+            --data "{\"name\": \"${{ inputs.target_id }}\", \"slug\": \"${{ inputs.target_id }}\", \"ssr_proxy_configs\": ${{ inputs.proxy_configs }}}")
+  
         http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
         echo "status=$http_status" >> $GITHUB_OUTPUT
 
@@ -68,7 +70,7 @@ runs:
         attempts=0
 
         while [ $attempts -lt $max_attempts ]; do
-          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/${{ inputs.target_name }}" \
+          response=$(curl --location --silent --show-error --write-out "HTTPSTATUS:%{http_code}" "$TARGET_API_BASE_URL/${{ inputs.target_id }}" \
             --header "Authorization: Bearer ${{ inputs.mobify_api_key }}")
 
           http_status=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
