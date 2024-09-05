@@ -1,4 +1,4 @@
-const { program, Argument } = require("commander");
+const { program } = require("commander");
 
 const main = async (opts) => {
     const { projectKey, projectConfig } = opts;
