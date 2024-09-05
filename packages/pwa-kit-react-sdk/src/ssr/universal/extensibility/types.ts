@@ -11,8 +11,8 @@ export type ExtensionClass<T extends IApplicationExtension> = new (...args: any[
 
 // TODO: Move this somewhere closer to the router code.
 export interface IRouteConfig {
-    path: string;
-    exact?: boolean;
+    path: string
+    exact?: boolean
     component: React.ComponentType<any>
 }
 
@@ -24,17 +24,17 @@ export interface IApplicationExtension {
     /**
      * The name of the extension that will be used for logging.
      */
-    getName(): string;
+    getName(): string
     /**
      * Called during the rendering of the base application on the server (/ssr/server/react-rendering.js)
-     * and on the client (./ssr/browser/main.js). It is predomenantly use to enhance the "base" application 
+     * and on the client (./ssr/browser/main.js). It is predomenantly use to enhance the "base" application
      * by wrapping it with React providers.
      */
-    extendApp(App: React.ComponentType): React.ComponentType;
+    extendApp(App: React.ComponentType): React.ComponentType
     /**
      * Called during server rendering and client application initialiation. This method allows you to modify
      * the routes of the base application. This is typically used to add new routes poting at page components
      * added by your application extension.
      */
-    extendRoutes(routes: IRouteConfig[]): IRouteConfig[];
+    extendRoutes(routes: IRouteConfig[]): IRouteConfig[]
 }
