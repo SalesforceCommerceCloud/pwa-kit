@@ -4,20 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useState} from 'react'
 import useAuthContext from './useAuthContext'
 import useConfig from './useConfig'
-import {getDefaultCookieAttributes} from '../utils'
-import Cookies from 'js-cookie'
 
 interface useDntReturn {
-    dntNotSet: boolean
+    dntStatus: boolean | undefined
     updateDNT: (preference: boolean | null) => Promise<void>
 }
 
 /**
  * Hook that returns
- * dntNotSet - a boolean indicating that the dw_dnt cookie was not correctly defined
+ * dntStatus - a boolean indicating the current DNT preference
  * updateDNT - a function that takes a DNT preference and creates the dw_dnt
  *              cookie and reauthroizes with SLAS
  *
@@ -28,10 +25,7 @@ interface useDntReturn {
 const useDNT = (): useDntReturn => {
     const auth = useAuthContext()
     const config = useConfig()
-    const dwDntValue = Cookies.get('dw_dnt')
-
-    const isDntCookieNotDefined = dwDntValue !== '1' && dwDntValue !== '0'
-    const [dntNotSet, setDntNotSet] = useState(isDntCookieNotDefined)
+    const dwDntValue = auth.getDnt()
 
     const updateDNT = async (preference: boolean | null) => {
         let dntCookieVal = String(Number(preference))
@@ -40,24 +34,25 @@ const useDNT = (): useDntReturn => {
             dntCookieVal = config.defaultDnt ? String(Number(config.defaultDnt)) : '0'
         }
         // Set the cookie once to include dnt in the access token and then again to set the expiry time
-        Cookies.set('dw_dnt', dntCookieVal, {
-            ...getDefaultCookieAttributes(),
-            secure: true
-        })
-        setDntNotSet(false)
-        await auth.refreshAccessToken()
-
+        auth.setDnt(dntCookieVal)
+        const accessToken = auth.get('access_token')
+        if (accessToken !== '') {
+            const {dnt} = auth.parseSlasJWT(auth.get('access_token'))
+            if (dnt !== dntCookieVal) {
+                await auth.refreshAccessToken()
+            }
+        } else {
+            await auth.refreshAccessToken()
+        }
         if (preference !== null) {
-            const daysUntilExpires = Number(auth.get('refresh_token_expires_in')) / 86400
-            Cookies.set('dw_dnt', dntCookieVal, {
-                ...getDefaultCookieAttributes(),
-                secure: true,
-                expires: daysUntilExpires
-            })
+            auth.setDnt(dntCookieVal, Number(auth.get('refresh_token_expires_in')))
         }
     }
 
-    return {dntNotSet, updateDNT}
+    let dntStatus = undefined
+    if (dwDntValue && (dwDntValue === '1' || dwDntValue === '0'))
+        dntStatus = Boolean(Number(dwDntValue))
+    return {dntStatus, updateDNT}
 }
 
 export default useDNT

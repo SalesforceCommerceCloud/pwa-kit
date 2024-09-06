@@ -7,6 +7,7 @@
 
 export interface BaseStorageOptions {
     keySuffix?: string
+    keysExcludedFromSuffixing?: Array<string>
 }
 
 export abstract class BaseStorage {
@@ -14,6 +15,7 @@ export abstract class BaseStorage {
         if (typeof this.options.keySuffix !== 'string') this.options.keySuffix = ''
     }
     protected getSuffixedKey(key: string): string {
+        if (this.options.keysExcludedFromSuffixing?.includes(key)) return key
         return this.options.keySuffix ? `${key}_${this.options.keySuffix}` : key
     }
     abstract set(key: string, value: string, options?: unknown): void

@@ -15,7 +15,7 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes} from '../utils'
 import {
     MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
@@ -49,6 +49,7 @@ interface JWTHeaders {
 interface SlasJwtPayload extends JwtPayload {
     sub: string
     isb: string
+    dnt: string
 }
 
 /**
@@ -190,7 +191,7 @@ class Auth {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
-
+        const keysExcludedFromSuffixing = ['dw_dnt']
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
             parameters: {
@@ -216,6 +217,7 @@ class Auth {
 
         const options = {
             keySuffix: config.siteId,
+            keysExcludedFromSuffixing: keysExcludedFromSuffixing,
             // Setting this to true on the server allows us to reuse guest auth tokens across lambda runs
             sharedContext: !onClient()
         }
@@ -278,6 +280,18 @@ class Auth {
         const storage = this.stores[storageType]
         storage.set(key, value, options)
         DATA_MAP[name].callback?.(storage)
+    }
+
+    getDnt() {
+        return this.get('dw_dnt')
+    }
+
+    setDnt(val: string, secondsUntilExpire?: number) {
+        this.set('dw_dnt', val, {
+            ...getDefaultCookieAttributes(),
+            secure: true,
+            ...(secondsUntilExpire !== undefined && {expires: secondsUntilExpire / 86400})
+        })
     }
 
     private clearStorage() {
@@ -399,7 +413,7 @@ class Auth {
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
         if (refreshToken) {
             try {
-                return await this.queueRequest(
+                const result = await this.queueRequest(
                     () =>
                         helpers.refreshAccessToken(
                             this.client,
@@ -413,6 +427,8 @@ class Auth {
                         ),
                     !!refreshTokenGuest
                 )
+                this.handleTokenResponse(result, !!refreshTokenGuest)
+                return result
             } catch (error) {
                 // If the refresh token is invalid, we need to re-login the user
                 if (error instanceof Error && 'response' in error) {
@@ -641,7 +657,7 @@ class Auth {
      */
     parseSlasJWT(jwt: string) {
         const payload: SlasJwtPayload = jwtDecode(jwt)
-        const {sub, isb} = payload
+        const {sub, isb, dnt} = payload
 
         if (!sub || !isb) {
             throw new Error('Unable to parse access token payload: missing sub and isb.')
@@ -660,7 +676,8 @@ class Auth {
         return {
             isGuest,
             customerId,
-            usid
+            usid,
+            dnt
         }
     }
 }
