@@ -172,7 +172,7 @@ describe('useDNT tests', () => {
 
     it('dntStatus should be undefined if dw_dnt cookie is invalid', () => {
         mockGetDnt.mockReset()
-        mockGetDnt.mockReturnValueOnce("waefawe")
+        mockGetDnt.mockReturnValueOnce('invalidValue')
         renderHookWithProviders(() => {
             const {dntStatus} = useDNT()
             expect(dntStatus).toBeUndefined()
