@@ -53,7 +53,7 @@ export const useShopperContextSearchParams = (siteId) => {
                 updateShopperContextObj,
                 usid,
                 siteId,
-                refetchDataOnClient,
+                refetchDataOnClient
             })
         }
     }, [search])
@@ -97,25 +97,25 @@ export const getShopperContextSearchParams = (
     }
 }
 
-const handleShopperContextUpdate = async ({
+export const handleShopperContextUpdate = async ({
     createShopperContext,
     updateShopperContext,
     shopperContext,
     updateShopperContextObj,
     usid,
     siteId,
-    refetchDataOnClient,
+    refetchDataOnClient
 }) => {
     const payload = {
-        parameters: { usid, siteId },
+        parameters: {usid, siteId},
         body: updateShopperContextObj
     }
     if (!shopperContext) {
         await createShopperContext.mutateAsync(payload)
     } else {
         await updateShopperContext.mutateAsync(payload)
-        console.log('updated shopperContext', updateShopperContextObj);
+        console.log('updated shopperContext', updateShopperContextObj)
     }
     // Refresh data
-    refetchDataOnClient();
+    refetchDataOnClient()
 }

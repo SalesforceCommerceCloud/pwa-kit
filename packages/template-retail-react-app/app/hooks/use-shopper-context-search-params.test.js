@@ -13,7 +13,8 @@ import {renderHook} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {
     useShopperContextSearchParams,
-    getShopperContextSearchParams
+    getShopperContextSearchParams,
+    handleShopperContextUpdate
 } from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
 
 const siteId = 'my-cool-site'
@@ -28,13 +29,13 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-const createShopperContextMutateAsync = jest.fn()
-const updateShopperContextMutateAsync = jest.fn()
+const createShopperContext = {mutateAsync: jest.fn()}
+const updateShopperContext = {mutateAsync: jest.fn()}
 useShopperContextsMutation.mockImplementation((param) => {
     if (param === 'createShopperContext') {
-        return {mutateAsync: createShopperContextMutateAsync}
+        return createShopperContext
     } else if (param === 'updateShopperContext') {
-        return {mutateAsync: updateShopperContextMutateAsync}
+        return updateShopperContext
     }
 })
 
@@ -52,7 +53,7 @@ afterEach(() => {
 })
 
 describe('useShopperContextSearchParams', () => {
-    test('creates an empty shopper context when useShopperContext returns undefined', () => {
+    test('does not create/update the shopper context when no shopper context search params are present', () => {
         const history = createMemoryHistory()
         history.push('/test/path')
         const wrapper = ({children}) => <Router history={history}>{children}</Router>
@@ -60,30 +61,17 @@ describe('useShopperContextSearchParams', () => {
         useShopperContext.mockReturnValue({data: undefined})
         renderHook(() => useShopperContextSearchParams(siteId), {wrapper})
         expect(useShopperContext).toHaveBeenCalledTimes(1)
-        expect(createShopperContextMutateAsync).toHaveBeenCalledWith({
-            parameters: {siteId, usid},
-            body: {}
-        })
+        expect(createShopperContext.mutateAsync).not.toHaveBeenCalled()
+        expect(updateShopperContext.mutateAsync).not.toHaveBeenCalled()
     })
 
-    test('does not create shopper context when useShopperContext returns data', () => {
-        const history = createMemoryHistory()
-        history.push('/test/path')
-        const wrapper = ({children}) => <Router history={history}>{children}</Router>
-
-        useShopperContext.mockReturnValue({data: {}})
-        renderHook(() => useShopperContextSearchParams(siteId), {wrapper})
-        expect(useShopperContext).toHaveBeenCalledTimes(1)
-        expect(createShopperContextMutateAsync).not.toHaveBeenCalled()
-    })
-
-    test('updates shopper context with the parsed search params', () => {
+    test('creates shopper context with the parsed search params', () => {
         const history = createMemoryHistory()
         history.push('/test/path?sourceCode=instagram&customerGroupIds=BigSpenders')
         const wrapper = ({children}) => <Router history={history}>{children}</Router>
 
         renderHook(() => useShopperContextSearchParams(siteId), {wrapper})
-        expect(updateShopperContextMutateAsync).toHaveBeenCalledWith({
+        expect(createShopperContext.mutateAsync).toHaveBeenCalledWith({
             parameters: {usid, siteId},
             body: {sourceCode: 'instagram', customerGroupIds: ['BigSpenders']}
         })
@@ -96,7 +84,12 @@ describe('getShopperContextSearchParams', () => {
         expect(shopperContextObj).toEqual({})
     })
 
-    test('returns an object with the parsed search params', () => {
+    test('returns an empty object when search params not related to shopper context are present', () => {
+        const shopperContextObj = getShopperContextSearchParams('?a=1&b=2&c=3')
+        expect(shopperContextObj).toEqual({})
+    })
+
+    test('returns an object with parsed search params related to shopper context', () => {
         const shopperContextObj = getShopperContextSearchParams(
             '?sourceCode=instagram&effectiveDateTime=2024-09-04T00:00:00Z' +
                 // Customer Group IDs
@@ -104,7 +97,9 @@ describe('getShopperContextSearchParams', () => {
                 // Custom Qualifiers
                 '&deviceType=mobile&ipAddress=189.0.0.0&operatingSystem=Android' +
                 // Assignment Qualifiers
-                '&store=boston'
+                '&store=boston' +
+                // Non Shopper Context Params
+                '&a=1&b=2&c=3'
         )
 
         expect(shopperContextObj).toEqual({
@@ -117,6 +112,68 @@ describe('getShopperContextSearchParams', () => {
             },
             assignmentQualifiers: {store: 'boston'},
             customerGroupIds: ['BigSpenders', 'MobileUsers']
+        })
+    })
+
+    describe('handleShopperContextUpdate', () => {
+        const updateShopperContextObj = {
+            sourceCode: 'instagram',
+            customerGroupIds: ['BigSpenders']
+        }
+        const refetchDataOnClient = jest.fn()
+
+        test('creates the shopper context when shopper context is undefined', () => {
+            const shopperContext = undefined
+            handleShopperContextUpdate({
+                createShopperContext,
+                updateShopperContext,
+                shopperContext,
+                updateShopperContextObj,
+                usid,
+                siteId,
+                refetchDataOnClient
+            })
+            expect(createShopperContext.mutateAsync).toHaveBeenCalledWith({
+                parameters: {usid, siteId},
+                body: updateShopperContextObj
+            })
+            expect(updateShopperContext.mutateAsync).not.toHaveBeenCalled()
+        })
+
+        test('updates the shopper context when shopper context is an empty object', () => {
+            const shopperContext = {}
+            handleShopperContextUpdate({
+                createShopperContext,
+                updateShopperContext,
+                shopperContext,
+                updateShopperContextObj,
+                usid,
+                siteId,
+                refetchDataOnClient
+            })
+            expect(createShopperContext.mutateAsync).not.toHaveBeenCalled()
+            expect(updateShopperContext.mutateAsync).toHaveBeenCalledWith({
+                parameters: {usid, siteId},
+                body: updateShopperContextObj
+            })
+        })
+
+        test('updates the shopper context when shopper context is an object', () => {
+            const shopperContext = {sourceCode: 'facebook'}
+            handleShopperContextUpdate({
+                createShopperContext,
+                updateShopperContext,
+                shopperContext,
+                updateShopperContextObj,
+                usid,
+                siteId,
+                refetchDataOnClient
+            })
+            expect(createShopperContext.mutateAsync).not.toHaveBeenCalled()
+            expect(updateShopperContext.mutateAsync).toHaveBeenCalledWith({
+                parameters: {usid, siteId},
+                body: updateShopperContextObj
+            })
         })
     })
 })
