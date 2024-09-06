@@ -48,27 +48,28 @@ export const useShopperContextSearchParams = (siteId) => {
         const executeCreateShopperContext = async () => {
             await createShopperContext.mutateAsync({
                 parameters: {usid, siteId},
-                body: {}
+                body: updateShopperContextObj
             })
+            // Refresh to update the data on the page
+            refetchDataOnClient()
         }
-        if (!shopperContext) {
-            executeCreateShopperContext()
-        }
-    }, [shopperContext])
-
-    useEffect(() => {
-        console.warn('jinsu', search)
         const executeUpdateShopperContext = async () => {
             // update the shopper context if the query string contains the relevant search parameters
             await updateShopperContext.mutateAsync({
                 parameters: {usid, siteId},
                 body: updateShopperContextObj
             })
+            console.log('updated shopperContext', updateShopperContextObj)
             // Refresh to update the data on the page
             refetchDataOnClient()
-            console.log('updated shopperContext', updateShopperContextObj)
         }
-        executeUpdateShopperContext()
+        if (Object.keys(updateShopperContextObj).length === 0) {
+            return
+        } else if (!shopperContext) {
+            executeCreateShopperContext()
+        } else {
+            executeUpdateShopperContext()
+        }
     }, [search])
 
     useEffect(() => {
