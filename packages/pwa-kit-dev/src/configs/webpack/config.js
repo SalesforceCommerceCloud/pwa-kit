@@ -18,6 +18,7 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
+import AppExtensibilityPlugin from './app-extensitility-plugin'
 
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
@@ -200,17 +201,11 @@ const baseConfig = (target) => {
                     path: buildDir
                 },
                 resolve: {
-                    ...(EXT_EXTENDS && EXT_OVERRIDES_DIR
-                        ? {
-                              plugins: [
-                                  new OverridesResolverPlugin({
-                                      extends: [EXT_EXTENDS],
-                                      overridesDir: EXT_OVERRIDES_DIR,
-                                      projectDir: process.cwd()
-                                  })
-                              ]
-                          }
-                        : {}),
+                    plugins: [
+                        new AppExtensibilityPlugin({
+                            projectDir: process.cwd()
+                        })
+                    ],
                     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                     alias: {
                         // Create alias's for all the extensions as they are being imported from the SDK package and cannot be
