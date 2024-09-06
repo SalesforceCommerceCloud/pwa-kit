@@ -38,37 +38,23 @@ export const useShopperContextSearchParams = (siteId) => {
         {enabled: !isServer}
     )
     console.log('shopperContext', shopperContext)
-    const updateShopperContextObj = getShopperContextSearchParams(search)
 
     const refetchDataOnClient = () => {
         queryClient.invalidateQueries()
     }
 
     useEffect(() => {
-        const executeCreateShopperContext = async () => {
-            await createShopperContext.mutateAsync({
-                parameters: {usid, siteId},
-                body: updateShopperContextObj
+        const updateShopperContextObj = getShopperContextSearchParams(search)
+        if (Object.keys(updateShopperContextObj).length > 0) {
+            handleShopperContextUpdate({
+                createShopperContext,
+                updateShopperContext,
+                shopperContext,
+                updateShopperContextObj,
+                usid,
+                siteId,
+                refetchDataOnClient,
             })
-            // Refresh to update the data on the page
-            refetchDataOnClient()
-        }
-        const executeUpdateShopperContext = async () => {
-            // update the shopper context if the query string contains the relevant search parameters
-            await updateShopperContext.mutateAsync({
-                parameters: {usid, siteId},
-                body: updateShopperContextObj
-            })
-            console.log('updated shopperContext', updateShopperContextObj)
-            // Refresh to update the data on the page
-            refetchDataOnClient()
-        }
-        if (Object.keys(updateShopperContextObj).length === 0) {
-            return
-        } else if (!shopperContext) {
-            executeCreateShopperContext()
-        } else {
-            executeUpdateShopperContext()
         }
     }, [search])
 
@@ -109,4 +95,27 @@ export const getShopperContextSearchParams = (
         ...(Object.keys(customQualifiers).length && {customQualifiers}),
         ...(Object.keys(assignmentQualifiers).length && {assignmentQualifiers})
     }
+}
+
+const handleShopperContextUpdate = async ({
+    createShopperContext,
+    updateShopperContext,
+    shopperContext,
+    updateShopperContextObj,
+    usid,
+    siteId,
+    refetchDataOnClient,
+}) => {
+    const payload = {
+        parameters: { usid, siteId },
+        body: updateShopperContextObj
+    }
+    if (!shopperContext) {
+        await createShopperContext.mutateAsync(payload)
+    } else {
+        await updateShopperContext.mutateAsync(payload)
+        console.log('updated shopperContext', updateShopperContextObj);
+    }
+    // Refresh data
+    refetchDataOnClient();
 }
