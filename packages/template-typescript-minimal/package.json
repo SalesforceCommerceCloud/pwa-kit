@@ -30,14 +30,17 @@
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.3.4",
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+    "@salesforce/extension-sample": "1.0.0-dev"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
-    "app":{},
+    "app": {
+      "extensions": ["@salesforce/extension-sample"]
+    },
     "ssrEnabled": true,
     "ssrOnly": [
       "ssr.js",
