@@ -51,6 +51,20 @@ sh.set('-e')
 
 const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'verdaccio.log')
 
+const makePublic = (pkgLocation) => {
+    sh.exec('npm pkg delete private', {cwd: pkgLocation})
+
+    sh.exec('git add .', {silent: true})
+    sh.exec('git commit -m "temporary commit to have clean working tree"', {silent: true})
+
+    const revertChanges = () => {
+        // Undo the temporary commit
+        sh.exec('git reset HEAD~1', {silent: true})
+        sh.exec('git restore package.json', {cwd: pkgLocation})
+    }
+    return revertChanges
+}
+
 /**
  * Run the provided function with a local NPM repository running in the background.
  */
@@ -64,8 +78,11 @@ const withLocalNPMRepo = (func) => {
     sh.mkdir(p.join(verdaccioConfigDir, 'storage'))
 
     let verdaccioServerProcess
+    let revertChangesToSampleExtension
 
     const cleanup = () => {
+        revertChangesToSampleExtension()
+
         console.log('Shutting down local NPM repository')
         delete process.env['npm_config_registry']
         verdaccioServerProcess.kill()
@@ -104,6 +121,12 @@ const withLocalNPMRepo = (func) => {
             // packages to it. This is safe to do – Verdaccio does not forward these
             // the public NPM repo.
             console.log('Publishing packages to the local NPM repository')
+
+            // TODO: delete this when done
+            revertChangesToSampleExtension = makePublic(
+                p.join(monorepoRoot, 'packages', 'extension-sample')
+            )
+
             sh.exec('npm run lerna -- publish from-package --yes --concurrency 1 --loglevel warn', {
                 cwd: monorepoRoot,
                 fatal: true,
