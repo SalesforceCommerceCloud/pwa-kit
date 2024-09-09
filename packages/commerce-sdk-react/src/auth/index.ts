@@ -15,7 +15,7 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient, getDntPreference} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
 import {
     MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
@@ -320,6 +320,22 @@ class Auth {
     }
 
     /**
+     * Gets the Do-Not-Track (DNT) preference from the `dw_dnt` cookie.
+     * If user has set their DNT preference, read the cookie, if not, use the default DNT pref. If the default DNT pref has not been set, default to false.
+     */
+    private getDntPreference(dw_dnt: string | undefined, defaultDnt: boolean | undefined) {
+        let dntPref
+        // Read `dw_dnt` cookie
+        const dntCookie = dw_dnt === '1' ? true : dw_dnt === '0' ? false : undefined
+        dntPref = dntCookie
+
+        // If the cookie is not set, read the default DNT preference.
+        if (dntCookie === undefined) dntPref = defaultDnt !== undefined ? defaultDnt : undefined
+
+        return dntPref
+    }
+
+    /**
      * Returns the SLAS access token or an empty string if the access token
      * is not found in local store or if SFRA wants PWA to trigger refresh token login.
      *
@@ -454,7 +470,7 @@ class Auth {
             return this.data
         }
 
-        const dntPref = getDntPreference(this.get('dw_dnt'), this.defaultDnt)
+        const dntPref = this.getDntPreference(this.get('dw_dnt'), this.defaultDnt)
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -514,7 +530,7 @@ class Auth {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
-        const dntPref = getDntPreference(this.get('dw_dnt'), this.defaultDnt)
+        const dntPref = this.getDntPreference(this.get('dw_dnt'), this.defaultDnt)
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
@@ -579,7 +595,7 @@ class Auth {
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
-        const dntPref = getDntPreference(this.get('dw_dnt'), this.defaultDnt)
+        const dntPref = this.getDntPreference(this.get('dw_dnt'), this.defaultDnt)
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
