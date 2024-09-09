@@ -185,11 +185,13 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
+    private dntCookieName: AuthDataKeys
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+        this.dntCookieName = 'dw_dnt'
 
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
@@ -278,6 +280,10 @@ class Auth {
         const storage = this.stores[storageType]
         storage.set(key, value, options)
         DATA_MAP[name].callback?.(storage)
+    }
+
+    getDnt() {
+        return this.get(this.dntCookieName)
     }
 
     private clearStorage() {
@@ -470,7 +476,7 @@ class Auth {
             return this.data
         }
 
-        const dntPref = this.getDntPreference(this.get('dw_dnt'), this.defaultDnt)
+        const dntPref = this.getDntPreference(this.getDnt(), this.defaultDnt)
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -530,7 +536,7 @@ class Auth {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
-        const dntPref = this.getDntPreference(this.get('dw_dnt'), this.defaultDnt)
+        const dntPref = this.getDntPreference(this.getDnt(), this.defaultDnt)
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
@@ -595,7 +601,7 @@ class Auth {
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
-        const dntPref = this.getDntPreference(this.get('dw_dnt'), this.defaultDnt)
+        const dntPref = this.getDntPreference(this.getDnt(), this.defaultDnt)
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
