@@ -111,3 +111,20 @@ export function detectCookiesAvailable(options?: CookieAttributes) {
         return false
     }
 }
+
+/**
+ * Gets the Do-Not-Track (DNT) preference from the `dw_dnt` cookie.
+ * If user has set their DNT preference, read the cookie, if not, use the default DNT pref. If the default DNT pref has not been set, default to false.
+ * @private
+ */
+export function getDntPreference(dw_dnt: string | undefined, defaultDnt: boolean | undefined) {
+    let dntPref
+    // Read `dw_dnt` cookie
+    const dntCookie = dw_dnt === '1' ? true : dw_dnt === '0' ? false : undefined
+    dntPref = dntCookie
+
+    // If the cookie is not set, read the default DNT preference.
+    if (!dntCookie) dntPref = defaultDnt !== undefined ? defaultDnt : undefined
+
+    return dntPref
+}

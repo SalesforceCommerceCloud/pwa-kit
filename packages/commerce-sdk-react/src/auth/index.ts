@@ -15,7 +15,7 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient, getDntPreference} from '../utils'
 import {
     MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
@@ -454,16 +454,7 @@ class Auth {
             return this.data
         }
 
-        // If user has set their DNT preference, read the cookie, if not, use the default DNT pref. If the default DNT pref has not been set, default to false.
-        const dw_dnt = this.get('dw_dnt')
-        const dntPref =
-            dw_dnt === '1'
-                ? true
-                : dw_dnt === '0'
-                ? false
-                : this.defaultDnt !== undefined
-                ? this.defaultDnt
-                : undefined
+        const dntPref = getDntPreference(this.get('dw_dnt'), this.defaultDnt)
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -523,15 +514,7 @@ class Auth {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
-        const dw_dnt = this.get('dw_dnt')
-        const dntPref =
-            dw_dnt === '1'
-                ? true
-                : dw_dnt === '0'
-                ? false
-                : this.defaultDnt !== undefined
-                ? this.defaultDnt
-                : undefined
+        const dntPref = getDntPreference(this.get('dw_dnt'), this.defaultDnt)
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
@@ -596,15 +579,7 @@ class Auth {
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
-        const dw_dnt = this.get('dw_dnt')
-        const dntPref =
-            dw_dnt === '1'
-                ? true
-                : dw_dnt === '0'
-                ? false
-                : this.defaultDnt !== undefined
-                ? this.defaultDnt
-                : undefined
+        const dntPref = getDntPreference(this.get('dw_dnt'), this.defaultDnt)
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
