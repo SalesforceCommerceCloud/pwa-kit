@@ -186,12 +186,14 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
-
+    private dntCookieName: AuthDataKeys
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
-        const keysExcludedFromSuffixing = ['dw_dnt']
+        this.dntCookieName = 'dw_dnt'
+        // Add keys that should not be site specific to this array
+        const keysExcludedFromSuffixing = [this.dntCookieName]
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
             parameters: {
@@ -283,15 +285,38 @@ class Auth {
     }
 
     getDnt() {
-        return this.get('dw_dnt')
+        return this.get(this.dntCookieName)
     }
 
-    setDnt(val: string, secondsUntilExpire?: number) {
-        this.set('dw_dnt', val, {
+    async setDnt(preference: boolean | null, secondsUntilExpire?: number) {
+        let dntCookieVal = String(Number(preference))
+        // Use defaultDNT if defined. If not, use SLAS default DNT
+        if (preference === null) {
+            dntCookieVal = this.defaultDnt ? String(Number(this.defaultDnt)) : '0'
+        }
+        // Set the cookie once to include dnt in the access token and then again to set the expiry time
+        this.set(this.dntCookieName, dntCookieVal, {
             ...getDefaultCookieAttributes(),
-            secure: true,
-            ...(secondsUntilExpire !== undefined && {expires: secondsUntilExpire / 86400})
+            secure: true
         })
+        const accessToken = this.get('access_token')
+        if (accessToken !== '') {
+            const {dnt} = this.parseSlasJWT(accessToken)
+            if (dnt !== dntCookieVal) {
+                await this.refreshAccessToken()
+            }
+        } else {
+            await this.refreshAccessToken()
+        }
+        if (preference !== null) {
+            this.set(this.dntCookieName, dntCookieVal, {
+                ...getDefaultCookieAttributes(),
+                secure: true,
+                ...(secondsUntilExpire !== undefined && {
+                    expires: Number(this.get('refresh_token_expires_in')) / 86400
+                })
+            })
+        }
     }
 
     private clearStorage() {
@@ -362,7 +387,7 @@ class Auth {
                 this.clearSFRAAuthToken()
                 return ''
             }
-
+            console.log('(JEREMY) sfraAuthToken: ', sfraAuthToken)
             const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
             this.set('access_token', sfraAuthToken)
             this.set('customer_id', customerId)
@@ -427,7 +452,6 @@ class Auth {
                         ),
                     !!refreshTokenGuest
                 )
-                this.handleTokenResponse(result, !!refreshTokenGuest)
                 return result
             } catch (error) {
                 // If the refresh token is invalid, we need to re-login the user
@@ -491,6 +515,7 @@ class Auth {
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
+            console.log('(JEREMY) fetchedToken: ', this.fetchedToken)
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)

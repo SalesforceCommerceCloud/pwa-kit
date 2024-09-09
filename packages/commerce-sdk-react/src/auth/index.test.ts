@@ -40,7 +40,8 @@ jest.mock('../utils', () => ({
     __esModule: true,
     onClient: () => true,
     getParentOrigin: jest.fn().mockResolvedValue(''),
-    isOriginTrusted: () => false
+    isOriginTrusted: () => false,
+    getDefaultCookieAttributes: () => {}
 }))
 
 /** The auth data we store has a slightly different shape than what we use. */
@@ -474,5 +475,26 @@ describe('Auth', () => {
         // Set mock value back to expected.
         // @ts-expect-error read-only property
         utils.onClient = () => true
+    })
+
+    test('setDNT(true) results dw_dnt=1', async () => {
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(true)
+        expect(auth.get('dw_dnt')).toBe('1')
+    })
+    test('setDNT(false) results dw_dnt=0', async () => {
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(false)
+        expect(auth.get('dw_dnt')).toBe('0')
+    })
+    test('setDNT(null) results in SLAS default if defaultDNT not defined', async () => {
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(null)
+        expect(auth.get('dw_dnt')).toBe('0')
+    })
+    test('setDNT(null) results in defaultDnt if defaultDnt is defined', async () => {
+        const auth = new Auth({...config, siteId: 'siteA', defaultDnt: true})
+        await auth.setDnt(null)
+        expect(auth.get('dw_dnt')).toBe('1')
     })
 })
