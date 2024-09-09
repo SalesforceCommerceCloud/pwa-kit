@@ -4,12 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useEffect} from 'react'
-import {waitFor} from '@testing-library/react'
 import useDNT from './useDNT'
 import useAuthContext from './useAuthContext'
 import useConfig from './useConfig'
-import {renderHookWithProviders} from '../test-utils'
 
 jest.mock('./useAuthContext')
 jest.mock('./useConfig')
