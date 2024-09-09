@@ -387,7 +387,6 @@ class Auth {
                 this.clearSFRAAuthToken()
                 return ''
             }
-            console.log('(JEREMY) sfraAuthToken: ', sfraAuthToken)
             const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
             this.set('access_token', sfraAuthToken)
             this.set('customer_id', customerId)
@@ -515,7 +514,6 @@ class Auth {
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
-            console.log('(JEREMY) fetchedToken: ', this.fetchedToken)
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
