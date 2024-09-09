@@ -18,7 +18,12 @@ export const applyAppExtensions = (
     App: React.ComponentType,
     extensions: IApplicationExtension[]
 ): React.ComponentType => {
-    const extendAppHocs = extensions.map(({extendApp}) => extendApp).filter(Boolean)
+    const extendAppHocs = extensions
+        // TODO: All Application Extensions configuration objects will extend from a single IApplicationExtensionConfig type so that we
+        // can add a feature to toggle if the extension is enabled or disabled. This will happen in the tupal config support ticket.
+        // .map((extension) => extension.getConfig().enabled && extension.extendApp)
+        .map((extension) => extension.extendApp.bind(extension))
+        .filter(Boolean)
 
     return applyHOCs(App, extendAppHocs)
 }

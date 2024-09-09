@@ -26,7 +26,7 @@ class Sample implements IApplicationExtension {
     }
 
     getName(): string {
-        return 'sample'
+        return 'sample-disabled'
     }
 
     extendApp(App: React.ComponentType): React.ComponentType {

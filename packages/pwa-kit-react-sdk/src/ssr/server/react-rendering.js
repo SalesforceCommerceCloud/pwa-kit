@@ -28,7 +28,7 @@ import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import App from '../universal/components/_app'
 import Document from '../universal/components/_document'
-import extensions from '../universal/extensibility/extensions'
+import {getExtensions} from '../universal/extensibility/extensions'
 import Throw404 from '../universal/components/throw-404'
 
 import {getAppConfig} from '../universal/compatibility'
@@ -127,6 +127,7 @@ export const render = async (req, res, next) => {
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
+    const extensions = getExtensions()
 
     AppConfig.restore(res.locals)
 

@@ -22,6 +22,10 @@ export interface IRouteConfig {
  */
 export interface IApplicationExtension {
     /**
+     * Returns the configuration that was used to instantiate this application extension
+     */
+    getConfig(): Record<string, any>
+    /**
      * The name of the extension that will be used for logging.
      */
     getName(): string
