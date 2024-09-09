@@ -2373,6 +2373,20 @@
       "value": "]"
     }
   ],
+  "drawer_menu.header.assistive_msg.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḿḗḗƞŭŭ Ḓřȧȧẇḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "drawer_menu.link.about_us": [
     {
       "type": 0,
