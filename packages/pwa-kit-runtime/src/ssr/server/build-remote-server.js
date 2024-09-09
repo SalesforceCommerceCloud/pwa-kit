@@ -65,6 +65,8 @@ import {createProxyMiddleware} from 'http-proxy-middleware'
  */
 const binaryMimeTypes = ['application/*', 'audio/*', 'font/*', 'image/*', 'video/*']
 
+const {IApplicationExtension} = require('./extensibility/types')
+
 /**
  * Environment variables that must be set for the Express app to run remotely.
  *
@@ -664,13 +666,18 @@ export const RemoteServerFactory = {
 
         let _require
 
+        console.log('_setupExtensions')
+
         extensions.forEach((extension) => {
             const setupServerFilePath = path.join(
                 options.buildDir,
                 'extensions',
                 extension,
+                'src',
                 'setup-server.js'
             )
+
+            console.log('_setupExtensions extension:', extension)
 
             // Only eval when there are extensions
             // this makes it slightly faster for projects that
@@ -679,29 +686,51 @@ export const RemoteServerFactory = {
                 _require = eval('require')
             }
 
-            let setupServer
+            let ExtensionClass
 
             try {
-                setupServer = _require(setupServerFilePath)
+                ExtensionClass = _require(setupServerFilePath).default
             } catch (e) {
                 if (e.message && e.message.startsWith('Cannot find module')) {
                     // skip extensions that don't have a setup-server.js file
                     return
                 }
 
-                console.error(`Error loading extension ${extension}:`, e)
+                logger.error(`Error loading extension ${extension}:`, e)
                 throw e
             }
 
-            if (!setupServer.default) {
-                console.warn(`Extension ${extension} does not have a default export. Skipping.`)
+            // Check if the default export is a class that implements IApplicationExtension
+            if (!ExtensionClass || typeof ExtensionClass !== 'function') {
+                logger.warn(`Extension ${extension} does not export a valid class. Skipping.`)
                 return
             }
 
+            // Instantiate the extension class
+            let extensionInstance
             try {
-                setupServer.default({app, options})
+                extensionInstance = new ExtensionClass(options)
             } catch (e) {
-                console.error(`Error setting up extension ${extension}:`, e)
+                logger.error(`Error instantiating extension ${extension}:`, e)
+                return
+            }
+
+            // Verify the instance has the methods defined by IApplicationExtension
+            if (
+                typeof extensionInstance.getName !== 'function' ||
+                typeof extensionInstance.extendApp !== 'function'
+            ) {
+                logger.warn(
+                    `Extension ${extension} does not implement IApplicationExtension interface. Skipping.`
+                )
+                return
+            }
+
+            // Extend the app using the provided method
+            try {
+                extensionInstance.extendApp(app)
+            } catch (e) {
+                logger.error(`Error setting up extension ${extension}:`, e)
             }
         })
     },
@@ -832,7 +861,7 @@ export const RemoteServerFactory = {
             )
         ) {
             /* istanbul ignore next */
-            console.warn(
+            logger.warn(
                 `Warning: You are using Node ${process.versions.node}. ` +
                     `Your app may not work as expected when deployed to Managed ` +
                     `Runtime servers which are compatible with Node ${requiredNode}`
@@ -892,7 +921,7 @@ export const RemoteServerFactory = {
         }
 
         if (!options.strictSSL) {
-            console.warn('The SSR Server has _strictSSL turned off for https requests')
+            logger.warn('The SSR Server has _strictSSL turned off for https requests')
         }
     },
 

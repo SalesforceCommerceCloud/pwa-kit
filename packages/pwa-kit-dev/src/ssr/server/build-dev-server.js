@@ -16,6 +16,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import open from 'open'
+import logger from '../../utils/logger-instance'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
@@ -43,7 +44,7 @@ export const DevServerMixin = {
      * @private
      */
     _logStartupMessage(options) {
-        console.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}`)
+        logger.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}`)
     },
 
     /**
@@ -132,38 +133,83 @@ export const DevServerMixin = {
      * @private
      */
     _setupExtensions(app, options) {
+        logger.log('Setting up extensions...')
+
         // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
+        logger.log('Extensions to load:', extensions)
+
         app.__extensions = extensions || []
 
         extensions.forEach((extension) => {
+            logger.log(`Loading extension: ${extension}`)
+
             const setupServerFilePathBase = path.join(
                 options.projectDir,
                 'node_modules',
                 extension,
+                'src',
                 'setup-server'
             )
-
             let filePath
             if (fs.existsSync(`${setupServerFilePathBase}.ts`)) {
                 filePath = `${setupServerFilePathBase}.ts`
             } else if (fs.existsSync(`${setupServerFilePathBase}.js`)) {
                 filePath = `${setupServerFilePathBase}.js`
             } else {
+                logger.warn(`No setup-server file found for ${extension}. Skipping.`)
+                return // Skip if neither .ts nor .js file exists
+            }
+
+            let ExtensionClass
+            try {
+                logger.log(`Loading extension class from ${filePath}...`)
+                // Load the extension module using tsx.require for TypeScript support
+                ExtensionClass = tsx.require(filePath, __filename).default
+                logger.log(`Successfully loaded extension class for ${extension}.`)
+            } catch (e) {
+                logger.error(`Error loading extension ${extension}:`, e)
                 return
             }
 
-            const setupServer = tsx.require(filePath, __filename)
-            if (!setupServer.default) {
-                console.warn(`Extension ${extension} does not have a default export. Skipping.`)
+            // Ensure that the default export is a class that implements IApplicationExtension
+            if (!ExtensionClass || typeof ExtensionClass !== 'function') {
+                logger.warn(`Extension ${extension} does not export a valid class. Skipping.`)
                 return
             }
+
+            let extensionInstance
             try {
-                setupServer.default({app, options})
+                logger.log(`Instantiating extension class for ${extension}...`)
+                extensionInstance = new ExtensionClass(options)
+                logger.log(`Successfully instantiated extension ${extension}.`)
             } catch (e) {
-                console.error(`Error setting up extension ${extension}:`, e)
+                logger.error(`Error instantiating extension ${extension}:`, e)
+                return
+            }
+
+            // Verify the instance has the methods defined by IApplicationExtension
+            if (
+                typeof extensionInstance.getName !== 'function' ||
+                typeof extensionInstance.extendApp !== 'function'
+            ) {
+                logger.warn(
+                    `Extension ${extension} does not implement IApplicationExtension interface. Skipping.`
+                )
+                return
+            }
+
+            // Extend the app using the provided method
+            try {
+                logger.log(`Extending app using extension ${extension}...`)
+                app = extensionInstance.extendApp(app)
+                logger.log(`Successfully extended app with ${extension}.`)
+            } catch (e) {
+                logger.error(`Error setting up extension ${extension}:`, e)
             }
         })
+
+        logger.log('Finished setting up extensions.')
     },
 
     /**
