@@ -587,7 +587,7 @@ const extensions =
     mode === 'production'
         ? (appConfig?.extensions || [])
               .map((extension) => {
-                  const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/setup-server`
+                  const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/src/setup-server`
                   const foundType = ['ts', 'js'].find((type) =>
                       fse.existsSync(`${setupServerFilePathBase}.${type}`)
                   )
