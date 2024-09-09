@@ -20,14 +20,10 @@ class SampleExtension implements IApplicationExtension {
     }
 
     extendApp(app: Application): Application {
-    console.log('SampleExtension extendApp')
 
-        // Example of extending the base app with some functionality
         app.get('/sample', (req, res) => {
-        console.log('SampleExtension extendApp GET')
-
-
-        res.send('Hello from an express SampleExtension!')
+            console.log('SampleExtension extendApp GET /sample')
+            res.send('Hello from an express SampleExtension!')
         })
 
         return app

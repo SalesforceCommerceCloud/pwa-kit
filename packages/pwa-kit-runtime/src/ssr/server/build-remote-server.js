@@ -65,8 +65,6 @@ import {createProxyMiddleware} from 'http-proxy-middleware'
  */
 const binaryMimeTypes = ['application/*', 'audio/*', 'font/*', 'image/*', 'video/*']
 
-const {IApplicationExtension} = require('./extensibility/types')
-
 /**
  * Environment variables that must be set for the Express app to run remotely.
  *
@@ -661,14 +659,16 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupExtensions(app, options) {
+        logger.log('Setting up extensions...')
+
         const extensions = options.mobify?.app?.extensions || []
+        logger.log('Extensions to load:', extensions)
+
         app.__extensions = extensions || []
 
-        let _require
+        extensions.forEach(async (extension) => {
+            logger.log(`Loading extension: ${extension}`)
 
-        console.log('_setupExtensions')
-
-        extensions.forEach((extension) => {
             const setupServerFilePath = path.join(
                 options.buildDir,
                 'extensions',
@@ -677,22 +677,14 @@ export const RemoteServerFactory = {
                 'setup-server.js'
             )
 
-            console.log('_setupExtensions extension:', extension)
-
-            // Only eval when there are extensions
-            // this makes it slightly faster for projects that
-            // have no extensions
-            if (!_require) {
-                _require = eval('require')
-            }
-
             let ExtensionClass
 
             try {
-                ExtensionClass = _require(setupServerFilePath).default
+                logger.log(`Importing extension from ${setupServerFilePath}...`)
+                ExtensionClass = (await import(setupServerFilePath)).default
             } catch (e) {
                 if (e.message && e.message.startsWith('Cannot find module')) {
-                    // skip extensions that don't have a setup-server.js file
+                    logger.warn(`No setup-server.js file found for ${extension}. Skipping.`)
                     return
                 }
 
@@ -709,6 +701,7 @@ export const RemoteServerFactory = {
             // Instantiate the extension class
             let extensionInstance
             try {
+                logger.log(`Initializing extension: ${extension}`)
                 extensionInstance = new ExtensionClass(options)
             } catch (e) {
                 logger.error(`Error instantiating extension ${extension}:`, e)
@@ -728,11 +721,15 @@ export const RemoteServerFactory = {
 
             // Extend the app using the provided method
             try {
+                logger.log(`Extending app with ${extension}...`)
                 extensionInstance.extendApp(app)
+                logger.log(`Successfully extended app with ${extension}.`)
             } catch (e) {
                 logger.error(`Error setting up extension ${extension}:`, e)
             }
         })
+
+        logger.log('Completed setting up extensions.')
     },
 
     /**

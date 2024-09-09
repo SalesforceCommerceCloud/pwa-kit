@@ -164,7 +164,6 @@ export const DevServerMixin = {
             let ExtensionClass
             try {
                 logger.log(`Loading extension class from ${filePath}...`)
-                // Load the extension module using tsx.require for TypeScript support
                 ExtensionClass = tsx.require(filePath, __filename).default
                 logger.log(`Successfully loaded extension class for ${extension}.`)
             } catch (e) {
