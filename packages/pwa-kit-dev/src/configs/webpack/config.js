@@ -629,7 +629,10 @@ const extensions =
                                       // No nothing if tsconfig.json is declared in the extension.
                                       // Typescript will resolve to it magically.
                                       // If no tsconfig.json is found, use the default options
-                                      ...(tsConfigFound ? {} : {compilerOptions: defaultTsConfig})
+                                      // ...(tsConfigFound ? {} : {compilerOptions: defaultTsConfig})
+                                      options: {
+                                          compilerOptions: defaultTsConfig
+                                      }
                                   },
                                   exclude: /node_modules/
                               }

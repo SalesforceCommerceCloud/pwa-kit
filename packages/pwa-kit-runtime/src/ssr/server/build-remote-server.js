@@ -666,22 +666,27 @@ export const RemoteServerFactory = {
 
         app.__extensions = extensions || []
 
-        extensions.forEach(async (extension) => {
-            logger.log(`Loading extension: ${extension}`)
+        let _require
 
+        extensions.forEach((extension) => {
             const setupServerFilePath = path.join(
                 options.buildDir,
                 'extensions',
                 extension,
-                'src',
                 'setup-server.js'
             )
+
+            // Only eval when there are extensions
+            // this makes it slightly faster for projects that
+            // have no extensions
+            if (!_require) {
+                _require = eval('require')
+            }
 
             let ExtensionClass
 
             try {
-                logger.log(`Importing extension from ${setupServerFilePath}...`)
-                ExtensionClass = (await import(setupServerFilePath)).default
+                ExtensionClass = _require(setupServerFilePath)
             } catch (e) {
                 if (e.message && e.message.startsWith('Cannot find module')) {
                     logger.warn(`No setup-server.js file found for ${extension}. Skipping.`)
@@ -722,7 +727,7 @@ export const RemoteServerFactory = {
             // Extend the app using the provided method
             try {
                 logger.log(`Extending app with ${extension}...`)
-                extensionInstance.extendApp(app)
+                app = extensionInstance.extendApp(app)
                 logger.log(`Successfully extended app with ${extension}.`)
             } catch (e) {
                 logger.error(`Error setting up extension ${extension}:`, e)

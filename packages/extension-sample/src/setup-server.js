@@ -5,21 +5,20 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { IApplicationExtension } from '@salesforce/pwa-kit-runtime/ssr/server/extensibility/types'
-import { Application } from 'express'
 
-class SampleExtension implements IApplicationExtension {
-    private options: any;
 
-    constructor(options: any) {
+class SampleExtension {
+    options
+
+    constructor(options) {
         this.options = options
     }
 
-    getName(): string {
+    getName() {
         return 'SampleExtension'
     }
 
-    extendApp(app: Application): Application {
+    extendApp(app) {
 
         app.get('/sample', (req, res) => {
             console.log('SampleExtension extendApp GET /sample')
