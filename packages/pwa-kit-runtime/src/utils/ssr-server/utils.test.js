@@ -6,12 +6,6 @@
  */
 import * as utils from './utils'
 
-jest.mock('../ssr-config', () => {
-    return {
-        getConfig: () => {}
-    }
-})
-
 describe.each([[true], [false]])('Utils remote/local tests (isRemote: %p)', (isRemote) => {
     let originalEnv
     const bundleId = 'test-bundle-id-12345'

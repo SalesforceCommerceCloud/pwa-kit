@@ -33,12 +33,6 @@ import {
 } from './express'
 import {randomUUID} from 'crypto'
 
-jest.mock('../../utils/ssr-config', () => {
-    return {
-        getConfig: () => {}
-    }
-})
-
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
 jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
