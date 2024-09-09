@@ -82,13 +82,17 @@ export const getShopperContextSearchParams = (
             {}
         )
 
+    const shopperContextSearchParams = {
+        ...searchParamsObj.has(SHOPPER_CONTEXT_SEARCH_PARAMS.SOURCE_CODE) && {sourceCode: searchParamsObj.get(SHOPPER_CONTEXT_SEARCH_PARAMS.SOURCE_CODE)},
+        ...searchParamsObj.has(SHOPPER_CONTEXT_SEARCH_PARAMS.EFFECTIVE_DATE_TIME) && {effectiveDateTime: searchParamsObj.get(SHOPPER_CONTEXT_SEARCH_PARAMS.EFFECTIVE_DATE_TIME)},
+        ...searchParamsObj.has(SHOPPER_CONTEXT_SEARCH_PARAMS.CUSTOMER_GROUP_IDS) && {customerGroupIds: searchParamsObj.getAll(SHOPPER_CONTEXT_SEARCH_PARAMS.CUSTOMER_GROUP_IDS)}
+    }
     const customQualifiers = reduceParams(
         Object.values(SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAMS)
     )
     const assignmentQualifiers = reduceParams(
         Object.values(SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS)
     )
-    const shopperContextSearchParams = reduceParams(Object.values(SHOPPER_CONTEXT_SEARCH_PARAMS))
 
     return {
         ...shopperContextSearchParams,
