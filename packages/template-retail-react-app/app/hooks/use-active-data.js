@@ -6,7 +6,7 @@
  */
 /*global dw*/
 import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
+import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 const useActiveData = () => {
@@ -79,7 +79,7 @@ const useActiveData = () => {
             if (!canTrack()) return
             try {
                 var activeDataUrl =
-                    `${getProxyPath()}/ocapi/on/demandware.store/Sites-` +
+                    `${proxyBasePath}/ocapi/on/demandware.store/Sites-` +
                     siteId +
                     '-Site/' +
                     localeId +
