@@ -15,6 +15,9 @@ import {
 import {isServer, isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
 import {useQueryClient} from '@tanstack/react-query'
 
+// Hooks
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+
 // Constants
 import {
     SHOPPER_CONTEXT_SEARCH_PARAMS,
@@ -27,14 +30,15 @@ import {
  * This hook will set the shopper context when search params pertinant
  * to shopper context are present.
  */
-export const useShopperContextSearchParams = (siteId) => {
+export const useShopperContextSearchParams = () => {
+    const {site} = useMultiSite()
     const {usid} = useUsid()
     const queryClient = useQueryClient()
     const {search} = useLocation()
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
     const {data: shopperContext} = useShopperContext(
-        {parameters: {usid, siteId}},
+        {parameters: {usid, siteId: site.id}},
         {enabled: !isServer}
     )
     console.log('shopperContext', shopperContext)
@@ -52,7 +56,7 @@ export const useShopperContextSearchParams = (siteId) => {
                 shopperContext,
                 updateShopperContextObj,
                 usid,
-                siteId,
+                siteId: site.id,
                 refetchDataOnClient
             })
         }
@@ -71,11 +75,14 @@ export const getShopperContextSearchParams = (
     arraySearchParams = SHOPPER_CONTEXT_ARRAY_FIELDS
 ) => {
     const searchParamsObj = new URLSearchParams(search)
+
+    // Parses the search param key and value into an object
     const getSearchParam = (key, isList = false) =>
         searchParamsObj.has(key)
             ? {[key]: isList ? searchParamsObj.getAll(key) : searchParamsObj.get(key)}
             : {}
 
+    // Merges the shopper context search param key and values into a single object.    
     const reduceParams = (keys) =>
         keys.reduce(
             (acc, key) => ({...acc, ...getSearchParam(key, arraySearchParams.includes(key))}),

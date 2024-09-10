@@ -59,7 +59,7 @@ describe('useShopperContextSearchParams', () => {
         const wrapper = ({children}) => <Router history={history}>{children}</Router>
 
         useShopperContext.mockReturnValue({data: undefined})
-        renderHook(() => useShopperContextSearchParams(siteId), {wrapper})
+        renderHook(() => useShopperContextSearchParams(), {wrapper})
         expect(useShopperContext).toHaveBeenCalledTimes(1)
         expect(createShopperContext.mutateAsync).not.toHaveBeenCalled()
         expect(updateShopperContext.mutateAsync).not.toHaveBeenCalled()
@@ -70,7 +70,7 @@ describe('useShopperContextSearchParams', () => {
         history.push('/test/path?sourceCode=instagram&customerGroupIds=BigSpenders')
         const wrapper = ({children}) => <Router history={history}>{children}</Router>
 
-        renderHook(() => useShopperContextSearchParams(siteId), {wrapper})
+        renderHook(() => useShopperContextSearchParams(), {wrapper})
         expect(createShopperContext.mutateAsync).toHaveBeenCalledWith({
             parameters: {usid, siteId},
             body: {sourceCode: 'instagram', customerGroupIds: ['BigSpenders']}

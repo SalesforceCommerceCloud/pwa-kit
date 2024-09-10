@@ -64,11 +64,7 @@ import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/
 import {IntlProvider} from 'react-intl'
 
 // Others
-import {
-    watchOnlineStatus,
-    flatten,
-    isServer,
-} from '@salesforce/retail-react-app/app/utils/utils'
+import {watchOnlineStatus, flatten, isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getTargetLocale, fetchTranslations} from '@salesforce/retail-react-app/app/utils/locale'
 import {
     DEFAULT_SITE_TITLE,
@@ -238,7 +234,7 @@ const App = (props) => {
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const deleteShopperContext = useShopperContextsMutation('deleteShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
-    useShopperContextSearchParams(site.id)
+    useShopperContextSearchParams()
 
     useEffect(() => {
         // Lets automatically close the mobile navigation when the
