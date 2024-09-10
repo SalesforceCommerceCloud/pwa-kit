@@ -6,8 +6,9 @@
 
 ### Accessibility Improvements
 - [a11y] Hide svg from screenreader as they are decorative on homepage [#1980](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1980) 
-- [a11y]] Hide log out svg from screenreader as they are decorative [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
+- [a11y] Hide log out svg from screenreader as they are decorative [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
 - [a11y] Ensure heading level matches the heading's visual importance/level [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
+- [a11y] Provide a descriptive dialog title for Mobile Navigation Header [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
 
 ### Accessibility Improvements
 - Hide breadcrumb chevrons from screen readers [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
