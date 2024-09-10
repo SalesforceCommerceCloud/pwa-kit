@@ -49,21 +49,18 @@ describe('useDNT tests', () => {
     })
 
     it('dntStatus should be false if dw_dnt cookie is "0"', () => {
-        mockGetDnt.mockReset()
         mockGetDnt.mockReturnValue('0')
         const {dntStatus} = useDNT()
         expect(dntStatus).toBe(false)
     })
 
     it('dntStatus should be undefined if dw_dnt cookie is not defined', () => {
-        mockGetDnt.mockReset()
         mockGetDnt.mockReturnValueOnce(undefined)
         const {dntStatus} = useDNT()
         expect(dntStatus).toBeUndefined()
     })
 
     it('dntStatus should be undefined if dw_dnt cookie is invalid', () => {
-        mockGetDnt.mockReset()
         mockGetDnt.mockReturnValueOnce('invalidValue')
         const {dntStatus} = useDNT()
         expect(dntStatus).toBeUndefined()

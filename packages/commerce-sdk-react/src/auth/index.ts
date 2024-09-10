@@ -65,13 +65,14 @@ export type AuthData = Prettify<
     }
 >
 
+const DNT_COOKIE_NAME = 'dw_dnt' as const
 /** A shopper could be guest or registered, so we store the refresh tokens individually. */
 type AuthDataKeys =
     | Exclude<keyof AuthData, 'refresh_token'>
     | 'refresh_token_guest'
     | 'refresh_token_registered'
     | 'access_token_sfra'
-    | 'dw_dnt'
+    | typeof DNT_COOKIE_NAME
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -160,9 +161,9 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'cookie',
         key: 'cc-at'
     },
-    dw_dnt: {
+    [DNT_COOKIE_NAME]: {
         storageType: 'cookie',
-        key: 'dw_dnt'
+        key: DNT_COOKIE_NAME
     }
 }
 
@@ -186,14 +187,12 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
-    private dntCookieName: AuthDataKeys
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
-        this.dntCookieName = 'dw_dnt'
         // Add keys that should not be site specific to this array
-        const keysExcludedFromSuffixing = [this.dntCookieName]
+        const keysExcludedFromSuffixing = [DNT_COOKIE_NAME]
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
             parameters: {
@@ -285,7 +284,7 @@ class Auth {
     }
 
     getDnt() {
-        return this.get(this.dntCookieName)
+        return this.get(DNT_COOKIE_NAME)
     }
 
     async setDnt(preference: boolean | null, secondsUntilExpire?: number) {
@@ -295,11 +294,11 @@ class Auth {
             dntCookieVal = this.defaultDnt ? String(Number(this.defaultDnt)) : '0'
         }
         // Set the cookie once to include dnt in the access token and then again to set the expiry time
-        this.set(this.dntCookieName, dntCookieVal, {
+        this.set(DNT_COOKIE_NAME, dntCookieVal, {
             ...getDefaultCookieAttributes(),
             secure: true
         })
-        const accessToken = this.get('access_token')
+        const accessToken = this.getAccessToken()
         if (accessToken !== '') {
             const {dnt} = this.parseSlasJWT(accessToken)
             if (dnt !== dntCookieVal) {
@@ -309,7 +308,7 @@ class Auth {
             await this.refreshAccessToken()
         }
         if (preference !== null) {
-            this.set(this.dntCookieName, dntCookieVal, {
+            this.set(DNT_COOKIE_NAME, dntCookieVal, {
                 ...getDefaultCookieAttributes(),
                 secure: true,
                 ...(secondsUntilExpire !== undefined && {
@@ -437,7 +436,7 @@ class Auth {
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
         if (refreshToken) {
             try {
-                const result = await this.queueRequest(
+                return await this.queueRequest(
                     () =>
                         helpers.refreshAccessToken(
                             this.client,
@@ -451,7 +450,6 @@ class Auth {
                         ),
                     !!refreshTokenGuest
                 )
-                return result
             } catch (error) {
                 // If the refresh token is invalid, we need to re-login the user
                 if (error instanceof Error && 'response' in error) {
@@ -529,7 +527,9 @@ class Auth {
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
-        await this.refreshAccessToken()
+        const result = await this.refreshAccessToken()
+        if (result) return result
+
         return this.loginGuestUser()
     }
 
