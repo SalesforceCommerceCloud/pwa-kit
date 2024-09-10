@@ -284,7 +284,12 @@ class Auth {
     }
 
     getDnt() {
-        return this.get(DNT_COOKIE_NAME)
+        const dntCookieVal = this.get(DNT_COOKIE_NAME)
+        let dntStatus = undefined
+        if (dntCookieVal !== '1' && dntCookieVal !== '0')
+            if (dntCookieVal && (dntCookieVal === '1' || dntCookieVal === '0'))
+                dntStatus = Boolean(Number(dntCookieVal))
+        return dntStatus
     }
 
     async setDnt(preference: boolean | null, secondsUntilExpire?: number) {

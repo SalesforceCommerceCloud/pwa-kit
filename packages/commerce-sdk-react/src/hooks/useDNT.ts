@@ -24,14 +24,11 @@ interface useDntReturn {
  */
 const useDNT = (): useDntReturn => {
     const auth = useAuthContext()
-    const dwDntValue = auth.getDnt()
+    const dntStatus = auth.getDnt()
     const updateDNT = async (preference: boolean | null) => {
         await auth.setDnt(preference)
     }
 
-    let dntStatus = undefined
-    if (dwDntValue && (dwDntValue === '1' || dwDntValue === '0'))
-        dntStatus = Boolean(Number(dwDntValue))
     return {dntStatus, updateDNT}
 }
 
