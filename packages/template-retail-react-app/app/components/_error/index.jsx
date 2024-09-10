@@ -50,6 +50,9 @@ const Error = (props) => {
                         icon={<BrandLogo width={[8, 8, 8, 12]} height={[6, 6, 6, 8]} />}
                         marginBottom={[1, 1, 2, 0]}
                         variant="unstyled"
+                        // We need to use window.location.href here rather than history
+                        // as the application is in an error state. We need to force a
+                        // hard navigation to get back to the normal state.
                         onClick={() => (window.location.href = '/')}
                     />
                 </Box>
