@@ -654,13 +654,14 @@ export const RemoteServerFactory = {
      * This function assumes that optionally, there is a `setup-server.js`
      * file in each extension directory in the build.
      *
-     * This file should export a default which is a function.
+     * This file should export a default which is a IApplicationExtension class.
      *
      * @private
      */
     _setupExtensions(app, options) {
         logger.log('Setting up extensions...')
 
+        // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
         logger.log('Extensions to load:', extensions)
 
@@ -684,9 +685,8 @@ export const RemoteServerFactory = {
             }
 
             let ExtensionClass
-
             try {
-                ExtensionClass = _require(setupServerFilePath)
+                ExtensionClass = _require(setupServerFilePath).default
             } catch (e) {
                 if (e.message && e.message.startsWith('Cannot find module')) {
                     logger.warn(`No setup-server.js file found for ${extension}. Skipping.`)
@@ -697,17 +697,17 @@ export const RemoteServerFactory = {
                 throw e
             }
 
-            // Check if the default export is a class that implements IApplicationExtension
+            // Ensure that the default export is a class that implements IApplicationExtension
             if (!ExtensionClass || typeof ExtensionClass !== 'function') {
                 logger.warn(`Extension ${extension} does not export a valid class. Skipping.`)
                 return
             }
 
-            // Instantiate the extension class
             let extensionInstance
             try {
-                logger.log(`Initializing extension: ${extension}`)
+                logger.log(`Instantiating extension class for ${extension}...`)
                 extensionInstance = new ExtensionClass(options)
+                logger.log(`Successfully instantiated extension ${extension}.`)
             } catch (e) {
                 logger.error(`Error instantiating extension ${extension}:`, e)
                 return
@@ -726,7 +726,7 @@ export const RemoteServerFactory = {
 
             // Extend the app using the provided method
             try {
-                logger.log(`Extending app with ${extension}...`)
+                logger.log(`Extending app using extension ${extension}...`)
                 app = extensionInstance.extendApp(app)
                 logger.log(`Successfully extended app with ${extension}.`)
             } catch (e) {
@@ -734,7 +734,7 @@ export const RemoteServerFactory = {
             }
         })
 
-        logger.log('Completed setting up extensions.')
+        logger.log('Finished setting up extensions.')
     },
 
     /**

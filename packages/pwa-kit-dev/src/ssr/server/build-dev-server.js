@@ -158,14 +158,12 @@ export const DevServerMixin = {
                 filePath = `${setupServerFilePathBase}.js`
             } else {
                 logger.warn(`No setup-server file found for ${extension}. Skipping.`)
-                return // Skip if neither .ts nor .js file exists
+                return
             }
 
             let ExtensionClass
             try {
-                logger.log(`Loading extension class from ${filePath}...`)
                 ExtensionClass = tsx.require(filePath, __filename).default
-                logger.log(`Successfully loaded extension class for ${extension}.`)
             } catch (e) {
                 logger.error(`Error loading extension ${extension}:`, e)
                 return
