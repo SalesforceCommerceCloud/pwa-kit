@@ -593,7 +593,7 @@ const extensions =
                   )
 
                   if (!foundType) {
-                      // no setup-server file found, early exit because it's optional
+                      // No setup-server file found, early exit because it's optional
                       return
                   }
 
@@ -604,14 +604,19 @@ const extensions =
                       esModuleInterop: true,
                       skipLibCheck: true
                   }
-                  let tsConfigFound = fse.existsSync(
-                      `${projectDir}/node_modules/${extension}/tsconfig.json`
-                  )
+
+                  const tsConfigPath = `${projectDir}/node_modules/${extension}/tsconfig.json`
+                  const tsConfigFound = fse.existsSync(tsConfigPath)
+
+                  console.log(`Configuring extension: ${extension}`)
+                  console.log(`tsConfigFound: ${tsConfigFound}`)
+                  console.log(`setupServerFilePathBase: ${setupServerFilePathBase}`)
+
                   return {
                       name: 'extensions',
                       target: 'node',
                       mode,
-                      entry: setupServerFilePathBase,
+                      entry: `${setupServerFilePathBase}.${foundType}`,
                       output: {
                           path: `${buildDir}/extensions/${extension}`,
                           filename: 'setup-server.js',
@@ -626,12 +631,11 @@ const extensions =
                                   test: /\.ts?$/,
                                   use: {
                                       loader: findDepInStack('ts-loader'),
-                                      // No nothing if tsconfig.json is declared in the extension.
-                                      // Typescript will resolve to it magically.
-                                      // If no tsconfig.json is found, use the default options
-                                      // ...(tsConfigFound ? {} : {compilerOptions: defaultTsConfig})
                                       options: {
-                                          compilerOptions: defaultTsConfig
+                                          configFile: tsConfigFound ? tsConfigPath : false, // Explicitly disable tsconfig.json if not found
+                                          compilerOptions: tsConfigFound
+                                              ? {} // No extra options if tsconfig.json is found
+                                              : defaultTsConfig // Use default options if tsconfig.json is not found
                                       }
                                   },
                                   exclude: /node_modules/
