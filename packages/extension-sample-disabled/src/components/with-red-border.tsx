@@ -14,7 +14,7 @@ type WithRedBorderProps = React.ComponentPropsWithoutRef<any>;
 const withRedBorder = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
   const WithRedBorder: React.FC<P> = (props: WithRedBorderProps) => {
     return (
-      <div style={{ border: '2px solid red', padding: '10px' }}>
+      <div style={{ border: '2px solid blue', padding: '10px' }}>
         <WrappedComponent {...(props as P)} />
       </div>
     )

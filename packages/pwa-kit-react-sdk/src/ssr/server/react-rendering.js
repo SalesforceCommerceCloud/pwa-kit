@@ -127,7 +127,8 @@ export const render = async (req, res, next) => {
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
-    const extensions = getExtensions()
+    const extensions = await getExtensions()
+    console.log('extensions: ', extensions)
 
     AppConfig.restore(res.locals)
 

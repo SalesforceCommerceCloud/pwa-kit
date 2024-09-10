@@ -58,29 +58,37 @@ module.exports = function () {
             * SPDX-License-Identifier: BSD-3-Clause
             * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
             */
+            import loadable from '@loadable/component'
             import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
             // App Extensions
             ${extensionDetails
                 .map(
                     ({instanceVariable, modulePath}) =>
-                        `import ${instanceVariable} from '${modulePath}'`
+                        `const ${instanceVariable}Loader = loadable.lib(() => import('${modulePath}'))`
                 )
                 .join('\n            ')}
             
-            export const getExtensions = () => {
+            let loaders = [
+                ${extensionDetails
+                    .map(
+                        ({instanceVariable}) => `${instanceVariable}Loader`
+                    )
+                    .join(',\n            ')}
+            ]
+
+            export const getExtensions = async () => {
                 const configuredExtensions = getConfig()?.app?.extensions || []
 
-                return [
-                    ${extensionDetails
-                        .map(({instanceVariable, packageName}) => {
-                            const config = {} // TODO: Parse config config here.
-                            return `configuredExtensions.includes('${packageName}') ? new ${instanceVariable}(${JSON.stringify(
-                                config
-                            )}) : false`
-                        })
-                        .join(',\n                    ')}
-                ].filter(Boolean)
+                let modules = await Promise.all(loaders.map((loader) => loader.load()))
+                        
+                modules = modules.map((module) => module.default)
+                
+                const instances = modules.map((module) => {
+                    return new module({})
+                })
+
+                return instances
             }
         `
 }
