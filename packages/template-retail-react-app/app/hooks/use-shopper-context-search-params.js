@@ -48,18 +48,27 @@ export const useShopperContextSearchParams = () => {
     }
 
     useEffect(() => {
-        const updateShopperContextObj = getShopperContextSearchParams(search)
-        if (Object.keys(updateShopperContextObj).length > 0) {
-            handleShopperContextUpdate({
-                createShopperContext,
-                updateShopperContext,
-                shopperContext,
-                updateShopperContextObj,
-                usid,
-                siteId: site.id,
-                refetchDataOnClient
-            })
+        const handleShopperContextUpdate = async () => {
+            const payload = {
+                parameters: {usid, siteId: site.id},
+                body: updateShopperContextObj
+            }
+            if (!shopperContext) {
+                await createShopperContext.mutateAsync(payload)
+            } else {
+                await updateShopperContext.mutateAsync(payload)
+                console.log('updated shopperContext', updateShopperContextObj)
+            }
         }
+
+        const updateShopperContextObj = getShopperContextSearchParams(search)
+        if (Object.keys(updateShopperContextObj).length === 0) {
+            return
+        }
+        handleShopperContextUpdate()
+        // Refresh data
+        refetchDataOnClient()
+
     }, [search])
 
     useEffect(() => {
@@ -72,10 +81,11 @@ export const useShopperContextSearchParams = () => {
 
 export const getShopperContextSearchParams = (
     search,
+    customQualifersSearchParams = SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAMS,
+    assignmentQualifiersSearchParams = SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS,
     arraySearchParams = SHOPPER_CONTEXT_ARRAY_FIELDS
 ) => {
     const searchParamsObj = new URLSearchParams(search)
-
     // Parses the search param key and value into an object
     const getSearchParam = (key, isList = false) =>
         searchParamsObj.has(key)
@@ -89,7 +99,7 @@ export const getShopperContextSearchParams = (
             {}
         )
 
-    const shopperContextSearchParams = {
+    const shopperContext = {
         ...(searchParamsObj.has(SHOPPER_CONTEXT_SEARCH_PARAMS.SOURCE_CODE) && {
             sourceCode: searchParamsObj.get(SHOPPER_CONTEXT_SEARCH_PARAMS.SOURCE_CODE)
         }),
@@ -105,38 +115,15 @@ export const getShopperContextSearchParams = (
         })
     }
     const customQualifiers = reduceParams(
-        Object.values(SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAMS)
+        Object.values(customQualifersSearchParams)
     )
     const assignmentQualifiers = reduceParams(
-        Object.values(SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS)
+        Object.values(assignmentQualifiersSearchParams)
     )
 
     return {
-        ...shopperContextSearchParams,
+        ...shopperContext,
         ...(Object.keys(customQualifiers).length && {customQualifiers}),
         ...(Object.keys(assignmentQualifiers).length && {assignmentQualifiers})
     }
-}
-
-export const handleShopperContextUpdate = async ({
-    createShopperContext,
-    updateShopperContext,
-    shopperContext,
-    updateShopperContextObj,
-    usid,
-    siteId,
-    refetchDataOnClient
-}) => {
-    const payload = {
-        parameters: {usid, siteId},
-        body: updateShopperContextObj
-    }
-    if (!shopperContext) {
-        await createShopperContext.mutateAsync(payload)
-    } else {
-        await updateShopperContext.mutateAsync(payload)
-        console.log('updated shopperContext', updateShopperContextObj)
-    }
-    // Refresh data
-    refetchDataOnClient()
 }
