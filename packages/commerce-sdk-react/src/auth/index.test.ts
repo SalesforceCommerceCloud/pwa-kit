@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import Auth, {AuthData} from './'
+import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
-
+import {getDefaultCookieAttributes} from '../utils'
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
     const originalModule = jest.requireActual('./storage')
@@ -501,5 +502,21 @@ describe('Auth', () => {
         const auth = new Auth({...config, siteId: 'siteA'})
         await auth.setDnt(null)
         expect(auth.get('dw_dnt')).toBe('0')
+    })
+
+    test('setDNT(true|false) sets cookie with an expiration time', async () => {
+        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(true)
+        expect(setDntSpiedOn).toHaveBeenLastCalledWith('dw_dnt', '1', expect.objectContaining({ expires: expect.any(Number) }))
+    })
+
+    test('setDNT(null) sets cookie WITHOUT an expiration time', async () => {
+        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(null)
+        await waitFor(() => {
+            expect(setDntSpiedOn).not.toHaveBeenCalledWith('dw_dnt', '1', expect.objectContaining({ expires: expect.any(Number) }))
+        })
     })
 })

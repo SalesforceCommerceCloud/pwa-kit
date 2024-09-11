@@ -300,7 +300,7 @@ class Auth {
         return dntStatus
     }
 
-    async setDnt(preference: boolean | null, secondsUntilExpire?: number) {
+    async setDnt(preference: boolean | null) {
         let dntCookieVal = String(Number(preference))
         // Use defaultDNT if defined. If not, use SLAS default DNT
         if (preference === null) {
@@ -324,9 +324,7 @@ class Auth {
             this.set(DNT_COOKIE_NAME, dntCookieVal, {
                 ...getDefaultCookieAttributes(),
                 secure: true,
-                ...(secondsUntilExpire !== undefined && {
-                    expires: Number(this.get('refresh_token_expires_in')) / 86400
-                })
+                expires: Number(this.get('refresh_token_expires_in')) / 86400
             })
         }
     }
