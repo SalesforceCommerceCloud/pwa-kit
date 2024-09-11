@@ -55,7 +55,7 @@ import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
+import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
 
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
@@ -234,7 +234,7 @@ const App = (props) => {
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const deleteShopperContext = useShopperContextsMutation('deleteShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
-    useShopperContextSearchParams()
+    useUpdateShopperContext()
 
     useEffect(() => {
         // Lets automatically close the mobile navigation when the
@@ -370,7 +370,7 @@ const App = (props) => {
                                             },
                                             body: {}
                                         })
-                                        refetchDataOnClient()
+                                        // refetchDataOnClient()
                                     }}
                                 >
                                     Create context
@@ -385,7 +385,7 @@ const App = (props) => {
                                                 siteId: site.id
                                             }
                                         })
-                                        refetchDataOnClient()
+                                        // refetchDataOnClient()
                                     }}
                                 >
                                     Delete context
@@ -394,7 +394,7 @@ const App = (props) => {
                                     colorScheme="yellow"
                                     variant="solid"
                                     onClick={async () => {
-                                        const test = await updateShopperContext.mutateAsync({
+                                        await updateShopperContext.mutateAsync({
                                             parameters: {
                                                 usid,
                                                 siteId: site.id
@@ -406,7 +406,7 @@ const App = (props) => {
                                                 }
                                             }
                                         })
-                                        refetchDataOnClient()
+                                        // refetchDataOnClient()
                                         // window.location.reload()
                                     }}
                                 >
