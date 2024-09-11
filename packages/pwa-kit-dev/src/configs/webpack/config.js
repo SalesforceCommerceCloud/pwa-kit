@@ -608,15 +608,11 @@ const extensions =
                   const tsConfigPath = `${projectDir}/node_modules/${extension}/tsconfig.json`
                   const tsConfigFound = fse.existsSync(tsConfigPath)
 
-                  console.log(`Configuring extension: ${extension}`)
-                  console.log(`tsConfigFound: ${tsConfigFound}`)
-                  console.log(`setupServerFilePathBase: ${setupServerFilePathBase}`)
-
                   return {
                       name: 'extensions',
                       target: 'node',
                       mode,
-                      entry: `${setupServerFilePathBase}.${foundType}`,
+                      entry: setupServerFilePathBase,
                       output: {
                           path: `${buildDir}/extensions/${extension}`,
                           filename: 'setup-server.js',
@@ -632,10 +628,10 @@ const extensions =
                                   use: {
                                       loader: findDepInStack('ts-loader'),
                                       options: {
-                                          configFile: tsConfigFound ? tsConfigPath : false, // Explicitly disable tsconfig.json if not found
-                                          compilerOptions: tsConfigFound
-                                              ? {} // No extra options if tsconfig.json is found
-                                              : defaultTsConfig // Use default options if tsconfig.json is not found
+                                          // If tsconfig is not found, ignore tsconfig.json and rely on
+                                          // using the default compilerOptions
+                                          happyPackMode: !tsConfigFound,
+                                          compilerOptions: tsConfigFound ? {} : defaultTsConfig
                                       }
                                   },
                                   exclude: /node_modules/
