@@ -283,12 +283,21 @@ class Auth {
         DATA_MAP[name].callback?.(storage)
     }
 
+    private delete(name: AuthDataKeys) {
+        const {key, storageType} = DATA_MAP[name]
+        const storage = this.stores[storageType]
+        storage.delete(key)
+    }
+
     getDnt() {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
-        let dntStatus = undefined
-        if (dntCookieVal !== '1' && dntCookieVal !== '0')
-            if (dntCookieVal && (dntCookieVal === '1' || dntCookieVal === '0'))
-                dntStatus = Boolean(Number(dntCookieVal))
+        var dntStatus = undefined
+        if (dntCookieVal !== '1' && dntCookieVal !== '0') {
+            this.delete(DNT_COOKIE_NAME)
+        }
+        else {
+            dntStatus = Boolean(Number(dntCookieVal))
+        }
         return dntStatus
     }
 
@@ -485,6 +494,7 @@ class Auth {
                 }
             }
         }
+        return this.loginGuestUser()
     }
 
     /**
@@ -548,10 +558,7 @@ class Auth {
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
-        const result = await this.refreshAccessToken()
-        if (result) return result
-
-        return this.loginGuestUser()
+        return await this.refreshAccessToken()
     }
 
     /**

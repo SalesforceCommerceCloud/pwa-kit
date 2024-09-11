@@ -19,7 +19,7 @@ describe('useDNT tests', () => {
     beforeEach(() => {
         mockedUseConfig.mockReset()
         mockGetDnt.mockReset()
-        mockGetDnt.mockReturnValue('1')
+        mockGetDnt.mockReturnValue(true)
         mockedUseConfig.mockReturnValueOnce({
             defaultDnt: true
         })
@@ -49,7 +49,7 @@ describe('useDNT tests', () => {
     })
 
     it('dntStatus should be false if dw_dnt cookie is "0"', () => {
-        mockGetDnt.mockReturnValue('0')
+        mockGetDnt.mockReturnValue(false)
         const {dntStatus} = useDNT()
         expect(dntStatus).toBe(false)
     })
@@ -61,7 +61,7 @@ describe('useDNT tests', () => {
     })
 
     it('dntStatus should be undefined if dw_dnt cookie is invalid', () => {
-        mockGetDnt.mockReturnValueOnce('invalidValue')
+        mockGetDnt.mockReturnValueOnce(undefined)
         const {dntStatus} = useDNT()
         expect(dntStatus).toBeUndefined()
     })
