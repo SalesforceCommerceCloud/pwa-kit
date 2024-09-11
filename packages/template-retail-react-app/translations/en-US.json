@@ -462,6 +462,9 @@
   "drawer_menu.button.order_history": {
     "defaultMessage": "Order History"
   },
+  "drawer_menu.header.assistive_msg.title": {
+    "defaultMessage": "Menu Drawer"
+  },
   "drawer_menu.link.about_us": {
     "defaultMessage": "About Us"
   },

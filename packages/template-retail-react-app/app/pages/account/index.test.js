@@ -117,6 +117,9 @@ describe('Render and logs out', function () {
             expect(screen.getByText('Testing Tester')).toBeInTheDocument()
             expect(screen.getByText('customer@test.com')).toBeInTheDocument()
             expect(screen.getByText('(727) 555-1234')).toBeInTheDocument()
+            const logOutIcons = screen.getAllByLabelText('signout')
+            expect(logOutIcons[0]).toHaveAttribute('aria-hidden', 'true')
+            expect(logOutIcons[1]).toHaveAttribute('aria-hidden', 'true')
         })
 
         await user.click(screen.getAllByText(/Log Out/)[0])

@@ -283,7 +283,11 @@ const Header = ({
                                     <Divider colorScheme="gray" />
                                     <Button variant="unstyled" {...styles.signout}>
                                         <Flex>
-                                            <SignoutIcon boxSize={5} {...styles.signoutIcon} />
+                                            <SignoutIcon
+                                                aria-hidden={true}
+                                                boxSize={5}
+                                                {...styles.signoutIcon}
+                                            />
                                             <Text as="span" {...styles.signoutText}>
                                                 {intl.formatMessage({
                                                     defaultMessage: 'Log out',

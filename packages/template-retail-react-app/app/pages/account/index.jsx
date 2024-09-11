@@ -64,7 +64,7 @@ const LogoutButton = ({onClick}) => {
                 height={11}
             >
                 <Flex justify={{base: 'center', lg: 'flex-start'}}>
-                    <SignoutIcon boxSize={5} mr={2} />
+                    <SignoutIcon boxSize={5} mr={2} aria-hidden={true} />
                     <Text as="span" fontSize={['md', 'md', 'md', 'sm']} fontWeight="normal">
                         {formatMessage({
                             defaultMessage: 'Log Out',
@@ -182,7 +182,7 @@ const Account = () => {
                 <Stack display={{base: 'none', lg: 'flex'}} spacing={4}>
                     {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
-                    <Heading as="h6" fontSize="18px">
+                    <Heading as="h2" fontSize="18px">
                         <FormattedMessage
                             defaultMessage="My Account"
                             id="account.heading.my_account"
