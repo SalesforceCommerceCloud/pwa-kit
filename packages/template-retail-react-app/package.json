@@ -81,7 +81,7 @@
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.43.9",
     "react-intl": "^5.25.1",
-    "react-router-dom": "^5.3.4"
+    "react-router-dom": "^6.0.0"
   },
   "devDependencies": {
     "cross-env": "^5.2.1"
