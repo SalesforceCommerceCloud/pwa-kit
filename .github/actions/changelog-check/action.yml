@@ -31,7 +31,7 @@ runs:
       id: check_labels
       run: |
         SKIP_CHANGELOG_LABEL="${{ contains(github.event.pull_request.labels.*.name, 'skip changelog') }}"
-        if [ "SKIP_CHANGELOG_LABEL" = "true" ]; then
+        if [ "$SKIP_CHANGELOG_LABEL" = "true" ]; then
           echo "Skip changelog label is present. Skipping changelog check."
           echo "SKIP_CHANGELOG_CHECK=true" >> $GITHUB_ENV
         fi
