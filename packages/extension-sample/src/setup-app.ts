@@ -21,7 +21,7 @@ class Sample implements IApplicationExtension {
         this.config = config
     }
     
-    getConfig(): object {
+    getConfig(): Record<string, any> {
         return this.config
     }
 
