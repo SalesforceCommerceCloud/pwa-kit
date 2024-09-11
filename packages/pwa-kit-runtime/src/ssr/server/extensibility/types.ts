@@ -7,7 +7,7 @@
 import {Application} from 'express'
 
 /**
- * Interface that must be implemented by all React application extensions.
+ * Interface that must be implemented by all Express application extensions.
  */
 export interface IExpressApplicationExtension {
     /**

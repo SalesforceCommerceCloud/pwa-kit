@@ -664,11 +664,11 @@ export const RemoteServerFactory = {
         // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
         logger.info('Extensions to load', {
-            namespace: 'DevServerMixin._setupExtensions',
+            namespace: 'RemoteServerFactory._setupExtensions',
             additionalProperties: {extensions: extensions}
         })
 
-        app.__extensions = extensions || []
+        app.__extensions = extensions
 
         let _require
 
@@ -699,14 +699,14 @@ export const RemoteServerFactory = {
                 }
 
                 logger.error(`Error loading extension ${extension}:`, {
-                    namespace: 'DevServerMixin._setupExtensions',
+                    namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })
                 throw e
             }
 
             // Ensure that the default export is a class that implements IExpressApplicationExtension
-            if (!ExtensionClass || typeof ExtensionClass !== 'function') {
+            if (ExtensionClass && typeof ExtensionClass !== 'function') {
                 logger.warn(`Extension ${extension} does not export a valid class. Skipping.`)
                 return
             }
@@ -718,7 +718,7 @@ export const RemoteServerFactory = {
                 logger.info(`Successfully instantiated extension ${extension}.`)
             } catch (e) {
                 logger.error(`Error instantiating extension ${extension}:`, {
-                    namespace: 'DevServerMixin._setupExtensions',
+                    namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })
                 return
@@ -742,7 +742,7 @@ export const RemoteServerFactory = {
                 logger.log(`Successfully extended app with ${extension}.`)
             } catch (e) {
                 logger.error(`Error setting extension ${extension}:`, {
-                    namespace: 'DevServerMixin._setupExtensions',
+                    namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })
             }

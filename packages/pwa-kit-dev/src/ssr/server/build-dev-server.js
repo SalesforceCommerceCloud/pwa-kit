@@ -176,7 +176,7 @@ export const DevServerMixin = {
             }
 
             // Ensure that the default export is a class that implements IExpressApplicationExtension
-            if (!ExtensionClass || typeof ExtensionClass !== 'function') {
+            if (ExtensionClass && typeof ExtensionClass !== 'function') {
                 logger.warn(`Extension ${extension} does not export a valid class. Skipping.`)
                 return
             }
