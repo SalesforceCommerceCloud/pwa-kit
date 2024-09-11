@@ -438,9 +438,21 @@ describe('Auth', () => {
             clientSecret: SLAS_SECRET_PLACEHOLDER
         })
     })
-    test('logout', async () => {
+    test('logout as registered user calls isomorphic logout', async () => {
+        const auth = new Auth(config)
+
+        // @ts-expect-error private method
+        // simulate logging in as login function is mocked
+        auth.set('customer_type', 'registered')
+
+        await auth.logout()
+        expect(helpers.logout).toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+    })
+    test('logout as guest user does not call isomorphic logout', async () => {
         const auth = new Auth(config)
         await auth.logout()
+        expect(helpers.logout).not.toHaveBeenCalled()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
     test('PWA private client mode takes priority', async () => {

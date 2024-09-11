@@ -71,7 +71,7 @@ const Footer = ({...otherProps}) => {
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
-            <Box {...styles.content}>
+            <Box {...styles.content} as="section">
                 <StylesProvider value={styles}>
                     <HideOnMobile>
                         <SimpleGrid columns={4} spacing={3}>

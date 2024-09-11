@@ -49,7 +49,7 @@ const ProductScroller = forwardRef(
         const scroll = (direction = 1) => {
             scrollRef.current?.scrollBy({
                 top: 0,
-                left: direction * window.innerWidth,
+                left: direction * scrollRef.current?.offsetWidth,
                 behavior: 'smooth'
             })
         }

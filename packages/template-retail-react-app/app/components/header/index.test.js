@@ -220,5 +220,8 @@ test('shows dropdown menu when an authenticated users hover on the account icon'
         expect(screen.getByText(/addresses/i)).toBeInTheDocument()
         expect(screen.getByText(/wishlist/i)).toBeInTheDocument()
         expect(screen.getByText(/order history/i)).toBeInTheDocument()
+        const logOutIcon = screen.getByLabelText('signout')
+        expect(logOutIcon).toBeInTheDocument()
+        expect(logOutIcon).toHaveAttribute('aria-hidden', 'true')
     })
 })
