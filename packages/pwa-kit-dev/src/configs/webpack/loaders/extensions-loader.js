@@ -7,11 +7,10 @@
 
 import dedent from 'dedent'
 import {kebabToUpperCamelCase} from '../utils'
+import {nameRegex} from '../../../utils/extensibility-utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
 const APP_EXTENSION_PREFIX = 'extension'
-
-const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
 
 /**
  * The `extensions-loader` as a mechanism to get all configured extensions for a given pwa-kit

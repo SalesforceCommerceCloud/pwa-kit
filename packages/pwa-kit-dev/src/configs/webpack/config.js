@@ -23,7 +23,7 @@ import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {buildAliases} from '../../utils/extensibility-utils'
+import {buildAliases, nameRegex} from '../../utils/extensibility-utils'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -217,7 +217,7 @@ const baseConfig = (target) => {
                         // are configured at build time.
                         ...buildAliases(
                             Object.keys(pkg?.devDependencies || {}).filter((dependency) =>
-                                dependency.match(/^(?:@([^/]+)\/)?extension-(.+)$/)
+                                dependency.match(nameRegex)
                             )
                         ),
                         ...Object.assign(
