@@ -107,7 +107,7 @@ test('Provides navigation for subpages', async () => {
 })
 
 describe('Render and logs out', function () {
-    test.only('Renders account detail page by default for logged-in customer, and can log out', async () => {
+    test('Renders account detail page by default for logged-in customer, and can log out', async () => {
         const {user} = renderWithProviders(<MockedComponent />)
 
         // Render user profile page
