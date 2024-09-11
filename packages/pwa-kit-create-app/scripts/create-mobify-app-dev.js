@@ -54,7 +54,7 @@ const logFileName = p.join(__dirname, '..', 'local-npm-repo', 'verdaccio.log')
 const makePublic = (pkgLocation) => {
     sh.exec('npm pkg delete private', {cwd: pkgLocation})
 
-    sh.exec('git add .', {silent: true})
+    sh.exec('git add .')
     sh.exec('git commit -m "temporary commit to have clean working tree"', {silent: true})
 
     const revertChanges = () => {
@@ -122,7 +122,7 @@ const withLocalNPMRepo = (func) => {
             // the public NPM repo.
             console.log('Publishing packages to the local NPM repository')
 
-            // TODO: delete this when done
+            // TODO: revert PR #2001 when done
             revertChangesToSampleExtension = makePublic(
                 p.join(monorepoRoot, 'packages', 'extension-sample')
             )

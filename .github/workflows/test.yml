@@ -202,6 +202,11 @@ jobs:
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
 
+      - name: Update identity in git config
+        run: |-
+          git config --global user.name ${{ secrets.GIT_CONFIG_USERNAME }}
+          git config --global user.email ${{ secrets.GIT_CONFIG_EMAIL }}
+
       - name: Generate ${{ matrix.template }} project
         run: |-
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
@@ -299,6 +304,11 @@ jobs:
 
       - name: Setup Windows Machine
         uses: "./.github/actions/setup_windows"
+
+      - name: Update identity in git config
+        run: |-
+          git config --global user.name ${{ secrets.GIT_CONFIG_USERNAME }}
+          git config --global user.email ${{ secrets.GIT_CONFIG_EMAIL }}
 
       - name: Generate ${{ matrix.template }} project
         run: |-
