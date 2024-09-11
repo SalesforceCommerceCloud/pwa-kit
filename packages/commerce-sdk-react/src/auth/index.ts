@@ -322,10 +322,11 @@ class Auth {
             await this.refreshAccessToken()
         }
         if (preference !== null) {
+            const SECONDS_IN_DAY = 86400
             this.set(DNT_COOKIE_NAME, dntCookieVal, {
                 ...getDefaultCookieAttributes(),
                 secure: true,
-                expires: Number(this.get('refresh_token_expires_in')) / 86400
+                expires: Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
             })
         }
     }
