@@ -9,7 +9,7 @@ import {Application} from 'express'
 /**
  * Interface that must be implemented by all React application extensions.
  */
-export interface IApplicationExtension {
+export interface IExpressApplicationExtension {
     /**
      * The name of the extension that will be used for logging.
      */

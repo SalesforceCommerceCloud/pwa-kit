@@ -175,7 +175,7 @@ export const DevServerMixin = {
                 return
             }
 
-            // Ensure that the default export is a class that implements IApplicationExtension
+            // Ensure that the default export is a class that implements IExpressApplicationExtension
             if (!ExtensionClass || typeof ExtensionClass !== 'function') {
                 logger.warn(`Extension ${extension} does not export a valid class. Skipping.`)
                 return
@@ -194,13 +194,13 @@ export const DevServerMixin = {
                 return
             }
 
-            // Verify the instance has the methods defined by IApplicationExtension
+            // Verify the instance has the methods defined by IExpressApplicationExtension
             if (
                 typeof extensionInstance.getName !== 'function' ||
                 typeof extensionInstance.extendApp !== 'function'
             ) {
                 logger.warn(
-                    `Extension ${extension} does not implement IApplicationExtension interface. Skipping.`
+                    `Extension ${extension} does not implement IExpressApplicationExtension interface. Skipping.`
                 )
                 return
             }

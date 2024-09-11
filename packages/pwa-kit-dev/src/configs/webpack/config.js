@@ -631,6 +631,9 @@ const extensions =
                                       options: {
                                           // If tsconfig is not found, ignore tsconfig.json and rely on
                                           // using the default compilerOptions
+                                          // TODO: Avoid using happyPackMode in the future.
+                                          // This was required to get your PR working because the `tsconfig.json`
+                                          // file was not found.
                                           happyPackMode: !tsConfigFound,
                                           compilerOptions: tsConfigFound ? {} : defaultTsConfig
                                       }
