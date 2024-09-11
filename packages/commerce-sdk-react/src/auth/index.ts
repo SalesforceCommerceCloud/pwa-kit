@@ -291,7 +291,7 @@ class Auth {
 
     getDnt() {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
-        var dntStatus = undefined
+        let dntStatus = undefined
         if (dntCookieVal !== '1' && dntCookieVal !== '0') {
             this.delete(DNT_COOKIE_NAME)
         } else {
