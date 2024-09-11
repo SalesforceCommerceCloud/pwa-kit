@@ -504,11 +504,18 @@ describe('Auth', () => {
         expect(auth.get('dw_dnt')).toBe('0')
     })
 
-    test('setDNT(true|false) sets cookie with an expiration time', async () => {
+    test('setDNT(true) sets cookie with an expiration time', async () => {
         const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
         const auth = new Auth({...config, siteId: 'siteA'})
         await auth.setDnt(true)
         expect(setDntSpiedOn).toHaveBeenLastCalledWith('dw_dnt', '1', expect.objectContaining({ expires: expect.any(Number) }))
+    })
+
+    test('setDNT(false) sets cookie with an expiration time', async () => {
+        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(false)
+        expect(setDntSpiedOn).toHaveBeenLastCalledWith('dw_dnt', '0', expect.objectContaining({ expires: expect.any(Number) }))
     })
 
     test('setDNT(null) sets cookie WITHOUT an expiration time', async () => {
