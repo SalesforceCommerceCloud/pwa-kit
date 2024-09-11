@@ -291,13 +291,14 @@ class Auth {
 
     getDnt() {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
-        let dntStatus = undefined
+        // Only '1' or '0' are valid, and invalid values or lack of cookie must be an undefined DNT
+        let dntCookieStatus = undefined
         if (dntCookieVal !== '1' && dntCookieVal !== '0') {
             this.delete(DNT_COOKIE_NAME)
         } else {
-            dntStatus = Boolean(Number(dntCookieVal))
+            dntCookieStatus = Boolean(Number(dntCookieVal))
         }
-        return dntStatus
+        return dntCookieStatus
     }
 
     async setDnt(preference: boolean | null) {
