@@ -207,9 +207,9 @@ export const DevServerMixin = {
 
             // Extend the app using the provided method
             try {
-                logger.log(`Extending app using extension ${extension}...`)
+                logger.info(`Extending app using extension ${extension}...`)
                 app = extensionInstance.extendApp(app)
-                logger.log(`Successfully extended app with ${extension}.`)
+                logger.info(`Successfully extended app with ${extension}.`)
             } catch (e) {
                 logger.error(`Error setting extension ${extension}:`, {
                     namespace: 'DevServerMixin._setupExtensions',

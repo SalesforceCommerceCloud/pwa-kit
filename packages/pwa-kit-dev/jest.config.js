@@ -28,16 +28,16 @@ module.exports = {
     ],
     moduleNameMapper: {
         'tsx/cjs/api': '<rootDir>/node_modules/tsx/dist/cjs/api/index.cjs',
-        'src/ssr/server/test_fixtures/node_modules/test-extension/setup-server.js':
-            '<rootDir>/src/ssr/server/test_fixtures/node_modules/test-extension/setup-server.js',
-        'src/ssr/server/test_fixtures/node_modules/ts-extension/setup-server.ts':
-            '<rootDir>/src/ssr/server/test_fixtures/node_modules/ts-extension/setup-server.ts',
-        'src/ssr/server/test_fixtures/node_modules/another-extension/setup-server.js':
-            '<rootDir>/src/ssr/server/test_fixtures/node_modules/another-extension/setup-server.js',
-        'src/ssr/server/test_fixtures/node_modules/extension-with-bad-setup-server/setup-server.js':
-            '<rootDir>/src/ssr/server/test_fixtures/node_modules/extension-with-bad-setup-server/setup-server.js',
-        'src/ssr/server/test_fixtures/node_modules/extension-with-setup-server-no-default-export/setup-server.js':
-            '<rootDir>/src/ssr/server/test_fixtures/node_modules/extension-with-setup-server-no-default-export/setup-server.js'
+        'src/ssr/server/test_fixtures/node_modules/test-extension/src/setup-server.js':
+            '<rootDir>/src/ssr/server/test_fixtures/node_modules/test-extension/src/setup-server.js',
+        'src/ssr/server/test_fixtures/node_modules/ts-extension/src/setup-server.ts':
+            '<rootDir>/src/ssr/server/test_fixtures/node_modules/ts-extension/src/setup-server.ts',
+        'src/ssr/server/test_fixtures/node_modules/another-extension/src/setup-server.js':
+            '<rootDir>/src/ssr/server/test_fixtures/node_modules/another-extension/src/setup-server.js',
+        'src/ssr/server/test_fixtures/node_modules/extension-with-bad-setup-server/src/setup-server.js':
+            '<rootDir>/src/ssr/server/test_fixtures/node_modules/extension-with-bad-setup-server/src/setup-server.js',
+        'src/ssr/server/test_fixtures/node_modules/extension-with-setup-server-no-default-export/src/setup-server.js':
+            '<rootDir>/src/ssr/server/test_fixtures/node_modules/extension-with-setup-server-no-default-export/src/setup-server.js'
     },
     transformIgnorePatterns: [
         '<rootDir>/node_modules/',
