@@ -363,6 +363,22 @@ class Auth {
     }
 
     /**
+     * Gets the Do-Not-Track (DNT) preference from the `dw_dnt` cookie.
+     * If user has set their DNT preference, read the cookie, if not, use the default DNT pref. If the default DNT pref has not been set, default to false.
+     */
+    private getDntPreference(dw_dnt: string | undefined, defaultDnt: boolean | undefined) {
+        let dntPref
+        // Read `dw_dnt` cookie
+        const dntCookie = dw_dnt === '1' ? true : dw_dnt === '0' ? false : undefined
+        dntPref = dntCookie
+
+        // If the cookie is not set, read the default DNT preference.
+        if (dntCookie === undefined) dntPref = defaultDnt !== undefined ? defaultDnt : undefined
+
+        return dntPref
+    }
+
+    /**
      * Returns the SLAS access token or an empty string if the access token
      * is not found in local store or if SFRA wants PWA to trigger refresh token login.
      *
@@ -561,11 +577,12 @@ class Auth {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
+        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
             {
-                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...(dntPref !== undefined && {dnt: dntPref}),
                 ...(usid && {usid})
             },
             {clientSecret: this.clientSecret}
@@ -574,7 +591,7 @@ class Auth {
             this.client,
             {
                 redirectURI: this.redirectURI,
-                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...(dntPref !== undefined && {dnt: dntPref}),
                 ...(usid && {usid})
             }
         ] as const
@@ -625,6 +642,7 @@ class Auth {
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
+        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
@@ -634,7 +652,7 @@ class Auth {
             },
             {
                 redirectURI,
-                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...(dntPref !== undefined && {dnt: dntPref}),
                 ...(usid && {usid})
             }
         )

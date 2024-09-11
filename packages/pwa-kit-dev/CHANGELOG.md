@@ -1,4 +1,7 @@
 ## v3.8.0-dev (Aug 08, 2024)
+
+- Add support for environment level base paths [#1970](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1970)
+
 ## v3.7.0 (Aug 07, 2024)
 
 ## v3.6.0 (Jun 25, 2024)
