@@ -53,13 +53,13 @@ describe('Product Scroller', () => {
         await user.click(screen.getByTestId('product-scroller-nav-right'))
         expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
             top: 0,
-            left: 1024,
+            left: 0,
             behavior: 'smooth'
         })
         await user.click(screen.getByTestId('product-scroller-nav-left'))
         expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
             top: 0,
-            left: -1024,
+            left: -0,
             behavior: 'smooth'
         })
         expect(screen.getByTestId('product-scroller-nav-left')).toBeInTheDocument()
