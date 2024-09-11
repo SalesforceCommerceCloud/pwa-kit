@@ -294,8 +294,7 @@ class Auth {
         var dntStatus = undefined
         if (dntCookieVal !== '1' && dntCookieVal !== '0') {
             this.delete(DNT_COOKIE_NAME)
-        }
-        else {
+        } else {
             dntStatus = Boolean(Number(dntCookieVal))
         }
         return dntStatus
