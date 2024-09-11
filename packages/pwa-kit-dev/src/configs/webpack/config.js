@@ -605,8 +605,9 @@ const extensions =
                       skipLibCheck: true
                   }
 
-                  const tsConfigPath = `${projectDir}/node_modules/${extension}/tsconfig.json`
-                  const tsConfigFound = fse.existsSync(tsConfigPath)
+                  let tsConfigFound = fse.existsSync(
+                      `${projectDir}/node_modules/${extension}/tsconfig.json`
+                  )
 
                   return {
                       name: 'extensions',
