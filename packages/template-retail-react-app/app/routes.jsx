@@ -12,10 +12,9 @@
 // we don't want it to count toward coverage until we figure out how to cover the `functions`
 // metric for this file in its test.
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import loadable from '@loadable/component'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {withRouter} from 'react-router-dom'
 
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -31,6 +30,11 @@ const Registration = loadable(() => import('./pages/registration'), {
 })
 const ResetPassword = loadable(() => import('./pages/reset-password'), {fallback})
 const Account = loadable(() => import('./pages/account'), {fallback})
+const Cart = loadable(() => import('./pages/cart'), {fallback})
+const Checkout = loadable(() => import('./pages/checkout'), {
+    fallback
+})
+const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {
@@ -47,11 +51,6 @@ const PageNotFound = loadable(() => import('./pages/page-not-found'))
 export const routes = [
     {
         path: '/',
-        component: Home,
-        exact: true
-    },
-    {
-        path: '/home',
         component: Home,
         exact: true
     },
@@ -75,8 +74,22 @@ export const routes = [
         component: Account
     },
     {
+        path: '/checkout',
+        component: Checkout,
+        exact: true
+    },
+    {
+        path: '/checkout/confirmation/:orderNo',
+        component: CheckoutConfirmation
+    },
+    {
         path: '/callback',
         component: LoginRedirect,
+        exact: true
+    },
+    {
+        path: '/cart',
+        component: Cart,
         exact: true
     },
     {
@@ -101,22 +114,7 @@ export const routes = [
     },
     {
         path: '*',
-        component: withRouter((props) => {
-            const {location} = props
-            const urlParams = new URLSearchParams(location.search)
-
-            useEffect(() => {
-                const newURL = new URL(window.location)
-                if (!urlParams.has('redirected')) {
-                    newURL.searchParams.append('redirected', '1')
-                    window.location.href = newURL
-                }
-            }, [window.location.href])
-            if (urlParams.has('redirected')) {
-                return <PageNotFound {...props} />
-            }
-            return null
-        })
+        component: PageNotFound
     }
 ]
 

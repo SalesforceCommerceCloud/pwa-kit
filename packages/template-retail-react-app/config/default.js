@@ -10,17 +10,24 @@ const sites = require('./sites.js')
 module.exports = {
     app: {
         url: {
-            locale: 'none'
+            site: 'path',
+            locale: 'path',
+            showDefaults: true,
+            interpretPlusSignAsSpace: false
         },
-        defaultSite: 'RefArch',
+        defaultSite: 'RefArchGlobal',
+        siteAliases: {
+            RefArch: 'us',
+            RefArchGlobal: 'global'
+        },
         sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'e7e22b7f-a904-4f3a-8022-49dbee696485',
-                organizationId: 'f_ecom_bjnl_prd',
-                shortCode: 'performance-001',
-                siteId: 'RefArch'
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: '8o7m175y',
+                siteId: 'RefArchGlobal'
             }
         },
         einsteinAPI: {
@@ -46,11 +53,11 @@ module.exports = {
         ssrFunctionNodeVersion: '20.x',
         proxyConfigs: [
             {
-                host: 'performance-001.api.commercecloud.salesforce.com',
+                host: 'kv7kzm78.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'www.phased-launch-testing.com',
+                host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]
