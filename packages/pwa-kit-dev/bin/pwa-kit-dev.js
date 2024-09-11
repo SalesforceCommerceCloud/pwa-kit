@@ -280,7 +280,6 @@ const main = async () => {
                 ? projectWebpack
                 : p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
             fse.emptyDirSync(buildDirectory)
-
             execSync(`${webpack} --config ${webpackConf}`, {
                 env: {
                     NODE_ENV: 'production',

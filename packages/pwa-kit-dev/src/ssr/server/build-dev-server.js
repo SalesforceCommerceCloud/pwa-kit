@@ -133,11 +133,11 @@ export const DevServerMixin = {
      * @private
      */
     _setupExtensions(app, options) {
-        logger.log('Setting up extensions...')
+        logger.info('Setting up extensions...')
 
         // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
-        logger.log('Extensions to load', {
+        logger.info('Extensions to load', {
             namespace: 'DevServerMixin._setupExtensions',
             additionalProperties: {extensions: extensions}
         })
@@ -145,7 +145,7 @@ export const DevServerMixin = {
         app.__extensions = extensions || []
 
         extensions.forEach((extension) => {
-            logger.log(`Loading extension: ${extension}`)
+            logger.info(`Loading extension: ${extension}`)
 
             const setupServerFilePathBase = path.join(
                 options.projectDir,
@@ -168,7 +168,7 @@ export const DevServerMixin = {
             try {
                 ExtensionClass = tsx.require(filePath, __filename).default
             } catch (e) {
-                logger.log(`Error loading extension ${extension}:`, {
+                logger.error(`Error loading extension ${extension}:`, {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -183,11 +183,11 @@ export const DevServerMixin = {
 
             let extensionInstance
             try {
-                logger.log(`Instantiating extension class for ${extension}...`)
+                logger.info(`Instantiating extension class for ${extension}...`)
                 extensionInstance = new ExtensionClass(options)
-                logger.log(`Successfully instantiated extension ${extension}.`)
+                logger.info(`Successfully instantiated extension ${extension}.`)
             } catch (e) {
-                logger.log(`Error instantiating extension ${extension}:`, {
+                logger.error(`Error instantiating extension ${extension}:`, {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -211,14 +211,14 @@ export const DevServerMixin = {
                 app = extensionInstance.extendApp(app)
                 logger.log(`Successfully extended app with ${extension}.`)
             } catch (e) {
-                logger.log(`Error setting extension ${extension}:`, {
+                logger.error(`Error setting extension ${extension}:`, {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })
             }
         })
 
-        logger.log('Finished setting up extensions.')
+        logger.info('Finished setting up extensions.')
     },
 
     /**
