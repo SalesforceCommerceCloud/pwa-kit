@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {applyHOCs} from '../utils'
-import {IApplicationExtension} from './types'
+import ApplicationExtension from './application-extension'
 
 /**
  * Given the provided Application, apply all the App extensions to it.
@@ -16,7 +16,7 @@ import {IApplicationExtension} from './types'
  */
 export const applyAppExtensions = (
     App: React.ComponentType,
-    extensions: IApplicationExtension[]
+    extensions: ApplicationExtension[]
 ): React.ComponentType => {
     const extendAppHocs = extensions
         // TODO: All Application Extensions configuration objects will extend from a single IApplicationExtensionConfig type so that we
