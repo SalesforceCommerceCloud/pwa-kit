@@ -659,17 +659,22 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupExtensions(app, options) {
-        logger.log('Setting up extensions...')
+        logger.info('Setting up extensions...')
 
         // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
-        logger.log('Extensions to load:', extensions)
+        logger.info('Extensions to load', {
+            namespace: 'DevServerMixin._setupExtensions',
+            additionalProperties: {extensions: extensions}
+        })
 
         app.__extensions = extensions || []
 
         let _require
 
         extensions.forEach((extension) => {
+            logger.info(`Loading extension: ${extension}`)
+
             const setupServerFilePath = path.join(
                 options.buildDir,
                 'extensions',
@@ -693,7 +698,10 @@ export const RemoteServerFactory = {
                     return
                 }
 
-                logger.error(`Error loading extension ${extension}:`, e)
+                logger.error(`Error loading extension ${extension}:`, {
+                    namespace: 'DevServerMixin._setupExtensions',
+                    additionalProperties: {error: e}
+                })
                 throw e
             }
 
@@ -705,11 +713,14 @@ export const RemoteServerFactory = {
 
             let extensionInstance
             try {
-                logger.log(`Instantiating extension class for ${extension}...`)
+                logger.info(`Instantiating extension class for ${extension}...`)
                 extensionInstance = new ExtensionClass(options)
-                logger.log(`Successfully instantiated extension ${extension}.`)
+                logger.info(`Successfully instantiated extension ${extension}.`)
             } catch (e) {
-                logger.error(`Error instantiating extension ${extension}:`, e)
+                logger.error(`Error instantiating extension ${extension}:`, {
+                    namespace: 'DevServerMixin._setupExtensions',
+                    additionalProperties: {error: e}
+                })
                 return
             }
 
@@ -730,11 +741,14 @@ export const RemoteServerFactory = {
                 app = extensionInstance.extendApp(app)
                 logger.log(`Successfully extended app with ${extension}.`)
             } catch (e) {
-                logger.error(`Error setting up extension ${extension}:`, e)
+                logger.error(`Error setting extension ${extension}:`, {
+                    namespace: 'DevServerMixin._setupExtensions',
+                    additionalProperties: {error: e}
+                })
             }
         })
 
-        logger.log('Finished setting up extensions.')
+        logger.info('Finished setting up extensions.')
     },
 
     /**

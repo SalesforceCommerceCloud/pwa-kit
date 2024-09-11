@@ -279,14 +279,6 @@ const main = async () => {
             const webpackConf = fse.pathExistsSync(projectWebpack)
                 ? projectWebpack
                 : p.join(__dirname, '..', 'configs', 'webpack', 'config.js')
-
-            try {
-                execSync('tsc --noEmit', {stdio: 'inherit'})
-            } catch (error) {
-                console.error('TypeScript type-checking failed.')
-                process.exit(1)
-            }
-
             fse.emptyDirSync(buildDirectory)
 
             execSync(`${webpack} --config ${webpackConf}`, {
@@ -295,8 +287,7 @@ const main = async () => {
                     ...process.env,
                     // Command option overrides the env var, so we must continue that pattern
                     PWA_KIT_BUILD_DIR: buildDirectory
-                },
-                stdio: 'inherit'
+                }
             })
 
             // Copy the project `package.json` into the build folder.

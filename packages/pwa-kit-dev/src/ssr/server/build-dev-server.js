@@ -137,7 +137,10 @@ export const DevServerMixin = {
 
         // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
-        logger.log('Extensions to load:', extensions)
+        logger.log('Extensions to load', {
+            namespace: 'DevServerMixin._setupExtensions',
+            additionalProperties: {extensions: extensions}
+        })
 
         app.__extensions = extensions || []
 
@@ -165,7 +168,10 @@ export const DevServerMixin = {
             try {
                 ExtensionClass = tsx.require(filePath, __filename).default
             } catch (e) {
-                logger.error(`Error loading extension ${extension}:`, e)
+                logger.log(`Error loading extension ${extension}:`, {
+                    namespace: 'DevServerMixin._setupExtensions',
+                    additionalProperties: {error: e}
+                })
                 return
             }
 
@@ -181,7 +187,10 @@ export const DevServerMixin = {
                 extensionInstance = new ExtensionClass(options)
                 logger.log(`Successfully instantiated extension ${extension}.`)
             } catch (e) {
-                logger.error(`Error instantiating extension ${extension}:`, e)
+                logger.log(`Error instantiating extension ${extension}:`, {
+                    namespace: 'DevServerMixin._setupExtensions',
+                    additionalProperties: {error: e}
+                })
                 return
             }
 
@@ -202,7 +211,10 @@ export const DevServerMixin = {
                 app = extensionInstance.extendApp(app)
                 logger.log(`Successfully extended app with ${extension}.`)
             } catch (e) {
-                logger.error(`Error setting up extension ${extension}:`, e)
+                logger.log(`Error setting extension ${extension}:`, {
+                    namespace: 'DevServerMixin._setupExtensions',
+                    additionalProperties: {error: e}
+                })
             }
         })
 
