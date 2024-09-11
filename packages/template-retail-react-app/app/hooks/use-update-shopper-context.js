@@ -19,7 +19,7 @@ import {useQueryClient} from '@tanstack/react-query'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // Constants
-import {useShopperContextSearchParams} from '@salesforce/retail-react-app/../../app/hooks/use-shopper-context-search-params'
+import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
 
 /*
  * This hook will set the shopper context when search params pertinant
