@@ -1,9 +1,6 @@
 name: 'Changelog Check'
 description: 'Check if changelog is updated for the changed packages'
 inputs:
-  github_token:
-    description: 'GitHub token'
-    required: true
   pr_number:
     description: 'Pull request number'
     required: true
@@ -16,39 +13,26 @@ runs:
       with:
         fetch-depth: 0  # Fetch full history to access all commits
 
-    - name: Get Base Branch SHA
-      id: get_base_sha
+    - name: Determine Base SHA and Merge Base
+      id: determine_base
       run: |
-        if [ -n "${{ inputs.pr_number }}" ]; then
-          BASE_SHA=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ inputs.pr_number }}" | \
-            jq -r '.base.sha')
+        if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          MERGE_BASE=$(git merge-base $BASE_SHA ${{ github.sha }})
+          echo "BASE_SHA=$BASE_SHA" >> $GITHUB_ENV
+          echo "MERGE_BASE=$MERGE_BASE" >> $GITHUB_ENV
         else
-          echo "Not running in a PR context. Skipping changelog check."
+          echo "Not running in a PR context or unable to determine base SHA. Skipping changelog check."
           echo "SKIP_CHANGELOG_CHECK=true" >> $GITHUB_ENV
-        fi
-
-        if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" == "null" ]; then
-          echo "Unable to fetch base SHA or no base SHA available. Skipping changelog check."
-          echo "SKIP_CHANGELOG_CHECK=true" >> $GITHUB_ENV
-        else
-          echo "BASE_SHA=${BASE_SHA}" >> $GITHUB_ENV
         fi
       shell: bash
 
-    - name: Find merge base
-      id: find_merge_base
+    - name: Check if 'skip changelog' label is present
+      id: check_labels
       run: |
-        if [ -n "${{ env.BASE_SHA }}" ] && [ "${{ env.BASE_SHA }}" != "null" ]; then
-            MERGE_BASE=$(git merge-base ${{ env.BASE_SHA }} ${{ github.sha }})
-            if [ -z "$MERGE_BASE" ]; then
-              echo "Unable to find merge base. Skipping changelog check."
-              echo "SKIP_CHANGELOG_CHECK=true" >> $GITHUB_ENV
-            else
-              echo "MERGE_BASE=${MERGE_BASE}" >> $GITHUB_ENV
-            fi
-        else
-          echo "Unable to make the merge base calculation due to missing or null BASE_SHA. Skipping changelog check."
+        SKIP_CHANGELOG_LABEL="${{ contains(github.event.pull_request.labels.*.name, 'skip changelog') }}"
+        if [ "SKIP_CHANGELOG_LABEL" = "true" ]; then
+          echo "Skip changelog label is present. Skipping changelog check."
           echo "SKIP_CHANGELOG_CHECK=true" >> $GITHUB_ENV
         fi
       shell: bash
@@ -58,20 +42,7 @@ runs:
         echo "Base SHA: ${{ env.BASE_SHA }}"
         echo "Current SHA: ${{ github.sha }}"
         echo "Merge Base: ${{ env.MERGE_BASE }}"
-      shell: bash
-
-    - name: Fetch PR labels and check for skip changelog
-      id: fetch_and_check_labels
-      run: |
-        PR_LABELS=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
-          "https://api.github.com/repos/${{ github.repository }}/issues/${{ inputs.pr_number }}/labels" | \
-          jq -r '.[].name | @sh' | tr '\n' ' ')
-        echo "PR_LABELS=${PR_LABELS}" >> $GITHUB_ENV
-
-        if echo "${PR_LABELS}" | grep -q "'skip changelog'"; then
-          echo "Skip changelog label is present. Skipping changelog check."
-          echo "SKIP_CHANGELOG_CHECK=true" >> $GITHUB_ENV
-        fi
+        echo "SKIP_CHANGELOG_CHECK: ${{ env.SKIP_CHANGELOG_CHECK }}"
       shell: bash
 
     - name: Check if changelog is updated
@@ -87,7 +58,7 @@ runs:
         PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
 
         for PACKAGE in "${PUBLIC_PACKAGES[@]}"; do
-          if echo "$CHANGED_FILES" | grep -i "^packages/$PACKAGE/"; then
+          if echo "$CHANGED_FILES" | grep -iq "^packages/$PACKAGE/"; then
             if ! echo "$CHANGED_FILES" | grep -iq "^packages/$PACKAGE/CHANGELOG.md"; then
               echo "CHANGELOG.md was not updated for package $PACKAGE. Please update the CHANGELOG.md or add 'skip changelog' label to the PR."
               exit 1
