@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getProxyPath, getCachingPath} from './ssr-paths'
+import {proxyBasePath, cachingBasePath} from './ssr-namespace-paths'
 
 /**
  * @module progressive-web-sdk/utils/ssr-shared
@@ -169,8 +169,8 @@ export const updatePackageMobify = (newValue) => {
         }
 
         // Generate paths
-        config.proxyPath = `${getProxyPath()}/${config.path}`
-        config.cachingPath = `${getCachingPath()}/${config.path}`
+        config.proxyPath = `${proxyBasePath}/${config.path}`
+        config.cachingPath = `${cachingBasePath}/${config.path}`
 
         proxyConfigs.push(config)
     }
