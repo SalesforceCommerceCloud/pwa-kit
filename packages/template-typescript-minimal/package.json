@@ -38,7 +38,9 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
-    "app":{"extensions": ["@salesforce/extension-sample"]},
+    "app":{
+      "extensions": ["@salesforce/extension-sample"]
+    },
     "ssrEnabled": true,
     "ssrOnly": [
       "ssr.js",

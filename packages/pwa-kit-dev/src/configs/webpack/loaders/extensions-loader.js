@@ -5,23 +5,24 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import dedent from 'dedent'
 import {kebabToUpperCamelCase} from '../utils'
+import {nameRegex} from '../../../utils/extensibility-utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
 const APP_EXTENSION_PREFIX = 'extension'
 
-const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
-
 /**
- * The `extensions-loader` is used to return all configured extensions for a given pwa-kit
+ * The `extensions-loader` as a mechanism to get all configured extensions for a given pwa-kit
  * application. We use this loader as a simple way to determine what extension code in required in
  * the application bundle, without this we would have to rely on other more complex ways of
  * including application extensions in the bundle, like custom webpack entry points for extension.
  *
- * With this solution we can rely on the fact that all configured application extensions are concretely
- * referenced in code and therefore will end up in the resultant bundle.
+ * With this solution we can rely on the fact that all installed application extensions are referenced
+ * in code and will be in the bundle.
+ *
+ * The named export `getExtensions` will only return the application extensions required/configured by
+ * the current PWA-Kit application.
  *
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
@@ -30,18 +31,24 @@ module.exports = function () {
     // string that is the npm package name, the only expectation is that the package name starts with `extension-`,
     // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the
     // extensions configuration array when we add support for the tupal config format.
-    const {extensions = []} = getConfig()?.app || {}
+    const {pkg} = this.getOptions() || {}
+    const {devDependencies} = pkg
+
+    const extensions = Object.keys(devDependencies)
+        .map((packageName) => packageName.match(nameRegex))
+        .filter(Boolean)
 
     // Ensure that only valid extension names are loaded.
-    const extensionDetails = extensions
-        .map((extension) => extension.match(nameRegex))
-        .filter(Boolean)
-        .map(([_, namespace, name]) => ({
+    const extensionDetails = extensions.map((match) => {
+        const [packageName, namespace, name] = match
+        return {
             instanceVariable: kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`),
             modulePath: `${
                 namespace ? `@${namespace}/` : ''
-            }${APP_EXTENSION_PREFIX}-${name}/${APP_EXTENSION_CLIENT_ENTRY}`
-        }))
+            }${APP_EXTENSION_PREFIX}-${name}/${APP_EXTENSION_CLIENT_ENTRY}`,
+            packageName
+        }
+    })
 
     return dedent`
             /*
@@ -50,7 +57,9 @@ module.exports = function () {
             * SPDX-License-Identifier: BSD-3-Clause
             * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
             */
-            // Extension Imports
+            import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+            // App Extensions
             ${extensionDetails
                 .map(
                     ({instanceVariable, modulePath}) =>
@@ -58,13 +67,19 @@ module.exports = function () {
                 )
                 .join('\n            ')}
             
-            export default [
-                ${extensionDetails
-                    .map(({instanceVariable}) => {
-                        const config = {} // TODO: Parse config config here.
-                        return `new ${instanceVariable}(${JSON.stringify(config)})`
-                    })
-                    .join(',\n                ')}
-            ]
+            export const getExtensions = () => {
+                const configuredExtensions = getConfig()?.app?.extensions || []
+
+                return [
+                    ${extensionDetails
+                        .map(({instanceVariable, packageName}) => {
+                            const config = {} // TODO: Parse config config here.
+                            return `configuredExtensions.includes('${packageName}') ? new ${instanceVariable}(${JSON.stringify(
+                                config
+                            )}) : false`
+                        })
+                        .join(',\n                    ')}
+                ].filter(Boolean)
+            }
         `
 }

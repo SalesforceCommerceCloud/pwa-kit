@@ -125,6 +125,7 @@
     "@types/node-fetch": "~2.6.3",
     "@types/validator": "~13.7.14",
     "internal-lib-build": "4.0.0-dev",
+    "memfs": "^4.11.1",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
     "superagent": "^6.1.0",
