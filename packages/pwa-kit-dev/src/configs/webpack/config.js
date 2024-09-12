@@ -29,7 +29,7 @@ import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-
 
 // Utilities
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {buildAliases} from '../../utils/extensibility-utils'
+import {buildAliases, nameRegex} from '../../utils/extensibility-utils'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -183,9 +183,14 @@ const baseConfig = (target) => {
                     ],
                     extensions: SUPPORTED_FILE_EXTENSIONS,
                     alias: {
-                        // Create alias's for all the extensions as they are being imported from the SDK package and cannot be
-                        // resolved from that location.
-                        ...buildAliases(appConfig?.extensions),
+                        // Create alias's for "all" extensions, enabled or disabled, as they as they are being imported from the SDK package
+                        // and cannot be resolved from that location. We create alias's for all because we do not know which extensions
+                        // are configured at build time.
+                        ...buildAliases(
+                            Object.keys(pkg?.devDependencies || {}).filter((dependency) =>
+                                dependency.match(nameRegex)
+                            )
+                        ),
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
@@ -240,7 +245,7 @@ const baseConfig = (target) => {
                             test: /universal\/extensibility\/extensions/,
                             loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extensions-loader`,
                             options: {
-                                projectDir
+                                pkg
                             }
                         }
                     ].filter(Boolean)

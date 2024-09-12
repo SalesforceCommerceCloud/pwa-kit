@@ -9,6 +9,8 @@
  * @module progressive-web-sdk/ssr/universal/utils
  */
 
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 // @ts-ignore
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 // @ts-ignore
@@ -27,9 +29,9 @@ const onClient = typeof window !== 'undefined'
 export const getAssetUrl = (path: string) => {
     /* istanbul ignore next */
     const publicPath = onClient
-        // @ts-ignore
-        ? `${window.Progressive.buildOrigin}`
-        : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
+        ? // @ts-ignore
+          `${window.Progressive.buildOrigin as string}`
+        : `${bundleBasePath as string}/${process.env.BUNDLE_ID || 'development'}/`
     return path ? `${publicPath}${path}` : publicPath
 }
 
@@ -53,15 +55,14 @@ export const getAssetUrl = (path: string) => {
  */
 export const getProxyConfigs = () => {
     const configs = onClient
-        // @ts-ignore
-        ? (window.Progressive.ssrOptions || {}).proxyConfigs || []
-        // @ts-ignore
-        : proxyConfigs
+        ? // @ts-ignore
+          (window.Progressive.ssrOptions || {}).proxyConfigs || []
+        : // @ts-ignore
+          proxyConfigs
 
     // Clone to avoid accidental mutation of important configuration variables.
     return configs.map((config: any) => ({...config}))
 }
-
 
 /**
  * Applies a series of Higher-Order Components (HOCs) to a given React component.
@@ -76,7 +77,7 @@ export const applyHOCs = <T extends React.ComponentType<any>>(
     hocs: Array<(component: T) => T>
 ): T => {
     return hocs.reduce((AccumulatedComponent, hoc) => {
-        const WrappedComponent = hoc(AccumulatedComponent);
+        const WrappedComponent = hoc(AccumulatedComponent)
         return hoistNonReactStatics(WrappedComponent, AccumulatedComponent) as T
     }, Component)
 }

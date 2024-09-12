@@ -19,7 +19,7 @@ import {getRoutes, routeComponent} from '../universal/components/route-component
 import {applyAppExtensions} from '../universal/extensibility/utils'
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
-import extensions from '../universal/extensibility/extensions'
+import {getExtensions} from '../universal/extensibility/extensions'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -117,6 +117,7 @@ export const start = () => {
     window.__HYDRATING__ = true
 
     let WrappedApp = routeComponent(App, false, locals)
+    const extensions = getExtensions()
 
     // Use locals to thread the application extensions through the react app start flow.
     locals.appExtensions = extensions

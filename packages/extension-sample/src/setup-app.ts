@@ -6,36 +6,28 @@
  */
 
 import React from 'react'
-import loadable from '@loadable/component'
-import {IApplicationExtension, IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility/types'
-import {IConfig} from './types'
-import withRedBorder from '*/components/with-red-border'
+// import loadable from '@loadable/component'
+import {IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility/types'
+import {ApplicationExtension} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
+import withRedBorder from './components/with-red-border'
 
 // TODO: Investigate if we can even override loadable components.
 // const SamplePage = loadable(() => import('./pages/sample'))
 import SamplePage from '*/pages/sample'
 
 const defaultPath: string = '/sample-page'
-class Sample implements IApplicationExtension {
-    private config: IConfig;
-
-    constructor(config: IConfig) {
-        this.config = config
-    }
+class Sample extends ApplicationExtension {
     
-    getName(): string {
-        return 'sample'
-    }
-
     extendApp(App: React.ComponentType): React.ComponentType {
         return withRedBorder(App)
     }
 
     extendRoutes(routes: IRouteConfig[]): IRouteConfig[] {
+        console.log('Extend Routes for ', this.getName())
         return [
             {
                 exact: true,
-                path: this.config?.path || defaultPath,
+                path: this.getConfig()?.path || defaultPath,
                 component: SamplePage
             },
             ...routes

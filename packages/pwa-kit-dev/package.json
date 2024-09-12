@@ -26,7 +26,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production internal-lib-build build",
     "build:watch": "nodemon --watch 'src/**' --watch 'bin/**' --exec 'npm run build'",
-    "format": "internal-lib-build format \"**/*.{js,jsx}\"",
+    "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "npm run lint:js && npm run typecheck",
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "eslint .",
@@ -125,6 +125,7 @@
     "@types/node-fetch": "~2.6.3",
     "@types/validator": "~13.7.14",
     "internal-lib-build": "4.0.0-dev",
+    "memfs": "^4.11.1",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
     "superagent": "^6.1.0",
