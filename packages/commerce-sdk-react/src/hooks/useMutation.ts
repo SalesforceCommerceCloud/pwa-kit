@@ -98,5 +98,38 @@ export const useCustomMutation = (
         }
     }
 
-    return useReactQueryMutation(callCustomEndpointWithAuth(apiOptions), mutationOptions)
+    // TODO: update `any` type to proper type for HTTP payload body
+    const callCustomEndpointByBody = async (args: { body: any }) => {
+        const clientHeaders = config.headers || {}
+        const {access_token} = await auth.ready()
+        const response = await helpers.callCustomEndpoint({
+            ...apiOptions,
+            options: {
+                ...apiOptions.options,
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                    ...clientHeaders,
+                    ...apiOptions.options.headers
+                },
+                body: args.body
+            },
+            clientConfig: {
+                parameters: {
+                    clientId: config.clientId,
+                    siteId: config.siteId,
+                    organizationId: config.organizationId,
+                    shortCode: config.organizationId
+                },
+                proxy: config.proxy,
+                ...apiOptions.clientConfig
+            },
+        })
+        return response
+    }
+
+    if(!apiOptions?.options?.body) {
+        return useReactQueryMutation(callCustomEndpointByBody)
+    } else {
+        return useReactQueryMutation(callCustomEndpointWithAuth(apiOptions), mutationOptions)
+    }
 }
