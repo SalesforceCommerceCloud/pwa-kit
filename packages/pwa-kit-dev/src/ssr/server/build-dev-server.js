@@ -172,7 +172,7 @@ export const DevServerMixin = {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })
-                throw e
+                return
             }
 
             // Ensure that the default export is a class that implements IExpressApplicationExtension
