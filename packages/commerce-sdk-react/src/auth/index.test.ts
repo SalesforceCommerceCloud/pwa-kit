@@ -389,7 +389,6 @@ describe('Auth', () => {
     })
 
     test.each([
-        // [defaultDnt, dw_dnt, expected]
         // When user has not selected DNT pref
         [true, undefined, {dnt: true}],
         [false, undefined, {dnt: false}],
