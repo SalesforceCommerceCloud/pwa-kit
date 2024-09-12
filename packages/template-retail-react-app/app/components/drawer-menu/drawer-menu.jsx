@@ -122,7 +122,12 @@ const DrawerMenu = ({
             <DrawerOverlay>
                 <DrawerContent>
                     {/* Header Content */}
-                    <DrawerHeader>
+                    <DrawerHeader
+                        aria-label={intl.formatMessage({
+                            id: 'drawer_menu.header.assistive_msg.title',
+                            defaultMessage: 'Menu Drawer'
+                        })}
+                    >
                         <IconButton
                             icon={<BrandLogo {...styles.logo} />}
                             variant="unstyled"
