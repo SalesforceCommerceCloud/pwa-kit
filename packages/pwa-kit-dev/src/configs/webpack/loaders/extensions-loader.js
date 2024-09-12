@@ -14,6 +14,12 @@ const APP_EXTENSION_PREFIX = 'extension'
 
 const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
 
+const getExtensionNames = (extensions) => {
+    return (extensions || []).map((extension) => {
+        return Array.isArray(extension) ? extension[0] : extension
+    })
+}
+
 /**
  * The `extensions-loader` is used to return all configured extensions for a given pwa-kit
  * application. We use this loader as a simple way to determine what extension code in required in
@@ -26,6 +32,7 @@ const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
 module.exports = function () {
+    // TODO: Ben's PR will affect this file
     // TODO: We need to account for extensions being tuples. Here we assume it's a simple
     // string that is the npm package name, the only expectation is that the package name starts with `extension-`,
     // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the
@@ -33,7 +40,7 @@ module.exports = function () {
     const {extensions = []} = getConfig()?.app || {}
 
     // Ensure that only valid extension names are loaded.
-    const extensionDetails = extensions
+    const extensionDetails = getExtensionNames(extensions)
         .map((extension) => extension.match(nameRegex))
         .filter(Boolean)
         .map(([_, namespace, name]) => ({
@@ -57,7 +64,7 @@ module.exports = function () {
                         `import ${instanceVariable} from '${modulePath}'`
                 )
                 .join('\n            ')}
-            
+
             export default [
                 ${extensionDetails
                     .map(({instanceVariable}) => {

@@ -135,22 +135,29 @@ export const DevServerMixin = {
     _setupExtensions(app, options) {
         logger.info('Setting up extensions...')
 
-        // TODO: support extensions options array syntax i.e. ['extension-a', {}]
-        const extensions = options.mobify?.app?.extensions || []
+        // TODO: support extensions options array syntax i.e. [['extension-a', {}], ['extension-b', {}]]
+        const extensions = (options.mobify?.app?.extensions || []).map((extension) => {
+            if (Array.isArray(extension)) {
+                return {name: extension[0], config: extension[1]}
+            }
+            return {name: extension}
+        })
+
         logger.info('Extensions to load', {
             namespace: 'DevServerMixin._setupExtensions',
             additionalProperties: {extensions: extensions}
         })
 
+        // TODO: how does __extensions get used?
         app.__extensions = extensions || []
 
         extensions.forEach((extension) => {
-            logger.info(`Loading extension: ${extension}`)
+            logger.info(`Loading extension: ${extension.name}`)
 
             const setupServerFilePathBase = path.join(
                 options.projectDir,
                 'node_modules',
-                extension,
+                extension.name,
                 'src',
                 'setup-server'
             )
@@ -160,7 +167,7 @@ export const DevServerMixin = {
             } else if (fs.existsSync(`${setupServerFilePathBase}.js`)) {
                 filePath = `${setupServerFilePathBase}.js`
             } else {
-                logger.warn(`No setup-server file found for ${extension}. Skipping.`)
+                logger.warn(`No setup-server file found for ${extension.name}. Skipping.`)
                 return
             }
 
@@ -168,7 +175,7 @@ export const DevServerMixin = {
             try {
                 ExtensionClass = tsx.require(filePath, __filename).default
             } catch (e) {
-                logger.error(`Error loading extension ${extension}:`, {
+                logger.error(`Error loading extension ${extension.name}:`, {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -177,17 +184,20 @@ export const DevServerMixin = {
 
             // Ensure that the default export is a class that implements IExpressApplicationExtension
             if (ExtensionClass && typeof ExtensionClass !== 'function') {
-                logger.warn(`Extension ${extension} does not export a valid class. Skipping.`)
+                logger.warn(`Extension ${extension.name} does not export a valid class. Skipping.`)
                 return
             }
 
             let extensionInstance
             try {
-                logger.info(`Instantiating extension class for ${extension}...`)
-                extensionInstance = new ExtensionClass(options)
-                logger.info(`Successfully instantiated extension ${extension}.`)
+                logger.info(`Instantiating extension class for ${extension.name}...`)
+                // TODO: pass in the config to ExtensionClass
+                console.log('--- options', options)
+                console.log('--- extension.config', extension.config)
+                extensionInstance = new ExtensionClass(options, extension.config)
+                logger.info(`Successfully instantiated extension ${extension.name}.`)
             } catch (e) {
-                logger.error(`Error instantiating extension ${extension}:`, {
+                logger.error(`Error instantiating extension ${extension.name}:`, {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -200,18 +210,18 @@ export const DevServerMixin = {
                 typeof extensionInstance.extendApp !== 'function'
             ) {
                 logger.warn(
-                    `Extension ${extension} does not implement IExpressApplicationExtension interface. Skipping.`
+                    `Extension ${extension.name} does not implement IExpressApplicationExtension interface. Skipping.`
                 )
                 return
             }
 
             // Extend the app using the provided method
             try {
-                logger.info(`Extending app using extension ${extension}...`)
+                logger.info(`Extending app using extension ${extension.name}...`)
                 app = extensionInstance.extendApp(app)
-                logger.info(`Successfully extended app with ${extension}.`)
+                logger.info(`Successfully extended app with ${extension.name}.`)
             } catch (e) {
-                logger.error(`Error setting extension ${extension}:`, {
+                logger.error(`Error setting extension ${extension.name}:`, {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })

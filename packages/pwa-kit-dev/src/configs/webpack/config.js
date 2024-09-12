@@ -40,7 +40,6 @@ const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
 const {app: appConfig} = getConfig()
-const hasExtensions = appConfig?.extensions && appConfig?.extensions.length > 0
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -215,6 +214,7 @@ const baseConfig = (target) => {
                     alias: {
                         // Create alias's for all the extensions as they are being imported from the SDK package and cannot be
                         // resolved from that location.
+                        // TODO
                         ...buildAliases(appConfig?.extensions),
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
@@ -581,11 +581,18 @@ const requestProcessor =
         })
         .build()
 
+const getExtensionNames = (extensions) => {
+    return (extensions || []).map((extension) => {
+        return Array.isArray(extension) ? extension[0] : extension
+    })
+}
+
 // This is the extensions for multi-extensibility feature in PWA Kit.
 // Don't mistake this with the concept of extensions for Webpack.
 const extensions =
     mode === 'production'
-        ? (appConfig?.extensions || [])
+        ? // TODO
+          (getExtensionNames(appConfig?.extensions) || [])
               .map((extension) => {
                   const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/src/setup-server`
                   const foundType = ['ts', 'js'].find((type) =>
