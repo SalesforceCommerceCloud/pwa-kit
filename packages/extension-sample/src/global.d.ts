@@ -18,3 +18,4 @@
 // NOTE: If an app extension contains "overrides" in it, it implies that it has a dependency on another
 // application extension. We should be specifying those dependent app extensions as peer dependencies.
 // We can then use that information in the pacakge.json dependencies to infer the module resolution.
+
