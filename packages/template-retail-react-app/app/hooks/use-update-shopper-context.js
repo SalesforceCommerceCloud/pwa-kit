@@ -36,8 +36,6 @@ export const useUpdateShopperContext = () => {
         {parameters: {usid, siteId: site.id}},
         {enabled: !isServer}
     )
-    // TODO: REMOVE BEFORE MERGING
-    console.log('shopperContext', shopperContext)
 
     const refetchDataOnClient = () => {
         queryClient.invalidateQueries()
