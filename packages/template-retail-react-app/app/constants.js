@@ -208,7 +208,7 @@ export const SHOPPER_CONTEXT_FIELD_TYPES = {
     DOUBLE: 'double',
     ARRAY: 'array'
 }
-export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
+export const SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING = {
     sourceCode: {apiField: 'sourceCode'},
     effectiveDateTime: {apiField: 'effectiveDateTime'},
     customerGroupIds: {apiField: 'customerGroupIds', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY},
@@ -225,5 +225,5 @@ export const SHOPPER_CONTEXT_GEOLOCATION_SEARCH_PARAM_TO_API_FIELD_MAPPING = {
     region: {apiField: 'region'},
     regionCode: {apiField: 'regionCode'}
 }
-export const SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAMS = {}
-export const SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS = {}
+export const SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAM_TO_API_FIELD_MAPPING = {}
+export const SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAM_TO_API_FIELD_MAPPING = {}
