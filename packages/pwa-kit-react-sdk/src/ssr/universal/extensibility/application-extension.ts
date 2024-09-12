@@ -21,8 +21,7 @@ export default abstract class ApplicationExtension {
     /**
      * Constructs a new instance of the ApplicationExtension class.
      *
-     * @param {string} [name] - The name of the extension. Defaults to the class name if not provided.
-     * @param {Record<string, any>} [config] - The configuration object used to set up the extension.
+     * @param config - The configuration object used to set up the extension.
      */
     constructor(config?: any) {
         this.config = config
@@ -32,7 +31,7 @@ export default abstract class ApplicationExtension {
      * Returns the configuration that was used to instantiate this application extension.
      *
      * @protected
-     * @returns {Record<string, any>} The configuration object.
+     * @returns config - The configuration object.
      */
     public getConfig(): Record<string, any> {
         return this.config
@@ -42,7 +41,7 @@ export default abstract class ApplicationExtension {
      * Returns the name of the extension that will be used for logging.
      *
      * @protected
-     * @returns {string} The name of the extension.
+     * @returns name - The name of the extension.
      */
     public getName(): string {
         return this.constructor.name
@@ -53,8 +52,8 @@ export default abstract class ApplicationExtension {
      * It is predominantly used to enhance the "base" application by wrapping it with React providers.
      *
      * @protected
-     * @param {React.ComponentType} App - The base application component.
-     * @returns {React.ComponentType} The enhanced application component.
+     * @param App - The base application component.
+     * @returns EnhancedApp - The enhanced application component.
      */
     public extendApp(App: React.ComponentType): React.ComponentType {
         return App
@@ -66,8 +65,8 @@ export default abstract class ApplicationExtension {
      * at page components added by your application extension.
      *
      * @protected
-     * @param {IRouteConfig[]} routes - The base application routes.
-     * @returns {IRouteConfig[]} The modified application routes.
+     * @param routes - The base application routes.
+     * @returns routes - The modified application routes.
      */
     public extendRoutes(routes: IRouteConfig[]): IRouteConfig[] {
         return routes
