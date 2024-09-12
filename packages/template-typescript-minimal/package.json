@@ -37,7 +37,9 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
-    "app":{},
+    "app":{
+      "extensions": []
+    },
     "ssrEnabled": true,
     "ssrOnly": [
       "ssr.js",
