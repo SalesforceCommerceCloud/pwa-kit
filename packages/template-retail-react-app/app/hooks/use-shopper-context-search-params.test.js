@@ -9,7 +9,11 @@ import React from 'react'
 import {Router} from 'react-router'
 import {renderHook} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
+import {
+    useShopperContextSearchParams,
+    getShopperContextFromSearchParams
+} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
+import {SHOPPER_CONTEXT_FIELD_TYPES} from '@salesforce/retail-react-app/app/constants'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -81,4 +85,41 @@ describe('useShopperContextSearchParams', () => {
             customerGroupIds: ['BigSpenders', 'MobileUsers']
         })
     })
+})
+
+describe('getShopperContextFromSearchParams', () => {
+    test.each([
+        [
+            new URLSearchParams('intParam=123'),
+            {intParam: {apiField: 'intField', type: SHOPPER_CONTEXT_FIELD_TYPES.INT}},
+            {intField: 123}
+        ],
+        [
+            new URLSearchParams('doubleParam=123.45'),
+            {doubleParam: {apiField: 'doubleField', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE}},
+            {doubleField: 123.45}
+        ],
+        [
+            new URLSearchParams('arrayParam=value1&arrayParam=value2'),
+            {arrayParam: {apiField: 'arrayField', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY}},
+            {arrayField: ['value1', 'value2']}
+        ],
+        [
+            new URLSearchParams('stringParam=value'),
+            {stringParam: {apiField: 'stringField', type: 'string'}},
+            {stringField: 'value'}
+        ],
+        [
+            new URLSearchParams('unknownParam=value'),
+            {knownParam: {apiField: 'knownField', type: SHOPPER_CONTEXT_FIELD_TYPES.STRING}},
+            {}
+        ]
+    ])(
+        'should handle %p correctly with mapping %p',
+        (searchParamsObj, searchParamToApiFieldMapping, expected) => {
+            expect(
+                getShopperContextFromSearchParams(searchParamsObj, searchParamToApiFieldMapping)
+            ).toEqual(expected)
+        }
+    )
 })
