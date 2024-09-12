@@ -19,6 +19,13 @@ const getExtensionNames = (extensions) => {
         return Array.isArray(extension) ? extension[0] : extension
     })
 }
+const normalizeExtensionsList = (extensions) =>
+    extensions.map((extension) => {
+        if (Array.isArray(extension)) {
+            return {name: extension[0], config: extension[1]}
+        }
+        return {name: extension}
+    })
 
 /**
  * The `extensions-loader` is used to return all configured extensions for a given pwa-kit
@@ -40,15 +47,20 @@ module.exports = function () {
     const {extensions = []} = getConfig()?.app || {}
 
     // Ensure that only valid extension names are loaded.
-    const extensionDetails = getExtensionNames(extensions)
-        .map((extension) => extension.match(nameRegex))
-        .filter(Boolean)
-        .map(([_, namespace, name]) => ({
+    const validExtensions = normalizeExtensionsList(extensions).filter((extension) =>
+        Boolean(extension.name.match(nameRegex))
+    )
+    const extensionDetails = validExtensions.map((extension) => {
+        const [_, namespace, name] = extension.name.match(nameRegex)
+        return {
             instanceVariable: kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`),
             modulePath: `${
                 namespace ? `@${namespace}/` : ''
-            }${APP_EXTENSION_PREFIX}-${name}/${APP_EXTENSION_CLIENT_ENTRY}`
-        }))
+            }${APP_EXTENSION_PREFIX}-${name}/${APP_EXTENSION_CLIENT_ENTRY}`,
+            config: JSON.stringify(extension.config)
+        }
+    })
+    console.log('--- extensionDetails', extensionDetails)
 
     return dedent`
             /*
@@ -67,9 +79,8 @@ module.exports = function () {
 
             export default [
                 ${extensionDetails
-                    .map(({instanceVariable}) => {
-                        const config = {} // TODO: Parse config config here.
-                        return `new ${instanceVariable}(${JSON.stringify(config)})`
+                    .map(({instanceVariable, config}) => {
+                        return `new ${instanceVariable}(${config})`
                     })
                     .join(',\n                ')}
             ]

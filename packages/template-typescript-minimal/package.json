@@ -39,7 +39,7 @@
   },
   "mobify": {
     "app":{"extensions": [
-      ["@salesforce/extension-sample", {"enabled": true}]
+      ["@salesforce/extension-sample", {"enabled": true, "path": "/foo-page"}]
     ]},
     "ssrEnabled": true,
     "ssrOnly": [

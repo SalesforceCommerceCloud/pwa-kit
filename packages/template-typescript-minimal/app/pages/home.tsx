@@ -145,7 +145,7 @@ const Home = ({value}: Props) => {
                             <br />
                             <br />
                             App Extensions work if you can navigate to this link:{' '}
-                            <Link to="/sample-page">sample page</Link>.
+                            <Link to="/foo-page">sample page</Link>.
                         </>
                     </p>
                 </div>
