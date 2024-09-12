@@ -209,21 +209,27 @@ export const SHOPPER_CONTEXT_FIELD_TYPES = {
     ARRAY: 'array'
 }
 export const SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING = {
-    sourceCode: {apiField: 'sourceCode'},
-    effectiveDateTime: {apiField: 'effectiveDateTime'},
-    customerGroupIds: {apiField: 'customerGroupIds', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY},
-    clientIp: {apiField: 'clientIp'}
+    shopperContext: {
+        sourceCode: {paramName: 'sourceCode'},
+        effectiveDateTime: {paramName: 'effectiveDateTime'},
+        customerGroupIds: {paramName: 'customerGroupIds', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY},
+        clientIp: {paramName: 'clientIp'}
+    },
+    geoLocation: {
+        city: {paramName: 'city'},
+        country: {paramName: 'country'},
+        countryCode: {paramName: 'countryCode'},
+        latitude: {paramName: 'latitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
+        longitude: {paramName: 'longitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
+        metroCode: {paramName: 'metroCode'},
+        postalCode: {paramName: 'postalCode'},
+        region: {paramName: 'region'},
+        regionCode: {paramName: 'regionCode'}
+    },
+    customQualifers: {
+        // Add custom qualifiers here
+    },
+    assignmentQualifiers: {
+        // Add assignment qualifiers here
+    }
 }
-export const SHOPPER_CONTEXT_GEOLOCATION_SEARCH_PARAM_TO_API_FIELD_MAPPING = {
-    city: {apiField: 'city'},
-    country: {apiField: 'country'},
-    countryCode: {apiField: 'countryCode'},
-    latitude: {apiField: 'latitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
-    longitude: {apiField: 'longitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
-    metroCode: {apiField: 'metroCode'},
-    postalCode: {apiField: 'postalCode'},
-    region: {apiField: 'region'},
-    regionCode: {apiField: 'regionCode'}
-}
-export const SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAM_TO_API_FIELD_MAPPING = {}
-export const SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAM_TO_API_FIELD_MAPPING = {}

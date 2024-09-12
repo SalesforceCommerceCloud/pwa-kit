@@ -56,8 +56,8 @@ describe('useShopperContextSearchParams', () => {
         )
 
         const wrapper = ({children}) => <Router history={history}>{children}</Router>
-        const customQualifiers = {deviceType: {apiField: 'deviceType'}}
-        const assignmentQualifiers = {storeId: {apiField: 'storeId'}}
+        const customQualifiers = {deviceType: {paramName: 'deviceType'}}
+        const assignmentQualifiers = {storeId: {paramName: 'storeId'}}
         const {result} = renderHook(
             () => useShopperContextSearchParams(customQualifiers, assignmentQualifiers),
             {wrapper}
@@ -91,34 +91,34 @@ describe('getShopperContextFromSearchParams', () => {
     test.each([
         [
             new URLSearchParams('intParam=123'),
-            {intParam: {apiField: 'intField', type: SHOPPER_CONTEXT_FIELD_TYPES.INT}},
+            {intField: {paramName: 'intParam', type: SHOPPER_CONTEXT_FIELD_TYPES.INT}},
             {intField: 123}
         ],
         [
             new URLSearchParams('doubleParam=123.45'),
-            {doubleParam: {apiField: 'doubleField', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE}},
+            {doubleField: {paramName: 'doubleParam', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE}},
             {doubleField: 123.45}
         ],
         [
             new URLSearchParams('arrayParam=value1&arrayParam=value2'),
-            {arrayParam: {apiField: 'arrayField', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY}},
+            {arrayField: {paramName: 'arrayParam', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY}},
             {arrayField: ['value1', 'value2']}
         ],
         [
             new URLSearchParams('stringParam=value'),
-            {stringParam: {apiField: 'stringField', type: 'string'}},
+            {stringField: {paramName: 'stringParam', type: 'string'}},
             {stringField: 'value'}
         ],
         [
             new URLSearchParams('unknownParam=value'),
-            {knownParam: {apiField: 'knownField', type: SHOPPER_CONTEXT_FIELD_TYPES.STRING}},
+            {knownField: {paramName: 'knownParam', type: SHOPPER_CONTEXT_FIELD_TYPES.STRING}},
             {}
         ]
     ])(
         'should handle %p correctly with mapping %p',
-        (searchParamsObj, searchParamToApiFieldMapping, expected) => {
+        (searchParamsObj, searchParamToparamNameMapping, expected) => {
             expect(
-                getShopperContextFromSearchParams(searchParamsObj, searchParamToApiFieldMapping)
+                getShopperContextFromSearchParams(searchParamsObj, searchParamToparamNameMapping)
             ).toEqual(expected)
         }
     )

@@ -10,9 +10,6 @@ import {useLocation} from 'react-router-dom'
 // Constants
 import {
     SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING,
-    SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAM_TO_API_FIELD_MAPPING,
-    SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAM_TO_API_FIELD_MAPPING,
-    SHOPPER_CONTEXT_GEOLOCATION_SEARCH_PARAM_TO_API_FIELD_MAPPING,
     SHOPPER_CONTEXT_FIELD_TYPES
 } from '@salesforce/retail-react-app/app/constants'
 
@@ -25,19 +22,19 @@ import {
  * @returns {Object} A shopper context object that can be passed to the Shopper Context API
  */
 export const useShopperContextSearchParams = (
-    customQualifersSearchParams = SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAM_TO_API_FIELD_MAPPING,
-    assignmentQualifiersSearchParams = SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAM_TO_API_FIELD_MAPPING
+    customQualifersSearchParams = SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING.customQualifers,
+    assignmentQualifiersSearchParams = SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING.assignmentQualifiers
 ) => {
     const {search} = useLocation()
     const searchParamsObj = new URLSearchParams(search)
 
     const shopperContext = getShopperContextFromSearchParams(
         searchParamsObj,
-        SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING
+        SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING.shopperContext
     )
     const geoLocation = getShopperContextFromSearchParams(
         searchParamsObj,
-        SHOPPER_CONTEXT_GEOLOCATION_SEARCH_PARAM_TO_API_FIELD_MAPPING
+        SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING.geoLocation
     )
     const customQualifiers = getShopperContextFromSearchParams(
         searchParamsObj,
@@ -68,22 +65,29 @@ export const getShopperContextFromSearchParams = (
     searchParamToApiFieldMapping
 ) => {
     const shopperContextObj = {}
-    for (const [key, value] of searchParamsObj.entries()) {
-        if (searchParamToApiFieldMapping[key]) {
-            const {apiField, type} = searchParamToApiFieldMapping[key]
+    for (const [searchParamKey, searchParamValue] of searchParamsObj.entries()) {
+        // Find the mapping entry where paramName matches the searchParamKey
+        const mappingEntry = Object.entries(searchParamToApiFieldMapping).find(
+            ([, entry]) => entry.paramName === searchParamKey
+        )
 
-            if (
-                type === SHOPPER_CONTEXT_FIELD_TYPES.INT ||
-                type === SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE
-            ) {
-                shopperContextObj[apiField] = Number(value)
-            } else if (type === SHOPPER_CONTEXT_FIELD_TYPES.ARRAY) {
-                shopperContextObj[apiField] = searchParamsObj.getAll(key)
-            } else {
-                // Default to string
-                shopperContextObj[apiField] = value
+        if (mappingEntry) {
+            const [apiFieldName, {type}] = mappingEntry
+            switch (type) {
+                case SHOPPER_CONTEXT_FIELD_TYPES.INT:
+                case SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE:
+                    shopperContextObj[apiFieldName] = Number(searchParamValue)
+                    break
+                case SHOPPER_CONTEXT_FIELD_TYPES.ARRAY:
+                    shopperContextObj[apiFieldName] = searchParamsObj.getAll(searchParamKey)
+                    break
+                default:
+                    // Default to string
+                    shopperContextObj[apiFieldName] = searchParamValue
+                    break
             }
         }
     }
+
     return shopperContextObj
 }
