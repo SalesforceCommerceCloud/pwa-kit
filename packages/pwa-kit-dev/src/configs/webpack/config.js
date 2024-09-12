@@ -8,20 +8,26 @@
 /* eslint-env node */
 
 // For more information on these settings, see https://webpack.js.org/configuration
-import path, {resolve} from 'path'
-import fse from 'fs-extra'
-
-import webpack from 'webpack'
-import WebpackNotifierPlugin from 'webpack-notifier'
-import CopyPlugin from 'copy-webpack-plugin'
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
+import {resolve} from 'path'
+import fse from 'fs-extra'
+import webpack from 'webpack'
+
+// Third-Party Plugins
+import CopyPlugin from 'copy-webpack-plugin'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
-import ApplicationExtensibilityPlugin from './plugins/application-extensibility'
+import WebpackNotifierPlugin from 'webpack-notifier'
 
+// Local Plugins // TODO: Refactor Plugins in the 'plugins' file.
+import ApplicationExtensibilityPlugin from './plugins/application-extensibility'
 import {sdkReplacementPlugin} from './plugins'
+
+// Constants
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
+
+// Utilities
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {buildAliases} from '../../utils/extensibility-utils'
 
@@ -44,19 +50,6 @@ const {app: appConfig} = getConfig()
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
-
-// for API convenience, add the leading slash if missing
-export const EXT_OVERRIDES_DIR =
-    typeof pkg?.ccExtensibility?.overridesDir === 'string' &&
-    !pkg?.ccExtensibility?.overridesDir?.match(/(^\/|^\\)/)
-        ? '/' + pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/')
-        : pkg?.ccExtensibility?.overridesDir
-        ? pkg?.ccExtensibility?.overridesDir?.replace(/\\/g, '/')
-        : ''
-export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
-export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
-export const EXT_EXTENDS_WIN = pkg?.ccExtensibility?.extends?.replace('/', '\\')
-export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
 
 const SUPPORTED_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
 
@@ -84,18 +77,6 @@ export const DEPS_TO_DEDUPE = [
     '@emotion/react'
 ]
 
-if (EXT_EXTENDABLE && EXT_EXTENDS) {
-    const extendsAsArr = Array.isArray(EXT_EXTENDS) ? EXT_EXTENDS : [EXT_EXTENDS]
-    const conflicts = extendsAsArr.filter((x) => EXT_EXTENDABLE?.includes(x))
-    if (conflicts?.length) {
-        throw new Error(
-            `Dependencies in 'extendable' and 'extends' cannot overlap, fix these: ${conflicts.join(
-                ', '
-            )}"`
-        )
-    }
-}
-
 const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
     new BundleAnalyzerPlugin({
         analyzerMode: 'static',
@@ -110,20 +91,12 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
 
 const entryPointExists = (segments) => {
     for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
-        const primary = resolve(projectDir, ...segments) + ext
-        const override = EXT_OVERRIDES_DIR
-            ? resolve(projectDir, EXT_OVERRIDES_DIR_NO_SLASH, ...segments) + ext
-            : null
-
-        if (fse.existsSync(primary) || (override && fse.existsSync(override))) {
+        const p = resolve(projectDir, ...segments) + ext
+        if (fse.existsSync(p)) {
             return true
         }
     }
     return false
-}
-
-const getAppEntryPoint = () => {
-    return resolve('./', EXT_OVERRIDES_DIR_NO_SLASH, 'app', 'main')
 }
 
 const getPublicPathEntryPoint = () => {
@@ -218,25 +191,6 @@ const baseConfig = (target) => {
                                 [dep]: findDepInStack(dep)
                             }))
                         ),
-                        ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
-                            ? Object.assign(
-                                  // NOTE: when an array of `extends` dirs are accepted, don't coerce here
-                                  ...[EXT_EXTENDS].map((extendTarget) => ({
-                                      [extendTarget]: path.resolve(
-                                          projectDir,
-                                          'node_modules',
-                                          ...extendTarget.split('/')
-                                      )
-                                  }))
-                              )
-                            : {}),
-                        ...(EXT_EXTENDABLE
-                            ? Object.assign(
-                                  ...[EXT_EXTENDABLE].map((item) => ({
-                                      [item]: path.resolve(projectDir)
-                                  }))
-                              )
-                            : {})
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -321,27 +275,7 @@ const withChunking = (config) => {
             splitChunks: {
                 cacheGroups: {
                     vendor: {
-                        // Three scenarios that we'd like to chunk vendor.js:
-                        // 1. The package is in node_modules
-                        // 2. The package is one of the monorepo packages.
-                        //    This is for local development to ensure the bundle
-                        //    composition is the same as a production build
-                        // 3. If extending another template, don't include the
-                        //    baseline route files in vendor.js
-                        test: (module) => {
-                            if (
-                                EXT_EXTENDS &&
-                                EXT_OVERRIDES_DIR &&
-                                module?.context?.includes(
-                                    `${path.sep}${
-                                        path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
-                                    }${path.sep}`
-                                )
-                            ) {
-                                return false
-                            }
-                            return module?.context?.match?.(/(node_modules)|(packages\/(.*)dist)/)
-                        },
+                        test: /(node_modules)|(packages\/.*\/dist)/,
                         name: 'vendor',
                         chunks: 'all'
                     }
@@ -352,15 +286,7 @@ const withChunking = (config) => {
 }
 
 const staticFolderCopyPlugin = new CopyPlugin({
-    patterns: [
-        {
-            from: path
-                .resolve(`${EXT_OVERRIDES_DIR ? EXT_OVERRIDES_DIR_NO_SLASH + '/' : ''}app/static`)
-                .replace(/\\/g, '/'),
-            to: `static/`,
-            noErrorOnMissing: true
-        }
-    ]
+    patterns: [{from: 'app/static/', to: 'static/'}]
 })
 
 const ruleForBabelLoader = (babelPlugins) => {
@@ -414,7 +340,7 @@ const enableReactRefresh = (config) => {
             main: [
                 'webpack-hot-middleware/client?path=/__mrt/hmr',
                 getPublicPathEntryPoint(),
-                getAppEntryPoint()
+                './app/main'
             ]
         },
         plugins: [
@@ -440,7 +366,7 @@ const client =
                 // use source map to make debugging easier
                 devtool: mode === development ? 'source-map' : false,
                 entry: {
-                    main: getAppEntryPoint()
+                    main: './app/main'
                 },
                 plugins: [
                     ...config.plugins,
@@ -466,7 +392,7 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', resolve(projectDir, EXT_OVERRIDES_DIR, 'app', 'loader.js')),
+                ...optional('loader', resolve(projectDir, 'app', 'loader.js')), // TODO: This might be a breaking point as its not the same as it was before completely 
                 ...optional('worker', resolve(projectDir, 'worker', 'main.js')),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
@@ -529,7 +455,7 @@ const ssr = (() => {
                         : {}),
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    entry: `.${EXT_OVERRIDES_DIR}/app/ssr.js`,
+                    entry: `./app/ssr.js`,
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
@@ -555,8 +481,7 @@ const requestProcessor =
             return {
                 ...config,
                 name: REQUEST_PROCESSOR,
-                // entry: './app/request-processor.js',
-                entry: `.${EXT_OVERRIDES_DIR}/app/request-processor.js`,
+                entry: './app/request-processor.js',
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',
