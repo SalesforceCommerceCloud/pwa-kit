@@ -191,9 +191,6 @@ export const DevServerMixin = {
             let extensionInstance
             try {
                 logger.info(`Instantiating extension class for ${extension.name}...`)
-                // TODO: pass in the config to ExtensionClass
-                console.log('--- options', options)
-                console.log('--- extension.config', extension.config)
                 extensionInstance = new ExtensionClass(options, extension.config)
                 logger.info(`Successfully instantiated extension ${extension.name}.`)
             } catch (e) {
