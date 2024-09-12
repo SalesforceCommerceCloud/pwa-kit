@@ -203,11 +203,27 @@ export const STORE_LOCATOR_DISTANCE_UNIT = 'km'
 export const STORE_LOCATOR_IS_ENABLED = true
 
 // Constants for shopper context
+export const SHOPPER_CONTEXT_FIELD_TYPES = {
+    INT: 'int',
+    DOUBLE: 'double',
+    ARRAY: 'array'
+}
 export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
-    SOURCE_CODE: 'sourceCode',
-    EFFECTIVE_DATE_TIME: 'effectiveDateTime',
-    CUSTOMER_GROUP_IDS: 'customerGroupIds'
+    sourceCode: {apiField: 'sourceCode'},
+    effectiveDateTime: {apiField: 'effectiveDateTime'},
+    customerGroupIds: {apiField: 'customerGroupIds', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY},
+    clientIp: {apiField: 'clientIp'}
+}
+export const SHOPPER_CONTEXT_GEOLOCATION_SEARCH_PARAM_TO_API_FIELD_MAPPING = {
+    city: {apiField: 'city'},
+    country: {apiField: 'country'},
+    countryCode: {apiField: 'countryCode'},
+    latitude: {apiField: 'latitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
+    longitude: {apiField: 'longitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
+    metroCode: {apiField: 'metroCode'},
+    postalCode: {apiField: 'postalCode'},
+    region: {apiField: 'region'},
+    regionCode: {apiField: 'regionCode'}
 }
 export const SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAMS = {}
 export const SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS = {}
-export const SHOPPER_CONTEXT_ARRAY_FIELDS = [SHOPPER_CONTEXT_SEARCH_PARAMS.CUSTOMER_GROUP_IDS]

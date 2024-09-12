@@ -12,7 +12,8 @@ import {
     SHOPPER_CONTEXT_SEARCH_PARAMS,
     SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAMS,
     SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS,
-    SHOPPER_CONTEXT_ARRAY_FIELDS
+    SHOPPER_CONTEXT_GEOLOCATION_SEARCH_PARAM_TO_API_FIELD_MAPPING,
+    SHOPPER_CONTEXT_FIELD_TYPES
 } from '@salesforce/retail-react-app/app/constants'
 
 /*
@@ -21,45 +22,55 @@ import {
  */
 export const useShopperContextSearchParams = (
     customQualifersSearchParams = SHOPPER_CONTEXT_CUSTOM_QUALIFIERS_SEARCH_PARAMS,
-    assignmentQualifiersSearchParams = SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS,
-    arraySearchParams = SHOPPER_CONTEXT_ARRAY_FIELDS
+    assignmentQualifiersSearchParams = SHOPPER_CONTEXT_ASSIGNMENT_QUALIFIERS_SEARCH_PARAMS
 ) => {
     const {search} = useLocation()
     const searchParamsObj = new URLSearchParams(search)
-    // Parses the search param key and value into an object
-    const getSearchParam = (key, isList = false) =>
-        searchParamsObj.has(key)
-            ? {[key]: isList ? searchParamsObj.getAll(key) : searchParamsObj.get(key)}
-            : {}
 
-    // Merges the shopper context search param key and values into a single object.
-    const reduceParams = (keys) =>
-        keys.reduce(
-            (acc, key) => ({...acc, ...getSearchParam(key, arraySearchParams.includes(key))}),
-            {}
-        )
-
-    const shopperContext = {
-        ...(searchParamsObj.has(SHOPPER_CONTEXT_SEARCH_PARAMS.SOURCE_CODE) && {
-            sourceCode: searchParamsObj.get(SHOPPER_CONTEXT_SEARCH_PARAMS.SOURCE_CODE)
-        }),
-        ...(searchParamsObj.has(SHOPPER_CONTEXT_SEARCH_PARAMS.EFFECTIVE_DATE_TIME) && {
-            effectiveDateTime: searchParamsObj.get(
-                SHOPPER_CONTEXT_SEARCH_PARAMS.EFFECTIVE_DATE_TIME
-            )
-        }),
-        ...(searchParamsObj.has(SHOPPER_CONTEXT_SEARCH_PARAMS.CUSTOMER_GROUP_IDS) && {
-            customerGroupIds: searchParamsObj.getAll(
-                SHOPPER_CONTEXT_SEARCH_PARAMS.CUSTOMER_GROUP_IDS
-            )
-        })
-    }
-    const customQualifiers = reduceParams(Object.values(customQualifersSearchParams))
-    const assignmentQualifiers = reduceParams(Object.values(assignmentQualifiersSearchParams))
+    const shopperContext = getShopperContextFromSearchParams(
+        searchParamsObj,
+        SHOPPER_CONTEXT_SEARCH_PARAMS
+    )
+    const geoLocation = getShopperContextFromSearchParams(
+        searchParamsObj,
+        SHOPPER_CONTEXT_GEOLOCATION_SEARCH_PARAM_TO_API_FIELD_MAPPING
+    )
+    const customQualifiers = getShopperContextFromSearchParams(
+        searchParamsObj,
+        customQualifersSearchParams
+    )
+    const assignmentQualifiers = getShopperContextFromSearchParams(
+        searchParamsObj,
+        assignmentQualifiersSearchParams
+    )
 
     return {
         ...shopperContext,
+        ...(Object.keys(geoLocation).length && {geoLocation}),
         ...(Object.keys(customQualifiers).length && {customQualifiers}),
         ...(Object.keys(assignmentQualifiers).length && {assignmentQualifiers})
     }
+}
+
+// Iterate through the search parameters and apply the mapping with types
+export const getShopperContextFromSearchParams = (searchParamsObj, paramToApiFieldMapping) => {
+    const shopperContextObj = {}
+    for (const [key, value] of searchParamsObj.entries()) {
+        if (paramToApiFieldMapping[key]) {
+            const {apiField, type} = paramToApiFieldMapping[key]
+
+            if (
+                type === SHOPPER_CONTEXT_FIELD_TYPES.INT ||
+                type === SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE
+            ) {
+                shopperContextObj[apiField] = Number(value)
+            } else if (type === SHOPPER_CONTEXT_FIELD_TYPES.ARRAY) {
+                shopperContextObj[apiField] = searchParamsObj.getAll(key)
+            } else {
+                // Default to string
+                shopperContextObj[apiField] = value
+            }
+        }
+    }
+    return shopperContextObj
 }
