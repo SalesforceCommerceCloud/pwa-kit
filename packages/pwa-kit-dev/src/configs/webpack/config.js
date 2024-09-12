@@ -21,7 +21,7 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import WebpackNotifierPlugin from 'webpack-notifier'
 
 // Local Plugins // TODO: Refactor Plugins in the 'plugins' file.
-import ApplicationExtensibilityPlugin from './plugins/application-extensibility'
+import OverridesResolverPlugin from './plugins/overrides-resolver'
 import {sdkReplacementPlugin} from './plugins'
 
 // Constants
@@ -175,7 +175,7 @@ const baseConfig = (target) => {
                 },
                 resolve: {
                     plugins: [
-                        new ApplicationExtensibilityPlugin({
+                        new OverridesResolverPlugin({
                             projectDir: process.cwd(),
                             extensions: appConfig?.extensions,
                             fileExtensions: SUPPORTED_FILE_EXTENSIONS

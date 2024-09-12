@@ -12,13 +12,13 @@ import {buildCandidatePaths} from '../../../utils/resolver-utils'
 
 const DEFAULT_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
 /**
- * @class AppExtensionResolverPlugin
+ * @class OverridesResolverPlugin
  *
- *  This plugin provides the "Application Extension" behavior of the Template Extensibility feature,
- *  allowing third party implementations that depend on an npm module for the base implementation
- *  and then overriding only specific files
+ *  This plugin provides the "overrides" behavior of the application extensibility feature. This allows
+ *  App Extension developers to define which files are part of their public api thus can be overridden, but 
+ *  also the module resolution algorithm. 
  */
-class AppExtensionResolverPlugin {
+class OverridesResolverPlugin {
     constructor(options) {
         this.projectDir = options.projectDir?.replace(/\\/g, '/')
         this.extensions = options.extensions || []
@@ -66,7 +66,7 @@ class AppExtensionResolverPlugin {
         resolver
             .getHook('resolve')
             .tapAsync(
-                'ApplicationExtensibilityPlugin',
+                'OverridesResolverPlugin',
                 (requestContext, resolveContext, callback) => {
                     this.handleHook(requestContext, resolveContext, callback, resolver)
                 }
@@ -74,4 +74,4 @@ class AppExtensionResolverPlugin {
     }
 }
 
-export default AppExtensionResolverPlugin
+export default OverridesResolverPlugin
