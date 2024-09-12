@@ -10,10 +10,15 @@ import path from 'path'
 const EXTENSION_NAMESPACE = '@salesforce'
 const EXTENSION_PREFIX = 'extension'
 const NODE_MODULES = 'node_modules'
+const OVERRIDES = 'overrides'
+const SRC = 'src'
+const PWA_KIT_REACT_SDK = 'pwa-kit-react-sdk'
+
+// TODO: Flesh this out some more.
 const SDK_COMPONENT_MAP = {
     'app/routes': '/ssr/universal/components/routes'
 }
-const INDEX_FILE = 'index'
+const INDEX_FILE = 'index' // TODO: Take this in as a configuration value.
 
 // Returns true/false indicating if the importPath resolves to a same named file as the sourcePath.
 // @private
@@ -79,15 +84,18 @@ export const expand = (extensions = []) =>
  * @param {String} sourcePath - The path the the file of the source import.
  * @param {Object} opts - The path the the file of the source import.
  * @param {Array<shortName: String, config: Array>} opts.extensions - List of extensions used by the base PWA-Kit application.
- * @param {String>} opts.productDir - Absolute path of the base project.
+ * @param {String>} opts.projectDir - Absolute path of the base project.
  * @returns {String[]} paths - The potential paths to find the module import.
  */
 export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
+    // TODO: Add logging using the logger instance but only for silly mode or something.
+
     // Replace wildcard character as it has done its job getting us to this point.
     importPath = importPath.replace('*/', '')
 
-    const {extensions = [], productDir = process.cwd()} = opts
+    const {extensions = [], projectDir = process.cwd()} = opts
     const isSelfReferenceImport = isSelfReference(importPath, sourcePath)
+    
     let paths = expand(extensions).reverse()
 
     // Map all the extensions and resolve the module names to absolute paths.
@@ -95,28 +103,30 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
         // The reference can be a module/package or an absolute path to a file.
         const [extensionRef] = extension
         const isLocalExtension = extensionRef.startsWith(path.sep)
-
+    
         return path.join(
             ...(isLocalExtension
                 ? [extensionRef, importPath]
-                : [productDir, NODE_MODULES, extensionRef, importPath])
+                : [projectDir, NODE_MODULES, extensionRef, SRC, OVERRIDES, importPath])
         )
     })
-
+    
     // Add non-extension search locations locations. The base project and the sdk as the final callback.
     paths = [
         // Base Project
-        path.join(productDir, importPath),
+        path.join(projectDir, 'app', 'overrides', importPath),
         // Extensions
         ...paths,
         // SDK
-        path.join(
-            productDir,
-            NODE_MODULES,
-            EXTENSION_NAMESPACE,
-            'pwa-kit-react-sdk',
-            SDK_COMPONENT_MAP[importPath]
-        )
+        ...(SDK_COMPONENT_MAP[importPath]
+            ? path.join(
+                  projectDir,
+                  NODE_MODULES,
+                  EXTENSION_NAMESPACE,
+                  PWA_KIT_REACT_SDK,
+                  SDK_COMPONENT_MAP[importPath]
+              )
+            : [])
     ]
 
     // Under certain circumstances we want to truncate the cadidate path array to prevent circular dependancies.

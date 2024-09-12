@@ -6,16 +6,10 @@
  */
 
 import React from 'react'
-import loadable from '@loadable/component'
 import {IApplicationExtension, IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility/types'
 import {IConfig} from './types'
-import withRedBorder from '*/components/with-red-border'
+import withChakraUI from './components/with-chakra-ui'
 
-// TODO: Investigate if we can even override loadable components.
-// const SamplePage = loadable(() => import('./pages/sample'))
-import SamplePage from '*/pages/sample'
-
-const defaultPath: string = '/sample-page'
 class Sample implements IApplicationExtension {
     private config: IConfig;
 
@@ -28,18 +22,11 @@ class Sample implements IApplicationExtension {
     }
 
     extendApp(App: React.ComponentType): React.ComponentType {
-        return withRedBorder(App)
+        return withChakraUI(App)
     }
 
     extendRoutes(routes: IRouteConfig[]): IRouteConfig[] {
-        return [
-            {
-                exact: true,
-                path: this.config?.path || defaultPath,
-                component: SamplePage
-            },
-            ...routes
-        ]
+        return routes
     }
 }
 

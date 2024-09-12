@@ -18,9 +18,8 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
-import AppExtensibilityPlugin from './app-extensitility-plugin'
+import ApplicationExtensibilityPlugin from './plugins/application-extensibility'
 
-import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -41,7 +40,6 @@ const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
 const {app: appConfig} = getConfig()
-const hasExtensions = appConfig?.extensions && appConfig?.extensions.length > 0
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -59,6 +57,8 @@ export const EXT_OVERRIDES_DIR_NO_SLASH = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 export const EXT_EXTENDS = pkg?.ccExtensibility?.extends
 export const EXT_EXTENDS_WIN = pkg?.ccExtensibility?.extends?.replace('/', '\\')
 export const EXT_EXTENDABLE = pkg?.ccExtensibility?.extendable
+
+const SUPPORTED_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
 
 // TODO: can these be handled in package.json as peerDependencies?
 // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
@@ -202,11 +202,13 @@ const baseConfig = (target) => {
                 },
                 resolve: {
                     plugins: [
-                        new AppExtensibilityPlugin({
-                            projectDir: process.cwd()
+                        new ApplicationExtensibilityPlugin({
+                            projectDir: process.cwd(),
+                            extensions: appConfig?.extensions,
+                            fileExtensions: SUPPORTED_FILE_EXTENSIONS
                         })
                     ],
-                    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+                    extensions: SUPPORTED_FILE_EXTENSIONS,
                     alias: {
                         // Create alias's for all the extensions as they are being imported from the SDK package and cannot be
                         // resolved from that location.
@@ -365,16 +367,10 @@ const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
-            ? // TODO: handle for array here when that's supported
-              {
-                  exclude: new RegExp(
-                      `${path.sep}node_modules(?!${path.sep}${
-                          path.sep === '/' ? EXT_EXTENDS : EXT_EXTENDS_WIN
-                      })`
-                  )
-              }
-            : {exclude: /node_modules/}),
+        // NOTE: Because our extensions are just folders containing source code, we need to ensure that the babel-loader processes them.
+        // By default babel doesn't process files in "node_modules" folder, so here we will ensure they are included.
+        // TODO: Make sure this regex works for windows.
+        exclude: /^\/node_modules\/(?:@([^/]+)\/)*(?!extension-)[^\/]+$/i,
         use: [
             {
                 loader: findDepInStack('babel-loader'),
