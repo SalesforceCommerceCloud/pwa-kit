@@ -16,9 +16,7 @@ import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
-    useShopperBasketsMutation,
-    useShopperContextsMutation,
-    useUsid
+    useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
@@ -27,7 +25,6 @@ import {
     Center,
     Fade,
     Spinner,
-    Button,
     useDisclosure,
     useStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -230,10 +227,7 @@ const App = (props) => {
         })
     }, [])
 
-    const {usid} = useUsid()
-    const createShopperContext = useShopperContextsMutation('createShopperContext')
-    const deleteShopperContext = useShopperContextsMutation('deleteShopperContext')
-    const updateShopperContext = useShopperContextsMutation('updateShopperContext')
+    // Handle updating the shopper context
     useUpdateShopperContext()
 
     useEffect(() => {
@@ -331,7 +325,7 @@ const App = (props) => {
                             <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
                             {/* Urls for all localized versions of this page (including current page)
-                                For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
+                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
                             {site.l10n?.supportedLocales.map((locale) => (
                                 <link
                                     rel="alternate"
@@ -359,59 +353,6 @@ const App = (props) => {
                                 onClose={onCloseStoreLocator}
                             />
                             <Box {...styles.headerWrapper}>
-                                <Button
-                                    colorScheme="teal"
-                                    variant="solid"
-                                    onClick={async () => {
-                                        await createShopperContext.mutateAsync({
-                                            parameters: {
-                                                usid,
-                                                siteId: site.id
-                                            },
-                                            body: {}
-                                        })
-                                        // refetchDataOnClient()
-                                    }}
-                                >
-                                    Create context
-                                </Button>
-                                <Button
-                                    colorScheme="red"
-                                    variant="solid"
-                                    onClick={async () => {
-                                        await deleteShopperContext.mutateAsync({
-                                            parameters: {
-                                                usid,
-                                                siteId: site.id
-                                            }
-                                        })
-                                        // refetchDataOnClient()
-                                    }}
-                                >
-                                    Delete context
-                                </Button>
-                                <Button
-                                    colorScheme="yellow"
-                                    variant="solid"
-                                    onClick={async () => {
-                                        await updateShopperContext.mutateAsync({
-                                            parameters: {
-                                                usid,
-                                                siteId: site.id
-                                            },
-                                            body: {
-                                                sourceCode: 'instagram',
-                                                customQualifiers: {
-                                                    vip: 'yes'
-                                                }
-                                            }
-                                        })
-                                        // refetchDataOnClient()
-                                        // window.location.reload()
-                                    }}
-                                >
-                                    Update context
-                                </Button>
                                 {!isCheckout ? (
                                     <>
                                         <AboveHeader />

@@ -36,6 +36,7 @@ export const useUpdateShopperContext = () => {
         {parameters: {usid, siteId: site.id}},
         {enabled: !isServer}
     )
+    // TODO: REMOVE BEFORE MERGING
     console.log('shopperContext', shopperContext)
 
     const refetchDataOnClient = () => {
@@ -55,7 +56,6 @@ export const useUpdateShopperContext = () => {
             await createShopperContext.mutateAsync(payload)
         } else {
             await updateShopperContext.mutateAsync(payload)
-            console.log('updated shopperContext', updateShopperContextObj)
         }
 
         // Refresh data
@@ -69,7 +69,6 @@ export const useUpdateShopperContext = () => {
     }, [search])
 
     useEffect(() => {
-        console.log('isHydrated()', isHydrated())
         if (isHydrated()) {
             refetchDataOnClient()
         }
