@@ -67,7 +67,7 @@ export const useUpdateShopperContext = () => {
     }, [search])
 
     useEffect(() => {
-        if (isHydrated()) {
+        if (shopperContext && isHydrated()) {
             refetchDataOnClient()
         }
     }, [])
