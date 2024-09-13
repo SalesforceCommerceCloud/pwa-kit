@@ -109,6 +109,8 @@ describe('useCustomMutation', () => {
         })
         expect(result.current.data).toBeUndefined()
         // TODO: fix typing issue
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         act(() => result.current.mutate({body: {test: '123'}}))
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(mockRes)

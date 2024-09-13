@@ -7,7 +7,8 @@
 import {
     useMutation as useReactQueryMutation,
     useQueryClient,
-    UseMutationOptions
+    UseMutationOptions,
+    MutationFunction
 } from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
@@ -136,11 +137,16 @@ export const useCustomMutation = (
         // If users don't define a body when they use this hook, they can pass in a body later
         // when calling mutate() or mutateAsync()
         // this allows users to call the same endpoint with different arguments
-        return useReactQueryMutation(callCustomEndpointWithBody)
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        return useReactQueryMutation(
+            callCustomEndpointWithBody as MutationFunction<unknown, unknown>,
+            mutationOptions
+        )
     } else {
         // If users define a body when they use this hook, every time they call
         // mutate() or mutateAsync(), it will make the exactly the same call
         // with the same arguments to the provided endpoint
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         return useReactQueryMutation(callCustomEndpointWithAuth(apiOptions), mutationOptions)
     }
 }
