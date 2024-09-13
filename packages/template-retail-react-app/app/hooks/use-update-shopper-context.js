@@ -70,5 +70,5 @@ export const useUpdateShopperContext = () => {
         if (shopperContext && isHydrated()) {
             refetchDataOnClient()
         }
-    }, [])
+    }, [shopperContext])
 }
