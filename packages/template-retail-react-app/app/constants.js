@@ -208,8 +208,8 @@ export const SHOPPER_CONTEXT_FIELD_TYPES = {
     DOUBLE: 'double',
     ARRAY: 'array'
 }
-export const SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING = {
-    shopperContext: {
+export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
+    qualifiers: {
         sourceCode: {paramName: 'sourceCode'},
         effectiveDateTime: {paramName: 'effectiveDateTime'},
         customerGroupIds: {paramName: 'customerGroupIds', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY},

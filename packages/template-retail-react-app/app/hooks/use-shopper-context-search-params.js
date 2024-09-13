@@ -9,7 +9,7 @@ import {useLocation} from 'react-router-dom'
 
 // Constants
 import {
-    SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING,
+    SHOPPER_CONTEXT_SEARCH_PARAMS,
     SHOPPER_CONTEXT_FIELD_TYPES
 } from '@salesforce/retail-react-app/app/constants'
 
@@ -22,19 +22,19 @@ import {
  * @returns {Object} A shopper context object that can be passed to the Shopper Context API
  */
 export const useShopperContextSearchParams = (
-    customQualifersSearchParams = SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING.customQualifers,
-    assignmentQualifiersSearchParams = SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING.assignmentQualifiers
+    customQualifersSearchParams = SHOPPER_CONTEXT_SEARCH_PARAMS.customQualifers,
+    assignmentQualifiersSearchParams = SHOPPER_CONTEXT_SEARCH_PARAMS.assignmentQualifiers
 ) => {
     const {search} = useLocation()
     const searchParamsObj = new URLSearchParams(search)
 
     const shopperContext = getShopperContextFromSearchParams(
         searchParamsObj,
-        SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING.shopperContext
+        SHOPPER_CONTEXT_SEARCH_PARAMS.qualifiers
     )
     const geoLocation = getShopperContextFromSearchParams(
         searchParamsObj,
-        SHOPPER_CONTEXT_SEARCH_PARAM_TO_API_FIELD_MAPPING.geoLocation
+        SHOPPER_CONTEXT_SEARCH_PARAMS.geoLocation
     )
     const customQualifiers = getShopperContextFromSearchParams(
         searchParamsObj,
