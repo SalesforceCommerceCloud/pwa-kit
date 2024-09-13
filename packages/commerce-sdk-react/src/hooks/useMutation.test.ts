@@ -101,7 +101,7 @@ describe('useCustomMutation', () => {
                     customApiPathParameters: {
                         endpointPath: 'test-hello-world',
                         apiName
-                    },
+                    }
                 },
                 clientConfig,
                 rawResponse: false
@@ -109,7 +109,7 @@ describe('useCustomMutation', () => {
         })
         expect(result.current.data).toBeUndefined()
         // TODO: fix typing issue
-        act(() => result.current.mutate({ body: {test: '123'} }))
+        act(() => result.current.mutate({body: {test: '123'}}))
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(mockRes)
     })

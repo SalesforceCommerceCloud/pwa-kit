@@ -67,12 +67,22 @@ export const useCustomMutation = (
     apiOptions: OptionalCustomEndpointClientConfig,
     mutationOptions?: UseMutationOptions
 ) => {
-    const config = useConfig()
     const auth = useAuthContext()
+    const config = useConfig()
+    const clientHeaders = config.headers || {}
+    const currentClientConfig = {
+        parameters: {
+            clientId: config.clientId,
+            siteId: config.siteId,
+            organizationId: config.organizationId,
+            shortCode: config.organizationId
+        },
+        proxy: config.proxy
+    }
+
     const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
         return async () => {
             const clientConfig = options.clientConfig || {}
-            const clientHeaders = config.headers || {}
             const {access_token} = await auth.ready()
             return await helpers.callCustomEndpoint({
                 ...options,
@@ -85,51 +95,52 @@ export const useCustomMutation = (
                     }
                 },
                 clientConfig: {
-                    parameters: {
-                        clientId: config.clientId,
-                        siteId: config.siteId,
-                        organizationId: config.organizationId,
-                        shortCode: config.organizationId
-                    },
-                    proxy: config.proxy,
+                    ...currentClientConfig,
                     ...clientConfig
                 }
             })
         }
     }
 
-    // TODO: update `any` type to proper type for HTTP payload body
-    const callCustomEndpointByBody = async (args: { body: any }) => {
-        const clientHeaders = config.headers || {}
+    const callCustomEndpointWithBody = async (args: {
+        body: unknown
+        parameters?: {[key: string]: string | number | boolean | string[] | number[]}
+        headers?: {[key: string]: string}
+    }) => {
+        const clientConfig = apiOptions.clientConfig || {}
         const {access_token} = await auth.ready()
-        const response = await helpers.callCustomEndpoint({
+        return await helpers.callCustomEndpoint({
             ...apiOptions,
             options: {
                 ...apiOptions.options,
                 headers: {
                     Authorization: `Bearer ${access_token}`,
                     ...clientHeaders,
-                    ...apiOptions.options.headers
+                    ...apiOptions.options.headers,
+                    ...args.headers
                 },
-                body: args.body
+                body: args.body,
+                parameters: {
+                    ...apiOptions.options.parameters,
+                    ...args.parameters
+                }
             },
             clientConfig: {
-                parameters: {
-                    clientId: config.clientId,
-                    siteId: config.siteId,
-                    organizationId: config.organizationId,
-                    shortCode: config.organizationId
-                },
-                proxy: config.proxy,
-                ...apiOptions.clientConfig
-            },
+                ...currentClientConfig,
+                ...clientConfig
+            }
         })
-        return response
     }
 
-    if(!apiOptions?.options?.body) {
-        return useReactQueryMutation(callCustomEndpointByBody)
+    if (!apiOptions?.options?.body) {
+        // If users don't define a body when they use this hook, they can pass in a body later
+        // when calling mutate() or mutateAsync()
+        // this allows users to call the same endpoint with different arguments
+        return useReactQueryMutation(callCustomEndpointWithBody)
     } else {
+        // If users define a body when they use this hook, every time they call
+        // mutate() or mutateAsync(), it will make the exactly the same call
+        // with the same arguments to the provided endpoint
         return useReactQueryMutation(callCustomEndpointWithAuth(apiOptions), mutationOptions)
     }
 }
