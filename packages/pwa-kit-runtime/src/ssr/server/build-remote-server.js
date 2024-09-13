@@ -30,7 +30,12 @@ import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
 import URL from 'url'
-import {Headers, X_HEADERS_TO_REMOVE_ORIGIN, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
+import {
+    Headers,
+    X_HEADERS_TO_REMOVE_ORIGIN,
+    X_MOBIFY_REQUEST_CLASS,
+    X_ENCODED_HEADERS
+} from '../../utils/ssr-proxying'
 import assert from 'assert'
 import semver from 'semver'
 import pkg from '../../../package.json'
@@ -1103,7 +1108,30 @@ const prepNonProxyRequest = (req, res, next) => {
         res.setHeader = function (header, value) {
             /* istanbul ignore else */
             if (header && header.toLowerCase() !== SET_COOKIE && value) {
-                setHeader.call(this, header, value)
+                // TODO: move into separate helper util
+                const isASCII = (str) => {
+                    // TODO: double check this logic
+                    // matches against printable ASCII characters
+                    return /^[\x20-\x7E]*$/.test(str)
+                }
+
+                if (isASCII(value)) {
+                    setHeader.call(this, header, value)
+                } else {
+                    // Should it be this.getHeader()?
+                    let currentEncodedHeaders = res.getHeader(X_ENCODED_HEADERS)
+                    if (currentEncodedHeaders) {
+                        // may not need .toString() call
+                        setHeader.call(
+                            this,
+                            X_ENCODED_HEADERS,
+                            `${currentEncodedHeaders},${header.toString()}`
+                        )
+                    } else {
+                        setHeader.call(this, X_ENCODED_HEADERS, header.toString())
+                    }
+                    setHeader.call(this, header, encodeURIComponent(value))
+                }
             } /* istanbul ignore else */ else if (!remote) {
                 logger.warn(
                     `Req ${res.locals.requestId}: ` +
