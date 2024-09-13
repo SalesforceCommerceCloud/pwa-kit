@@ -1149,6 +1149,12 @@
       "value": "Order History"
     }
   ],
+  "drawer_menu.header.assistive_msg.title": [
+    {
+      "type": 0,
+      "value": "Menu Drawer"
+    }
+  ],
   "drawer_menu.link.about_us": [
     {
       "type": 0,
