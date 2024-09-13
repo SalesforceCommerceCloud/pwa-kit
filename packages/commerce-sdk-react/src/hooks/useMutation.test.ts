@@ -81,4 +81,36 @@ describe('useCustomMutation', () => {
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(mockRes)
     })
+    test('accepts body as mutate parameter', async () => {
+        const mockRes = {data: '123'}
+        const apiName = 'hello-world'
+        mockMutationEndpoints(apiName, mockRes)
+        const {result} = renderHookWithProviders(() => {
+            const clientConfig = {
+                parameters: {
+                    clientId: 'CLIENT_ID',
+                    siteId: 'SITE_ID',
+                    organizationId: 'ORG_ID',
+                    shortCode: 'SHORT_CODE'
+                },
+                proxy: 'http://localhost:8888/mobify/proxy/api'
+            }
+            return useCustomMutation({
+                options: {
+                    method: 'POST',
+                    customApiPathParameters: {
+                        endpointPath: 'test-hello-world',
+                        apiName
+                    },
+                },
+                clientConfig,
+                rawResponse: false
+            })
+        })
+        expect(result.current.data).toBeUndefined()
+        // TODO: fix typing issue
+        act(() => result.current.mutate({ body: {test: '123'} }))
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(mockRes)
+    })
 })
