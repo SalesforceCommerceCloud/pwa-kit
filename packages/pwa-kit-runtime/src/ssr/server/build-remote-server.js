@@ -11,7 +11,8 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE
+    NO_CACHE,
+    X_ENCODED_HEADERS
 } from './constants'
 import {
     catchAndLog,
@@ -33,8 +34,7 @@ import URL from 'url'
 import {
     Headers,
     X_HEADERS_TO_REMOVE_ORIGIN,
-    X_MOBIFY_REQUEST_CLASS,
-    X_ENCODED_HEADERS
+    X_MOBIFY_REQUEST_CLASS
 } from '../../utils/ssr-proxying'
 import assert from 'assert'
 import semver from 'semver'

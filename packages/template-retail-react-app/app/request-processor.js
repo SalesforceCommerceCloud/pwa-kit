@@ -56,8 +56,8 @@ import {QueryParameters} from '@salesforce/pwa-kit-runtime/utils/ssr-request-pro
  */
 export const processRequest = ({
     // Uncomment the following lines for the example code to work.
-    // headers,
-    // setRequestClass,
+    headers,
+    setRequestClass,
     // parameters,
     path,
     querystring
@@ -110,6 +110,14 @@ export const processRequest = ({
         setRequestClass('bot')
     }
     ***************************************************************************/
+
+    let region = headers.getHeader('cf-region')
+    if (region) {
+        region = Buffer.from(region, 'ascii').toString('utf8')
+        headers.deleteHeader('cf-region')
+        setRequestClass(new URLSearchParams({region}) + '')
+    }
+
     // Return the path unchanged, and the updated query string
     return {
         path,
