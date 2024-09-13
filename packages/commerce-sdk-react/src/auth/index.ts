@@ -478,6 +478,7 @@ class Auth {
     }
 
     async refreshAccessToken() {
+        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -489,7 +490,7 @@ class Auth {
                             this.client,
                             {
                                 refreshToken,
-                                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt})
+                                ...(dntPref !== undefined && {dnt: dntPref})
                             },
                             {
                                 clientSecret: this.clientSecret
