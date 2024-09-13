@@ -17,36 +17,34 @@ import {
  * This hook will return a shopper context object when search params related
  * to shopper context are present.
  *
- * @param {Object} customQualifersSearchParams - object containing the search param to API field mapping related to customQualifers
- * @param {Object} assignmentQualifiersSearchParams - object containing the search param to API field mapping related to assignmentQualifiers
  * @returns {Object} A shopper context object that can be passed to the Shopper Context API
  */
-export const useShopperContextSearchParams = (
-    customQualifersSearchParams = SHOPPER_CONTEXT_SEARCH_PARAMS.customQualifers,
-    assignmentQualifiersSearchParams = SHOPPER_CONTEXT_SEARCH_PARAMS.assignmentQualifiers
-) => {
+export const useShopperContextSearchParams = () => {
     const {search} = useLocation()
     const searchParamsObj = new URLSearchParams(search)
+    const {
+        geoLocation: geoLocationSearchParams,
+        customQualifiers: customQualiferSearchParams,
+        assignmentQualifiers: assignmentQualifierSearchParams,
+        ...rootQualifierSearchParams
+    } = SHOPPER_CONTEXT_SEARCH_PARAMS
 
-    const shopperContext = getShopperContextFromSearchParams(
+    const rootQualifiers = getShopperContextFromSearchParams(
         searchParamsObj,
-        SHOPPER_CONTEXT_SEARCH_PARAMS.qualifiers
+        rootQualifierSearchParams
     )
-    const geoLocation = getShopperContextFromSearchParams(
-        searchParamsObj,
-        SHOPPER_CONTEXT_SEARCH_PARAMS.geoLocation
-    )
+    const geoLocation = getShopperContextFromSearchParams(searchParamsObj, geoLocationSearchParams)
     const customQualifiers = getShopperContextFromSearchParams(
         searchParamsObj,
-        customQualifersSearchParams
+        customQualiferSearchParams
     )
     const assignmentQualifiers = getShopperContextFromSearchParams(
         searchParamsObj,
-        assignmentQualifiersSearchParams
+        assignmentQualifierSearchParams
     )
 
     return {
-        ...shopperContext,
+        ...rootQualifiers,
         ...(Object.keys(geoLocation).length && {geoLocation}),
         ...(Object.keys(customQualifiers).length && {customQualifiers}),
         ...(Object.keys(assignmentQualifiers).length && {assignmentQualifiers})

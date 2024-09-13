@@ -209,12 +209,10 @@ export const SHOPPER_CONTEXT_FIELD_TYPES = {
     ARRAY: 'array'
 }
 export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
-    qualifiers: {
-        sourceCode: {paramName: 'sourceCode'},
-        effectiveDateTime: {paramName: 'effectiveDateTime'},
-        customerGroupIds: {paramName: 'customerGroupIds', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY},
-        clientIp: {paramName: 'clientIp'}
-    },
+    sourceCode: {paramName: 'sourceCode'},
+    effectiveDateTime: {paramName: 'effectiveDateTime'},
+    customerGroupIds: {paramName: 'customerGroupIds', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY},
+    clientIp: {paramName: 'clientIp'},
     geoLocation: {
         city: {paramName: 'city'},
         country: {paramName: 'country'},
@@ -226,7 +224,7 @@ export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
         region: {paramName: 'region'},
         regionCode: {paramName: 'regionCode'}
     },
-    customQualifers: {
+    customQualifiers: {
         // Add custom qualifiers here
     },
     assignmentQualifiers: {

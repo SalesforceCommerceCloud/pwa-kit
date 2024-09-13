@@ -13,7 +13,10 @@ import {
     useShopperContextSearchParams,
     getShopperContextFromSearchParams
 } from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
-import {SHOPPER_CONTEXT_FIELD_TYPES} from '@salesforce/retail-react-app/app/constants'
+import {
+    SHOPPER_CONTEXT_FIELD_TYPES,
+    SHOPPER_CONTEXT_SEARCH_PARAMS
+} from '@salesforce/retail-react-app/app/constants'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -39,6 +42,11 @@ describe('useShopperContextSearchParams', () => {
     })
 
     test('returns an object with parsed search params related to shopper context', () => {
+        const originalCustomQualifiers = SHOPPER_CONTEXT_SEARCH_PARAMS.customQualifiers
+        const originalAssignmentQualifiers = SHOPPER_CONTEXT_SEARCH_PARAMS.assignmentQualifiers
+        SHOPPER_CONTEXT_SEARCH_PARAMS.customQualifiers = {deviceType: {paramName: 'deviceType'}}
+        SHOPPER_CONTEXT_SEARCH_PARAMS.assignmentQualifiers = {storeId: {paramName: 'storeId'}}
+
         const history = createMemoryHistory()
         history.push(
             // Shopper Context Search Params
@@ -56,12 +64,7 @@ describe('useShopperContextSearchParams', () => {
         )
 
         const wrapper = ({children}) => <Router history={history}>{children}</Router>
-        const customQualifiers = {deviceType: {paramName: 'deviceType'}}
-        const assignmentQualifiers = {storeId: {paramName: 'storeId'}}
-        const {result} = renderHook(
-            () => useShopperContextSearchParams(customQualifiers, assignmentQualifiers),
-            {wrapper}
-        )
+        const {result} = renderHook(() => useShopperContextSearchParams(), {wrapper})
         expect(result.current).toEqual({
             sourceCode: 'instagram',
             effectiveDateTime: '2024-09-04T00:00:00Z',
@@ -84,6 +87,9 @@ describe('useShopperContextSearchParams', () => {
             },
             customerGroupIds: ['BigSpenders', 'MobileUsers']
         })
+
+        SHOPPER_CONTEXT_SEARCH_PARAMS.customQualifiers = originalCustomQualifiers
+        SHOPPER_CONTEXT_SEARCH_PARAMS.assignmentQualifiers = originalAssignmentQualifiers
     })
 })
 
