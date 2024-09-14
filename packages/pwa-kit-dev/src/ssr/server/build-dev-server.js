@@ -136,12 +136,16 @@ export const DevServerMixin = {
         logger.info('Setting up extensions...')
 
         // TODO: support extensions options array syntax i.e. [['extension-a', {}], ['extension-b', {}]]
-        const extensions = (options.mobify?.app?.extensions || []).map((extension) => {
-            if (Array.isArray(extension)) {
-                return {name: extension[0], config: extension[1]}
-            }
-            return {name: extension}
-        })
+        const extensions = (options.mobify?.app?.extensions || [])
+            .map((extension) => {
+                return {
+                    name: Array.isArray(extension) ? extension[0] : extension,
+                    config: Array.isArray(extension)
+                        ? {enabled: true, ...extension[1]}
+                        : {enabled: true}
+                }
+            })
+            .filter((extension) => extension.config.enabled)
 
         logger.info('Extensions to load', {
             namespace: 'DevServerMixin._setupExtensions',

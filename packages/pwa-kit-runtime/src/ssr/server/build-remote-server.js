@@ -662,6 +662,7 @@ export const RemoteServerFactory = {
         logger.info('Setting up extensions...')
 
         // TODO: support extensions options array syntax i.e. ['extension-a', {}]
+        // TODO: repeat updates for build-remote-server.js
         const extensions = options.mobify?.app?.extensions || []
         logger.info('Extensions to load', {
             namespace: 'RemoteServerFactory._setupExtensions',

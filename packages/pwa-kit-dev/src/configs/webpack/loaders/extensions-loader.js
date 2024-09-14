@@ -21,10 +21,10 @@ const getExtensionNames = (extensions) => {
 }
 const normalizeExtensionsList = (extensions) =>
     extensions.map((extension) => {
-        if (Array.isArray(extension)) {
-            return {name: extension[0], config: extension[1]}
+        return {
+            name: Array.isArray(extension) ? extension[0] : extension,
+            config: Array.isArray(extension) ? {enabled: true, ...extension[1]} : {enabled: true}
         }
-        return {name: extension}
     })
 
 /**
@@ -50,7 +50,8 @@ module.exports = function () {
     const validExtensions = normalizeExtensionsList(extensions).filter((extension) =>
         Boolean(extension.name.match(nameRegex))
     )
-    const extensionDetails = validExtensions.map((extension) => {
+    const enabledExtensions = validExtensions.filter((extension) => extension.config.enabled)
+    const extensionDetails = enabledExtensions.map((extension) => {
         const [_, namespace, name] = extension.name.match(nameRegex)
         return {
             instanceVariable: kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`),
