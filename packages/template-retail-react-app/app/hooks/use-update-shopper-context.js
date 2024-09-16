@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import _ from 'lodash'
 import {useEffect} from 'react'
-import {useLocation} from 'react-router-dom'
 import {
     useUsid,
     useShopperContext,
@@ -41,7 +41,11 @@ export const useUpdateShopperContext = () => {
     }
 
     const handleShopperContextUpdate = async (updateShopperContextObj) => {
-        if (isLoading || Object.keys(updateShopperContextObj).length === 0) {
+        if (
+            isLoading ||
+            _.isEqual(shopperContext, updateShopperContextObj) ||
+            Object.keys(updateShopperContextObj).length === 0
+        ) {
             return
         }
 

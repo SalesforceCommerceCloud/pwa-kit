@@ -47,7 +47,38 @@ describe('useShopperContextSearchParams', () => {
     test('does not create/update the shopper context when no shopper context search params are present', () => {
         const history = createMemoryHistory()
         history.push('/test/path')
-        useShopperContext.mockReturnValue({data: undefined})
+        useShopperContext.mockReturnValue({data: undefined, isLoading: false})
+        renderWithProviders(
+            <Router history={history}>
+                <MockComponent />
+            </Router>
+        )
+        expect(useShopperContext).toHaveBeenCalledTimes(1)
+        expect(createShopperContext.mutateAsync).not.toHaveBeenCalled()
+        expect(updateShopperContext.mutateAsync).not.toHaveBeenCalled()
+    })
+
+    test('does not create/update the shopper context when isLoading is true', () => {
+        const history = createMemoryHistory()
+        history.push('/test/path')
+        useShopperContext.mockReturnValue({data: undefined, isLoading: true})
+        renderWithProviders(
+            <Router history={history}>
+                <MockComponent />
+            </Router>
+        )
+        expect(useShopperContext).toHaveBeenCalledTimes(1)
+        expect(createShopperContext.mutateAsync).not.toHaveBeenCalled()
+        expect(updateShopperContext.mutateAsync).not.toHaveBeenCalled()
+    })
+
+    test('does not create/update the shopper context when current the shopper context deep equals the updateShopperContextObj', () => {
+        const history = createMemoryHistory()
+        history.push('/test/path/?sourceCode=instagram&city=Toronto')
+        useShopperContext.mockReturnValue({
+            data: {sourceCode: 'instagram', geoLocation: {city: 'Toronto'}},
+            isLoading: false
+        })
         renderWithProviders(
             <Router history={history}>
                 <MockComponent />
@@ -61,7 +92,7 @@ describe('useShopperContextSearchParams', () => {
     test('creates shopper context when shopper context is undefined', () => {
         const history = createMemoryHistory()
         history.push('/test/path/?sourceCode=instagram&customerGroupIds=BigSpenders')
-        useShopperContext.mockReturnValue({data: undefined})
+        useShopperContext.mockReturnValue({data: undefined, isLoading: false})
         renderWithProviders(
             <Router history={history}>
                 <MockComponent />
@@ -76,7 +107,7 @@ describe('useShopperContextSearchParams', () => {
     test('updates shopper context when shopper context is an empty object', () => {
         const history = createMemoryHistory()
         history.push('/test/path/?sourceCode=instagram&customerGroupIds=BigSpenders')
-        useShopperContext.mockReturnValue({data: {}})
+        useShopperContext.mockReturnValue({data: {}, isLoading: false})
         renderWithProviders(
             <Router history={history}>
                 <MockComponent />
@@ -91,7 +122,7 @@ describe('useShopperContextSearchParams', () => {
     test('updates shopper context when shopper context is an object with values', () => {
         const history = createMemoryHistory()
         history.push('/test/path/?sourceCode=instagram&customerGroupIds=BigSpenders')
-        useShopperContext.mockReturnValue({data: {sourceCode: 'facebook'}})
+        useShopperContext.mockReturnValue({data: {sourceCode: 'facebook'}, isLoading: false})
         renderWithProviders(
             <Router history={history}>
                 <MockComponent />
