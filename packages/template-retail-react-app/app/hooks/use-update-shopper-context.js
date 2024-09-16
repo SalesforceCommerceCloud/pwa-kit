@@ -28,7 +28,6 @@ import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/ho
 export const useUpdateShopperContext = () => {
     const {site} = useMultiSite()
     const {usid} = useUsid()
-    const {search} = useLocation()
     const queryClient = useQueryClient()
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
@@ -59,11 +58,14 @@ export const useUpdateShopperContext = () => {
 
     // Handle updating the shopper context based on URL search params
     const updateShopperContextObj = useShopperContextSearchParams()
+
     useEffect(() => {
         handleShopperContextUpdate(updateShopperContextObj)
+    }, [updateShopperContextObj, isLoading])
 
+    useEffect(() => {
         if (shopperContext && isHydrated()) {
             refetchDataOnClient()
         }
-    }, [search, shopperContext, isLoading])
+    }, [shopperContext])
 }

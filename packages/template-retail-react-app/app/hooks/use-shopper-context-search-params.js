@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 
 // Constants
@@ -21,34 +22,39 @@ import {
  */
 export const useShopperContextSearchParams = () => {
     const {search} = useLocation()
-    const searchParamsObj = new URLSearchParams(search)
-    const {
-        geoLocation: geoLocationSearchParams,
-        customQualifiers: customQualiferSearchParams,
-        assignmentQualifiers: assignmentQualifierSearchParams,
-        ...rootQualifierSearchParams
-    } = SHOPPER_CONTEXT_SEARCH_PARAMS
+    return useMemo(() => {
+        const searchParamsObj = new URLSearchParams(search)
+        const {
+            geoLocation: geoLocationSearchParams,
+            customQualifiers: customQualiferSearchParams,
+            assignmentQualifiers: assignmentQualifierSearchParams,
+            ...rootQualifierSearchParams
+        } = SHOPPER_CONTEXT_SEARCH_PARAMS
 
-    const rootQualifiers = getShopperContextFromSearchParams(
-        searchParamsObj,
-        rootQualifierSearchParams
-    )
-    const geoLocation = getShopperContextFromSearchParams(searchParamsObj, geoLocationSearchParams)
-    const customQualifiers = getShopperContextFromSearchParams(
-        searchParamsObj,
-        customQualiferSearchParams
-    )
-    const assignmentQualifiers = getShopperContextFromSearchParams(
-        searchParamsObj,
-        assignmentQualifierSearchParams
-    )
+        const rootQualifiers = getShopperContextFromSearchParams(
+            searchParamsObj,
+            rootQualifierSearchParams
+        )
+        const geoLocation = getShopperContextFromSearchParams(
+            searchParamsObj,
+            geoLocationSearchParams
+        )
+        const customQualifiers = getShopperContextFromSearchParams(
+            searchParamsObj,
+            customQualiferSearchParams
+        )
+        const assignmentQualifiers = getShopperContextFromSearchParams(
+            searchParamsObj,
+            assignmentQualifierSearchParams
+        )
 
-    return {
-        ...rootQualifiers,
-        ...(Object.keys(geoLocation).length && {geoLocation}),
-        ...(Object.keys(customQualifiers).length && {customQualifiers}),
-        ...(Object.keys(assignmentQualifiers).length && {assignmentQualifiers})
-    }
+        return {
+            ...rootQualifiers,
+            ...(Object.keys(geoLocation).length && {geoLocation}),
+            ...(Object.keys(customQualifiers).length && {customQualifiers}),
+            ...(Object.keys(assignmentQualifiers).length && {assignmentQualifiers})
+        }
+    }, [search])
 }
 
 /**
