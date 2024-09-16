@@ -91,3 +91,18 @@ export const findFileWithExtension = (basePath, extensions = []) => {
     }
     return null
 }
+
+/**
+ * This regular expression is used to identify and validate application extensions.
+ * The current formate for a valid extension is an optional package namespace followed by
+ * `extension-` string litteral, then the extension name. (E.g. @salesforce/extension-store-finder).
+ * This regex has grouping that allows you to pull the namespace and application extension
+ * name from the string being matched.
+ *
+ * @example
+ *
+ * const installedExtensions = Object.keys(pkg.devDependencies)
+ *      .map((packageName) => packageName.match(nameRegex))
+ *      .filter(Boolean)
+ */
+export const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/

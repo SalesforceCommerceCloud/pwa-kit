@@ -87,6 +87,10 @@ jest.mock('../universal/extensibility/extensions', () => {
             return 'pwa-extension'
         }
 
+        getConfig() {
+            return {}
+        }
+
         extendApp(App) {
             return withTitle(App)
         }
@@ -102,7 +106,9 @@ jest.mock('../universal/extensibility/extensions', () => {
         }
     }
 
-    return [new PWAExtension()]
+    return {
+        getExtensions: () => [new PWAExtension()]
+    }
 })
 
 jest.mock('../universal/routes', () => {

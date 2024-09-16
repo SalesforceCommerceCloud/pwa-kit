@@ -141,9 +141,6 @@ const Home = ({value}: Props) => {
                             <HelloTS message="it works!" />
                             <br />
                             <br />
-                            Client-side JS works if this counter increments: {counter}
-                            <br />
-                            <br />
                             App Extensions work if you can navigate to this link:{' '}
                             <Link to="/foo-page">sample page</Link>.
                         </>
