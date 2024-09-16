@@ -54,6 +54,7 @@ export const useShopperContextSearchParams = () => {
 /**
  * Converts search parameters into a shopper context object based on a provided mapping.
  *
+ * @private
  * @param {URLSearchParams} searchParamsObj - The search parameters object
  * @param {Object} searchParamToApiFieldMapping - An object mapping search parameter keys to API field names and types
  * @returns {Object} The shopper context object where keys are API field names and values are the converted search parameter values.
