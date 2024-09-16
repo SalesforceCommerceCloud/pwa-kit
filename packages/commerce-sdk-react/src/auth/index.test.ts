@@ -506,15 +506,12 @@ describe('Auth', () => {
         // When user has not selected DNT pref
         [true, '1'],
         [false, '0'],
-        [null, '0'],
-    ])(
-        'setDNT(true) results dw_dnt=1',
-        async (newDntPref, expectedDwDnt) => {
-            const auth = new Auth({...config, siteId: 'siteA'})
-            await auth.setDnt(newDntPref)
-            expect(auth.get('dw_dnt')).toBe(expectedDwDnt)
-        }
-    )
+        [null, '0']
+    ])('setDNT(true) results dw_dnt=1', async (newDntPref, expectedDwDnt) => {
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(newDntPref)
+        expect(auth.get('dw_dnt')).toBe(expectedDwDnt)
+    })
 
     test('setDNT(null) results in defaultDnt if defaultDnt is defined', async () => {
         const auth = new Auth({...config, siteId: 'siteA', defaultDnt: true})
