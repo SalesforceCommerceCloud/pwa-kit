@@ -41,6 +41,20 @@ describe('useShopperContextSearchParams', () => {
         expect(result.current).toEqual({})
     })
 
+    test('returns object with only allowed search params', () => {
+        const originalCustomQualifiers = SHOPPER_CONTEXT_SEARCH_PARAMS.customQualifiers
+        SHOPPER_CONTEXT_SEARCH_PARAMS.customQualifiers = {a: {paramName: 'a'}, b: {paramName: 'b'}}
+
+        const history = createMemoryHistory()
+        history.push('?a=1&b=2&c=3')
+
+        const wrapper = ({children}) => <Router history={history}>{children}</Router>
+        const {result} = renderHook(() => useShopperContextSearchParams(), {wrapper})
+        expect(result.current).toEqual({customQualifiers: {a: '1', b: '2'}})
+
+        SHOPPER_CONTEXT_SEARCH_PARAMS.customQualifiers = originalCustomQualifiers
+    })
+
     test('returns an object with parsed search params related to shopper context', () => {
         const originalCustomQualifiers = SHOPPER_CONTEXT_SEARCH_PARAMS.customQualifiers
         const originalAssignmentQualifiers = SHOPPER_CONTEXT_SEARCH_PARAMS.assignmentQualifiers
@@ -96,33 +110,31 @@ describe('useShopperContextSearchParams', () => {
 describe('getShopperContextFromSearchParams', () => {
     test.each([
         [
-            new URLSearchParams('intParam=123'),
+            'intParam=123',
             {intField: {paramName: 'intParam', type: SHOPPER_CONTEXT_FIELD_TYPES.INT}},
             {intField: 123}
         ],
         [
-            new URLSearchParams('doubleParam=123.45'),
+            'doubleParam=123.45',
             {doubleField: {paramName: 'doubleParam', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE}},
             {doubleField: 123.45}
         ],
         [
-            new URLSearchParams('arrayParam=value1&arrayParam=value2'),
+            'arrayParam=value1&arrayParam=value2',
             {arrayField: {paramName: 'arrayParam', type: SHOPPER_CONTEXT_FIELD_TYPES.ARRAY}},
             {arrayField: ['value1', 'value2']}
         ],
         [
-            new URLSearchParams('stringParam=value'),
+            'stringParam=value',
             {stringField: {paramName: 'stringParam', type: 'string'}},
             {stringField: 'value'}
         ],
-        [
-            new URLSearchParams('unknownParam=value'),
-            {knownField: {paramName: 'knownParam', type: SHOPPER_CONTEXT_FIELD_TYPES.STRING}},
-            {}
-        ]
+        ['unknownParam=value', {knownField: {paramName: 'knownParam'}}, {}],
+        ['', {knownField: {paramName: 'knownParam'}}, {}]
     ])(
         'should handle %p correctly with mapping %p',
-        (searchParamsObj, searchParamToparamNameMapping, expected) => {
+        (queryString, searchParamToparamNameMapping, expected) => {
+            const searchParamsObj = new URLSearchParams(queryString)
             expect(
                 getShopperContextFromSearchParams(searchParamsObj, searchParamToparamNameMapping)
             ).toEqual(expected)

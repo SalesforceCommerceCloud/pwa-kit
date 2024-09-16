@@ -203,6 +203,9 @@ export const STORE_LOCATOR_DISTANCE_UNIT = 'km'
 export const STORE_LOCATOR_IS_ENABLED = true
 
 // Constants for shopper context
+// Supported non-string field types used in SHOPPER_CONTEXT_SEARCH_PARAMS below.
+// Only non-string types need to be identified using the "type" field.
+// If no "type" field is present, the value will be parsed as a string by default.
 export const SHOPPER_CONTEXT_FIELD_TYPES = {
     INT: 'int',
     DOUBLE: 'double',
