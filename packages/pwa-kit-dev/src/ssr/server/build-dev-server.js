@@ -135,7 +135,7 @@ export const DevServerMixin = {
     _setupExtensions(app, options) {
         logger.info('Setting up extensions...')
 
-        // TODO: support extensions options array syntax i.e. [['extension-a', {}], ['extension-b', {}]]
+        // Normalize the extensions list for easier parsing
         const extensions = (options.mobify?.app?.extensions || [])
             .map((extension) => {
                 return {

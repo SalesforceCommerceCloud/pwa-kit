@@ -27,7 +27,6 @@ const APP_EXTENSION_PREFIX = 'extension'
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
 module.exports = function () {
-    // TODO: Ben's PR will affect this file
     // TODO: We need to account for extensions being tuples. Here we assume it's a simple
     // string that is the npm package name, the only expectation is that the package name starts with `extension-`,
     // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the
@@ -76,10 +75,6 @@ module.exports = function () {
                     }
                 })
 
-            const includesPackageName = (extensions, pkgName) => {
-                return Boolean(extensions.find((extension) => extension.name === pkgName))
-            }
-
             const initExtensionIfFound = (extensions, {instanceVariable, packageName}) => {
                 const found = extensions.find((ext) => ext.name === packageName)
                 return found ? new instanceVariable(found.config || {}) : false
@@ -88,7 +83,6 @@ module.exports = function () {
             export const getExtensions = () => {
                 const configuredExtensions = normalizeExtensionsList(getConfig()?.app?.extensions) || []
                 const enabledExtensions = configuredExtensions.filter((extension) => extension.config.enabled)
-
 
                 return [
                     ${extensionDetails

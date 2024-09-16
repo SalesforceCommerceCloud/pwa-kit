@@ -23,7 +23,7 @@ import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {buildAliases, nameRegex} from '../../utils/extensibility-utils'
+import {buildAliases, getExtensionNames, nameRegex} from '../../utils/extensibility-utils'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -585,18 +585,11 @@ const requestProcessor =
         })
         .build()
 
-const getExtensionNames = (extensions) => {
-    return (extensions || []).map((extension) => {
-        return Array.isArray(extension) ? extension[0] : extension
-    })
-}
-
 // This is the extensions for multi-extensibility feature in PWA Kit.
 // Don't mistake this with the concept of extensions for Webpack.
 const extensions =
     mode === 'production'
-        ? // TODO
-          (getExtensionNames(appConfig?.extensions) || [])
+        ? (getExtensionNames(appConfig?.extensions) || [])
               .map((extension) => {
                   const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/src/setup-server`
                   const foundType = ['ts', 'js'].find((type) =>

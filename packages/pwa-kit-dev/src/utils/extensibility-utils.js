@@ -11,12 +11,6 @@ import fs from 'fs-extra'
 const REACT_EXTENSIBILITY_FILE = 'setup-app'
 const SUPPORTED_FILE_TYPES = ['.ts', '.js']
 
-const getExtensionNames = (extensions) => {
-    return (extensions || []).map((extension) => {
-        return Array.isArray(extension) ? extension[0] : extension
-    })
-}
-
 /**
  * Given a list of extensions, returns an object where the key is the extensions
  * app entry import string, and the value the path to the source file.
@@ -106,3 +100,12 @@ export const findFileWithExtension = (basePath, extensions = []) => {
  *      .filter(Boolean)
  */
 export const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
+
+/**
+ * @private
+ */
+export const getExtensionNames = (extensions) => {
+    return (extensions || []).map((extension) => {
+        return Array.isArray(extension) ? extension[0] : extension
+    })
+}
