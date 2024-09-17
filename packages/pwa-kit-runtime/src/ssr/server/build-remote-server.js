@@ -11,8 +11,7 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE,
-    X_ENCODED_HEADERS
+    NO_CACHE
 } from './constants'
 import {
     catchAndLog,
@@ -31,11 +30,7 @@ import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
 import URL from 'url'
-import {
-    Headers,
-    X_HEADERS_TO_REMOVE_ORIGIN,
-    X_MOBIFY_REQUEST_CLASS
-} from '../../utils/ssr-proxying'
+import {Headers, X_HEADERS_TO_REMOVE_ORIGIN, X_MOBIFY_REQUEST_CLASS} from '../../utils/ssr-proxying'
 import assert from 'assert'
 import semver from 'semver'
 import pkg from '../../../package.json'
@@ -752,76 +747,6 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupCommonMiddleware(app, options) {
-
-        app.use((req, res, next) => {
-            logger.info('########################### SETTING UP MIDDLEWARE')
-
-            try {
-
-                // logger.info('########################### SETTING UP MIDDLEWARE 2')
-
-            const isASCII = (str) => {
-                // TODO: double check this logic
-                // matches against printable ASCII characters
-                return /^[\x20-\x7E]*$/.test(str)
-            }
-            // logger.info('########################### SETTING UP MIDDLEWARE 3')
-
-
-            const sanitizeHeader = ({ header, value, extra}) => {
-                logger.info(`@@@@@@@@@@ ${extra} | ${header}: ${value}`)
-                if(isASCII(value)) {
-                    return value
-                } else {
-                    logger.info(`   @@@@@@@@@@ ${value} is not ASCII, converting to: ${encodeURIComponent(value)}`)
-                    return encodeURIComponent(value)
-                }
-            }
-
-            try {
-                for (const header in req.headers) {
-                    if (typeof req.headers[header] === 'string') {
-                        const originalValue = req.headers[header]
-                        req.headers[header] = sanitizeHeader({
-                            header: header,
-                            value: req.headers[header],
-                            extra: 'REQUEST'
-                        });
-                        if(originalValue !== req.headers[header]) {
-                            hasChangedHeader = true
-                            logger.info(`   $$$ ${header} HEADER CHANGED from ${originalValue} to ${req.headers[header]}`)
-                        }
-                    }
-                }
-                logger.info('%%%%%% Request Object from Changed Header:', JSON.stringify(req.headers))
-            } catch(error) {
-                logger.info('@@@ ERROR IN BUILD SERVER - REQUEST: ', error)
-            }
-
-            try {
-                const originalSetHeader = res.setHeader;
-                res.setHeader = function (name, value) {
-                    if (typeof value === 'string') {
-                        value = sanitizeHeader({
-                            header: name,
-                            value: value,
-                            extra: 'RESPONSE'
-                        });
-                    }
-                    originalSetHeader.call(this, name, value);
-                };
-            } catch(error) {
-                logger.info('@@@ ERROR IN BUILD SERVER - RESPONSE: ', error)
-            }
-
-            } catch(error) {
-                logger.info('########## HAD AN ERRoR', error)
-            }
-
-            logger.info('########################### DONE SETTING UP')
-            next();
-        });
-
         app.use(prepNonProxyRequest)
 
         // Apply the SSR middleware to any subsequent routes that we expect users
@@ -1025,7 +950,7 @@ export const RemoteServerFactory = {
      * @param app {Express} - an Express App
      * @private
      */
-    _createHandler(app) {
+    _createHandler(app, options) {
         // This flag is initially false, and is set true on the first request
         // handled by a Lambda. If it is true on entry to the handler function,
         // it indicates that the Lambda container has been reused.
@@ -1033,7 +958,17 @@ export const RemoteServerFactory = {
 
         const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes)
 
+        // TODO: get more context on what the handler does
         const handler = (event, context, callback) => {
+            if (options?.encodeNonAsciiHttpHeaders) {
+                Object.keys(event.headers).forEach((key) => {
+                    if (!this._isASCII(event.headers[key])) {
+                        event.headers[key] = encodeURIComponent(event.headers[key])
+                    }
+                })
+                // TODO: potentially set X_ENCODED_HEADERS
+            }
+
             // We don't want to wait for an empty event loop once the response
             // has been sent. Setting this to false will "send the response
             // right away when the callback executes", but any pending events
@@ -1136,7 +1071,7 @@ export const RemoteServerFactory = {
     createHandler(options, customizeApp) {
         process.on('unhandledRejection', catchAndLog)
         const app = this._createApp(options)
-        customizeApp(app)
+        customizeApp(app, options)
         return this._createHandler(app)
     },
 
@@ -1146,6 +1081,17 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getRequestProcessor(req) {
         return null
+    },
+
+    /**
+     * TODO: add documentation
+     *
+     * @private
+     */
+    _isASCII(str) {
+        // TODO: double check this logic
+        // matches against printable ASCII characters
+        return /^[\x20-\x7E]*$/.test(str)
     }
 }
 
@@ -1178,30 +1124,7 @@ const prepNonProxyRequest = (req, res, next) => {
         res.setHeader = function (header, value) {
             /* istanbul ignore else */
             if (header && header.toLowerCase() !== SET_COOKIE && value) {
-                // TODO: move into separate helper util
-                const isASCII = (str) => {
-                    // TODO: double check this logic
-                    // matches against printable ASCII characters
-                    return /^[\x20-\x7E]*$/.test(str)
-                }
-
-                if (isASCII(value)) {
-                    setHeader.call(this, header, value)
-                } else {
-                    // Should it be this.getHeader()?
-                    let currentEncodedHeaders = res.getHeader(X_ENCODED_HEADERS)
-                    if (currentEncodedHeaders) {
-                        // may not need .toString() call
-                        setHeader.call(
-                            this,
-                            X_ENCODED_HEADERS,
-                            `${currentEncodedHeaders},${header.toString()}`
-                        )
-                    } else {
-                        setHeader.call(this, X_ENCODED_HEADERS, header.toString())
-                    }
-                    setHeader.call(this, header, encodeURIComponent(value))
-                }
+                setHeader.call(this, header, value)
             } /* istanbul ignore else */ else if (!remote) {
                 logger.warn(
                     `Req ${res.locals.requestId}: ` +

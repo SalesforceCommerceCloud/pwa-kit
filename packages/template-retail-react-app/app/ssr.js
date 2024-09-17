@@ -21,6 +21,7 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
+import {ENCODE_NON_ASCII_HTTP_HEADERS} from '@salesforce/retail-react-app/../../app/constants'
 
 const options = {
     // The build directory (an absolute path)
@@ -45,7 +46,10 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false
+    useSLASPrivateClient: false,
+
+    // TODO: add comment
+    encodeNonAsciiHttpHeaders: ENCODE_NON_ASCII_HTTP_HEADERS
 }
 
 const runtime = getRuntime()
