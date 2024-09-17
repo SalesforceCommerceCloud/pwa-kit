@@ -91,7 +91,7 @@ describe('useShopperContextSearchParams', () => {
 
     test('creates shopper context when shopper context is undefined', () => {
         const history = createMemoryHistory()
-        history.push('/test/path/?sourceCode=instagram&customerGroupIds=BigSpenders')
+        history.push('/test/path/?sourceCode=instagram')
         useShopperContext.mockReturnValue({data: undefined, isLoading: false})
         renderWithProviders(
             <Router history={history}>
@@ -100,13 +100,13 @@ describe('useShopperContextSearchParams', () => {
         )
         expect(createShopperContext.mutateAsync).toHaveBeenCalledWith({
             parameters: {usid, siteId: 'site-1'},
-            body: {sourceCode: 'instagram', customerGroupIds: ['BigSpenders']}
+            body: {sourceCode: 'instagram'}
         })
     })
 
     test('updates shopper context when shopper context is an empty object', () => {
         const history = createMemoryHistory()
-        history.push('/test/path/?sourceCode=instagram&customerGroupIds=BigSpenders')
+        history.push('/test/path/?sourceCode=instagram')
         useShopperContext.mockReturnValue({data: {}, isLoading: false})
         renderWithProviders(
             <Router history={history}>
@@ -115,13 +115,13 @@ describe('useShopperContextSearchParams', () => {
         )
         expect(updateShopperContext.mutateAsync).toHaveBeenCalledWith({
             parameters: {usid, siteId: 'site-1'},
-            body: {sourceCode: 'instagram', customerGroupIds: ['BigSpenders']}
+            body: {sourceCode: 'instagram'}
         })
     })
 
     test('updates shopper context when shopper context is an object with values', () => {
         const history = createMemoryHistory()
-        history.push('/test/path/?sourceCode=instagram&customerGroupIds=BigSpenders')
+        history.push('/test/path/?sourceCode=instagram')
         useShopperContext.mockReturnValue({data: {sourceCode: 'facebook'}, isLoading: false})
         renderWithProviders(
             <Router history={history}>
@@ -130,7 +130,7 @@ describe('useShopperContextSearchParams', () => {
         )
         expect(updateShopperContext.mutateAsync).toHaveBeenCalledWith({
             parameters: {usid, siteId: 'site-1'},
-            body: {sourceCode: 'instagram', customerGroupIds: ['BigSpenders']}
+            body: {sourceCode: 'instagram'}
         })
     })
 })
