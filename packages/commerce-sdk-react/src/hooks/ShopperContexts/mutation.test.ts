@@ -21,7 +21,8 @@ import {
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
-        ready: jest.fn().mockResolvedValue({access_token: 'access_token'})
+        ready: jest.fn().mockResolvedValue({access_token: 'access_token'}),
+        get: jest.fn().mockResolvedValue({dwsid: 'dwsid'})
     }))
 })
 

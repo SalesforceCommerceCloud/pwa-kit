@@ -32,8 +32,7 @@ export const DEFAULT_TEST_CONFIG = {
     siteId: 'RefArchGlobal',
     locale: 'en-US',
     currency: 'USD',
-    fetchedToken: 'test-token',
-    OCAPISessionsURL: `${DEFAULT_TEST_HOST}${PROXY_PATH}/ocapi/s/RefArch/dw/shop/v22_8/sessions`
+    fetchedToken: 'test-token'
 }
 
 export const createQueryClient = () => {

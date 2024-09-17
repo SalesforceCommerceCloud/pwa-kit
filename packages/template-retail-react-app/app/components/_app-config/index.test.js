@@ -21,7 +21,6 @@ describe('AppConfig', () => {
     beforeAll(() => {
         jest.spyOn(window.localStorage, 'setItem')
         originalFetch = global.fetch
-        global.fetch = jest.fn().mockImplementation(() => mockConfig.mockFetchOCAPISessions)
     })
 
     beforeEach(() => {
