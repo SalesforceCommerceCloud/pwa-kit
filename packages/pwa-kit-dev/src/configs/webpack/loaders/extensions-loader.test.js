@@ -9,12 +9,10 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import dedent from 'dedent'
 import compiler from './test/compiler'
 
-import ExtensionLoader from './extensions-loader'
-
 const mockConfig = {
     app: {
         extensions: [
-            '@salesforce/extension-this',
+            ['@salesforce/extension-this', {path: '/foo'}],
             '@salesforce/extension-that',
             '@companyx/extension-another',
             'extension-this'
@@ -61,14 +59,28 @@ describe('Extension Loader', () => {
             import CompanyxAnother from '@companyx/extension-another/setup-app'
             import This from 'extension-this/setup-app'
 
+            const normalizeExtensionsList = (extensions) =>
+                extensions.map((extension) => {
+                    return {
+                        name: Array.isArray(extension) ? extension[0] : extension,
+                        config: Array.isArray(extension) ? {enabled: true, ...extension[1]} : {enabled: true}
+                    }
+                })
+
+            const initExtensionIfFound = (extensions, {instanceVariable, packageName}) => {
+                const found = extensions.find((ext) => ext.name === packageName)
+                return found ? new instanceVariable(found.config || {}) : false
+            }
+
             export const getExtensions = () => {
-                const configuredExtensions = getConfig()?.app?.extensions || []
+                const configuredExtensions = normalizeExtensionsList(getConfig()?.app?.extensions) || []
+                const enabledExtensions = configuredExtensions.filter((extension) => extension.config.enabled)
 
                 return [
-                    configuredExtensions.includes('@salesforce/extension-this') ? new SalesforceThis({}) : false,
-                    configuredExtensions.includes('@salesforce/extension-that') ? new SalesforceThat({}) : false,
-                    configuredExtensions.includes('@companyx/extension-another') ? new CompanyxAnother({}) : false,
-                    configuredExtensions.includes('extension-this') ? new This({}) : false
+                    initExtensionIfFound(enabledExtensions, {instanceVariable: SalesforceThis, packageName: '@salesforce/extension-this'}),
+                    initExtensionIfFound(enabledExtensions, {instanceVariable: SalesforceThat, packageName: '@salesforce/extension-that'}),
+                    initExtensionIfFound(enabledExtensions, {instanceVariable: CompanyxAnother, packageName: '@companyx/extension-another'}),
+                    initExtensionIfFound(enabledExtensions, {instanceVariable: This, packageName: 'extension-this'})
                 ].filter(Boolean)
             }
         `)
