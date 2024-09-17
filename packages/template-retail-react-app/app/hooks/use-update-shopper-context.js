@@ -35,41 +35,38 @@ export const useUpdateShopperContext = () => {
         {parameters: {usid, siteId: site.id}},
         {enabled: !isServer}
     )
+    // Handle updating the shopper context based on URL search params
+    let shopperContextFromSearchParams = useShopperContextSearchParams()
 
     const refetchDataOnClient = () => {
         queryClient.invalidateQueries()
     }
 
-    const handleShopperContextUpdate = async (updateShopperContextObj) => {
-        if (
-            isLoading ||
-            _.isEqual(shopperContext, updateShopperContextObj) ||
-            Object.keys(updateShopperContextObj).length === 0
-        ) {
-            return
-        }
-
+    const handleShopperContextUpdate = async (shopperContextFromSearchParams) => {
         const payload = {
             parameters: {usid, siteId: site.id},
-            body: updateShopperContextObj
+            body: shopperContextFromSearchParams
         }
         if (!shopperContext) {
             await createShopperContext.mutateAsync(payload)
         } else {
             await updateShopperContext.mutateAsync(payload)
         }
+
+        // Clear the shopper context from search params to trigger a data refetch
+        shopperContextFromSearchParams = {}
     }
 
-    // Handle updating the shopper context based on URL search params
-    const updateShopperContextObj = useShopperContextSearchParams()
-
     useEffect(() => {
-        handleShopperContextUpdate(updateShopperContextObj)
-    }, [updateShopperContextObj, isLoading])
-
-    useEffect(() => {
-        if (shopperContext && isHydrated()) {
+        const requiresShopperContextUpdates =
+            !isLoading &&
+            Object.keys(shopperContextFromSearchParams).length > 0 &&
+            !_.isEqual(shopperContext, shopperContextFromSearchParams)
+    
+        if (requiresShopperContextUpdates) {
+            handleShopperContextUpdate(shopperContextFromSearchParams)
+        } else if (shopperContext && isHydrated()) {
             refetchDataOnClient()
         }
-    }, [shopperContext])
+    }, [isLoading, shopperContext, shopperContextFromSearchParams])
 }
