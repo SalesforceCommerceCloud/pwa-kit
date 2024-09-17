@@ -36,25 +36,22 @@ export const useUpdateShopperContext = () => {
         {enabled: !isServer}
     )
     // Handle updating the shopper context based on URL search params
-    let shopperContextFromSearchParams = useShopperContextSearchParams()
+    const shopperContextFromSearchParams = useShopperContextSearchParams()
 
     const refetchDataOnClient = () => {
         queryClient.invalidateQueries()
     }
 
-    const handleShopperContextUpdate = async (shopperContextFromSearchParams) => {
+    const handleShopperContextUpdate = async (shopperContext, newShopperContext) => {
         const payload = {
             parameters: {usid, siteId: site.id},
-            body: shopperContextFromSearchParams
+            body: newShopperContext
         }
         if (!shopperContext) {
             await createShopperContext.mutateAsync(payload)
         } else {
             await updateShopperContext.mutateAsync(payload)
         }
-
-        // Clear the shopper context from search params to trigger a data refetch
-        shopperContextFromSearchParams = {}
     }
 
     useEffect(() => {
@@ -62,9 +59,9 @@ export const useUpdateShopperContext = () => {
             !isLoading &&
             Object.keys(shopperContextFromSearchParams).length > 0 &&
             !_.isEqual(shopperContext, shopperContextFromSearchParams)
-    
+
         if (requiresShopperContextUpdates) {
-            handleShopperContextUpdate(shopperContextFromSearchParams)
+            handleShopperContextUpdate(shopperContext, shopperContextFromSearchParams)
         } else if (shopperContext && isHydrated()) {
             refetchDataOnClient()
         }
