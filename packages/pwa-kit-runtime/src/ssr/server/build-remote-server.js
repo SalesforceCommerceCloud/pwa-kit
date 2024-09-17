@@ -654,17 +654,27 @@ export const RemoteServerFactory = {
      * This function assumes that optionally, there is a `setup-server.js`
      * file in each extension directory in the build.
      *
-     * This file should export a default which is a function.
+     * This file should export a default which is a IExpressApplicationExtension class.
      *
      * @private
      */
     _setupExtensions(app, options) {
+        logger.info('Setting up extensions...')
+
+        // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
-        app.__extensions = extensions || []
+        logger.info('Extensions to load', {
+            namespace: 'RemoteServerFactory._setupExtensions',
+            additionalProperties: {extensions: extensions}
+        })
+
+        app.__extensions = extensions
 
         let _require
 
         extensions.forEach((extension) => {
+            logger.info(`Loading extension: ${extension}`)
+
             const setupServerFilePath = path.join(
                 options.buildDir,
                 'extensions',
@@ -679,31 +689,66 @@ export const RemoteServerFactory = {
                 _require = eval('require')
             }
 
-            let setupServer
-
+            let ExtensionClass
             try {
-                setupServer = _require(setupServerFilePath)
+                ExtensionClass = _require(setupServerFilePath).default
             } catch (e) {
                 if (e.message && e.message.startsWith('Cannot find module')) {
-                    // skip extensions that don't have a setup-server.js file
+                    logger.warn(`No setup-server.js file found for ${extension}. Skipping.`)
                     return
                 }
 
-                console.error(`Error loading extension ${extension}:`, e)
+                logger.error(`Error loading extension ${extension}:`, {
+                    namespace: 'RemoteServerFactory._setupExtensions',
+                    additionalProperties: {error: e}
+                })
                 throw e
             }
 
-            if (!setupServer.default) {
-                console.warn(`Extension ${extension} does not have a default export. Skipping.`)
+            // Ensure that the default export is a class that implements IExpressApplicationExtension
+            if (ExtensionClass && typeof ExtensionClass !== 'function') {
+                logger.warn(`Extension ${extension} does not export a valid class. Skipping.`)
                 return
             }
 
+            let extensionInstance
             try {
-                setupServer.default({app, options})
+                logger.info(`Instantiating extension class for ${extension}...`)
+                extensionInstance = new ExtensionClass(options)
+                logger.info(`Successfully instantiated extension ${extension}.`)
             } catch (e) {
-                console.error(`Error setting up extension ${extension}:`, e)
+                logger.error(`Error instantiating extension ${extension}:`, {
+                    namespace: 'RemoteServerFactory._setupExtensions',
+                    additionalProperties: {error: e}
+                })
+                return
+            }
+
+            // Verify the instance has the methods defined by IExpressApplicationExtension
+            if (
+                typeof extensionInstance.getName !== 'function' ||
+                typeof extensionInstance.extendApp !== 'function'
+            ) {
+                logger.warn(
+                    `Extension ${extension} does not implement IExpressApplicationExtension interface. Skipping.`
+                )
+                return
+            }
+
+            // Extend the app using the provided method
+            try {
+                logger.log(`Extending app using extension ${extension}...`)
+                app = extensionInstance.extendApp(app)
+                logger.log(`Successfully extended app with ${extension}.`)
+            } catch (e) {
+                logger.error(`Error setting extension ${extension}:`, {
+                    namespace: 'RemoteServerFactory._setupExtensions',
+                    additionalProperties: {error: e}
+                })
             }
         })
+
+        logger.info('Finished setting up extensions.')
     },
 
     /**
@@ -832,7 +877,7 @@ export const RemoteServerFactory = {
             )
         ) {
             /* istanbul ignore next */
-            console.warn(
+            logger.warn(
                 `Warning: You are using Node ${process.versions.node}. ` +
                     `Your app may not work as expected when deployed to Managed ` +
                     `Runtime servers which are compatible with Node ${requiredNode}`
@@ -892,7 +937,7 @@ export const RemoteServerFactory = {
         }
 
         if (!options.strictSSL) {
-            console.warn('The SSR Server has _strictSSL turned off for https requests')
+            logger.warn('The SSR Server has _strictSSL turned off for https requests')
         }
     },
 
