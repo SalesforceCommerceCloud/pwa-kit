@@ -752,6 +752,76 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupCommonMiddleware(app, options) {
+
+        app.use((req, res, next) => {
+            logger.info('########################### SETTING UP MIDDLEWARE')
+
+            try {
+
+                // logger.info('########################### SETTING UP MIDDLEWARE 2')
+
+            const isASCII = (str) => {
+                // TODO: double check this logic
+                // matches against printable ASCII characters
+                return /^[\x20-\x7E]*$/.test(str)
+            }
+            // logger.info('########################### SETTING UP MIDDLEWARE 3')
+
+
+            const sanitizeHeader = ({ header, value, extra}) => {
+                logger.info(`@@@@@@@@@@ ${extra} | ${header}: ${value}`)
+                if(isASCII(value)) {
+                    return value
+                } else {
+                    logger.info(`   @@@@@@@@@@ ${value} is not ASCII, converting to: ${encodeURIComponent(value)}`)
+                    return encodeURIComponent(value)
+                }
+            }
+
+            try {
+                for (const header in req.headers) {
+                    if (typeof req.headers[header] === 'string') {
+                        const originalValue = req.headers[header]
+                        req.headers[header] = sanitizeHeader({
+                            header: header,
+                            value: req.headers[header],
+                            extra: 'REQUEST'
+                        });
+                        if(originalValue !== req.headers[header]) {
+                            hasChangedHeader = true
+                            logger.info(`   $$$ ${header} HEADER CHANGED from ${originalValue} to ${req.headers[header]}`)
+                        }
+                    }
+                }
+                logger.info('%%%%%% Request Object from Changed Header:', JSON.stringify(req.headers))
+            } catch(error) {
+                logger.info('@@@ ERROR IN BUILD SERVER - REQUEST: ', error)
+            }
+
+            try {
+                const originalSetHeader = res.setHeader;
+                res.setHeader = function (name, value) {
+                    if (typeof value === 'string') {
+                        value = sanitizeHeader({
+                            header: name,
+                            value: value,
+                            extra: 'RESPONSE'
+                        });
+                    }
+                    originalSetHeader.call(this, name, value);
+                };
+            } catch(error) {
+                logger.info('@@@ ERROR IN BUILD SERVER - RESPONSE: ', error)
+            }
+
+            } catch(error) {
+                logger.info('########## HAD AN ERRoR', error)
+            }
+
+            logger.info('########################### DONE SETTING UP')
+            next();
+        });
+
         app.use(prepNonProxyRequest)
 
         // Apply the SSR middleware to any subsequent routes that we expect users
