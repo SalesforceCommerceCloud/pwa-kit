@@ -19,7 +19,6 @@ import {
     useDisclosure
 } from '@chakra-ui/react'
 
-  
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
 
@@ -115,37 +114,32 @@ const Home = ({value}: Props) => {
     )
 
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const btnRef = React.useRef()
+    const btnRef = React.useRef(null)
 
     return (
         <div>
             <style dangerouslySetInnerHTML={{__html: style}} />
-            <Button ref={btnRef} colorScheme='teal' onClick={onOpen}>
+            <Button ref={btnRef} colorScheme="teal" onClick={onOpen}>
                 Open
             </Button>
-            <Drawer
-                isOpen={isOpen}
-                placement='right'
-                onClose={onClose}
-                finalFocusRef={btnRef}
-            >
+            <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
                 <DrawerOverlay />
                 <DrawerContent>
-                <DrawerCloseButton />
-                <DrawerHeader>Create your account</DrawerHeader>
+                    <DrawerCloseButton />
+                    <DrawerHeader>Create your account</DrawerHeader>
 
-                <DrawerBody>
-                    <Link to="/sample-page">Sample Page</Link>
-                    <br/>
-                    <Link to="/sample-page-2">Sample Page 2</Link>
-                </DrawerBody>
+                    <DrawerBody>
+                        <Link to="/sample-page">Sample Page</Link>
+                        <br />
+                        <Link to="/sample-page-2">Sample Page 2</Link>
+                    </DrawerBody>
 
-                <DrawerFooter>
-                    <Button variant='outline' mr={3} onClick={onClose}>
-                    Cancel
-                    </Button>
-                    <Button colorScheme='blue'>Save</Button>
-                </DrawerFooter>
+                    <DrawerFooter>
+                        <Button variant="outline" mr={3} onClick={onClose}>
+                            Cancel
+                        </Button>
+                        <Button colorScheme="blue">Save</Button>
+                    </DrawerFooter>
                 </DrawerContent>
             </Drawer>
             <div className="loading-screen">

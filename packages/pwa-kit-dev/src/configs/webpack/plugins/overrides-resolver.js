@@ -6,23 +6,23 @@
  */
 
 import resolve from 'resolve/sync'
-// TODO: Think about how to organize all these files. Maybe it's a smart idea to have an "extensibility" folder in this project
-// that has all the configs, scripts, utils related to extensibility in it.
 import {buildCandidatePaths} from '../../../utils/resolver-utils'
 
-const DEFAULT_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
+export const DEFAULT_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
+
 /**
  * @class OverridesResolverPlugin
  *
  *  This plugin provides the "overrides" behavior of the application extensibility feature. This allows
- *  App Extension developers to define which files are part of their public api thus can be overridden, but 
- *  also the module resolution algorithm. 
+ *  App Extension developers to define which files are part of their public api thus can be overridden, but
+ *  also the module resolution algorithm.
  */
 class OverridesResolverPlugin {
     constructor(options) {
         this.projectDir = options.projectDir?.replace(/\\/g, '/')
         this.extensions = options.extensions || []
         this.fileExtensions = options.fileExtensions || DEFAULT_FILE_EXTENSIONS
+        this.resolveOptions = options.resolveOptions || {}
     }
 
     handleHook(request, resolveContext, callback, resolver) {
@@ -45,7 +45,8 @@ class OverridesResolverPlugin {
                 buildCandidatePaths(importPath, sourcePath, {
                     extensions: this.extensions,
                     projectDir: this.projectDir
-                }) // NOTE: Should I be used the passed in "request" object?
+                }), // NOTE: Should I be used the passed in "request" object?
+            ...this.resolveOptions
         })
 
         if (modulePath) {
@@ -65,12 +66,9 @@ class OverridesResolverPlugin {
     apply(resolver) {
         resolver
             .getHook('resolve')
-            .tapAsync(
-                'OverridesResolverPlugin',
-                (requestContext, resolveContext, callback) => {
-                    this.handleHook(requestContext, resolveContext, callback, resolver)
-                }
-            )
+            .tapAsync('OverridesResolverPlugin', (requestContext, resolveContext, callback) => {
+                this.handleHook(requestContext, resolveContext, callback, resolver)
+            })
     }
 }
 

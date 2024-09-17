@@ -13,8 +13,8 @@ import React from 'react'
 const withRedBorder = (WrappedComponent) => {
     const WithRedBorder = (props) => {
         return (
-            <div style={{ border: '2px solid blue', padding: '10px' }}>
-                <WrappedComponent {...(props)} />
+            <div style={{border: '2px solid blue', padding: '10px'}}>
+                <WrappedComponent {...props} />
             </div>
         )
     }

@@ -45,13 +45,14 @@ const INSPECT = process.execArgv.some((arg) => /^--inspect(?:-brk)?(?:$|=)/.test
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
+
 const {app: appConfig} = getConfig()
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
 
-const SUPPORTED_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
+export const SUPPORTED_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
 
 // TODO: can these be handled in package.json as peerDependencies?
 // https://salesforce-internal.slack.com/archives/C0DKK1FJS/p1672939909212589
@@ -195,7 +196,7 @@ const baseConfig = (target) => {
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
                             }))
-                        ),
+                        )
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -301,7 +302,7 @@ const ruleForBabelLoader = (babelPlugins) => {
         // NOTE: Because our extensions are just folders containing source code, we need to ensure that the babel-loader processes them.
         // By default babel doesn't process files in "node_modules" folder, so here we will ensure they are included.
         // TODO: Make sure this regex works for windows.
-        exclude: /^\/node_modules\/(?:@([^/]+)\/)*(?!extension-)[^\/]+$/i,
+        exclude: /^\/node_modules\/(?:@([^/]+)\/)*(?!extension-)[^/]+$/i,
         use: [
             {
                 loader: findDepInStack('babel-loader'),
@@ -397,7 +398,7 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', resolve(projectDir, 'app', 'loader.js')), // TODO: This might be a breaking point as its not the same as it was before completely 
+                ...optional('loader', resolve(projectDir, 'app', 'loader.js')), // TODO: This might be a breaking point as its not the same as it was before completely
                 ...optional('worker', resolve(projectDir, 'worker', 'main.js')),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))

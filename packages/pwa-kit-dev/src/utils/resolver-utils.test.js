@@ -22,6 +22,8 @@ describe('resolverUtils', () => {
                     'node_modules',
                     '@salesforce',
                     'extension-module-extension-b',
+                    'src',
+                    'overrides',
                     'app',
                     'routes.jsx'
                 ),
@@ -35,6 +37,8 @@ describe('resolverUtils', () => {
                     'node_modules',
                     '@salesforce',
                     'extension-module-extension-b',
+                    'src',
+                    'overrides',
                     'app',
                     'routes.jsx'
                 ),
@@ -48,6 +52,8 @@ describe('resolverUtils', () => {
                     'node_modules',
                     '@salesforce',
                     'extension-module-extension-b',
+                    'src',
+                    'overrides',
                     'app',
                     'routes.jsx'
                 ),
@@ -140,12 +146,14 @@ describe('resolverUtils', () => {
 
                 extensions: ['module-extension-a', 'module-extension-b', 'module-extension-c'],
                 expected: [
-                    path.join(process.cwd(), 'app', 'routes'),
+                    path.join(process.cwd(), 'app', 'overrides', 'app', 'routes'),
                     path.join(
                         process.cwd(),
                         'node_modules',
                         '@salesforce',
                         'extension-module-extension-c',
+                        'src',
+                        'overrides',
                         'app',
                         'routes'
                     ),
@@ -154,6 +162,8 @@ describe('resolverUtils', () => {
                         'node_modules',
                         '@salesforce',
                         'extension-module-extension-b',
+                        'src',
+                        'overrides',
                         'app',
                         'routes'
                     ),
@@ -162,19 +172,24 @@ describe('resolverUtils', () => {
                         'node_modules',
                         '@salesforce',
                         'extension-module-extension-a',
+                        'src',
+                        'overrides',
                         'app',
                         'routes'
-                    ),
-                    path.join(
-                        process.cwd(),
-                        'node_modules',
-                        '@salesforce',
-                        'pwa-kit-react-sdk',
-                        'ssr',
-                        'universal',
-                        'components',
-                        'routes'
                     )
+                    // NOTE: Removed because we are not supporting resolving into the `pwa-kit-react-sdk` at the time of this
+                    // PR.
+                    // ,
+                    // path.join(
+                    //     process.cwd(),
+                    //     'node_modules',
+                    //     '@salesforce',
+                    //     'pwa-kit-react-sdk',
+                    //     'ssr',
+                    //     'universal',
+                    //     'components',
+                    //     'routes'
+                    // )
                 ]
             },
             {
@@ -185,6 +200,8 @@ describe('resolverUtils', () => {
                     'node_modules',
                     '@salesforce',
                     'extension-module-extension-b',
+                    'src',
+                    'overrides',
                     'app',
                     'routes.jsx'
                 ),
@@ -195,19 +212,24 @@ describe('resolverUtils', () => {
                         'node_modules',
                         '@salesforce',
                         'extension-module-extension-a',
+                        'src',
+                        'overrides',
                         'app',
                         'routes'
-                    ),
-                    path.join(
-                        process.cwd(),
-                        'node_modules',
-                        '@salesforce',
-                        'pwa-kit-react-sdk',
-                        'ssr',
-                        'universal',
-                        'components',
-                        'routes'
                     )
+                    // NOTE: Removed because we are not supporting resolving into the `pwa-kit-react-sdk` at the time of this
+                    // PR.
+                    // ,
+                    // path.join(
+                    //     process.cwd(),
+                    //     'node_modules',
+                    //     '@salesforce',
+                    //     'pwa-kit-react-sdk',
+                    //     'ssr',
+                    //     'universal',
+                    //     'components',
+                    //     'routes'
+                    // )
                 ]
             }
         ].forEach((testCase) => {

@@ -9,8 +9,6 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import dedent from 'dedent'
 import compiler from './test/compiler'
 
-import ExtensionLoader from './extensions-loader'
-
 const mockConfig = {
     app: {
         extensions: [

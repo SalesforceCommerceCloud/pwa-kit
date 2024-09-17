@@ -11,13 +11,14 @@ const EXTENSION_NAMESPACE = '@salesforce'
 const EXTENSION_PREFIX = 'extension'
 const NODE_MODULES = 'node_modules'
 const OVERRIDES = 'overrides'
+const APP = 'app'
 const SRC = 'src'
 const PWA_KIT_REACT_SDK = 'pwa-kit-react-sdk'
 
-// TODO: Flesh this out some more.
-const SDK_COMPONENT_MAP = {
-    'app/routes': '/ssr/universal/components/routes'
-}
+// TODO: We should determine if we want the `overrides-resolver` plugin to handle resolution of application special
+// components like _app and _document. If so we can update this map and remove the special logic from our webpack
+// configuration.
+const SDK_COMPONENT_MAP = {}
 const INDEX_FILE = 'index' // TODO: Take this in as a configuration value.
 
 // Returns true/false indicating if the importPath resolves to a same named file as the sourcePath.
@@ -95,7 +96,7 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
 
     const {extensions = [], projectDir = process.cwd()} = opts
     const isSelfReferenceImport = isSelfReference(importPath, sourcePath)
-    
+
     let paths = expand(extensions).reverse()
 
     // Map all the extensions and resolve the module names to absolute paths.
@@ -103,18 +104,18 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
         // The reference can be a module/package or an absolute path to a file.
         const [extensionRef] = extension
         const isLocalExtension = extensionRef.startsWith(path.sep)
-    
+
         return path.join(
             ...(isLocalExtension
                 ? [extensionRef, importPath]
                 : [projectDir, NODE_MODULES, extensionRef, SRC, OVERRIDES, importPath])
         )
     })
-    
+
     // Add non-extension search locations locations. The base project and the sdk as the final callback.
     paths = [
         // Base Project
-        path.join(projectDir, 'app', 'overrides', importPath),
+        path.join(projectDir, APP, OVERRIDES, importPath),
         // Extensions
         ...paths,
         // SDK
