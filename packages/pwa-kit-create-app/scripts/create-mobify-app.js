@@ -337,7 +337,7 @@ const PRESETS = [
             ['project.commerce.clientId']: 'd3cc8e8c-86fd-4801-8444-722bde85369a',
             ['project.commerce.siteId']: 'RefArch',
             ['project.commerce.organizationId']: 'f_ecom_zxbe_stg',
-            ['project.commerce.shortCode']: 'sandbox-001',
+            ['project.commerce.shortCode']: 'sandbox001',
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             ['project.einstein.siteId']: 'aaij-MobileFirst',
             ['project.commerce.isSlasPrivate']: true
