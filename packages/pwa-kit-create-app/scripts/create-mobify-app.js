@@ -332,12 +332,12 @@ const PRESETS = [
         answers: {
             ['project.extend']: true,
             ['project.hybrid']: true,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://test.phased-launch-testing.com/',
-            ['project.commerce.clientId']: '99b4e081-00cf-454a-95b0-26ac2b824931',
+            ['project.name']: 'scaffold-pwa',
+            ['project.commerce.instanceUrl']: 'https://staging-test05-qatest1uswest2.demandware.net',
+            ['project.commerce.clientId']: 'd3cc8e8c-86fd-4801-8444-722bde85369a',
             ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_bdpx_dev',
-            ['project.commerce.shortCode']: 'xitgmcd3',
+            ['project.commerce.organizationId']: 'f_ecom_zxbe_stg',
+            ['project.commerce.shortCode']: 'sandbox-001',
             ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
             ['project.einstein.siteId']: 'aaij-MobileFirst',
             ['project.commerce.isSlasPrivate']: true
