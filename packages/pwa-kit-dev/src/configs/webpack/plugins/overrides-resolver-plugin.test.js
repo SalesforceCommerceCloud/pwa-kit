@@ -5,15 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// import compiler from './test/compiler'
 import {BASE_DIR, runWebpackCompiler} from '../test-utils'
 import OverridesResolverPlugin from './overrides-resolver-plugin'
 
 describe('Overrides Resolver Plugin', () => {
-    beforeEach(() => {
-        // Placeholder
-    })
-
     const testCases = [
         {
             description: 'Wildcard import resolved to correct extension override',
@@ -89,7 +84,7 @@ describe('Overrides Resolver Plugin', () => {
                     // Overrides
                 }
             },
-            expects: (output, err) => {
+            expects: (_, err) => {
                 // console.log('output: ', output)
                 expect(err).toBeDefined()
             }
