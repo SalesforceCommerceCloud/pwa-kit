@@ -21,7 +21,7 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
-import {ENCODE_NON_ASCII_HTTP_HEADERS} from '@salesforce/retail-react-app/../../app/constants'
+import {ENCODE_NON_ASCII_HTTP_HEADERS} from '@salesforce/retail-react-app/app/constants'
 
 const options = {
     // The build directory (an absolute path)
@@ -49,7 +49,8 @@ const options = {
     useSLASPrivateClient: false,
 
     // TODO: add comment
-    encodeNonAsciiHttpHeaders: ENCODE_NON_ASCII_HTTP_HEADERS
+    // encodeNonAsciiHttpHeaders: ENCODE_NON_ASCII_HTTP_HEADERS
+    encodeNonAsciiHttpHeaders: true
 }
 
 const runtime = getRuntime()
@@ -93,11 +94,6 @@ const {handler} = runtime.createHandler(options, (app) => {
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
     app.get('*', runtime.render)
-
-    app.get('/', function renderRegion(_, res) {
-        const requestClass = Object.fromEntries(new URLSearchParams(res.locals.requestClass))
-        return res.json({requestClass})
-    })
 })
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.

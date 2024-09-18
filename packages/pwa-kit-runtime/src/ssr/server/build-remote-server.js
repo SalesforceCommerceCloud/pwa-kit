@@ -11,7 +11,8 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE
+    NO_CACHE,
+    X_ENCODED_HEADERS
 } from './constants'
 import {
     catchAndLog,
@@ -960,12 +961,33 @@ export const RemoteServerFactory = {
 
         // TODO: get more context on what the handler does
         const handler = (event, context, callback) => {
+            // TODO: remove logs
+            console.log('@@@ console.log | event headers: ', event.headers)
+            console.log(
+                '@@@ console.log | is encode ASII enabled?: ',
+                options?.encodeNonAsciiHttpHeaders
+            )
+
+            // encode non ASCII request headers
             if (options?.encodeNonAsciiHttpHeaders) {
+                console.log('### in encodeNonAsciiHttpHeaders')
                 Object.keys(event.headers).forEach((key) => {
                     if (!this._isASCII(event.headers[key])) {
+                        console.log('### console.log | modifying header: ', key)
                         event.headers[key] = encodeURIComponent(event.headers[key])
+                        // x-encoded-headers keeps track of which headers have been modified and encoded
+                        if (event.headers[X_ENCODED_HEADERS]) {
+                            // append header key
+                            event.headers[
+                                X_ENCODED_HEADERS
+                            ] = `${event.headers[X_ENCODED_HEADERS]},${key}`
+                        } else {
+                            event.headers[X_ENCODED_HEADERS] = key
+                        }
                     }
                 })
+                console.log('### console.log | event headers after: ', event.headers)
+
                 // TODO: potentially set X_ENCODED_HEADERS
             }
 
@@ -1072,7 +1094,7 @@ export const RemoteServerFactory = {
         process.on('unhandledRejection', catchAndLog)
         const app = this._createApp(options)
         customizeApp(app, options)
-        return this._createHandler(app)
+        return this._createHandler(app, options)
     },
 
     /**

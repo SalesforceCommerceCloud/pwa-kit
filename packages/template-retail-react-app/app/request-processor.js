@@ -110,14 +110,6 @@ export const processRequest = ({
         setRequestClass('bot')
     }
     ***************************************************************************/
-
-    let region = headers.getHeader('cf-region')
-    if (region) {
-        region = Buffer.from(region, 'ascii').toString('utf8')
-        headers.deleteHeader('cf-region')
-        setRequestClass(new URLSearchParams({region}) + '')
-    }
-
     // Return the path unchanged, and the updated query string
     return {
         path,
