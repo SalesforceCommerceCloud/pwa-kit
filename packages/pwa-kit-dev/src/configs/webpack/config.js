@@ -102,6 +102,8 @@ const entryPointExists = (segments) => {
 
 const getAppEntryPoint = () => './app/main'
 
+const getServerEntryPoint = () =>  './app/ssr.js'
+
 const getPublicPathEntryPoint = () => {
     return resolve(
         projectDir,
@@ -400,7 +402,7 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', resolve(projectDir, 'app', 'loader.js')), // TODO: This might be a breaking point as its not the same as it was before completely
+                ...optional('loader', resolve(projectDir, 'app', 'loader.js')),
                 ...optional('worker', resolve(projectDir, 'worker', 'main.js')),
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
@@ -463,7 +465,7 @@ const ssr = (() => {
                         : {}),
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
-                    entry: `./app/ssr.js`,
+                    entry: getServerEntryPoint(),
                     output: {
                         path: buildDir,
                         filename: 'ssr.js',
