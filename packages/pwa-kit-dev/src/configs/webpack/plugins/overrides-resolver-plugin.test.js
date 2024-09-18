@@ -7,7 +7,7 @@
 
 // import compiler from './test/compiler'
 import {BASE_DIR, runWebpackCompiler} from '../test-utils'
-import OverridesResolverPlugin from './overrides-resolver'
+import OverridesResolverPlugin from './overrides-resolver-plugin'
 
 describe('Overrides Resolver Plugin', () => {
     beforeEach(() => {

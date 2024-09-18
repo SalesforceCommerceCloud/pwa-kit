@@ -20,8 +20,8 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import WebpackNotifierPlugin from 'webpack-notifier'
 
-// Local Plugins // TODO: Refactor Plugins in the 'plugins' file.
-import OverridesResolverPlugin from './plugins/overrides-resolver'
+// Local Plugins
+import OverridesResolverPlugin from './plugins/overrides-resolver-plugin'
 import {sdkReplacementPlugin} from './plugins'
 
 // Constants
