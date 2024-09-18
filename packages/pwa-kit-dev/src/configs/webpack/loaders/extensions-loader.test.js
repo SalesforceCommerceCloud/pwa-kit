@@ -59,7 +59,7 @@ describe('Extension Loader', () => {
             import CompanyxAnother from '@companyx/extension-another/setup-app'
             import This from 'extension-this/setup-app'
 
-            const normalizeExtensionsList = (extensions) =>
+            const normalizeExtensionsList = (extensions = []) =>
                 extensions.map((extension) => {
                     return {
                         name: Array.isArray(extension) ? extension[0] : extension,

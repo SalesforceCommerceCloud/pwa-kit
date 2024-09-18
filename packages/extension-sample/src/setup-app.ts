@@ -16,7 +16,7 @@ const SamplePage = loadable(() => import('./pages/sample'))
 
 const defaultPath: string = '/sample-page'
 class Sample extends ApplicationExtension {
-    
+
     extendApp(App: React.ComponentType): React.ComponentType {
         return withRedBorder(App)
     }
@@ -26,7 +26,7 @@ class Sample extends ApplicationExtension {
         return [
             {
                 exact: true,
-                path: this.getConfig()?.path || defaultPath,
+                path: this.getConfig().path || defaultPath,
                 component: SamplePage
             },
             ...routes

@@ -16,14 +16,14 @@ import {IRouteConfig} from './types'
  * @abstract
  */
 export default abstract class ApplicationExtension {
-    private config: Record<string, any>
+    private config: Record<string, unknown>
 
     /**
      * Constructs a new instance of the ApplicationExtension class.
      *
      * @param config - The configuration object used to set up the extension.
      */
-    constructor(config?: any) {
+    constructor(config: Record<string, unknown>) {
         this.config = config
     }
 
@@ -33,7 +33,7 @@ export default abstract class ApplicationExtension {
      * @protected
      * @returns config - The configuration object.
      */
-    public getConfig(): Record<string, any> {
+    public getConfig(): Record<string, unknown> {
         return this.config
     }
 

@@ -27,10 +27,6 @@ const APP_EXTENSION_PREFIX = 'extension'
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
 module.exports = function () {
-    // TODO: We need to account for extensions being tuples. Here we assume it's a simple
-    // string that is the npm package name, the only expectation is that the package name starts with `extension-`,
-    // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the
-    // extensions configuration array when we add support for the tupal config format.
     const {pkg} = this.getOptions() || {}
     const {devDependencies} = pkg
 
@@ -67,7 +63,7 @@ module.exports = function () {
                 )
                 .join('\n            ')}
 
-            const normalizeExtensionsList = (extensions) =>
+            const normalizeExtensionsList = (extensions = []) =>
                 extensions.map((extension) => {
                     return {
                         name: Array.isArray(extension) ? extension[0] : extension,
