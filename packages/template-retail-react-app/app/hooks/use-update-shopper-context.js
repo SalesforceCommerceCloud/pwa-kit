@@ -55,14 +55,12 @@ export const useUpdateShopperContext = () => {
     }
 
     useEffect(() => {
-        const shouldUpdateShopperContext = !isLoading &&
-            Object.keys(shopperContextFromSearchParams).length > 0 &&
-            !_.isEqual(shopperContext, shopperContextFromSearchParams)
+        const shouldUpdateShopperContext =
             !isLoading &&
             Object.keys(shopperContextFromSearchParams).length > 0 &&
             !_.isEqual(shopperContext, shopperContextFromSearchParams)
 
-        if (requiresShopperContextUpdates) {
+        if (shouldUpdateShopperContext) {
             handleShopperContextUpdate(shopperContext, shopperContextFromSearchParams)
         } else if (shopperContext && isHydrated()) {
             refetchDataOnClient()
