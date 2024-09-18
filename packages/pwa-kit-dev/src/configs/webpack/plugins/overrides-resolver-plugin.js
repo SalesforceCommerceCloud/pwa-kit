@@ -36,8 +36,7 @@ class OverridesResolverPlugin {
         const importPath = request.request
         const sourcePath = request.context.issuer
 
-        // NOTE: Should we pass in a bogus value as the first argument so we know we are
-        // soley replying on the packageIterator?
+        // Resolve the import with the provided packageIterator.
         const modulePath = resolve(importPath, {
             basedir: this.projectDir,
             extensions: this.fileExtensions,
@@ -45,7 +44,7 @@ class OverridesResolverPlugin {
                 buildCandidatePaths(importPath, sourcePath, {
                     extensions: this.extensions,
                     projectDir: this.projectDir
-                }), // NOTE: Should I be used the passed in "request" object?
+                }),
             ...this.resolveOptions
         })
 

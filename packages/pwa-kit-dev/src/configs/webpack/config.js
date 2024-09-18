@@ -102,7 +102,7 @@ const entryPointExists = (segments) => {
 
 const getAppEntryPoint = () => './app/main'
 
-const getServerEntryPoint = () =>  './app/ssr.js'
+const getServerEntryPoint = () => './app/ssr.js'
 
 const getPublicPathEntryPoint = () => {
     return resolve(

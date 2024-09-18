@@ -177,9 +177,7 @@ describe('resolverUtils', () => {
                         'app',
                         'routes'
                     )
-                    // NOTE: Removed because we are not supporting resolving into the `pwa-kit-react-sdk` at the time of this
-                    // PR.
-                    // ,
+                    // NOTE: This has been removed at we currently aren't using the `overrides-resolver-plugin` to resolve special components.
                     // path.join(
                     //     process.cwd(),
                     //     'node_modules',
@@ -217,9 +215,7 @@ describe('resolverUtils', () => {
                         'app',
                         'routes'
                     )
-                    // NOTE: Removed because we are not supporting resolving into the `pwa-kit-react-sdk` at the time of this
-                    // PR.
-                    // ,
+                    // NOTE: This has been removed at we currently aren't using the `overrides-resolver-plugin` to resolve special components.
                     // path.join(
                     //     process.cwd(),
                     //     'node_modules',

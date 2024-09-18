@@ -15,11 +15,11 @@ const APP = 'app'
 const SRC = 'src'
 const PWA_KIT_REACT_SDK = 'pwa-kit-react-sdk'
 
-// TODO: We should determine if we want the `overrides-resolver` plugin to handle resolution of application special
+// TODO: We should determine if we want the `overrides-resolver-plugin` to handle resolution of application special
 // components like _app and _document. If so we can update this map and remove the special logic from our webpack
 // configuration.
 const SDK_COMPONENT_MAP = {}
-const INDEX_FILE = 'index' // TODO: Take this in as a configuration value.
+const INDEX_FILE = 'index' // TODO: Make this value obey the webpack's `resolve.mainFiles` options.
 
 // Returns true/false indicating if the importPath resolves to a same named file as the sourcePath.
 // @private
@@ -89,8 +89,6 @@ export const expand = (extensions = []) =>
  * @returns {String[]} paths - The potential paths to find the module import.
  */
 export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
-    // TODO: Add logging using the logger instance but only for silly mode or something.
-
     // Replace wildcard character as it has done its job getting us to this point.
     importPath = importPath.replace('*/', '')
 

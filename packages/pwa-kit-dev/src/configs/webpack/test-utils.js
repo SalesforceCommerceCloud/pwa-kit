@@ -19,8 +19,9 @@ export const SUPPORTED_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
  *
  * @param {string} fixture - The name of the entry file for Webpack to compile.
  * @param {Object} [options={}] - Optional configuration for the Webpack compiler.
- * @param {Object} [options.files={}] - An object representing the virtual file system. The keys are file paths and the values are file content.
  * @param {Function} [options.buildPlugins] - A function that returns an array of Webpack plugins. It is passed the virtual file system.
+ * @param {Object} [options.files={}] - An object representing the virtual file system. The keys are file paths and the values are file content.
+ * @param {Object} [options.mode="none"] - The mode in which you want the compiler to run. Default is "none". NOTE: Running in production mode will cause warning to be suppressed, ensure your tests account for that..
  *
  * @returns {Promise} A promise that resolves with the Webpack stats object or rejects with errors.
  *
