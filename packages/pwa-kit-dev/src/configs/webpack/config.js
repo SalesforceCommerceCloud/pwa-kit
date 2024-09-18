@@ -100,6 +100,8 @@ const entryPointExists = (segments) => {
     return false
 }
 
+const getAppEntryPoint = () => './app/main'
+
 const getPublicPathEntryPoint = () => {
     return resolve(
         projectDir,
@@ -346,7 +348,7 @@ const enableReactRefresh = (config) => {
             main: [
                 'webpack-hot-middleware/client?path=/__mrt/hmr',
                 getPublicPathEntryPoint(),
-                './app/main'
+                getAppEntryPoint()
             ]
         },
         plugins: [
@@ -372,7 +374,7 @@ const client =
                 // use source map to make debugging easier
                 devtool: mode === development ? 'source-map' : false,
                 entry: {
-                    main: './app/main'
+                    main: getAppEntryPoint()
                 },
                 plugins: [
                     ...config.plugins,
