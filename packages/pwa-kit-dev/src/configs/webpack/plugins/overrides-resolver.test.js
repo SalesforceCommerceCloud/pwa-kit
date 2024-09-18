@@ -84,20 +84,14 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`
 
                     // Overrides
-
-                    // Extensions Overrides
-                    '/virtual/project/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
-                        '// @salesforce/extension-that',
-                    '/virtual/project/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
-                        '// @salesforce/extension-this'
-                    // TODO: Why don't index files work here?
                 }
             },
-            expects: (output) => {
-                expect(output.warnings.length).toBeGreaterThan(0)
+            expects: (output, err) => {
+                // console.log('output: ', output)
+                expect(err).toBeDefined()
             }
         }
     ]

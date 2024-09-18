@@ -36,7 +36,7 @@ export const SUPPORTED_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
  *   .catch((errors) => console.error('Compilation failed', errors));
  */
 export const runWebpackCompiler = (fixture, options = {}) => {
-    const {buildPlugins = () => [], files = {}} = options
+    const {buildPlugins = () => [], files = {}, mode = 'none'} = options
 
     // Setup the virtual filesystem with the provided files.
     const volume = Volume.fromJSON(files)
@@ -47,6 +47,7 @@ export const runWebpackCompiler = (fixture, options = {}) => {
     const compiler = webpack({
         context: BASE_DIR,
         entry: `./${fixture}`,
+        mode,
         output: {
             path: path.resolve(BASE_DIR),
             filename: 'bundle.js'
