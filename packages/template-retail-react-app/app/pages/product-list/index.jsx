@@ -14,7 +14,8 @@ import {
     useCategory,
     useCustomerId,
     useProductSearch,
-    useShopperCustomersMutation
+    useShopperCustomersMutation,
+    usePage,
 } from '@salesforce/commerce-sdk-react'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
@@ -44,6 +45,7 @@ import {
     DrawerContent,
     DrawerCloseButton
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Page} from '@salesforce/commerce-sdk-react/components'
 
 // Project Components
 import Pagination from '@salesforce/retail-react-app/app/components/pagination'
@@ -57,6 +59,10 @@ import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/page-header'
 import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/above-page-header'
+
+// Page Designer Components
+import {ImageWithText} from '../../page-designer/assets'
+import {MobileGrid1r1c} from '../../page-designer/layouts'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
@@ -396,6 +402,13 @@ const ProductList = (props) => {
         }
     }, [productSearchResult])
 
+    /**************** Page Designer ****************/
+    const PAGEDESIGNER_TO_COMPONENT = {
+        'commerce_assets.productListTile': ImageWithText,
+        'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c,
+    }
+    const {data: instagramBannerPage}= usePage({parameters: {pageId: 'instagram-promo-banner'}})
+
     return (
         <Box
             className="sf-product-list-page"
@@ -414,6 +427,7 @@ const ProductList = (props) => {
             ) : (
                 <>
                     <AbovePageHeader />
+                    {instagramBannerPage && <Page page={instagramBannerPage} components={PAGEDESIGNER_TO_COMPONENT} />}
                     {/* Header */}
                     <Stack
                         display={{base: 'none', lg: 'flex'}}
