@@ -55,7 +55,9 @@ export const useUpdateShopperContext = () => {
     }
 
     useEffect(() => {
-        const requiresShopperContextUpdates =
+        const shouldUpdateShopperContext = !isLoading &&
+            Object.keys(shopperContextFromSearchParams).length > 0 &&
+            !_.isEqual(shopperContext, shopperContextFromSearchParams)
             !isLoading &&
             Object.keys(shopperContextFromSearchParams).length > 0 &&
             !_.isEqual(shopperContext, shopperContextFromSearchParams)
