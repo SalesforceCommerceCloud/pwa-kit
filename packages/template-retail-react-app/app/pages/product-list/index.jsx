@@ -407,7 +407,9 @@ const ProductList = (props) => {
         'commerce_assets.productListTile': ImageWithText,
         'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
     }
-    const {data: instagramPromoBanner, error: pageError} = usePage({parameters: {pageId: 'instagram-promo-banner'}})
+    const {data: instagramPromoBanner, error: pageError} = usePage({
+        parameters: {pageId: 'instagram-promo-banner'}
+    })
 
     return (
         <Box
@@ -429,7 +431,11 @@ const ProductList = (props) => {
                     <AbovePageHeader />
                     {/* Banner */}
                     {instagramPromoBanner && !pageError && (
-                        <Page page={instagramPromoBanner} components={PAGEDESIGNER_TO_COMPONENT} />
+                        <Page
+                            page={instagramPromoBanner}
+                            components={PAGEDESIGNER_TO_COMPONENT}
+                            data-testid={'sf-instagram-promo-banner'}
+                        />
                     )}
 
                     {/* Header */}
