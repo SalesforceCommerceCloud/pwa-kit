@@ -31,6 +31,7 @@ import {
 import {randomUUID} from 'crypto'
 import chalk from 'chalk'
 import tsx from 'tsx/cjs/api'
+import {expand} from '../../utils/resolver-utils'
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -136,13 +137,11 @@ export const DevServerMixin = {
         logger.info('Setting up extensions...')
 
         // Normalize the extensions list for easier parsing
-        const extensions = (options.mobify?.app?.extensions || [])
+        const extensions = expand(options.mobify?.app?.extensions || [])
             .map((extension) => {
                 return {
-                    name: Array.isArray(extension) ? extension[0] : extension,
-                    config: Array.isArray(extension)
-                        ? {enabled: true, ...extension[1]}
-                        : {enabled: true}
+                    name: extension[0],
+                    config: {enabled: true, ...extension[1]}
                 }
             })
             .filter((extension) => extension.config.enabled)
