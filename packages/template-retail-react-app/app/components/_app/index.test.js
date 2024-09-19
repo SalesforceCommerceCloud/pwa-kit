@@ -8,6 +8,7 @@
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
+import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 
 import App from '@salesforce/retail-react-app/app/components/_app/index.jsx'
@@ -61,15 +62,20 @@ describe('App', () => {
         buildUrl
     }
 
-    test('App component is rendered appropriately', () => {
+    test('App component is rendered appropriately', async () => {
         useMultiSite.mockImplementation(() => resultUseMultiSite)
         renderWithProviders(
             <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <p>Any children here</p>
             </App>
         )
-        expect(screen.getByRole('main')).toBeInTheDocument()
-        expect(screen.getByText('Any children here')).toBeInTheDocument()
+        const closeButton = screen.getByLabelText('Close dnt form')
+        const user = userEvent.setup()
+        await user.click(closeButton)
+        await waitFor(() => {
+            expect(screen.getByRole('main')).toBeInTheDocument()
+            expect(screen.getByText('Any children here')).toBeInTheDocument()
+        })
     })
 
     test('Active Data component is not rendered', async () => {
