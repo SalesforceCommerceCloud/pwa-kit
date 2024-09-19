@@ -755,6 +755,10 @@ export const RemoteServerFactory = {
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
 
+        if (options?.encodeNonAsciiHttpHeaders) {
+            app.use(encodeNonAsciiMiddleware)
+        }
+
         applyPatches(options)
     },
 
@@ -970,10 +974,8 @@ export const RemoteServerFactory = {
 
             // encode non ASCII request headers
             if (options?.encodeNonAsciiHttpHeaders) {
-                console.log('### in encodeNonAsciiHttpHeaders')
                 Object.keys(event.headers).forEach((key) => {
-                    if (!this._isASCII(event.headers[key])) {
-                        console.log('### console.log | modifying header: ', key)
+                    if (!isASCII(event.headers[key])) {
                         event.headers[key] = encodeURIComponent(event.headers[key])
                         // x-encoded-headers keeps track of which headers have been modified and encoded
                         if (event.headers[X_ENCODED_HEADERS]) {
@@ -986,9 +988,6 @@ export const RemoteServerFactory = {
                         }
                     }
                 })
-                console.log('### console.log | event headers after: ', event.headers)
-
-                // TODO: potentially set X_ENCODED_HEADERS
             }
 
             // We don't want to wait for an empty event loop once the response
@@ -1103,17 +1102,6 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getRequestProcessor(req) {
         return null
-    },
-
-    /**
-     * TODO: add documentation
-     *
-     * @private
-     */
-    _isASCII(str) {
-        // TODO: double check this logic
-        // matches against printable ASCII characters
-        return /^[\x20-\x7E]*$/.test(str)
     }
 }
 
@@ -1195,6 +1183,41 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     catchAndLog(err)
     req.app.sendMetric('RenderErrors')
     res.sendStatus(500)
+}
+
+/**
+ * Helper function that checks if a string is composed of ASCII characters
+ * We only check printable ASCII characters and not special ASCII characters
+ * such as NULL
+ *
+ * @private
+ */
+const isASCII = (str) => {
+    // TODO: double check this logic
+    return /^[\x20-\x7E]*$/.test(str)
+}
+
+/**
+ * Express Middleware applied to responses that encode any non ASCII headers
+ *
+ * @private
+ */
+const encodeNonAsciiMiddleware = (req, res, next) => {
+    const originalSetHeader = res.setHeader
+
+    res.setHeader = function (key, value) {
+        if (!isASCII(value)) {
+            originalSetHeader.call(this, key, encodeURIComponent(value))
+
+            let encodedHeaders = res.getHeader(X_ENCODED_HEADERS)
+            encodedHeaders = encodedHeaders ? `${encodedHeaders},${key}` : key
+            originalSetHeader.call(this, X_ENCODED_HEADERS, encodedHeaders)
+        } else {
+            originalSetHeader.call(this, key, value)
+        }
+    }
+
+    next()
 }
 
 /**
