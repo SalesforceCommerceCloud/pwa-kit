@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import _ from 'lodash'
+import isEqual from 'lodash/isEqual'
 import {useEffect} from 'react'
 import {
     useUsid,
@@ -58,7 +58,7 @@ export const useUpdateShopperContext = () => {
         const shouldUpdateShopperContext =
             !isLoading &&
             Object.keys(shopperContextFromSearchParams).length > 0 &&
-            !_.isEqual(shopperContext, shopperContextFromSearchParams)
+            !isEqual(shopperContext, shopperContextFromSearchParams)
 
         if (shouldUpdateShopperContext) {
             handleShopperContextUpdate(shopperContext, shopperContextFromSearchParams)
