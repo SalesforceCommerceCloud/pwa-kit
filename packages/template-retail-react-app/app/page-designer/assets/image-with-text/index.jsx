@@ -44,7 +44,19 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                 <picture>
                     <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
                     <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
-                    <LinkWrapper {...linkProps}>
+                    {ITCLink ? (
+                        <LinkWrapper {...linkProps}>
+                            <Image
+                                className={'image-with-text-image'}
+                                data-testid={'image-with-text-image'}
+                                src={image?.src?.mobile ? image?.src?.mobile : image?.url}
+                                ignoreFallback={true}
+                                alt={alt}
+                                title={alt}
+                                filter={'brightness(40%)'}
+                            />
+                        </LinkWrapper>
+                    ) : (
                         <Image
                             className={'image-with-text-image'}
                             data-testid={'image-with-text-image'}
@@ -54,7 +66,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                             title={alt}
                             filter={'brightness(40%)'}
                         />
-                    </LinkWrapper>
+                    )}
                 </picture>
                 {hasCaption && (
                     <Text as="figcaption">

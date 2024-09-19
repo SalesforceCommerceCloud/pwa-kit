@@ -32,7 +32,15 @@ const SAMPLE_DATA = {
 }
 
 test('Page renders correct component', () => {
-    const {getByText} = renderWithProviders(<ImageWithText {...SAMPLE_DATA} />)
+    const {getByText, getByRole} = renderWithProviders(<ImageWithText {...SAMPLE_DATA} />)
 
     expect(getByText(/image with text component/i)).toBeInTheDocument()
+    expect(getByRole('link', {name: /Alt Text test Image With Text Component/})).toBeInTheDocument()
+})
+
+test('Page does not render link when ITCLink is missing', () => {
+    const {ITCLink, ...sampleDataWithoutLink} = SAMPLE_DATA
+    const {queryByRole} = renderWithProviders(<ImageWithText {...sampleDataWithoutLink} />)
+
+    expect(queryByRole('link', {name: /Alt Text test Image With Text Component/})).toBeNull()
 })
