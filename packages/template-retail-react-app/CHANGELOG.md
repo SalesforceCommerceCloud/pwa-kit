@@ -2,6 +2,7 @@
 
 ### New Features
 - Implement ability to set Shopper Context via search paramters in the Retail React App [#1986](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1986)
+- Display an instagram promo banner from Page Designer in the PLP page of the Retail React App [#2016](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2016)
 
 ### Bug Fixes
 - The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
