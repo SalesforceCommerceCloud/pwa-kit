@@ -17,6 +17,7 @@ const SamplePage = loadable(() => import('./pages/sample'))
 const defaultPath: string = '/sample-page'
 
 interface Config extends ApplicationExtensionConfig {
+    // react-router-style path to the new sample page
     path?: string
 }
 
