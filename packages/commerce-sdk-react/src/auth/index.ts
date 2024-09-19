@@ -628,6 +628,35 @@ class Auth {
     }
 
     /**
+     * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
+     *
+     */
+    async loginIDPUser() {
+        if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
+            this.logWarning(SLAS_SECRET_WARNING_MSG)
+        }
+        const usid = this.get('usid')
+        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
+        const isGuest = false
+        const token = await helpers.loginIDPUser(
+            this.client,
+            {},
+            {
+                redirectURI: "http://localhost:3000/account",
+                hint: "Google",
+                ...(usid && {usid}),
+                ...(dntPref !== undefined && {dnt: dntPref}),
+            }
+        )
+
+        this.handleTokenResponse(token, isGuest)
+        if (onClient() && this.OCAPISessionsURL) {
+            void this.createOCAPISession()
+        }
+        return token
+    }
+
+    /**
      * This is a wrapper method for ShopperCustomer API registerCustomer endpoint.
      *
      */
