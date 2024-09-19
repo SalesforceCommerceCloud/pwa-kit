@@ -21,6 +21,7 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
+import fetch from 'node-fetch'
 
 const options = {
     // The build directory (an absolute path)
@@ -69,7 +70,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
-                        'api.cquotient.com'
+                        '*'
                     ]
                 }
             }
@@ -83,6 +84,21 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.set('Cache-Control', `max-age=31536000`)
         res.send()
     })
+
+    // app.get('/mobify/proxy/cf/*', (req, res) => {
+    //     console.log('proxying to req.url = ', req.url)
+    //     // res.redirect(
+    //     //     301,
+    //     //     'https://patient-silence-e8df.brian-feister.workers.dev/' +
+    //     //         req.url.replace('/mobify/proxy/cf/', '')
+    //     // )
+    //     const res = await fetch('https://patient-silence-e8df.brian-feister.workers.dev/' +
+    //             req.url.replace('/mobify/proxy/cf/', ''))
+    //     const json = await res.json()
+    //     console.log('json = ', json)
+    //     res.set('Access-Control-Allow-Origin', '*')
+    //     res.send(json)
+    // })
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))

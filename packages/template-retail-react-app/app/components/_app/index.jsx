@@ -74,7 +74,6 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 
@@ -82,6 +81,7 @@ import {useBlock} from '@salesforce/retail-react-app/app/hooks/use-block'
 import {useRouteContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/switch'
 import {ProductDetail, ProductList} from '@salesforce/retail-react-app/app/routes'
 import {Redirect} from 'react-router-dom'
+import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -217,17 +217,32 @@ const App = (props) => {
         let urlMapping
 
         try {
-            urlMapping = await api.shopperSeo.getUrlMapping({
-                parameters: {
-                    urlSegment
-                },
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-                throwOnBadResponse: true
-            })
+            console.log('urlSegment: ', urlSegment)
+            let reqUrl
+            console.log('proxyBasePath: ', proxyBasePath)
+            if (window?.location?.hostname?.match('localhost')) {
+                reqUrl = `${proxyBasePath}/cf${urlSegment}&siteId=RefArch&locale=en`
+            } else {
+                reqUrl = `${proxyBasePath}/cf${urlSegment}&siteId=RefArch&locale=en`
+            }
+            let cfMapping = await fetch(reqUrl)
+            cfMapping = await cfMapping.json()
+            console.log('cfMapping: ', cfMapping)
+            if (cfMapping?.resourceId && cfMapping?.resourceType) {
+                urlMapping = cfMapping
+            } else {
+                urlMapping = await api.shopperSeo.getUrlMapping({
+                    parameters: {
+                        urlSegment
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                    throwOnBadResponse: true
+                })
+            }
             console.log('urlMapping: ', urlMapping)
-        } catch(e) {
+        } catch (e) {
             console.error(`Couldn't find mapping for given segement: ${urlSegment}`)
         }
 
@@ -256,12 +271,12 @@ const App = (props) => {
                 {
                     path: location.pathname,
                     // DEVELOPER NOTE: Here we would want to use a Loadable component as to not bloat the home page chunk size.
-                    component: () => <Component {...props}/>
+                    component: () => <Component {...props} />
                 },
                 ...routes
             ])
         }
-        
+
         return false
     })
 

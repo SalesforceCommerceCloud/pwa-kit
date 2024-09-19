@@ -60,6 +60,10 @@ module.exports = {
             {
                 host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
+            },
+            {
+                host: 'patient-silence-e8df.brian-feister.workers.dev',
+                path: 'cf'
             }
         ]
     }
