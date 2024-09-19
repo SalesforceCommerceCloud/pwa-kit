@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import ApplicationExtension from './application-extension'
+import ApplicationExtension, {ApplicationExtensionConfig} from './application-extension'
 
 // This file exports the default extensions object, which is empty. During local development and the production
 // build process, this object is replaced with those application extensions configured by the base PWA-Kit project.
-const extensions: ApplicationExtension[] = []
+const extensions: ApplicationExtension<ApplicationExtensionConfig>[] = []
 
 export default extensions

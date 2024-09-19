@@ -6,6 +6,10 @@
  */
 import {IRouteConfig} from './types'
 
+export interface ApplicationExtensionConfig extends Record<string, unknown> {
+    enabled: boolean
+}
+
 /**
  * An abstract class representing an Application Extension. This class provides
  * foundational methods and properties for extending an application with additional
@@ -15,15 +19,15 @@ import {IRouteConfig} from './types'
  *
  * @abstract
  */
-export default abstract class ApplicationExtension {
-    private config: Record<string, unknown>
+export default abstract class ApplicationExtension<Config> {
+    private config: Config
 
     /**
      * Constructs a new instance of the ApplicationExtension class.
      *
      * @param config - The configuration object used to set up the extension.
      */
-    constructor(config: Record<string, unknown>) {
+    constructor(config: Config) {
         this.config = config
     }
 
@@ -33,7 +37,7 @@ export default abstract class ApplicationExtension {
      * @protected
      * @returns config - The configuration object.
      */
-    public getConfig(): Record<string, unknown> {
+    public getConfig(): Config {
         return this.config
     }
 

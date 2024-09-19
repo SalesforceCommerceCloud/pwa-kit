@@ -11,12 +11,16 @@ import {IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensib
 import {ApplicationExtension} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
 
 import withRedBorder from './components/with-red-border'
+import {ApplicationExtensionConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility/application-extension'
 
 const SamplePage = loadable(() => import('./pages/sample'))
-
 const defaultPath: string = '/sample-page'
-class Sample extends ApplicationExtension {
 
+interface Config extends ApplicationExtensionConfig {
+    path?: string
+}
+
+class Sample extends ApplicationExtension<Config> {
     extendApp(App: React.ComponentType): React.ComponentType {
         return withRedBorder(App)
     }
