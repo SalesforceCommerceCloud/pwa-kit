@@ -15,7 +15,7 @@ import {
     useCustomerId,
     useProductSearch,
     useShopperCustomersMutation,
-    usePage,
+    usePage
 } from '@salesforce/commerce-sdk-react'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
@@ -405,9 +405,9 @@ const ProductList = (props) => {
     /**************** Page Designer ****************/
     const PAGEDESIGNER_TO_COMPONENT = {
         'commerce_assets.productListTile': ImageWithText,
-        'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c,
+        'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
     }
-    const {data: instagramBannerPage}= usePage({parameters: {pageId: 'instagram-promo-banner'}})
+    const {data: instagramPromoBanner} = usePage({parameters: {pageId: 'instagram-promo-banner'}})
 
     return (
         <Box
@@ -427,7 +427,11 @@ const ProductList = (props) => {
             ) : (
                 <>
                     <AbovePageHeader />
-                    {instagramBannerPage && <Page page={instagramBannerPage} components={PAGEDESIGNER_TO_COMPONENT} />}
+                    {/* Banner */}
+                    {instagramPromoBanner && (
+                        <Page page={instagramPromoBanner} components={PAGEDESIGNER_TO_COMPONENT} />
+                    )}
+
                     {/* Header */}
                     <Stack
                         display={{base: 'none', lg: 'flex'}}
