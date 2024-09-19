@@ -353,6 +353,7 @@ const App = (props) => {
                                 {!isCheckout ? (
                                     <>
                                         <AboveHeader />
+                                        <div>App Origin: {appOrigin}</div>
                                         <Header
                                             onMenuClick={onOpen}
                                             onLogoClick={onLogoClick}

@@ -977,6 +977,9 @@ export const RemoteServerFactory = {
             // the response to the browser.
             context.callbackWaitsForEmptyEventLoop = false
 
+            if (app.options.overrideAppOrigin) {
+                app.options.overrideAppOrigin(event)
+            }
             if (lambdaContainerReused) {
                 // DESKTOP-434 If this Lambda container is being reused,
                 // clean up memory now, so that we start with low usage.

@@ -45,7 +45,14 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false
+    useSLASPrivateClient: false,
+    overrideAppOrigin: function (event) {
+        const xForwardedHost = event.headers?.['x-forwarded-host'] || 'https://testing-example.com'
+        if (xForwardedHost) {
+            // reassign process.env.APP_ORIGIN
+            process.env.APP_ORIGIN = xForwardedHost
+        }
+    }
 }
 
 const runtime = getRuntime()
