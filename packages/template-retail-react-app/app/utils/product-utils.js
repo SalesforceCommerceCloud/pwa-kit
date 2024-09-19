@@ -37,6 +37,55 @@ export const getDisplayVariationValues = (variationAttributes, values = {}) => {
 }
 
 /**
+ * Normalizes data for product sets and product bundles into the same format
+ * Useful for operations that apply to both product sets and product bundles
+ *
+ * @param {Object} product - A product set or product bundle
+ * @returns {Object} - returns normalized product if product is a set/bundle, otherwise returns original product
+ */
+export const normalizeSetBundleProduct = (product) => {
+    if (!product?.type.set && !product?.type.bundle) return product
+    return {
+        ...product,
+        childProducts: product?.type.set
+            ? product.setProducts.map((child) => {
+                  return {product: child, quantity: null}
+              })
+            : product.bundledProducts
+    }
+}
+
+/**
+ * Creates an array of product items used to update the child variant selections for a product bundle,
+ * usually in an updateItemToBasket/updateItemsToBasket shopper baskets API call
+ *
+ * @param {Object} bundle - A product that is a bundle.
+ * @param {Array} childProductSelections - An array of the bundle child products with a selected variant.
+ *      Each item in the array should have the product, variant, and quantity.
+ * @returns {Array} - an array of bundle child product items that have the updated variant
+ */
+export const getUpdateBundleChildArray = (bundle, childProductSelections) => {
+    const itemsToBeUpdated = []
+    bundle?.bundledProductItems?.forEach((bundleChild) => {
+        const childSelection = childProductSelections?.find(
+            (childProduct) =>
+                childProduct.product?.id === bundleChild.productId ||
+                childProduct.product?.itemId === bundleChild.itemId
+        )
+
+        // only update the item if the selected variant is different then what's in the current bundle
+        if (childSelection && childSelection.variant?.productId !== bundleChild.productId) {
+            itemsToBeUpdated.push({
+                itemId: bundleChild.itemId,
+                productId: childSelection.variant.productId,
+                quantity: childSelection.quantity ?? bundleChild.quantity
+            })
+        }
+    })
+    return itemsToBeUpdated
+}
+
+/**
  * This function extract the price information of a given product
  * If a product is a master,
  *  currentPrice: get the lowest price (including promotional prices) among variants

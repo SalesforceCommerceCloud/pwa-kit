@@ -38,6 +38,7 @@ interface AuthConfig extends ApiClientConfigParams {
     clientSecret?: string
     silenceWarnings?: boolean
     logger: Logger
+    defaultDnt?: boolean
 }
 
 interface JWTHeaders {
@@ -178,6 +179,7 @@ class Auth {
     private clientSecret: string
     private silenceWarnings: boolean
     private logger: Logger
+    private defaultDnt: boolean | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -226,6 +228,8 @@ class Auth {
         this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
         this.logger = config.logger
+
+        this.defaultDnt = config.defaultDnt
 
         /*
          * There are 2 ways to enable SLAS private client mode.
@@ -362,6 +366,21 @@ class Auth {
     }
 
     /**
+     * Converts a duration in seconds to a Date object.
+     * This function takes a number representing seconds and returns a Date object
+     * for the current time plus the given duration.
+     *
+     * @param {number} seconds - The number of seconds to add to the current time.
+     * @returns {Date} A Date object for the expiration time.
+     */
+    private convertSecondsToDate(seconds: number): Date {
+        if (typeof seconds !== 'number') {
+            throw new Error('The refresh_token_expires_in seconds parameter must be a number.')
+        }
+        return new Date(Date.now() + seconds * 1000)
+    }
+
+    /**
      * This method stores the TokenResponse object retrived from SLAS, and
      * store the data in storage.
      */
@@ -377,9 +396,12 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
+        const expiresDate = res.refresh_token_expires_in
+            ? this.convertSecondsToDate(res.refresh_token_expires_in)
+            : undefined
 
         this.set(refreshTokenKey, res.refresh_token, {
-            expires: res.refresh_token_expires_in
+            expires: expiresDate
         })
     }
 
@@ -453,7 +475,10 @@ class Auth {
                     () =>
                         helpers.refreshAccessToken(
                             this.client,
-                            {refreshToken},
+                            {
+                                refreshToken,
+                                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt})
+                            },
                             {
                                 clientSecret: this.clientSecret
                             }
@@ -503,12 +528,19 @@ class Auth {
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
-            {...(usid && {usid})},
+            {
+                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...(usid && {usid})
+            },
             {clientSecret: this.clientSecret}
         ] as const
         const guestPublicArgs = [
             this.client,
-            {redirectURI: this.redirectURI, ...(usid && {usid})}
+            {
+                redirectURI: this.redirectURI,
+                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
+                ...(usid && {usid})
+            }
         ] as const
         const callback = this.clientSecret
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
@@ -566,6 +598,7 @@ class Auth {
             },
             {
                 redirectURI,
+                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
                 ...(usid && {usid})
             }
         )
@@ -600,11 +633,13 @@ class Auth {
      *
      */
     async logout() {
-        // Not awaiting on purpose because there isn't much we can do if this fails.
-        void helpers.logout(this.client, {
-            accessToken: this.get('access_token'),
-            refreshToken: this.get('refresh_token_registered')
-        })
+        if (this.get('customer_type') === 'registered') {
+            // Not awaiting on purpose because there isn't much we can do if this fails.
+            void helpers.logout(this.client, {
+                accessToken: this.get('access_token'),
+                refreshToken: this.get('refresh_token_registered')
+            })
+        }
         this.clearStorage()
         return await this.loginGuestUser()
     }

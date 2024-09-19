@@ -174,6 +174,9 @@
   "cart.info.removed_from_cart": {
     "defaultMessage": "Item removed from cart"
   },
+  "cart.product_edit_modal.modal_label": {
+    "defaultMessage": "Edit modal for {productName}"
+  },
   "cart.recommended_products.title.may_also_like": {
     "defaultMessage": "You May Also Like"
   },
@@ -459,6 +462,9 @@
   "drawer_menu.button.order_history": {
     "defaultMessage": "Order History"
   },
+  "drawer_menu.header.assistive_msg.title": {
+    "defaultMessage": "Menu Drawer"
+  },
   "drawer_menu.link.about_us": {
     "defaultMessage": "About Us"
   },
@@ -621,6 +627,9 @@
   "header.button.assistive_msg.menu": {
     "defaultMessage": "Menu"
   },
+  "header.button.assistive_msg.menu.open_dialog": {
+    "defaultMessage": "Opens a dialog"
+  },
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "My account"
   },
@@ -629,6 +638,9 @@
   },
   "header.button.assistive_msg.my_cart_with_num_items": {
     "defaultMessage": "My cart, number of items: {numItems}"
+  },
+  "header.button.assistive_msg.store_locator": {
+    "defaultMessage": "Store Locator"
   },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "Wishlist"
@@ -741,6 +753,9 @@
   },
   "item_attributes.label.quantity": {
     "defaultMessage": "Quantity: {quantity}"
+  },
+  "item_attributes.label.selected_options": {
+    "defaultMessage": "Selected Options"
   },
   "item_image.label.sale": {
     "defaultMessage": "Sale",
@@ -1126,6 +1141,12 @@
   "product_tile.badge.label.sale": {
     "defaultMessage": "Sale"
   },
+  "product_view.button.add_bundle_to_cart": {
+    "defaultMessage": "Add Bundle to Cart"
+  },
+  "product_view.button.add_bundle_to_wishlist": {
+    "defaultMessage": "Add Bundle to Wishlist"
+  },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
   },
@@ -1301,6 +1322,63 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
   },
+  "store_locator.action.find": {
+    "defaultMessage": "Find"
+  },
+  "store_locator.action.select_a_country": {
+    "defaultMessage": "Select a country"
+  },
+  "store_locator.action.use_my_location": {
+    "defaultMessage": "Use My Location"
+  },
+  "store_locator.action.viewMore": {
+    "defaultMessage": "View More"
+  },
+  "store_locator.description.away": {
+    "defaultMessage": "away"
+  },
+  "store_locator.description.loading_locations": {
+    "defaultMessage": "Loading locations..."
+  },
+  "store_locator.description.no_locations": {
+    "defaultMessage": "Sorry, there are no locations in this area"
+  },
+  "store_locator.description.or": {
+    "defaultMessage": "Or"
+  },
+  "store_locator.description.phone": {
+    "defaultMessage": "Phone:"
+  },
+  "store_locator.description.viewing_near_postal_code": {
+    "defaultMessage": "Viewing stores within {distance}{distanceUnit} of {postalCode} in"
+  },
+  "store_locator.description.viewing_near_your_location": {
+    "defaultMessage": "Viewing stores near your location"
+  },
+  "store_locator.dropdown.germany": {
+    "defaultMessage": "Germany"
+  },
+  "store_locator.dropdown.united_states": {
+    "defaultMessage": "United States"
+  },
+  "store_locator.error.agree_to_share_your_location": {
+    "defaultMessage": "Please agree to share your location"
+  },
+  "store_locator.error.please_enter_a_postal_code": {
+    "defaultMessage": "Please enter a postal code."
+  },
+  "store_locator.error.please_select_a_country": {
+    "defaultMessage": "Please select a country."
+  },
+  "store_locator.field.placeholder.enter_postal_code": {
+    "defaultMessage": "Enter postal code"
+  },
+  "store_locator.pagination.load_more": {
+    "defaultMessage": "Load More"
+  },
+  "store_locator.title": {
+    "defaultMessage": "Find a Store"
+  },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
   },
@@ -1447,8 +1525,14 @@
   "use_product.message.inventory_remaining": {
     "defaultMessage": "Only {stockLevel} left!"
   },
+  "use_product.message.inventory_remaining_for_product": {
+    "defaultMessage": "Only {stockLevel} left for {productName}!"
+  },
   "use_product.message.out_of_stock": {
     "defaultMessage": "Out of stock"
+  },
+  "use_product.message.out_of_stock_for_product": {
+    "defaultMessage": "Out of stock for {productName}"
   },
   "use_profile_fields.error.required_email": {
     "defaultMessage": "Please enter a valid email address."

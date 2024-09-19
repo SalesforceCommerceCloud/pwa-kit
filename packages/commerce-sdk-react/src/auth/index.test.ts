@@ -386,6 +386,19 @@ describe('Auth', () => {
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
 
+    test.each([
+        {defaultDnt: true, expected: {dnt: true}},
+        {defaultDnt: false, expected: {dnt: false}},
+        {defaultDnt: undefined, expected: {}}
+    ])('dnt flag is set correctly', async ({defaultDnt, expected}) => {
+        const auth = new Auth({...config, defaultDnt})
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUser).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining(expected)
+        )
+    })
+
     test('loginGuestUser with slas private', async () => {
         const auth = new Auth(configSLASPrivate)
         await auth.loginGuestUser()
@@ -416,9 +429,21 @@ describe('Auth', () => {
             clientSecret: SLAS_SECRET_PLACEHOLDER
         })
     })
-    test('logout', async () => {
+    test('logout as registered user calls isomorphic logout', async () => {
+        const auth = new Auth(config)
+
+        // @ts-expect-error private method
+        // simulate logging in as login function is mocked
+        auth.set('customer_type', 'registered')
+
+        await auth.logout()
+        expect(helpers.logout).toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+    })
+    test('logout as guest user does not call isomorphic logout', async () => {
         const auth = new Auth(config)
         await auth.logout()
+        expect(helpers.logout).not.toHaveBeenCalled()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
     test('PWA private client mode takes priority', async () => {

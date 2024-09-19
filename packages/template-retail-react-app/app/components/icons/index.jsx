@@ -43,6 +43,7 @@ import '@salesforce/retail-react-app/app/assets/svg/social-facebook.svg'
 import '@salesforce/retail-react-app/app/assets/svg/social-instagram.svg'
 import '@salesforce/retail-react-app/app/assets/svg/social-twitter.svg'
 import '@salesforce/retail-react-app/app/assets/svg/social-youtube.svg'
+import '@salesforce/retail-react-app/app/assets/svg/store.svg'
 import '@salesforce/retail-react-app/app/assets/svg/like.svg'
 import '@salesforce/retail-react-app/app/assets/svg/lock.svg'
 import '@salesforce/retail-react-app/app/assets/svg/plug.svg'
@@ -148,6 +149,7 @@ export const ChevronLeftIcon = icon('chevron-left')
 export const ChevronRightIcon = icon('chevron-right')
 export const ChevronUpIcon = icon('chevron-up')
 export const CVVIcon = icon('cc-cvv', {viewBox: CVVSymbol.viewBox})
+export const CloseIcon = icon('close')
 export const DashboardIcon = icon('dashboard')
 export const DiscoverIcon = icon('cc-discover', {viewBox: DiscoverSymbol.viewBox})
 export const FigmaLogo = icon('figma-logo')
@@ -162,6 +164,8 @@ export const FlagCNIcon = icon('flag-cn')
 export const FlagJPIcon = icon('flag-jp')
 export const GithubLogo = icon('github-logo')
 export const HamburgerIcon = icon('hamburger')
+export const HeartIcon = icon('heart')
+export const HeartSolidIcon = icon('heart-solid')
 export const InfoIcon = icon('info')
 export const LikeIcon = icon('like')
 export const LockIcon = icon(
@@ -191,11 +195,9 @@ export const SocialPinterestIcon = icon('social-pinterest', {
 })
 export const SocialTwitterIcon = icon('social-twitter')
 export const SocialYoutubeIcon = icon('social-youtube')
+export const StoreIcon = icon('store')
 export const SignoutIcon = icon('signout')
 export const UserIcon = icon('user')
 export const VisaIcon = icon('cc-visa', {viewBox: VisaSymbol.viewBox})
 export const VisibilityIcon = icon('visibility')
 export const VisibilityOffIcon = icon('visibility-off')
-export const HeartIcon = icon('heart')
-export const HeartSolidIcon = icon('heart-solid')
-export const CloseIcon = icon('close')

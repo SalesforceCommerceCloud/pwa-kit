@@ -41,14 +41,16 @@ import {
     HamburgerIcon,
     ChevronDownIcon,
     HeartIcon,
-    SignoutIcon
+    SignoutIcon,
+    StoreIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 
 import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account/constant'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
-
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 const IconButtonWithRegistration = withRegistration(IconButton)
 
 /**
@@ -103,9 +105,11 @@ const Header = ({
     onLogoClick = noop,
     onMyCartClick = noop,
     onWishlistClick = noop,
+    onStoreLocatorClick = noop,
     ...props
 }) => {
     const intl = useIntl()
+    const popoverTriggerRef = useRef(null)
     const {
         derivedData: {totalItems},
         data: basket
@@ -143,6 +147,14 @@ const Header = ({
         }, 100)
     }
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Tab' && event.shiftKey && isAccountMenuOpen) {
+            // Prevent default behavior to keep focus on the popup trigger
+            event.preventDefault()
+            popoverTriggerRef.current.focus()
+        }
+    }
+
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
@@ -152,6 +164,10 @@ const Header = ({
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.menu',
                             defaultMessage: 'Menu'
+                        })}
+                        title={intl.formatMessage({
+                            id: 'header.button.assistive_msg.menu.open_dialog',
+                            defaultMessage: 'Opens a dialog'
                         })}
                         icon={<HamburgerIcon />}
                         variant="unstyled"
@@ -170,7 +186,9 @@ const Header = ({
                         onClick={onLogoClick}
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
-                    {isDesktop && <SearchBar />}
+                    <HideOnMobile>
+                        <SearchBar />
+                    </HideOnMobile>
                     <IconButtonWithRegistration
                         icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
@@ -206,6 +224,8 @@ const Header = ({
                                     {...getAccountMenuButtonProps()}
                                     onMouseOver={onAccountMenuOpen}
                                     onMouseLeave={handleIconsMouseLeave}
+                                    ref={popoverTriggerRef}
+                                    onKeyDown={handleKeyDown}
                                 />
                             </PopoverTrigger>
 
@@ -263,7 +283,11 @@ const Header = ({
                                     <Divider colorScheme="gray" />
                                     <Button variant="unstyled" {...styles.signout}>
                                         <Flex>
-                                            <SignoutIcon boxSize={5} {...styles.signoutIcon} />
+                                            <SignoutIcon
+                                                aria-hidden={true}
+                                                boxSize={5}
+                                                {...styles.signoutIcon}
+                                            />
                                             <Text as="span" {...styles.signoutText}>
                                                 {intl.formatMessage({
                                                     defaultMessage: 'Log out',
@@ -287,6 +311,18 @@ const Header = ({
                         {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
+                    {STORE_LOCATOR_IS_ENABLED && (
+                        <IconButton
+                            aria-label={intl.formatMessage({
+                                defaultMessage: 'Store Locator',
+                                id: 'header.button.assistive_msg.store_locator'
+                            })}
+                            icon={<StoreIcon />}
+                            {...styles.icons}
+                            variant="unstyled"
+                            onClick={onStoreLocatorClick}
+                        />
+                    )}
                     <IconButton
                         aria-label={intl.formatMessage(
                             {
@@ -307,7 +343,9 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMyCartClick}
                     />
-                    {!isDesktop && <SearchBar />}
+                    <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
+                        <SearchBar />
+                    </HideOnDesktop>
                 </Flex>
             </Box>
         </Box>
@@ -321,6 +359,7 @@ Header.propTypes = {
     onMyAccountClick: PropTypes.func,
     onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,
+    onStoreLocatorClick: PropTypes.func,
     searchInputRef: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.shape({current: PropTypes.elementType})
