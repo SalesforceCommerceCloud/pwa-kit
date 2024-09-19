@@ -201,3 +201,35 @@ export const STORE_LOCATOR_DISTANCE = 100
 export const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
 export const STORE_LOCATOR_DISTANCE_UNIT = 'km'
 export const STORE_LOCATOR_IS_ENABLED = true
+
+// Constants for shopper context
+// Supported non-string field types used in SHOPPER_CONTEXT_SEARCH_PARAMS below.
+// Only non-string types need to be identified using the "type" field.
+// If no "type" field is present, the value will be parsed as a string by default.
+export const SHOPPER_CONTEXT_FIELD_TYPES = {
+    INT: 'int',
+    DOUBLE: 'double',
+    ARRAY: 'array'
+}
+export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
+    sourceCode: {paramName: 'sourceCode'},
+    effectiveDateTime: {paramName: 'effectiveDateTime'},
+    clientIp: {paramName: 'clientIp'},
+    geoLocation: {
+        city: {paramName: 'city'},
+        country: {paramName: 'country'},
+        countryCode: {paramName: 'countryCode'},
+        latitude: {paramName: 'latitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
+        longitude: {paramName: 'longitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
+        metroCode: {paramName: 'metroCode'},
+        postalCode: {paramName: 'postalCode'},
+        region: {paramName: 'region'},
+        regionCode: {paramName: 'regionCode'}
+    },
+    customQualifiers: {
+        // Add custom qualifiers here
+    },
+    assignmentQualifiers: {
+        // Add assignment qualifiers here
+    }
+}
