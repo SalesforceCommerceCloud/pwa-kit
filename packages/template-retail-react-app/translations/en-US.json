@@ -447,6 +447,21 @@
   "display_price.label.current_price_with_range": {
     "defaultMessage": "From {currentPrice}"
   },
+  "dnt_modal.accept": {
+    "defaultMessage": "Accept"
+  },
+  "dnt_modal.button.close.assistive_msg": {
+    "defaultMessage": "Close dnt form"
+  },
+  "dnt_modal.decline": {
+    "defaultMessage": "Decline"
+  },
+  "dnt_modal.description": {
+    "defaultMessage": "This website uses cookies to enhance user experience and to analyze performance and traffic on our website. We also share information about your use of our site with our social media, advertising and analytics partners. By clicking “Accept,” you agree to our website’s cookie use as described in our Cookie Policy. You can change your cookie settings at any time by clicking “Preferences.”"
+  },
+  "dnt_modal.title": {
+    "defaultMessage": "Tracking Consent"
+  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Account Details"
   },

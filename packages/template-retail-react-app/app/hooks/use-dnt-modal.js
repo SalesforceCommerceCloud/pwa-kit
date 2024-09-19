@@ -91,7 +91,7 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
                                     color="black"
                                     border="1px"
                                     _hover={{bg: 'gray.100'}}
-                                    borderColor="gray.200"
+                                    borderColor="gray.100"
                                     boxShadow="md"
                                     onClick={() => {
                                         updateDNT(true)
@@ -108,6 +108,7 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
                                         updateDNT(false)
                                         onClose()
                                     }}
+                                    boxShadow="md"
                                 >
                                     <FormattedMessage
                                         defaultMessage="Accept"
