@@ -8,6 +8,8 @@
 import { IExpressApplicationExtension } from '@salesforce/pwa-kit-runtime/ssr/server/extensibility/types'
 import { Application } from 'express'
 
+// TODO: type the extensionConfig
+// NOTE: Ben will update this to use an abstract class
 class SampleExtension implements IExpressApplicationExtension {
     private options: any
     private extensionConfig: any
