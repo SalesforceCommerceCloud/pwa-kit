@@ -52,7 +52,8 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
 
         const originalHeaders = {
             'x-non-ascii-header-one': 'テスト',
-            'x-non-ascii-header-two': '测试'
+            'x-non-ascii-header-two': '测试',
+            'x-regular-header': 'ascii-str'
         }
 
         const event = {
@@ -62,7 +63,8 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
         const expectedHeaders = {
             'x-non-ascii-header-one': '%E3%83%86%E3%82%B9%E3%83%88',
             'x-non-ascii-header-two': '%E6%B5%8B%E8%AF%95',
-            'x-encoded-headers': 'x-non-ascii-header-one,x-non-ascii-header-two'
+            'x-encoded-headers': 'x-non-ascii-header-one,x-non-ascii-header-two',
+            'x-regular-header': 'ascii-str'
         }
 
         const {handler} = RemoteServerFactory._createHandler(mockApp, mockOptions)
@@ -93,9 +95,13 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
             }
         }
 
-        const expectedEncoding = '%E3%83%86%E3%82%B9%E3%83%88'
         const nonASCIIheader = 'x-non-ascii-header'
         const nonASCIIstr = 'テスト'
+        const expectedEncoding = '%E3%83%86%E3%82%B9%E3%83%88'
+
+        const regularHeaderKey = 'x-regular-header'
+        const regularHeaderValue = 'ascii-str'
+
         RemoteServerFactory._setupCommonMiddleware(mockApp, mockOptions)
         const encodeNonAsciiMiddleware = mockApp.use.mock.calls[3][0]
 
@@ -108,5 +114,9 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
         expect(res.getHeader(nonASCIIheader)).toEqual(expectedEncoding)
         expect(decodeURI(expectedEncoding)).toEqual(nonASCIIstr)
         expect(res.getHeader(X_ENCODED_HEADERS)).toEqual(nonASCIIheader)
+
+        // confirm ASCII headers are not modified
+        res.setHeader(regularHeaderKey, regularHeaderValue)
+        expect(res.getHeader(regularHeaderKey)).toEqual(regularHeaderValue)
     })
 })
