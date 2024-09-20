@@ -10,7 +10,7 @@ import {kebabToUpperCamelCase} from '../utils'
 import {nameRegex} from '../../../utils/extensibility-utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
-const APP_EXTENSION_PREFIX = 'extension'
+const APP_EXTENSION_PREFIX = 'extension' // aligns with what's in `nameRegex`
 
 /**
  * The `extensions-loader` as a mechanism to get all configured extensions for a given pwa-kit
@@ -63,6 +63,15 @@ module.exports = function () {
                 )
                 .join('\n            ')}
 
+            const installedExtensions = [
+                ${extensionDetails
+                    .map(
+                        ({packageName, instanceVariable}) =>
+                            `{packageName: '${packageName}', instanceVariable: ${instanceVariable}}`
+                    )
+                    .join(',\n                ')}
+            ]
+
             const normalizeExtensionsList = (extensions = []) =>
                 extensions.map((extension) => {
                     return {
@@ -71,22 +80,14 @@ module.exports = function () {
                     }
                 })
 
-            const initExtensionIfFound = (extensions, {instanceVariable, packageName}) => {
-                const found = extensions.find((ext) => ext.name === packageName)
-                return found ? new instanceVariable(found.config || {}) : false
-            }
-
             export const getExtensions = () => {
                 const configuredExtensions = normalizeExtensionsList(getConfig()?.app?.extensions) || []
                 const enabledExtensions = configuredExtensions.filter((extension) => extension.config.enabled)
 
-                return [
-                    ${extensionDetails
-                        .map(({instanceVariable, packageName}) => {
-                            return `initExtensionIfFound(enabledExtensions, {instanceVariable: ${instanceVariable}, packageName: '${packageName}'})`
-                        })
-                        .join(',\n                    ')}
-                ].filter(Boolean)
+                return enabledExtensions.map((extension) => {
+                    const found = installedExtensions.find((ext) => ext.packageName === extension.name)
+                    return found ? new found.instanceVariable(extension.config || {}) : false
+                }).filter(Boolean)
             }
         `
 }

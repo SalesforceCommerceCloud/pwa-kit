@@ -59,6 +59,13 @@ describe('Extension Loader', () => {
             import CompanyxAnother from '@companyx/extension-another/setup-app'
             import This from 'extension-this/setup-app'
 
+            const installedExtensions = [
+                {packageName: '@salesforce/extension-this', instanceVariable: SalesforceThis},
+                {packageName: '@salesforce/extension-that', instanceVariable: SalesforceThat},
+                {packageName: '@companyx/extension-another', instanceVariable: CompanyxAnother},
+                {packageName: 'extension-this', instanceVariable: This}
+            ]
+
             const normalizeExtensionsList = (extensions = []) =>
                 extensions.map((extension) => {
                     return {
@@ -67,21 +74,14 @@ describe('Extension Loader', () => {
                     }
                 })
 
-            const initExtensionIfFound = (extensions, {instanceVariable, packageName}) => {
-                const found = extensions.find((ext) => ext.name === packageName)
-                return found ? new instanceVariable(found.config || {}) : false
-            }
-
             export const getExtensions = () => {
                 const configuredExtensions = normalizeExtensionsList(getConfig()?.app?.extensions) || []
                 const enabledExtensions = configuredExtensions.filter((extension) => extension.config.enabled)
 
-                return [
-                    initExtensionIfFound(enabledExtensions, {instanceVariable: SalesforceThis, packageName: '@salesforce/extension-this'}),
-                    initExtensionIfFound(enabledExtensions, {instanceVariable: SalesforceThat, packageName: '@salesforce/extension-that'}),
-                    initExtensionIfFound(enabledExtensions, {instanceVariable: CompanyxAnother, packageName: '@companyx/extension-another'}),
-                    initExtensionIfFound(enabledExtensions, {instanceVariable: This, packageName: 'extension-this'})
-                ].filter(Boolean)
+                return enabledExtensions.map((extension) => {
+                    const found = installedExtensions.find((ext) => ext.packageName === extension.name)
+                    return found ? new found.instanceVariable(extension.config || {}) : false
+                }).filter(Boolean)
             }
         `)
     })
