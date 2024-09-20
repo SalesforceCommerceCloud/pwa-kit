@@ -5,6 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {once, RemoteServerFactory} from './build-remote-server'
+import {X_ENCODED_HEADERS} from './constants'
+import awsServerlessExpress from 'aws-serverless-express'
+
+jest.mock('aws-serverless-express', () => {
+    return {
+        createServer: jest.fn(),
+        proxy: jest.fn()
+    }
+})
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
@@ -28,5 +37,76 @@ describe('remote server factory test coverage', () => {
     test('getSlasEndpoint returns endpoint if useSLASPrivateClient is true', () => {
         const endpoint = RemoteServerFactory._getSlasEndpoint({useSLASPrivateClient: true})
         expect(endpoint).toBeDefined()
+    })
+})
+
+describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
+    test('encodes request headers', () => {
+        const mockApp = {
+            sendMetric: jest.fn()
+        }
+
+        const mockOptions = {
+            encodeNonAsciiHttpHeaders: true
+        }
+
+        const originalHeaders = {
+            'x-non-ascii-header-one': 'テスト',
+            'x-non-ascii-header-two': '测试'
+        }
+
+        const event = {
+            headers: {...originalHeaders}
+        }
+
+        const expectedHeaders = {
+            'x-non-ascii-header-one': '%E3%83%86%E3%82%B9%E3%83%88',
+            'x-non-ascii-header-two': '%E6%B5%8B%E8%AF%95',
+            'x-encoded-headers': 'x-non-ascii-header-one,x-non-ascii-header-two'
+        }
+
+        const {handler} = RemoteServerFactory._createHandler(mockApp, mockOptions)
+        expect(event.headers).toEqual(originalHeaders)
+        handler(event, {}, {})
+        expect(event.headers).toEqual(expectedHeaders)
+        expect(decodeURIComponent(event.headers['x-non-ascii-header-one'])).toEqual(
+            originalHeaders['x-non-ascii-header-one']
+        )
+    })
+
+    test('encodes response headers', () => {
+        const mockApp = {
+            use: jest.fn()
+        }
+
+        const mockOptions = {
+            encodeNonAsciiHttpHeaders: true
+        }
+
+        const res = {
+            headers: {},
+            setHeader: (key, value) => {
+                res.headers[key] = value
+            },
+            getHeader: (key) => {
+                return res.headers[key]
+            }
+        }
+
+        const expectedEncoding = '%E3%83%86%E3%82%B9%E3%83%88'
+        const nonASCIIheader = 'x-non-ascii-header'
+        const nonASCIIstr = 'テスト'
+        RemoteServerFactory._setupCommonMiddleware(mockApp, mockOptions)
+        const encodeNonAsciiMiddleware = mockApp.use.mock.calls[3][0]
+
+        res.setHeader(nonASCIIheader, nonASCIIstr)
+        expect(res.getHeader(nonASCIIheader)).toEqual(nonASCIIstr)
+
+        encodeNonAsciiMiddleware({}, res, () => {})
+
+        res.setHeader(nonASCIIheader, nonASCIIstr)
+        expect(res.getHeader(nonASCIIheader)).toEqual(expectedEncoding)
+        expect(decodeURI(expectedEncoding)).toEqual(nonASCIIstr)
+        expect(res.getHeader(X_ENCODED_HEADERS)).toEqual(nonASCIIheader)
     })
 })
