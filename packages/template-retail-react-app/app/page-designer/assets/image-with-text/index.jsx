@@ -32,6 +32,18 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     const LinkWrapper = isAbsolute ? ChakraLink : Link
     const linkProps = isAbsolute ? {href: ITCLink} : {to: ITCLink}
 
+    const ImageComponent = () => (
+        <Image
+            className={'image-with-text-image'}
+            data-testid={'image-with-text-image'}
+            src={image?.src?.mobile ? image?.src?.mobile : image?.url}
+            ignoreFallback={true}
+            alt={alt}
+            title={alt}
+            filter={heading ? 'brightness(40%)': undefined}
+        />
+    )
+
     return (
         <Box className={'image-with-text'}>
             <Box
@@ -46,26 +58,10 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                     <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
                     {ITCLink ? (
                         <LinkWrapper {...linkProps}>
-                            <Image
-                                className={'image-with-text-image'}
-                                data-testid={'image-with-text-image'}
-                                src={image?.src?.mobile ? image?.src?.mobile : image?.url}
-                                ignoreFallback={true}
-                                alt={alt}
-                                title={alt}
-                                filter={'brightness(40%)'}
-                            />
+                            <ImageComponent/>
                         </LinkWrapper>
                     ) : (
-                        <Image
-                            className={'image-with-text-image'}
-                            data-testid={'image-with-text-image'}
-                            src={image?.src?.mobile ? image?.src?.mobile : image?.url}
-                            ignoreFallback={true}
-                            alt={alt}
-                            title={alt}
-                            filter={'brightness(40%)'}
-                        />
+                        <ImageComponent/>
                     )}
                 </picture>
                 {hasCaption && (
