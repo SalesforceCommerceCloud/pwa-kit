@@ -963,23 +963,14 @@ export const RemoteServerFactory = {
 
         const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes)
 
-        // TODO: get more context on what the handler does
         const handler = (event, context, callback) => {
-            // TODO: remove logs
-            console.log('@@@ console.log | event headers: ', event.headers)
-            console.log(
-                '@@@ console.log | is encode ASII enabled?: ',
-                options?.encodeNonAsciiHttpHeaders
-            )
 
             // encode non ASCII request headers
             if (options?.encodeNonAsciiHttpHeaders) {
-                console.log('@@@ REQUEST HEADERS BEFORE:', event.headers)
 
                 Object.keys(event.headers).forEach((key) => {
                     if (!isASCII(event.headers[key])) {
                         event.headers[key] = encodeURIComponent(event.headers[key])
-                        console.log('@@@ REQUEST Header has been encoded:', key, event.headers[key])
                         // x-encoded-headers keeps track of which headers have been modified and encoded
                         if (event.headers[X_ENCODED_HEADERS]) {
                             // append header key
@@ -992,7 +983,6 @@ export const RemoteServerFactory = {
                     }
                 })
 
-                console.log('@@@ REQUEST HEADERS AFTER:', event.headers)
             }
 
             // We don't want to wait for an empty event loop once the response
@@ -1198,7 +1188,6 @@ const errorHandlerMiddleware = (err, req, res, next) => {
  * @private
  */
 const isASCII = (str) => {
-    // TODO: double check this logic
     return /^[\x20-\x7E]*$/.test(str)
 }
 
@@ -1209,7 +1198,6 @@ const isASCII = (str) => {
  */
 const encodeNonAsciiMiddleware = (req, res, next) => {
     const originalSetHeader = res.setHeader
-    console.log('@@@ RESPONSE HEADERS BEFORE:', res.getHeaders())
 
     res.setHeader = function (key, value) {
         if (!isASCII(value)) {
@@ -1221,7 +1209,6 @@ const encodeNonAsciiMiddleware = (req, res, next) => {
         } else {
             originalSetHeader.call(this, key, value)
         }
-        console.log('@@@ RESPONSE HEADERS AFTER:', res.getHeaders())
     }
 
     next()
