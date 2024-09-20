@@ -152,7 +152,7 @@ export const DevServerMixin = {
         })
 
         // TODO: how does __extensions get used?
-        app.__extensions = extensions || []
+        app.__extensions = extensions
 
         extensions.forEach((extension) => {
             logger.info(`Loading extension: ${extension.name}`)

@@ -105,6 +105,36 @@ describe('extensions', () => {
             })
     })
 
+    test('mixed types in extensions configuration', async () => {
+        const options = opts({
+            mobify: {app: {extensions: [['test-extension', {path: '/foo'}], 'another-extension']}}
+        })
+        const app = RemoteServerFactory._createApp(options)
+        expect(app.__extensions).toBeDefined()
+
+        await request(app)
+            .get('/test-extension')
+            .expect(200)
+            .then((res) => {
+                expect(res.text).toBe('test')
+            })
+
+        await request(app)
+            .get('/another-extension')
+            .expect(200)
+            .then((res) => {
+                expect(res.text).toBe('test')
+            })
+    })
+
+    test('disabled extension will not run', () => {
+        const options = opts({mobify: {app: {extensions: [['test-extension', {enabled: false}]]}}})
+        const app = RemoteServerFactory._createApp(options)
+        // TODO: should this be defined?
+        expect(app.__extensions).toBeDefined()
+        return request(app).get('/test-extension').expect(404)
+    })
+
     test('logs warning when setup-server.js file is not found', () => {
         const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
         const app = RemoteServerFactory._createApp(
