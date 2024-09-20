@@ -56,8 +56,8 @@ import {QueryParameters} from '@salesforce/pwa-kit-runtime/utils/ssr-request-pro
  */
 export const processRequest = ({
     // Uncomment the following lines for the example code to work.
-    headers,
-    setRequestClass,
+    // headers,
+    // setRequestClass,
     // parameters,
     path,
     querystring
