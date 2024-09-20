@@ -19,7 +19,7 @@
     "utils"
   ],
   "scripts": {
-    "build": "cross-env NODE_ENV=production internal-lib-build build",
+    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc",
     "build:watch": "nodemon --watch 'src/**' --exec 'npm run build'",
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
@@ -48,6 +48,7 @@
     "@loadable/component": "^5.15.3",
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@serverless/event-mocks": "^1.1.1",
+    "@types/express": "^4.17.21",
     "aws-lambda-mock-context": "^3.2.1",
     "fs-extra": "^11.1.1",
     "internal-lib-build": "4.0.0-dev",

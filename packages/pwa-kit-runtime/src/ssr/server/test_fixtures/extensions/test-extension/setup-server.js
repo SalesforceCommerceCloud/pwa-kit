@@ -5,18 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-class TestExtension {
-    options
-
-    constructor(options) {
-        this.options = options
-    }
-
-    getName() {
-        return 'TestExtension'
-    }
-
+import {ApplicationExtension} from '../../../extensibility'
+class TestExtension extends ApplicationExtension {
     extendApp(app) {
+        console.log(
+            'ApplicationExtensionApplicationExtensionApplicationExtensionApplicationExtensionApplicationExtensionApplicationExtension: ',
+            ApplicationExtension
+        )
+
         app.get('/test-extension', (req, res) => {
             res.send('test')
         })
