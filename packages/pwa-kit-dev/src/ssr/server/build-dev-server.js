@@ -31,7 +31,6 @@ import {
 import {randomUUID} from 'crypto'
 import chalk from 'chalk'
 import tsx from 'tsx/cjs/api'
-import {expand} from '../../utils/resolver-utils'
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
