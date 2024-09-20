@@ -33,3 +33,12 @@ export const getAppOrigin = () => {
 
     return process.env.APP_ORIGIN
 }
+
+export const getXForwardedInfo = () => {
+    if (typeof window !== 'undefined') {
+        return window.location.origin
+    }
+    const {X_FORWARDED_HOST, X_FORWARDED_FOR, X_FORWARDED_PROTO} = process.env
+
+    return {X_FORWARDED_HOST, X_FORWARDED_FOR, X_FORWARDED_PROTO}
+}

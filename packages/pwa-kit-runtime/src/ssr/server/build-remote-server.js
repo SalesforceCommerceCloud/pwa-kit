@@ -356,6 +356,7 @@ export const RemoteServerFactory = {
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
         this._setupSSRRequestProcessorMiddleware(app)
+        this._setupXForwardedInfo(app)
 
         this._setupLogging(app)
         this._setupMetricsFlushing(app)
@@ -442,6 +443,49 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _addSDKInternalHandlers(app) {
         // This method is used by the dev server, but is not needed here.
+    },
+
+    /**
+     * @private
+     */
+    _setupXForwardedInfo(app) {
+        app.use((req, res, next) => {
+            const xForwardedHost = req.headers?.['x-forwarded-host']
+            console.log('req.headers', req.headers)
+            console.log('xForwardedHost', xForwardedHost)
+            const xForwardedFor = req.headers?.['x-forwarded-for']
+            const xForwardedProto = req.headers?.['x-forwarded-proto']
+            if (xForwardedHost) {
+                process.env.X_FORWARDED_HOST = xForwardedHost
+            }
+            if (xForwardedFor) {
+                process.env.X_FORWARDED_FOR = xForwardedFor
+            }
+            if (xForwardedProto) {
+                process.env.X_FORWARDED_PROTO = xForwardedProto
+            }
+            // since X-FORWARDED-Host is attached to header on the request
+            // and process.env is a global object
+            // we only want to use the env variable when request is coming
+            // once it is done, we should remove it to avoid leaking this value to other requests
+            const afterResponse = () => {
+                if (process.env.X_FORWARDED_HOST) {
+                    delete process.env.X_FORWARDED_HOST
+                }
+                if (process.env.X_FORWARDED_FOR) {
+                    delete process.env.X_FORWARDED_FOR
+                }
+                if (process.env.X_FORWARDED_PROTO) {
+                    delete process.env.X_FORWARDED_PROTO
+                }
+            }
+
+            // Attach event listeners to the Response (we need to attach
+            // both to handle all possible cases)
+            res.on('finish', afterResponse)
+            res.on('close', afterResponse)
+            next()
+        })
     },
 
     /**
@@ -977,9 +1021,6 @@ export const RemoteServerFactory = {
             // the response to the browser.
             context.callbackWaitsForEmptyEventLoop = false
 
-            if (app.options.overrideAppOrigin) {
-                app.options.overrideAppOrigin(event)
-            }
             if (lambdaContainerReused) {
                 // DESKTOP-434 If this Lambda container is being reused,
                 // clean up memory now, so that we start with low usage.
