@@ -15,11 +15,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useLocation} from 'react-router-dom'
 // Chakra
-import {
-    Box,
-    VStack,
-    Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, VStack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const IDPRedirect = () => {
     const navigate = useNavigation()
@@ -57,10 +53,7 @@ const IDPRedirect = () => {
             {!authenticationError && (
                 <VStack>
                     <Text>
-                        <FormattedMessage
-                            defaultMessage="Authenticating"
-                            id="idp.redirect.title"
-                        />
+                        <FormattedMessage defaultMessage="Authenticating" id="idp.redirect.title" />
                     </Text>
                     <Text>
                         <FormattedMessage

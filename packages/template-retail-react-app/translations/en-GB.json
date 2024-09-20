@@ -1053,6 +1053,9 @@
     "defaultMessage": "1 uppercase letter",
     "description": "Password requirement"
   },
+  "passwordless_form.button.log_in": {
+    "defaultMessage": "Log In"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Credit Card"
   },

@@ -2439,6 +2439,12 @@
       "value": "1 uppercase letter"
     }
   ],
+  "passwordless_form.button.log_in": [
+    {
+      "type": 0,
+      "value": "Log In"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,

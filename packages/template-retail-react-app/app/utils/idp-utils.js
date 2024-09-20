@@ -70,7 +70,6 @@ export const redirectToAuthURL = (
         hint: idp
     })
 
-
     const url = `${proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/authorize?${params.toString()}`
 
     window.location.assign(url)

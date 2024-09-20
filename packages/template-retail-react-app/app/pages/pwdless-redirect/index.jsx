@@ -8,9 +8,6 @@
 // This page is here along witht the `callback` route to handle the redirect
 // after a user logs in using the SLAS Implementation
 
-<<<<<<< HEAD
-import React, {Fragment} from 'react'
-=======
 import React, {useState, useEffect, Fragment} from 'react'
 import {Input, Stack, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -18,7 +15,6 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useLocation} from 'react-router-dom'
 import usePasswordlessSignInCallback from '@salesforce/retail-react-app/app/hooks/use-passwordless-signin-callback'
->>>>>>> 6d0ac540a (use passwordlessaccesstoken in sdk)
 
 const PwdlessRedirect = () => {
     const navigate = useNavigation()
