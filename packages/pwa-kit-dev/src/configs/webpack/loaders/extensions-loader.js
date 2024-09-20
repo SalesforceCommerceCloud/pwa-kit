@@ -46,6 +46,7 @@ module.exports = function () {
         }
     })
 
+    // TODO: later consider updating `normalizeExtensionsList` to use a util function
     return dedent`
             /*
             * Copyright (c) 2024, salesforce.com, inc.

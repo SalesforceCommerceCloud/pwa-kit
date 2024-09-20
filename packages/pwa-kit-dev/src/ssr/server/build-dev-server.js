@@ -137,11 +137,14 @@ export const DevServerMixin = {
         logger.info('Setting up extensions...')
 
         // Normalize the extensions list for easier parsing
-        const extensions = expand(options.mobify?.app?.extensions || [])
+        const extensions = (options.mobify?.app?.extensions || [])
             .map((extension) => {
                 return {
-                    name: extension[0],
-                    config: {enabled: true, ...extension[1]}
+                    // TODO: later we'll consider reusing a util function or perhaps eliminate this
+                    name: Array.isArray(extension) ? extension[0] : extension,
+                    config: Array.isArray(extension)
+                        ? {enabled: true, ...extension[1]}
+                        : {enabled: true}
                 }
             })
             .filter((extension) => extension.config.enabled)

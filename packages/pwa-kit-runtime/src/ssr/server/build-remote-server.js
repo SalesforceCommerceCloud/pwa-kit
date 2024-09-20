@@ -665,6 +665,7 @@ export const RemoteServerFactory = {
         const extensions = (options.mobify?.app?.extensions || [])
             .map((extension) => {
                 return {
+                    // TODO: later we'll consider reusing a util function or perhaps eliminate this
                     name: Array.isArray(extension) ? extension[0] : extension,
                     config: Array.isArray(extension)
                         ? {enabled: true, ...extension[1]}
