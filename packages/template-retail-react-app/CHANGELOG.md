@@ -3,6 +3,9 @@
 ### Performance Improvements
 -   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
 
+### New Features
+- Encode non ASCII HTTP headers when `ENCODE_NON_ASCII_HTTP_HEADERS` flag is set to true in `constants.js` [#2009](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2009)
+
 ### Bug Fixes
 - The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
 - Remove save/edit billing action in checkout page for the registered user [#1976](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1976)
