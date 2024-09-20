@@ -11,7 +11,7 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
-import {getAppOrigin, getXForwardedInfo} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
@@ -139,10 +139,6 @@ const App = (props) => {
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useDisclosure()
-
-    const {X_FORWARDED_HOST, X_FORWARDED_FOR, X_FORWARDED_PROTO} = getXForwardedInfo()
-    console.log('getXForwardedInfo', getXForwardedInfo())
-    console.log('process.env', isServer ? process.env : 'client')
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -358,7 +354,6 @@ const App = (props) => {
                                     <>
                                         <AboveHeader />
                                         <div>App Origin: {appOrigin}</div>
-                                        <div>X_FORWARDED_HOST: {X_FORWARDED_HOST}</div>
                                         <Header
                                             onMenuClick={onOpen}
                                             onLogoClick={onLogoClick}

@@ -453,37 +453,35 @@ export const RemoteServerFactory = {
             const xForwardedHost = req.headers?.['x-forwarded-host']
             console.log('req.headers', req.headers)
             console.log('xForwardedHost', xForwardedHost)
-            const xForwardedFor = req.headers?.['x-forwarded-for']
-            const xForwardedProto = req.headers?.['x-forwarded-proto']
             if (xForwardedHost) {
                 process.env.X_FORWARDED_HOST = xForwardedHost
             }
-            if (xForwardedFor) {
-                process.env.X_FORWARDED_FOR = xForwardedFor
-            }
-            if (xForwardedProto) {
-                process.env.X_FORWARDED_PROTO = xForwardedProto
-            }
+            // if (xForwardedFor) {
+            //     process.env.X_FORWARDED_FOR = xForwardedFor
+            // }
+            // if (xForwardedProto) {
+            //     process.env.X_FORWARDED_PROTO = xForwardedProto
+            // }
             // since X-FORWARDED-Host is attached to header on the request
             // and process.env is a global object
             // we only want to use the env variable when request is coming
             // once it is done, we should remove it to avoid leaking this value to other requests
-            const afterResponse = () => {
-                if (process.env.X_FORWARDED_HOST) {
-                    delete process.env.X_FORWARDED_HOST
-                }
-                if (process.env.X_FORWARDED_FOR) {
-                    delete process.env.X_FORWARDED_FOR
-                }
-                if (process.env.X_FORWARDED_PROTO) {
-                    delete process.env.X_FORWARDED_PROTO
-                }
-            }
-
-            // Attach event listeners to the Response (we need to attach
-            // both to handle all possible cases)
-            res.on('finish', afterResponse)
-            res.on('close', afterResponse)
+            // const afterResponse = () => {
+            //     if (process.env.X_FORWARDED_HOST) {
+            //         delete process.env.X_FORWARDED_HOST
+            //     }
+            //     if (process.env.X_FORWARDED_FOR) {
+            //         delete process.env.X_FORWARDED_FOR
+            //     }
+            //     if (process.env.X_FORWARDED_PROTO) {
+            //         delete process.env.X_FORWARDED_PROTO
+            //     }
+            // }
+            //
+            // // Attach event listeners to the Response (we need to attach
+            // // both to handle all possible cases)
+            // res.on('finish', afterResponse)
+            // res.on('close', afterResponse)
             next()
         })
     },
