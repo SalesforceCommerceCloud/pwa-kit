@@ -48,9 +48,7 @@ const options = {
     // environment variable as this endpoint will return HTTP 501 if it is not set
     useSLASPrivateClient: false,
 
-    // TODO: add comment
-    // encodeNonAsciiHttpHeaders: ENCODE_NON_ASCII_HTTP_HEADERS
-    encodeNonAsciiHttpHeaders: true
+    encodeNonAsciiHttpHeaders: ENCODE_NON_ASCII_HTTP_HEADERS
 }
 
 const runtime = getRuntime()
