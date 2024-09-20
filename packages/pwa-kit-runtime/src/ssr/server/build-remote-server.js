@@ -964,10 +964,8 @@ export const RemoteServerFactory = {
         const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes)
 
         const handler = (event, context, callback) => {
-
             // encode non ASCII request headers
             if (options?.encodeNonAsciiHttpHeaders) {
-
                 Object.keys(event.headers).forEach((key) => {
                     if (!isASCII(event.headers[key])) {
                         event.headers[key] = encodeURIComponent(event.headers[key])
@@ -982,7 +980,6 @@ export const RemoteServerFactory = {
                         }
                     }
                 })
-
             }
 
             // We don't want to wait for an empty event loop once the response
