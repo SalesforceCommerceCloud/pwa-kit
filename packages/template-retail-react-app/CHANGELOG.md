@@ -1,5 +1,8 @@
 ## v4.1.0-dev (Aug 8, 2024)
 
+### Performance Improvements
+-   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
+
 ### Bug Fixes
 - The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
 - Remove save/edit billing action in checkout page for the registered user [#1976](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1976)
