@@ -40,7 +40,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
             ignoreFallback={true}
             alt={alt}
             title={alt}
-            filter={heading ? 'brightness(40%)': undefined}
+            filter={heading ? 'brightness(40%)' : undefined}
         />
     )
 
@@ -58,10 +58,10 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                     <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
                     {ITCLink ? (
                         <LinkWrapper {...linkProps}>
-                            <ImageComponent/>
+                            <ImageComponent />
                         </LinkWrapper>
                     ) : (
-                        <ImageComponent/>
+                        <ImageComponent />
                     )}
                 </picture>
                 {hasCaption && (
