@@ -16,6 +16,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import open from 'open'
+import logger from '../../utils/logger-instance'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
@@ -43,7 +44,7 @@ export const DevServerMixin = {
      * @private
      */
     _logStartupMessage(options) {
-        console.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}`)
+        logger.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}`)
     },
 
     /**
@@ -132,38 +133,92 @@ export const DevServerMixin = {
      * @private
      */
     _setupExtensions(app, options) {
+        logger.info('Setting up extensions...')
+
         // TODO: support extensions options array syntax i.e. ['extension-a', {}]
         const extensions = options.mobify?.app?.extensions || []
+        logger.info('Extensions to load', {
+            namespace: 'DevServerMixin._setupExtensions',
+            additionalProperties: {extensions: extensions}
+        })
+
         app.__extensions = extensions || []
 
         extensions.forEach((extension) => {
+            logger.info(`Loading extension: ${extension}`)
+
             const setupServerFilePathBase = path.join(
                 options.projectDir,
                 'node_modules',
                 extension,
+                'src',
                 'setup-server'
             )
-
             let filePath
             if (fs.existsSync(`${setupServerFilePathBase}.ts`)) {
                 filePath = `${setupServerFilePathBase}.ts`
             } else if (fs.existsSync(`${setupServerFilePathBase}.js`)) {
                 filePath = `${setupServerFilePathBase}.js`
             } else {
+                logger.warn(`No setup-server file found for ${extension}. Skipping.`)
                 return
             }
 
-            const setupServer = tsx.require(filePath, __filename)
-            if (!setupServer.default) {
-                console.warn(`Extension ${extension} does not have a default export. Skipping.`)
+            let ExtensionClass
+            try {
+                ExtensionClass = tsx.require(filePath, __filename).default
+            } catch (e) {
+                logger.error(`Error loading extension ${extension}:`, {
+                    namespace: 'DevServerMixin._setupExtensions',
+                    additionalProperties: {error: e}
+                })
                 return
             }
+
+            // Ensure that the default export is a class that implements IExpressApplicationExtension
+            if (ExtensionClass && typeof ExtensionClass !== 'function') {
+                logger.warn(`Extension ${extension} does not export a valid class. Skipping.`)
+                return
+            }
+
+            let extensionInstance
             try {
-                setupServer.default({app, options})
+                logger.info(`Instantiating extension class for ${extension}...`)
+                extensionInstance = new ExtensionClass(options)
+                logger.info(`Successfully instantiated extension ${extension}.`)
             } catch (e) {
-                console.error(`Error setting up extension ${extension}:`, e)
+                logger.error(`Error instantiating extension ${extension}:`, {
+                    namespace: 'DevServerMixin._setupExtensions',
+                    additionalProperties: {error: e}
+                })
+                return
+            }
+
+            // Verify the instance has the methods defined by IExpressApplicationExtension
+            if (
+                typeof extensionInstance.getName !== 'function' ||
+                typeof extensionInstance.extendApp !== 'function'
+            ) {
+                logger.warn(
+                    `Extension ${extension} does not implement IExpressApplicationExtension interface. Skipping.`
+                )
+                return
+            }
+
+            // Extend the app using the provided method
+            try {
+                logger.info(`Extending app using extension ${extension}...`)
+                app = extensionInstance.extendApp(app)
+                logger.info(`Successfully extended app with ${extension}.`)
+            } catch (e) {
+                logger.error(`Error setting extension ${extension}:`, {
+                    namespace: 'DevServerMixin._setupExtensions',
+                    additionalProperties: {error: e}
+                })
             }
         })
+
+        logger.info('Finished setting up extensions.')
     },
 
     /**

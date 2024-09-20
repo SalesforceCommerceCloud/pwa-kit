@@ -513,13 +513,13 @@ const extensions =
     mode === 'production'
         ? (appConfig?.extensions || [])
               .map((extension) => {
-                  const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/setup-server`
+                  const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/src/setup-server`
                   const foundType = ['ts', 'js'].find((type) =>
                       fse.existsSync(`${setupServerFilePathBase}.${type}`)
                   )
 
                   if (!foundType) {
-                      // no setup-server file found, early exit because it's optional
+                      // No setup-server file found, early exit because it's optional
                       return
                   }
 
@@ -530,9 +530,11 @@ const extensions =
                       esModuleInterop: true,
                       skipLibCheck: true
                   }
+
                   let tsConfigFound = fse.existsSync(
                       `${projectDir}/node_modules/${extension}/tsconfig.json`
                   )
+
                   return {
                       name: 'extensions',
                       target: 'node',
@@ -552,10 +554,15 @@ const extensions =
                                   test: /\.ts?$/,
                                   use: {
                                       loader: findDepInStack('ts-loader'),
-                                      // No nothing if tsconfig.json is declared in the extension.
-                                      // Typescript will resolve to it magically.
-                                      // If no tsconfig.json is found, use the default options
-                                      ...(tsConfigFound ? {} : {compilerOptions: defaultTsConfig})
+                                      options: {
+                                          // If tsconfig is not found, ignore tsconfig.json and rely on
+                                          // using the default compilerOptions
+                                          // TODO: Avoid using happyPackMode in the future.
+                                          // This was required to get your PR working because the `tsconfig.json`
+                                          // file was not found.
+                                          happyPackMode: !tsConfigFound,
+                                          compilerOptions: tsConfigFound ? {} : defaultTsConfig
+                                      }
                                   },
                                   exclude: /node_modules/
                               }

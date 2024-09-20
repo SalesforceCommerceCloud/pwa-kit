@@ -802,6 +802,10 @@ describe('SLAS private client proxy', () => {
 })
 
 describe('extensions', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
     test('can register extensions properly via _setupExtensions', () => {
         const app = NoWebpackDevServerFactory._createApp(opts())
         expect(app.__extensions).toBeDefined()
@@ -811,5 +815,48 @@ describe('extensions', () => {
             .then((res) => {
                 expect(res.text).toBe('test')
             })
+    })
+
+    test('logs warning when setup-server file is not found', () => {
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        const app = NoWebpackDevServerFactory._createApp(
+            opts({
+                mobify: {app: {extensions: ['extension-without-setup-server']}}
+            })
+        )
+        expect(warn.mock.calls).toEqual([
+            [
+                'pwa-kit-dev WARN No setup-server file found for extension-without-setup-server. Skipping.'
+            ]
+        ])
+    })
+
+    test('logs error when there is an error loading extension', () => {
+        const errorlog = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const app = NoWebpackDevServerFactory._createApp(
+            opts({
+                mobify: {app: {extensions: ['extension-with-bad-setup-server']}}
+            })
+        )
+        expect(errorlog.mock.calls).toEqual([
+            [
+                'pwa-kit-dev.DevServerMixin._setupExtensions ERROR Error setting extension extension-with-bad-setup-server: {"error":{}}'
+            ]
+        ])
+    })
+
+    test('logs error when instantiating extension throws an error', () => {
+        const errorlog = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const app = NoWebpackDevServerFactory._createApp(
+            opts({
+                mobify: {app: {extensions: ['extension-with-setup-server-no-default-export']}}
+            })
+        )
+
+        expect(errorlog.mock.calls).toEqual([
+            [
+                'pwa-kit-dev.DevServerMixin._setupExtensions ERROR Error instantiating extension extension-with-setup-server-no-default-export: {"error":{}}'
+            ]
+        ])
     })
 })
