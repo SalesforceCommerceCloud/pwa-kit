@@ -56,7 +56,7 @@ test('Clicking Accept does setDNT(false)', async () => {
     renderWithProviders(<MockedComponent />)
 
     // open the modal
-    const acceptButton = screen.getByText('Accept')
+    const acceptButton = screen.getAllByText('Accept')[0]
     await user.click(acceptButton)
 
     await waitFor(() => {
@@ -70,7 +70,7 @@ test('Clicking Decline does setDNT(true)', async () => {
     renderWithProviders(<MockedComponent />)
 
     // open the modal
-    const acceptButton = screen.getByText('Decline')
+    const acceptButton = screen.getAllByText('Decline')[0]
     await user.click(acceptButton)
 
     await waitFor(() => {

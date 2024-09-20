@@ -14,12 +14,12 @@ import {
     ModalCloseButton,
     ModalContent,
     useDisclosure,
-    Box,
     Heading,
     Stack,
     Text,
     Flex
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {useDNT} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 
@@ -36,6 +36,45 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
         updateDNT(null)
         onClose()
     }
+
+    const buttons = (
+        <>
+            <Button
+                bg="white"
+                color="black"
+                border="1px"
+                _hover={{bg: 'gray.100'}}
+                borderColor="gray.100"
+                boxShadow="md"
+                onClick={() => {
+                    updateDNT(true)
+                    onClose()
+                }}
+                width="100%"
+            >
+                <FormattedMessage defaultMessage="Decline" id="dnt_modal.decline" />
+            </Button>
+            <Button
+                onClick={() => {
+                    updateDNT(false)
+                    onClose()
+                }}
+                boxShadow="md"
+                width="100%"
+            >
+                <FormattedMessage defaultMessage="Accept" id="dnt_modal.accept" />
+            </Button>
+        </>
+    )
+
+    const description = (
+        <Text color={'gray.700'} fontWeight={500} marginTop={7}>
+            <FormattedMessage
+                defaultMessage="This website uses cookies to enhance user experience and to analyze performance and traffic on our website. We also share information about your use of our site with our social media, advertising and analytics partners.  By clicking “Accept,” you agree to our website’s cookie use as described in our Cookie Policy. "
+                id="dnt_modal.description"
+            />
+        </Text>
+    )
 
     return (
         <Modal
@@ -65,20 +104,20 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
                     })}
                 />
                 <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={7}>
-                    <Box>
-                        <Heading as="h3" fontSize={25}>
-                            <FormattedMessage
-                                defaultMessage="Tracking Consent"
-                                id="dnt_modal.title"
-                            />
-                        </Heading>
+                    <Heading as="h3" fontSize={25} width="100%">
+                        <FormattedMessage defaultMessage="Tracking Consent" id="dnt_modal.title" />
+                    </Heading>
+                    <HideOnDesktop>
+                        <Flex direction="column">
+                            {description}
+                            <Stack direction="column" spacing={4} mt={4} align="flex-end">
+                                {buttons}
+                            </Stack>
+                        </Flex>
+                    </HideOnDesktop>
+                    <HideOnMobile>
                         <Flex align="center">
-                            <Text color={'gray.700'} fontWeight={500} marginTop={7}>
-                                <FormattedMessage
-                                    defaultMessage="This website uses cookies to enhance user experience and to analyze performance and traffic on our website. We also share information about your use of our site with our social media, advertising and analytics partners.  By clicking “Accept,” you agree to our website’s cookie use as described in our Cookie Policy. You can change your cookie settings at any time by clicking “Preferences.”"
-                                    id="dnt_modal.description"
-                                />
-                            </Text>
+                            {description}
                             <Stack
                                 direction="row"
                                 spacing={4}
@@ -86,38 +125,10 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
                                 marginLeft={6}
                                 align="flex-end"
                             >
-                                <Button
-                                    bg="white"
-                                    color="black"
-                                    border="1px"
-                                    _hover={{bg: 'gray.100'}}
-                                    borderColor="gray.100"
-                                    boxShadow="md"
-                                    onClick={() => {
-                                        updateDNT(true)
-                                        onClose()
-                                    }}
-                                >
-                                    <FormattedMessage
-                                        defaultMessage="Decline"
-                                        id="dnt_modal.decline"
-                                    />
-                                </Button>
-                                <Button
-                                    onClick={() => {
-                                        updateDNT(false)
-                                        onClose()
-                                    }}
-                                    boxShadow="md"
-                                >
-                                    <FormattedMessage
-                                        defaultMessage="Accept"
-                                        id="dnt_modal.accept"
-                                    />
-                                </Button>
+                                {buttons}
                             </Stack>
                         </Flex>
-                    </Box>
+                    </HideOnMobile>
                 </ModalBody>
             </ModalContent>
         </Modal>
