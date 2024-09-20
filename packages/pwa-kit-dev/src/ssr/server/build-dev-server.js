@@ -154,7 +154,6 @@ export const DevServerMixin = {
             additionalProperties: {extensions: extensions}
         })
 
-        // TODO: how does __extensions get used?
         app.__extensions = extensions
 
         extensions.forEach((extension) => {

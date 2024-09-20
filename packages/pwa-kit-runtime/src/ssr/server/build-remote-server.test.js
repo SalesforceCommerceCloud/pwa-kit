@@ -130,7 +130,6 @@ describe('extensions', () => {
     test('disabled extension will not run', () => {
         const options = opts({mobify: {app: {extensions: [['test-extension', {enabled: false}]]}}})
         const app = RemoteServerFactory._createApp(options)
-        // TODO: should this be defined?
         expect(app.__extensions).toBeDefined()
         return request(app).get('/test-extension').expect(404)
     })
