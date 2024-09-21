@@ -356,7 +356,7 @@ export const RemoteServerFactory = {
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
         this._setupSSRRequestProcessorMiddleware(app)
-        this._setupXForwardedInfo(app)
+        this._setXForwardedEnvVars(app)
 
         this._setupLogging(app)
         this._setupMetricsFlushing(app)
@@ -446,12 +446,12 @@ export const RemoteServerFactory = {
     },
 
     /**
+     * Set up environment variables based on x-forward-* headers
      * @private
      */
-    _setupXForwardedInfo(app) {
+    _setXForwardedEnvVars(app) {
         app.use((req, res, next) => {
             const xForwardedHost = req.headers?.['x-forwarded-host']
-            console.log('req.headers', req.headers)
             console.log('xForwardedHost', xForwardedHost)
             if (xForwardedHost) {
                 process.env.X_FORWARDED_HOST = xForwardedHost
