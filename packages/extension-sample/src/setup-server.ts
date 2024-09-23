@@ -9,7 +9,7 @@ import {
     Application as ExpressApplication,
     ApplicationExtension as ExpressApplicationExtension
 } from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
-import {Config} from './types'
+import {ServerExtensionConfig as Config} from './types'
 
 class SampleExtension extends ExpressApplicationExtension<Config> {
 
