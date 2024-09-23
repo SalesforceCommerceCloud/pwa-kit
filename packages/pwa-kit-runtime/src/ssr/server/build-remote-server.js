@@ -356,7 +356,7 @@ export const RemoteServerFactory = {
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
         this._setupSSRRequestProcessorMiddleware(app)
-        this._setXForwardedEnvVars(app)
+        this._setXForwardedEnvVars(app, options)
 
         this._setupLogging(app)
         this._setupMetricsFlushing(app)
@@ -449,39 +449,26 @@ export const RemoteServerFactory = {
      * Set up environment variables based on x-forward-* headers
      * @private
      */
-    _setXForwardedEnvVars(app) {
+    _setXForwardedEnvVars(app, options) {
         app.use((req, res, next) => {
             const xForwardedHost = req.headers?.['x-forwarded-host']
-            console.log('xForwardedHost', xForwardedHost)
             if (xForwardedHost) {
-                process.env.X_FORWARDED_HOST = xForwardedHost
+                process.env.X_FORWARDED_HOST = `${options.protocol}://${xForwardedHost}`
             }
-            // if (xForwardedFor) {
-            //     process.env.X_FORWARDED_FOR = xForwardedFor
-            // }
-            // if (xForwardedProto) {
-            //     process.env.X_FORWARDED_PROTO = xForwardedProto
-            // }
-            // since X-FORWARDED-Host is attached to header on the request
+
+            // since X-FORWARDED-* is attached to header on a request
             // and process.env is a global object
-            // we only want to use the env variable when request is coming
-            // once it is done, we should remove it to avoid leaking this value to other requests
-            // const afterResponse = () => {
-            //     if (process.env.X_FORWARDED_HOST) {
-            //         delete process.env.X_FORWARDED_HOST
-            //     }
-            //     if (process.env.X_FORWARDED_FOR) {
-            //         delete process.env.X_FORWARDED_FOR
-            //     }
-            //     if (process.env.X_FORWARDED_PROTO) {
-            //         delete process.env.X_FORWARDED_PROTO
-            //     }
-            // }
-            //
-            // // Attach event listeners to the Response (we need to attach
-            // // both to handle all possible cases)
-            // res.on('finish', afterResponse)
-            // res.on('close', afterResponse)
+            // we only want to use the env variable when it is existing in a request
+            // once it is done, we should remove it to avoid leaking this value to other places
+            const afterResponse = () => {
+                if (process.env.X_FORWARDED_HOST) {
+                    delete process.env.X_FORWARDED_HOST
+                }
+            }
+            // Attach event listeners to the Response (we need to attach
+            // both to handle all possible cases)
+            res.on('finish', afterResponse)
+            res.on('close', afterResponse)
             next()
         })
     },
