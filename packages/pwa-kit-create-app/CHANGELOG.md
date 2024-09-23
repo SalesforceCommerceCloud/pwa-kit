@@ -1,4 +1,6 @@
 ## v3.8.0-dev (Aug 8, 2024)
+- Update assets/templated files after removing "Shared UI" support in Retail App [#2022](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2022)
+
 
 ## v3.7.0 (Aug 7, 2024)
 
