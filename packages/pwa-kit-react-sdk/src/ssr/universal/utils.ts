@@ -31,7 +31,7 @@ export const getAssetUrl = (path: string) => {
     const publicPath = onClient
         ? // @ts-ignore
           `${window.Progressive.buildOrigin as string}`
-        : `${bundleBasePath as string}/${process.env.BUNDLE_ID || 'development'}/`
+        : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
     return path ? `${publicPath}${path}` : publicPath
 }
 
