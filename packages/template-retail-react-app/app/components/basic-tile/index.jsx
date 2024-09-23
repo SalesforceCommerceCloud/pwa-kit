@@ -13,7 +13,7 @@ import {
     Text,
     AspectRatio,
     useTheme
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {Link} from 'react-router-dom'
 
 import {ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'

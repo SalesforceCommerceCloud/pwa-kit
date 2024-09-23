@@ -14,7 +14,7 @@ import {
     Stack,
     Text,
     Link as ChakraLink
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import RegistrationFields from '@salesforce/retail-react-app/app/components/forms/registration-fields'

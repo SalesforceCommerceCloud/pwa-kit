@@ -20,9 +20,9 @@ import {
     mockedRegisteredCustomer
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 
-jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
+jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual(
-        '@salesforce/retail-react-app/app/components/shared/ui'
+        '@chakra-ui/react'
     )
     return {
         ...originalModule,

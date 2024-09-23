@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import theme from '@salesforce/retail-react-app/app/components/shared/theme'
+import {theme} from '@chakra-ui/theme'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 /**

@@ -12,7 +12,7 @@ import {
     GridItem,
     Skeleton,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 const CheckoutSkeleton = () => {
     return (

@@ -20,7 +20,7 @@ import {
 
     // Hooks
     useTheme
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 // Project Components
 import {ListMenuPopover} from '@salesforce/retail-react-app/app/components/list-menu/list-menu-popover'

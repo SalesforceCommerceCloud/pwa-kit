@@ -15,7 +15,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
-import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Stack} from '@chakra-ui/react'
 import {
     useProduct,
     useProducts,

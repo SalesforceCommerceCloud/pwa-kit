@@ -15,7 +15,7 @@ import {
     AccordionIcon,
     Box,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
 const InformationAccordion = ({product}) => {

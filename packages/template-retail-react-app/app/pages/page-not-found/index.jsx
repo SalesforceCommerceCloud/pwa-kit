@@ -13,7 +13,7 @@ import {
     Button,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {Helmet} from 'react-helmet'
 import {useIntl} from 'react-intl'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'

@@ -16,7 +16,7 @@ import {
     SimpleGrid,
     Stack,
     Tooltip
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {
     formatCreditCardNumber,
     getCreditCardIcon

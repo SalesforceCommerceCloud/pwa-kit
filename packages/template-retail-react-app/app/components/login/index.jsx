@@ -14,7 +14,7 @@ import {
     Button,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'

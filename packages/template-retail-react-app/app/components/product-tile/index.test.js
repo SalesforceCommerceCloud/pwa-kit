@@ -15,11 +15,11 @@ import {
     mockProductSetHit,
     mockStandardProductHit
 } from '@salesforce/retail-react-app/app/mocks/product-search-hit-data'
-import {useBreakpointValue} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useBreakpointValue} from '@chakra-ui/react'
 
-jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
+jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual(
-        '@salesforce/retail-react-app/app/components/shared/ui'
+        '@chakra-ui/react'
     )
     return {
         ...originalModule,

@@ -15,7 +15,7 @@ import {
     RadioGroup,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'

@@ -14,7 +14,7 @@ import {
     Container,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {
     useShopperCustomersMutation,

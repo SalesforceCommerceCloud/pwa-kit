@@ -15,7 +15,7 @@ import {
     SimpleGrid,
     FormControl,
     FormErrorMessage
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {RadioCard, RadioCardGroup} from '@salesforce/retail-react-app/app/components/radio-card'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'

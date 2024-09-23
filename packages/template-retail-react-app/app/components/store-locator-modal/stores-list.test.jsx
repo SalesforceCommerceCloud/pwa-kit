@@ -10,7 +10,7 @@ import StoresList from '@salesforce/retail-react-app/app/components/store-locato
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {Accordion} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Accordion} from '@chakra-ui/react'
 
 const mockSearchStoresData = [
     {

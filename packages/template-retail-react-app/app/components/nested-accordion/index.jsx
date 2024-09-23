@@ -21,7 +21,7 @@ import {
 
     // Hooks
     useStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 // Icons
 import {ChevronDownIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'

@@ -26,7 +26,7 @@ import {
     Divider,
     useDisclosure,
     useMediaQuery
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'

@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box} from '@chakra-ui/react'
 import CurrentPrice from '@salesforce/retail-react-app/app/components/display-price/current-price'
 import ListPrice from '@salesforce/retail-react-app/app/components/display-price/list-price'
 

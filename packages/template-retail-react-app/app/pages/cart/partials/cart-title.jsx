@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {FormattedMessage} from 'react-intl'
-import {Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Heading} from '@chakra-ui/react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 const CartTitle = () => {

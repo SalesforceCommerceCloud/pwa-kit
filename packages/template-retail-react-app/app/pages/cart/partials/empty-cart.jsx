@@ -13,7 +13,7 @@ import {
     Stack,
     Center,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {AccountIcon, BasketIcon} from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
 

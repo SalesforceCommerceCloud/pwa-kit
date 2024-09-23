@@ -34,7 +34,7 @@ Create a new file called `app/pages/page-viewer/index.jsx`, and add the followin
 
 import React from 'react'
 import {useParams} from 'react-router-dom'
-import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box} from '@chakra-ui/react'
 import {usePage} from '@salesforce/commerce-sdk-react'
 import {Page} from '@salesforce/commerce-sdk-react/components'
 import {ImageTile, ImageWithText} from '../../page-designer/assets'

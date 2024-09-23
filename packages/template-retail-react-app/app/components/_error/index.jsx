@@ -15,7 +15,7 @@ import {
     IconButton,
     Stack,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 import {BrandLogo, FileIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {useHistory} from 'react-router-dom'

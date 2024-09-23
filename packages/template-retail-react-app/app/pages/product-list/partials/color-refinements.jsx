@@ -14,7 +14,7 @@ import {
     Button,
     Center,
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {cssColorGroups} from '@salesforce/retail-react-app/app/constants'
 import {useIntl} from 'react-intl'

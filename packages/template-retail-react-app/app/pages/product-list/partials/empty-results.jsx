@@ -12,7 +12,7 @@ import {
     Flex,
     Stack,
     Link
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'

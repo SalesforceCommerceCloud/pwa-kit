@@ -15,7 +15,7 @@ import {
     Grid,
     GridItem,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     CheckoutProvider,

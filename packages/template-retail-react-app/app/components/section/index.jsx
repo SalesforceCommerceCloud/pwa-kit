@@ -13,7 +13,7 @@ import {
     Stack,
     Text,
     Container
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 /**
  * Section component used on content pages like home page.

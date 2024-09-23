@@ -13,7 +13,7 @@ import {
     ModalCloseButton,
     ModalContent,
     ModalOverlay
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
 import {useIntl} from 'react-intl'

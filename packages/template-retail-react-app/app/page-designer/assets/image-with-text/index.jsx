@@ -11,7 +11,7 @@ import {
     Image,
     Link as ChakraLink,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 

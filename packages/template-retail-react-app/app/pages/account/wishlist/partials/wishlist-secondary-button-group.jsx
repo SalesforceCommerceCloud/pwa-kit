@@ -10,7 +10,7 @@ import {
     Button,
     ButtonGroup,
     useDisclosure
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 

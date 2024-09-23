@@ -14,7 +14,7 @@ import {
     Heading,
     SimpleGrid,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {shallowEquals} from '@salesforce/retail-react-app/app/utils/utils'
 import {RadioCard, RadioCardGroup} from '@salesforce/retail-react-app/app/components/radio-card'

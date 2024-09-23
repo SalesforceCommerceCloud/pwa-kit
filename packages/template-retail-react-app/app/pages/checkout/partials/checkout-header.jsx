@@ -12,7 +12,7 @@ import {
     Button,
     Flex,
     Center
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {BasketIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import {HOME_HREF} from '@salesforce/retail-react-app/app/constants'

@@ -7,7 +7,7 @@
 import React from 'react'
 import {useItemVariant} from '.'
 import Link from '@salesforce/retail-react-app/app/components/link'
-import {Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Heading} from '@chakra-ui/react'
 
 /**
  * In the context of a cart product item variant, this components simply renders

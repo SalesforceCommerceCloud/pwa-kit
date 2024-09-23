@@ -13,7 +13,7 @@ import {
     Heading,
     HStack,
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
 const LinksList = ({

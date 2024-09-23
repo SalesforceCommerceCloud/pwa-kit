@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {
     StylesProvider,
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {screen} from '@testing-library/react'
 
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'

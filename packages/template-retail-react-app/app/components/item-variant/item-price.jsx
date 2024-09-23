@@ -11,7 +11,7 @@ import {
     Stack,
     Text,
     useBreakpointValue
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useItemVariant} from '.'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'

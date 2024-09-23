@@ -12,9 +12,9 @@ import {
     Box,
     Center,
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {Link as RouteLink} from 'react-router-dom'
-import {useBreakpointValue} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useBreakpointValue} from '@chakra-ui/react'
 
 /**
  * The Swatch Component displays item inside `SwatchGroup`. For proper keyboard accessibility,

@@ -13,7 +13,7 @@ import {
     IconButton,
     Skeleton,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'
 import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {useIntl} from 'react-intl'

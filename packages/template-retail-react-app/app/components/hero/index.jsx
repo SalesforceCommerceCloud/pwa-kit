@@ -13,7 +13,7 @@ import {
     Heading,
     Stack,
     Image
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 const Hero = ({title, img, actions, ...props}) => {
     const {src, alt} = img

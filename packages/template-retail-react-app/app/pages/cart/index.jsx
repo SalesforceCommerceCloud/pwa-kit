@@ -16,7 +16,7 @@ import {
     Container,
     useDisclosure,
     Button
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 // Project Components
 import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'

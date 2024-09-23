@@ -15,7 +15,7 @@ import {
     AccordionItem,
     Box,
     Button
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
 import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
 

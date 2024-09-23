@@ -13,7 +13,7 @@ import {
     Flex,
     Heading,
     Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 
 const ToggleCardContext = createContext()

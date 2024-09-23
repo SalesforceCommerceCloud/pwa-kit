@@ -20,7 +20,7 @@ import {
     useMultiStyleConfig,
     IconButton,
     HStack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 
 // Project Components
