@@ -76,7 +76,7 @@ module.exports = function () {
             const normalizeExtensionsList = (extensions = []) =>
                 extensions.map((extension) => {
                     return {
-                        name: Array.isArray(extension) ? extension[0] : extension,
+                        packageName: Array.isArray(extension) ? extension[0] : extension,
                         config: Array.isArray(extension) ? {enabled: true, ...extension[1]} : {enabled: true}
                     }
                 })
@@ -86,7 +86,7 @@ module.exports = function () {
                     .filter((extension) => extension.config.enabled)
                     .map((extension) => {
                         // Make sure that the configured extensions are installed, before instantiating them
-                        const found = installedExtensions.find((ext) => ext.packageName === extension.name)
+                        const found = installedExtensions.find((ext) => ext.packageName === extension.packageName)
                         return found ? new found.instanceVariable(extension.config || {}) : false
                     })
                     .filter(Boolean)

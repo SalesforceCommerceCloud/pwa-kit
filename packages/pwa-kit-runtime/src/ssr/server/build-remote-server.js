@@ -666,7 +666,7 @@ export const RemoteServerFactory = {
             .map((extension) => {
                 return {
                     // TODO: later we'll consider reusing a util function or perhaps eliminate this
-                    name: Array.isArray(extension) ? extension[0] : extension,
+                    packageName: Array.isArray(extension) ? extension[0] : extension,
                     config: Array.isArray(extension)
                         ? {enabled: true, ...extension[1]}
                         : {enabled: true}
@@ -684,12 +684,12 @@ export const RemoteServerFactory = {
         let _require
 
         extensions.forEach((extension) => {
-            logger.info(`Loading extension: ${extension.name}`)
+            logger.info(`Loading extension: ${extension.packageName}`)
 
             const setupServerFilePath = path.join(
                 options.buildDir,
                 'extensions',
-                extension.name,
+                extension.packageName,
                 'setup-server.js'
             )
 
@@ -705,11 +705,13 @@ export const RemoteServerFactory = {
                 ExtensionClass = _require(setupServerFilePath).default
             } catch (e) {
                 if (e.message && e.message.startsWith('Cannot find module')) {
-                    logger.warn(`No setup-server.js file found for ${extension.name}. Skipping.`)
+                    logger.warn(
+                        `No setup-server.js file found for ${extension.packageName}. Skipping.`
+                    )
                     return
                 }
 
-                logger.error(`Error loading extension ${extension.name}:`, {
+                logger.error(`Error loading extension ${extension.packageName}:`, {
                     namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -718,17 +720,19 @@ export const RemoteServerFactory = {
 
             // Ensure that the default export is a class that implements IExpressApplicationExtension
             if (ExtensionClass && typeof ExtensionClass !== 'function') {
-                logger.warn(`Extension ${extension.name} does not export a valid class. Skipping.`)
+                logger.warn(
+                    `Extension ${extension.packageName} does not export a valid class. Skipping.`
+                )
                 return
             }
 
             let extensionInstance
             try {
-                logger.info(`Instantiating extension class for ${extension.name}...`)
+                logger.info(`Instantiating extension class for ${extension.packageName}...`)
                 extensionInstance = new ExtensionClass(options, extension.config)
-                logger.info(`Successfully instantiated extension ${extension.name}.`)
+                logger.info(`Successfully instantiated extension ${extension.packageName}.`)
             } catch (e) {
-                logger.error(`Error instantiating extension ${extension.name}:`, {
+                logger.error(`Error instantiating extension ${extension.packageName}:`, {
                     namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -741,18 +745,18 @@ export const RemoteServerFactory = {
                 typeof extensionInstance.extendApp !== 'function'
             ) {
                 logger.warn(
-                    `Extension ${extension.name} does not implement IExpressApplicationExtension interface. Skipping.`
+                    `Extension ${extension.packageName} does not implement IExpressApplicationExtension interface. Skipping.`
                 )
                 return
             }
 
             // Extend the app using the provided method
             try {
-                logger.log(`Extending app using extension ${extension.name}...`)
+                logger.log(`Extending app using extension ${extension.packageName}...`)
                 app = extensionInstance.extendApp(app)
-                logger.log(`Successfully extended app with ${extension.name}.`)
+                logger.log(`Successfully extended app with ${extension.packageName}.`)
             } catch (e) {
-                logger.error(`Error setting extension ${extension.name}:`, {
+                logger.error(`Error setting extension ${extension.packageName}:`, {
                     namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })
