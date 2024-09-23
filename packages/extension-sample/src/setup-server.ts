@@ -8,8 +8,8 @@
 import {
     Application as ExpressApplication,
     ApplicationExtension as ExpressApplicationExtension,
+    ApplicationExtensionConfig
 } from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
-import {ApplicationExtensionConfig} from '@salesforce/pwa-kit-runtime/ssr/server/extensibility/types'
 
 interface Config extends ApplicationExtensionConfig {
     path?: string

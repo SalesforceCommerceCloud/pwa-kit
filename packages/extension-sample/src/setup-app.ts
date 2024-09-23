@@ -7,8 +7,7 @@
 
 import React from 'react'
 import loadable from '@loadable/component'
-import {IRouteConfig, ApplicationExtensionConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility/types'
-import {ApplicationExtension} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
+import {ApplicationExtension, ApplicationExtensionConfig, IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
 
 import withRedBorder from './components/with-red-border'
 
