@@ -5,17 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-class Extension {
-    options
+import {ApplicationExtension} from '../../../extensibility'
 
-    constructor(options) {
-        this.options = options
-    }
-
-    getName() {
-        return 'Extension'
-    }
-
+class Extension extends ApplicationExtension {
     extendApp(app) {
         throw new Error('extension will fail to initialize because of me')
     }

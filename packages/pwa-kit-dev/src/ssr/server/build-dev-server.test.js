@@ -855,7 +855,7 @@ describe('extensions', () => {
 
         expect(errorlog.mock.calls).toEqual([
             [
-                'pwa-kit-dev.DevServerMixin._setupExtensions ERROR Error instantiating extension extension-with-setup-server-no-default-export: {"error":{}}'
+                `pwa-kit-dev.DevServerMixin._setupExtensions ERROR 'extension-with-setup-server-no-default-export' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`
             ]
         ])
     })
