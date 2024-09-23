@@ -238,7 +238,7 @@ test('clicking a filter on search result will change url', async () => {
     )
 })
 
-test('should render instagram promo banner', async () => {
+test('should render promo banner', async () => {
     global.server.use(
         rest.get('*/pages/instagram-promo-banner', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockImageWithText))
@@ -246,13 +246,13 @@ test('should render instagram promo banner', async () => {
     )
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
-    expect(await screen.findByTestId('sf-instagram-promo-banner')).toBeInTheDocument()
+    expect(await screen.findByTestId('sf-promo-banner')).toBeInTheDocument()
 })
 
 test.each([
     [500, mockImageWithText],
     [500, undefined]
-])('should not render instagram promo banner', async (statusCode, response) => {
+])('should not render promo banner', async (statusCode, response) => {
     global.server.use(
         rest.get('*/pages/instagram-promo-banner', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(statusCode), ctx.json(response))
@@ -260,5 +260,5 @@ test.each([
     )
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />)
-    expect(await screen.queryByTestId('sf-instagram-promo-banner')).toBeNull()
+    expect(await screen.queryByTestId('sf-promo-banner')).toBeNull()
 })

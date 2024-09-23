@@ -403,12 +403,13 @@ const ProductList = (props) => {
     }, [productSearchResult])
 
     /**************** Page Designer ****************/
+    const PROMO_BANNER_PAGE_ID = 'instagram-promo-banner'
     const PAGEDESIGNER_TO_COMPONENT = {
         'commerce_assets.productListTile': ImageWithText,
         'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
     }
-    const {data: instagramPromoBanner, error: pageError} = usePage({
-        parameters: {pageId: 'instagram-promo-banner'}
+    const {data: promoBanner, error: pageError} = usePage({
+        parameters: {pageId: PROMO_BANNER_PAGE_ID}
     })
 
     return (
@@ -430,11 +431,11 @@ const ProductList = (props) => {
                 <>
                     <AbovePageHeader />
                     {/* Banner */}
-                    {instagramPromoBanner && !pageError && (
+                    {promoBanner && !pageError && (
                         <Page
-                            page={instagramPromoBanner}
+                            page={promoBanner}
                             components={PAGEDESIGNER_TO_COMPONENT}
-                            data-testid={'sf-instagram-promo-banner'}
+                            data-testid={'sf-promo-banner'}
                         />
                     )}
 
