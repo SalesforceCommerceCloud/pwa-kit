@@ -15,16 +15,16 @@ import {Application} from './types'
  *
  * @abstract
  */
-export default abstract class ApplicationExtension {
-    private serverOptions: Record<string, any>
-    private extensionConfig: Record<string, any>
+export default abstract class ApplicationExtension<Config> {
+    private serverOptions: Record<string, unknown>
+    private extensionConfig: Config
 
     /**
      * Constructs a new instance of the ApplicationExtension class.
      *
      * @param config - The configuration object used to set up the extension.
      */
-    constructor(serverOptions: Record<string, any>, config: Record<string, any>) {
+    constructor(serverOptions: Record<string, unknown>, config: Config) {
         this.serverOptions = serverOptions
         this.extensionConfig = config
     }
@@ -35,8 +35,18 @@ export default abstract class ApplicationExtension {
      * @protected
      * @returns config - The configuration object.
      */
-    public getConfig(): Record<string, any> {
+    public getConfig(): Config {
         return this.extensionConfig
+    }
+
+    /**
+     * Returns the SSR options that were used to instantiate the server.
+     *
+     * @protected
+     * @returns serverOptions - The server options
+     */
+    public getServerOptions(): Record<string, unknown> {
+        return this.serverOptions
     }
 
     /**

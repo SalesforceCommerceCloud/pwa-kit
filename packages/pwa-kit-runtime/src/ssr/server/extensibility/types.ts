@@ -7,3 +7,7 @@
 import {Application} from 'express'
 
 export type {Application}
+
+export interface ApplicationExtensionConfig extends Record<string, unknown> {
+    enabled: boolean
+}
