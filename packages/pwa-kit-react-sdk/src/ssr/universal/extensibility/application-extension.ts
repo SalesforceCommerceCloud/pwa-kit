@@ -6,10 +6,6 @@
  */
 import {IRouteConfig} from './types'
 
-export interface ApplicationExtensionConfig extends Record<string, unknown> {
-    enabled: boolean
-}
-
 /**
  * An abstract class representing an Application Extension. This class provides
  * foundational methods and properties for extending an application with additional

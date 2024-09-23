@@ -13,3 +13,7 @@ export interface IRouteConfig {
     exact?: boolean
     component: React.ComponentType<any>
 }
+
+export interface ApplicationExtensionConfig extends Record<string, unknown> {
+    enabled: boolean
+}

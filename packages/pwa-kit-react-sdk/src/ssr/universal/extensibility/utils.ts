@@ -7,7 +7,8 @@
 
 import React from 'react'
 import {applyHOCs} from '../utils'
-import ApplicationExtension, {ApplicationExtensionConfig} from './application-extension'
+import ApplicationExtension from './application-extension'
+import {ApplicationExtensionConfig} from './types'
 
 /**
  * Given the provided Application, apply all the App extensions to it.
