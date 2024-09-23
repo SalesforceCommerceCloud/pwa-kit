@@ -1,5 +1,5 @@
 ## v4.1.0-dev (Aug 8, 2024)
-- Remove "Shared UI" folder as we are not supporting replacement of Chakra UI for this template []()
+- Remove "Shared UI" folder as we are not supporting replacement of Chakra UI for this template [#2022](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2022)
 
 ### Bug Fixes
 - The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
