@@ -17,10 +17,8 @@ class SampleExtension extends ExpressApplicationExtension<Config> {
 
         app.get('/sample', (req, res) => {
             console.log('SampleExtension extendApp GET /sample')
-            this.getConfig
             res.send(
                 `<p>Hello from an express SampleExtension!</p>
-                <pre>options = ${JSON.stringify(this.getServerOptions())}</pre>
                 <pre>extensionConfig = ${JSON.stringify(this.getConfig())}</pre>`
             )
         })
