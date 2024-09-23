@@ -7,14 +7,9 @@
 
 import {
     Application as ExpressApplication,
-    ApplicationExtension as ExpressApplicationExtension,
-    ApplicationExtensionConfig
+    ApplicationExtension as ExpressApplicationExtension
 } from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
-
-interface Config extends ApplicationExtensionConfig {
-    path?: string
-
-}
+import {Config} from './types'
 
 class SampleExtension extends ExpressApplicationExtension<Config> {
 
