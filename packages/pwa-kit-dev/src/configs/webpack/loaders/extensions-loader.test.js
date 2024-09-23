@@ -75,13 +75,16 @@ describe('Extension Loader', () => {
                 })
 
             export const getExtensions = () => {
-                const configuredExtensions = normalizeExtensionsList(getConfig()?.app?.extensions) || []
-                const enabledExtensions = configuredExtensions.filter((extension) => extension.config.enabled)
+                const configuredExtensions = (normalizeExtensionsList(getConfig()?.app?.extensions) || [])
+                    .filter((extension) => extension.config.enabled)
+                    .map((extension) => {
+                        // Make sure that the configured extensions are installed, before instantiating them
+                        const found = installedExtensions.find((ext) => ext.packageName === extension.name)
+                        return found ? new found.instanceVariable(extension.config || {}) : false
+                    })
+                    .filter(Boolean)
 
-                return enabledExtensions.map((extension) => {
-                    const found = installedExtensions.find((ext) => ext.packageName === extension.name)
-                    return found ? new found.instanceVariable(extension.config || {}) : false
-                }).filter(Boolean)
+                return configuredExtensions
             }
         `)
     })
