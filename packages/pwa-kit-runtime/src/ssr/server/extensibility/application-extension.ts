@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-// import {Application} from './types'
-import {Application} from 'express'
+import {Application} from './types'
+
 /**
  * An abstract class representing an Application Extension. This class provides
  * foundational methods and properties for extending an application with additional
