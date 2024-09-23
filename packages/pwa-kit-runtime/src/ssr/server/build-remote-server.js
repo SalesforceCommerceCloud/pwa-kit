@@ -716,7 +716,7 @@ export const RemoteServerFactory = {
                 logger.error(
                     `'${extension}' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`,
                     {
-                        namespace: 'DevServerMixin._setupExtensions'
+                        namespace: 'RemoteServerFactory._setupExtensions'
                     }
                 )
                 return
