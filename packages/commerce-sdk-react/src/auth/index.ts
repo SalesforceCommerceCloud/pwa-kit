@@ -310,7 +310,7 @@ class Auth {
         // Set the cookie once to include dnt in the access token and then again to set the expiry time
         this.set(DNT_COOKIE_NAME, dntCookieVal, {
             ...getDefaultCookieAttributes(),
-            domain: domain,
+            ...(domain !== undefined && {domain: domain}),
             secure: true
         })
         const accessToken = this.getAccessToken()
@@ -327,7 +327,7 @@ class Auth {
             this.set(DNT_COOKIE_NAME, dntCookieVal, {
                 ...getDefaultCookieAttributes(),
                 secure: true,
-                domain: domain,
+                ...(domain !== undefined && {domain: domain}),
                 expires: Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
             })
         }

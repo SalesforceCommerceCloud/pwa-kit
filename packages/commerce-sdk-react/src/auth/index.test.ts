@@ -553,4 +553,27 @@ describe('Auth', () => {
             )
         })
     })
+    test('setDNT(boolean, hostname) sets with domain attribute', async () => {
+        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(true, 'example.com')
+        expect(setDntSpiedOn).toHaveBeenLastCalledWith(
+            'dw_dnt',
+            '1',
+            expect.objectContaining({domain: 'example.com'})
+        )
+    })
+
+    test('setDNT(boolean) sets cookie withOUT domain attribute', async () => {
+        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(true)
+        await waitFor(() => {
+            expect(setDntSpiedOn).not.toHaveBeenCalledWith(
+                'dw_dnt',
+                '1',
+                expect.objectContaining({domain: 'example.com'})
+            )
+        })
+    })
 })
