@@ -21,7 +21,6 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
-import {ENCODE_NON_ASCII_HTTP_HEADERS} from '@salesforce/retail-react-app/app/constants'
 
 const options = {
     // The build directory (an absolute path)
@@ -52,7 +51,7 @@ const options = {
     // If there any HTTP headers that have been encoded, an additional header will be
     // passed, `x-encoded-headers`, containing a comma separated list
     // of the keys of headers that have been encoded
-    encodeNonAsciiHttpHeaders: ENCODE_NON_ASCII_HTTP_HEADERS
+    encodeNonAsciiHttpHeaders: false
 }
 
 const runtime = getRuntime()

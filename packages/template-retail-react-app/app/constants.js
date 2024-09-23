@@ -201,5 +201,3 @@ export const STORE_LOCATOR_DISTANCE = 100
 export const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
 export const STORE_LOCATOR_DISTANCE_UNIT = 'km'
 export const STORE_LOCATOR_IS_ENABLED = true
-
-export const ENCODE_NON_ASCII_HTTP_HEADERS = false
