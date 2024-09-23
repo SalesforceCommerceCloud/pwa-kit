@@ -19,6 +19,8 @@ import open from 'open'
 import logger from '../../utils/logger-instance'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
+import {ApplicationExtension} from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
+
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {
@@ -177,6 +179,7 @@ export const DevServerMixin = {
 
             let ExtensionClass
             try {
+                console.log('filePath, __filename: ', filePath, __filename)
                 ExtensionClass = tsx.require(filePath, __filename).default
             } catch (e) {
                 logger.error(`Error loading extension ${extension.packageName}:`, {
@@ -186,10 +189,18 @@ export const DevServerMixin = {
                 return
             }
 
-            // Ensure that the default export is a class that implements IExpressApplicationExtension
-            if (ExtensionClass && typeof ExtensionClass !== 'function') {
-                logger.warn(
-                    `Extension ${extension.packageName} does not export a valid class. Skipping.`
+            // Ensure that the default export is a class that extends abstract class "ApplicationExtension".
+            const isPrototype = Object.prototype.isPrototypeOf.call(
+                ApplicationExtension.prototype,
+                ExtensionClass?.prototype
+            )
+
+            if (!isPrototype) {
+                logger.error(
+                    `'${extension.packageName}' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`,
+                    {
+                        namespace: 'DevServerMixin._setupExtensions'
+                    }
                 )
                 return
             }
@@ -204,17 +215,6 @@ export const DevServerMixin = {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })
-                return
-            }
-
-            // Verify the instance has the methods defined by IExpressApplicationExtension
-            if (
-                typeof extensionInstance.getName !== 'function' ||
-                typeof extensionInstance.extendApp !== 'function'
-            ) {
-                logger.warn(
-                    `Extension ${extension.packageName} does not implement IExpressApplicationExtension interface. Skipping.`
-                )
                 return
             }
 

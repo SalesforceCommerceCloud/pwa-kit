@@ -50,6 +50,7 @@ import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware} from 'http-proxy-middleware'
+import {ApplicationExtension} from './extensibility'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -654,7 +655,7 @@ export const RemoteServerFactory = {
      * This function assumes that optionally, there is a `setup-server.js`
      * file in each extension directory in the build.
      *
-     * This file should export a default which is a IExpressApplicationExtension class.
+     * This file should export a default which is a class extending ApplicationExtension abstract class.
      *
      * @private
      */
@@ -718,10 +719,18 @@ export const RemoteServerFactory = {
                 throw e
             }
 
-            // Ensure that the default export is a class that implements IExpressApplicationExtension
-            if (ExtensionClass && typeof ExtensionClass !== 'function') {
-                logger.warn(
-                    `Extension ${extension.packageName} does not export a valid class. Skipping.`
+            // Ensure that the default export is a class that extends abstract class "ApplicationExtension".
+            const isPrototype = Object.prototype.isPrototypeOf.call(
+                ApplicationExtension.prototype,
+                ExtensionClass?.prototype
+            )
+
+            if (!isPrototype) {
+                logger.error(
+                    `'${extension.packageName}' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`,
+                    {
+                        namespace: 'RemoteServerFactory._setupExtensions'
+                    }
                 )
                 return
             }
@@ -736,17 +745,6 @@ export const RemoteServerFactory = {
                     namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })
-                return
-            }
-
-            // Verify the instance has the methods defined by IExpressApplicationExtension
-            if (
-                typeof extensionInstance.getName !== 'function' ||
-                typeof extensionInstance.extendApp !== 'function'
-            ) {
-                logger.warn(
-                    `Extension ${extension.packageName} does not implement IExpressApplicationExtension interface. Skipping.`
-                )
                 return
             }
 

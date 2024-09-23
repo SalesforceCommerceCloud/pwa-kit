@@ -5,31 +5,20 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { IExpressApplicationExtension } from '@salesforce/pwa-kit-runtime/ssr/server/extensibility/types'
-import { Application } from 'express'
+import {
+    Application as ExpressApplication,
+    ApplicationExtension as ExpressApplicationExtension
+} from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
 
-// TODO: type the extensionConfig
-// NOTE: Ben will update this to use an abstract class
-class SampleExtension implements IExpressApplicationExtension {
-    private options: any
-    private extensionConfig: any
+class SampleExtension extends ExpressApplicationExtension {
 
-    constructor(options: any, extensionConfig: any) {
-        this.options = options
-        this.extensionConfig = extensionConfig
-    }
-
-    getName(): string {
-        return 'SampleExtension'
-    }
-
-    extendApp(app: Application): Application {
+    extendApp(app: ExpressApplication): ExpressApplication {
 
         app.get('/sample', (req, res) => {
             console.log('SampleExtension extendApp GET /sample')
             res.send(
                 `<p>Hello from an express SampleExtension!</p>
-                <pre>options = ${JSON.stringify(this.options)}</pre>
+                <pre>options = ${JSON.stringify(this.serverOptions)}</pre>
                 <pre>extensionConfig = ${JSON.stringify(this.extensionConfig)}</pre>`
             )
         })
