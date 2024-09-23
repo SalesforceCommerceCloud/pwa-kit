@@ -16,6 +16,10 @@ class TestExtension extends ApplicationExtension {
         app.get('/test-extension', (req, res) => {
             res.send('test')
         })
+        app.get('/test-extension-config', (req, res) => {
+            const config = JSON.stringify(this.getConfig())
+            res.send(config)
+        })
 
         return app
     }

@@ -837,6 +837,14 @@ describe('extensions', () => {
             .then((res) => {
                 expect(res.text).toBe('test')
             })
+
+        await request(app)
+            .get('/test-extension-config')
+            .expect(200)
+            .then((res) => {
+                // The config should have {enabled: true} by default
+                expect(res.text).toBe('{"enabled":true,"path":"/foo"}')
+            })
     })
 
     test('disabled extension will not run', () => {
