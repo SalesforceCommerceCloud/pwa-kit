@@ -7,16 +7,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
-import {
-    Box,
-    Button,
-    Checkbox,
-    Container,
-    Heading,
-    Stack,
-    Text,
-    Divider
-} from '@chakra-ui/react'
+import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'

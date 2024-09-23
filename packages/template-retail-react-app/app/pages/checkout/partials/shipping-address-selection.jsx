@@ -7,14 +7,7 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
-import {
-    Box,
-    Button,
-    Container,
-    Heading,
-    SimpleGrid,
-    Stack
-} from '@chakra-ui/react'
+import {Box, Button, Container, Heading, SimpleGrid, Stack} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {shallowEquals} from '@salesforce/retail-react-app/app/utils/utils'
 import {RadioCard, RadioCardGroup} from '@salesforce/retail-react-app/app/components/radio-card'

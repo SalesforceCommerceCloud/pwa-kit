@@ -21,9 +21,7 @@ import {
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 
 jest.mock('@chakra-ui/react', () => {
-    const originalModule = jest.requireActual(
-        '@chakra-ui/react'
-    )
+    const originalModule = jest.requireActual('@chakra-ui/react')
     return {
         ...originalModule,
         useMediaQuery: jest.fn().mockReturnValue([true])

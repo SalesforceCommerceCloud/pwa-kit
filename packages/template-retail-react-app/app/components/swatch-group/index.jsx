@@ -7,12 +7,7 @@
 
 import React, {Children, useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {
-    Flex,
-    Box,
-    HStack,
-    useStyleConfig
-} from '@chakra-ui/react'
+import {Flex, Box, HStack, useStyleConfig} from '@chakra-ui/react'
 import {FormattedMessage} from 'react-intl'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 

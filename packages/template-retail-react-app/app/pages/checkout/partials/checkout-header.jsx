@@ -6,13 +6,7 @@
  */
 import React from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    Badge,
-    Box,
-    Button,
-    Flex,
-    Center
-} from '@chakra-ui/react'
+import {Badge, Box, Button, Flex, Center} from '@chakra-ui/react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {BasketIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import {HOME_HREF} from '@salesforce/retail-react-app/app/constants'

@@ -7,12 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {
-    SimpleGrid,
-    Button,
-    Center,
-    useMultiStyleConfig
-} from '@chakra-ui/react'
+import {SimpleGrid, Button, Center, useMultiStyleConfig} from '@chakra-ui/react'
 import {
     ADD_FILTER,
     REMOVE_FILTER

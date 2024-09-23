@@ -8,15 +8,7 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import ccValidator from 'card-validator'
 import {useIntl} from 'react-intl'
-import {
-    Box,
-    Flex,
-    FormLabel,
-    InputRightElement,
-    SimpleGrid,
-    Stack,
-    Tooltip
-} from '@chakra-ui/react'
+import {Box, Flex, FormLabel, InputRightElement, SimpleGrid, Stack, Tooltip} from '@chakra-ui/react'
 import {
     formatCreditCardNumber,
     getCreditCardIcon

@@ -18,9 +18,7 @@ import {within} from '@testing-library/react'
 import {useMediaQuery} from '@chakra-ui/react'
 
 jest.mock('@chakra-ui/react', () => {
-    const originalModule = jest.requireActual(
-        '@chakra-ui/react'
-    )
+    const originalModule = jest.requireActual('@chakra-ui/react')
     return {
         ...originalModule,
         useMediaQuery: jest.fn()

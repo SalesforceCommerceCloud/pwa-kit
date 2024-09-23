@@ -8,15 +8,7 @@ import React, {useState, useMemo} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
-import {
-    Box,
-    Stack,
-    Grid,
-    GridItem,
-    Container,
-    useDisclosure,
-    Button
-} from '@chakra-ui/react'
+import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
 
 // Project Components
 import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'

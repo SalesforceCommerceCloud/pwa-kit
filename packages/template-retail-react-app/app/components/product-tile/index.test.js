@@ -18,9 +18,7 @@ import {
 import {useBreakpointValue} from '@chakra-ui/react'
 
 jest.mock('@chakra-ui/react', () => {
-    const originalModule = jest.requireActual(
-        '@chakra-ui/react'
-    )
+    const originalModule = jest.requireActual('@chakra-ui/react')
     return {
         ...originalModule,
         useBreakpointValue: jest.fn()

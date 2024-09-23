@@ -7,13 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Box,
-    Img,
-    Text,
-    AspectRatio,
-    useTheme
-} from '@chakra-ui/react'
+import {Box, Img, Text, AspectRatio, useTheme} from '@chakra-ui/react'
 import {Link} from 'react-router-dom'
 
 import {ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'

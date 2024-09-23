@@ -6,10 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    StylesProvider,
-    useMultiStyleConfig
-} from '@chakra-ui/react'
+import {StylesProvider, useMultiStyleConfig} from '@chakra-ui/react'
 import {screen} from '@testing-library/react'
 
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
