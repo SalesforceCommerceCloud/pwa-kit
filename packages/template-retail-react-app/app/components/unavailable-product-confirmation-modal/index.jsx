@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/constants'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
-import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useDisclosure} from '@chakra-ui/react'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 /**

@@ -7,13 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalOverlay
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay} from '@chakra-ui/react'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
 import {useIntl} from 'react-intl'

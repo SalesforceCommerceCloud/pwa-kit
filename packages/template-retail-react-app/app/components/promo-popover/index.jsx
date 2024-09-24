@@ -17,7 +17,7 @@ import {
     PopoverHeader,
     PopoverTrigger,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {InfoIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {FormattedMessage, useIntl} from 'react-intl'
 

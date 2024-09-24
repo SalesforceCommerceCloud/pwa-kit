@@ -8,7 +8,7 @@
 import React from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Box, Button, Wrap, WrapItem} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Wrap, WrapItem} from '@chakra-ui/react'
 import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {REMOVE_FILTER} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
 

@@ -9,7 +9,7 @@ import {createMemoryHistory} from 'history'
 import {Router, useHistory, useLocation} from 'react-router-dom'
 import {screen, fireEvent, waitFor} from '@testing-library/react'
 
-import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box} from '@chakra-ui/react'
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group/index'
 import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'

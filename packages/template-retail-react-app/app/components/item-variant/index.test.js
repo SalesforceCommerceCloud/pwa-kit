@@ -15,12 +15,10 @@ import {
     wishlistVariant
 } from '@salesforce/retail-react-app/app/components/item-variant/data.mock'
 import {within} from '@testing-library/react'
-import {useMediaQuery} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useMediaQuery} from '@chakra-ui/react'
 
-jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
-    const originalModule = jest.requireActual(
-        '@salesforce/retail-react-app/app/components/shared/ui'
-    )
+jest.mock('@chakra-ui/react', () => {
+    const originalModule = jest.requireActual('@chakra-ui/react')
     return {
         ...originalModule,
         useMediaQuery: jest.fn()

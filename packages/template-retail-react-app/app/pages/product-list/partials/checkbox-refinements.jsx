@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Box, Checkbox, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Checkbox, Stack} from '@chakra-ui/react'
 import {
     ADD_FILTER,
     REMOVE_FILTER

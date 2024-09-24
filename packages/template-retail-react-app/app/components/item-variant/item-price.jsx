@@ -7,11 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import {
-    Stack,
-    Text,
-    useBreakpointValue
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, Text, useBreakpointValue} from '@chakra-ui/react'
 import {useItemVariant} from '.'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'

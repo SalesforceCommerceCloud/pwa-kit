@@ -15,7 +15,7 @@ import {
 
     // Hooks
     useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 // Icons
 import {

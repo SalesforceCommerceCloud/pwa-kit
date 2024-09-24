@@ -10,17 +10,7 @@ import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
 
-import {
-    Flex,
-    Heading,
-    Button,
-    Skeleton,
-    Box,
-    Text,
-    VStack,
-    Fade,
-    useTheme
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 

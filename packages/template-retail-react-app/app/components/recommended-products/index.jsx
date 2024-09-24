@@ -8,7 +8,7 @@
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Button} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button} from '@chakra-ui/react'
 import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'

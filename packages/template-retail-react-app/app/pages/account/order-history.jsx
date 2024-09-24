@@ -21,7 +21,7 @@ import {
     AspectRatio,
     Img,
     Skeleton
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'

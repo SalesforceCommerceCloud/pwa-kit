@@ -10,13 +10,7 @@ import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
 // Components
-import {
-    AccordionItem,
-    AccordionButton,
-    AccordionIcon,
-    AccordionPanel,
-    Box
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box} from '@chakra-ui/react'
 
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()

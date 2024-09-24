@@ -7,14 +7,9 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {
-    Button,
-    Box,
-    Center,
-    useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button, Box, Center, useMultiStyleConfig} from '@chakra-ui/react'
 import {Link as RouteLink} from 'react-router-dom'
-import {useBreakpointValue} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useBreakpointValue} from '@chakra-ui/react'
 
 /**
  * The Swatch Component displays item inside `SwatchGroup`. For proper keyboard accessibility,

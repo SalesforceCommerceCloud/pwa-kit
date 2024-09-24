@@ -15,7 +15,7 @@ import {
     ModalCloseButton,
     ModalContent,
     useBreakpointValue
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 
 // Others

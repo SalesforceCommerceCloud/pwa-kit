@@ -9,13 +9,7 @@ import React, {useState, useContext} from 'react'
 import {useIntl} from 'react-intl'
 
 // Components
-import {
-    Heading,
-    Accordion,
-    AccordionItem,
-    Box,
-    Button
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Heading, Accordion, AccordionItem, Box, Button} from '@chakra-ui/react'
 import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
 import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
 

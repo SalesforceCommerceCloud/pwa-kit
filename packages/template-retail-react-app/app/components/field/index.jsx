@@ -17,7 +17,7 @@ import {
     InputRightElement,
     Select,
     Checkbox
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {
     VisibilityIcon,
     VisibilityOffIcon,

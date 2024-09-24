@@ -20,7 +20,7 @@ import {
     AccordionItem,
     AccordionButton,
     AccordionPanel
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'

@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box} from '@chakra-ui/react'
 
 /**
  * Render the children in the DOM but visually hide them on desktop
