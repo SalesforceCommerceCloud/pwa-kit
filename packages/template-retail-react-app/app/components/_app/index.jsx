@@ -16,7 +16,8 @@ import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
-    useShopperBasketsMutation
+    useShopperBasketsMutation,
+    usePasswordless
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
@@ -163,7 +164,8 @@ const App = (props) => {
     const is404ForMissingTranslationFile = /\/static\/translations\/compiled\/[^.]+\.json$/.test(
         location?.pathname
     )
-
+    const {getPasswordLessAccessToken} = usePasswordless()
+    console.log("(JEREMY) getPasswordLessAccessToken: ", getPasswordLessAccessToken)
     // Fetch the translation message data using the target locale.
     const {data: messages} = useQuery({
         queryKey: ['app', 'translations', 'messages', targetLocale],
@@ -270,6 +272,16 @@ const App = (props) => {
     useEffect(() => {
         trackPage()
     }, [location])
+
+      // State to store the value of the text input
+    const [inputValue, setInputValue] = useState('');
+
+    // Function to handle form submission
+    const handleSubmit = (event) => {
+        event.preventDefault(); // Prevent the default form submission behavior
+        // Call a function with the input value as a parameter
+        getPasswordLessAccessToken(inputValue);
+    };
 
     return (
         <Box className="sf-app" {...styles.container}>
@@ -418,6 +430,17 @@ const App = (props) => {
                                 {!isCheckout ? <Footer /> : <CheckoutFooter />}
 
                                 <AuthModal {...authModal} />
+                                <form onSubmit={handleSubmit}>
+                                    <label>
+                                        Enter text:
+                                        <input
+                                        type="text"
+                                        value={inputValue}
+                                        onChange={(e) => setInputValue(e.target.value)}
+                                        />
+                                    </label>
+                                    <button type="submit">Submit</button>
+                                    </form>
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>

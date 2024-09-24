@@ -133,7 +133,7 @@ export const RemoteServerFactory = {
             // client secret handler will inject an Authorization header.
             // Do not modify unless a project wants to customize additional SLAS
             // endpoints that we currently do not support (ie. /oauth2/passwordless/token)
-            applySLASPrivateClientToEndpoints: /\/oauth2\/token/
+            applySLASPrivateClientToEndpoints: /\/oauth2\/passwordless\/login|\/oauth2\/token|\/oauth2\/passwordless\/token/
         }
 
         options = Object.assign({}, defaults, options)
@@ -662,6 +662,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupSlasPrivateClientProxy(app, options) {
+        console.log("(JEREMY) in _setupSlasPrivateClientProxy")
         if (!options.useSLASPrivateClient) {
             return
         }
@@ -691,7 +692,8 @@ export const RemoteServerFactory = {
                         targetHost: options.slasHostName,
                         targetProtocol: 'https'
                     })
-
+                    console.log("(JEREMY) encodedSlasCredentials: ", encodedSlasCredentials, " proxyRequest.path: ", proxyRequest.path)
+                    console.log("(JEREMY) options.applySLASPrivateClientToEndpoints: ", options.applySLASPrivateClientToEndpoints)
                     // We pattern match and add client secrets only to endpoints that
                     // match the regex specified by options.applySLASPrivateClientToEndpoints.
                     // By default, this regex matches only calls to SLAS /oauth2/token

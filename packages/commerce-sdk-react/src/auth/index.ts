@@ -549,6 +549,34 @@ class Auth {
         return await this.queueRequest(callback, isGuest)
     }
 
+    async passwordlessAuthorize(userid: any) {
+        return helpers.authorizePasswordless(
+            this.client,
+            {
+                clientSecret: this.clientSecret
+            },
+            {
+                callbackURI: 'https://webhook.site/4cb9f313-a8e0-4066-bf2e-5087edf1bf66',
+                //   usid: this.get('usid'),
+                userid: userid,
+                //   locale: string,
+                mode: 'callback'
+            }
+        )
+    }
+
+    async getPasswordLessAccessToken (pwdless_login_token: string) {
+        helpers.getPasswordLessAccessToken(
+            this.client,
+            {
+              clientSecret: this.clientSecret
+            },
+            {
+              pwdlessLoginToken: pwdless_login_token
+            }
+          )
+    }
+
     /**
      * This is a wrapper method for ShopperCustomer API registerCustomer endpoint.
      *
