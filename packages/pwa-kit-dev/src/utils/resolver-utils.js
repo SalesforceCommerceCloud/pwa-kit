@@ -63,6 +63,7 @@ export const expand = (extensions = []) =>
                     // Do nothing
                     break
                 default:
+                    // TODO: revise this to be more aligned with `nameRegex` in extensibility-utils.js (e.g. namespace is now optional)
                     // Default is to treat the reference as a extension "short" name.
                     nameRef = `${EXTENSION_NAMESPACE}/${EXTENSION_PREFIX}-${nameRef}`
                     break

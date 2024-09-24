@@ -10,7 +10,7 @@ import {kebabToUpperCamelCase} from '../utils'
 import {nameRegex} from '../../../utils/extensibility-utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
-const APP_EXTENSION_PREFIX = 'extension'
+const APP_EXTENSION_PREFIX = 'extension' // aligns with what's in `nameRegex`
 
 /**
  * The `extensions-loader` as a mechanism to get all configured extensions for a given pwa-kit
@@ -27,10 +27,6 @@ const APP_EXTENSION_PREFIX = 'extension'
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
 module.exports = function () {
-    // TODO: We need to account for extensions being tuples. Here we assume it's a simple
-    // string that is the npm package name, the only expectation is that the package name starts with `extension-`,
-    // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the
-    // extensions configuration array when we add support for the tupal config format.
     const {pkg} = this.getOptions() || {}
     const {devDependencies} = pkg
 
@@ -50,6 +46,7 @@ module.exports = function () {
         }
     })
 
+    // TODO: later consider updating `normalizeExtensionsList` to use a util function
     return dedent`
             /*
             * Copyright (c) 2024, salesforce.com, inc.
@@ -66,20 +63,35 @@ module.exports = function () {
                         `import ${instanceVariable} from '${modulePath}'`
                 )
                 .join('\n            ')}
-            
-            export const getExtensions = () => {
-                const configuredExtensions = getConfig()?.app?.extensions || []
 
-                return [
-                    ${extensionDetails
-                        .map(({instanceVariable, packageName}) => {
-                            const config = {} // TODO: Parse config config here.
-                            return `configuredExtensions.includes('${packageName}') ? new ${instanceVariable}(${JSON.stringify(
-                                config
-                            )}) : false`
-                        })
-                        .join(',\n                    ')}
-                ].filter(Boolean)
+            const installedExtensions = [
+                ${extensionDetails
+                    .map(
+                        ({packageName, instanceVariable}) =>
+                            `{packageName: '${packageName}', instanceVariable: ${instanceVariable}}`
+                    )
+                    .join(',\n                ')}
+            ]
+
+            const normalizeExtensionsList = (extensions = []) =>
+                extensions.map((extension) => {
+                    return {
+                        packageName: Array.isArray(extension) ? extension[0] : extension,
+                        config: Array.isArray(extension) ? {enabled: true, ...extension[1]} : {enabled: true}
+                    }
+                })
+
+            export const getExtensions = () => {
+                const configuredExtensions = (normalizeExtensionsList(getConfig()?.app?.extensions) || [])
+                    .filter((extension) => extension.config.enabled)
+                    .map((extension) => {
+                        // Make sure that the configured extensions are installed, before instantiating them
+                        const found = installedExtensions.find((ext) => ext.packageName === extension.packageName)
+                        return found ? new found.instanceVariable(extension.config || {}) : false
+                    })
+                    .filter(Boolean)
+
+                return configuredExtensions
             }
         `
 }

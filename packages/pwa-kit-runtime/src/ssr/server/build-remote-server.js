@@ -662,8 +662,19 @@ export const RemoteServerFactory = {
     _setupExtensions(app, options) {
         logger.info('Setting up extensions...')
 
-        // TODO: support extensions options array syntax i.e. ['extension-a', {}]
-        const extensions = options.mobify?.app?.extensions || []
+        // Normalize the extensions list for easier parsing
+        const extensions = (options.mobify?.app?.extensions || [])
+            .map((extension) => {
+                return {
+                    // TODO: later we'll consider reusing a util function or perhaps eliminate this
+                    packageName: Array.isArray(extension) ? extension[0] : extension,
+                    config: Array.isArray(extension)
+                        ? {enabled: true, ...extension[1]}
+                        : {enabled: true}
+                }
+            })
+            .filter((extension) => extension.config.enabled)
+
         logger.info('Extensions to load', {
             namespace: 'RemoteServerFactory._setupExtensions',
             additionalProperties: {extensions: extensions}
@@ -674,12 +685,12 @@ export const RemoteServerFactory = {
         let _require
 
         extensions.forEach((extension) => {
-            logger.info(`Loading extension: ${extension}`)
+            logger.info(`Loading extension: ${extension.packageName}`)
 
             const setupServerFilePath = path.join(
                 options.buildDir,
                 'extensions',
-                extension,
+                extension.packageName,
                 'setup-server.js'
             )
 
@@ -695,11 +706,13 @@ export const RemoteServerFactory = {
                 ExtensionClass = _require(setupServerFilePath).default
             } catch (e) {
                 if (e.message && e.message.startsWith('Cannot find module')) {
-                    logger.warn(`No setup-server.js file found for ${extension}. Skipping.`)
+                    logger.warn(
+                        `No setup-server.js file found for ${extension.packageName}. Skipping.`
+                    )
                     return
                 }
 
-                logger.error(`Error loading extension ${extension}:`, {
+                logger.error(`Error loading extension ${extension.packageName}:`, {
                     namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -714,7 +727,7 @@ export const RemoteServerFactory = {
 
             if (!isPrototype) {
                 logger.error(
-                    `'${extension}' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`,
+                    `'${extension.packageName}' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`,
                     {
                         namespace: 'RemoteServerFactory._setupExtensions'
                     }
@@ -724,11 +737,11 @@ export const RemoteServerFactory = {
 
             let extensionInstance
             try {
-                logger.info(`Instantiating extension class for ${extension}...`)
-                extensionInstance = new ExtensionClass(options)
-                logger.info(`Successfully instantiated extension ${extension}.`)
+                logger.info(`Instantiating extension class for ${extension.packageName}...`)
+                extensionInstance = new ExtensionClass(extension.config)
+                logger.info(`Successfully instantiated extension ${extension.packageName}.`)
             } catch (e) {
-                logger.error(`Error instantiating extension ${extension}:`, {
+                logger.error(`Error instantiating extension ${extension.packageName}:`, {
                     namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -737,11 +750,11 @@ export const RemoteServerFactory = {
 
             // Extend the app using the provided method
             try {
-                logger.log(`Extending app using extension ${extension}...`)
+                logger.log(`Extending app using extension ${extension.packageName}...`)
                 app = extensionInstance.extendApp(app)
-                logger.log(`Successfully extended app with ${extension}.`)
+                logger.log(`Successfully extended app with ${extension.packageName}.`)
             } catch (e) {
-                logger.error(`Error setting extension ${extension}:`, {
+                logger.error(`Error setting extension ${extension.packageName}:`, {
                     namespace: 'RemoteServerFactory._setupExtensions',
                     additionalProperties: {error: e}
                 })

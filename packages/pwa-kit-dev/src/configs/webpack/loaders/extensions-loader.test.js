@@ -9,12 +9,10 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import dedent from 'dedent'
 import compiler from './test/compiler'
 
-import ExtensionLoader from './extensions-loader'
-
 const mockConfig = {
     app: {
         extensions: [
-            '@salesforce/extension-this',
+            ['@salesforce/extension-this', {path: '/foo'}],
             '@salesforce/extension-that',
             '@companyx/extension-another',
             'extension-this'
@@ -61,15 +59,32 @@ describe('Extension Loader', () => {
             import CompanyxAnother from '@companyx/extension-another/setup-app'
             import This from 'extension-this/setup-app'
 
-            export const getExtensions = () => {
-                const configuredExtensions = getConfig()?.app?.extensions || []
+            const installedExtensions = [
+                {packageName: '@salesforce/extension-this', instanceVariable: SalesforceThis},
+                {packageName: '@salesforce/extension-that', instanceVariable: SalesforceThat},
+                {packageName: '@companyx/extension-another', instanceVariable: CompanyxAnother},
+                {packageName: 'extension-this', instanceVariable: This}
+            ]
 
-                return [
-                    configuredExtensions.includes('@salesforce/extension-this') ? new SalesforceThis({}) : false,
-                    configuredExtensions.includes('@salesforce/extension-that') ? new SalesforceThat({}) : false,
-                    configuredExtensions.includes('@companyx/extension-another') ? new CompanyxAnother({}) : false,
-                    configuredExtensions.includes('extension-this') ? new This({}) : false
-                ].filter(Boolean)
+            const normalizeExtensionsList = (extensions = []) =>
+                extensions.map((extension) => {
+                    return {
+                        packageName: Array.isArray(extension) ? extension[0] : extension,
+                        config: Array.isArray(extension) ? {enabled: true, ...extension[1]} : {enabled: true}
+                    }
+                })
+
+            export const getExtensions = () => {
+                const configuredExtensions = (normalizeExtensionsList(getConfig()?.app?.extensions) || [])
+                    .filter((extension) => extension.config.enabled)
+                    .map((extension) => {
+                        // Make sure that the configured extensions are installed, before instantiating them
+                        const found = installedExtensions.find((ext) => ext.packageName === extension.packageName)
+                        return found ? new found.instanceVariable(extension.config || {}) : false
+                    })
+                    .filter(Boolean)
+
+                return configuredExtensions
             }
         `)
     })

@@ -15,15 +15,15 @@ import {Application} from './types'
  *
  * @abstract
  */
-export default abstract class ApplicationExtension {
-    private config: Record<string, any>
+export default abstract class ApplicationExtension<Config> {
+    private config: Config
 
     /**
      * Constructs a new instance of the ApplicationExtension class.
      *
      * @param config - The configuration object used to set up the extension.
      */
-    constructor(config?: any) {
+    constructor(config: Config) {
         this.config = config
     }
 
@@ -33,7 +33,7 @@ export default abstract class ApplicationExtension {
      * @protected
      * @returns config - The configuration object.
      */
-    public getConfig(): Record<string, any> {
+    public getConfig(): Config {
         return this.config
     }
 
