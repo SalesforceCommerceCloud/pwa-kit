@@ -22,7 +22,7 @@ import {
     // Hooks
     useDisclosure,
     useTheme
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) => {
     const initialFocusRef = useRef()

@@ -7,13 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {
-    Box,
-    Button,
-    Stack,
-    Center,
-    Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Stack, Center, Text} from '@chakra-ui/react'
 import {AccountIcon, BasketIcon} from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
 

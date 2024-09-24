@@ -7,13 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Box,
-    Flex,
-    Heading,
-    Stack,
-    Image
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Flex, Heading, Stack, Image} from '@chakra-ui/react'
 
 const Hero = ({title, img, actions, ...props}) => {
     const {src, alt} = img

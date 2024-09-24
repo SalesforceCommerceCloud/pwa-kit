@@ -8,13 +8,7 @@
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {
-    Alert,
-    Box,
-    Button,
-    Stack,
-    Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Alert, Box, Button, Stack, Text} from '@chakra-ui/react'
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'

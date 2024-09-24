@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage, FormattedNumber} from 'react-intl'
-import {Flex, Stack, Text, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Flex, Stack, Text, Box} from '@chakra-ui/react'
 import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
 import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'

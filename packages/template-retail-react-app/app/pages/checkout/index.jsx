@@ -6,16 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    Alert,
-    AlertIcon,
-    Box,
-    Button,
-    Container,
-    Grid,
-    GridItem,
-    Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     CheckoutProvider,

@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, Text} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import Link from '@salesforce/retail-react-app/app/components/link'
 

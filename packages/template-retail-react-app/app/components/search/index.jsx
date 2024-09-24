@@ -18,7 +18,7 @@ import {
     Flex,
     HStack,
     Spinner
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import SearchSuggestions from '@salesforce/retail-react-app/app/components/search/partials/search-suggestions'
 import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {

@@ -7,7 +7,7 @@
 import React, {forwardRef, useContext} from 'react'
 import {defineMessage, IntlContext} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Icon, useTheme} from '@chakra-ui/react'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
 // svg-sprite-loader webpack plugin at build time and injected in the <body> tag

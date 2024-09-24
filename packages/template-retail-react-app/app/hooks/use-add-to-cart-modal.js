@@ -24,7 +24,7 @@ import {
     ModalOverlay,
     Stack,
     useBreakpointValue
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'

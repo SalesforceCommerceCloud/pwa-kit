@@ -22,7 +22,7 @@ import {
     Stack,
     Text,
     Divider
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {

@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {Stack, Box, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack, Box, Button} from '@chakra-ui/react'
 import {FormattedMessage} from 'react-intl'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 

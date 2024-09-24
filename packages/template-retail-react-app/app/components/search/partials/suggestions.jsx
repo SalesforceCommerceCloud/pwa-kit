@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Button, Stack, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, Button, Stack, Box} from '@chakra-ui/react'
 
 const Suggestions = ({suggestions, closeAndNavigate}) => {
     if (!suggestions) {

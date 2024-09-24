@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Stack} from '@chakra-ui/react'
 import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 

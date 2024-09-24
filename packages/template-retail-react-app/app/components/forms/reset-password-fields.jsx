@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box} from '@chakra-ui/react'
 import useResetPasswordFields from '@salesforce/retail-react-app/app/components/forms/useResetPasswordFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 
