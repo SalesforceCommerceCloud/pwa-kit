@@ -6,11 +6,19 @@
  */
 import React, {Fragment} from 'react'
 
+// Temporary
+import {useExtensions} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
+
 const Sample = () => {
+
+    const extensions = useExtensions()
+
     return (
         <Fragment>
             <h1>Welcome to the Sample Page 👋</h1>
             <hr/>
+            <img src={extensions[0].getAssetURL('static/salesforce-logo.svg')} />
+
             <p>If you are reading this, it means that this page was successfully added to your base project. 🎉</p>
             <p>
                 This <i>Application Extension</i> was installed by running the below command in your PWA-Kit project. 

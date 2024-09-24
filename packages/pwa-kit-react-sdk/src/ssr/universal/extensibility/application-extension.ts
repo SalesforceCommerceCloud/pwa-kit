@@ -6,6 +6,9 @@
  */
 import {IRouteConfig} from './types'
 
+// Temporary
+import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+
 /**
  * An abstract class representing an Application Extension. This class provides
  * foundational methods and properties for extending an application with additional
@@ -45,6 +48,16 @@ export default abstract class ApplicationExtension {
      */
     public getName(): string {
         return this.constructor.name
+    }
+
+    public getAssetURL(path: string): string {
+        const onClient = typeof window !== 'undefined'
+        const publicPath = onClient
+            ? // @ts-ignore
+            `${window.Progressive.buildOrigin as string}`
+            : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
+            
+        return path ? `${publicPath}${path}` : publicPath
     }
 
     /**

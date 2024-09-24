@@ -366,7 +366,15 @@ const staticFolderCopyPlugin = new CopyPlugin({
                 .replace(/\\/g, '/'),
             to: `static/`,
             noErrorOnMissing: true
-        }
+        },
+        ...(appConfig?.extensions || []).map((extension) => {
+            return {
+                from: `${projectDir}/node_modules/${extension}/assets`,
+                to: `static/${extension}`,
+                // Add exclude for readme file.
+                noErrorOnMissing: true
+            }
+        })
     ]
 })
 
