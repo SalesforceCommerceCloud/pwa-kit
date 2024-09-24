@@ -22,6 +22,7 @@ import ConfirmationModal from '@salesforce/retail-react-app/app/components/confi
 import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {values} from 'lodash'
 
 export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     dialogTitle: defineMessage({
@@ -57,6 +58,7 @@ export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
  */
 const WishlistSecondaryButtonGroup = ({
     productListItemId,
+    productName = '',
     focusElementOnRemove,
     onClick = noop
 }) => {
@@ -112,6 +114,13 @@ const WishlistSecondaryButtonGroup = ({
                     size="sm"
                     onClick={showRemoveItemConfirmation}
                     data-testid={`sf-wishlist-remove-${productListItemId}`}
+                    aria-label={formatMessage(
+                        {
+                            defaultMessage: 'Remove {productName}',
+                            id: 'wishlist_secondary_button_group.info.item.remove.label'
+                        },
+                        {productName}
+                    )}
                 >
                     <FormattedMessage
                         defaultMessage="Remove"
@@ -134,6 +143,7 @@ const WishlistSecondaryButtonGroup = ({
 
 WishlistSecondaryButtonGroup.propTypes = {
     productListItemId: PropTypes.string,
+    productName: PropTypes.string,
     focusElementOnRemove: PropTypes.object,
     onClick: PropTypes.func
 }

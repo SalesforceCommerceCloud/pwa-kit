@@ -3747,6 +3747,34 @@
       "value": "New Password"
     }
   ],
+  "wishlist_primary_action.button.addSetToCart.label": [
+    {
+      "type": 0,
+      "value": "Add "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " set to cart"
+    }
+  ],
+  "wishlist_primary_action.button.addToCart.label": [
+    {
+      "type": 0,
+      "value": "Add "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " to cart"
+    }
+  ],
   "wishlist_primary_action.button.add_set_to_cart": [
     {
       "type": 0,
@@ -3759,6 +3787,16 @@
       "value": "Add to Cart"
     }
   ],
+  "wishlist_primary_action.button.viewFullDetails.label": [
+    {
+      "type": 0,
+      "value": "View full details for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
   "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
@@ -3769,6 +3807,16 @@
     {
       "type": 0,
       "value": "View Options"
+    }
+  ],
+  "wishlist_primary_action.button.view_options.label": [
+    {
+      "type": 0,
+      "value": "View Options for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
@@ -3813,6 +3861,16 @@
     {
       "type": 0,
       "value": "Remove"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item.remove.label": [
+    {
+      "type": 0,
+      "value": "Remove "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "wishlist_secondary_button_group.info.item_removed": [

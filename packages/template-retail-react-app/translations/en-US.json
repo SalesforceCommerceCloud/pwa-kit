@@ -1630,11 +1630,20 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "New Password"
   },
+  "wishlist_primary_action.button.addSetToCart.label": {
+    "defaultMessage": "Add {productName} set to cart"
+  },
+  "wishlist_primary_action.button.addToCart.label": {
+    "defaultMessage": "Add {productName} to cart"
+  },
   "wishlist_primary_action.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
   },
   "wishlist_primary_action.button.add_to_cart": {
     "defaultMessage": "Add to Cart"
+  },
+  "wishlist_primary_action.button.viewFullDetails.label": {
+    "defaultMessage": "View full details for {productName}"
   },
   "wishlist_primary_action.button.view_full_details": {
     "defaultMessage": "View Full Details"
@@ -1642,11 +1651,17 @@
   "wishlist_primary_action.button.view_options": {
     "defaultMessage": "View Options"
   },
+  "wishlist_primary_action.button.view_options.label": {
+    "defaultMessage": "View Options for {productName}"
+  },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
   "wishlist_secondary_button_group.action.remove": {
     "defaultMessage": "Remove"
+  },
+  "wishlist_secondary_button_group.info.item.remove.label": {
+    "defaultMessage": "Remove {productName}"
   },
   "wishlist_secondary_button_group.info.item_removed": {
     "defaultMessage": "Item removed from wishlist"
