@@ -29,7 +29,7 @@ export const defaultPwaKitSecurityHeaders = (req, res, next) => {
         'connect-src': ["'self'", runtimeAdmin, 'https://*.google.com'],
         'frame-ancestors': [runtimeAdmin],
         'img-src': ["'self'", 'data:'],
-        'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin],
+        'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin, 'https://*.google.com'],
         // Always upgrade insecure requests when deployed, never upgrade on local dev server
         'upgrade-insecure-requests': isRemote()
     }

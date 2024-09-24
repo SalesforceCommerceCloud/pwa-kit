@@ -38,7 +38,6 @@ const Login = () => {
     const einstein = useEinstein()
     const {isRegistered, customerType} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
-    const socialLogin = useAuthHelper(AuthHelpers.LoginIDPUser)
 
     const customerId = useCustomerId()
     const prevAuthType = usePrevious(customerType)
@@ -50,7 +49,7 @@ const Login = () => {
 
     const submitForm = async (data) => {
         try {
-            await socialLogin.mutateAsync()
+            await login.mutateAsync({username: data.email, password: data.password})
             const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
             // we only want to merge basket when the user is logged in as a recurring user
             // only recurring users trigger the login mutation, new user triggers register mutation

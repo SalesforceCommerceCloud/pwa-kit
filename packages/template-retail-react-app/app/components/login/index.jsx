@@ -18,8 +18,10 @@ import {
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
+    const socialLogin = useAuthHelper(AuthHelpers.LoginIDPUser)
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
@@ -69,6 +71,19 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                                 defaultMessage="Sign In"
                                 id="login_form.button.sign_in"
                             />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={async () => {
+                                await socialLogin.mutateAsync()
+                            }}
+                        >
+                            <Text>
+                                <FormattedMessage
+                                    defaultMessage="Login with Google"
+                                    id="login_form.button.google_sign_in"
+                                />
+                            </Text>
                         </Button>
 
                         <Stack direction="row" spacing={1} justify="center">
