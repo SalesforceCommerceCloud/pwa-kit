@@ -37,7 +37,6 @@ jobs:
       - name: Changelog Check
         uses: ./.github/actions/changelog-check
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_number: ${{ github.event.pull_request.number }}
 
   pwa-kit:
