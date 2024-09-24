@@ -2,6 +2,7 @@
 - Create new `OverrideResolverPlugin` and integrate into the Webpack configuration. [#2012](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2012)
 - Replace `IApplicationExtension` with `ApplicationExtension` abstract class. [#2019](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2019)
 - Change Webpack logic to include all installed Application Extensions in the app bundle. [#2004](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2004)
+- Support the tuples way of configuring the app extensions [#2010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2010)
 
 ## v3.6.0 (Apr 17, 2024)
 - Implement core wildcard import logic to be used in upcoming webpack/babel plugins [#1826](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1826)

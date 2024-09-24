@@ -1,5 +1,6 @@
 ## v4.0.0-dev (Jun 21, 2024)
 - Update Application Extensions import in `react-rendering.js` and `main.js` (#2004)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2004]
+- Define interface of the app extension's config [#2010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2010)
 
 ## v3.7.0 (Aug 07, 2024)
 - Add `beforeHydrate` option to withReactQuery component [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)

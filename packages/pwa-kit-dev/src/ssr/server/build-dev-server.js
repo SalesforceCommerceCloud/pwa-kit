@@ -137,22 +137,33 @@ export const DevServerMixin = {
     _setupExtensions(app, options) {
         logger.info('Setting up extensions...')
 
-        // TODO: support extensions options array syntax i.e. ['extension-a', {}]
-        const extensions = options.mobify?.app?.extensions || []
+        // Normalize the extensions list for easier parsing
+        const extensions = (options.mobify?.app?.extensions || [])
+            .map((extension) => {
+                return {
+                    // TODO: later we'll consider reusing a util function or perhaps eliminate this
+                    packageName: Array.isArray(extension) ? extension[0] : extension,
+                    config: Array.isArray(extension)
+                        ? {enabled: true, ...extension[1]}
+                        : {enabled: true}
+                }
+            })
+            .filter((extension) => extension.config.enabled)
+
         logger.info('Extensions to load', {
             namespace: 'DevServerMixin._setupExtensions',
             additionalProperties: {extensions: extensions}
         })
 
-        app.__extensions = extensions || []
+        app.__extensions = extensions
 
         extensions.forEach((extension) => {
-            logger.info(`Loading extension: ${extension}`)
+            logger.info(`Loading extension: ${extension.packageName}`)
 
             const setupServerFilePathBase = path.join(
                 options.projectDir,
                 'node_modules',
-                extension,
+                extension.packageName,
                 'src',
                 'setup-server'
             )
@@ -162,7 +173,7 @@ export const DevServerMixin = {
             } else if (fs.existsSync(`${setupServerFilePathBase}.js`)) {
                 filePath = `${setupServerFilePathBase}.js`
             } else {
-                logger.warn(`No setup-server file found for ${extension}. Skipping.`)
+                logger.warn(`No setup-server file found for ${extension.packageName}. Skipping.`)
                 return
             }
 
@@ -170,7 +181,7 @@ export const DevServerMixin = {
             try {
                 ExtensionClass = tsx.require(filePath, __filename).default
             } catch (e) {
-                logger.error(`Error loading extension ${extension}:`, {
+                logger.error(`Error loading extension ${extension.packageName}:`, {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -185,7 +196,7 @@ export const DevServerMixin = {
 
             if (!isPrototype) {
                 logger.error(
-                    `'${extension}' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`,
+                    `'${extension.packageName}' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`,
                     {
                         namespace: 'DevServerMixin._setupExtensions'
                     }
@@ -195,11 +206,11 @@ export const DevServerMixin = {
 
             let extensionInstance
             try {
-                logger.info(`Instantiating extension class for ${extension}...`)
-                extensionInstance = new ExtensionClass(options)
-                logger.info(`Successfully instantiated extension ${extension}.`)
+                logger.info(`Instantiating extension class for ${extension.packageName}...`)
+                extensionInstance = new ExtensionClass(extension.config)
+                logger.info(`Successfully instantiated extension ${extension.packageName}.`)
             } catch (e) {
-                logger.error(`Error instantiating extension ${extension}:`, {
+                logger.error(`Error instantiating extension ${extension.packageName}:`, {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })
@@ -208,11 +219,11 @@ export const DevServerMixin = {
 
             // Extend the app using the provided method
             try {
-                logger.info(`Extending app using extension ${extension}...`)
+                logger.info(`Extending app using extension ${extension.packageName}...`)
                 app = extensionInstance.extendApp(app)
-                logger.info(`Successfully extended app with ${extension}.`)
+                logger.info(`Successfully extended app with ${extension.packageName}.`)
             } catch (e) {
-                logger.error(`Error setting extension ${extension}:`, {
+                logger.error(`Error setting extension ${extension.packageName}:`, {
                     namespace: 'DevServerMixin._setupExtensions',
                     additionalProperties: {error: e}
                 })

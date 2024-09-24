@@ -9,14 +9,18 @@ import {
     Application as ExpressApplication,
     ApplicationExtension as ExpressApplicationExtension
 } from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
+import {ServerExtensionConfig as Config} from './types'
 
-class SampleExtension extends ExpressApplicationExtension {
+class SampleExtension extends ExpressApplicationExtension<Config> {
 
     extendApp(app: ExpressApplication): ExpressApplication {
 
         app.get('/sample', (req, res) => {
             console.log('SampleExtension extendApp GET /sample')
-            res.send('Hello from an express SampleExtension!')
+            res.send(
+                `<p>Hello from an express SampleExtension!</p>
+                <pre>extensionConfig = ${JSON.stringify(this.getConfig())}</pre>`
+            )
         })
 
         return app

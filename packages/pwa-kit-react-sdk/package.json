@@ -23,7 +23,7 @@
   ],
   "scripts": {
     "build": "cross-env NODE_ENV=production internal-lib-build build && tsc",
-    "build:watch": "nodemon --watch 'src/**' --exec 'npm run build'",
+    "build:watch": "nodemon --watch 'src/**' --ext 'js,jsx,ts,tsx' --exec 'npm run build'",
     "format": "internal-lib-build format \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",

@@ -46,7 +46,11 @@
   },
   "mobify": {
     "app":{
-      "extensions": ["@salesforce/extension-chakra-ui", "@salesforce/extension-sample", "@salesforce/extension-sample-2"]
+      "extensions": [
+        "@salesforce/extension-chakra-ui", 
+        ["@salesforce/extension-sample", {"path": "/foo-page"}], 
+        "@salesforce/extension-sample-2"
+      ]
     },
     "ssrEnabled": true,
     "ssrOnly": [
