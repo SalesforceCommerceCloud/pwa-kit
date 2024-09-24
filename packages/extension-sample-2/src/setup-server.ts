@@ -4,7 +4,22 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* istanbul ignore next */
-export default ({app}) => {
-    console.log('Setup Server App')
+import {
+    Application as ExpressApplication,
+    ApplicationExtension as ExpressApplicationExtension
+} from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
+
+class SampleExtension2 extends ExpressApplicationExtension {
+
+    extendApp(app: ExpressApplication): ExpressApplication {
+
+        app.get('/sample-2', (req, res) => {
+            console.log('SampleExtension extendApp GET /sample')
+            res.send('Hello from an express SampleExtension!')
+        })
+
+        return app
+    }
 }
+
+export default SampleExtension2

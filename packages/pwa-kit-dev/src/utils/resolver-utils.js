@@ -98,17 +98,12 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
     let paths = expand(extensions).reverse()
 
     // Map all the extensions and resolve the module names to absolute paths.
-    paths = paths.map((extension) => {
+    paths = paths.reduce((acc, extensionEntry) => {
         // The reference can be a module/package or an absolute path to a file.
-        const [extensionRef] = extension
-        const isLocalExtension = extensionRef.startsWith(path.sep)
-
-        return path.join(
-            ...(isLocalExtension
-                ? [extensionRef, importPath]
-                : [projectDir, NODE_MODULES, extensionRef, SRC, OVERRIDES, importPath])
-        )
-    })
+        const [extensionRef] = extensionEntry
+        const srcPath = path.join(projectDir, NODE_MODULES, extensionRef, SRC)
+        return [...acc, path.join(srcPath, OVERRIDES, importPath), path.join(srcPath, importPath)]
+    }, [])
 
     // Add non-extension search locations locations. The base project and the sdk as the final callback.
     paths = [

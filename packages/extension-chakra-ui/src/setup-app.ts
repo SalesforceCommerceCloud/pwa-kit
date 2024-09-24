@@ -6,21 +6,13 @@
  */
 
 import React from 'react'
-import {IApplicationExtension, IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility/types'
-import {IConfig} from './types'
+import {ApplicationExtension} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
+import {IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility/types'
+
 import withChakraUI from './components/with-chakra-ui'
 
-class Sample implements IApplicationExtension {
-    private config: IConfig;
-
-    constructor(config: IConfig) {
-        this.config = config
-    }
+class Sample extends ApplicationExtension {
     
-    getName(): string {
-        return 'sample'
-    }
-
     extendApp(App: React.ComponentType): React.ComponentType {
         return withChakraUI(App)
     }

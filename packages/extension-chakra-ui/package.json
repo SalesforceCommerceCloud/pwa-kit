@@ -18,6 +18,7 @@
     "devDependencies": {
       "@loadable/component": "^5.15.3",
       "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
+      "@salesforce/pwa-kit-runtime": "4.0.0-dev",
       "@types/react": "~18.2.0",
       "@types/react-dom": "~18.2.1",
       "react": "^18.2.0",

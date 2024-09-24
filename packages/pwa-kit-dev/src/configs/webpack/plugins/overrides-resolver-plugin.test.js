@@ -70,6 +70,36 @@ describe('Overrides Resolver Plugin', () => {
             }
         },
         {
+            description:
+                'Wildcard import pioritizes module resolution to the "overrides" folder if match import exists.',
+            entryPoint: 'app/routes.jsx',
+            // Compiler configuration.
+            compilerConfig: {
+                extensions: ['@salesforce/extension-that', '@salesforce/extension-this'],
+                files: {
+                    // Virtual Project Files
+
+                    // Entry Point
+                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+
+                    // Overrides
+
+                    // Local Files
+                    '/virtual/project/app/pages/sample-page.jsx': '// Sample Page',
+
+                    // Extensions Overrides
+                    '/virtual/project/node_modules/@salesforce/extension-this/src/pages/sample-page.jsx':
+                        '// @salesforce/extension-this',
+                    '/virtual/project/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
+                        '// @salesforce/extension-this-override'
+                    // TODO: Why don't index files work here?
+                }
+            },
+            expects: (output) => {
+                expect(output.modules[1].source).toBe('// @salesforce/extension-this-override')
+            }
+        },
+        {
             description: 'Wildcard import throws when no match is found.',
             entryPoint: 'app/routes.jsx',
             // Compiler configuration.
