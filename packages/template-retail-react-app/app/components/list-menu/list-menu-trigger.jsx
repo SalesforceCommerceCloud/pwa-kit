@@ -16,7 +16,7 @@ import {
 
     // Hooks
     useTheme
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 // Project Components
 import Link from '@salesforce/retail-react-app/app/components/link'

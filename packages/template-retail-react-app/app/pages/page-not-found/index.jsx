@@ -6,14 +6,7 @@
  */
 
 import React from 'react'
-import {
-    Box,
-    Heading,
-    Flex,
-    Button,
-    Stack,
-    Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Heading, Flex, Button, Stack, Text} from '@chakra-ui/react'
 import {Helmet} from 'react-helmet'
 import {useIntl} from 'react-intl'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'

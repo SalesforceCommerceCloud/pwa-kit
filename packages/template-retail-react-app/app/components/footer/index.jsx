@@ -20,7 +20,7 @@ import {
     createStylesContext,
     Button,
     FormControl
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
 import LinksList from '@salesforce/retail-react-app/app/components/links-list'

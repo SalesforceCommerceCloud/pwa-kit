@@ -6,15 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Button,
-    ButtonGroup,
-    Checkbox,
-    Divider,
-    Flex,
-    Stack,
-    useDisclosure
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button, ButtonGroup, Checkbox, Divider, Flex, Stack, useDisclosure} from '@chakra-ui/react'
 import {defineMessage, FormattedMessage} from 'react-intl'
 import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal/index'

@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Text} from '@chakra-ui/react'
 
 const AddressDisplay = ({address}) => {
     return (

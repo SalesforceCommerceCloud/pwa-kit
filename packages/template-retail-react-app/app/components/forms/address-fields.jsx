@@ -7,12 +7,7 @@
 import React, {useEffect, useRef} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
-import {
-    Grid,
-    GridItem,
-    SimpleGrid,
-    Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Grid, GridItem, SimpleGrid, Stack} from '@chakra-ui/react'
 import useAddressFields from '@salesforce/retail-react-app/app/components/forms/useAddressFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'

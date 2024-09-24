@@ -5,14 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {
-    Box,
-    Container,
-    Grid,
-    GridItem,
-    Skeleton,
-    Stack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Container, Grid, GridItem, Skeleton, Stack} from '@chakra-ui/react'
 
 const CheckoutSkeleton = () => {
     return (

@@ -6,12 +6,7 @@
  */
 
 import React from 'react'
-import {
-    Button,
-    HStack,
-    Input,
-    useNumberInput
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button, HStack, Input, useNumberInput} from '@chakra-ui/react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 /**

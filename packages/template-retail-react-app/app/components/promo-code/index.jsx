@@ -15,7 +15,7 @@ import {
     AccordionItem,
     AccordionPanel,
     useToast
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {ChevronDownIcon, ChevronUpIcon} from '@salesforce/retail-react-app/app/components/icons'
 import PromoCodeFields from '@salesforce/retail-react-app/app/components/forms/promo-code-fields'

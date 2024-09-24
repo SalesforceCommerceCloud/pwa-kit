@@ -7,13 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Box,
-    Heading,
-    Stack,
-    Text,
-    Container
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Heading, Stack, Text, Container} from '@chakra-ui/react'
 
 /**
  * Section component used on content pages like home page.

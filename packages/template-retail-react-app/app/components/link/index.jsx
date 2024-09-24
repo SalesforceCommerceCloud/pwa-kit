@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Link as ChakraLink} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Link as ChakraLink} from '@chakra-ui/react'
 import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 

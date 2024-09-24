@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, VisuallyHidden} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, VisuallyHidden} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 import msg from '@salesforce/retail-react-app/app/components/display-price/messages'
 /**

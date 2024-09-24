@@ -6,16 +6,7 @@
  */
 import React, {useEffect} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
-import {
-    Box,
-    Button,
-    Container,
-    Flex,
-    Radio,
-    RadioGroup,
-    Stack,
-    Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Container, Flex, Radio, RadioGroup, Stack, Text} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'

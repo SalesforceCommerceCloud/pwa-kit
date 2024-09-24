@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {Button, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button, useDisclosure} from '@chakra-ui/react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
