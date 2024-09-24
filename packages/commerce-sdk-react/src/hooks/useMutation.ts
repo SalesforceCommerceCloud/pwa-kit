@@ -76,7 +76,7 @@ export const useCustomMutation = (
             clientId: config.clientId,
             siteId: config.siteId,
             organizationId: config.organizationId,
-            shortCode: config.organizationId
+            shortCode: config.shortCode
         },
         proxy: config.proxy
     }
