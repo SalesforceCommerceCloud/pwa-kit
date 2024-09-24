@@ -51,7 +51,9 @@ const options = {
     // If there any HTTP headers that have been encoded, an additional header will be
     // passed, `x-encoded-headers`, containing a comma separated list
     // of the keys of headers that have been encoded
-    encodeNonAsciiHttpHeaders: false
+    // There may be a slight performance loss with requests/responses with large number
+    // of headers as we loop through all the headers to verify ASCII vs non ASCII
+    encodeNonAsciiHttpHeaders: true
 }
 
 const runtime = getRuntime()
