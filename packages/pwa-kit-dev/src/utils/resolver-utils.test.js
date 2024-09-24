@@ -161,7 +161,35 @@ describe('resolverUtils', () => {
                         process.cwd(),
                         'node_modules',
                         '@salesforce',
+                        'extension-module-extension-c',
+                        'src',
+                        'app',
+                        'routes'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
                         'extension-module-extension-b',
+                        'src',
+                        'overrides',
+                        'app',
+                        'routes'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-b',
+                        'src',
+                        'app',
+                        'routes'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-a',
                         'src',
                         'overrides',
                         'app',
@@ -173,7 +201,6 @@ describe('resolverUtils', () => {
                         '@salesforce',
                         'extension-module-extension-a',
                         'src',
-                        'overrides',
                         'app',
                         'routes'
                     )
@@ -212,6 +239,15 @@ describe('resolverUtils', () => {
                         'extension-module-extension-a',
                         'src',
                         'overrides',
+                        'app',
+                        'routes'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-a',
+                        'src',
                         'app',
                         'routes'
                     )

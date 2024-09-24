@@ -131,7 +131,7 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
         // NOTE: Overriding files requires that you use the exact file name, you cannot replace a non-index file with one that
         // is an index file.
         const index = paths.indexOf(sourcePath.split('.')[0])
-        paths = paths.slice(index + 1)
+        paths = paths.slice(index + 2)
     }
 
     return paths
