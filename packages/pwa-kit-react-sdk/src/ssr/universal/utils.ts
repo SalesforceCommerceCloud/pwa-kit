@@ -19,6 +19,10 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 
 const onClient = typeof window !== 'undefined'
 
+type GetAssetUrlOptions = {
+    extensionName: string
+}
+
 /**
  * Get the URL that should be used to load an asset from the bundle.
  *
@@ -26,12 +30,16 @@ const onClient = typeof window !== 'undefined'
  * @function
  * @returns {string}
  */
-export const getAssetUrl = (path: string) => {
+export const getAssetUrl = (path: string, opts: GetAssetUrlOptions) => {
+    const {extensionName} = opts || {}
+    console.log('getAssetUrl: ', extensionName)
     /* istanbul ignore next */
     const publicPath = onClient
         ? // @ts-ignore
           `${window.Progressive.buildOrigin as string}`
         : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
+
+        // http://localhost:3000/mobify/bundle/development/static/@salesforce/extension-sample/salesforce-logo.svg
     return path ? `${publicPath}${path}` : publicPath
 }
 

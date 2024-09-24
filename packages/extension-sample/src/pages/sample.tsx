@@ -5,19 +5,17 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {Fragment} from 'react'
-
-// Temporary
-import {useExtensions} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 const Sample = () => {
-
-    const extensions = useExtensions()
-
+    const assetUrl = getAssetUrl('/static/@salesforce/extension-sample/salesforce-logo.svg', {extensionName: 'sample'})
+    // const logoUrl = getStaticAsset('sample/salesforce-logo.svg')
+    // const logoUrl = getStaticAsset('salesforce-logo.svg', {extensionName: 'sample'})
     return (
         <Fragment>
             <h1>Welcome to the Sample Page 👋</h1>
             <hr/>
-            <img src={extensions[0].getAssetURL('static/salesforce-logo.svg')} />
+            <img src={assetUrl} />
 
             <p>If you are reading this, it means that this page was successfully added to your base project. 🎉</p>
             <p>

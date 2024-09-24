@@ -19,7 +19,7 @@ import {getRoutes, routeComponent} from '../universal/components/route-component
 import {applyAppExtensions} from '../universal/extensibility/utils'
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
-import {getExtensions, ExtensionsContext} from '../universal/extensibility/extensions'
+import {getExtensions} from '../universal/extensibility/extensions'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -44,43 +44,40 @@ export const registerServiceWorker = (url) => {
     })
 }
 
-export const OuterApp = ({routes, error, extensions, WrappedApp, locals, onHydrate}) => {
+export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
 
     return (
-        <ExtensionsContext.Provider value={extensions}>
-            <ServerContext.Provider value={{}}>
-                <Router ref={onHydrate}>
-                    <CorrelationIdProvider
-                        correlationId={() => {
-                            // If we are hydrating an error page use the server correlation id.
-                            if (isInitialPageRef.current && window.__ERROR__) {
-                                isInitialPageRef.current = false
-                                return window.__INITIAL_CORRELATION_ID__
-                            }
-                            return uuidv4()
-                        }}
-                    >
-                        <AppConfig locals={locals}>
-                            <Switch
-                                error={error}
-                                appState={window.__PRELOADED_STATE__}
-                                routes={routes}
-                                App={WrappedApp}
-                            />
-                        </AppConfig>
-                    </CorrelationIdProvider>
-                </Router>
-            </ServerContext.Provider>
-        </ExtensionsContext.Provider>
+        <ServerContext.Provider value={{}}>
+            <Router ref={onHydrate}>
+                <CorrelationIdProvider
+                    correlationId={() => {
+                        // If we are hydrating an error page use the server correlation id.
+                        if (isInitialPageRef.current && window.__ERROR__) {
+                            isInitialPageRef.current = false
+                            return window.__INITIAL_CORRELATION_ID__
+                        }
+                        return uuidv4()
+                    }}
+                >
+                    <AppConfig locals={locals}>
+                        <Switch
+                            error={error}
+                            appState={window.__PRELOADED_STATE__}
+                            routes={routes}
+                            App={WrappedApp}
+                        />
+                    </AppConfig>
+                </CorrelationIdProvider>
+            </Router>
+        </ServerContext.Provider>
     )
 }
 
 OuterApp.propTypes = {
     routes: PropTypes.array.isRequired,
     error: PropTypes.object,
-    extensions: PropTypes.array, // TODO: Do better!
     WrappedApp: PropTypes.func.isRequired,
     locals: PropTypes.object,
     onHydrate: PropTypes.func
@@ -130,7 +127,6 @@ export const start = () => {
 
     const props = {
         error: window.__ERROR__,
-        extensions,
         locals: locals,
         routes: getRoutes(locals),
         WrappedApp
