@@ -756,6 +756,9 @@
   "item_variant.assistive_msg.quantity": {
     "defaultMessage": "Quantity {quantity}"
   },
+  "item_variant.quantity.label": {
+    "defaultMessage": "Quantity selector for {productName}. Selected quantity is {quantity}"
+  },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
   },

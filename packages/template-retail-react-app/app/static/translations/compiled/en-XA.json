@@ -3815,6 +3815,32 @@
       "value": "]"
     }
   ],
+  "item_variant.quantity.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɋŭŭȧȧƞŧīŧẏ şḗḗŀḗḗƈŧǿǿř ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": ". Şḗḗŀḗḗƈŧḗḗḓ ɋŭŭȧȧƞŧīŧẏ īş "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,

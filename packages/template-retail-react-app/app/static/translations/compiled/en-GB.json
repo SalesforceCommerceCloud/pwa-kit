@@ -1815,6 +1815,24 @@
       "value": "quantity"
     }
   ],
+  "item_variant.quantity.label": [
+    {
+      "type": 0,
+      "value": "Quantity selector for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": ". Selected quantity is "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,
