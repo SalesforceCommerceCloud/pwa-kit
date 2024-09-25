@@ -213,8 +213,6 @@ export const SHOPPER_CONTEXT_FIELD_TYPES = {
 }
 export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
     sourceCode: {paramName: 'sourceCode'},
-    effectiveDateTime: {paramName: 'effectiveDateTime'},
-    clientIp: {paramName: 'clientIp'},
     geoLocation: {
         city: {paramName: 'city'},
         country: {paramName: 'country'},
