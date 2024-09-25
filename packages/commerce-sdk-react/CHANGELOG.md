@@ -1,3 +1,6 @@
+## v3.1.0-nightly-20240925080204 (Sep 25, 2024)
+## v3.1.0-dev (Sep 25, 2024)
+## v3.8.0-nightly-20240925080204 (Sep 25, 2024)
 ## v3.1.0-dev (Aug 08, 2024)
 
 -   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
