@@ -9,10 +9,8 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Button,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
+    CloseButton,
+    Box,
     useDisclosure,
     Heading,
     Stack,
@@ -77,61 +75,60 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
     )
 
     return (
-        <Modal
-            size="sm"
-            closeOnOverlayClick={true}
-            data-testid="sf-dnt-modal"
-            isOpen={isOpen}
-            onOpen={onOpen}
-            onClose={onCloseModal}
-            {...props}
+        isOpen && <Box
+            position="fixed"
+            bottom={0}
+            left={0}
+            right={0}
+            margin="0"
+            borderTopRadius="md"
+            boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)"
+            width="100%"
+            maxWidth="100%"
+            backgroundColor="white"
         >
-            <ModalContent
-                width="100%"
-                maxWidth="100%"
+            <CloseButton
                 position="absolute"
-                bottom={0}
-                left={0}
-                right={0}
-                margin="0"
-                borderTopRadius="md"
-                boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)"
+                aria-label={formatMessage({
+                    id: 'dnt_modal.button.close.assistive_msg',
+                    defaultMessage: 'Close dnt form'
+                })}
+                right={5}
+                top={5}
+                onClick={onCloseModal}
+            />
+            <Box
+                paddingBottom={14} 
+                paddingTop={10} 
+                paddingLeft={10}
+                paddingRight={10}
             >
-                <ModalCloseButton
-                    aria-label={formatMessage({
-                        id: 'dnt_modal.button.close.assistive_msg',
-                        defaultMessage: 'Close dnt form'
-                    })}
-                />
-                <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={7}>
-                    <Heading as="h3" fontSize={25} width="100%">
-                        <FormattedMessage defaultMessage="Tracking Consent" id="dnt_modal.title" />
-                    </Heading>
-                    <HideOnDesktop>
-                        <Flex direction="column">
-                            {description}
-                            <Stack direction="column" spacing={4} mt={4} align="flex-end">
-                                {buttons}
-                            </Stack>
-                        </Flex>
-                    </HideOnDesktop>
-                    <HideOnMobile>
-                        <Flex align="center">
-                            {description}
-                            <Stack
-                                direction="row"
-                                spacing={4}
-                                mt={4}
-                                marginLeft={6}
-                                align="flex-end"
-                            >
-                                {buttons}
-                            </Stack>
-                        </Flex>
-                    </HideOnMobile>
-                </ModalBody>
-            </ModalContent>
-        </Modal>
+                <Heading as="h3" fontSize={25} width="100%">
+                    <FormattedMessage defaultMessage="Tracking Consent" id="dnt_modal.title" />
+                </Heading>
+                <HideOnDesktop>
+                    <Flex direction="column">
+                        {description}
+                        <Stack direction="column" spacing={4} mt={4} align="flex-end">
+                            {buttons}
+                        </Stack>
+                    </Flex>
+                </HideOnDesktop>
+                <HideOnMobile>
+                    <Flex align="center">
+                        {description}
+                        <Stack
+                            direction="row"
+                            spacing={4}
+                            marginLeft={6}
+                            align="flex-end"
+                        >
+                            {buttons}
+                        </Stack>
+                    </Flex>
+                </HideOnMobile>
+            </Box>
+        </Box>
     )
 }
 
