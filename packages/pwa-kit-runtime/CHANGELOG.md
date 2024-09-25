@@ -1,5 +1,5 @@
 ## v3.8.0-dev (Aug 08, 2024)
-- Set up X_FORWARDED_* env variables according to x-forwarded-* headers [#2018](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2018)
+- Set up X_FORWARDED_HOST env variable according to x-forwarded-host headers [#2018](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2018)
 
 ## v3.7.0 (Aug 07, 2024)
 
