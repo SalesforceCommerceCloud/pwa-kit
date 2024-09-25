@@ -72,6 +72,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                                 position={'absolute'}
                                 top={'50%'}
                                 width={'100%'}
+                                transform={"translateY(-50%)"}
                                 padding={'15px'}
                                 textAlign={{base: 'center', sm: 'left'}}
                             >
