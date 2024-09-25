@@ -9,9 +9,6 @@ const sites = require('./sites.js')
 
 module.exports = {
     app: {
-        login: {
-            idps: ['Apple', 'Google']
-        },
         url: {
             site: 'path',
             locale: 'path',
