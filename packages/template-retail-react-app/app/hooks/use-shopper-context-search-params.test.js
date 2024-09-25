@@ -63,8 +63,8 @@ describe('useShopperContextSearchParams', () => {
 
         const history = createMemoryHistory()
         history.push(
-            // Shopper Context Search Params
-            '?sourceCode=instagram&effectiveDateTime=2024-09-04T00:00:00Z&clientIp=13.108.0.0' +
+            // Source code
+            '?sourceCode=instagram' +
                 // GeoLocation
                 '&countryCode=CA&city=toronto&latitude=11.1111&longitude=22.2222&metroCode=AB&postalCode=A3B2C5&region=soemwhere&regionCode=ZZ' +
                 // Custom Qualifiers
@@ -79,8 +79,6 @@ describe('useShopperContextSearchParams', () => {
         const {result} = renderHook(() => useShopperContextSearchParams(), {wrapper})
         expect(result.current).toEqual({
             sourceCode: 'instagram',
-            effectiveDateTime: '2024-09-04T00:00:00Z',
-            clientIp: '13.108.0.0',
             geoLocation: {
                 countryCode: 'CA',
                 city: 'toronto',
