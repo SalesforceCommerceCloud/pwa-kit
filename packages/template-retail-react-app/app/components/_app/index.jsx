@@ -16,7 +16,8 @@ import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
-    useShopperBasketsMutation
+    useShopperBasketsMutation,
+    useDNT
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
@@ -134,6 +135,7 @@ const App = (props) => {
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const {dntStatus, updateDNT} = useDNT()
     const {
         isOpen: isOpenStoreLocator,
         onOpen: onOpenStoreLocator,
@@ -225,6 +227,11 @@ const App = (props) => {
         watchOnlineStatus((isOnline) => {
             setIsOnline(isOnline)
         })
+
+        if (window.location.hostname) {
+            console.log("(JEREMY) window.location.hostname: ", window.location.hostname)
+            updateDNT(true, window.location.hostname)
+        }
     }, [])
 
     useEffect(() => {
