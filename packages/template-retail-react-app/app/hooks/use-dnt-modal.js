@@ -48,7 +48,10 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
                     updateDNT(true)
                     onClose()
                 }}
-                aria-label={formatMessage({id: 'dnt_modal.button.decline.assistive_msg', defaultMessage: "Decline Tracking"})}
+                aria-label={formatMessage({
+                    id: 'dnt_modal.button.decline.assistive_msg',
+                    defaultMessage: 'Decline Tracking'
+                })}
                 width="100%"
             >
                 <FormattedMessage defaultMessage="Decline" id="dnt_modal.decline" />
@@ -60,7 +63,10 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
                 }}
                 boxShadow="md"
                 width="100%"
-                aria-label={formatMessage({id: 'dnt_modal.button.accept.assistive_msg', defaultMessage: "Accept Tracking"})}
+                aria-label={formatMessage({
+                    id: 'dnt_modal.button.accept.assistive_msg',
+                    defaultMessage: 'Accept Tracking'
+                })}
             >
                 <FormattedMessage defaultMessage="Accept" id="dnt_modal.accept" />
             </Button>
