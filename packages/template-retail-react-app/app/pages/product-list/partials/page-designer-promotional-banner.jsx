@@ -10,10 +10,6 @@ import {usePage} from '@salesforce/commerce-sdk-react'
 // Components
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {Page} from '@salesforce/commerce-sdk-react/components'
-import {
-    HideOnDesktop,
-    HideOnMobile
-} from '@salesforce/retail-react-app/app/components/responsive/index'
 
 // Page Designer Components
 import {ImageWithText} from '@salesforce/retail-react-app/app/page-designer/assets'
@@ -35,7 +31,7 @@ const PageDesignerPromotionalBanner = () => {
 
     return (
         <Box>
-            <HideOnMobile>
+            <Box display={{base: 'none', sm: 'block'}}>
                 {promoBannerDesktop && !pageErrorDesktop && (
                     <Page
                         page={promoBannerDesktop}
@@ -43,8 +39,8 @@ const PageDesignerPromotionalBanner = () => {
                         data-testid={'sf-promo-banner-desktop'}
                     />
                 )}
-            </HideOnMobile>
-            <HideOnDesktop>
+            </Box>
+            <Box display={{base: 'block', sm: 'none'}}>
                 {promoBannerMobile && !pageErrorMobile && (
                     <Page
                         page={promoBannerMobile}
@@ -52,7 +48,7 @@ const PageDesignerPromotionalBanner = () => {
                         data-testid={'sf-promo-banner-mobile'}
                     />
                 )}
-            </HideOnDesktop>
+            </Box>
         </Box>
     )
 }
