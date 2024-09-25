@@ -1,12 +1,15 @@
 ## v4.1.0-dev (Aug 8, 2024)
 
+### Performance Improvements
+-   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
+
 ### Bug Fixes
 - The unused `njwt` npm package had a security vulnerability, since it was unused, the package has been dropped
 - Remove save/edit billing action in checkout page for the registered user [#1976](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1976)
 - Product scroller: don't skip tiles if window is too large [#2003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2003)
 - PDP / PLP: Render non HTTP 404 erros [#2003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2003)
 - Error page: Render home page when clicking nav icon [#2003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2003)
-
+- DNT UI: [#2017](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2017)
 ### Accessibility Improvements
 - [a11y] Hide svg from screenreader as they are decorative on homepage [#1980](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1980) 
 - [a11y] Hide log out svg from screenreader as they are decorative [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)

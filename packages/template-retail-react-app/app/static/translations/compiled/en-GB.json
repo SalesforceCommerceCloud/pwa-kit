@@ -1119,6 +1119,36 @@
       "value": "currentPrice"
     }
   ],
+  "dnt_modal.accept": [
+    {
+      "type": 0,
+      "value": "Accept"
+    }
+  ],
+  "dnt_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Close dnt form"
+    }
+  ],
+  "dnt_modal.decline": [
+    {
+      "type": 0,
+      "value": "Decline"
+    }
+  ],
+  "dnt_modal.description": [
+    {
+      "type": 0,
+      "value": "This website uses cookies to enhance user experience and to analyze performance and traffic on our website. We also share information about your use of our site with our social media, advertising and analytics partners. By clicking “Accept,” you agree to our website’s cookie use as described in our Cookie Policy."
+    }
+  ],
+  "dnt_modal.title": [
+    {
+      "type": 0,
+      "value": "Tracking Consent"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
