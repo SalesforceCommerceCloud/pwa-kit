@@ -21,7 +21,7 @@ import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/comp
 import {useDNT} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 
-export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
+export const DntModal = ({isOpen, onOpen, onClose}) => {
     const {dntStatus, updateDNT} = useDNT()
     const {formatMessage} = useIntl()
     const location = useLocation()
@@ -72,11 +72,11 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
             </Button>
         </>
     )
-
+    // Placeholder for the consent tracking form for demonstration purposes
     const description = (
         <Text color={'gray.700'} fontWeight={500} marginTop={7}>
             <FormattedMessage
-                defaultMessage="This website uses cookies to enhance user experience and to analyze performance and traffic on our website. We also share information about your use of our site with our social media, advertising and analytics partners.  By clicking “Accept,” you agree to our website’s cookie use as described in our Cookie Policy. "
+                defaultMessage="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
                 id="dnt_modal.description"
             />
         </Text>
