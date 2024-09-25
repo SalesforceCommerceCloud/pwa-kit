@@ -2712,13 +2712,21 @@
   "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,
-      "value": "Decrement Quantity"
+      "value": "Decrement Quantity for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "product_view.label.assistive_msg.quantity_increment": [
     {
       "type": 0,
-      "value": "Increment Quantity"
+      "value": "Increment Quantity for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "product_view.label.quantity": [

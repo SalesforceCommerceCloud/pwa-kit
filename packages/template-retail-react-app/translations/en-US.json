@@ -1148,10 +1148,10 @@
     "defaultMessage": "Update"
   },
   "product_view.label.assistive_msg.quantity_decrement": {
-    "defaultMessage": "Decrement Quantity"
+    "defaultMessage": "Decrement Quantity for {productName}"
   },
   "product_view.label.assistive_msg.quantity_increment": {
-    "defaultMessage": "Increment Quantity"
+    "defaultMessage": "Increment Quantity for {productName}"
   },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"

@@ -27,6 +27,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
  */
 const QuantityPicker = (props) => {
     const intl = useIntl()
+    const productName = props.productName
     const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
         ...props,
         // Defaults
@@ -47,17 +48,23 @@ const QuantityPicker = (props) => {
 
     const inc = getIncrementButtonProps({
         variant: 'outline',
-        'aria-label': intl.formatMessage({
-            defaultMessage: 'Increment Quantity',
-            id: 'product_view.label.assistive_msg.quantity_increment'
-        })
+        'aria-label': intl.formatMessage(
+            {
+                defaultMessage: 'Increment Quantity for {productName}',
+                id: 'product_view.label.assistive_msg.quantity_increment'
+            },
+            {productName}
+        )
     })
     const dec = getDecrementButtonProps({
         variant: 'outline',
-        'aria-label': intl.formatMessage({
-            defaultMessage: 'Decrement Quantity',
-            id: 'product_view.label.assistive_msg.quantity_decrement'
-        })
+        'aria-label': intl.formatMessage(
+            {
+                defaultMessage: 'Decrement Quantity for {productName}',
+                id: 'product_view.label.assistive_msg.quantity_decrement'
+            },
+            {productName}
+        )
     })
     const input = getInputProps({
         maxWidth: '44px',
@@ -104,5 +111,9 @@ const QuantityPicker = (props) => {
         </HStack>
     )
 }
+
+// QuantityPicker.propTypes = {
+//     productName: PropTypes.string
+// }
 
 export default QuantityPicker
