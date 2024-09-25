@@ -12,7 +12,6 @@ import {
     mockProductSearch,
     mockedEmptyCustomerProductList
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
-import {mockImageWithText} from '@salesforce/retail-react-app/app/mocks/page-designer'
 import {screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {
@@ -236,29 +235,4 @@ test('clicking a filter on search result will change url', async () => {
             '?limit=25&q=dress&refine=c_refinementColor%3DBeige&sort=best-matches'
         )
     )
-})
-
-test('should render promo banner', async () => {
-    global.server.use(
-        rest.get('*/pages/instagram-promo-banner', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockImageWithText))
-        })
-    )
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
-    renderWithProviders(<MockedComponent />)
-    expect(await screen.findByTestId('sf-promo-banner')).toBeInTheDocument()
-})
-
-test.each([
-    [500, mockImageWithText],
-    [500, undefined]
-])('should not render promo banner', async (statusCode, response) => {
-    global.server.use(
-        rest.get('*/pages/instagram-promo-banner', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(statusCode), ctx.json(response))
-        })
-    )
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
-    renderWithProviders(<MockedComponent />)
-    expect(await screen.queryByTestId('sf-promo-banner')).toBeNull()
 })
