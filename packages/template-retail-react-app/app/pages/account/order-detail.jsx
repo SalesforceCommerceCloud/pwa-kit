@@ -283,7 +283,9 @@ const AccountOrderDetail = () => {
                                         />
                                     </Heading>
                                     <Stack direction="row">
-                                        {CardIcon && <CardIcon layerStyle="ccIcon" />}
+                                        {CardIcon && (
+                                            <CardIcon layerStyle="ccIcon" aria-hidden="true" />
+                                        )}
                                         <Box>
                                             <Text fontSize="sm">{paymentCard?.cardType}</Text>
                                             <Stack direction="row">
