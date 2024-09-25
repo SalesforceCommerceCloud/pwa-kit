@@ -7,8 +7,7 @@
 import {
     useMutation as useReactQueryMutation,
     useQueryClient,
-    UseMutationOptions,
-    MutationFunction
+    UseMutationOptions
 } from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
@@ -68,22 +67,12 @@ export const useCustomMutation = (
     apiOptions: OptionalCustomEndpointClientConfig,
     mutationOptions?: UseMutationOptions
 ) => {
-    const auth = useAuthContext()
     const config = useConfig()
-    const clientHeaders = config.headers || {}
-    const currentClientConfig = {
-        parameters: {
-            clientId: config.clientId,
-            siteId: config.siteId,
-            organizationId: config.organizationId,
-            shortCode: config.shortCode
-        },
-        proxy: config.proxy
-    }
-
+    const auth = useAuthContext()
     const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
         return async () => {
             const clientConfig = options.clientConfig || {}
+            const clientHeaders = config.headers || {}
             const {access_token} = await auth.ready()
             return await helpers.callCustomEndpoint({
                 ...options,
@@ -96,61 +85,18 @@ export const useCustomMutation = (
                     }
                 },
                 clientConfig: {
-                    ...currentClientConfig,
+                    parameters: {
+                        clientId: config.clientId,
+                        siteId: config.siteId,
+                        organizationId: config.organizationId,
+                        shortCode: config.organizationId
+                    },
+                    proxy: config.proxy,
                     ...clientConfig
                 }
             })
         }
     }
 
-    const callCustomEndpointWithBody = async (args: {
-        body: unknown
-        parameters?: {[key: string]: string | number | boolean | string[] | number[]}
-        headers?: {[key: string]: string}
-    }) => {
-        const clientConfig = apiOptions.clientConfig || {}
-        const {access_token} = await auth.ready()
-        return await helpers.callCustomEndpoint({
-            ...apiOptions,
-            options: {
-                ...apiOptions.options,
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                    ...clientHeaders,
-                    ...apiOptions.options.headers,
-                    ...args.headers
-                },
-                body: args.body,
-                parameters: {
-                    ...apiOptions.options.parameters,
-                    ...args.parameters
-                }
-            },
-            clientConfig: {
-                ...currentClientConfig,
-                ...clientConfig
-            }
-        })
-    }
-
-    if (!apiOptions?.options?.body) {
-        // If users don't define a body when they use this hook, they can pass in a body later
-        // when calling mutate() or mutateAsync()
-        // this allows users to call the same endpoint with different arguments
-
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useReactQueryMutation(
-            callCustomEndpointWithBody as MutationFunction<unknown, unknown>,
-            mutationOptions
-        )
-    } else {
-        // If users define a body when they use this hook, every time they call
-        // mutate() or mutateAsync(), it will make the exactly the same call
-        // with the same arguments to the provided endpoint
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useReactQueryMutation(
-            callCustomEndpointWithAuth(apiOptions) as MutationFunction<unknown, unknown>,
-            mutationOptions
-        )
-    }
+    return useReactQueryMutation(callCustomEndpointWithAuth(apiOptions), mutationOptions)
 }
