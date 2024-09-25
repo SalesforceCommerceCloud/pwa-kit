@@ -128,7 +128,7 @@ const Home = ({value}: Props) => {
                     <DrawerHeader>Create your account</DrawerHeader>
 
                     <DrawerBody>
-                        <Link to="/sample-page">Sample Page</Link>
+                        <Link to="/foo-page">Sample Page</Link>
                         <br />
                         <Link to="/sample-page-2">Sample Page 2</Link>
                     </DrawerBody>
