@@ -55,7 +55,10 @@ const ProductItem = ({
     const {currency: activeCurrency} = useCurrency()
     const intl = useIntl()
     return (
-        <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
+        <Box
+            position="relative"
+            data-testid={`sf-cart-item-${product.productId ? product.productId : product.id}`}
+        >
             <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
                 <Stack layerStyle="cardBordered" align="flex-start">
