@@ -379,6 +379,41 @@ describe('Auth', () => {
         await auth.ready()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
+    test('ready - throw error and discard refresh token if refresh token is invalid', async () => {
+        // Force the mock to throw just for this test
+        const refreshAccessTokenSpy = jest.spyOn(helpers, 'refreshAccessToken')
+        refreshAccessTokenSpy.mockRejectedValueOnce({})
+
+        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
+
+        // To simulate real-world scenario, let's start with an expired access token
+        const data: StoredAuthData = {
+            refresh_token_guest: 'refresh_token_guest',
+            access_token: JWTExpired,
+            customer_id: 'customer_id',
+            enc_user_id: 'enc_user_id',
+            expires_in: 1800,
+            id_token: 'id_token',
+            idp_access_token: 'idp_access_token',
+            token_type: 'token_type',
+            usid: 'usid',
+            customer_type: 'guest',
+            refresh_token_expires_in: 30 * 24 * 3600
+        }
+
+        const auth = new Auth(config)
+
+        Object.keys(data).forEach((key) => {
+            // @ts-expect-error private method
+            auth.set(key, data[key])
+        })
+
+        await auth.ready()
+
+        // The call to loginGuestUser only executes when refreshAccessToken fails
+        expect(refreshAccessTokenSpy).toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+    })
 
     test('loginGuestUser', async () => {
         const auth = new Auth(config)
