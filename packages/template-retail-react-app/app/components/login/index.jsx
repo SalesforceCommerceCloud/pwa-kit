@@ -17,9 +17,13 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
+import SocialLogin from '@salesforce/retail-react-app/app/components/social-login'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
+    const idps = getConfig().app?.login?.idps
+
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
@@ -70,6 +74,8 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                                 id="login_form.button.sign_in"
                             />
                         </Button>
+
+                        <SocialLogin idps={idps} />
 
                         <Stack direction="row" spacing={1} justify="center">
                             <Text fontSize="sm">
