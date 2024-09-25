@@ -31,7 +31,7 @@ const PageDesignerPromotionalBanner = () => {
 
     return (
         <Box>
-            <Box display={{base: 'none', sm: 'block'}}>
+            <Box display={{base: 'none', md: 'block'}}>
                 {promoBannerDesktop && !pageErrorDesktop && (
                     <Page
                         page={promoBannerDesktop}
@@ -40,7 +40,7 @@ const PageDesignerPromotionalBanner = () => {
                     />
                 )}
             </Box>
-            <Box display={{base: 'block', sm: 'none'}}>
+            <Box display={{base: 'block', md: 'none'}}>
                 {promoBannerMobile && !pageErrorMobile && (
                     <Page
                         page={promoBannerMobile}
