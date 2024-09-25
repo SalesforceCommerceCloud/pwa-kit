@@ -13,6 +13,7 @@ import {
     useNumberInput
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage, useIntl} from 'react-intl'
+import PropTypes from 'prop-types'
 
 /**
  * This is the mobile implementation of the Chakra NumberInput. This simple component essentially
@@ -112,8 +113,8 @@ const QuantityPicker = (props) => {
     )
 }
 
-// QuantityPicker.propTypes = {
-//     productName: PropTypes.string
-// }
+QuantityPicker.propTypes = {
+    productName: PropTypes.string
+}
 
 export default QuantityPicker
