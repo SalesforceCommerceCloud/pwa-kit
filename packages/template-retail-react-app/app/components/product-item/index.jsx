@@ -124,7 +124,7 @@ const ProductItem = ({
                                                 setQuantity(stringValue)
                                             }
                                         }}
-                                        productName={product.name}
+                                        productName={product?.name}
                                     />
                                     <VisuallyHidden role="status">
                                         {product?.name}

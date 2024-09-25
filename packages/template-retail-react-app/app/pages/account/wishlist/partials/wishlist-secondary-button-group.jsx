@@ -22,7 +22,6 @@ import ConfirmationModal from '@salesforce/retail-react-app/app/components/confi
 import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {values} from 'lodash'
 
 export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     dialogTitle: defineMessage({
