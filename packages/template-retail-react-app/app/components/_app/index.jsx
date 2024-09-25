@@ -230,10 +230,10 @@ const App = (props) => {
             setIsOnline(isOnline)
         })
 
-        if (window.location.hostname) {
-            console.log("(JEREMY) window.location.hostname: ", window.location.hostname)
-            updateDNT(true)
-        }
+        // if (window.location.hostname) {
+        //     console.log("(JEREMY) window.location.hostname: ", window.location.hostname)
+        //     updateDNT(true)
+        // }
     }, [])
 
     useEffect(() => {
