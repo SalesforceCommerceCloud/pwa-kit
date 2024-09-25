@@ -75,60 +75,52 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
     )
 
     return (
-        isOpen && <Box
-            position="fixed"
-            bottom={0}
-            left={0}
-            right={0}
-            margin="0"
-            borderTopRadius="md"
-            boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)"
-            width="100%"
-            maxWidth="100%"
-            backgroundColor="white"
-        >
-            <CloseButton
-                position="absolute"
-                aria-label={formatMessage({
-                    id: 'dnt_modal.button.close.assistive_msg',
-                    defaultMessage: 'Close dnt form'
-                })}
-                right={5}
-                top={5}
-                onClick={onCloseModal}
-            />
+        isOpen && (
             <Box
-                paddingBottom={14} 
-                paddingTop={10} 
-                paddingLeft={10}
-                paddingRight={10}
+                position="fixed"
+                bottom={0}
+                left={0}
+                right={0}
+                margin="0"
+                borderTopRadius="md"
+                boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)"
+                width="100%"
+                maxWidth="100%"
+                backgroundColor="white"
             >
-                <Heading as="h3" fontSize={25} width="100%">
-                    <FormattedMessage defaultMessage="Tracking Consent" id="dnt_modal.title" />
-                </Heading>
-                <HideOnDesktop>
-                    <Flex direction="column">
-                        {description}
-                        <Stack direction="column" spacing={4} mt={4} align="flex-end">
-                            {buttons}
-                        </Stack>
-                    </Flex>
-                </HideOnDesktop>
-                <HideOnMobile>
-                    <Flex align="center">
-                        {description}
-                        <Stack
-                            direction="row"
-                            spacing={4}
-                            marginLeft={6}
-                            align="flex-end"
-                        >
-                            {buttons}
-                        </Stack>
-                    </Flex>
-                </HideOnMobile>
+                <CloseButton
+                    position="absolute"
+                    aria-label={formatMessage({
+                        id: 'dnt_modal.button.close.assistive_msg',
+                        defaultMessage: 'Close dnt form'
+                    })}
+                    right={5}
+                    top={5}
+                    onClick={onCloseModal}
+                />
+                <Box paddingBottom={14} paddingTop={10} paddingLeft={10} paddingRight={10}>
+                    <Heading as="h3" fontSize={25} width="100%">
+                        <FormattedMessage defaultMessage="Tracking Consent" id="dnt_modal.title" />
+                    </Heading>
+                    <HideOnDesktop>
+                        <Flex direction="column">
+                            {description}
+                            <Stack direction="column" spacing={4} mt={4} align="flex-end">
+                                {buttons}
+                            </Stack>
+                        </Flex>
+                    </HideOnDesktop>
+                    <HideOnMobile>
+                        <Flex align="center">
+                            {description}
+                            <Stack direction="row" spacing={4} marginLeft={6} align="flex-end">
+                                {buttons}
+                            </Stack>
+                        </Flex>
+                    </HideOnMobile>
+                </Box>
             </Box>
-        </Box>
+        )
     )
 }
 
