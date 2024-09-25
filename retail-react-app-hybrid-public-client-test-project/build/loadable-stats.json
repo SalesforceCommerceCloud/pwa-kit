@@ -1,0 +1,1137 @@
+{
+  "name": "client",
+  "hash": "da26d2b775f4fa4c0cdd",
+  "publicPath": "",
+  "outputPath": "/Users/jangho.jung/Documents/pwa-kit/retail-react-app-hybrid-public-client-test-project/build",
+  "assetsByChunkName": {
+    "main": [
+      "main.js"
+    ],
+    "pages-home": [
+      "pages-home.js"
+    ],
+    "pages-my-new-route": [
+      "pages-my-new-route.js"
+    ],
+    "pages-page-not-found": [
+      "pages-page-not-found.js"
+    ],
+    "pages-login": [
+      "pages-login.js"
+    ],
+    "pages-registration": [
+      "pages-registration.js"
+    ],
+    "pages-reset-password": [
+      "pages-reset-password.js"
+    ],
+    "pages-account": [
+      "pages-account.js"
+    ],
+    "pages-cart": [
+      "pages-cart.js"
+    ],
+    "pages-checkout": [
+      "pages-checkout.js"
+    ],
+    "pages-checkout-confirmation": [
+      "pages-checkout-confirmation.js"
+    ],
+    "pages-login-redirect": [
+      "pages-login-redirect.js"
+    ],
+    "pages-product-detail": [
+      "pages-product-detail.js"
+    ],
+    "pages-product-list": [
+      "pages-product-list.js"
+    ],
+    "pages-store-locator": [
+      "pages-store-locator.js"
+    ],
+    "pages-account-wishlist": [
+      "pages-account-wishlist.js"
+    ],
+    "vendor": [
+      "vendor.js"
+    ]
+  },
+  "assets": [
+    {
+      "type": "asset",
+      "name": "vendor.js",
+      "size": 1329285,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true,
+        "related": {
+          "license": "vendor.js.LICENSE.txt"
+        }
+      },
+      "chunkNames": [
+        "vendor"
+      ],
+      "chunkIdHints": [
+        "vendor"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1,
+      "chunks": [
+        121
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "main.js",
+      "size": 190140,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "main"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        792
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-checkout.js",
+      "size": 37872,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-checkout"
+      ],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        766
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-account.js",
+      "size": 36891,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-account"
+      ],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        291
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-product-list.js",
+      "size": 25847,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-product-list"
+      ],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        928
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-cart.js",
+      "size": 24783,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-cart"
+      ],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        788
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "157.js",
+      "size": 15245,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        157
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "736.js",
+      "size": 14764,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        736
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "852.js",
+      "size": 13995,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        505,
+        852
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-checkout-confirmation.js",
+      "size": 13121,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-checkout-confirmation"
+      ],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        348
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "962.js",
+      "size": 12049,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        962
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-product-detail.js",
+      "size": 10524,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-product-detail"
+      ],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        875
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-home.js",
+      "size": 9661,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-home"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        339
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "51.js",
+      "size": 9386,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [],
+      "chunkIdHints": [
+        "vendors"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        51
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-account-wishlist.js",
+      "size": 2983,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-account-wishlist"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        505
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-reset-password.js",
+      "size": 2137,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-reset-password"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        215
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-login.js",
+      "size": 2096,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-login"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        729
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-page-not-found.js",
+      "size": 1800,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-page-not-found"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        64
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-registration.js",
+      "size": 1347,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-registration"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        197
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-store-locator.js",
+      "size": 683,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-store-locator"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        540
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-login-redirect.js",
+      "size": 340,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-login-redirect"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        930
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "pages-my-new-route.js",
+      "size": 259,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [
+        "pages-my-new-route"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        173
+      ],
+      "auxiliaryChunks": []
+    },
+    {
+      "type": "asset",
+      "name": "42.js",
+      "size": 98,
+      "emitted": false,
+      "comparedForEmit": false,
+      "cached": true,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "chunks": [
+        42
+      ],
+      "auxiliaryChunks": []
+    }
+  ],
+  "namedChunkGroups": {
+    "main": {
+      "name": "main",
+      "chunks": [
+        121,
+        792
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "main.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "salesforce-retail-react-app-app-pages-home": {
+      "name": "salesforce-retail-react-app-app-pages-home",
+      "chunks": [
+        121,
+        339
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "pages-home.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-my-new-route": {
+      "name": "pages-my-new-route",
+      "chunks": [
+        173
+      ],
+      "assets": [
+        {
+          "name": "pages-my-new-route.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "salesforce-retail-react-app-app-pages-page-not-found": {
+      "name": "salesforce-retail-react-app-app-pages-page-not-found",
+      "chunks": [
+        64
+      ],
+      "assets": [
+        {
+          "name": "pages-page-not-found.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-home": {
+      "name": "pages-home",
+      "chunks": [
+        121,
+        339
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "pages-home.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-login": {
+      "name": "pages-login",
+      "chunks": [
+        729
+      ],
+      "assets": [
+        {
+          "name": "pages-login.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-registration": {
+      "name": "pages-registration",
+      "chunks": [
+        197
+      ],
+      "assets": [
+        {
+          "name": "pages-registration.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-reset-password": {
+      "name": "pages-reset-password",
+      "chunks": [
+        215
+      ],
+      "assets": [
+        {
+          "name": "pages-reset-password.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-account": {
+      "name": "pages-account",
+      "chunks": [
+        121,
+        51,
+        157,
+        852,
+        736,
+        962,
+        291
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "51.js"
+        },
+        {
+          "name": "157.js"
+        },
+        {
+          "name": "852.js"
+        },
+        {
+          "name": "736.js"
+        },
+        {
+          "name": "962.js"
+        },
+        {
+          "name": "pages-account.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-cart": {
+      "name": "pages-cart",
+      "chunks": [
+        121,
+        51,
+        157,
+        852,
+        788
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "51.js"
+        },
+        {
+          "name": "157.js"
+        },
+        {
+          "name": "852.js"
+        },
+        {
+          "name": "pages-cart.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-checkout": {
+      "name": "pages-checkout",
+      "chunks": [
+        121,
+        51,
+        852,
+        962,
+        766
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "51.js"
+        },
+        {
+          "name": "852.js"
+        },
+        {
+          "name": "962.js"
+        },
+        {
+          "name": "pages-checkout.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-checkout-confirmation": {
+      "name": "pages-checkout-confirmation",
+      "chunks": [
+        121,
+        51,
+        348
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "51.js"
+        },
+        {
+          "name": "pages-checkout-confirmation.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-login-redirect": {
+      "name": "pages-login-redirect",
+      "chunks": [
+        930
+      ],
+      "assets": [
+        {
+          "name": "pages-login-redirect.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-product-detail": {
+      "name": "pages-product-detail",
+      "chunks": [
+        121,
+        157,
+        875
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "157.js"
+        },
+        {
+          "name": "pages-product-detail.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-product-list": {
+      "name": "pages-product-list",
+      "chunks": [
+        121,
+        928
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "pages-product-list.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-store-locator": {
+      "name": "pages-store-locator",
+      "chunks": [
+        540
+      ],
+      "assets": [
+        {
+          "name": "pages-store-locator.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-account-wishlist": {
+      "name": "pages-account-wishlist",
+      "chunks": [
+        121,
+        51,
+        157,
+        736,
+        505
+      ],
+      "assets": [
+        {
+          "name": "vendor.js"
+        },
+        {
+          "name": "51.js"
+        },
+        {
+          "name": "157.js"
+        },
+        {
+          "name": "736.js"
+        },
+        {
+          "name": "pages-account-wishlist.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    },
+    "pages-page-not-found": {
+      "name": "pages-page-not-found",
+      "chunks": [
+        64
+      ],
+      "assets": [
+        {
+          "name": "pages-page-not-found.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    }
+  },
+  "generator": "loadable-components",
+  "chunks": [
+    {
+      "id": 792,
+      "files": [
+        "main.js"
+      ]
+    },
+    {
+      "id": 42,
+      "files": [
+        "42.js"
+      ]
+    },
+    {
+      "id": 339,
+      "files": [
+        "pages-home.js"
+      ]
+    },
+    {
+      "id": 173,
+      "files": [
+        "pages-my-new-route.js"
+      ]
+    },
+    {
+      "id": 64,
+      "files": [
+        "pages-page-not-found.js"
+      ]
+    },
+    {
+      "id": 729,
+      "files": [
+        "pages-login.js"
+      ]
+    },
+    {
+      "id": 197,
+      "files": [
+        "pages-registration.js"
+      ]
+    },
+    {
+      "id": 215,
+      "files": [
+        "pages-reset-password.js"
+      ]
+    },
+    {
+      "id": 291,
+      "files": [
+        "pages-account.js"
+      ]
+    },
+    {
+      "id": 788,
+      "files": [
+        "pages-cart.js"
+      ]
+    },
+    {
+      "id": 766,
+      "files": [
+        "pages-checkout.js"
+      ]
+    },
+    {
+      "id": 348,
+      "files": [
+        "pages-checkout-confirmation.js"
+      ]
+    },
+    {
+      "id": 930,
+      "files": [
+        "pages-login-redirect.js"
+      ]
+    },
+    {
+      "id": 875,
+      "files": [
+        "pages-product-detail.js"
+      ]
+    },
+    {
+      "id": 928,
+      "files": [
+        "pages-product-list.js"
+      ]
+    },
+    {
+      "id": 540,
+      "files": [
+        "pages-store-locator.js"
+      ]
+    },
+    {
+      "id": 505,
+      "files": [
+        "pages-account-wishlist.js"
+      ]
+    },
+    {
+      "id": 121,
+      "files": [
+        "vendor.js"
+      ]
+    },
+    {
+      "id": 51,
+      "files": [
+        "51.js"
+      ]
+    },
+    {
+      "id": 157,
+      "files": [
+        "157.js"
+      ]
+    },
+    {
+      "id": 852,
+      "files": [
+        "852.js"
+      ]
+    },
+    {
+      "id": 736,
+      "files": [
+        "736.js"
+      ]
+    },
+    {
+      "id": 962,
+      "files": [
+        "962.js"
+      ]
+    }
+  ]
+}

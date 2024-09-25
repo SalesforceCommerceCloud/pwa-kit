@@ -230,7 +230,7 @@ const App = (props) => {
 
         if (window.location.hostname) {
             console.log("(JEREMY) window.location.hostname: ", window.location.hostname)
-            updateDNT(true, window.location.hostname)
+            updateDNT(true)
         }
     }, [])
 
