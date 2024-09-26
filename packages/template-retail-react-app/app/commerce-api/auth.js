@@ -479,7 +479,7 @@ class Auth {
         if (response.status_code) {
             // if the refresh has failed, clear auth so the user is
             // not stuck with an invalid refresh token
-            _clearAuth()
+            this._clearAuth()
             console.log(`Auth Error: HTTP ${response.status_code} - ${response.message}`)
             throw new HTTPError(response.status_code, response.message)
         }
