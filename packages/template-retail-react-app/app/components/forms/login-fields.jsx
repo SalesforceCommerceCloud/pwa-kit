@@ -6,16 +6,17 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {FormattedMessage} from 'react-intl'
+import {Stack, Box, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 
-const LoginFields = ({form, prefix = ''}) => {
+const LoginFields = ({form, prefix = '', includeEmail = true, includePassword = true}) => {
     const fields = useLoginFields({form, prefix})
     return (
         <Stack spacing={5}>
             <Field {...fields.email} />
-            <Field {...fields.password} />
+            {includePassword && <Field {...fields.password} />}
         </Stack>
     )
 }
@@ -25,7 +26,11 @@ LoginFields.propTypes = {
     form: PropTypes.object.isRequired,
 
     /** Optional prefix for field names */
-    prefix: PropTypes.string
+    prefix: PropTypes.string,
+
+    /** Optional configurations */
+    includeEmail: PropTypes.bool,
+    includePassword: PropTypes.bool
 }
 
 export default LoginFields

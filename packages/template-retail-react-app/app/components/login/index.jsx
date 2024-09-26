@@ -8,6 +8,7 @@
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
     Alert,
     Box,
@@ -17,9 +18,12 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
+import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passwordless-login/index'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
+    const allowPasswordless = getConfig().app?.login?.allowPasswordless
+
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
@@ -36,55 +40,64 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                 onSubmit={form.handleSubmit(submitForm)}
                 data-testid="sf-auth-modal-form"
             >
-                <Stack spacing={8} paddingLeft={4} paddingRight={4}>
-                    {form.formState.errors?.global && (
-                        <Alert status="error">
-                            <AlertIcon color="red.500" boxSize={4} />
-                            <Text fontSize="sm" ml={3}>
-                                {form.formState.errors.global.message}
-                            </Text>
-                        </Alert>
-                    )}
-                    <Stack>
-                        <LoginFields form={form} />
+                {form.formState.errors?.global && (
+                    <Alert status="error">
+                        <AlertIcon color="red.500" boxSize={4} />
+                        <Text fontSize="sm" ml={3}>
+                            {form.formState.errors.global.message}
+                        </Text>
+                    </Alert>
+                )}
+                <Stack spacing={6}>
+                    {allowPasswordless ? (
+                        <PasswordlessLogin
+                            form={form}
+                            clickForgotPassword={clickForgotPassword}
+                        />
+                    ) : (
+                        // TODO: Move to its own StandardLogin component
+                        <Stack spacing={8} paddingLeft={4} paddingRight={4}>
+                            <Stack>
+                                <LoginFields form={form} />
 
-                        <Box>
-                            <Button variant="link" size="sm" onClick={clickForgotPassword}>
-                                <FormattedMessage
-                                    defaultMessage="Forgot password?"
-                                    id="login_form.link.forgot_password"
-                                />
-                            </Button>
-                        </Box>
-                    </Stack>
-                    <Stack spacing={6}>
-                        <Button
-                            type="submit"
-                            onClick={() => {
-                                form.clearErrors('global')
-                            }}
-                            isLoading={form.formState.isSubmitting}
-                        >
+                                <Box>
+                                    <Button variant="link" size="sm" onClick={clickForgotPassword}>
+                                        <FormattedMessage
+                                            defaultMessage="Forgot password?"
+                                            id="login_form.link.forgot_password"
+                                        />
+                                    </Button>
+                                </Box>
+                            </Stack>
+                            <Stack spacing={6}>
+                                <Button
+                                    type="submit"
+                                    onClick={() => {
+                                        form.clearErrors('global')
+                                    }}
+                                    isLoading={form.formState.isSubmitting}
+                                >
+                                    <FormattedMessage
+                                        defaultMessage="Sign In"
+                                        id="login_form.button.sign_in"
+                                    />
+                                </Button>
+                            </Stack>
+                        </Stack>
+                    )}
+                    <Stack direction="row" spacing={1} justify="center">
+                        <Text fontSize="sm">
                             <FormattedMessage
-                                defaultMessage="Sign In"
-                                id="login_form.button.sign_in"
+                                defaultMessage="Don't have an account?"
+                                id="login_form.message.dont_have_account"
+                            />
+                        </Text>
+                        <Button variant="link" size="sm" onClick={clickCreateAccount}>
+                            <FormattedMessage
+                                defaultMessage="Create account"
+                                id="login_form.action.create_account"
                             />
                         </Button>
-
-                        <Stack direction="row" spacing={1} justify="center">
-                            <Text fontSize="sm">
-                                <FormattedMessage
-                                    defaultMessage="Don't have an account?"
-                                    id="login_form.message.dont_have_account"
-                                />
-                            </Text>
-                            <Button variant="link" size="sm" onClick={clickCreateAccount}>
-                                <FormattedMessage
-                                    defaultMessage="Create account"
-                                    id="login_form.action.create_account"
-                                />
-                            </Button>
-                        </Stack>
                     </Stack>
                 </Stack>
             </form>
