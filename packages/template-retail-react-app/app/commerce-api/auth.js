@@ -201,6 +201,7 @@ class Auth {
         const response = await this._api.shopperLogin.getAccessToken(options)
         // Check for error response before handling the token
         if (response.status_code) {
+            console.log(`Auth Error: HTTP ${response.status_code} - ${response.message}`)
             throw new HTTPError(response.status_code, response.message)
         }
         this._handleShopperLoginTokenResponse(response)
@@ -474,6 +475,10 @@ class Auth {
         const response = await this._api.shopperLogin.getAccessToken(options)
         // Check for error response before handling the token
         if (response.status_code) {
+            // if the refresh has failed, clear auth so the user is
+            // not stuck with an invalid refresh token
+            _clearAuth()
+            console.log(`Auth Error: HTTP ${response.status_code} - ${response.message}`)
             throw new HTTPError(response.status_code, response.message)
         }
         this._handleShopperLoginTokenResponse(response)
