@@ -442,6 +442,17 @@ class Auth {
         }
     }
 
+    logTokenRequestError = async (error: Error) => {
+        if (error instanceof Error && 'response' in error) {
+            // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
+            // We can't use `instanceof`, so instead we just check for the `response` property
+            // and assume it is a fetch Response.
+            const json = await (error['response'] as Response).json()
+
+            this.logger.error(`${json.status_code} ${json.message}`)
+        }
+    }
+
     /**
      * The ready function returns a promise that resolves with valid ShopperLogin
      * token response.
@@ -491,15 +502,7 @@ class Auth {
                 )
             } catch (error) {
                 // If the refresh token login fails, we fall back to the new guest refresh login
-                if (error instanceof Error && 'response' in error) {
-                    // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
-                    // We can't use `instanceof`, so instead we just check for the `response` property
-                    // and assume it is a fetch Response.
-                    const json = await (error['response'] as Response).json()
-
-                    this.logger.error(`${json.status_code} ${json.message}`)
-                }
-
+                this.logTokenRequestError(error as Error)
                 // clean up storage and restart the login flow
                 this.clearStorage()
             }
@@ -551,7 +554,12 @@ class Auth {
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
             : () => helpers.loginGuestUser(...guestPublicArgs)
 
-        return await this.queueRequest(callback, isGuest)
+        try {
+            return await this.queueRequest(callback, isGuest)
+        } catch (error) {
+            this.logTokenRequestError(error as Error)
+            throw error
+        }
     }
 
     /**
