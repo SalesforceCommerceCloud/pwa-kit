@@ -190,6 +190,7 @@ class Auth {
         data.append('code_verifier', codeVerifier)
         data.append('client_id', this._config.parameters.clientId)
         data.append('redirect_uri', redirectUri)
+        data.append('channel_id', this._config.parameters.siteId)
 
         const options = {
             headers: {
@@ -465,6 +466,7 @@ class Auth {
         data.append('grant_type', 'refresh_token')
         data.append('refresh_token', this.refreshToken)
         data.append('client_id', this._config.parameters.clientId)
+        data.append('channel_id', this._config.parameters.siteId)
 
         const options = {
             headers: {
