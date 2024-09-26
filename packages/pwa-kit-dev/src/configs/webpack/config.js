@@ -91,7 +91,7 @@ const getBundleAnalyzerPlugin = (name = 'report', pluginOptions) =>
     })
 
 const entryPointExists = (segments) => {
-    for (let ext of ['.js', '.jsx', '.ts', '.tsx']) {
+    for (let ext of SUPPORTED_FILE_EXTENSIONS) {
         const p = resolve(projectDir, ...segments) + ext
         if (fse.existsSync(p)) {
             return true
