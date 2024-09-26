@@ -8,7 +8,7 @@ import {
     useMutation as useReactQueryMutation,
     useQueryClient,
     UseMutationOptions,
-    MutationFunction
+    UseMutationResult
 } from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
@@ -54,6 +54,14 @@ export const useMutation = <
     })
 }
 
+type MutationVariablesWithBody = {
+    body: unknown;
+    parameters?: { [key: string]: string | number | boolean | string[] | number[] };
+    headers?: { [key: string]: string };
+};
+type MutationVariables = MutationVariablesWithBody | void;
+
+
 /**
  * A hook for SCAPI custom endpoint mutations.
  *
@@ -64,10 +72,10 @@ export const useMutation = <
  * @param mutationOptions - Options passed through to @tanstack/react-query
  * @returns A TanStack Query mutation hook with data from the custom API endpoint.
  */
-export const useCustomMutation = (
+export const useCustomMutation = <TData = unknown, TError = unknown>(
     apiOptions: OptionalCustomEndpointClientConfig,
-    mutationOptions?: UseMutationOptions
-) => {
+    mutationOptions?: UseMutationOptions<TData, TError, MutationVariables>
+):UseMutationResult<TData, TError, MutationVariables> => {
     const auth = useAuthContext()
     const config = useConfig()
     const clientHeaders = config.headers || {}
@@ -82,7 +90,7 @@ export const useCustomMutation = (
     }
 
     const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
-        return async () => {
+        return async (): Promise<any> => {
             const clientConfig = options.clientConfig || {}
             const {access_token} = await auth.ready()
             return await helpers.callCustomEndpoint({
@@ -103,11 +111,7 @@ export const useCustomMutation = (
         }
     }
 
-    const callCustomEndpointWithBody = async (args: {
-        body: unknown
-        parameters?: {[key: string]: string | number | boolean | string[] | number[]}
-        headers?: {[key: string]: string}
-    }) => {
+    const callCustomEndpointWithBody = async (args: MutationVariablesWithBody): Promise<any> => {
         const clientConfig = apiOptions.clientConfig || {}
         const {access_token} = await auth.ready()
         return await helpers.callCustomEndpoint({
@@ -140,17 +144,17 @@ export const useCustomMutation = (
 
         // eslint-disable-next-line react-hooks/rules-of-hooks
         return useReactQueryMutation(
-            callCustomEndpointWithBody as MutationFunction<unknown, unknown>,
+            callCustomEndpointWithBody,
             mutationOptions
-        )
+        ) as UseMutationResult<TData, TError, MutationVariables>
     } else {
         // If users define a body when they use this hook, every time they call
         // mutate() or mutateAsync(), it will make the exactly the same call
         // with the same arguments to the provided endpoint
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useReactQueryMutation(
-            callCustomEndpointWithAuth(apiOptions) as MutationFunction<unknown, unknown>,
+        return useReactQueryMutation<TData, TError, undefined, unknown>(
+            callCustomEndpointWithAuth(apiOptions),
             mutationOptions
-        )
+        ) as UseMutationResult<TData, TError, MutationVariables>
     }
 }
