@@ -31,35 +31,38 @@ class OverridesResolverPlugin {
             callback()
             return
         }
-
         const target = resolver.ensureHook('resolved')
         const importPath = request.request
         const sourcePath = request.context.issuer
 
         // Resolve the import with the provided packageIterator.
-        const modulePath = resolve(importPath, {
-            basedir: this.projectDir,
-            extensions: this.fileExtensions,
-            packageIterator: () =>
-                buildCandidatePaths(importPath, sourcePath, {
-                    extensions: this.extensions,
-                    projectDir: this.projectDir
-                }),
-            ...this.resolveOptions
-        })
-
-        if (modulePath) {
-            // Update the requests path with the one resoved from above.
-            request.path = modulePath
-
-            resolver.doResolve(
-                target,
-                request,
-                `${this.constructor.name} found base override file`,
-                resolveContext,
-                callback
-            )
+        let modulePath
+        
+        try {
+            modulePath = resolve(importPath, {
+                basedir: this.projectDir,
+                extensions: this.fileExtensions,
+                packageIterator: () =>
+                    buildCandidatePaths(importPath, sourcePath, {
+                        extensions: this.extensions,
+                        projectDir: this.projectDir
+                    }),
+                ...this.resolveOptions
+            })
+        } catch (e) {
+            return callback(e)
         }
+        
+        // Update the requests path with the one resoved from above.
+        request.path = modulePath
+
+        resolver.doResolve(
+            target,
+            request,
+            `${this.constructor.name} found base override file`,
+            resolveContext,
+            callback
+        )
     }
 
     apply(resolver) {
