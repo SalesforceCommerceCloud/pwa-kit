@@ -44,6 +44,7 @@ const SocialLogin = ({idps}) => {
                                 onClick={() => {
                                     alert(message)
                                 }}
+                                borderColor="gray.500"
                                 color="blue.600"
                                 variant="outline"
                             >
