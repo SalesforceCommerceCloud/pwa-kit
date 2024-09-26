@@ -365,6 +365,7 @@ class Auth {
         const response = await this._api.shopperLogin.authenticateCustomer(options, true)
         if (response.status >= 400) {
             const json = await response.json()
+            console.log(`Auth Error: HTTP ${response.status} - ${json.message}`)
             throw new HTTPError(response.status, json.message)
         }
 
@@ -419,6 +420,7 @@ class Auth {
                     errorMessage = data.message
                 }
             } catch {} // eslint-disable-line no-empty
+            console.log(`Auth Error: HTTP ${response.status} - ${errorMessage}`)
             throw new HTTPError(response.status, errorMessage)
         }
 
