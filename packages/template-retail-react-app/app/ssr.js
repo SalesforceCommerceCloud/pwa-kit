@@ -69,7 +69,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
-                        'api.cquotient.com'
+                        'api.cquotient.com',
+                        'https://*.google.com',
+                        'https://*.api.commercecloud.salesforce.com'
                     ]
                 }
             }

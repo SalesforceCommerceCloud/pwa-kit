@@ -641,11 +641,12 @@ class Auth {
             this.client,
             {},
             {
-                redirectURI: "http://localhost:3000/account",
+                redirectURI: "http://localhost:3000/global/en-GB/category/womens",
                 hint: "Google",
                 ...(dntPref !== undefined && {dnt: dntPref}),
             }
         )
+        console.log(response)
 
         return response
     }

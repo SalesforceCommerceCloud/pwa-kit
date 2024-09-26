@@ -26,7 +26,7 @@ export const defaultPwaKitSecurityHeaders = (req, res, next) => {
      * @type Object.<string, string[] | boolean>
      */
     const directives = {
-        'connect-src': ["'self'", runtimeAdmin, 'https://*.google.com'],
+        'connect-src': ["'self'", runtimeAdmin],
         'frame-ancestors': [runtimeAdmin],
         'img-src': ["'self'", 'data:'],
         'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin, 'https://*.google.com'],
@@ -61,6 +61,10 @@ export const defaultPwaKitSecurityHeaders = (req, res, next) => {
     }
     // Provide an initial CSP (or patch the existing header)
     res.setHeader(CONTENT_SECURITY_POLICY, res.getHeader(CONTENT_SECURITY_POLICY) ?? '')
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+    res.setHeader('Access-Control-Allow-Credentials', 'true')
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     // Provide an initial value for HSTS, if not already set - use default from `helmet`
     if (!res.hasHeader(STRICT_TRANSPORT_SECURITY)) {
         res.setHeader(STRICT_TRANSPORT_SECURITY, 'max-age=15552000; includeSubDomains')
