@@ -19,7 +19,7 @@ export const DEFAULT_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
  */
 class OverridesResolverPlugin {
     constructor(options) {
-        this.projectDir = options.projectDir?.replace(/\\/g, '/')
+        this.projectDir = options.projectDir?.replace(/\\/g, '/') || process.cwd()
         this.extensions = options.extensions || []
         this.fileExtensions = options.fileExtensions || DEFAULT_FILE_EXTENSIONS
         this.resolveOptions = options.resolveOptions || {}
@@ -37,7 +37,7 @@ class OverridesResolverPlugin {
 
         // Resolve the import with the provided packageIterator.
         let modulePath
-        
+
         try {
             modulePath = resolve(importPath, {
                 basedir: this.projectDir,
@@ -52,7 +52,7 @@ class OverridesResolverPlugin {
         } catch (e) {
             return callback(e)
         }
-        
+
         // Update the requests path with the one resoved from above.
         request.path = modulePath
 
