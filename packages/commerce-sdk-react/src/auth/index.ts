@@ -559,10 +559,12 @@ class Auth {
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
             : () => helpers.loginGuestUser(...guestPublicArgs)
 
-        return await this.queueRequest(callback, isGuest).catch(async (error) => {
+        try {
+            return await this.queueRequest(callback, isGuest)
+        } catch (error) {
             await this.logTokenRequestError(error as Error)
             throw error
-        })
+        }
     }
 
     /**

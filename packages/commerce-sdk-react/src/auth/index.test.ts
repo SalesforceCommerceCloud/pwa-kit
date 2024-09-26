@@ -442,6 +442,16 @@ describe('Auth', () => {
         expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
     })
 
+    test('loginGuestUser throws error when API has error', async () => {
+        // Force the mock to throw just for this test
+        const loginGuestUserSpy = jest.spyOn(helpers, 'loginGuestUser')
+        loginGuestUserSpy.mockRejectedValueOnce(new Error('test'))
+
+        const auth = new Auth(config)
+        await expect(auth.loginGuestUser()).rejects.toThrow()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+    })
+
     test('loginRegisteredUserB2C', async () => {
         const auth = new Auth(config)
         await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
