@@ -17,8 +17,10 @@ describe('SocialLogin', () => {
     })
     test('Load Apple and Google', async () => {
         renderWithProviders(<SocialLogin idps={['Apple', 'Google']} />)
-        const button = screen.getByText('Google')
+        const button = screen.getByText('Apple')
         expect(button).toBeDefined()
+        const button2 = screen.getByText('Google')
+        expect(button2).toBeDefined()
     })
     /* expect nothing to be rendered for an empty list */
     test('Load none', async () => {
