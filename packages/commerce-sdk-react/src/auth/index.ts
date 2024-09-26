@@ -631,24 +631,20 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
      *
      */
-    async loginIDPUser() {
+    async authorizeIDP() {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
-        const isGuest = false
-        const response = await helpers.loginIDPUser(
+        await helpers.authorizeIDP(
             this.client,
             {},
             {
-                redirectURI: "http://localhost:3000/global/en-GB/category/womens",
+                redirectURI: 'http://localhost:3000/global/en-GB/category/womens',
                 hint: "Google",
                 ...(dntPref !== undefined && {dnt: dntPref}),
             }
         )
-        console.log(response)
-
-        return response
     }
 
     /**

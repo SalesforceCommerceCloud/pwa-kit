@@ -23,7 +23,7 @@ import {updateCache} from './utils'
 export const AuthHelpers = {
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
-    LoginIDPUser: 'loginIDPUser',
+    AuthorizeIDP: 'authorizeIDP',
     Logout: 'logout',
     Register: 'register'
 } as const

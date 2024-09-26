@@ -21,7 +21,7 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
-    const socialLogin = useAuthHelper(AuthHelpers.LoginIDPUser)
+    const authorizeIDP = useAuthHelper(AuthHelpers.AuthorizeIDP)
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
@@ -75,7 +75,7 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                         <Button
                             variant="outline"
                             onClick={async () => {
-                                await socialLogin.mutateAsync()
+                                await authorizeIDP.mutateAsync()
                             }}
                         >
                             <Text>
