@@ -548,6 +548,33 @@ describe('SSRServer operation', () => {
             })
     })
 
+    test('SSRServer set process env according to x-forwarded-host header', () => {
+        process.env = {
+            X_FORWARDED_HOST: undefined,
+            MRT_ALLOW_COOKIES: 'true'
+        }
+        const forwardedHost = 'www.example.com'
+        const app = RemoteServerFactory._createApp(opts())
+        const route = (req, res) => {
+            expect(req.headers['x-forwarded-host']).toBe(forwardedHost)
+            expect(process.env.X_FORWARDED_HOST).toBe(`https://${forwardedHost}`)
+
+            res.sendStatus(200)
+        }
+        app.get('/*', route)
+
+        return request(app)
+            .get('/')
+            .set('x-forwarded-host', forwardedHost)
+            .then((response) => {
+                expect(response.status).toBe(200)
+            })
+            .finally(() => {
+                // Ensure that the environment variable is cleared after the response
+                expect(process.env.X_FORWARDED_HOST).toBeUndefined()
+            })
+    })
+
     test('should fix host and origin headers before passing the request to the handler', () => {
         const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
