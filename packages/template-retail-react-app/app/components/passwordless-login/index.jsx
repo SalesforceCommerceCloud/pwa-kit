@@ -18,7 +18,11 @@ const PasswordlessLogin = ({form, clickForgotPassword = noop}) => {
 
     return !showPasswordView ? (
         <Stack spacing={6} paddingLeft={4} paddingRight={4}>
-            <LoginFields form={form} hidePassword={true} />
+            <LoginFields
+                form={form}
+                hidePassword={true}
+                clickForgotPassword={clickForgotPassword}
+            />
             <Button
                 type="submit"
                 onClick={() => {

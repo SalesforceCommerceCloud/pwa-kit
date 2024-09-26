@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
@@ -16,16 +16,11 @@ const StandardLogin = ({form, clickForgotPassword = noop, hideEmail = false}) =>
     return (
         <Stack spacing={8} paddingLeft={4} paddingRight={4}>
             <Stack>
-                <LoginFields form={form} hideEmail={hideEmail} />
-                
-                <Box>
-                    <Button variant="link" size="sm" onClick={clickForgotPassword}>
-                        <FormattedMessage
-                            defaultMessage="Forgot password?"
-                            id="login_form.link.forgot_password"
-                        />
-                    </Button>
-                </Box>
+                <LoginFields
+                    form={form}
+                    hideEmail={hideEmail}
+                    clickForgotPassword={clickForgotPassword}
+                />
             </Stack>
             <Stack spacing={6}>
                 <Button

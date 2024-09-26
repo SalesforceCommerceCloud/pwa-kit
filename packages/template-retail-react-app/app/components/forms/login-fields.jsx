@@ -8,20 +8,41 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Stack, Box, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
-import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
+import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
+import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
-const LoginFields = ({form, prefix = '', hideEmail = false, hidePassword = false}) => {
+const LoginFields = ({
+    form,
+    clickForgotPassword = noop,
+    prefix = '',
+    hideEmail = false,
+    hidePassword = false
+}) => {
     const fields = useLoginFields({form, prefix})
     return (
         <Stack spacing={5}>
             {!hideEmail && <Field {...fields.email} />}
-            {!hidePassword && <Field {...fields.password} />}
+            {!hidePassword && (
+                <Stack>
+                    <Field {...fields.password} />
+                    <Box>
+                        <Button variant="link" size="sm" onClick={clickForgotPassword}>
+                            <FormattedMessage
+                                defaultMessage="Forgot password?"
+                                id="login_form.link.forgot_password"
+                            />
+                        </Button>
+                    </Box>
+                </Stack>
+            )}
         </Stack>
     )
 }
 
 LoginFields.propTypes = {
+    clickForgotPassword: PropTypes.func,
+
     /** Object returned from `useForm` */
     form: PropTypes.object.isRequired,
 
