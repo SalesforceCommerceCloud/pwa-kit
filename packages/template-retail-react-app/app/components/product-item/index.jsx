@@ -55,7 +55,10 @@ const ProductItem = ({
     const {currency: activeCurrency} = useCurrency()
     const intl = useIntl()
     return (
-        <Box position="relative" data-testid={`sf-cart-item-${product.productId}`}>
+        <Box
+            position="relative"
+            data-testid={`sf-cart-item-${product.productId ? product.productId : product.id}`}
+        >
             <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
                 <Stack layerStyle="cardBordered" align="flex-start">
@@ -77,7 +80,21 @@ const ProductItem = ({
 
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
-                                    <Text fontSize="sm" color="gray.700">
+                                    <Text
+                                        fontSize="sm"
+                                        color="gray.700"
+                                        aria-label={intl.formatMessage(
+                                            {
+                                                id: 'item_variant.quantity.label',
+                                                defaultMessage:
+                                                    'Quantity selector for {productName}. Selected quantity is {quantity}'
+                                            },
+                                            {
+                                                quantity: product?.quantity,
+                                                productName: product?.name
+                                            }
+                                        )}
+                                    >
                                         <FormattedMessage
                                             defaultMessage="Quantity:"
                                             id="product_item.label.quantity"
@@ -110,6 +127,7 @@ const ProductItem = ({
                                                 setQuantity(stringValue)
                                             }
                                         }}
+                                        productName={product?.name}
                                     />
                                     <VisuallyHidden role="status">
                                         {product?.name}
