@@ -1,3 +1,4 @@
+## v3.8.0-nightly-20240926080200 (Sep 26, 2024)
 ## v3.8.0-dev (Aug 08, 2024)
 - Encode non ASCII HTTP headers when `encodeNonAsciiHttpHeaders` flag is set to true in `ssr.js` in the retail react app [#2009](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2009)
 
