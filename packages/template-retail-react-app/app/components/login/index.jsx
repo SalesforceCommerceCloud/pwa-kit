@@ -9,16 +9,10 @@ import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {
-    Alert,
-    Box,
-    Button,
-    Stack,
-    Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Alert, Button, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
-import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passwordless-login/index'
+import StandardLogin from '@salesforce/retail-react-app/app/components/standard-login'
+import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passwordless-login'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
@@ -50,40 +44,9 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                 )}
                 <Stack spacing={6}>
                     {allowPasswordless ? (
-                        <PasswordlessLogin
-                            form={form}
-                            clickForgotPassword={clickForgotPassword}
-                        />
+                        <PasswordlessLogin form={form} clickForgotPassword={clickForgotPassword} />
                     ) : (
-                        // TODO: Move to its own StandardLogin component
-                        <Stack spacing={8} paddingLeft={4} paddingRight={4}>
-                            <Stack>
-                                <LoginFields form={form} />
-
-                                <Box>
-                                    <Button variant="link" size="sm" onClick={clickForgotPassword}>
-                                        <FormattedMessage
-                                            defaultMessage="Forgot password?"
-                                            id="login_form.link.forgot_password"
-                                        />
-                                    </Button>
-                                </Box>
-                            </Stack>
-                            <Stack spacing={6}>
-                                <Button
-                                    type="submit"
-                                    onClick={() => {
-                                        form.clearErrors('global')
-                                    }}
-                                    isLoading={form.formState.isSubmitting}
-                                >
-                                    <FormattedMessage
-                                        defaultMessage="Sign In"
-                                        id="login_form.button.sign_in"
-                                    />
-                                </Button>
-                            </Stack>
-                        </Stack>
+                        <StandardLogin form={form} clickForgotPassword={clickForgotPassword} />
                     )}
                     <Stack direction="row" spacing={1} justify="center">
                         <Text fontSize="sm">

@@ -11,12 +11,12 @@ import {Stack, Box, Button} from '@salesforce/retail-react-app/app/components/sh
 import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
 
-const LoginFields = ({form, prefix = '', includeEmail = true, includePassword = true}) => {
+const LoginFields = ({form, prefix = '', hideEmail = false, hidePassword = false}) => {
     const fields = useLoginFields({form, prefix})
     return (
         <Stack spacing={5}>
-            <Field {...fields.email} />
-            {includePassword && <Field {...fields.password} />}
+            {!hideEmail && <Field {...fields.email} />}
+            {!hidePassword && <Field {...fields.password} />}
         </Stack>
     )
 }
@@ -29,8 +29,8 @@ LoginFields.propTypes = {
     prefix: PropTypes.string,
 
     /** Optional configurations */
-    includeEmail: PropTypes.bool,
-    includePassword: PropTypes.bool
+    hideEmail: PropTypes.bool,
+    hidePassword: PropTypes.bool
 }
 
 export default LoginFields

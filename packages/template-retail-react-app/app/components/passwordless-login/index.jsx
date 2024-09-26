@@ -5,17 +5,20 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Button, Divider, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import StandardLogin from '../standard-login/index'
 
-const PasswordlessLogin = ({clickForgotPassword = noop, form}) => {
-    return (
+const PasswordlessLogin = ({form, clickForgotPassword = noop}) => {
+    const [showPasswordView, setShowPasswordView] = useState(false)
+
+    return !showPasswordView ? (
         <Stack spacing={6} paddingLeft={4} paddingRight={4}>
-            <LoginFields form={form} includePassword={false} />
+            <LoginFields form={form} hidePassword={true} />
             <Button
                 type="submit"
                 onClick={() => {
@@ -29,7 +32,7 @@ const PasswordlessLogin = ({clickForgotPassword = noop, form}) => {
                     id="login_form.button.continue_securely"
                 />
             </Button>
-            <Divider/>
+            <Divider />
             <Text align="center" fontSize="sm">
                 <FormattedMessage
                     defaultMessage="Or Login With"
@@ -39,6 +42,7 @@ const PasswordlessLogin = ({clickForgotPassword = noop, form}) => {
             <Button
                 onClick={() => {
                     form.clearErrors('global')
+                    setShowPasswordView(true)
                 }}
                 borderColor="gray.500"
                 color="blue.600"
@@ -51,6 +55,8 @@ const PasswordlessLogin = ({clickForgotPassword = noop, form}) => {
                 />
             </Button>
         </Stack>
+    ) : (
+        <StandardLogin form={form} clickForgotPassword={clickForgotPassword} hideEmail={true} />
     )
 }
 
