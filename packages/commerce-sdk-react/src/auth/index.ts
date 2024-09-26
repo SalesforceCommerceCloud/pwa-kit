@@ -443,13 +443,18 @@ class Auth {
     }
 
     logTokenRequestError = async (error: Error) => {
+        // the regular error.message will return only the generic status code message
+        // ie. 'Bad Request' for 400. We need to drill specifically into the ResponseError
+        // to get a more descriptive error message from SLAS
         if (error instanceof Error && 'response' in error) {
             // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
             // We can't use `instanceof`, so instead we just check for the `response` property
             // and assume it is a fetch Response.
             const json = await (error['response'] as Response).json()
+            const status_code: string = json.status_code
+            const responseMessage: string = json.message
 
-            this.logger.error(`${json.status_code} ${json.message}`)
+            this.logger.error(`${status_code} ${responseMessage}`)
         }
     }
 
@@ -502,7 +507,7 @@ class Auth {
                 )
             } catch (error) {
                 // If the refresh token login fails, we fall back to the new guest refresh login
-                this.logTokenRequestError(error as Error)
+                await this.logTokenRequestError(error as Error)
                 // clean up storage and restart the login flow
                 this.clearStorage()
             }
@@ -554,12 +559,10 @@ class Auth {
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
             : () => helpers.loginGuestUser(...guestPublicArgs)
 
-        try {
-            return await this.queueRequest(callback, isGuest)
-        } catch (error) {
-            this.logTokenRequestError(error as Error)
+        return await this.queueRequest(callback, isGuest).catch(async (error) => {
+            await this.logTokenRequestError(error as Error)
             throw error
-        }
+        })
     }
 
     /**
