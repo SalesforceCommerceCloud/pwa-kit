@@ -31,24 +31,24 @@ const PageDesignerPromotionalBanner = () => {
 
     return (
         <Box>
-            <Box display={{base: 'none', md: 'block'}}>
-                {promoBannerDesktop && !pageErrorDesktop && (
+            {promoBannerDesktop && !pageErrorDesktop && (
+                <Box display={{base: 'none', md: 'block'}}>
                     <Page
                         page={promoBannerDesktop}
                         components={PAGEDESIGNER_TO_COMPONENT}
                         data-testid={'sf-promo-banner-desktop'}
                     />
-                )}
-            </Box>
-            <Box display={{base: 'block', md: 'none'}}>
-                {promoBannerMobile && !pageErrorMobile && (
+                </Box>
+            )}
+            {promoBannerMobile && !pageErrorMobile && (
+                <Box display={{base: 'block', md: 'none'}}>
                     <Page
                         page={promoBannerMobile}
                         components={PAGEDESIGNER_TO_COMPONENT}
                         data-testid={'sf-promo-banner-mobile'}
                     />
-                )}
-            </Box>
+                </Box>
+            )}
         </Box>
     )
 }
