@@ -497,10 +497,11 @@ class Auth {
                     // and assume it is a fetch Response.
                     const json = await (error['response'] as Response).json()
 
-                    this.logger.error(json.message)
-                    // clean up storage and restart the login flow
-                    this.clearStorage()
+                    this.logger.error(`${json.status_code} ${json.message}`)
                 }
+
+                // clean up storage and restart the login flow
+                this.clearStorage()
             }
         }
         return this.loginGuestUser()
