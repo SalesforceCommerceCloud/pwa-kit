@@ -11,7 +11,7 @@ import OverridesResolverPlugin from './overrides-resolver-plugin'
 describe('Overrides Resolver Plugin', () => {
     const testCases = [
         {
-            description: 'Wildcard import resolved to correct extension override',
+            description: 'Wildcard import resolves to correct base project file',
             entryPoint: 'app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
@@ -25,7 +25,33 @@ describe('Overrides Resolver Plugin', () => {
                     // Overrides
 
                     // Local Files
-                    '/virtual/project/app/pages/sample-page.jsx': '// Sample Page',
+                    '/virtual/project/app/pages/sample-page.jsx': '// Base Project - Sample Page',
+
+                    // Extensions Overrides
+                    '/virtual/project/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
+                        '// @salesforce/extension-that',
+                    '/virtual/project/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
+                        '// @salesforce/extension-this'
+                    // TODO: Why don't index files work here?
+                }
+            },
+            expects: (output) => {
+                expect(output.modules[1].source).toBe('// Base Project - Sample Page')
+            }
+        },
+        {
+            description: 'Wildcard import resolved to correct extension override',
+            entryPoint: 'app/routes.jsx',
+            // Compiler configuration.
+            compilerConfig: {
+                extensions: ['@salesforce/extension-this', '@salesforce/extension-that'],
+                files: {
+                    // Virtual Project Files
+
+                    // Entry Point
+                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+
+                    // Overrides
 
                     // Extensions Overrides
                     '/virtual/project/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
@@ -54,9 +80,6 @@ describe('Overrides Resolver Plugin', () => {
 
                     // Overrides
 
-                    // Local Files
-                    '/virtual/project/app/pages/sample-page.jsx': '// Sample Page',
-
                     // Extensions Overrides
                     '/virtual/project/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
                         '// @salesforce/extension-that',
@@ -83,9 +106,6 @@ describe('Overrides Resolver Plugin', () => {
                     '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
 
                     // Overrides
-
-                    // Local Files
-                    '/virtual/project/app/pages/sample-page.jsx': '// Sample Page',
 
                     // Extensions Overrides
                     '/virtual/project/node_modules/@salesforce/extension-this/src/pages/sample-page.jsx':

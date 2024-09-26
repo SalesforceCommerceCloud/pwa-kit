@@ -110,6 +110,7 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
     paths = [
         // Base Project
         path.join(projectDir, APP, OVERRIDES, importPath),
+        path.join(projectDir, APP, importPath),
         // Extensions
         ...paths,
         // SDK

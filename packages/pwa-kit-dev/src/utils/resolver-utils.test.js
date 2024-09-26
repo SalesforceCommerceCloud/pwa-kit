@@ -147,6 +147,7 @@ describe('resolverUtils', () => {
                 extensions: ['module-extension-a', 'module-extension-b', 'module-extension-c'],
                 expected: [
                     path.join(process.cwd(), 'app', 'overrides', 'app', 'routes'),
+                    path.join(process.cwd(), 'app', 'app', 'routes'),
                     path.join(
                         process.cwd(),
                         'node_modules',
