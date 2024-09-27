@@ -33,6 +33,7 @@ const CurrentPrice = ({labelForA11y, price, as, isRange = false, currency, ...ex
                 <Text
                     as={as}
                     {...extraProps}
+                    aria-live={'polite'}
                     aria-label={intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
                         currentPrice: currentPriceText
                     })}
