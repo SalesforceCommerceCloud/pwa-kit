@@ -1,6 +1,6 @@
 ## v4.1.0-dev (Aug 8, 2024)
-
 - Add useXForwardedHost (default to false) flag to allow the use of x-forwarded-host header value in building links [#2018](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2018)
+- Announce wishlist change in total for screen readers [#2033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2033) 
 
 ### Performance Improvements
 -   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
