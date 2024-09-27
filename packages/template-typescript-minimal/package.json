@@ -19,8 +19,6 @@
   "devDependencies": {
     "@loadable/component": "^5.15.3",
     "@salesforce/extension-sample": "1.0.0-dev",
-    "@salesforce/extension-sample-2": "1.0.0-dev",
-    "@salesforce/extension-chakra-ui": "1.0.0-dev",
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
     "@salesforce/pwa-kit-runtime": "4.0.0-dev",
@@ -47,9 +45,7 @@
   "mobify": {
     "app":{
       "extensions": [
-        "@salesforce/extension-chakra-ui", 
-        ["@salesforce/extension-sample", {"path": "/foo-page"}], 
-        "@salesforce/extension-sample-2"
+        ["@salesforce/extension-sample", {"path": "/foo-page"}]
       ]
     },
     "ssrEnabled": true,
