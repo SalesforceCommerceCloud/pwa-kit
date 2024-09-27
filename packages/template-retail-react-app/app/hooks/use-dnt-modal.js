@@ -31,7 +31,7 @@ export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
         console.log("(JEREMY) on the useEffect for DNT modal")
         if (dntStatus === undefined) onOpen()
         else onClose()
-    }, [location, history])
+    }, [location, history, dntStatus, location.key])
 
     const onCloseModal = () => {
         updateDNT(null)
