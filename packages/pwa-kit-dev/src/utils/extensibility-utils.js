@@ -31,7 +31,7 @@ const SUPPORTED_FILE_TYPES = ['.ts', '.js']
 export const buildAliases = (extensions = []) => {
     const projectDir = process.cwd()
 
-    const aliases = extensions.reduce((acc, extension) => {
+    const aliases = getExtensionNames(extensions).reduce((acc, extension) => {
         const basePath = path.join(
             projectDir,
             'node_modules',
@@ -100,3 +100,12 @@ export const findFileWithExtension = (basePath, extensions = []) => {
  *      .filter(Boolean)
  */
 export const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
+
+/**
+ * @private
+ */
+export const getExtensionNames = (extensions) => {
+    return (extensions || []).map((extension) => {
+        return Array.isArray(extension) ? extension[0] : extension
+    })
+}

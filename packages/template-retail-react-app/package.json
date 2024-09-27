@@ -3,11 +3,6 @@
   "version": "4.1.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
-  "ccExtensibility": {
-    "extendable": [
-      "@salesforce/retail-react-app"
-    ]
-  },
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "npm run build-translations && pwa-kit-dev build",

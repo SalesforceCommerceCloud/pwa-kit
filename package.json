@@ -8,7 +8,7 @@
     "publish-to-npm": "node ./scripts/publish-to-npm.js",
     "format": "lerna run --stream format",
     "preinstall": "node ./scripts/check-version.js",
-    "postinstall": "node ./scripts/bootstrap.js && node ./scripts/check-lockfiles.mjs && npm run check-dep-version",
+    "postinstall": "node ./scripts/bootstrap.js && node ./scripts/check-lockfiles.mjs && node ./scripts/check-lockfiles.mjs",
     "lerna": "lerna",
     "lint": "lerna run --stream lint",
     "lint:fix": "lerna run lint:fix",

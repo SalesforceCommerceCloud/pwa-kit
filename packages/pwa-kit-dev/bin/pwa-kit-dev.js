@@ -59,17 +59,8 @@ const getProjectName = async () => {
     return projectPkg.name
 }
 
-const getAppEntrypoint = async () => {
-    const defaultPath = p.join(process.cwd(), 'app', 'ssr.js')
-    if (await fse.pathExists(defaultPath)) return defaultPath
-
-    const projectPkg = await scriptUtils.getProjectPkg()
-    const {overridesDir} = projectPkg?.ccExtensibility ?? {}
-    if (!overridesDir || typeof overridesDir !== 'string') return null
-
-    const overridePath = p.join(process.cwd(), p.sep + overridesDir, 'app', 'ssr.js')
-    if (await fse.pathExists(overridePath)) return overridePath
-    return null
+const getAppEntrypoint = () => {
+    return p.join(process.cwd(), 'app', 'ssr.js')
 }
 
 const main = async () => {
@@ -248,18 +239,15 @@ const main = async () => {
                 'babel-node'
             )
 
-            const entrypoint = await getAppEntrypoint()
-            if (!entrypoint) {
-                error('Could not determine app entrypoint.')
-                process.exit(1)
-            }
-
-            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
-                env: {
-                    ...process.env,
-                    ...(noHMR ? {HMR: 'false'} : {})
+            execSync(
+                `${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${getAppEntrypoint()}`,
+                {
+                    env: {
+                        ...process.env,
+                        ...(noHMR ? {HMR: 'false'} : {})
+                    }
                 }
-            })
+            )
         })
 
     program
