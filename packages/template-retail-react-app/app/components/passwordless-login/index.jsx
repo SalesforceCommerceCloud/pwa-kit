@@ -16,51 +16,67 @@ import StandardLogin from '../standard-login/index'
 const PasswordlessLogin = ({form, clickForgotPassword = noop}) => {
     const [showPasswordView, setShowPasswordView] = useState(false)
 
-    return !showPasswordView ? (
-        <Stack spacing={6} paddingLeft={4} paddingRight={4}>
-            <LoginFields
-                form={form}
-                hidePassword={true}
-                clickForgotPassword={clickForgotPassword}
-            />
-            <Button
-                type="submit"
-                onClick={() => {
-                    form.clearErrors('global')
-                }}
-                isLoading={form.formState.isSubmitting}
-            >
-                <FormattedMessage
-                    defaultMessage="Continue Securely"
-                    // TODO: Translations
-                    id="login_form.button.continue_securely"
-                />
-            </Button>
-            <Divider />
-            <Text align="center" fontSize="sm">
-                <FormattedMessage
-                    defaultMessage="Or Login With"
-                    id="login_form.message.or_login_with"
-                />
-            </Text>
-            <Button
-                onClick={() => {
-                    form.clearErrors('global')
-                    setShowPasswordView(true)
-                }}
-                borderColor="gray.500"
-                color="blue.600"
-                variant="outline"
-            >
-                <FormattedMessage
-                    defaultMessage="Password"
-                    // TODO: Translations
-                    id="login_form.button.password"
-                />
-            </Button>
-        </Stack>
-    ) : (
-        <StandardLogin form={form} clickForgotPassword={clickForgotPassword} hideEmail={true} />
+    return (
+        <>
+            {((!form.formState.isSubmitSuccessful && !showPasswordView) ||
+                form.formState.errors.email) && (
+                <Stack spacing={6} paddingLeft={4} paddingRight={4}>
+                    <LoginFields
+                        form={form}
+                        hidePassword={true}
+                        clickForgotPassword={clickForgotPassword}
+                    />
+                    <Button
+                        type="submit"
+                        onClick={() => {
+                            form.clearErrors('global')
+                        }}
+                        isLoading={form.formState.isSubmitting}
+                    >
+                        <FormattedMessage
+                            defaultMessage="Continue Securely"
+                            // TODO: Translations
+                            id="login_form.button.continue_securely"
+                        />
+                    </Button>
+                    <Divider />
+                    <Text align="center" fontSize="sm">
+                        <FormattedMessage
+                            defaultMessage="Or Login With"
+                            id="login_form.message.or_login_with"
+                        />
+                    </Text>
+                    <Button
+                        onClick={(e) => {
+                            const form = e.target.closest('form')
+                            if (form.checkValidity()) {
+                                setShowPasswordView(true)
+                            } else {
+                                form.reportValidity()
+                            }
+                        }}
+                        borderColor="gray.500"
+                        color="blue.600"
+                        variant="outline"
+                    >
+                        <FormattedMessage
+                            defaultMessage="Password"
+                            // TODO: Translations
+                            id="login_form.button.password"
+                        />
+                    </Button>
+                </Stack>
+            )}
+            {!form.formState.isSubmitSuccessful &&
+                showPasswordView &&
+                !form.formState.errors.email && (
+                    <StandardLogin
+                        form={form}
+                        clickForgotPassword={clickForgotPassword}
+                        hideEmail={true}
+                    />
+                )}
+        </>
     )
 }
 
