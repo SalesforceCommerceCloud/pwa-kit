@@ -27,8 +27,12 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
     const location = useLocation()
 
     useEffect(() => {
-        if (dntStatus === undefined) onOpen()
-    }, [location])
+        if (dntStatus === undefined) {
+            onOpen()
+        } else {
+            onClose()
+        }
+    }, [location, dntStatus])
 
     const onCloseModal = () => {
         updateDNT(null)
