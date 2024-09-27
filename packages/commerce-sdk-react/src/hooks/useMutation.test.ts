@@ -112,4 +112,38 @@ describe('useCustomMutation', () => {
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(mockRes)
     })
+    test('accepts headers as mutate parameter', async () => {
+        const apiName = 'hello-world'
+        mockMutationEndpoints(apiName, function () {
+            // @ts-expect-error there is no typing for nock request
+            return this.req.headers
+        })
+        const {result} = renderHookWithProviders(() => {
+            const clientConfig = {
+                parameters: {
+                    clientId: 'CLIENT_ID',
+                    siteId: 'SITE_ID',
+                    organizationId: 'ORG_ID',
+                    shortCode: 'SHORT_CODE'
+                },
+                proxy: 'http://localhost:8888/mobify/proxy/api'
+            }
+            return useCustomMutation({
+                options: {
+                    method: 'POST',
+                    customApiPathParameters: {
+                        endpointPath: 'test-hello-world',
+                        apiName
+                    }
+                },
+                clientConfig,
+                rawResponse: false
+            })
+        })
+        expect(result.current.data).toBeUndefined()
+        const mockHeaders = {test: '123'}
+        act(() => result.current.mutate({headers: mockHeaders}))
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toHaveProperty('test')
+    })
 })
