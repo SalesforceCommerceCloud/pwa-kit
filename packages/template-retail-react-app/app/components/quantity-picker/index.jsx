@@ -13,6 +13,7 @@ import {
     useNumberInput
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage, useIntl} from 'react-intl'
+import PropTypes from 'prop-types'
 
 /**
  * This is the mobile implementation of the Chakra NumberInput. This simple component essentially
@@ -27,6 +28,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
  */
 const QuantityPicker = (props) => {
     const intl = useIntl()
+    const productName = props.productName
     const {getInputProps, getIncrementButtonProps, getDecrementButtonProps} = useNumberInput({
         ...props,
         // Defaults
@@ -47,17 +49,23 @@ const QuantityPicker = (props) => {
 
     const inc = getIncrementButtonProps({
         variant: 'outline',
-        'aria-label': intl.formatMessage({
-            defaultMessage: 'Increment Quantity',
-            id: 'product_view.label.assistive_msg.quantity_increment'
-        })
+        'aria-label': intl.formatMessage(
+            {
+                defaultMessage: 'Increment Quantity for {productName}',
+                id: 'product_view.label.assistive_msg.quantity_increment'
+            },
+            {productName}
+        )
     })
     const dec = getDecrementButtonProps({
         variant: 'outline',
-        'aria-label': intl.formatMessage({
-            defaultMessage: 'Decrement Quantity',
-            id: 'product_view.label.assistive_msg.quantity_decrement'
-        })
+        'aria-label': intl.formatMessage(
+            {
+                defaultMessage: 'Decrement Quantity for {productName}',
+                id: 'product_view.label.assistive_msg.quantity_decrement'
+            },
+            {productName}
+        )
     })
     const input = getInputProps({
         maxWidth: '44px',
@@ -103,6 +111,10 @@ const QuantityPicker = (props) => {
             </Button>
         </HStack>
     )
+}
+
+QuantityPicker.propTypes = {
+    productName: PropTypes.string
 }
 
 export default QuantityPicker

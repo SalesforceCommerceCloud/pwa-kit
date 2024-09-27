@@ -22,6 +22,7 @@
 - Add descriptive text for screen readers on product edit modal in cart page [#1965](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1965)
 - A11y: Fix search bar header element focus order [#1969](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1969)
 - A11y: Order Details - hide decorative image and convert some p tags as proper headings [#2026](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2026)
+- Add aria-labels for buttons in product item wishlist component to ensure they are unique and descriptive. [#2023](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2023)
 - Focus onto the `ToggleCard` title whenever the component is opened to be editted [#2029](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2029)
 
 ## v4.0.1 (Sept 4, 2024)
