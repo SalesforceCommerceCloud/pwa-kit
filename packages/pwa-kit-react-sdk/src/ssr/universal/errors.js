@@ -11,7 +11,7 @@ export class HTTPError extends Error {
         this.constructor = HTTPError
         this.__proto__ = HTTPError.prototype
         this.message = message
-        this.status = Number(status)
+        this.status = status
     }
 
     toString() {

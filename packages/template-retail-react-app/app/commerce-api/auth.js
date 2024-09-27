@@ -201,9 +201,14 @@ class Auth {
 
         const response = await this._api.shopperLogin.getAccessToken(options)
         // Check for error response before handling the token
+        // Note: SLAS getAccessToken will only return a status_code on error
         if (response.status_code) {
-            console.log(`Auth Error: HTTP ${response.status_code} - ${response.message}`)
-            throw new HTTPError(response.status_code, response.message)
+            console.error(`Auth Error: HTTP ${response.status_code} - ${response.message}`)
+
+            // The status_code will be a string with a format like `400 BAD_REQUEST`
+            // But HTTPError expects a number so we convert the status_code to a valid number here
+            const status_code = response.status_code.split(' ')[0]
+            throw new HTTPError(status_code, response.message)
         }
         this._handleShopperLoginTokenResponse(response)
         return response
@@ -365,7 +370,7 @@ class Auth {
         const response = await this._api.shopperLogin.authenticateCustomer(options, true)
         if (response.status >= 400) {
             const json = await response.json()
-            console.log(`Auth Error: HTTP ${response.status} - ${json.message}`)
+            console.error(`Auth Error: HTTP ${response.status} - ${json.message}`)
             throw new HTTPError(response.status, json.message)
         }
 
@@ -420,7 +425,7 @@ class Auth {
                     errorMessage = data.message
                 }
             } catch {} // eslint-disable-line no-empty
-            console.log(`Auth Error: HTTP ${response.status} - ${errorMessage}`)
+            console.error(`Auth Error: HTTP ${response.status} - ${errorMessage}`)
             throw new HTTPError(response.status, errorMessage)
         }
 
@@ -478,12 +483,16 @@ class Auth {
         }
         const response = await this._api.shopperLogin.getAccessToken(options)
         // Check for error response before handling the token
+        // Note: SLAS getAccessToken will only return a status code on error
+        // The status code will be a string with a format like `400 BAD_REQUEST`
         if (response.status_code) {
-            // if the refresh has failed, clear auth so the user is
+            // if the refresh login has failed, clear auth so the user is
             // not stuck with an invalid refresh token
             this._clearAuth()
-            console.log(`Auth Error: HTTP ${response.status_code} - ${response.message}`)
-            throw new HTTPError(response.status_code, response.message)
+            console.error(`Auth Error: HTTP ${response.status_code} - ${response.message}`)
+
+            // fall back to new guest login
+            return this._loginAsGuest()
         }
         this._handleShopperLoginTokenResponse(response)
 
