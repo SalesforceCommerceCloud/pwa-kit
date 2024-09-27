@@ -111,6 +111,32 @@ const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
+const EXTENSION_QUESTIONS = [
+    {
+        name: 'project.generationType',
+        message: 'Do you want to generate a project using extensions or using a template?',
+        type: 'list',
+        choices: [
+            {name: 'Generate a project using extensions', value: 'extensions'},
+            {name: 'Generate a project using a template', value: 'template'}
+        ]
+    },
+    {
+        name: 'project.extension',
+        message: 'Which extension do you want to install?',
+        type: 'list',
+        // TODO: Get the list of available extensions dynamically
+        choices: [{name: 'extension-sample', value: 'extension-sample'}],
+        when: (answers) => answers.project.generationType === 'extensions'
+    },
+    {
+        name: 'project.extractExtension',
+        message: 'Do you want to extract the extension code?',
+        type: 'confirm',
+        when: (answers) => answers.project.generationType === 'extensions'
+    }
+]
+
 const EXTENSIBILITY_QUESTIONS = [
     {
         name: 'project.extend',
@@ -437,6 +463,38 @@ const PRESETS = [
         questions: MRT_REFERENCE_QUESTIONS,
         answers: {
             ['project.name']: 'mrt-reference-app'
+        },
+        private: true
+    },
+    {
+        id: 'app-sample-extension-local-install',
+        name: 'Application Extension (Local Install)',
+        description: 'Generate an Application Extension and install it locally.',
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'typescript-minimal'
+        },
+        // TODO: Revisit TYPESCRIPT_MINIMAL_QUESTIONS with extension
+        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
+        answers: {
+            ['project.extension']: 'extension-sample',
+            ['project.extractExtension']: true
+        },
+        private: true
+    },
+    {
+        id: 'app-sample-extension-npm-install',
+        name: 'Application Extension (NPM Verdaccio)',
+        fescription: 'Generate an Application Extension and install it from local NPM.',
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'typescript-minimal'
+        },
+        // TODO: Revisit TYPESCRIPT_MINIMAL_QUESTIONS with extension
+        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
+        answers: {
+            ['project.extension']: 'extension-sample',
+            ['project.extractExtension']: false
         },
         private: true
     }
@@ -771,17 +829,34 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // If there is no preset arg, prompt the user with a selection of presets.
+    // If no preset argument is provided, ask extension questions
     if (!presetId) {
+        const generationAnswers = await prompt(EXTENSION_QUESTIONS)
+        context = merge(context, {answers: expandObject(generationAnswers)})
+
+        if (context.answers.project.generationType === 'extensions') {
+            const {extension, extractExtension} = context.answers.project
+
+            if (extractExtension) {
+                // TODO: Logic to copy extension-sample
+            } else {
+                // TODO: Install the extension from local NPM Verdaccio
+            }
+
+            // Add the 'typescript-minimal' preset for Application Extension
+            context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
+        }
+    }
+
+    // If no preset is provided, prompt the user with available preset options
+    if (!presetId && !context.preset) {
         context.answers = await prompt(PRESET_QUESTIONS)
     }
 
-    // Add the selected preset to the context object.
-    const selectedPreset = PRESETS.find(
-        ({id}) => id === (presetId || context.answers.general.presetId)
-    )
-
-    // Add the preset to the context.
+    // Set the preset to the selected preset or based on presetId
+    const selectedPreset =
+        context.preset ||
+        PRESETS.find(({id}) => id === (presetId || context.answers.general.presetId))
     context.preset = selectedPreset
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
