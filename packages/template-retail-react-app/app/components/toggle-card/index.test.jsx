@@ -35,3 +35,13 @@ test('ToggleCard renders edit button with correct aria-label and calls onEdit on
     // Assert onEdit function is called
     expect(mockOnEdit).toHaveBeenCalledTimes(1)
 })
+
+test('ToggleCard focuses on title when first editting', () => {
+    const cardTitle = 'Card Title'
+
+    renderWithProviders(<ToggleCard title={cardTitle} editing={true} />)
+
+    const title = screen.getByText(cardTitle)
+    expect(title).toBeInTheDocument()
+    expect(document.activeElement).toBe(title)
+})
