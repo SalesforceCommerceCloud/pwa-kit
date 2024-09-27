@@ -412,6 +412,7 @@ describe('Auth', () => {
 
         // The call to loginGuestUser only executes when refreshAccessToken fails
         expect(refreshAccessTokenSpy).toHaveBeenCalled()
+        expect(auth.get('refresh_token_guest')).toBe('')
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
 
