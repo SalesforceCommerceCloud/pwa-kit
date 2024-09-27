@@ -179,7 +179,6 @@ export const DevServerMixin = {
 
             let ExtensionClass
             try {
-                console.log('filePath, __filename: ', filePath, __filename)
                 ExtensionClass = tsx.require(filePath, __filename).default
             } catch (e) {
                 logger.error(`Error loading extension ${extension.packageName}:`, {

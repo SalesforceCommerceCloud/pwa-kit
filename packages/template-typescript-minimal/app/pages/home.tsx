@@ -7,6 +7,17 @@
 import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {Link} from 'react-router-dom'
+import {
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerOverlay,
+    DrawerContent,
+    DrawerCloseButton,
+    useDisclosure
+} from '@chakra-ui/react'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
@@ -101,9 +112,35 @@ const Home = ({value}: Props) => {
             })
     )
 
+    const {isOpen, onOpen, onClose} = useDisclosure()
+    const btnRef = React.useRef(null)
+
     return (
         <div>
             <style dangerouslySetInnerHTML={{__html: style}} />
+            <Button ref={btnRef} colorScheme="teal" onClick={onOpen}>
+                Open
+            </Button>
+            <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+                <DrawerOverlay />
+                <DrawerContent>
+                    <DrawerCloseButton />
+                    <DrawerHeader>Create your account</DrawerHeader>
+
+                    <DrawerBody>
+                        <Link to="/foo-page">Sample Page</Link>
+                        <br />
+                        <Link to="/sample-page-2">Sample Page 2</Link>
+                    </DrawerBody>
+
+                    <DrawerFooter>
+                        <Button variant="outline" mr={3} onClick={onClose}>
+                            Cancel
+                        </Button>
+                        <Button colorScheme="blue">Save</Button>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
             <div className="loading-screen">
                 <div className="panel title">
                     <h1>
@@ -133,6 +170,9 @@ const Home = ({value}: Props) => {
                             <br />
                             <br />
                             <b>You can mix-and-match JS and TS</b>
+                            <br />
+                            <br />
+                            <b>Chakra UI was added via `extension-chakra-ui`</b>
                             <br />
                             <br />
                             <HelloJS />

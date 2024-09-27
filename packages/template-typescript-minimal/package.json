@@ -19,6 +19,8 @@
   "devDependencies": {
     "@loadable/component": "^5.15.3",
     "@salesforce/extension-sample": "1.0.0-dev",
+    "@salesforce/extension-sample-2": "1.0.0-dev",
+    "@salesforce/extension-chakra-ui": "1.0.0-dev",
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
     "@salesforce/pwa-kit-runtime": "4.0.0-dev",
@@ -31,16 +33,23 @@
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.3.4",
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "framer-motion": "^11.5.4"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
-    "app": {
+    "app":{
       "extensions": [
-        ["@salesforce/extension-sample", {"path": "/foo-page"}]
+        "@salesforce/extension-chakra-ui", 
+        ["@salesforce/extension-sample", {"path": "/foo-page"}], 
+        "@salesforce/extension-sample-2"
       ]
     },
     "ssrEnabled": true,

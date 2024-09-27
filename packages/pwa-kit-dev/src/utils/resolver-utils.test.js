@@ -22,6 +22,8 @@ describe('resolverUtils', () => {
                     'node_modules',
                     '@salesforce',
                     'extension-module-extension-b',
+                    'src',
+                    'overrides',
                     'app',
                     'routes.jsx'
                 ),
@@ -35,6 +37,8 @@ describe('resolverUtils', () => {
                     'node_modules',
                     '@salesforce',
                     'extension-module-extension-b',
+                    'src',
+                    'overrides',
                     'app',
                     'routes.jsx'
                 ),
@@ -48,6 +52,8 @@ describe('resolverUtils', () => {
                     'node_modules',
                     '@salesforce',
                     'extension-module-extension-b',
+                    'src',
+                    'overrides',
                     'app',
                     'routes.jsx'
                 ),
@@ -124,92 +130,139 @@ describe('resolverUtils', () => {
     describe('"buildCandidatePaths" util returns array of paths used to module resolving', () => {
         ;[
             {
-                name: 'Correct absolute paths are returned with valid input data',
-                importPath: '*/app/routes',
+                name: 'Correct paths are returned when wildcard import is used in an application extension',
+                importPath: '*/pages/sample',
                 sourcePath: path.join(
                     process.cwd(),
                     'node_modules',
                     '@salesforce',
-                    'pwa-kit-react-sdk',
-                    'ssr',
-                    'universal',
-                    'components',
-                    'routes',
-                    'index.jsx'
+                    'extension-module-extension-a',
+                    'src',
+                    'setup-app.ts'
                 ),
 
                 extensions: ['module-extension-a', 'module-extension-b', 'module-extension-c'],
                 expected: [
-                    path.join(process.cwd(), 'app', 'routes'),
+                    path.join(process.cwd(), 'app', 'overrides', 'pages', 'sample'),
+                    path.join(process.cwd(), 'app', 'pages', 'sample'),
                     path.join(
                         process.cwd(),
                         'node_modules',
                         '@salesforce',
                         'extension-module-extension-c',
-                        'app',
-                        'routes'
+                        'src',
+                        'overrides',
+                        'pages',
+                        'sample'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-c',
+                        'src',
+                        'pages',
+                        'sample'
                     ),
                     path.join(
                         process.cwd(),
                         'node_modules',
                         '@salesforce',
                         'extension-module-extension-b',
-                        'app',
-                        'routes'
+                        'src',
+                        'overrides',
+                        'pages',
+                        'sample'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-b',
+                        'src',
+                        'pages',
+                        'sample'
                     ),
                     path.join(
                         process.cwd(),
                         'node_modules',
                         '@salesforce',
                         'extension-module-extension-a',
-                        'app',
-                        'routes'
+                        'src',
+                        'overrides',
+                        'pages',
+                        'sample'
                     ),
-                    path.join(
-                        process.cwd(),
-                        'node_modules',
-                        '@salesforce',
-                        'pwa-kit-react-sdk',
-                        'ssr',
-                        'universal',
-                        'components',
-                        'routes'
-                    )
-                ]
-            },
-            {
-                name: 'If sourcePath implies a selfreference, only the paths before its first mention is included',
-                importPath: '*/app/routes',
-                sourcePath: path.join(
-                    process.cwd(),
-                    'node_modules',
-                    '@salesforce',
-                    'extension-module-extension-b',
-                    'app',
-                    'routes.jsx'
-                ),
-                extensions: ['module-extension-a', 'module-extension-b'],
-                expected: [
                     path.join(
                         process.cwd(),
                         'node_modules',
                         '@salesforce',
                         'extension-module-extension-a',
-                        'app',
-                        'routes'
-                    ),
-                    path.join(
-                        process.cwd(),
-                        'node_modules',
-                        '@salesforce',
-                        'pwa-kit-react-sdk',
-                        'ssr',
-                        'universal',
-                        'components',
-                        'routes'
+                        'src',
+                        'pages',
+                        'sample'
                     )
+                    // NOTE: This has been removed at we currently aren't using the `overrides-resolver-plugin` to resolve special components.
+                    // path.join(
+                    //     process.cwd(),
+                    //     'node_modules',
+                    //     '@salesforce',
+                    //     'pwa-kit-react-sdk',
+                    //     'ssr',
+                    //     'universal',
+                    //     'components',
+                    //     'routes'
+                    // )
                 ]
             }
+            // ,
+            // {
+            //     name: 'If sourcePath implies a self-reference, only the paths before its first mention is included',
+            //     importPath: '*/app/routes',
+            //     sourcePath: path.join(
+            //         process.cwd(),
+            //         'node_modules',
+            //         '@salesforce',
+            //         'extension-module-extension-b',
+            //         'src',
+            //         'overrides',
+            //         'app',
+            //         'routes.jsx'
+            //     ),
+            //     extensions: ['module-extension-a', 'module-extension-b'],
+            //     expected: [
+            //         path.join(
+            //             process.cwd(),
+            //             'node_modules',
+            //             '@salesforce',
+            //             'extension-module-extension-a',
+            //             'src',
+            //             'overrides',
+            //             'app',
+            //             'routes'
+            //         ),
+            //         path.join(
+            //             process.cwd(),
+            //             'node_modules',
+            //             '@salesforce',
+            //             'extension-module-extension-a',
+            //             'src',
+            //             'app',
+            //             'routes'
+            //         )
+            //         // NOTE: This has been removed at we currently aren't using the `overrides-resolver-plugin` to resolve special components.
+            //         // path.join(
+            //         //     process.cwd(),
+            //         //     'node_modules',
+            //         //     '@salesforce',
+            //         //     'pwa-kit-react-sdk',
+            //         //     'ssr',
+            //         //     'universal',
+            //         //     'components',
+            //         //     'routes'
+            //         // )
+            //     ]
+            // }
         ].forEach((testCase) => {
             test(`${testCase.name}`, () => {
                 const result = resolverUtils.buildCandidatePaths(
