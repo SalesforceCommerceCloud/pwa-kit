@@ -1,3 +1,4 @@
+## v3.8.0-nightly-20240927080200 (Sep 27, 2024)
 ## v3.8.0-dev (Aug 08, 2024)
 - Set up X_FORWARDED_HOST env variable according to x-forwarded-host headers [#2018](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2018)
 - Encode non ASCII HTTP headers when `encodeNonAsciiHttpHeaders` flag is set to true in `ssr.js` in the retail react app [#2009](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2009)

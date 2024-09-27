@@ -1,3 +1,4 @@
+## v3.8.0-nightly-20240927080200 (Sep 27, 2024)
 ## v3.8.0-dev (Aug 08, 2024)
 - Extend getAppOrigin to use x-forwarded-host header when useXForwardedHost config flag is enabled [#2018](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2018)
 
