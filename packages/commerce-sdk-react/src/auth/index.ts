@@ -562,8 +562,11 @@ class Auth {
         try {
             return await this.queueRequest(callback, isGuest)
         } catch (error) {
-            await this.logTokenRequestError(error as Error)
-            throw error
+            const err = error as Error
+            // We catch the error here to do logging but we still need to
+            // throw an error to stop the login flow from continuing.
+            await this.logTokenRequestError(err)
+            throw new Error(`New guest user could not be logged in. ${err.message}`)
         }
     }
 
