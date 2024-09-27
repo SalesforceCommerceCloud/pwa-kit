@@ -19,16 +19,19 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {useDNT} from '@salesforce/commerce-sdk-react'
-import {useLocation} from 'react-router-dom'
+import {useLocation, useHistory} from 'react-router-dom'
 
 export const DntModal = ({isOpen, onOpen, onClose, ...props}) => {
     const {dntStatus, updateDNT} = useDNT()
     const {formatMessage} = useIntl()
     const location = useLocation()
+    const history = useHistory()
 
     useEffect(() => {
+        console.log("(JEREMY) on the useEffect for DNT modal")
         if (dntStatus === undefined) onOpen()
-    }, [location])
+        else onClose()
+    }, [location, history])
 
     const onCloseModal = () => {
         updateDNT(null)
