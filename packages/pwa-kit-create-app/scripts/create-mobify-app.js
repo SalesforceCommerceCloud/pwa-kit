@@ -58,6 +58,11 @@ sh.set('-e')
 // Our eslint script uses exscaped double quotes to have windows compatibility. This helper
 // will ensure those escaped double quotes are still escaped after processing the template.
 Handlebars.registerHelper('script', (object) => object.replaceAll('"', '\\"'))
+// Helper to handle all potential "No" answers
+Handlebars.registerHelper('isNo', function (a) {
+    const noValues = ['no', 'false', false, null, undefined, 0, '0']
+    return noValues.includes(a)
+})
 
 // Validations
 const validPreset = (preset) => {
@@ -762,16 +767,27 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         })
     } else {
         // Copy the base template either from the package or npm.
+        console.log(`DEBUG: Copying base template from ${packagePath} to ${outputDir}`)
         sh.cp('-rf', packagePath, outputDir)
 
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
+        console.log(`DEBUG: Checking if assets directory exists: ${assetsDir}`)
         if (sh.test('-e', assetsDir)) {
+            console.log('DEBUG: Assets directory found, processing files')
+
             getFiles(assetsDir)
-                .map((file) => file.replace(assetsDir, ''))
-                .forEach((relFilePath) =>
+                .map((file) => {
+                    const relFilePath = file.replace(assetsDir, '')
+                    console.log(`DEBUG: Processing file: ${file}, Relative Path: ${relFilePath}`)
+                    return relFilePath
+                })
+                .forEach((relFilePath) => {
+                    console.log(`DEBUG: Processing template for file: ${relFilePath}`)
                     processTemplate(relFilePath, assetsDir, outputDir, context)
-                )
+                })
+        } else {
+            console.log('DEBUG: No assets directory found')
         }
 
         // Update the generated projects version. NOTE: For bootstrapped projects this
@@ -779,10 +795,32 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // (bootstrap/bundle) we'll do it here where it works in both scenarios.
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
+        console.log('DEBUG: Current package.json content:', JSON.stringify(pkgJSON, null, 2))
+
+        // Add @salesforce/extension-sample dependency if not present
         const finalPkgData = merge(pkgJSON, {
             name: slugifyName(context.answers.project.name || context.preset.id),
-            version: GENERATED_PROJECT_VERSION
+            version: GENERATED_PROJECT_VERSION,
+            devDependencies: {
+                '@salesforce/extension-sample': '1.0.0-dev'
+            },
+            mobify: {
+                app: {
+                    extensions: [
+                        [
+                            '@salesforce/extension-sample',
+                            {
+                                path: '/faaaaaa-page'
+                            }
+                        ]
+                    ]
+                }
+            }
         })
+
+        console.log('DEBUG: Updated package.json content:', JSON.stringify(finalPkgData, null, 2))
+
+        // Write updated package.json back to the output directory
         writeJson(pkgJsonPath, finalPkgData)
 
         // Clean up
