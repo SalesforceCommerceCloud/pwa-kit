@@ -21,7 +21,8 @@ import {
     dwSessionIdKey,
     REFRESH_TOKEN_COOKIE_AGE,
     EXPIRED_TOKEN,
-    INVALID_TOKEN
+    INVALID_TOKEN,
+    dwsidStorageKey
 } from './constants'
 import fetch from 'cross-fetch'
 import Cookies from 'js-cookie'
@@ -48,11 +49,11 @@ class Auth {
         this._api = api
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
-        this._storageCopy = this._onClient ? new LocalStorage() : new Map()
 
         // To store tokens as cookies
         // change the next line to
         // this._storage = this._onClient ? new CookieStorage() : new Map()
+        this._cookieStorage = this._onClient ? new CookieStorage() : new Map()
         this._storage = this._onClient ? new LocalStorage() : new Map()
 
         const configOid = api._config.parameters.organizationId
@@ -140,6 +141,10 @@ class Auth {
         this._storage.set(oidStorageKey, oid)
     }
 
+    get dwsid() {
+        return this._cookieStorage.get(dwsidStorageKey)
+    }
+
     get isTokenValid() {
         return (
             !isTokenExpired(this.authToken) &&
@@ -154,26 +159,16 @@ class Auth {
      * @param {USER_TYPE} type Type of the user.
      */
     _saveRefreshToken(token, type) {
-        /**
-         * For hybrid deployments, We store a copy of the refresh_token
-         * to update access_token whenever customer auth state changes on SFRA.
-         */
         if (type === Auth.USER_TYPE.REGISTERED) {
             this._storage.set(refreshTokenRegisteredStorageKey, token, {
                 expires: REFRESH_TOKEN_COOKIE_AGE
             })
             this._storage.delete(refreshTokenGuestStorageKey)
-
-            this._storageCopy.set(refreshTokenRegisteredStorageKey, token)
-            this._storageCopy.delete(refreshTokenGuestStorageKey)
             return
         }
 
         this._storage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
         this._storage.delete(refreshTokenRegisteredStorageKey)
-
-        this._storageCopy.set(refreshTokenGuestStorageKey, token)
-        this._storageCopy.delete(refreshTokenRegisteredStorageKey)
     }
 
     /**
@@ -208,31 +203,6 @@ class Auth {
     }
 
     /**
-     * Make a post request to the OCAPI /session endpoint to bridge the session.
-     *
-     * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
-     * This cookie is used on SFRA, and it allows shoppers to navigate between SFRA and
-     * this PWA site seamlessly; this is often used to enable hybrid deployment.
-     *
-     * (Note: this method is client side only, b/c MRT doesn't support set-cookie header right now)
-     *
-     * @returns {Promise}
-     */
-    createOCAPISession() {
-        return fetch(
-            `${getAppOrigin()}/mobify/proxy/ocapi/s/${
-                this._config.parameters.siteId
-            }/dw/shop/v22_8/sessions`,
-            {
-                method: 'POST',
-                headers: {
-                    Authorization: this.authToken
-                }
-            }
-        )
-    }
-
-    /**
      * Authorizes the customer as a registered or guest user.
      * @param {CustomerCredentials} [credentials]
      * @returns {Promise}
@@ -255,8 +225,6 @@ class Auth {
             }
             return this[authorizationMethod](credentials)
                 .then((result) => {
-                    // Uncomment the following line for phased launch
-                    // this._onClient && this.createOCAPISession()
                     return result
                 })
                 .catch((error) => {
@@ -502,6 +470,7 @@ class Auth {
         this._storage.delete(cidStorageKey)
         this._storage.delete(encUserIdStorageKey)
         this._storage.delete(dwSessionIdKey)
+        this._cookieStorage.delete(dwsidStorageKey)
     }
 }
 
@@ -524,10 +493,37 @@ class CookieStorage extends Storage {
         Cookies.set(key, value, {secure: true, ...options})
     }
     get(key) {
-        return Cookies.get(key)
+        let value = Cookies.get(key)
+        if (value) {
+            // Some values, like the access token, may be split
+            // across multiple keys to fit under ECOM cookie size
+            // thresholds. We check for and append additional chunks here.
+            let chunk = 2
+            let additionalPart = Cookies.get(`${key}_${chunk}`)
+            while (additionalPart) {
+                value = value.concat(additionalPart)
+                chunk++
+                additionalPart = Cookies.get(`${key}_${chunk}`) || ''
+            }
+        }
+        return value
     }
     delete(key) {
         Cookies.remove(key)
+
+        // Some values, like the access token, may be split
+        // across multiple keys to fit under ECOM cookie size
+        // thresholds. We check for and delete additional chunks here.
+        let chunk = 2
+        let additionalPart = Cookies.get(`${key}_${chunk}`)
+        while (additionalPart) {
+            Cookies.remove(`${key}_${chunk}`, {
+                ...getDefaultCookieAttributes(),
+                ...options
+            })
+            chunk++
+            additionalPart = Cookies.get(`${key}_${chunk}`) || ''
+        }
     }
 }
 
