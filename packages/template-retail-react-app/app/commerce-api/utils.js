@@ -7,7 +7,7 @@
 import jwtDecode from 'jwt-decode'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
-import {refreshTokenGuestStorageKey, refreshTokenRegisteredStorageKey} from './constants'
+import {ECOM_ACCESS_TOKEN_STORAGE_KEY, tokenStorageKey} from './constants'
 import fetch from 'cross-fetch'
 
 /**
@@ -274,27 +274,37 @@ export const convertSnakeCaseToSentenceCase = (text) => {
 export const noop = () => {}
 
 /**
- * WARNING: This function is relevant to be used in Hybrid deployments only.
- * Compares the refresh_token keys for guest('cc-nx-g') and registered('cc-nx') login from the cookie received from SFRA with the copy stored in localstorage on PWA Kit
- * to determine if the login state of the shopper on SFRA site has changed. If the keys are different we return true considering the login state did change. If the keys are same,
- * we compare the values of the refresh_token to cover an edge case where the login state might have changed multiple times on SFRA and the eventual refresh_token key might be same
- * as that on PWA Kit which would incorrectly show both keys to be the same even though the sessions are different.
- * @param {Storage} storage Cookie storage on PWA Kit in hybrid deployment.
- * @param {LocalStorage} storageCopy Local storage holding the copy of the refresh_token in hybrid deployment.
- * @returns {boolean} true if the keys do not match (login state changed), false otherwise.
+ * WARNING: This function is relevant to be used in Phased Launch deployments only.
+ * 
+ * If any of the SLAS Auth flows were called in Plugin SLAS that generate a new access_token,
+ * Plugin SLAS will set the access_token in the cc-at (maybe chunked as cc-at, cc-at_2, ...) cookie.
+ * This function will look for the cc-at cookie and if found, it updates the token value in PWA Kit localStorage.
+ * This maintains auth and basket sync between SFRA and PWA Kit sites in a Phased Launch storefront.
+ * 
+ * However, if the shopper logs out on an SFRA page in a Phased Launch storefront, Plugin SLAS will set
+ * cc-at='refresh'. This indicated, the PWA Kit token in localstorage is no longer valid and must trigger a
+ * new guest shopper login in PWA Kit to fetch a new token.
+ * 
+ * @param {Storage} storage Local storage on PWA Kit in hybrid deployment.
+ * @param {LocalStorage} cookieStorage Cookie storage on PWA Kit in hybrid deployment.
+ * @returns {boolean} true if the cc-at is set to 'refresh' and PWA Kit needs to fetch new token, false otherwise..
  */
-export function hasSFRAAuthStateChanged(storage, storageCopy) {
-    let refreshTokenKey =
-        (storage.get(refreshTokenGuestStorageKey) && refreshTokenGuestStorageKey) ||
-        (storage.get(refreshTokenRegisteredStorageKey) && refreshTokenRegisteredStorageKey)
+export function hasSFRAAuthStateChanged(storage, cookieStorage) {
+    let SFRAAuthToken = cookieStorage.get(ECOM_ACCESS_TOKEN_STORAGE_KEY)
 
-    let refreshTokenCopyKey =
-        (storageCopy.get(refreshTokenGuestStorageKey) && refreshTokenGuestStorageKey) ||
-        (storageCopy.get(refreshTokenRegisteredStorageKey) && refreshTokenRegisteredStorageKey)
+    if (!SFRAAuthToken || SFRAAuthToken === "") {
+        return false
+    }
 
-    if (refreshTokenKey !== refreshTokenCopyKey) {
+    if (SFRAAuthToken === 'refresh') {
+        // If the shopper logged-out on SFRA/SG cc-at is set to refresh which means
+        // PWA Kit token is no-longer valid and must trigger new guest login to get new token.
         return true
     }
 
-    return storage.get(refreshTokenKey) !== storageCopy.get(refreshTokenCopyKey)
+    // If a cc-at cookie is found and it's value is NOT 'refresh',
+    // Update localStoreage token cookie to cc-at value and delete cc-at cookie.
+    storage.set(tokenStorageKey, SFRAAuthToken)
+    cookieStorage.delete(ECOM_ACCESS_TOKEN_STORAGE_KEY)
+
 }

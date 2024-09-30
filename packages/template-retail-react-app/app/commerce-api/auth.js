@@ -22,7 +22,7 @@ import {
     REFRESH_TOKEN_COOKIE_AGE,
     EXPIRED_TOKEN,
     INVALID_TOKEN,
-    dwsidStorageKey
+    DWSID_STORAGE_KEY
 } from './constants'
 import fetch from 'cross-fetch'
 import Cookies from 'js-cookie'
@@ -142,13 +142,13 @@ class Auth {
     }
 
     get dwsid() {
-        return this._cookieStorage.get(dwsidStorageKey)
+        return this._cookieStorage.get(DWSID_STORAGE_KEY)
     }
 
     get isTokenValid() {
         return (
             !isTokenExpired(this.authToken) &&
-            !hasSFRAAuthStateChanged(this._storage, this._storageCopy)
+            !hasSFRAAuthStateChanged(this._storage, this._cookieStorage)
         )
     }
 
@@ -470,7 +470,7 @@ class Auth {
         this._storage.delete(cidStorageKey)
         this._storage.delete(encUserIdStorageKey)
         this._storage.delete(dwSessionIdKey)
-        this._cookieStorage.delete(dwsidStorageKey)
+        this._cookieStorage.delete(DWSID_STORAGE_KEY)
     }
 }
 
