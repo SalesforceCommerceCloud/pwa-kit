@@ -62,15 +62,14 @@ describe('App', () => {
         buildUrl
     }
 
-    test('App component is rendered appropriately', async () => {
+    test('User can select DNT options when App component is rendered with DNT Modal', async () => {
         useMultiSite.mockImplementation(() => resultUseMultiSite)
-        renderWithProviders(
+        const {user} = renderWithProviders(
             <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <p>Any children here</p>
             </App>
         )
         const closeButton = screen.getByLabelText('Close dnt form')
-        const user = userEvent.setup()
         await user.click(closeButton)
         await waitFor(() => {
             expect(screen.getByRole('main')).toBeInTheDocument()
