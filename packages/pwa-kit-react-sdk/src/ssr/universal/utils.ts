@@ -23,7 +23,7 @@ const EXTENIONS_NAMESPACE = '__extensions'
 const STATIC_FOLDER = 'static'
 
 type GetAssetUrlOptions = {
-    extensionPackageName: string
+    extensionPackageName?: string
 }
 
 /**
@@ -43,6 +43,7 @@ export const getAssetUrl = (path: string) => {
     return path ? `${publicPath}${path}` : publicPath
 }
 
+  
 // TODO: Once we establish that we have a new @salesforce/pwa-kit-extensibility package, we can move this utility to
 // it as to not have direct references to extensibilty in the sdk. This will also reduce duplicate code.
 /**
@@ -61,9 +62,9 @@ export const getStaticAssetUrl = (path: string, opts: GetAssetUrlOptions) => {
           `${window.Progressive.buildOrigin as string}`
         : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
 
-    return `${publicPath}${STATIC_FOLDER}/${
-        extensionPackageName ? `${EXTENIONS_NAMESPACE}/${extensionPackageName}/` : ''
-    }${path}`
+    return `${publicPath}/${STATIC_FOLDER}${
+        extensionPackageName ? `/${EXTENIONS_NAMESPACE}/${extensionPackageName}` : ''
+    }${path ? path : ''}`
 }
 
 /**
