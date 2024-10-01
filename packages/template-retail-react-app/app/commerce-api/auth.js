@@ -24,7 +24,6 @@ import {
     INVALID_TOKEN,
     DWSID_STORAGE_KEY
 } from './constants'
-import fetch from 'cross-fetch'
 import Cookies from 'js-cookie'
 
 /**
@@ -50,9 +49,6 @@ class Auth {
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
 
-        // To store tokens as cookies
-        // change the next line to
-        // this._storage = this._onClient ? new CookieStorage() : new Map()
         this._cookieStorage = this._onClient ? new CookieStorage() : new Map()
         this._storage = this._onClient ? new LocalStorage() : new Map()
 
@@ -106,7 +102,9 @@ class Auth {
             this.userType === Auth.USER_TYPE.REGISTERED
                 ? refreshTokenRegisteredStorageKey
                 : refreshTokenGuestStorageKey
-        return this._storage.get(storageKey)
+        
+        // Refresh tokens are moved to cookie storage to support Phased Launch storefronts.
+        return this._cookieStorage.get(storageKey)
     }
 
     get usid() {
@@ -153,22 +151,23 @@ class Auth {
     }
 
     /**
-     * Save refresh token in designated storage.
-     *
+     * Save refresh token in cookie storage.
+     * Refresh tokens are moved to cookie storage to support Phased Launch storefronts.
+     * 
      * @param {string} token The refresh token.
      * @param {USER_TYPE} type Type of the user.
      */
     _saveRefreshToken(token, type) {
         if (type === Auth.USER_TYPE.REGISTERED) {
-            this._storage.set(refreshTokenRegisteredStorageKey, token, {
+            this._cookieStorage.set(refreshTokenRegisteredStorageKey, token, {
                 expires: REFRESH_TOKEN_COOKIE_AGE
             })
-            this._storage.delete(refreshTokenGuestStorageKey)
+            this._cookieStorage.delete(refreshTokenGuestStorageKey)
             return
         }
 
-        this._storage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
-        this._storage.delete(refreshTokenRegisteredStorageKey)
+        this._cookieStorage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
+        this._cookieStorage.delete(refreshTokenRegisteredStorageKey)
     }
 
     /**
@@ -333,6 +332,11 @@ class Auth {
             const json = await response.json()
             throw new HTTPError(response.status, json.message)
         }
+
+        // For Phased Launch storefronts, if the shopper logs into a registered account on PWA Kit,
+        // dwsid cookie must be cleared to trigger onSession in Plugin SLAS which will then use the new
+        // registered refresh_token (cc-nx cookie) value to restore SFRA/SG session for registered shopper.
+        this._cookieStorage.delete(DWSID_STORAGE_KEY)
 
         const tokenBody = createGetTokenBody(
             response.url,

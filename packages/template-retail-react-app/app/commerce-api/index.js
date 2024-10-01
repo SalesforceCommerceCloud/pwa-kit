@@ -14,6 +14,7 @@ import OcapiShopperOrders from './ocapi-shopper-orders'
 import {isError} from './utils'
 import Auth from './auth'
 import EinsteinAPI from './einstein'
+import { DWSID_SERVER_AFFINITY_HEADER } from './constants'
 
 /**
  * The configuration details for the connecting to the API.
@@ -219,6 +220,15 @@ class CommerceAPI {
                 ...fetchOptions.parameters,
                 ...(this.isStorefrontPreview ? {c_cache_breaker: Date.now()} : {})
             }
+        }
+        const dwsid = this.auth.dwsid()
+
+       /**
+        * In a Phased Launch storefront, if a dwsid exists, send it with each OCAPI call
+        * to maintain appserver affinity.
+        */
+        if (dwsid) {
+            newFetchOptions[headers][DWSID_SERVER_AFFINITY_HEADER] = dwsid
         }
         return [newFetchOptions, ...restParams]
     }
