@@ -19,8 +19,11 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 
 const onClient = typeof window !== 'undefined'
 
+const EXTENIONS_NAMESPACE = '__extensions'
+const STATIC_FOLDER = 'static'
+
 type GetAssetUrlOptions = {
-    extensionName: string
+    extensionPackageName: string
 }
 
 /**
@@ -30,17 +33,37 @@ type GetAssetUrlOptions = {
  * @function
  * @returns {string}
  */
-export const getAssetUrl = (path: string, opts: GetAssetUrlOptions) => {
-    const {extensionName} = opts || {}
-    console.log('getAssetUrl: ', extensionName)
+export const getAssetUrl = (path: string) => {
     /* istanbul ignore next */
     const publicPath = onClient
         ? // @ts-ignore
           `${window.Progressive.buildOrigin as string}`
         : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
 
-        // http://localhost:3000/mobify/bundle/development/static/@salesforce/extension-sample/salesforce-logo.svg
     return path ? `${publicPath}${path}` : publicPath
+}
+
+// TODO: Once we establish that we have a new @salesforce/pwa-kit-extensibility package, we can move this utility to
+// it as to not have direct references to extensibilty in the sdk. This will also reduce duplicate code.
+/**
+ * Get the URL that should be used to load a static asset from the bundle.
+ *
+ * @param {string} path - relative path from the build directory to the asset
+ * @function
+ * @returns {string}
+ */
+export const getStaticAssetUrl = (path: string, opts: GetAssetUrlOptions) => {
+    const {extensionPackageName = ''} = opts || {}
+
+    /* istanbul ignore next */
+    const publicPath = onClient
+        ? // @ts-ignore
+          `${window.Progressive.buildOrigin as string}`
+        : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
+
+    return `${publicPath}${STATIC_FOLDER}/${
+        extensionPackageName ? `${EXTENIONS_NAMESPACE}/${extensionPackageName}/` : ''
+    }${path}`
 }
 
 /**
