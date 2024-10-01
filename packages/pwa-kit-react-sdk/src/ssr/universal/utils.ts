@@ -43,7 +43,6 @@ export const getAssetUrl = (path: string) => {
     return path ? `${publicPath}${path}` : publicPath
 }
 
-  
 // TODO: Once we establish that we have a new @salesforce/pwa-kit-extensibility package, we can move this utility to
 // it as to not have direct references to extensibilty in the sdk. This will also reduce duplicate code.
 /**

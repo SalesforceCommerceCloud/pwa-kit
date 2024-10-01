@@ -34,7 +34,7 @@ describe('getAssetUrl (client-side)', () => {
     })
 })
 
-describe.only('getAssetStaticUrl (client-side)', () => {
+describe('getAssetStaticUrl (client-side)', () => {
     beforeEach(() => {
         global.Progressive = {buildOrigin: 'test.com'}
     })
@@ -48,9 +48,13 @@ describe.only('getAssetStaticUrl (client-side)', () => {
         expect(utils.getStaticAssetUrl('/path')).toBe('test.com/static/path')
     })
     test('should return build origin with extension prefix when no path is defined, but an extension package name is', () => {
-        expect(utils.getStaticAssetUrl('', {extensionPackageName: '@salesforce/sample-extension'})).toBe('test.com/static/__extensions/@salesforce/sample-extension')
+        expect(
+            utils.getStaticAssetUrl('', {extensionPackageName: '@salesforce/sample-extension'})
+        ).toBe('test.com/static/__extensions/@salesforce/sample-extension')
     })
     test('should return origin + extension prefix + path', () => {
-        expect(utils.getStaticAssetUrl('/path', {extensionPackageName: '@salesforce/sample-extension'})).toBe('test.com/static/__extensions/@salesforce/sample-extension/path')
+        expect(
+            utils.getStaticAssetUrl('/path', {extensionPackageName: '@salesforce/sample-extension'})
+        ).toBe('test.com/static/__extensions/@salesforce/sample-extension/path')
     })
 })
