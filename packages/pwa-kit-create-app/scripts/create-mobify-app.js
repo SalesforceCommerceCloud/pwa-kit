@@ -782,7 +782,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                     processTemplate(relFilePath, assetsDir, outputDir, context)
                 })
         }
-        
+
         let extensionSamplePath
         if (extractExtension) {
             const extensionTmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-extension-sample'))
@@ -807,7 +807,6 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             // Copy the extension-sample into the output directory
             extensionSamplePath = p.join(extensionTmp, 'package')
             sh.cp('-rf', extensionSamplePath, outputDir)
-
             sh.mv(extensionSamplePath, extensionDir)
 
             // Clean up extension temporary directory
