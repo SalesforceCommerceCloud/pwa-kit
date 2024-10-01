@@ -713,7 +713,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    const {extend = false} = answers.project
+    const {extend = false, extractExtension = false} = answers.project
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
@@ -722,6 +722,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
+    const extensionDir = p.join(outputDir, 'extension-sample')
     const {id, type} = templateSource
     let tarPath
 
@@ -745,7 +746,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         }
     }
 
-    // Extract the source
+    // Extract the main template
     tar.x({
         file: tarPath,
         cwd: tmp,
@@ -760,49 +761,75 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context)
             )
 
-        // Copy required assets defind on the preset level.
+        // Copy required assets defined on the preset level.
         const {assets = []} = preset
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
     } else {
         // Copy the base template either from the package or npm.
-        console.log(`DEBUG: Copying base template from ${packagePath} to ${outputDir}`)
         sh.cp('-rf', packagePath, outputDir)
 
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
-        console.log(`DEBUG: Checking if assets directory exists: ${assetsDir}`)
         if (sh.test('-e', assetsDir)) {
-            console.log('DEBUG: Assets directory found, processing files')
-
             getFiles(assetsDir)
                 .map((file) => {
                     const relFilePath = file.replace(assetsDir, '')
-                    console.log(`DEBUG: Processing file: ${file}, Relative Path: ${relFilePath}`)
                     return relFilePath
                 })
                 .forEach((relFilePath) => {
-                    console.log(`DEBUG: Processing template for file: ${relFilePath}`)
                     processTemplate(relFilePath, assetsDir, outputDir, context)
                 })
-        } else {
-            console.log('DEBUG: No assets directory found')
+        }
+        
+        let extensionSamplePath
+        if (extractExtension) {
+            const extensionTmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-extension-sample'))
+            const extensionTarFile = sh
+                .exec(
+                    `npm pack @salesforce/extension-sample@1.0.0-dev --pack-destination="${extensionTmp}"`,
+                    {
+                        silent: true
+                    }
+                )
+                .stdout.trim()
+            const extensionTarPath = p.join(extensionTmp, extensionTarFile)
+
+            // Extract the extension
+            const extensionFolder = p.join(outputDir, 'extension-sample')
+            tar.x({
+                file: extensionTarPath,
+                cwd: extensionTmp,
+                sync: true
+            })
+
+            // Copy the extension-sample into the output directory
+            extensionSamplePath = p.join(extensionTmp, 'package')
+            sh.cp('-rf', extensionSamplePath, outputDir)
+
+            sh.mv(extensionSamplePath, extensionDir)
+
+            // Clean up extension temporary directory
+            sh.rm('-rf', extensionTmp)
+
+            // Set the relative path for the extracted extension
+            extensionSamplePath = `file:./extension-sample`
         }
 
-        // Update the generated projects version. NOTE: For bootstrapped projects this
+        // Update the generated project's package.json. NOTE: For bootstrapped projects this
         // can be done in the template building. But since we have two types of project builds,
         // (bootstrap/bundle) we'll do it here where it works in both scenarios.
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
         console.log('DEBUG: Current package.json content:', JSON.stringify(pkgJSON, null, 2))
 
-        // Add @salesforce/extension-sample dependency if not present
+        // Add @salesforce/extension-sample to dependencies and mobify object with extensions
         const finalPkgData = merge(pkgJSON, {
             name: slugifyName(context.answers.project.name || context.preset.id),
             version: GENERATED_PROJECT_VERSION,
             devDependencies: {
-                '@salesforce/extension-sample': '1.0.0-dev'
+                '@salesforce/extension-sample': extractExtension ? extensionSamplePath : '1.0.0-dev'
             },
             mobify: {
                 app: {
@@ -823,7 +850,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // Write updated package.json back to the output directory
         writeJson(pkgJsonPath, finalPkgData)
 
-        // Clean up
+        // Clean up temporary directory
         sh.rm('-rf', tmp)
     }
 
@@ -873,14 +900,6 @@ const main = async (opts) => {
         context = merge(context, {answers: expandObject(generationAnswers)})
 
         if (context.answers.project.generationType === 'extensions') {
-            const {extension, extractExtension} = context.answers.project
-
-            if (extractExtension) {
-                // TODO: Logic to copy extension-sample
-            } else {
-                // TODO: Install the extension from local NPM Verdaccio
-            }
-
             // Add the 'typescript-minimal' preset for Application Extension
             context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
         }
