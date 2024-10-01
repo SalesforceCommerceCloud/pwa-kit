@@ -34,7 +34,7 @@ describe('getAssetUrl (client-side)', () => {
     })
 })
 
-describe('getAssetStaticUrl (client-side)', () => {
+describe('getStaticAssetUrl (client-side)', () => {
     beforeEach(() => {
         global.Progressive = {buildOrigin: 'test.com'}
     })
