@@ -48,6 +48,8 @@ const disableHMR = process.env.HMR === 'false'
 
 const {app: appConfig} = getConfig()
 
+export const EXTENIONS_NAMESPACE = '__extensions'
+
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
 }
@@ -298,8 +300,33 @@ const withChunking = (config) => {
     }
 }
 
+// TODO: Once we create a new project for extensibility we'll have the opportunity to better move this utility
+// to a place that can be reused. This util is also used in the `extensions-loader`.
+const normalizeExtensionsList = (extensions = []) =>
+    extensions.map((extension) => {
+        return {
+            packageName: Array.isArray(extension) ? extension[0] : extension,
+            config: Array.isArray(extension) ? {enabled: true, ...extension[1]} : {enabled: true}
+        }
+    })
+
 const staticFolderCopyPlugin = new CopyPlugin({
-    patterns: [{from: 'app/static/', to: 'static/'}]
+    patterns: [
+        {
+            from: 'app/static/',
+            to: 'static/'
+        },
+        ...normalizeExtensionsList(appConfig?.extensions).map((extension) => {
+            const {packageName} = extension
+            // Parse the extension name out.
+            return {
+                from: `${projectDir}/node_modules/${packageName}/static`,
+                to: `static/${EXTENIONS_NAMESPACE}/${packageName}`,
+                // Add exclude for readme file.
+                noErrorOnMissing: true
+            }
+        })
+    ]
 })
 
 const ruleForBabelLoader = (babelPlugins) => {
