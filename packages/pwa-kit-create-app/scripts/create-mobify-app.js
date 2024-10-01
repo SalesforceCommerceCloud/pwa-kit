@@ -821,7 +821,6 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // (bootstrap/bundle) we'll do it here where it works in both scenarios.
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
-        console.log('DEBUG: Current package.json content:', JSON.stringify(pkgJSON, null, 2))
 
         // Add @salesforce/extension-sample to dependencies and mobify object with extensions
         const finalPkgData = merge(pkgJSON, {
@@ -843,8 +842,6 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 }
             }
         })
-
-        console.log('DEBUG: Updated package.json content:', JSON.stringify(finalPkgData, null, 2))
 
         // Write updated package.json back to the output directory
         writeJson(pkgJsonPath, finalPkgData)
