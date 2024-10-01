@@ -6,6 +6,7 @@
 -   Update logout helper to work for guest users [#1997](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1997)
 -   Update `useCustomMutation` hook to accept request body as a parameter to the mutate function [#2030](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2030)
 -  Simplify `useCustomMutation` hook implementation [#2034](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2034)
+-  Documentation for `useCustomMutation` hook along with new dynamic `body` param option [#2042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2042)
 
 ## v3.0.1 (Sep 04, 2024)
 
