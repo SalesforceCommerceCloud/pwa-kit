@@ -485,7 +485,7 @@ const PRESETS = [
     {
         id: 'app-sample-extension-npm-install',
         name: 'Application Extension (NPM Verdaccio)',
-        fescription: 'Generate an Application Extension and install it from local NPM.',
+        description: 'Generate an Application Extension and install it from local NPM.',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
