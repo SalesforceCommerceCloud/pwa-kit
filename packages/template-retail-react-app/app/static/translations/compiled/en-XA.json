@@ -111,6 +111,42 @@
       "value": "]"
     }
   ],
+  "account_addresses.label.edit_button": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗḓīŧ "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_addresses.label.remove_button": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗḿǿǿṽḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_addresses.page_action_placeholder.button.add_address": [
     {
       "type": 0,
@@ -3815,6 +3851,32 @@
       "value": "]"
     }
   ],
+  "item_variant.quantity.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɋŭŭȧȧƞŧīŧẏ şḗḗŀḗḗƈŧǿǿř ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": ". Şḗḗŀḗḗƈŧḗḗḓ ɋŭŭȧȧƞŧīŧẏ īş "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "lCPCxk": [
     {
       "type": 0,
@@ -5714,7 +5776,11 @@
     },
     {
       "type": 0,
-      "value": "Ḓḗḗƈřḗḗḿḗḗƞŧ Ɋŭŭȧȧƞŧīŧẏ"
+      "value": "Ḓḗḗƈřḗḗḿḗḗƞŧ Ɋŭŭȧȧƞŧīŧẏ ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     },
     {
       "type": 0,
@@ -5728,7 +5794,11 @@
     },
     {
       "type": 0,
-      "value": "Īƞƈřḗḗḿḗḗƞŧ Ɋŭŭȧȧƞŧīŧẏ"
+      "value": "Īƞƈřḗḗḿḗḗƞŧ Ɋŭŭȧȧƞŧīŧẏ ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     },
     {
       "type": 0,
@@ -8051,6 +8121,50 @@
       "value": "]"
     }
   ],
+  "wishlist_primary_action.button.addSetToCart.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " şḗḗŧ ŧǿǿ ƈȧȧřŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "wishlist_primary_action.button.addToCart.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " ŧǿǿ ƈȧȧřŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "wishlist_primary_action.button.add_set_to_cart": [
     {
       "type": 0,
@@ -8079,6 +8193,24 @@
       "value": "]"
     }
   ],
+  "wishlist_primary_action.button.viewFullDetails.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ṽīḗḗẇ ƒŭŭŀŀ ḓḗḗŧȧȧīŀş ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
@@ -8101,6 +8233,24 @@
     {
       "type": 0,
       "value": "Ṽīḗḗẇ Ǿƥŧīǿǿƞş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "wishlist_primary_action.button.view_options.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ṽīḗḗẇ Ǿƥŧīǿǿƞş ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     },
     {
       "type": 0,
@@ -8161,6 +8311,24 @@
     {
       "type": 0,
       "value": "Řḗḗḿǿǿṽḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item.remove.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗḿǿǿṽḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     },
     {
       "type": 0,

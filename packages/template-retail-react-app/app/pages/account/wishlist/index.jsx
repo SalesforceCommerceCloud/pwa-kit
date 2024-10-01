@@ -216,6 +216,7 @@ const AccountWishlist = () => {
                             secondaryActions={
                                 <WishlistSecondaryButtonGroup
                                     productListItemId={item.id}
+                                    productName={item.product.name}
                                     // Focus to 'Wishlist' header after remove for accessibility
                                     focusElementOnRemove={headingRef}
                                     onClick={handleSecondaryAction}
