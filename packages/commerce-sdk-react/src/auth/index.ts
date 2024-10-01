@@ -442,20 +442,36 @@ class Auth {
         }
     }
 
-    logTokenRequestError = async (error: Error) => {
+    /**
+     * This method extracts the status and message from a ResponseError that is returned
+     * by commerce-sdk-isomorphic.
+     *
+     * commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
+     * We can't use `instanceof`, so instead we just check for the `response` property
+     * and assume it is a `ResponseError` if a response is present
+     *
+     * Once commerce-sdk-isomorphic exports `ResponseError` we can revisit if this method is
+     * still required.
+     *
+     * @returns {status_code, responseMessage} contained within the ResponseError
+     * @throws error if the error is not a ResponseError
+     * @Internal
+     */
+    extractResponseError = async (error: Error) => {
         // the regular error.message will return only the generic status code message
         // ie. 'Bad Request' for 400. We need to drill specifically into the ResponseError
         // to get a more descriptive error message from SLAS
-        if (error instanceof Error && 'response' in error) {
-            // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
-            // We can't use `instanceof`, so instead we just check for the `response` property
-            // and assume it is a fetch Response.
+        if ('response' in error) {
             const json = await (error['response'] as Response).json()
             const status_code: string = json.status_code
             const responseMessage: string = json.message
 
-            this.logger.error(`${status_code} ${responseMessage}`)
+            return {
+                status_code,
+                responseMessage
+            }
         }
+        throw error
     }
 
     /**
@@ -507,9 +523,13 @@ class Auth {
                 )
             } catch (error) {
                 // If the refresh token login fails, we fall back to the new guest refresh login
-                await this.logTokenRequestError(error as Error)
+                const {status_code, responseMessage} = await this.extractResponseError(
+                    error as Error
+                )
+                this.logger.error(`${status_code} ${responseMessage}`)
                 // clean up storage and restart the login flow
                 this.clearStorage()
+                this.logger.info(`Refresh login error. Attempting to log user in as new guest.`)
             }
         }
         return this.loginGuestUser()
@@ -562,11 +582,13 @@ class Auth {
         try {
             return await this.queueRequest(callback, isGuest)
         } catch (error) {
-            const err = error as Error
             // We catch the error here to do logging but we still need to
             // throw an error to stop the login flow from continuing.
-            await this.logTokenRequestError(err)
-            throw new Error(`New guest user could not be logged in. ${err.message}`)
+            const {status_code, responseMessage} = await this.extractResponseError(error as Error)
+            this.logger.error(`${status_code} ${responseMessage}`)
+            throw new Error(
+                `New guest user could not be logged in. ${status_code} ${responseMessage}`
+            )
         }
     }
 

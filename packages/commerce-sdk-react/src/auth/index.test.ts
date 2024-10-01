@@ -382,7 +382,16 @@ describe('Auth', () => {
     test('ready - throw error and discard refresh token if refresh token is invalid', async () => {
         // Force the mock to throw just for this test
         const refreshAccessTokenSpy = jest.spyOn(helpers, 'refreshAccessToken')
-        refreshAccessTokenSpy.mockRejectedValueOnce({})
+        refreshAccessTokenSpy.mockRejectedValueOnce({
+            response: {
+                json: () => {
+                    return {
+                        status_code: 404,
+                        message: 'test'
+                    }
+                }
+            }
+        })
 
         const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
 
