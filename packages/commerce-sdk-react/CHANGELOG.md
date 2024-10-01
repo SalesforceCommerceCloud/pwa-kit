@@ -5,6 +5,7 @@
 -   Add `defaultDnt` to support setting the dnt flag for SLAS. Upgrade `commerce-sdk-isomorphic` to v3.1.1 [#1979](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1979)
 -   Update logout helper to work for guest users [#1997](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1997)
 -   Update `useCustomMutation` hook to accept request body as a parameter to the mutate function [#2030](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2030)
+-  Simplify `useCustomMutation` hook implementation [#2034](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2034)
 
 ## v3.0.1 (Sep 04, 2024)
 
