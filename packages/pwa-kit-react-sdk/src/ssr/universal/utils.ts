@@ -63,6 +63,11 @@ export const getStaticAssetUrl = (path: string, opts: GetAssetUrlOptions) => {
           `${window.Progressive.buildOrigin as string}`
         : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
 
+    // Ensure all defined path arguments start with `/`.
+    if (path && !path.startsWith('/')) {
+        path = `/${path}`
+    }
+
     return `${publicPath}/${STATIC_FOLDER}${
         appExtensionPackageName ? `/${EXTENIONS_NAMESPACE}/${appExtensionPackageName}` : ''
     }${path ? path : ''}`
