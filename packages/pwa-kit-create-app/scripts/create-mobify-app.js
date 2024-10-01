@@ -810,7 +810,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                         [
                             '@salesforce/extension-sample',
                             {
-                                path: '/faaaaaa-page'
+                                path: '/foo-page'
                             }
                         ]
                     ]
