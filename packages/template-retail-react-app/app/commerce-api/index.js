@@ -226,7 +226,7 @@ class CommerceAPI {
          * In a Phased Launch storefront, if a dwsid exists, send it with each OCAPI call
          * to maintain appserver affinity.
          */
-        const dwsid = this.auth.dwsid()
+        const dwsid = this.auth.dwsid
         if (dwsid) {
             newFetchOptions['headers'][DWSID_SERVER_AFFINITY_HEADER] = dwsid
         }
