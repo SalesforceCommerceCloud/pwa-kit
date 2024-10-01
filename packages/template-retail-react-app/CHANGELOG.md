@@ -2,6 +2,7 @@
 
 ### New Features
 - Implement ability to set Shopper Context via search parameters in the Retail React App [#1986](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1986)
+- Display a promo banner from Page Designer in the PLP page of the Retail React App [#2016](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2016)
 
 ### Performance Improvements
 -   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)

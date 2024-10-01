@@ -57,6 +57,7 @@ import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/page-header'
 import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/above-page-header'
+import PageDesignerPromotionalBanner from '@salesforce/retail-react-app/app/pages/product-list/partials/page-designer-promotional-banner'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
@@ -414,6 +415,8 @@ const ProductList = (props) => {
             ) : (
                 <>
                     <AbovePageHeader />
+                    <PageDesignerPromotionalBanner />
+
                     {/* Header */}
                     <Stack
                         display={{base: 'none', lg: 'flex'}}
