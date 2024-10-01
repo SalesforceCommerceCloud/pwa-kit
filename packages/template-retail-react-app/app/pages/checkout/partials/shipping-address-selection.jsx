@@ -291,55 +291,75 @@ const ShippingAddressSelection = ({
                                     spacing={4}
                                     gridAutoFlow="row dense"
                                 >
-                                    {customer.addresses?.map((address, index) => (
-                                        <React.Fragment key={address.addressId}>
-                                            <RadioCard value={address.addressId}>
-                                                <ActionCard
-                                                    padding={0}
-                                                    border="none"
-                                                    onRemove={() =>
-                                                        removeSavedAddress(address.addressId)
-                                                    }
-                                                    onEdit={() => toggleAddressEdit(address)}
-                                                    editBtnRef={editBtnRefs[address.addressId]}
-                                                    data-testid={`sf-checkout-shipping-address-${index}`}
-                                                >
-                                                    <AddressDisplay address={address} />
-                                                </ActionCard>
-                                                {/*Arrow up icon pointing to the address that is being edited*/}
+                                    {customer.addresses?.map((address, index) => {
+                                        const editLabel = formatMessage(
+                                            {
+                                                defaultMessage: 'Edit {address}',
+                                                id: 'account_addresses.label.edit_button'
+                                            },
+                                            {address: address.address1}
+                                        )
+
+                                        const removeLabel = formatMessage(
+                                            {
+                                                defaultMessage: 'Remove {address}',
+                                                id: 'account_addresses.label.remove_button'
+                                            },
+                                            {address: address.address1}
+                                        )
+                                        return (
+                                            <React.Fragment key={address.addressId}>
+                                                <RadioCard value={address.addressId}>
+                                                    <ActionCard
+                                                        padding={0}
+                                                        border="none"
+                                                        onRemove={() =>
+                                                            removeSavedAddress(address.addressId)
+                                                        }
+                                                        onEdit={() => toggleAddressEdit(address)}
+                                                        editBtnRef={editBtnRefs[address.addressId]}
+                                                        data-testid={`sf-checkout-shipping-address-${index}`}
+                                                        editBtnLabel={editLabel}
+                                                        removeBtnLabel={removeLabel}
+                                                    >
+                                                        <AddressDisplay address={address} />
+                                                    </ActionCard>
+                                                    {/*Arrow up icon pointing to the address that is being edited*/}
+                                                    {isEditingAddress &&
+                                                        address.addressId === selectedAddressId && (
+                                                            <Box
+                                                                width={3}
+                                                                height={3}
+                                                                borderLeft="1px solid"
+                                                                borderTop="1px solid"
+                                                                borderColor="blue.600"
+                                                                position="absolute"
+                                                                left="50%"
+                                                                bottom="-23px"
+                                                                background="white"
+                                                                transform="rotate(45deg)"
+                                                            />
+                                                        )}
+                                                </RadioCard>
                                                 {isEditingAddress &&
                                                     address.addressId === selectedAddressId && (
-                                                        <Box
-                                                            width={3}
-                                                            height={3}
-                                                            borderLeft="1px solid"
-                                                            borderTop="1px solid"
-                                                            borderColor="blue.600"
-                                                            position="absolute"
-                                                            left="50%"
-                                                            bottom="-23px"
-                                                            background="white"
-                                                            transform="rotate(45deg)"
+                                                        <ShippingAddressEditForm
+                                                            title={formatMessage({
+                                                                defaultMessage:
+                                                                    'Edit Shipping Address',
+                                                                id: 'shipping_address_selection.title.edit_shipping'
+                                                            })}
+                                                            hasSavedAddresses={hasSavedAddresses}
+                                                            toggleAddressEdit={toggleAddressEdit}
+                                                            hideSubmitButton={hideSubmitButton}
+                                                            form={form}
+                                                            submitButtonLabel={submitButtonLabel}
+                                                            formTitleAriaLabel={formTitleAriaLabel}
                                                         />
                                                     )}
-                                            </RadioCard>
-                                            {isEditingAddress &&
-                                                address.addressId === selectedAddressId && (
-                                                    <ShippingAddressEditForm
-                                                        title={formatMessage({
-                                                            defaultMessage: 'Edit Shipping Address',
-                                                            id: 'shipping_address_selection.title.edit_shipping'
-                                                        })}
-                                                        hasSavedAddresses={hasSavedAddresses}
-                                                        toggleAddressEdit={toggleAddressEdit}
-                                                        hideSubmitButton={hideSubmitButton}
-                                                        form={form}
-                                                        submitButtonLabel={submitButtonLabel}
-                                                        formTitleAriaLabel={formTitleAriaLabel}
-                                                    />
-                                                )}
-                                        </React.Fragment>
-                                    ))}
+                                            </React.Fragment>
+                                        )
+                                    })}
 
                                     <Button
                                         variant="outline"
