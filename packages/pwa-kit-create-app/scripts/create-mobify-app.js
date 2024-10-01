@@ -58,11 +58,6 @@ sh.set('-e')
 // Our eslint script uses exscaped double quotes to have windows compatibility. This helper
 // will ensure those escaped double quotes are still escaped after processing the template.
 Handlebars.registerHelper('script', (object) => object.replaceAll('"', '\\"'))
-// Helper to handle all potential "No" answers
-Handlebars.registerHelper('isNo', function (a) {
-    const noValues = ['no', 'false', false, null, undefined, 0, '0']
-    return noValues.includes(a)
-})
 
 // Validations
 const validPreset = (preset) => {
