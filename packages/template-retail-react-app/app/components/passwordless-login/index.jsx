@@ -47,12 +47,14 @@ const PasswordlessLogin = ({form, clickForgotPassword = noop}) => {
                         />
                     </Text>
                     <Button
-                        onClick={(e) => {
-                            const form = e.target.closest('form')
-                            if (form.checkValidity()) {
+                        onClick={async (e) => {
+                            const isValid = await form.trigger()
+                            // Manually trigger the browser native form validations
+                            const domForm = e.target.closest('form')
+                            if (isValid && domForm.checkValidity()) {
                                 setShowPasswordView(true)
                             } else {
-                                form.reportValidity()
+                                domForm.reportValidity()
                             }
                         }}
                         borderColor="gray.500"
