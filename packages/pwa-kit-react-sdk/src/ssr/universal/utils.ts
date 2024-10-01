@@ -23,7 +23,7 @@ const EXTENIONS_NAMESPACE = '__extensions'
 const STATIC_FOLDER = 'static'
 
 type GetAssetUrlOptions = {
-    extensionPackageName?: string
+    appExtensionPackageName?: string
 }
 
 /**
@@ -48,12 +48,14 @@ export const getAssetUrl = (path: string) => {
 /**
  * Get the URL that should be used to load a static asset from the bundle.
  *
- * @param {string} path - relative path from the build directory to the asset
+ * @param {string} path - Relative path from the build directory to the asset.
+ * @param {Object} opts - Options for generating the asset URL.
+ * @param {string} [opts.appExtensionPackageName] - Optional package name for an application extension.
  * @function
- * @returns {string}
+ * @returns {string} The full URL to the static asset.
  */
 export const getStaticAssetUrl = (path: string, opts: GetAssetUrlOptions) => {
-    const {extensionPackageName = ''} = opts || {}
+    const {appExtensionPackageName = ''} = opts || {}
 
     /* istanbul ignore next */
     const publicPath = onClient
@@ -62,7 +64,7 @@ export const getStaticAssetUrl = (path: string, opts: GetAssetUrlOptions) => {
         : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
 
     return `${publicPath}/${STATIC_FOLDER}${
-        extensionPackageName ? `/${EXTENIONS_NAMESPACE}/${extensionPackageName}` : ''
+        appExtensionPackageName ? `/${EXTENIONS_NAMESPACE}/${appExtensionPackageName}` : ''
     }${path ? path : ''}`
 }
 
