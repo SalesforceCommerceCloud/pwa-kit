@@ -29,7 +29,7 @@ describe('PasswordlessLogin component', () => {
     })
 
     test('renders properly when hideEmail is true', async () => {
-        renderWithProviders(<WrapperComponent hideEmail={true}/>)
+        renderWithProviders(<WrapperComponent hideEmail={true} />)
 
         expect(screen.queryByLabelText('Email')).not.toBeInTheDocument()
         expect(screen.getByLabelText('Password')).toBeInTheDocument()
