@@ -73,6 +73,14 @@ describe('CurrentPrice', function () {
         expect(screen.getByText(/from £100\.00$/i)).toBeInTheDocument()
         expect(screen.getByLabelText(/from current price £100\.00/i)).toBeInTheDocument()
     })
+
+    test('should render range price', () => {
+        renderWithProviders(<CurrentPrice price={100} currency="GBP" isRange={true} />)
+        expect(screen.getByLabelText(/from current price £100\.00/i)).toHaveAttribute(
+            'aria-live',
+            'polite'
+        )
+    })
 })
 
 describe('ListPrice', function () {
