@@ -228,7 +228,7 @@ class CommerceAPI {
          */
         const dwsid = this.auth.dwsid()
         if (dwsid) {
-            newFetchOptions[headers][DWSID_SERVER_AFFINITY_HEADER] = dwsid
+            newFetchOptions['headers'][DWSID_SERVER_AFFINITY_HEADER] = dwsid
         }
         return [newFetchOptions, ...restParams]
     }

@@ -275,16 +275,16 @@ export const noop = () => {}
 
 /**
  * WARNING: This function is relevant to be used in Phased Launch deployments only.
- * 
+ *
  * If any of the SLAS Auth flows were called in Plugin SLAS that generate a new access_token,
  * Plugin SLAS will set the access_token in the cc-at (maybe chunked as cc-at, cc-at_2, ...) cookie.
  * This function will look for the cc-at cookie and if found, it updates the token value in PWA Kit localStorage.
  * This maintains auth and basket sync between SFRA and PWA Kit sites in a Phased Launch storefront.
- * 
+ *
  * However, if the shopper logs out on an SFRA page in a Phased Launch storefront, Plugin SLAS will set
  * cc-at='refresh'. This indicated, the PWA Kit token in localstorage is no longer valid and must trigger a
  * new guest shopper login in PWA Kit to fetch a new token.
- * 
+ *
  * @param {Storage} storage Local storage on PWA Kit in hybrid deployment.
  * @param {LocalStorage} cookieStorage Cookie storage on PWA Kit in hybrid deployment.
  * @returns {boolean} true if the cc-at is set to 'refresh' and PWA Kit needs to fetch new token, false otherwise..
@@ -292,7 +292,7 @@ export const noop = () => {}
 export function hasSFRAAuthStateChanged(storage, cookieStorage) {
     let SFRAAuthToken = cookieStorage.get(ECOM_ACCESS_TOKEN_STORAGE_KEY)
 
-    if (!SFRAAuthToken || SFRAAuthToken === "") {
+    if (!SFRAAuthToken || SFRAAuthToken === '') {
         return false
     }
 
@@ -306,5 +306,4 @@ export function hasSFRAAuthStateChanged(storage, cookieStorage) {
     // Update localStoreage token cookie to cc-at value and delete cc-at cookie.
     storage.set(tokenStorageKey, SFRAAuthToken)
     cookieStorage.delete(ECOM_ACCESS_TOKEN_STORAGE_KEY)
-
 }

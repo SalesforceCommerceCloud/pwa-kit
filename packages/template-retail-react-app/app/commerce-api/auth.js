@@ -102,7 +102,7 @@ class Auth {
             this.userType === Auth.USER_TYPE.REGISTERED
                 ? refreshTokenRegisteredStorageKey
                 : refreshTokenGuestStorageKey
-        
+
         // Refresh tokens are moved to cookie storage to support Phased Launch storefronts.
         return this._cookieStorage.get(storageKey)
     }
@@ -153,7 +153,7 @@ class Auth {
     /**
      * Save refresh token in cookie storage.
      * Refresh tokens are moved to cookie storage to support Phased Launch storefronts.
-     * 
+     *
      * @param {string} token The refresh token.
      * @param {USER_TYPE} type Type of the user.
      */
@@ -166,7 +166,9 @@ class Auth {
             return
         }
 
-        this._cookieStorage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
+        this._cookieStorage.set(refreshTokenGuestStorageKey, token, {
+            expires: REFRESH_TOKEN_COOKIE_AGE
+        })
         this._cookieStorage.delete(refreshTokenRegisteredStorageKey)
     }
 
@@ -521,10 +523,7 @@ class CookieStorage extends Storage {
         let chunk = 2
         let additionalPart = Cookies.get(`${key}_${chunk}`)
         while (additionalPart) {
-            Cookies.remove(`${key}_${chunk}`, {
-                ...getDefaultCookieAttributes(),
-                ...options
-            })
+            Cookies.remove(`${key}_${chunk}`)
             chunk++
             additionalPart = Cookies.get(`${key}_${chunk}`) || ''
         }
