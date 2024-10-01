@@ -47,6 +47,26 @@
       "value": "New address saved"
     }
   ],
+  "account_addresses.label.edit_button": [
+    {
+      "type": 0,
+      "value": "Edit "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
+  "account_addresses.label.remove_button": [
+    {
+      "type": 0,
+      "value": "Remove "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
   "account_addresses.page_action_placeholder.button.add_address": [
     {
       "type": 0,
