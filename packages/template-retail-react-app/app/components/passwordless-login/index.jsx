@@ -35,7 +35,6 @@ const PasswordlessLogin = ({form, clickForgotPassword = noop}) => {
                     >
                         <FormattedMessage
                             defaultMessage="Continue Securely"
-                            // TODO: Translations
                             id="login_form.button.continue_securely"
                         />
                     </Button>
@@ -63,7 +62,6 @@ const PasswordlessLogin = ({form, clickForgotPassword = noop}) => {
                     >
                         <FormattedMessage
                             defaultMessage="Password"
-                            // TODO: Translations
                             id="login_form.button.password"
                         />
                     </Button>
