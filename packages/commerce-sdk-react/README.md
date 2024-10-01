@@ -321,7 +321,56 @@ const Example = ({basketId}) => {
 }
 ```
 
-You could also import the mutation options as a constant like:
+#### Custom Endpoints and Dynamic `body` Mutate Parameters
+
+It is a common scenario that a mutate function might pass a value along to a request that is dynamic and therefore can't be available when the hook is declared (contrary to the previous example, which would work for a button that only adds one product to a basket, but doesn't handle a changeable input for adding a different product).
+
+Sending a custom body param is supported, the example below combines this strategy with the use of a `useCustomMutation()` hook, making it possible to dynamically declare a body when calling a custom API endpoint.
+
+```jsx
+import {useCustomMutation} from '@salesforce/commerce-sdk-react'
+
+const ExampleDynamicMutation = ({basketId}) => {
+    const customMutationHandler = useCustomMutation({
+        options: {
+            method: 'POST',
+            customApiPathParameters: {
+                endpointPath: 'path/to/resource',
+                apiName: 'hello-world'
+            }
+        }
+    })
+
+    const [colors, setColors] = useState(['blue', 'green', 'white'])
+    const [selectedColor, setSelectedColor] = useState(colors[0])
+
+    return (
+        <>
+            <select value={selectedColor} onChange={(e) => setSelectedColor(e.target.value)}>
+                {colors.map((color, index) => (
+                    <option key={index} value={color}>
+                        {color}
+                    </option>
+                ))}
+            </select>
+            <button
+                onClick={() =>
+                    customMutationHandler.mutate({
+                        parameters: {
+                            myCustomParam: 'custom parameters'
+                        },
+                        body: {
+                            resourceParam: selectedColor
+                        }
+                    })
+                }
+            />
+        </>
+    )
+}
+```
+
+Mutations also have their named methods exported as constants, available in this way:
 
 ```jsx
 import {useShopperBasketsMutation, ShopperBasketsMutations} from '@salesforce/commerce-sdk-react'
