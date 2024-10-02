@@ -6,7 +6,13 @@
  */
 import React, {useState, useEffect, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Box, Flex, Skeleton, Stack, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Box,
+    Flex,
+    Skeleton,
+    Stack,
+    Heading
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
