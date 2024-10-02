@@ -122,7 +122,10 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                 />
                 <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={7}>
                     <Heading as="h3" fontSize={25} width="100%">
-                        <FormattedMessage defaultMessage="Tracking Consent" id="dnt_notification.title" />
+                        <FormattedMessage
+                            defaultMessage="Tracking Consent"
+                            id="dnt_notification.title"
+                        />
                     </Heading>
                     <HideOnDesktop>
                         <Flex direction="column">
