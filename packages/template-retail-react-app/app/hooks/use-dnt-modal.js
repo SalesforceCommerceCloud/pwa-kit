@@ -9,8 +9,10 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Button,
-    CloseButton,
-    Box,
+    Modal,
+    ModalContent,
+    ModalBody,
+    ModalCloseButton,
     useDisclosure,
     Heading,
     Stack,
@@ -87,30 +89,38 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
     )
 
     return (
-        isOpen && (
-            <Box
-                position="fixed"
+        <Modal
+            size="sm"
+            data-testid="sf-dnt-modal"
+            blockScrollOnMount={false}
+            closeOnOverlayClick={false}
+            trapFocus={false}
+            isOpen={isOpen}
+            onOpen={onOpen}
+            onClose={onCloseModal}
+        >
+            <ModalContent
+                width="100%"
+                maxWidth="100%"
+                position="absolute"
                 bottom={0}
                 left={0}
                 right={0}
+                pointerEvents="all"
+                containerProps={{
+                    pointerEvents: 'none'
+                }}
                 margin="0"
                 borderTopRadius="md"
                 boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)"
-                width="100%"
-                maxWidth="100%"
-                backgroundColor="white"
             >
-                <CloseButton
-                    position="absolute"
+                <ModalCloseButton
                     aria-label={formatMessage({
                         id: 'dnt_modal.button.close.assistive_msg',
-                        defaultMessage: 'Close dnt form'
+                        defaultMessage: 'Close consent tracking form'
                     })}
-                    right={5}
-                    top={5}
-                    onClick={onCloseModal}
                 />
-                <Box paddingBottom={14} paddingTop={10} paddingLeft={10} paddingRight={10}>
+                <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={7}>
                     <Heading as="h3" fontSize={25} width="100%">
                         <FormattedMessage defaultMessage="Tracking Consent" id="dnt_modal.title" />
                     </Heading>
@@ -125,14 +135,20 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
                     <HideOnMobile>
                         <Flex align="center">
                             {description}
-                            <Stack direction="row" spacing={4} marginLeft={6} align="flex-end">
+                            <Stack
+                                direction="row"
+                                spacing={4}
+                                mt={4}
+                                marginLeft={6}
+                                align="flex-end"
+                            >
                                 {buttons}
                             </Stack>
                         </Flex>
                     </HideOnMobile>
-                </Box>
-            </Box>
-        )
+                </ModalBody>
+            </ModalContent>
+        </Modal>
     )
 }
 

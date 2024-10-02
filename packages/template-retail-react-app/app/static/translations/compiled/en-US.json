@@ -1119,31 +1119,31 @@
       "value": "currentPrice"
     }
   ],
-  "dnt_modal.accept": [
+  "dnt_modal.button.accept": [
     {
       "type": 0,
       "value": "Accept"
     }
   ],
-  "dnt_modal.button.accept.assistive_msg": [
+  "dnt_modal.button.assistive_msg.accept": [
     {
       "type": 0,
       "value": "Accept Tracking"
     }
   ],
-  "dnt_modal.button.close.assistive_msg": [
-    {
-      "type": 0,
-      "value": "Close dnt form"
-    }
-  ],
-  "dnt_modal.button.decline.assistive_msg": [
+  "dnt_modal.button.assistive_msg.decline": [
     {
       "type": 0,
       "value": "Decline Tracking"
     }
   ],
-  "dnt_modal.decline": [
+  "dnt_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Close consent tracking form"
+    }
+  ],
+  "dnt_modal.button.decline": [
     {
       "type": 0,
       "value": "Decline"

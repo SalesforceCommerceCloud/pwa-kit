@@ -42,7 +42,7 @@ test('Clicking out of modal does setDNT(null)', async () => {
     renderWithProviders(<MockedComponent />)
 
     // open the modal
-    const closeButton = screen.getByLabelText('Close dnt form')
+    const closeButton = screen.getByLabelText('Close consent tracking form')
     await user.click(closeButton)
 
     await waitFor(() => {

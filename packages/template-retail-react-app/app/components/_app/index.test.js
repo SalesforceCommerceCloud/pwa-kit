@@ -69,7 +69,7 @@ describe('App', () => {
                 <p>Any children here</p>
             </App>
         )
-        const closeButton = screen.getByLabelText('Close dnt form')
+        const closeButton = screen.getByLabelText('Close consent tracking form')
         await user.click(closeButton)
         await waitFor(() => {
             expect(screen.getByRole('main')).toBeInTheDocument()
