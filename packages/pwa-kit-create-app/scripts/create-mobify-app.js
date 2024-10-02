@@ -117,23 +117,23 @@ const EXTENSION_QUESTIONS = [
         message: 'Do you want to generate a project using extensions or using a template?',
         type: 'list',
         choices: [
-            {name: 'Generate a project using extensions', value: 'extensions'},
+            {name: 'Generate a project using extensions', value: 'applicationExtensions'},
             {name: 'Generate a project using a template', value: 'template'}
         ]
     },
     {
         name: 'project.extension',
-        message: 'Which extension do you want to install?',
-        type: 'list',
+        message: 'Which Application Extensions do you want to install?',
+        type: 'checkbox',
         // TODO: Get the list of available extensions dynamically
         choices: [{name: 'extension-sample', value: 'extension-sample'}],
-        when: (answers) => answers.project.generationType === 'extensions'
+        when: (answers) => answers.project.generationType === 'applicationExtensions'
     },
     {
         name: 'project.extractExtension',
-        message: 'Do you want to extract the extension code?',
+        message: 'Do you want to extract the Application Extension code?',
         type: 'confirm',
-        when: (answers) => answers.project.generationType === 'extensions'
+        when: (answers) => answers.project.generationType === 'applicationExtensions'
     }
 ]
 
@@ -717,7 +717,6 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
-    const extensionDir = p.join(outputDir, 'extension-sample')
     const {id, type} = templateSource
     let tarPath
 
@@ -792,7 +791,12 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             const extensionTarPath = p.join(extensionTmp, extensionTarFile)
 
             // Extract the extension
-            const extensionFolder = p.join(outputDir, 'extension-sample')
+            const extensionFolder = p.join(outputDir, 'app/application-extensions/extension-sample')
+
+            if (!fs.existsSync(p.dirname(extensionFolder))) {
+                sh.mkdir('-p', p.dirname(extensionFolder))
+            }
+
             tar.x({
                 file: extensionTarPath,
                 cwd: extensionTmp,
@@ -801,14 +805,13 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
             // Copy the extension-sample into the output directory
             extensionSamplePath = p.join(extensionTmp, 'package')
-            sh.cp('-rf', extensionSamplePath, outputDir)
-            sh.mv(extensionSamplePath, extensionDir)
+            sh.cp('-rf', extensionSamplePath, extensionFolder)
 
-            // Clean up extension temporary directory
+            // Clean up the extension temporary directory
             sh.rm('-rf', extensionTmp)
 
             // Set the relative path for the extracted extension
-            extensionSamplePath = `file:./extension-sample`
+            extensionSamplePath = `file:./app/application-extensions/extension-sample`
         }
 
         // Update the generated project's package.json. NOTE: For bootstrapped projects this
@@ -841,7 +844,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // Write updated package.json back to the output directory
         writeJson(pkgJsonPath, finalPkgData)
 
-        // Clean up temporary directory
+        // Clean up the temporary directory
         sh.rm('-rf', tmp)
     }
 
@@ -890,7 +893,7 @@ const main = async (opts) => {
         const generationAnswers = await prompt(EXTENSION_QUESTIONS)
         context = merge(context, {answers: expandObject(generationAnswers)})
 
-        if (context.answers.project.generationType === 'extensions') {
+        if (context.answers.project.generationType === 'applicationExtensions') {
             // Add the 'typescript-minimal' preset for Application Extension
             context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
         }
