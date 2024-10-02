@@ -13,7 +13,7 @@ import LoginFields from '@salesforce/retail-react-app/app/components/forms/login
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import SocialLogin from '../social-login/index'
 
-const StandardLogin = ({form, idps, clickForgotPassword = noop, hideEmail = false}) => {
+const StandardLogin = ({form, idps = [], clickForgotPassword = noop, hideEmail = false}) => {
     return (
         <Stack spacing={8} paddingLeft={4} paddingRight={4}>
             <Stack>

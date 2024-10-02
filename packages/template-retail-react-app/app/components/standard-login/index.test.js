@@ -19,7 +19,7 @@ const WrapperComponent = ({...props}) => {
     )
 }
 
-describe('PasswordlessLogin component', () => {
+describe('StandardLogin component', () => {
     test('renders properly', () => {
         renderWithProviders(<WrapperComponent />)
 
@@ -33,5 +33,13 @@ describe('PasswordlessLogin component', () => {
 
         expect(screen.queryByLabelText('Email')).not.toBeInTheDocument()
         expect(screen.getByLabelText('Password')).toBeInTheDocument()
+    })
+
+    test('renders social login buttons', async () => {
+        renderWithProviders(<WrapperComponent idps={['google', 'apple']} />)
+
+        expect(screen.getByText(/Or Login With/)).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /Google/})).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /Apple/})).toBeInTheDocument()
     })
 })

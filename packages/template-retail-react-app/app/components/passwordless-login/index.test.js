@@ -48,4 +48,11 @@ describe('PasswordlessLogin component', () => {
         expect(screen.getByLabelText('Email')).toBeInTheDocument()
         expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
     })
+
+    test('renders social login buttons', async () => {
+        renderWithProviders(<WrapperComponent idps={['google', 'apple']} />)
+
+        expect(screen.getByRole('button', {name: /Google/})).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /Apple/})).toBeInTheDocument()
+    })
 })

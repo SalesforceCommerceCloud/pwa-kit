@@ -14,7 +14,7 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import StandardLogin from '../standard-login/index'
 import SocialLogin from '@salesforce/retail-react-app/app/components/social-login'
 
-const PasswordlessLogin = ({form, idps, clickForgotPassword = noop}) => {
+const PasswordlessLogin = ({form, idps = [], clickForgotPassword = noop}) => {
     const [showPasswordView, setShowPasswordView] = useState(false)
 
     const handlePasswordButton = async (e) => {
