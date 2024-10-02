@@ -116,7 +116,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
             >
                 <ModalCloseButton
                     aria-label={formatMessage({
-                        id: 'dnt_notification.button.close.assistive_msg',
+                        id: 'dnt_notification.button.assistive_msg.close',
                         defaultMessage: 'Close consent tracking form'
                     })}
                 />

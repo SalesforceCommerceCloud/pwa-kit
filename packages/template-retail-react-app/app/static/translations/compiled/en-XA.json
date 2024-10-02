@@ -2303,7 +2303,7 @@
       "value": "]"
     }
   ],
-  "dnt_modal.button.accept": [
+  "dnt_notification.button.accept": [
     {
       "type": 0,
       "value": "["
@@ -2317,7 +2317,7 @@
       "value": "]"
     }
   ],
-  "dnt_modal.button.assistive_msg.accept": [
+  "dnt_notification.button.assistive_msg.accept": [
     {
       "type": 0,
       "value": "["
@@ -2331,21 +2331,7 @@
       "value": "]"
     }
   ],
-  "dnt_modal.button.assistive_msg.decline": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḓḗḗƈŀīƞḗḗ Ŧřȧȧƈķīƞɠ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "dnt_modal.button.close.assistive_msg": [
+  "dnt_notification.button.assistive_msg.close": [
     {
       "type": 0,
       "value": "["
@@ -2359,7 +2345,21 @@
       "value": "]"
     }
   ],
-  "dnt_modal.button.decline": [
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗƈŀīƞḗḗ Ŧřȧȧƈķīƞɠ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "dnt_notification.button.decline": [
     {
       "type": 0,
       "value": "["
@@ -2373,7 +2373,7 @@
       "value": "]"
     }
   ],
-  "dnt_modal.description": [
+  "dnt_notification.description": [
     {
       "type": 0,
       "value": "["
@@ -2387,7 +2387,7 @@
       "value": "]"
     }
   ],
-  "dnt_modal.title": [
+  "dnt_notification.title": [
     {
       "type": 0,
       "value": "["

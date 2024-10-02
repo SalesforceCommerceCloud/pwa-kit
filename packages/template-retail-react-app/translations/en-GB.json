@@ -447,25 +447,25 @@
   "display_price.label.current_price_with_range": {
     "defaultMessage": "From {currentPrice}"
   },
-  "dnt_modal.button.accept": {
+  "dnt_notification.button.accept": {
     "defaultMessage": "Accept"
   },
-  "dnt_modal.button.assistive_msg.accept": {
+  "dnt_notification.button.assistive_msg.accept": {
     "defaultMessage": "Accept Tracking"
   },
-  "dnt_modal.button.assistive_msg.decline": {
-    "defaultMessage": "Decline Tracking"
-  },
-  "dnt_modal.button.close.assistive_msg": {
+  "dnt_notification.button.assistive_msg.close": {
     "defaultMessage": "Close consent tracking form"
   },
-  "dnt_modal.button.decline": {
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "Decline Tracking"
+  },
+  "dnt_notification.button.decline": {
     "defaultMessage": "Decline"
   },
-  "dnt_modal.description": {
+  "dnt_notification.description": {
     "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
   },
-  "dnt_modal.title": {
+  "dnt_notification.title": {
     "defaultMessage": "Tracking Consent"
   },
   "drawer_menu.button.account_details": {
