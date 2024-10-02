@@ -452,11 +452,14 @@ export const RemoteServerFactory = {
      */
     _setXForwardedEnvVars(app, options) {
         app.use((req, res, next) => {
-            const xForwardedHost = req.headers?.['x-forwarded-host']
+            // const xForwardedHost = req.headers?.['x-forwarded-host']
+            const xForwardedHost = 'www.some-domain.org'
             if (xForwardedHost) {
-                process.env.X_FORWARDED_HOST = `${options.protocol}://${xForwardedHost}`
+                // process.env.X_FORWARDED_HOST = `${options.protocol}://${xForwardedHost}`
+                res.locals.xForwardedHost = `${options.protocol}://${xForwardedHost}`
             }
 
+            /*
             // since X-FORWARDED-* is attached to header on a request
             // and process.env is a global object
             // we only want to use the env variable when it is existing in a request
@@ -470,6 +473,8 @@ export const RemoteServerFactory = {
             // both to handle all possible cases)
             res.on('finish', afterResponse)
             res.on('close', afterResponse)
+            */
+
             next()
         })
     },

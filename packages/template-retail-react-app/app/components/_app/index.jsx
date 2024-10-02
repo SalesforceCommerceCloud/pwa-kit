@@ -74,6 +74,7 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/components/_app-config/index'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -123,7 +124,7 @@ const App = (props) => {
     })
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
-    const appOrigin = getAppOrigin()
+    const appOrigin = useAppOrigin()
     const activeData = useActiveData()
     const history = useHistory()
     const location = useLocation()
