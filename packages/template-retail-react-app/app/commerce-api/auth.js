@@ -22,7 +22,8 @@ import {
     REFRESH_TOKEN_COOKIE_AGE,
     EXPIRED_TOKEN,
     INVALID_TOKEN,
-    DWSID_STORAGE_KEY
+    DWSID_STORAGE_KEY,
+    EXCLUDE_COOKIE_SUFFIX
 } from './constants'
 import Cookies from 'js-cookie'
 
@@ -483,6 +484,12 @@ class Auth {
 export default Auth
 
 class Storage {
+    constructor(options = {}) {
+        if (typeof this.options.keySuffix !== 'string') this.options.keySuffix = ''
+    }
+    getSuffixedKey(key) {
+        return this.options.keySuffix ? `${key}_${this.options.keySuffix}` : key
+    }
     set(key, value, options) {}
     get(key) {}
     delete(key) {}
@@ -495,8 +502,12 @@ class CookieStorage extends Storage {
             throw new Error('CookieStorage is not avaliable on the current environment.')
         }
     }
+    getSuffixedKey(key) {
+        return this.options.keySuffix ? `${key}_${this.options.keySuffix}` : key
+    }
     set(key, value, options) {
-        Cookies.set(key, value, {secure: true, ...options})
+        const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
+        Cookies.set(suffixedKey, value, {secure: true, ...options})
     }
     get(key) {
         let value = Cookies.get(key)

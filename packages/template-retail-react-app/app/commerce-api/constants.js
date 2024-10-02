@@ -19,3 +19,7 @@ export const INVALID_TOKEN = 'invalid refresh_token'
 export const DWSID_STORAGE_KEY = 'dwsid'
 export const ECOM_ACCESS_TOKEN_STORAGE_KEY = 'cc-at'
 export const DWSID_SERVER_AFFINITY_HEADER = 'sfdc_dwsid'
+
+// commerce-sdk-react namespaces cookies with siteID as suffixes to allow multisite setups.
+// However some cookies are set and used outside of PWA Kit and must not be modified with suffixes.
+export const EXCLUDE_COOKIE_SUFFIX = ['dwsid']
