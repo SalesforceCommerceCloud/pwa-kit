@@ -63,7 +63,7 @@ const AppConfig = ({children, locals = {}}) => {
             siteId={locals.site?.id}
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
-            redirectURI={`${appOrigin}/callback`}
+            redirectURI={`${appOrigin}/global/en-GB/category/womens-clothing-tops`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.

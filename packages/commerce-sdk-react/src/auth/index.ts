@@ -636,13 +636,28 @@ class Auth {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
-        await helpers.authorizeIDP(
+        const {url, codeVerifier} = await helpers.authorizeIDP(
             this.client,
-            {},
             {
-                redirectURI: 'http://localhost:3000/global/en-GB/category/womens',
+                redirectURI: this.redirectURI,
                 hint: "Google",
                 ...(dntPref !== undefined && {dnt: dntPref}),
+            }
+        )
+        console.log('AUTH INDEX URL: ' + url)
+        window.location.assign(url)
+        localStorage.setItem('codeVerifier', codeVerifier)
+    }
+
+    async loginIDPUser(parameters: Parameters<Helpers['loginIDPUser']>[2]) {
+        console.log('(YUNA) parameters', parameters)
+        const codeVerifier = localStorage.getItem('codeVerifier') || ''
+        return await helpers.loginIDPUser(
+            this.client,
+            {codeVerifier},
+            {
+                ...parameters,
+                redirectURI: this.redirectURI
             }
         )
     }

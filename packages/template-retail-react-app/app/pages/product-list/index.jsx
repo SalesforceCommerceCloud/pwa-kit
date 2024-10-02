@@ -17,6 +17,8 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 // Components
 import {
@@ -119,6 +121,8 @@ const ProductList = (props) => {
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
+    const loginIDPUser = useAuthHelper(AuthHelpers.LoginIDPUser)
+    const {data: customer} = useCurrentCustomer()
 
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
@@ -208,6 +212,26 @@ const ProductList = (props) => {
         isRefetching && window.scrollTo(0, 0)
         setFiltersLoading(isRefetching)
     }, [isRefetching])
+
+    useEffect(() => {
+        // if (searchParams.code && searchParams.usid) {
+        //     loginIDPUser.mutateAsync({
+        //         code: searchParams.code,
+        //         usid: searchParams.usid
+        //     })
+        // }
+    }, [])
+
+    useEffect(() => {
+        console.log('CUSTOMER: ', customer)
+        if (customer?.isRegistered) {
+            if (location?.state?.directedFrom) {
+                navigate(location.state.directedFrom)
+            } else {
+                navigate('/account')
+            }
+        }
+    }, [customer?.isRegistered, customer])
 
     /**************** Render Variables ****************/
     const basePath = `${location.pathname}${location.search}`
