@@ -23,7 +23,7 @@ import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/comp
 import {useDNT} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 
-export const DntModal = ({isOpen, onOpen, onClose}) => {
+export const DntNotification = ({isOpen, onOpen, onClose}) => {
     const {dntStatus, updateDNT} = useDNT()
     const {formatMessage} = useIntl()
     const location = useLocation()
@@ -36,7 +36,7 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
         }
     }, [location, dntStatus])
 
-    const onCloseModal = () => {
+    const onCloseNotification = () => {
         updateDNT(null)
         onClose()
     }
@@ -55,12 +55,12 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
                     onClose()
                 }}
                 aria-label={formatMessage({
-                    id: 'dnt_modal.button.assistive_msg.decline',
+                    id: 'dnt_notification.button.assistive_msg.decline',
                     defaultMessage: 'Decline Tracking'
                 })}
                 width="100%"
             >
-                <FormattedMessage defaultMessage="Decline" id="dnt_modal.button.decline" />
+                <FormattedMessage defaultMessage="Decline" id="dnt_notification.button.decline" />
             </Button>
             <Button
                 onClick={() => {
@@ -70,11 +70,11 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
                 boxShadow="md"
                 width="100%"
                 aria-label={formatMessage({
-                    id: 'dnt_modal.button.assistive_msg.accept',
+                    id: 'dnt_notification.button.assistive_msg.accept',
                     defaultMessage: 'Accept Tracking'
                 })}
             >
-                <FormattedMessage defaultMessage="Accept" id="dnt_modal.button.accept" />
+                <FormattedMessage defaultMessage="Accept" id="dnt_notification.button.accept" />
             </Button>
         </>
     )
@@ -83,7 +83,7 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
         <Text color={'gray.700'} fontWeight={500} marginTop={7}>
             <FormattedMessage
                 defaultMessage="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-                id="dnt_modal.description"
+                id="dnt_notification.description"
             />
         </Text>
     )
@@ -91,13 +91,13 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
     return (
         <Modal
             size="sm"
-            data-testid="sf-dnt-modal"
+            data-testid="sf-dnt-notification"
             blockScrollOnMount={false}
             closeOnOverlayClick={false}
             trapFocus={false}
             isOpen={isOpen}
             onOpen={onOpen}
-            onClose={onCloseModal}
+            onClose={onCloseNotification}
         >
             <ModalContent
                 width="100%"
@@ -116,13 +116,13 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
             >
                 <ModalCloseButton
                     aria-label={formatMessage({
-                        id: 'dnt_modal.button.close.assistive_msg',
+                        id: 'dnt_notification.button.close.assistive_msg',
                         defaultMessage: 'Close consent tracking form'
                     })}
                 />
                 <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={7}>
                     <Heading as="h3" fontSize={25} width="100%">
-                        <FormattedMessage defaultMessage="Tracking Consent" id="dnt_modal.title" />
+                        <FormattedMessage defaultMessage="Tracking Consent" id="dnt_notification.title" />
                     </Heading>
                     <HideOnDesktop>
                         <Flex direction="column">
@@ -152,7 +152,7 @@ export const DntModal = ({isOpen, onOpen, onClose}) => {
     )
 }
 
-DntModal.propTypes = {
+DntNotification.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired
@@ -160,9 +160,9 @@ DntModal.propTypes = {
 
 /**
  *
- * @returns {Object} - Object props to be spread on to the DntModal component
+ * @returns {Object} - Object props to be spread on to the DntNotification component
  */
-export const useDntModal = () => {
+export const useDntNotification = () => {
     const {isOpen, onOpen, onClose} = useDisclosure()
 
     return {

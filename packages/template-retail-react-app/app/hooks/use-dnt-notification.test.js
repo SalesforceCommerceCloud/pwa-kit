@@ -8,7 +8,7 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {DntModal, useDntModal} from '@salesforce/retail-react-app/app/hooks/use-dnt-modal'
+import {DntNotification, useDntNotification} from '@salesforce/retail-react-app/app/hooks/use-dnt-notification'
 
 const mockUpdateDNT = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
@@ -20,8 +20,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 })
 
 const MockedComponent = () => {
-    const dntModal = useDntModal()
-    return <DntModal {...dntModal} />
+    const dntNotification = useDntNotification()
+    return <DntNotification {...dntNotification} />
 }
 
 afterEach(() => {
