@@ -23,7 +23,7 @@
 - A11y: Order Details - hide decorative image and convert some p tags as proper headings [#2026](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2026)
 - Add aria-labels for buttons in product item wishlist component to ensure they are unique and descriptive. [#2023](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2023)
 - Focus onto the `ToggleCard` title whenever the component is opened to be editted [#2029](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2029)
-- Add descriptive acccessibility label for edit/remove buttons on account addresses page [#2037](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2037)
+- Add descriptive acccessibility label for edit/remove buttons on account addresses and checkout pages [#2037](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2037)
 
 ## v4.0.1 (Sept 4, 2024)
 - Updated @salesforce/commerce-sdk-react to 3.0.1 to fix an issue with the expires attribute of cookies, ensuring it uses seconds instead of days [#1994](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1994)
