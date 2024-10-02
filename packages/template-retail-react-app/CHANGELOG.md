@@ -1,5 +1,6 @@
 ## v4.1.0-dev (Aug 8, 2024)
-- Announce wishlist change in total for screen readers (a11y) [#2033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2033) 
+- Announce wishlist change in total for screen readers (a11y) [#2033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2033)
+- Fixed a bug that incorrectly imports uninstalled package `@chakra-ui/layout` [#2047](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2047)
 
 ### Performance Improvements
 -   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
