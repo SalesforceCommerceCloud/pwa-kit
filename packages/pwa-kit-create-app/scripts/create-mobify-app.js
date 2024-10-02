@@ -471,33 +471,35 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'app-sample-extension-local-install',
-        name: 'Application Extension (Local Install)',
-        description: 'Generate an Application Extension and install it locally.',
+        id: 'app-extension-sample-extract',
+        name: 'Application Extension (Extract extension code)',
+        description:
+            'Generate an Application Extension using typescript-minimal template and extract the extension code.',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        // TODO: Revisit TYPESCRIPT_MINIMAL_QUESTIONS with extension
         questions: TYPESCRIPT_MINIMAL_QUESTIONS,
         answers: {
-            ['project.extension']: 'extension-sample',
+            ['project.name']: 'app-extension-sample-extract',
+            ['project.selectedExtensions']: ['extension-sample'],
             ['project.extractExtension']: true
         },
         private: true
     },
     {
-        id: 'app-sample-extension-npm-install',
-        name: 'Application Extension (NPM Verdaccio)',
-        description: 'Generate an Application Extension and install it from local NPM.',
+        id: 'app-extension-sample-npm',
+        name: 'Application Extension (NPM)',
+        description:
+            'Generate an Application Extension using typescript-minimal template and install it from NPM.',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        // TODO: Revisit TYPESCRIPT_MINIMAL_QUESTIONS with extension
         questions: TYPESCRIPT_MINIMAL_QUESTIONS,
         answers: {
-            ['project.extension']: 'extension-sample',
+            ['project.name']: 'app-extension-sample-npm',
+            ['project.selectedExtensions']: ['extension-sample'],
             ['project.extractExtension']: false
         },
         private: true
