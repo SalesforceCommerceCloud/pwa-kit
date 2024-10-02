@@ -111,6 +111,42 @@
       "value": "]"
     }
   ],
+  "account_addresses.label.edit_button": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗḓīŧ "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_addresses.label.remove_button": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗḿǿǿṽḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_addresses.page_action_placeholder.button.add_address": [
     {
       "type": 0,

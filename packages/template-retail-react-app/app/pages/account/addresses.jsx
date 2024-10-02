@@ -321,47 +321,67 @@ const AccountAddresses = () => {
                         </>
                     )}
 
-                    {addresses.map((address) => (
-                        <React.Fragment key={address.addressId}>
-                            <ActionCard
-                                borderColor="gray.200"
-                                key={address.addressId}
-                                editBtnRef={editBtnRefs[address.addressId]}
-                                onRemove={() => removeAddress(address.addressId)}
-                                onEdit={() => toggleEdit(address)}
-                            >
-                                {address.preferred && (
-                                    <Badge
-                                        position="absolute"
-                                        fontSize="xs"
-                                        right={4}
-                                        variant="solid"
-                                        bg="gray.100"
-                                        color="gray.900"
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Default"
-                                            id="account_addresses.badge.default"
-                                        />
-                                    </Badge>
-                                )}
-                                <AddressDisplay address={address} />
-                                {isEditing && address.addressId === selectedAddressId && (
-                                    <BoxArrow />
-                                )}
-                            </ActionCard>
+                    {addresses.map((address) => {
+                        const editLabel = formatMessage(
+                            {
+                                defaultMessage: 'Edit {address}',
+                                id: 'account_addresses.label.edit_button'
+                            },
+                            {address: address.address1}
+                        )
 
-                            {isEditing && address.addressId === selectedAddressId && (
-                                <ShippingAddressForm
-                                    form={form}
-                                    hasAddresses={hasAddresses}
-                                    submitForm={submitForm}
-                                    selectedAddressId={selectedAddressId}
-                                    toggleEdit={toggleEdit}
-                                />
-                            )}
-                        </React.Fragment>
-                    ))}
+                        const removeLabel = formatMessage(
+                            {
+                                defaultMessage: 'Remove {address}',
+                                id: 'account_addresses.label.remove_button'
+                            },
+                            {address: address.address1}
+                        )
+
+                        return (
+                            <React.Fragment key={address.addressId}>
+                                <ActionCard
+                                    borderColor="gray.200"
+                                    key={address.addressId}
+                                    editBtnRef={editBtnRefs[address.addressId]}
+                                    onRemove={() => removeAddress(address.addressId)}
+                                    onEdit={() => toggleEdit(address)}
+                                    editBtnLabel={editLabel}
+                                    removeBtnLabel={removeLabel}
+                                >
+                                    {address.preferred && (
+                                        <Badge
+                                            position="absolute"
+                                            fontSize="xs"
+                                            right={4}
+                                            variant="solid"
+                                            bg="gray.100"
+                                            color="gray.900"
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="Default"
+                                                id="account_addresses.badge.default"
+                                            />
+                                        </Badge>
+                                    )}
+                                    <AddressDisplay address={address} />
+                                    {isEditing && address.addressId === selectedAddressId && (
+                                        <BoxArrow />
+                                    )}
+                                </ActionCard>
+
+                                {isEditing && address.addressId === selectedAddressId && (
+                                    <ShippingAddressForm
+                                        form={form}
+                                        hasAddresses={hasAddresses}
+                                        submitForm={submitForm}
+                                        selectedAddressId={selectedAddressId}
+                                        toggleEdit={toggleEdit}
+                                    />
+                                )}
+                            </React.Fragment>
+                        )
+                    })}
                 </SimpleGrid>
             )}
 
