@@ -472,7 +472,7 @@ const PRESETS = [
     },
     {
         id: 'app-extension-sample-extract',
-        name: 'Application Extension (Extract extension code)',
+        name: 'Application Extension sample project (Extract extension code)',
         description:
             'Generate an Application Extension using typescript-minimal template and extract the extension code.',
         templateSource: {
@@ -488,8 +488,8 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'app-extension-sample-npm',
-        name: 'Application Extension (NPM)',
+        id: 'app-extension-sample-no-extract',
+        name: 'Application Extension sample project (Without extracting extension code)',
         description:
             'Generate an Application Extension using typescript-minimal template and install it from NPM.',
         templateSource: {
@@ -498,7 +498,7 @@ const PRESETS = [
         },
         questions: TYPESCRIPT_MINIMAL_QUESTIONS,
         answers: {
-            ['project.name']: 'app-extension-sample-npm',
+            ['project.name']: 'app-extension-sample-no-extract',
             ['project.selectedExtensions']: ['extension-sample'],
             ['project.extractExtension']: false
         },
