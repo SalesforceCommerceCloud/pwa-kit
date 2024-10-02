@@ -42,7 +42,7 @@ module.exports = {
         login: {
             allowPasswordless: false,
             idps: []
-        },
+        }
     },
     externals: [],
     pageNotFoundURL: '/page-not-found',
