@@ -8,7 +8,6 @@
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
-import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 
 import App from '@salesforce/retail-react-app/app/components/_app/index.jsx'
