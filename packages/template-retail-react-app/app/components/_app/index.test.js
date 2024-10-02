@@ -61,7 +61,7 @@ describe('App', () => {
         buildUrl
     }
 
-    test('User can select DNT options when App component is rendered with DNT Modal', async () => {
+    test('User can select DNT options when App component is rendered with DNT notification', async () => {
         useMultiSite.mockImplementation(() => resultUseMultiSite)
         const {user} = renderWithProviders(
             <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>

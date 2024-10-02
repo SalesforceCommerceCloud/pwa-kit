@@ -32,19 +32,19 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test('Modal gives the expected text', async () => {
+test('Notification gives the expected text', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => {
         expect(screen.getByText(/Tracking Consent/i)).toBeInTheDocument()
     })
 })
 
-test('Clicking out of modal does setDNT(null)', async () => {
+test('Clicking out of notification does setDNT(null)', async () => {
     const user = userEvent.setup()
 
     renderWithProviders(<MockedComponent />)
 
-    // open the modal
+    // open the notification
     const closeButton = screen.getByLabelText('Close consent tracking form')
     await user.click(closeButton)
 
@@ -58,7 +58,7 @@ test('Clicking Accept does setDNT(false)', async () => {
 
     renderWithProviders(<MockedComponent />)
 
-    // open the modal
+    // open the notification
     const acceptButton = screen.getAllByText('Accept')[0]
     await user.click(acceptButton)
 
@@ -72,7 +72,7 @@ test('Clicking Decline does setDNT(true)', async () => {
 
     renderWithProviders(<MockedComponent />)
 
-    // open the modal
+    // open the notification
     const acceptButton = screen.getAllByText('Decline')[0]
     await user.click(acceptButton)
 
