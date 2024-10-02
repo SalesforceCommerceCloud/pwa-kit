@@ -1,5 +1,5 @@
 ## v3.7.1 (Oct 02, 2024)
-## v3.7.1-preview.0 (Oct 02, 2024)
+
 ## v3.7.0 (Aug 07, 2024)
 - Add `beforeHydrate` option to withReactQuery component [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)
 - Add server side rendering performance metrics via query parameter `__server_timing` or environment variable `SERVER_TIMING`, the metrics is available in the console logs and response header `server-timing`. [#1895](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1895)
