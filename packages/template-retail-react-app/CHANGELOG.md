@@ -1,3 +1,6 @@
+## v4.0.2 (Oct 2, 2024)
+- Fixed a bug that incorrectly imports uninstalled package `@chakra-ui/layout` [#2047](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2047)
+
 ## v4.0.1 (Sept 4, 2024)
 - Updated @salesforce/commerce-sdk-react to 3.0.1 to fix an issue with the expires attribute of cookies, ensuring it uses seconds instead of days [#1994](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1994)
 
