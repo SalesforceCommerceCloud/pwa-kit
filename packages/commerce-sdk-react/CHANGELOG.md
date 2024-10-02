@@ -1,11 +1,13 @@
 ## v3.1.0-dev (Aug 08, 2024)
-- Add `defaultDnt` to support setting the dnt flag for SLAS. Upgrade `commerce-sdk-isomorphic` to v3.1.1 [#1979](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1979)
-- Added useDNT hook to commerce-sdk-react [#1989](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1989)
-- Read the DNT preference from the `dw_dnt` cookie set by the `useDnt` hook. If the cookie is not set, `defaultDnt` will be used to set the DNT flag. [#1987] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1987)
-- Update logout helper to work for guest users [#1997](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1997)
+
+-   Improve refresh token error logging [#2028](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2028)
 -   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
+
 -   Add `defaultDnt` to support setting the dnt flag for SLAS. Upgrade `commerce-sdk-isomorphic` to v3.1.1 [#1979](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1979)
 -   Update logout helper to work for guest users [#1997](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1997)
+-   Update `useCustomMutation` hook to accept request body as a parameter to the mutate function [#2030](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2030)
+-  Simplify `useCustomMutation` hook implementation [#2034](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2034)
+-  Documentation for `useCustomMutation` hook along with new dynamic `body` param option [#2042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2042)
 
 ## v3.0.1 (Sep 04, 2024)
 
