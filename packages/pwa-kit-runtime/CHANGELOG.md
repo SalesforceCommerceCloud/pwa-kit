@@ -1,3 +1,6 @@
+## v3.7.1 (Oct 02, 2024)
+- Fixed an issue that breaks the Node.js server when non-ascii characters is included in request header, added a new flag to encode non ASCII HTTP headers `encodeNonAsciiHttpHeaders` [#2009](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2009)
+
 ## v3.7.0 (Aug 07, 2024)
 
 ## v3.6.0 (Jun 25, 2024)
