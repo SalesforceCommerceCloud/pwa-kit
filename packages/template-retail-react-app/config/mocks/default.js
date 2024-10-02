@@ -85,6 +85,10 @@ module.exports = {
             // This is temporary and is meant as a placeholder until there is a mechanism for reading
             // the is_production property from an MRT target
             isProduction: false
+        },
+        login: {
+            allowPasswordless: false,
+            idps: []
         }
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack
