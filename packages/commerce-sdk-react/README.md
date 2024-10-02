@@ -390,7 +390,7 @@ const mutation = useCustomMutation({
 </button>
 ```
 
-It is a common scenario that a mutate function might pass a value along to a request that is dynamic and therefore can't be available when the hook is declared (contrary to the previous example, which would work for a button that only adds one product to a basket, but doesn't handle a changeable input for adding a different product).
+It is a common scenario that a mutate function might pass a value along to a request that is dynamic and therefore can't be available when the hook is declared (contrary to example in [Mutation Hooks](#mutation-hooks) above, which would work for a button that only adds one product to a basket, but doesn't handle a changeable input for adding a different product).
 
 Sending a custom body param is supported, the example below combines this strategy with the use of a `useCustomMutation()` hook, making it possible to dynamically declare a body when calling a custom API endpoint.
 
