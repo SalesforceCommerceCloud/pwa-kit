@@ -127,7 +127,10 @@ const APPLICATION_EXTENSIBILITY_QUESTIONS = [
         message: 'Which Application Extensions do you want to install?',
         type: 'checkbox',
         // TODO: Get the list of available extensions dynamically
-        choices: [{name: 'extension-sample', value: 'extension-sample'}, {name: 'extension-sample-dos', value: 'extension-sample-dos'}],
+        choices: [
+            {name: 'extension-sample', value: 'extension-sample'},
+            {name: 'extension-sample-dos', value: 'extension-sample-dos'}
+        ],
         when: (answers) => answers.project.generationType === 'appExtensions'
     },
     {
