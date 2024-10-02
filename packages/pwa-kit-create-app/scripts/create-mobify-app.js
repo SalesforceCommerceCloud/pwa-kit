@@ -122,7 +122,7 @@ const EXTENSION_QUESTIONS = [
         ]
     },
     {
-        name: 'project.extension',
+        name: 'project.selectedExtensions',
         message: 'Which Application Extensions do you want to install?',
         type: 'checkbox',
         // TODO: Get the list of available extensions dynamically
@@ -708,7 +708,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    const {extend = false, extractExtension = false} = answers.project
+    const {extend = false, selectedExtensions = []} = answers.project
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
@@ -717,6 +717,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
+    const extensionsDir = p.join(outputDir, 'app', 'application-extensions')
     const {id, type} = templateSource
     let tarPath
 
@@ -777,41 +778,41 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 })
         }
 
-        let extensionSamplePath
-        if (extractExtension) {
-            const extensionTmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-extension-sample'))
-            const extensionTarFile = sh
-                .exec(
-                    `npm pack @salesforce/extension-sample@1.0.0-dev --pack-destination="${extensionTmp}"`,
-                    {
-                        silent: true
-                    }
+        // Process selected application extensions
+        if (selectedExtensions.length > 0) {
+            selectedExtensions.forEach((extensionName) => {
+
+                const extensionTmp = fs.mkdtempSync(
+                    p.resolve(os.tmpdir(), `extract-${extensionName}`)
                 )
-                .stdout.trim()
-            const extensionTarPath = p.join(extensionTmp, extensionTarFile)
+                const extensionTarFile = sh
+                    .exec(
+                        `npm pack @salesforce/${extensionName} --pack-destination="${extensionTmp}"`,
+                        {
+                            silent: true
+                        }
+                    )
+                    .stdout.trim()
 
-            // Extract the extension
-            const extensionFolder = p.join(outputDir, 'app/application-extensions/extension-sample')
+                const extensionTarPath = p.join(extensionTmp, extensionTarFile)
 
-            if (!fs.existsSync(p.dirname(extensionFolder))) {
-                sh.mkdir('-p', p.dirname(extensionFolder))
-            }
+                // Extract the extension
+                tar.x({
+                    file: extensionTarPath,
+                    cwd: extensionTmp,
+                    sync: true
+                })
 
-            tar.x({
-                file: extensionTarPath,
-                cwd: extensionTmp,
-                sync: true
+                // Copy the extension into the appropriate folder inside application-extensions
+                const extensionSamplePath = p.join(extensionTmp, 'package')
+                const extensionDestDir = p.join(extensionsDir, extensionName)
+                sh.mkdir('-p', extensionDestDir)
+
+                sh.cp('-rf', p.join(extensionSamplePath, '*'), extensionDestDir)
+
+                // Clean up the temporary extension directory
+                sh.rm('-rf', extensionTmp)
             })
-
-            // Copy the extension-sample into the output directory
-            extensionSamplePath = p.join(extensionTmp, 'package')
-            sh.cp('-rf', extensionSamplePath, extensionFolder)
-
-            // Clean up the extension temporary directory
-            sh.rm('-rf', extensionTmp)
-
-            // Set the relative path for the extracted extension
-            extensionSamplePath = `file:./app/application-extensions/extension-sample`
         }
 
         // Update the generated project's package.json. NOTE: For bootstrapped projects this
@@ -820,23 +821,22 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
 
-        // Add @salesforce/extension-sample to dependencies and mobify object with extensions
+        // Add selected extensions to devDependencies and mobify object
+        const extensionDeps = selectedExtensions.reduce((acc, extensionName) => {
+            acc[`@salesforce/${extensionName}`] = `file:./app/application-extensions/${extensionName}`
+            return acc
+        }, {})
+
         const finalPkgData = merge(pkgJSON, {
             name: slugifyName(context.answers.project.name || context.preset.id),
             version: GENERATED_PROJECT_VERSION,
-            devDependencies: {
-                '@salesforce/extension-sample': extractExtension ? extensionSamplePath : '1.0.0-dev'
-            },
+            devDependencies: extensionDeps,
             mobify: {
                 app: {
-                    extensions: [
-                        [
-                            '@salesforce/extension-sample',
-                            {
-                                path: '/foo-page'
-                            }
-                        ]
-                    ]
+                    extensions: selectedExtensions.map((extensionName) => [
+                        `@salesforce/${extensionName}`,
+                        {path: `/foo-page`}
+                    ])
                 }
             }
         })
