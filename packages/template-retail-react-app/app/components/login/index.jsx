@@ -13,10 +13,12 @@ import {Alert, Button, Stack, Text} from '@salesforce/retail-react-app/app/compo
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import StandardLogin from '@salesforce/retail-react-app/app/components/standard-login'
 import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passwordless-login'
+import SocialLogin from '@salesforce/retail-react-app/app/components/social-login'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
-    const allowPasswordless = getConfig().app?.login?.allowPasswordless
+    const {allowPasswordless, idps} = getConfig().app?.login
 
     return (
         <Fragment>
@@ -48,6 +50,9 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                     ) : (
                         <StandardLogin form={form} clickForgotPassword={clickForgotPassword} />
                     )}
+                    
+                    <SocialLogin idps={idps} />
+                    
                     <Stack direction="row" spacing={1} justify="center">
                         <Text fontSize="sm">
                             <FormattedMessage
