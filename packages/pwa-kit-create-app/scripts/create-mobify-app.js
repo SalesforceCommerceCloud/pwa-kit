@@ -111,14 +111,15 @@ const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
-const EXTENSION_QUESTIONS = [
+const APPLICATION_EXTENSIBILITY_QUESTIONS = [
     {
         name: 'project.generationType',
-        message: 'Do you want to generate a project using extensions or using a template?',
+        message:
+            'Do you want to generate a project using Application Extensibility or using the template-retail-react-app?',
         type: 'list',
         choices: [
-            {name: 'Generate a project using extensions', value: 'applicationExtensions'},
-            {name: 'Generate a project using a template', value: 'template'}
+            {name: 'Generate a project using Application Extensibility', value: 'appExtensions'},
+            {name: 'Generate a project using the template-retail-react-app', value: 'template'}
         ]
     },
     {
@@ -127,13 +128,13 @@ const EXTENSION_QUESTIONS = [
         type: 'checkbox',
         // TODO: Get the list of available extensions dynamically
         choices: [{name: 'extension-sample', value: 'extension-sample'}],
-        when: (answers) => answers.project.generationType === 'applicationExtensions'
+        when: (answers) => answers.project.generationType === 'appExtensions'
     },
     {
         name: 'project.extractExtension',
         message: 'Do you want to extract the Application Extension code?',
         type: 'confirm',
-        when: (answers) => answers.project.generationType === 'applicationExtensions'
+        when: (answers) => answers.project.generationType === 'appExtensions'
     }
 ]
 
@@ -781,7 +782,6 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // Process selected application extensions
         if (selectedExtensions.length > 0) {
             selectedExtensions.forEach((extensionName) => {
-
                 const extensionTmp = fs.mkdtempSync(
                     p.resolve(os.tmpdir(), `extract-${extensionName}`)
                 )
@@ -823,7 +823,9 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
         // Add selected extensions to devDependencies and mobify object
         const extensionDeps = selectedExtensions.reduce((acc, extensionName) => {
-            acc[`@salesforce/${extensionName}`] = `file:./app/application-extensions/${extensionName}`
+            acc[
+                `@salesforce/${extensionName}`
+            ] = `file:./app/application-extensions/${extensionName}`
             return acc
         }, {})
 
@@ -890,10 +892,10 @@ const main = async (opts) => {
 
     // If no preset argument is provided, ask extension questions
     if (!presetId) {
-        const generationAnswers = await prompt(EXTENSION_QUESTIONS)
+        const generationAnswers = await prompt(APPLICATION_EXTENSIBILITY_QUESTIONS)
         context = merge(context, {answers: expandObject(generationAnswers)})
 
-        if (context.answers.project.generationType === 'applicationExtensions') {
+        if (context.answers.project.generationType === 'appExtensions') {
             // Add the 'typescript-minimal' preset for Application Extension
             context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
         }
