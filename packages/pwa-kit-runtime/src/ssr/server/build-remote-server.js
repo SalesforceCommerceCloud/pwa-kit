@@ -662,42 +662,7 @@ export const RemoteServerFactory = {
         const extensions = options.mobify?.app?.extensions || []
         app.__extensions = extensions || []
 
-        let _require
-
         extensions.forEach((extension) => {
-            const setupServerFilePath = path.join(
-                options.buildDir,
-                'extensions',
-                extension,
-                'setup-server.js'
-            )
-
-            // Only eval when there are extensions
-            // this makes it slightly faster for projects that
-            // have no extensions
-            if (!_require) {
-                _require = eval('require')
-            }
-
-            let setupServer
-
-            try {
-                setupServer = _require(setupServerFilePath)
-            } catch (e) {
-                if (e.message && e.message.startsWith('Cannot find module')) {
-                    // skip extensions that don't have a setup-server.js file
-                    return
-                }
-
-                console.error(`Error loading extension ${extension}:`, e)
-                throw e
-            }
-
-            if (!setupServer.default) {
-                console.warn(`Extension ${extension} does not have a default export. Skipping.`)
-                return
-            }
-
             try {
                 setupServer.default({app, options})
             } catch (e) {

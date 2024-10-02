@@ -42,6 +42,7 @@ module.exports = function () {
     // Ensure that only valid extension names are loaded.
     const extensionDetails = extensions.map((match) => {
         const [packageName, namespace, name] = match
+        console.log('Extension Name: ', name)
         return {
             instanceVariable: kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`),
             modulePath: `${
@@ -71,6 +72,7 @@ module.exports = function () {
             
             let loaders = [
                 ${extensionDetails
+                    .filter(({packageName}) => !packageName.endsWith('-disabled'))
                     .map(
                         ({instanceVariable}) => `${instanceVariable}Loader`
                     )
