@@ -942,6 +942,9 @@
   "login_form.button.sign_in": {
     "defaultMessage": "Sign In"
   },
+  "login_form.button.social": {
+    "defaultMessage": "{message}"
+  },
   "login_form.link.forgot_password": {
     "defaultMessage": "Forgot password?"
   },

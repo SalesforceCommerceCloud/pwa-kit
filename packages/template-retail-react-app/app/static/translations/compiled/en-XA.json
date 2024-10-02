@@ -4661,6 +4661,34 @@
       "value": "]"
     }
   ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈǿǿƞŧīƞŭŭḗḗ Şḗḗƈŭŭřḗḗŀẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥȧȧşşẇǿǿřḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -4669,6 +4697,20 @@
     {
       "type": 0,
       "value": "Şīɠƞ Īƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "login_form.button.social": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 1,
+      "value": "message"
     },
     {
       "type": 0,
@@ -4697,6 +4739,20 @@
     {
       "type": 0,
       "value": "Ḓǿǿƞ'ŧ ħȧȧṽḗḗ ȧȧƞ ȧȧƈƈǿǿŭŭƞŧ?"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿř Ŀǿǿɠīƞ Ẇīŧħ"
     },
     {
       "type": 0,
