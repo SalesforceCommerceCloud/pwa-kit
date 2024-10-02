@@ -40,7 +40,8 @@ module.exports = {
         // getAppOrigin will take x-forwarded-host header into account if this is true
         useXForwardedHost: false,
         login: {
-            allowPasswordless: true
+            allowPasswordless: false,
+            idps: []
         },
     },
     externals: [],
