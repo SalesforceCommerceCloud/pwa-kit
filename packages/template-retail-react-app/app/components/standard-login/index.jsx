@@ -8,11 +8,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button, Divider, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import SocialLogin from '../social-login/index'
 
-const StandardLogin = ({form, clickForgotPassword = noop, hideEmail = false}) => {
+const StandardLogin = ({form, idps, clickForgotPassword = noop, hideEmail = false}) => {
     return (
         <Stack spacing={8} paddingLeft={4} paddingRight={4}>
             <Stack>
@@ -32,14 +33,27 @@ const StandardLogin = ({form, clickForgotPassword = noop, hideEmail = false}) =>
                 >
                     <FormattedMessage defaultMessage="Sign In" id="login_form.button.sign_in" />
                 </Button>
+                {idps.length > 0 && (
+                    <>
+                        <Divider />
+                        <Text align="center" fontSize="sm">
+                            <FormattedMessage
+                                defaultMessage="Or Login With"
+                                id="login_form.message.or_login_with"
+                            />
+                        </Text>
+                        <SocialLogin idps={idps} />
+                    </>
+                )}
             </Stack>
         </Stack>
     )
 }
 
 StandardLogin.propTypes = {
-    clickForgotPassword: PropTypes.func,
     form: PropTypes.object,
+    idps: PropTypes.array[PropTypes.string],
+    clickForgotPassword: PropTypes.func,
     hideEmail: PropTypes.bool
 }
 

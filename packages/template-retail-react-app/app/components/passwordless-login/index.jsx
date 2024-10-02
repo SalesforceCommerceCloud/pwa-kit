@@ -12,9 +12,21 @@ import {Button, Divider, Stack, Text} from '@salesforce/retail-react-app/app/com
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import StandardLogin from '../standard-login/index'
+import SocialLogin from '@salesforce/retail-react-app/app/components/social-login'
 
-const PasswordlessLogin = ({form, clickForgotPassword = noop}) => {
+const PasswordlessLogin = ({form, idps, clickForgotPassword = noop}) => {
     const [showPasswordView, setShowPasswordView] = useState(false)
+
+    const handlePasswordButton = async (e) => {
+        const isValid = await form.trigger()
+        // Manually trigger the browser native form validations
+        const domForm = e.target.closest('form')
+        if (isValid && domForm.checkValidity()) {
+            setShowPasswordView(true)
+        } else {
+            domForm.reportValidity()
+        }
+    }
 
     return (
         <>
@@ -45,26 +57,20 @@ const PasswordlessLogin = ({form, clickForgotPassword = noop}) => {
                             id="login_form.message.or_login_with"
                         />
                     </Text>
-                    <Button
-                        onClick={async (e) => {
-                            const isValid = await form.trigger()
-                            // Manually trigger the browser native form validations
-                            const domForm = e.target.closest('form')
-                            if (isValid && domForm.checkValidity()) {
-                                setShowPasswordView(true)
-                            } else {
-                                domForm.reportValidity()
-                            }
-                        }}
-                        borderColor="gray.500"
-                        color="blue.600"
-                        variant="outline"
-                    >
-                        <FormattedMessage
-                            defaultMessage="Password"
-                            id="login_form.button.password"
-                        />
-                    </Button>
+                    <Stack spacing={4}>
+                        <Button
+                            onClick={handlePasswordButton}
+                            borderColor="gray.500"
+                            color="blue.600"
+                            variant="outline"
+                        >
+                            <FormattedMessage
+                                defaultMessage="Password"
+                                id="login_form.button.password"
+                            />
+                        </Button>
+                        <SocialLogin idps={idps} />
+                    </Stack>
                 </Stack>
             )}
             {!form.formState.isSubmitSuccessful &&
@@ -81,8 +87,9 @@ const PasswordlessLogin = ({form, clickForgotPassword = noop}) => {
 }
 
 PasswordlessLogin.propTypes = {
-    clickForgotPassword: PropTypes.func,
-    form: PropTypes.object
+    form: PropTypes.object,
+    idps: PropTypes.arrayOf[PropTypes.string],
+    clickForgotPassword: PropTypes.func
 }
 
 export default PasswordlessLogin
