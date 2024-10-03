@@ -11,17 +11,43 @@ import {
 } from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
 import {ServerExtensionConfig as Config} from './types'
 
+import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
+import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import helmet from 'helmet'
+
+const runtime = getRuntime()
+
 class SampleExtension extends ExpressApplicationExtension<Config> {
-
     extendApp(app: ExpressApplication): ExpressApplication {
+        console.log('--- extending the express app')
+        // Set default HTTP security headers required by PWA Kit
+        app.use(defaultPwaKitSecurityHeaders)
+        // Set custom HTTP security headers
+        app.use(
+            helmet({
+                contentSecurityPolicy: {
+                    useDefaults: true,
+                    directives: {
+                        'img-src': [
+                            // Default source for product images - replace with your CDN
+                            '*.commercecloud.salesforce.com'
+                        ],
+                        'script-src': [
+                            // Used by the service worker in /worker/main.js
+                            'storage.googleapis.com'
+                        ],
+                        'connect-src': [
+                            // Connect to Einstein APIs
+                            'api.cquotient.com'
+                        ]
+                    }
+                }
+            })
+        )
 
-        app.get('/sample', (req, res) => {
-            console.log('SampleExtension extendApp GET /sample')
-            res.send(
-                `<p>Hello from an express SampleExtension!</p>
-                <pre>extensionConfig = ${JSON.stringify(this.getConfig())}</pre>`
-            )
-        })
+        // TODO: serveStaticFile needs to be aware of app extensions
+        app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
+        app.get('/worker.js(.map)?', runtime.serveServiceWorker)
 
         return app
     }

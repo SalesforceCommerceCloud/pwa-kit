@@ -27,7 +27,14 @@ const options = {
     // except by Safari.
     protocol: 'http',
 
-    mobify: pkg.mobify
+    mobify: pkg.mobify,
+
+    // Option for whether to set up a special endpoint for handling
+    // private SLAS clients
+    // Set this to false if using a SLAS public client
+    // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
+    // environment variable as this endpoint will return HTTP 501 if it is not set
+    useSLASPrivateClient: false
 }
 
 const runtime = getRuntime()
