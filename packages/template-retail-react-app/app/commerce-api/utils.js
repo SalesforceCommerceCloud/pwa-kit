@@ -304,6 +304,6 @@ export function hasSFRAAuthStateChanged(storage, cookieStorage) {
 
     // If a cc-at cookie is found and it's value is NOT 'refresh',
     // Update localStoreage token cookie to cc-at value and delete cc-at cookie.
-    storage.set(tokenStorageKey, SFRAAuthToken)
+    storage.set(tokenStorageKey, `Bearer ${SFRAAuthToken}`)
     cookieStorage.delete(ECOM_ACCESS_TOKEN_STORAGE_KEY)
 }

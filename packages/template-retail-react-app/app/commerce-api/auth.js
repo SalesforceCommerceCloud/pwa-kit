@@ -50,7 +50,11 @@ class Auth {
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
 
-        this._cookieStorage = this._onClient ? new CookieStorage() : new Map()
+        const _options = {
+            keySuffix: this._config.parameters.siteId,
+        }
+
+        this._cookieStorage = this._onClient ? new CookieStorage(_options) : new Map()
         this._storage = this._onClient ? new LocalStorage() : new Map()
 
         const configOid = api._config.parameters.organizationId
@@ -109,11 +113,11 @@ class Auth {
     }
 
     get usid() {
-        return this._storage.get(usidStorageKey)
+        return this._cookieStorage.get(usidStorageKey)
     }
 
     set usid(usid) {
-        this._storage.set(usidStorageKey, usid)
+        this._cookieStorage.set(usidStorageKey, usid)
     }
 
     get cid() {
@@ -485,6 +489,7 @@ export default Auth
 
 class Storage {
     constructor(options = {}) {
+        this.options = options
         if (typeof this.options.keySuffix !== 'string') this.options.keySuffix = ''
     }
     getSuffixedKey(key) {
@@ -497,7 +502,8 @@ class Storage {
 
 class CookieStorage extends Storage {
     constructor(...args) {
-        super(args)
+        // Accessing 0 index considering options{} is the first argument being passed to the constructor extending this class
+        super(args[0])
         if (typeof document === 'undefined') {
             throw new Error('CookieStorage is not avaliable on the current environment.')
         }
