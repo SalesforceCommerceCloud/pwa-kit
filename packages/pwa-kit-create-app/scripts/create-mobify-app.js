@@ -714,7 +714,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    const {extend = false, selectedExtensions = []} = answers.project
+    const {extend = false, selectedExtensions = [], extractExtension = false} = answers.project
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
@@ -785,7 +785,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         }
 
         // Process selected application extensions
-        if (selectedExtensions.length > 0) {
+        if (selectedExtensions.length > 0 && extractExtension) {
             selectedExtensions.forEach((extensionName) => {
                 const extensionTmp = fs.mkdtempSync(
                     p.resolve(os.tmpdir(), `extract-${extensionName}`)
@@ -828,9 +828,9 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
         // Add selected extensions to devDependencies and mobify object
         const extensionDeps = selectedExtensions.reduce((acc, extensionName) => {
-            acc[
-                `@salesforce/${extensionName}`
-            ] = `file:./app/application-extensions/${extensionName}`
+            acc[`@salesforce/${extensionName}`] = extractExtension
+                ? `file:./app/application-extensions/${extensionName}`
+                : '1.0.0-dev'
             return acc
         }, {})
 
