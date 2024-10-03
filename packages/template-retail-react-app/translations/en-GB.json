@@ -23,12 +23,6 @@
   "account_addresses.info.new_address_saved": {
     "defaultMessage": "New address saved"
   },
-  "account_addresses.label.edit_button": {
-    "defaultMessage": "Edit {address}"
-  },
-  "account_addresses.label.remove_button": {
-    "defaultMessage": "Remove {address}"
-  },
   "account_addresses.page_action_placeholder.button.add_address": {
     "defaultMessage": "Add Address"
   },
@@ -1264,6 +1258,12 @@
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
+  },
+  "shipping_address.label.edit_button": {
+    "defaultMessage": "Edit {address}"
+  },
+  "shipping_address.label.remove_button": {
+    "defaultMessage": "Remove {address}"
   },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"

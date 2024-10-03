@@ -325,7 +325,7 @@ const AccountAddresses = () => {
                         const editLabel = formatMessage(
                             {
                                 defaultMessage: 'Edit {address}',
-                                id: 'account_addresses.label.edit_button'
+                                id: 'shipping_address.label.edit_button'
                             },
                             {address: address.address1}
                         )
@@ -333,7 +333,7 @@ const AccountAddresses = () => {
                         const removeLabel = formatMessage(
                             {
                                 defaultMessage: 'Remove {address}',
-                                id: 'account_addresses.label.remove_button'
+                                id: 'shipping_address.label.remove_button'
                             },
                             {address: address.address1}
                         )
