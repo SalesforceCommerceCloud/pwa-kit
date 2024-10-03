@@ -281,6 +281,12 @@ class Auth {
         DATA_MAP[name].callback?.(storage)
     }
 
+    private delete(name: AuthDataKeys) {
+        const {key, storageType} = DATA_MAP[name]
+        const storage = this.stores[storageType]
+        storage.delete(key)
+    }
+
     private clearStorage() {
         // Type assertion because Object.keys is silly and limited :(
         const keys = Object.keys(DATA_MAP) as AuthDataKeys[]
@@ -699,7 +705,6 @@ class Auth {
      *
      */
     async loginIDPUser(parameters: Parameters<Helpers['loginIDPUser']>[2]) {
-        console.log('(YUNA) PARAMETERS: ', parameters)
         const codeVerifier = this.get('code_verifier')
         const code = parameters.code
         const usid = parameters.usid
@@ -720,6 +725,8 @@ class Auth {
         // Should this be false ?
         const isGuest = false
         this.handleTokenResponse(token, isGuest)
+        // Delete the code verifier once the user has logged in
+        this.delete('code_verifier')
         if (onClient()) {
             void this.clearECOMSession()
         }
