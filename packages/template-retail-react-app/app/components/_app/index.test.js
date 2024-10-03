@@ -43,6 +43,15 @@ afterEach(() => {
     windowSpy.mockRestore()
 })
 
+const mockUpdateDNT = jest.fn()
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useDNT: () => ({dntStatus: undefined, updateDNT: mockUpdateDNT})
+    }
+})
+
 describe('App', () => {
     const site = {
         ...mockConfig.app.sites[0],
