@@ -11,7 +11,6 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
@@ -74,7 +73,7 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/components/_app-config/index'
+import {useAppOrigin} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -140,6 +139,7 @@ const App = (props) => {
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useDisclosure()
+    console.log('appOrigin', appOrigin)
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -274,6 +274,7 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
+            AppOrigin {appOrigin}
             <StorefrontPreview getToken={getTokenWhenReady}>
                 <Helmet>
                     {ACTIVE_DATA_ENABLED && (

@@ -15,17 +15,17 @@ import {
 import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/constants'
 
 /**
- * A function that takes a path and qualifies it with the current host and protocol.
- * This function works on the client and on the server.
+ * Constructs an absolute URL from a given path and an optional application origin.
  *
- * @example
- * absoluteUrl(/women/dresses?color=black)
- *
- * // => http(s)://www.site.com/women/dresses?color=black
- * @param path
- * @returns {string|*}
+ * @param {string} path - The relative URL path to be appended to the origin.
+ * @param {string} [appOrigin] - The optional application origin (e.g., "https://example.com").
+ *                                If not provided, the function will call `getAppOrigin()`.
+ * @returns {string} - The fully qualified URL as a string.
  */
-export const absoluteUrl = (path) => {
+export const absoluteUrl = (path, appOrigin) => {
+    if (appOrigin) {
+        return new URL(path, appOrigin).toString()
+    }
     return new URL(path, getAppOrigin()).toString()
 }
 

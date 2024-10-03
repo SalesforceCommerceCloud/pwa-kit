@@ -8,6 +8,7 @@
 
 import React, {useContext} from 'react'
 import {CorrelationIdContext, ServerContext} from '../contexts'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 /**
  * Use this hook to get the correlation id value of the closest CorrelationIdProvider component.
@@ -41,4 +42,23 @@ export const useServerContext = () => {
     const serverContext = useContext(ServerContext)
 
     return serverContext
+}
+
+export const useAppOrigin = () => {
+    const {
+        app: {useXForwardedHost}
+    } = getConfig()
+    if (typeof window !== 'undefined') {
+        return window.location.origin
+    }
+    const {APP_ORIGIN} = process.env
+
+    const {res} = useServerContext()
+    const host = res.locals.xForwardedHost
+    console.log('host', host)
+    if (useXForwardedHost && host) {
+        console.log('--- useAppOrigin host', host)
+        return host
+    }
+    return APP_ORIGIN
 }

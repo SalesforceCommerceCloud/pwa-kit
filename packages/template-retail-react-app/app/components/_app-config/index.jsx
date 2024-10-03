@@ -27,38 +27,13 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {useCorrelationId, useAppOrigin} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
-
-const XForwardedHeadersContext = React.createContext({})
-const XForwardedHeadersProvider = (props) => {
-    const {children} = props
-    return (
-        <XForwardedHeadersContext.Provider value={{...props}}>
-            {children}
-        </XForwardedHeadersContext.Provider>
-    )
-}
-
-export const useAppOrigin = () => {
-    const {
-        app: {useXForwardedHost}
-    } = getConfig()
-    const {host} = React.useContext(XForwardedHeadersContext)
-
-    if (useXForwardedHost && host) {
-        console.log('--- useAppOrigin host', host)
-        return host
-    }
-    return getAppOrigin()
-}
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -75,9 +50,7 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
-
-    const appOrigin =
-        (locals.appConfig.useXForwardedHost && locals.xForwardedHost) || getAppOrigin()
+    const appOrigin = useAppOrigin()
 
     return (
         <CommerceApiProvider
@@ -95,15 +68,9 @@ const AppConfig = ({children, locals = {}}) => {
             // enablePWAKitPrivateClient={true}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
-            <XForwardedHeadersProvider host={locals.xForwardedHost}>
-                <MultiSiteProvider
-                    site={locals.site}
-                    locale={locals.locale}
-                    buildUrl={locals.buildUrl}
-                >
-                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                </MultiSiteProvider>
-            </XForwardedHeadersProvider>
+            <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
+                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+            </MultiSiteProvider>
             <ReactQueryDevtools />
         </CommerceApiProvider>
     )
@@ -114,10 +81,19 @@ AppConfig.restore = (locals = {}) => {
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
-    const site = resolveSiteFromUrl(path)
-    const locale = resolveLocaleFromUrl(path)
 
+    let site
+    let locale
     const {app: appConfig} = getConfig()
+
+    if (appConfig.useXForwardedHost && locals.xForwardedHost) {
+        site = resolveSiteFromUrl(path, locals.xForwardedHost)
+        locale = resolveLocaleFromUrl(path, locals.xForwardedHost)
+    } else {
+        site = resolveSiteFromUrl(path)
+        locale = resolveLocaleFromUrl(path)
+    }
+
     const apiConfig = {
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI

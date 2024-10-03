@@ -12,13 +12,14 @@ import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
  * This functions takes an url and returns a site object,
  * an error will be thrown if no url is passed in or no site is found
  * @param {string} url
+ * @param {string} origin
  * @returns {object} site - a site object
  */
-export const resolveSiteFromUrl = (url) => {
+export const resolveSiteFromUrl = (url, origin) => {
     if (!url) {
         throw new Error('URL is required to find a site object.')
     }
-    const {pathname, search} = new URL(absoluteUrl(url))
+    const {pathname, search} = new URL(absoluteUrl(url, origin))
     const path = `${pathname}${search}`
     let site
 
@@ -195,14 +196,15 @@ export const getLocaleByReference = (site, localeRef) => {
  * and use it to find the locale object
  *
  * @param url
+ * @param origin
  * @return {Object} locale object
  */
-export const resolveLocaleFromUrl = (url) => {
+export const resolveLocaleFromUrl = (url, origin) => {
     if (!url) {
         throw new Error('URL is required to look for the locale object')
     }
     let {localeRef} = getParamsFromPath(url)
-    const site = resolveSiteFromUrl(url)
+    const site = resolveSiteFromUrl(url, origin)
     const {supportedLocales} = site.l10n
     // if no localeRef is found, use the default value of the current site
     if (!localeRef) {

@@ -357,7 +357,7 @@ export const RemoteServerFactory = {
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
         this._setupSSRRequestProcessorMiddleware(app)
-        this._setXForwardedEnvVars(app, options)
+        this._setForwardedHeaders(app, options)
 
         this._setupLogging(app)
         this._setupMetricsFlushing(app)
@@ -447,33 +447,15 @@ export const RemoteServerFactory = {
     },
 
     /**
-     * Set up environment variables based on x-forward-* headers
+     * Set x-forward-* headers into locals
      * @private
      */
-    _setXForwardedEnvVars(app, options) {
+    _setForwardedHeaders(app, options) {
         app.use((req, res, next) => {
-            // const xForwardedHost = req.headers?.['x-forwarded-host']
-            const xForwardedHost = 'www.some-domain.org'
+            const xForwardedHost = req.headers?.['x-forwarded-host']
             if (xForwardedHost) {
-                // process.env.X_FORWARDED_HOST = `${options.protocol}://${xForwardedHost}`
                 res.locals.xForwardedHost = `${options.protocol}://${xForwardedHost}`
             }
-
-            /*
-            // since X-FORWARDED-* is attached to header on a request
-            // and process.env is a global object
-            // we only want to use the env variable when it is existing in a request
-            // once it is done, we should remove it to avoid leaking this value to other places
-            const afterResponse = () => {
-                if (process.env.X_FORWARDED_HOST) {
-                    delete process.env.X_FORWARDED_HOST
-                }
-            }
-            // Attach event listeners to the Response (we need to attach
-            // both to handle all possible cases)
-            res.on('finish', afterResponse)
-            res.on('close', afterResponse)
-            */
 
             next()
         })
