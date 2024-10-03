@@ -36,8 +36,8 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
         }
     }, [location, dntStatus])
 
-    const onCloseNotification = async () => {
-        await updateDNT(null)
+    const onCloseNotification = () => {
+        updateDNT(null)
         onClose()
     }
 
@@ -50,8 +50,8 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                 _hover={{bg: 'gray.100'}}
                 borderColor="gray.100"
                 boxShadow="md"
-                onClick={async () => {
-                    await updateDNT(true)
+                onClick={() => {
+                    updateDNT(true)
                     onClose()
                 }}
                 aria-label={formatMessage({
@@ -63,8 +63,8 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                 <FormattedMessage defaultMessage="Decline" id="dnt_notification.button.decline" />
             </Button>
             <Button
-                onClick={async () => {
-                    await updateDNT(false)
+                onClick={() => {
+                    updateDNT(false)
                     onClose()
                 }}
                 boxShadow="md"
