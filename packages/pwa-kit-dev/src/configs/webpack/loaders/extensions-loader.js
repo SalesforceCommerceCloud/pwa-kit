@@ -9,6 +9,8 @@ import dedent from 'dedent'
 import {kebabToUpperCamelCase} from '../utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
+const APP_EXTENSION_SERVER_ENTRY = 'setup-server'
+
 const APP_EXTENSION_PREFIX = 'extension'
 
 const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
@@ -33,7 +35,7 @@ module.exports = function () {
     // string that is the npm package name, the only expectation is that the package name starts with `extension-`,
     // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the
     // extensions configuration array when we add support for the tupal config format.
-    const {pkg, loadAsync = false} = this.getOptions() || {}
+    const {pkg, loadAsync = false, mode = 'client'} = this.getOptions() || {}
     const {devDependencies} = pkg
 
     const extensions = Object.keys(devDependencies)
@@ -48,7 +50,7 @@ module.exports = function () {
             instanceVariable: kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`),
             modulePath: `${
                 namespace ? `@${namespace}/` : ''
-            }${APP_EXTENSION_PREFIX}-${name}/${APP_EXTENSION_CLIENT_ENTRY}`,
+            }${APP_EXTENSION_PREFIX}-${name}/${mode == 'client' ? APP_EXTENSION_CLIENT_ENTRY : APP_EXTENSION_SERVER_ENTRY}`,
             packageName
         }
     })

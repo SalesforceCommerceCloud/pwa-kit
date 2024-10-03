@@ -11,7 +11,7 @@ const config = {
             require('@babel/preset-env'),
             {
                 targets: {
-                    node: 18
+                    node: 'current'
                 }
             }
         ],
@@ -40,15 +40,19 @@ const config = {
         ],
         require('@babel/plugin-transform-async-generator-functions'),
         [
-            require('./plugins/extensions-plugin'),
+            require('/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/node_modules/babel-plugin-module-resolver'), 
             {
-                filesToReplace: {
-                    '/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/dist/ssr/server/extensions.js': `{getExtensions: function () {return [{setupServer: function ({app}) {app.get('/sample', (req, res) => { console.log('SampleExtension extendApp GET /sample'); res.send('<p>Hello from an express SampleExtension!</p>')}); return app;}}]}}`
+                root: ["/Users/bchypak/Projects/pwa-kit/packages/template-typescript-minimal/node_modules"], // or whatever your source directory is
+                // NOTE: I shouldn't have to use alias's here because the root should be enough to determine there these things exists. But this 
+                // does show that the plugin is running. So that is good news.
+                alias: {
+                    '@salesforce/extension-sample/setup-server': '/Users/bchypak/Projects/pwa-kit/packages/extension-sample/src/setup-server.ts',
+                    '@salesforce/extension-sample-disabled/setup-server': '/Users/bchypak/Projects/pwa-kit/packages/extension-sample-disabled/src/setup-server.ts'
 
-                    
                 }
             }
         ],
+        require('./plugins/extensions-plugin'),
     ],
     env: {
         test: {

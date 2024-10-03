@@ -141,11 +141,10 @@ export const DevServerMixin = {
         // const extensions = options.mobify?.app?.extensions || []
         const extensions = getExtensions()
         app.__extensions = extensions || []
-        console.log('extensions: ', extensions)
-        
+
         extensions.forEach((extension) => {
             try {
-                extension.setupServer({app, options})
+                extension.extendApp(app)
             } catch (e) {
                 console.error(`Error setting up extension ${extension}:`, e)
             }

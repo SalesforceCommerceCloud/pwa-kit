@@ -5,14 +5,31 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* istanbul ignore next */
-export default ({app}) => {
-    console.log('Setup Server App!!')
-    app.get('/sample', (req, res) => {
-        console.log('SampleExtension extendApp GET /sample')
-        res.send(
-            `<p>Hello from an express SampleExtension!</p>`
-        )
-    })
 
-    return app
+
+class Sample {
+    private config
+
+    constructor(config) {
+        this.config = config
+    }
+    
+    getConfig(): object {
+        return this.config
+    }
+
+    getName(): string {
+        return 'sample'
+    }
+
+    extendApp(app) {
+        app.get('/sample', (req, res) => {
+            console.log('SampleExtension extendApp GET /sample')
+            res.send(
+                `<p>Hello from an express SampleExtension!</p>`
+            )
+        })
+    }
 }
+
+export default Sample
