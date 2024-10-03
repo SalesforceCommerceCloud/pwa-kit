@@ -699,10 +699,11 @@ class Auth {
      *
      */
     async loginIDPUser(parameters: Parameters<Helpers['loginIDPUser']>[2]) {
+        console.log('(YUNA) PARAMETERS: ', parameters)
         const codeVerifier = this.get('code_verifier')
         const code = parameters.code
         const usid = parameters.usid
-        const redirectURI = this.redirectURI
+        const redirectURI = parameters.redirectURI || this.redirectURI
 
         const token = await helpers.loginIDPUser(
             this.client,
