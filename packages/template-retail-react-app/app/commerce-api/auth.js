@@ -510,33 +510,35 @@ class CookieStorage extends Storage {
         Cookies.set(suffixedKey, value, {secure: true, ...options})
     }
     get(key) {
-        let value = Cookies.get(key)
+        const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
+        let value = Cookies.get(suffixedKey)
         if (value) {
             // Some values, like the access token, may be split
             // across multiple keys to fit under ECOM cookie size
             // thresholds. We check for and append additional chunks here.
             let chunk = 2
-            let additionalPart = Cookies.get(`${key}_${chunk}`)
+            let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
             while (additionalPart) {
                 value = value.concat(additionalPart)
                 chunk++
-                additionalPart = Cookies.get(`${key}_${chunk}`) || ''
+                additionalPart = Cookies.get(`${suffixedKey}_${chunk}`) || ''
             }
         }
         return value
     }
     delete(key) {
-        Cookies.remove(key)
+        const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
+        Cookies.remove(suffixedKey)
 
         // Some values, like the access token, may be split
         // across multiple keys to fit under ECOM cookie size
         // thresholds. We check for and delete additional chunks here.
         let chunk = 2
-        let additionalPart = Cookies.get(`${key}_${chunk}`)
+        let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
         while (additionalPart) {
-            Cookies.remove(`${key}_${chunk}`)
+            Cookies.remove(`${suffixedKey}_${chunk}`)
             chunk++
-            additionalPart = Cookies.get(`${key}_${chunk}`) || ''
+            additionalPart = Cookies.get(`${suffixedKey}_${chunk}`) || ''
         }
     }
 }
