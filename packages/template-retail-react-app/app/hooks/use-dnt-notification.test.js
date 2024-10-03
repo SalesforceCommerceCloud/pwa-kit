@@ -43,7 +43,7 @@ test('Clicking out of notification does setDNT(null)', async () => {
 
     // open the notification
     const closeButton = screen.getByLabelText('Close consent tracking form')
-    expect(closeButton).toHaveAttribute('aria-label', 'Close consent tracking form');
+    expect(closeButton).toHaveAttribute('aria-label', 'Close consent tracking form')
     await user.click(closeButton)
 
     await waitFor(() => {
@@ -56,7 +56,7 @@ test('Clicking Accept does setDNT(false)', async () => {
 
     // open the notification
     const acceptButton = screen.getAllByText('Accept')[0]
-    expect(acceptButton).toHaveAttribute('aria-label', 'Accept tracking');
+    expect(acceptButton).toHaveAttribute('aria-label', 'Accept tracking')
     await user.click(acceptButton)
 
     await waitFor(() => {
@@ -69,7 +69,7 @@ test('Clicking Decline does setDNT(true)', async () => {
 
     // open the notification
     const declineButton = screen.getAllByText('Decline')[0]
-    expect(declineButton).toHaveAttribute('aria-label', 'Decline tracking');
+    expect(declineButton).toHaveAttribute('aria-label', 'Decline tracking')
     await user.click(declineButton)
 
     await waitFor(() => {
