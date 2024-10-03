@@ -889,8 +889,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             mobify: {
                 app: {
                     extensions: selectedAppExtensions.map((appExtensionName) => [
-                        appExtensionName,
-                        {path: `/foo-page`}
+                        appExtensionName
                     ])
                 }
             }
