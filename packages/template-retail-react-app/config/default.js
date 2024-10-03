@@ -38,7 +38,7 @@ module.exports = {
             isProduction: false
         },
         // getAppOrigin will take x-forwarded-host header into account if this is true
-        useXForwardedHost: true
+        useXForwardedHost: false
     },
     externals: [],
     pageNotFoundURL: '/page-not-found',
