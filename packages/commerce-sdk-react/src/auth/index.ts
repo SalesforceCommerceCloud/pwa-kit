@@ -669,6 +669,58 @@ class Auth {
     }
 
     /**
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizeIDP.
+     *
+     */
+    async authorizeIDP(parameters: Parameters<Helpers['authorizeIDP']>[1]) {
+        const privateClient = !!this.clientSecret
+        const redirectURI = this.redirectURI
+        const usid = this.get('usid')
+        const {url, codeVerifier} = await helpers.authorizeIDP(
+            this.client,
+            {
+                redirectURI,
+                hint: parameters.hint,
+                ...(usid && {usid})
+            },
+            privateClient
+        )
+        window.location.assign(url)
+        return codeVerifier
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
+     *
+     */
+    async loginIDPUser(credentials: Parameters<Helpers['loginIDPUser']>[1], parameters: Parameters<Helpers['loginIDPUser']>[2]) {
+        const codeVerifier = credentials.codeVerifier
+        const code = parameters.code
+        const usid = parameters.usid
+        const redirectURI = this.redirectURI
+
+        const token = await helpers.loginIDPUser(
+            this.client,
+            {
+                codeVerifier,
+                clientSecret: this.clientSecret
+            },
+            {
+                redirectURI,
+                code,
+                ...(usid && {usid})
+            }
+        )
+        // Should this be false ?
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
+    }
+
+    /**
      * Decode SLAS JWT and extract information such as customer id, usid, etc.
      *
      */
