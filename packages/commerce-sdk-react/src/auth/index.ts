@@ -70,6 +70,7 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'access_token_sfra'
     | 'dwsid'
+    | 'code_verifier'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -161,6 +162,10 @@ const DATA_MAP: AuthDataMap = {
     dwsid: {
         storageType: 'cookie',
         key: 'dwsid'
+    },
+    code_verifier: {
+        storageType: 'cookie',
+        key: 'code_verifier'
     }
 }
 
@@ -686,15 +691,15 @@ class Auth {
             privateClient
         )
         window.location.assign(url)
-        return codeVerifier
+        this.set('code_verifier', codeVerifier)
     }
 
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
      *
      */
-    async loginIDPUser(credentials: Parameters<Helpers['loginIDPUser']>[1], parameters: Parameters<Helpers['loginIDPUser']>[2]) {
-        const codeVerifier = credentials.codeVerifier
+    async loginIDPUser(parameters: Parameters<Helpers['loginIDPUser']>[2]) {
+        const codeVerifier = this.get('code_verifier')
         const code = parameters.code
         const usid = parameters.usid
         const redirectURI = this.redirectURI
