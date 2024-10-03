@@ -290,9 +290,11 @@ class Auth {
 
     getDnt() {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
-        // Only '1' or '0' are valid, and invalid values or lack of cookie must be an undefined DNT
+        // Only '1' or '0' are valid, and invalid values, lack of cookie, or value conflict with token must be an undefined DNT
         let dntCookieStatus = undefined
-        if (dntCookieVal !== '1' && dntCookieVal !== '0') {
+        const accessToken = this.getAccessToken()
+        const {dnt} = this.parseSlasJWT(accessToken)
+        if ((dntCookieVal !== '1' && dntCookieVal !== '0') || dnt !== dntCookieVal) {
             this.delete(DNT_COOKIE_NAME)
         } else {
             dntCookieStatus = Boolean(Number(dntCookieVal))
