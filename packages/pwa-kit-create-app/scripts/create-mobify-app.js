@@ -114,30 +114,29 @@ const DEFAULT_TEMPLATE_VERSION = 'latest'
 const askApplicationExtensibiltyQuestions = (appExtensions) => {
     return [
         {
-            name: 'project.generationType',
-            message:
-                'Do you want to generate a project using Application Extensibility or using the template-retail-react-app?',
-            type: 'list',
-            choices: [
-                {
-                    name: 'Generate a project using Application Extensibility',
-                    value: 'appExtensions'
-                },
-                {name: 'Generate a project using the template-retail-react-app', value: 'template'}
-            ]
+            name: 'project.useAppExtensibility',
+            message: 'Do you want to use Application Extensibility?',
+            type: 'confirm',
+            default: true
         },
         {
             name: 'project.selectedAppExtensions',
             message: 'Which Application Extensions do you want to install?',
             type: 'checkbox',
             choices: appExtensions,
-            when: (answers) => answers.project.generationType === 'appExtensions'
+            when: (answers) => answers.project.useAppExtensibility === true
         },
         {
             name: 'project.extractAppExtensions',
-            message: 'Do you want to extract the Application Extension code?',
+            message:
+                '⚠️ WARNING: If you choose to extract the Application Extension code,\n' +
+                'you will NO LONGER be able to consume upgrades from NPM. All changes\n' +
+                'made to the extracted code will be YOUR RESPONSIBILITY.\n' +
+                '\n' +
+                'Do you want to proceed with extracting the Application Extension code?',
             type: 'confirm',
-            when: (answers) => answers.project.generationType === 'appExtensions'
+            default: false,
+            when: (answers) => answers.project.useAppExtensibility === true
         }
     ]
 }
@@ -719,15 +718,12 @@ const processAppExtensions = (
     if (appExtensions.length > 0 && extractAppExtensions) {
         appExtensions.forEach((appExtensionName) => {
             const appExtensionTmp = fs.mkdtempSync(
-                p.resolve(os.tmpdir(), `extract-${appExtensionName}`)
+                p.resolve(os.tmpdir(), `extract-${appExtensionName.replace('@salesforce/', '')}`)
             )
             const appExtensionTarFile = sh
-                .exec(
-                    `npm pack @salesforce/${appExtensionName} --pack-destination="${appExtensionTmp}"`,
-                    {
-                        silent: true
-                    }
-                )
+                .exec(`npm pack ${appExtensionName} --pack-destination="${appExtensionTmp}"`, {
+                    silent: true
+                })
                 .stdout.trim()
 
             const appExtensionTarPath = p.join(appExtensionTmp, appExtensionTarFile)
@@ -769,8 +765,8 @@ const fetchAvailableAppExtensions = () => {
         return parsedData.map((pkg) => {
             const latestVersion = pkg['dist-tags'].latest
             return {
-                name: `${pkg.name.replace('@salesforce/', '')} (v${latestVersion})`,
-                value: pkg.name.replace('@salesforce/', ''),
+                name: `${pkg.name} (v${latestVersion})`,
+                value: pkg.name,
                 version: latestVersion
             }
         })
@@ -880,7 +876,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             const appExtension = context.appExtensions.find((ext) => ext.value === appExtensionName)
             const version = appExtension ? appExtension.version : '1.0.0-dev'
 
-            acc[`@salesforce/${appExtensionName}`] = extractAppExtensions
+            acc[appExtensionName] = extractAppExtensions
                 ? `file:./app/application-extensions/${appExtensionName}`
                 : version
             return acc
@@ -893,7 +889,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             mobify: {
                 app: {
                     extensions: selectedAppExtensions.map((appExtensionName) => [
-                        `@salesforce/${appExtensionName}`,
+                        appExtensionName,
                         {path: `/foo-page`}
                     ])
                 }
@@ -957,7 +953,7 @@ const main = async (opts) => {
         const generationAnswers = await prompt(askApplicationExtensibiltyQuestions(appExtensions))
         context = merge(context, {answers: expandObject(generationAnswers)})
 
-        if (context.answers.project.generationType === 'appExtensions') {
+        if (context.answers.project.useAppExtensibility) {
             // Add the 'typescript-minimal' preset for Application Extension
             context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
         }
@@ -974,10 +970,6 @@ const main = async (opts) => {
         PRESETS.find(({id}) => id === (presetId || context.answers.general.presetId))
     context.preset = selectedPreset
 
-    if (!OUTPUT_DIR_FLAG_ACTIVE) {
-        outputDir = p.join(process.cwd(), selectedPreset.id)
-    }
-
     // Ask preset specific questions and merge into the current context.
     const {questions = {}, answers = {}} = selectedPreset
     if (questions) {
@@ -986,6 +978,10 @@ const main = async (opts) => {
         context = merge(context, {
             answers: expandObject(projectAnswers)
         })
+    }
+
+    if (!OUTPUT_DIR_FLAG_ACTIVE) {
+        outputDir = p.join(process.cwd(), context.answers.project.name || selectedPreset.id)
     }
 
     if (context.answers.project.commerce?.instanceUrl) {
