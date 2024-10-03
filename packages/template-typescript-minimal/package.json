@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/retail-react-app": "4.1.0-dev",
+    "@salesforce/extension-retail-react-app": "4.1.0-dev",
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
     "@salesforce/pwa-kit-runtime": "4.0.0-dev",
@@ -45,7 +45,7 @@
   "mobify": {
     "app":{
       "extensions": [
-        "@salesforce/retail-react-app"
+        "@salesforce/extension-retail-react-app"
       ]
     },
     "ssrEnabled": true,
