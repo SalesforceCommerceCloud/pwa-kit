@@ -888,9 +888,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             devDependencies: appExtensionDeps,
             mobify: {
                 app: {
-                    extensions: selectedAppExtensions.map((appExtensionName) => [
-                        appExtensionName
-                    ])
+                    extensions: selectedAppExtensions.map((appExtensionName) => [appExtensionName])
                 }
             }
         })
