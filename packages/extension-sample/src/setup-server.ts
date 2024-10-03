@@ -6,5 +6,13 @@
  */
 /* istanbul ignore next */
 export default ({app}) => {
-    console.log('Setup Server App')
+    console.log('Setup Server App!!')
+    app.get('/sample', (req, res) => {
+        console.log('SampleExtension extendApp GET /sample')
+        res.send(
+            `<p>Hello from an express SampleExtension!</p>`
+        )
+    })
+
+    return app
 }

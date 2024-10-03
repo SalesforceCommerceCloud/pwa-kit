@@ -28,11 +28,12 @@ const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
 module.exports = function () {
+    console.log('Running Extesions Loader...')
     // TODO: We need to account for extensions being tuples. Here we assume it's a simple
     // string that is the npm package name, the only expectation is that the package name starts with `extension-`,
     // it can be namespaced or not. We'll most likely want to create utilities for validation and parsing of the
     // extensions configuration array when we add support for the tupal config format.
-    const {pkg} = this.getOptions() || {}
+    const {pkg, loadAsync = false} = this.getOptions() || {}
     const {devDependencies} = pkg
 
     const extensions = Object.keys(devDependencies)
@@ -65,26 +66,34 @@ module.exports = function () {
             // App Extensions
             ${extensionDetails
                 .map(
-                    ({instanceVariable, modulePath}) =>
-                        `const ${instanceVariable}Loader = loadable.lib(() => import('${modulePath}'))`
+                    ({instanceVariable, modulePath}) => {
+                        return loadAsync ?
+                            `const ${instanceVariable}Loader = loadable.lib(() => import('${modulePath}'))` :
+                            `import ${instanceVariable} from '${modulePath}'`
+                    }
                 )
                 .join('\n            ')}
             
             let loaders = [
                 ${extensionDetails
                     .filter(({packageName}) => !packageName.endsWith('-disabled'))
-                    .map(
-                        ({instanceVariable}) => `${instanceVariable}Loader`
-                    )
+                    .map(({instanceVariable}) => `${instanceVariable}${loadAsync ? 'Loader' : ''}`)
                     .join(',\n            ')}
             ]
 
-            export const getExtensions = async () => {
+            export const getExtensions = ${loadAsync ? 'async' : ''} () => {
                 const configuredExtensions = getConfig()?.app?.extensions || []
 
-                let modules = await Promise.all(loaders.map((loader) => loader.load()))
-                        
-                modules = modules.map((module) => module.default)
+                let modules
+                
+                ${
+                    loadAsync ? 
+                        `
+                            modules = await Promise.all(loaders.map((loader) => loader.load()))
+                            modules = modules.map((module) => module.default)
+                        ` : 
+                        'modules = loaders'
+                }
                 
                 const instances = modules.map((module) => {
                     return new module({})

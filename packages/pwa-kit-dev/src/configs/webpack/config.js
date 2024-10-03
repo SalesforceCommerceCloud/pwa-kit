@@ -293,6 +293,14 @@ const baseConfig = (target) => {
                             test: /universal\/extensibility\/extensions/,
                             loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extensions-loader`,
                             options: {
+                                loadAsync: true,
+                                pkg
+                            }
+                        },
+                        {
+                            test: /ssr\/server\/extensions/,
+                            loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extensions-loader`,
+                            options: {
                                 pkg
                             }
                         }

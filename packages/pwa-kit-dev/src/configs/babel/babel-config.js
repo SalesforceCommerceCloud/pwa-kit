@@ -38,7 +38,17 @@ const config = {
                 ast: true
             }
         ],
-        require('@babel/plugin-transform-async-generator-functions')
+        require('@babel/plugin-transform-async-generator-functions'),
+        [
+            require('./plugins/extensions-plugin'),
+            {
+                filesToReplace: {
+                    '/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/dist/ssr/server/extensions.js': `{getExtensions: function () {return [{setupServer: function ({app}) {app.get('/sample', (req, res) => { console.log('SampleExtension extendApp GET /sample'); res.send('<p>Hello from an express SampleExtension!</p>')}); return app;}}]}}`
+
+                    
+                }
+            }
+        ],
     ],
     env: {
         test: {

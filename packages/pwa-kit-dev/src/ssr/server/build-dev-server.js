@@ -31,7 +31,10 @@ import {randomUUID} from 'crypto'
 import chalk from 'chalk'
 // import tsx from 'tsx/cjs/api'
 
+import thing from './extensions'
+console.log('thing: ', thing, typeof thing)
 import {getExtensions} from './extensions'
+console.log('getExtensions: ', getExtensions)
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -138,39 +141,11 @@ export const DevServerMixin = {
         // const extensions = options.mobify?.app?.extensions || []
         const extensions = getExtensions()
         app.__extensions = extensions || []
-
-        // extensions.forEach((extension) => {
-        //     const setupServerFilePathBase = path.join(
-        //         options.projectDir,
-        //         'node_modules',
-        //         extension,
-        //         'setup-server'
-        //     )
-
-        //     let filePath
-        //     if (fs.existsSync(`${setupServerFilePathBase}.ts`)) {
-        //         filePath = `${setupServerFilePathBase}.ts`
-        //     } else if (fs.existsSync(`${setupServerFilePathBase}.js`)) {
-        //         filePath = `${setupServerFilePathBase}.js`
-        //     } else {
-        //         return
-        //     }
-
-        //     const setupServer = tsx.require(filePath, __filename)
-        //     if (!setupServer.default) {
-        //         console.warn(`Extension ${extension} does not have a default export. Skipping.`)
-        //         return
-        //     }
-        //     try {
-        //         setupServer.default({app, options})
-        //     } catch (e) {
-        //         console.error(`Error setting up extension ${extension}:`, e)
-        //     }
-        // })
-
+        console.log('extensions: ', extensions)
+        
         extensions.forEach((extension) => {
             try {
-                setupServer.default({app, options})
+                extension.setupServer({app, options})
             } catch (e) {
                 console.error(`Error setting up extension ${extension}:`, e)
             }

@@ -6,4 +6,4 @@
  */
 const extensions = []
 
-export default extensions
+export const getExtensions = () => extensions

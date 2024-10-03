@@ -254,12 +254,17 @@ const main = async () => {
                 process.exit(1)
             }
 
-            execSync(`${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${entrypoint}`, {
-                env: {
-                    ...process.env,
-                    ...(noHMR ? {HMR: 'false'} : {})
+            execSync(
+                `${babelNode} ${
+                    inspect ? '--inspect' : ''
+                } -i [\"/(?:\\/.*)?\\/node_modules\\//(?!@salesforce\/pwa-kit-dev\/dist\/ssr\/server\/extensions.js)\\//i\"] ${babelArgs} ${entrypoint}`,
+                {
+                    env: {
+                        ...process.env,
+                        ...(noHMR ? {HMR: 'false'} : {})
+                    }
                 }
-            })
+            )
         })
 
     program
