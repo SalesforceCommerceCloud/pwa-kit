@@ -123,10 +123,10 @@ const APPLICATION_EXTENSIBILITY_QUESTIONS = [
         ]
     },
     {
-        name: 'project.selectedExtensions',
+        name: 'project.selectedAppExtensions',
         message: 'Which Application Extensions do you want to install?',
         type: 'checkbox',
-        // TODO: Get the list of available extensions dynamically
+        // TODO: Get the list of available Application Extensions dynamically
         choices: [
             {name: 'extension-sample', value: 'extension-sample'},
             {name: 'extension-sample-dos', value: 'extension-sample-dos'}
@@ -134,7 +134,7 @@ const APPLICATION_EXTENSIBILITY_QUESTIONS = [
         when: (answers) => answers.project.generationType === 'appExtensions'
     },
     {
-        name: 'project.extractExtension',
+        name: 'project.extractAppExtensions',
         message: 'Do you want to extract the Application Extension code?',
         type: 'confirm',
         when: (answers) => answers.project.generationType === 'appExtensions'
@@ -472,9 +472,9 @@ const PRESETS = [
     },
     {
         id: 'app-extension-sample-extract',
-        name: 'Application Extension sample project (Extract extension code)',
+        name: 'Application Extension sample project (Extract Application Extensions code)',
         description:
-            'Generate an Application Extension using typescript-minimal template and extract the extension code.',
+            'Generate an Application Extension using typescript-minimal template with the Application Extensions code extracted.',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
@@ -482,16 +482,16 @@ const PRESETS = [
         questions: TYPESCRIPT_MINIMAL_QUESTIONS,
         answers: {
             ['project.name']: 'app-extension-sample-extract',
-            ['project.selectedExtensions']: ['extension-sample'],
-            ['project.extractExtension']: true
+            ['project.selectedAppExtensions']: ['extension-sample'],
+            ['project.extractAppExtensions']: true
         },
         private: true
     },
     {
         id: 'app-extension-sample-no-extract',
-        name: 'Application Extension sample project (Without extracting extension code)',
+        name: 'Application Extension sample project (Without extracting Application Extensions code)',
         description:
-            'Generate an Application Extension using typescript-minimal template and install it from NPM.',
+            'Generate an Application Extension using typescript-minimal template without the Applications Extensions code extracted.',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
@@ -499,8 +499,8 @@ const PRESETS = [
         questions: TYPESCRIPT_MINIMAL_QUESTIONS,
         answers: {
             ['project.name']: 'app-extension-sample-no-extract',
-            ['project.selectedExtensions']: ['extension-sample'],
-            ['project.extractExtension']: false
+            ['project.selectedAppExtensions']: ['extension-sample'],
+            ['project.extractAppExtensions']: false
         },
         private: true
     }
@@ -704,39 +704,51 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 }
 
 /**
- * Extract the extension into the application-extensions directory.
+ * Process the Application Extensions into the application-extensions directory.
  *
- * @param extensions - An array of the extension names.
- * @param extensionsDir - The path to the application-extensions directory.
+ * @param appExtensions - An array of the Application Extension names.
+ * @param extractAppExtensions - A boolean indicating whether to extract the Application Extensions code from the npm package
+ * @param appExtensionsDir - The path to the application-extensions directory.
  */
-const extractExtensions = (extensions = [], extensionsDir) => {
-    extensions.forEach((extensionName) => {
-        const extensionTmp = fs.mkdtempSync(p.resolve(os.tmpdir(), `extract-${extensionName}`))
-        const extensionTarFile = sh
-            .exec(`npm pack @salesforce/${extensionName} --pack-destination="${extensionTmp}"`, {
-                silent: true
+const processAppExtensions = (
+    appExtensions = [],
+    extractAppExtensions = false,
+    appExtensionsDir
+) => {
+    if (appExtensions.length > 0 && extractAppExtensions) {
+        appExtensions.forEach((appExtensionName) => {
+            const appExtensionTmp = fs.mkdtempSync(
+                p.resolve(os.tmpdir(), `extract-${appExtensionName}`)
+            )
+            const appExtensionTarFile = sh
+                .exec(
+                    `npm pack @salesforce/${appExtensionName} --pack-destination="${appExtensionTmp}"`,
+                    {
+                        silent: true
+                    }
+                )
+                .stdout.trim()
+
+            const appExtensionTarPath = p.join(appExtensionTmp, appExtensionTarFile)
+
+            // Extract the Application Extension
+            tar.x({
+                file: appExtensionTarPath,
+                cwd: appExtensionTmp,
+                sync: true
             })
-            .stdout.trim()
 
-        const extensionTarPath = p.join(extensionTmp, extensionTarFile)
+            // Copy the Application Extension into the appropriate folder inside application-extensions
+            const appExtensionTmpPath = p.join(appExtensionTmp, 'package')
+            const appExtensionDestDir = p.join(appExtensionsDir, appExtensionName)
+            sh.mkdir('-p', appExtensionDestDir)
 
-        // Extract the extension
-        tar.x({
-            file: extensionTarPath,
-            cwd: extensionTmp,
-            sync: true
+            sh.cp('-rf', p.join(appExtensionTmpPath, '*'), appExtensionDestDir)
+
+            // Clean up the temporary Application Extension directory
+            sh.rm('-rf', appExtensionTmp)
         })
-
-        // Copy the extension into the appropriate folder inside application-extensions
-        const extensionSamplePath = p.join(extensionTmp, 'package')
-        const extensionDestDir = p.join(extensionsDir, extensionName)
-        sh.mkdir('-p', extensionDestDir)
-
-        sh.cp('-rf', p.join(extensionSamplePath, '*'), extensionDestDir)
-
-        // Clean up the temporary extension directory
-        sh.rm('-rf', extensionTmp)
-    })
+    }
 }
 
 /**
@@ -750,7 +762,11 @@ const extractExtensions = (extensions = [], extensionsDir) => {
 const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    const {extend = false, selectedExtensions = [], extractExtension = false} = answers.project
+    const {
+        extend = false,
+        selectedAppExtensions = [],
+        extractAppExtensions = false
+    } = answers.project
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
@@ -759,7 +775,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
-    const extensionsDir = p.join(outputDir, 'app', 'application-extensions')
+    const appExtensionsDir = p.join(outputDir, 'app', 'application-extensions')
     const {id, type} = templateSource
     let tarPath
 
@@ -820,10 +836,8 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 })
         }
 
-        // Process selected application extensions
-        if (selectedExtensions.length > 0 && extractExtension) {
-            extractExtensions(selectedExtensions, extensionsDir)
-        }
+        // Process selected Application Extensions
+        processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
 
         // Update the generated project's package.json. NOTE: For bootstrapped projects this
         // can be done in the template building. But since we have two types of project builds,
@@ -831,10 +845,10 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
 
-        // Add selected extensions to devDependencies and mobify object
-        const extensionDeps = selectedExtensions.reduce((acc, extensionName) => {
-            acc[`@salesforce/${extensionName}`] = extractExtension
-                ? `file:./app/application-extensions/${extensionName}`
+        // Add selected Application Extensions to devDependencies and mobify object
+        const appExtensionDeps = selectedAppExtensions.reduce((acc, appExtensionName) => {
+            acc[`@salesforce/${appExtensionName}`] = extractAppExtensions
+                ? `file:./app/application-extensions/${appExtensionName}`
                 : '1.0.0-dev'
             return acc
         }, {})
@@ -842,11 +856,11 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         const finalPkgData = merge(pkgJSON, {
             name: slugifyName(context.answers.project.name || context.preset.id),
             version: GENERATED_PROJECT_VERSION,
-            devDependencies: extensionDeps,
+            devDependencies: appExtensionDeps,
             mobify: {
                 app: {
-                    extensions: selectedExtensions.map((extensionName) => [
-                        `@salesforce/${extensionName}`,
+                    extensions: selectedAppExtensions.map((appExtensionName) => [
+                        `@salesforce/${appExtensionName}`,
                         {path: `/foo-page`}
                     ])
                 }
@@ -900,7 +914,7 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // If no preset argument is provided, ask extension questions
+    // If no preset argument is provided, ask Application Extensibility questions
     if (!presetId) {
         const generationAnswers = await prompt(APPLICATION_EXTENSIBILITY_QUESTIONS)
         context = merge(context, {answers: expandObject(generationAnswers)})
