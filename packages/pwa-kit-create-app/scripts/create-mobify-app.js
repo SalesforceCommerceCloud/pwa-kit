@@ -111,35 +111,36 @@ const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
-const APPLICATION_EXTENSIBILITY_QUESTIONS = [
-    {
-        name: 'project.generationType',
-        message:
-            'Do you want to generate a project using Application Extensibility or using the template-retail-react-app?',
-        type: 'list',
-        choices: [
-            {name: 'Generate a project using Application Extensibility', value: 'appExtensions'},
-            {name: 'Generate a project using the template-retail-react-app', value: 'template'}
-        ]
-    },
-    {
-        name: 'project.selectedAppExtensions',
-        message: 'Which Application Extensions do you want to install?',
-        type: 'checkbox',
-        // TODO: Get the list of available Application Extensions dynamically
-        choices: [
-            {name: 'extension-sample', value: 'extension-sample'},
-            {name: 'extension-sample-dos', value: 'extension-sample-dos'}
-        ],
-        when: (answers) => answers.project.generationType === 'appExtensions'
-    },
-    {
-        name: 'project.extractAppExtensions',
-        message: 'Do you want to extract the Application Extension code?',
-        type: 'confirm',
-        when: (answers) => answers.project.generationType === 'appExtensions'
-    }
-]
+const askApplicationExtensibiltyQuestions = (appExtensions) => {
+    return [
+        {
+            name: 'project.generationType',
+            message:
+                'Do you want to generate a project using Application Extensibility or using the template-retail-react-app?',
+            type: 'list',
+            choices: [
+                {
+                    name: 'Generate a project using Application Extensibility',
+                    value: 'appExtensions'
+                },
+                {name: 'Generate a project using the template-retail-react-app', value: 'template'}
+            ]
+        },
+        {
+            name: 'project.selectedAppExtensions',
+            message: 'Which Application Extensions do you want to install?',
+            type: 'checkbox',
+            choices: appExtensions,
+            when: (answers) => answers.project.generationType === 'appExtensions'
+        },
+        {
+            name: 'project.extractAppExtensions',
+            message: 'Do you want to extract the Application Extension code?',
+            type: 'confirm',
+            when: (answers) => answers.project.generationType === 'appExtensions'
+        }
+    ]
+}
 
 const EXTENSIBILITY_QUESTIONS = [
     {
@@ -752,6 +753,34 @@ const processAppExtensions = (
 }
 
 /**
+ * Fetch available Application Extensions using npm search command.
+ * The command searches for packages starting with '@salesforce/extension-'.
+ *
+ * @returns {Array} A list of available Application Extension names and their versions.
+ */
+const fetchAvailableAppExtensions = () => {
+    try {
+        const result = child_proc.execSync('npm search @salesforce/extension- --json', {
+            encoding: 'utf-8'
+        })
+        const parsedData = JSON.parse(result)
+
+        // Include both name and version in the choices
+        return parsedData.map((pkg) => {
+            const latestVersion = pkg['dist-tags'].latest
+            return {
+                name: `${pkg.name.replace('@salesforce/', '')} (v${latestVersion})`,
+                value: pkg.name.replace('@salesforce/', ''),
+                version: latestVersion
+            }
+        })
+    } catch (error) {
+        console.error('Failed to fetch Application Extensions via npm search:', error.message)
+        return []
+    }
+}
+
+/**
  * This function does the bulk of the project generation given the project config
  * object and the answers returned from the survey process.
  *
@@ -847,9 +876,13 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
         // Add selected Application Extensions to devDependencies and mobify object
         const appExtensionDeps = selectedAppExtensions.reduce((acc, appExtensionName) => {
+            // Find the corresponding Application Extension details
+            const appExtension = context.appExtensions.find((ext) => ext.value === appExtensionName)
+            const version = appExtension ? appExtension.version : '1.0.0-dev'
+
             acc[`@salesforce/${appExtensionName}`] = extractAppExtensions
                 ? `file:./app/application-extensions/${appExtensionName}`
-                : '1.0.0-dev'
+                : version
             return acc
         }, {})
 
@@ -916,7 +949,12 @@ const main = async (opts) => {
 
     // If no preset argument is provided, ask Application Extensibility questions
     if (!presetId) {
-        const generationAnswers = await prompt(APPLICATION_EXTENSIBILITY_QUESTIONS)
+        const appExtensions = fetchAvailableAppExtensions()
+
+        // Include version info in context
+        context.appExtensions = appExtensions
+
+        const generationAnswers = await prompt(askApplicationExtensibiltyQuestions(appExtensions))
         context = merge(context, {answers: expandObject(generationAnswers)})
 
         if (context.answers.project.generationType === 'appExtensions') {
