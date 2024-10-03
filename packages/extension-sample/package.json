@@ -1,7 +1,6 @@
 {
   "name": "@salesforce/extension-sample",
   "version": "1.0.0-dev",
-  "private": true,
   "scripts": {},
   "peerDependencies": {
     "@loadable/component": "^5.15.3",

@@ -111,6 +111,36 @@ const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
+const askApplicationExtensibiltyQuestions = (appExtensions) => {
+    return [
+        {
+            name: 'project.useAppExtensibility',
+            message: 'Do you want to use Application Extensibility?',
+            type: 'confirm',
+            default: true
+        },
+        {
+            name: 'project.selectedAppExtensions',
+            message: 'Which Application Extensions do you want to install?',
+            type: 'checkbox',
+            choices: appExtensions,
+            when: (answers) => answers.project.useAppExtensibility === true
+        },
+        {
+            name: 'project.extractAppExtensions',
+            message:
+                '⚠️ WARNING: If you choose to extract the Application Extension code,\n' +
+                'you will NO LONGER be able to consume upgrades from NPM. All changes\n' +
+                'made to the extracted code will be YOUR RESPONSIBILITY.\n' +
+                '\n' +
+                'Do you want to proceed with extracting the Application Extension code?',
+            type: 'confirm',
+            default: false,
+            when: (answers) => answers.project.useAppExtensibility === true
+        }
+    ]
+}
+
 const EXTENSIBILITY_QUESTIONS = [
     {
         name: 'project.extend',
@@ -439,6 +469,40 @@ const PRESETS = [
             ['project.name']: 'mrt-reference-app'
         },
         private: true
+    },
+    {
+        id: 'app-extension-sample-extract',
+        name: 'Application Extension sample project (Extract Application Extensions code)',
+        description:
+            'Generate an Application Extension using typescript-minimal template with the Application Extensions code extracted.',
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'typescript-minimal'
+        },
+        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
+        answers: {
+            ['project.name']: 'app-extension-sample-extract',
+            ['project.selectedAppExtensions']: ['extension-sample'],
+            ['project.extractAppExtensions']: true
+        },
+        private: true
+    },
+    {
+        id: 'app-extension-sample-no-extract',
+        name: 'Application Extension sample project (Without extracting Application Extensions code)',
+        description:
+            'Generate an Application Extension using typescript-minimal template without the Applications Extensions code extracted.',
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'typescript-minimal'
+        },
+        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
+        answers: {
+            ['project.name']: 'app-extension-sample-no-extract',
+            ['project.selectedAppExtensions']: ['extension-sample'],
+            ['project.extractAppExtensions']: false
+        },
+        private: true
     }
 ]
 
@@ -640,6 +704,79 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 }
 
 /**
+ * Process the Application Extensions into the application-extensions directory.
+ *
+ * @param appExtensions - An array of the Application Extension names.
+ * @param extractAppExtensions - A boolean indicating whether to extract the Application Extensions code from the npm package
+ * @param appExtensionsDir - The path to the application-extensions directory.
+ */
+const processAppExtensions = (
+    appExtensions = [],
+    extractAppExtensions = false,
+    appExtensionsDir
+) => {
+    if (appExtensions.length > 0 && extractAppExtensions) {
+        appExtensions.forEach((appExtensionName) => {
+            const appExtensionTmp = fs.mkdtempSync(
+                p.resolve(os.tmpdir(), `extract-${appExtensionName.replace('@salesforce/', '')}`)
+            )
+            const appExtensionTarFile = sh
+                .exec(`npm pack ${appExtensionName} --pack-destination="${appExtensionTmp}"`, {
+                    silent: true
+                })
+                .stdout.trim()
+
+            const appExtensionTarPath = p.join(appExtensionTmp, appExtensionTarFile)
+
+            // Extract the Application Extension
+            tar.x({
+                file: appExtensionTarPath,
+                cwd: appExtensionTmp,
+                sync: true
+            })
+
+            // Copy the Application Extension into the appropriate folder inside application-extensions
+            const appExtensionTmpPath = p.join(appExtensionTmp, 'package')
+            const appExtensionDestDir = p.join(appExtensionsDir, appExtensionName)
+            sh.mkdir('-p', appExtensionDestDir)
+
+            sh.cp('-rf', p.join(appExtensionTmpPath, '*'), appExtensionDestDir)
+
+            // Clean up the temporary Application Extension directory
+            sh.rm('-rf', appExtensionTmp)
+        })
+    }
+}
+
+/**
+ * Fetch available Application Extensions using npm search command.
+ * The command searches for packages starting with '@salesforce/extension-'.
+ *
+ * @returns {Array} A list of available Application Extension names and their versions.
+ */
+const fetchAvailableAppExtensions = () => {
+    try {
+        const result = child_proc.execSync('npm search @salesforce/extension- --json', {
+            encoding: 'utf-8'
+        })
+        const parsedData = JSON.parse(result)
+
+        // Include both name and version in the choices
+        return parsedData.map((pkg) => {
+            const latestVersion = pkg['dist-tags'].latest
+            return {
+                name: `${pkg.name} (v${latestVersion})`,
+                value: pkg.name,
+                version: latestVersion
+            }
+        })
+    } catch (error) {
+        console.error('Failed to fetch Application Extensions via npm search:', error.message)
+        return []
+    }
+}
+
+/**
  * This function does the bulk of the project generation given the project config
  * object and the answers returned from the survey process.
  *
@@ -650,7 +787,11 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    const {extend = false} = answers.project
+    const {
+        extend = false,
+        selectedAppExtensions = [],
+        extractAppExtensions = false
+    } = answers.project
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
@@ -659,6 +800,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
+    const appExtensionsDir = p.join(outputDir, 'app', 'application-extensions')
     const {id, type} = templateSource
     let tarPath
 
@@ -682,7 +824,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         }
     }
 
-    // Extract the source
+    // Extract the main template
     tar.x({
         file: tarPath,
         cwd: tmp,
@@ -697,7 +839,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context)
             )
 
-        // Copy required assets defind on the preset level.
+        // Copy required assets defined on the preset level.
         const {assets = []} = preset
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
@@ -710,24 +852,51 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
         if (sh.test('-e', assetsDir)) {
             getFiles(assetsDir)
-                .map((file) => file.replace(assetsDir, ''))
-                .forEach((relFilePath) =>
+                .map((file) => {
+                    const relFilePath = file.replace(assetsDir, '')
+                    return relFilePath
+                })
+                .forEach((relFilePath) => {
                     processTemplate(relFilePath, assetsDir, outputDir, context)
-                )
+                })
         }
 
-        // Update the generated projects version. NOTE: For bootstrapped projects this
+        // Process selected Application Extensions
+        processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
+
+        // Update the generated project's package.json. NOTE: For bootstrapped projects this
         // can be done in the template building. But since we have two types of project builds,
         // (bootstrap/bundle) we'll do it here where it works in both scenarios.
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
+
+        // Add selected Application Extensions to devDependencies and mobify object
+        const appExtensionDeps = selectedAppExtensions.reduce((acc, appExtensionName) => {
+            // Find the corresponding Application Extension details
+            const appExtension = context.appExtensions.find((ext) => ext.value === appExtensionName)
+            const version = appExtension ? appExtension.version : '1.0.0-dev'
+
+            acc[appExtensionName] = extractAppExtensions
+                ? `file:./app/application-extensions/${appExtensionName}`
+                : version
+            return acc
+        }, {})
+
         const finalPkgData = merge(pkgJSON, {
             name: slugifyName(context.answers.project.name || context.preset.id),
-            version: GENERATED_PROJECT_VERSION
+            version: GENERATED_PROJECT_VERSION,
+            devDependencies: appExtensionDeps,
+            mobify: {
+                app: {
+                    extensions: selectedAppExtensions.map((appExtensionName) => [appExtensionName])
+                }
+            }
         })
+
+        // Write updated package.json back to the output directory
         writeJson(pkgJsonPath, finalPkgData)
 
-        // Clean up
+        // Clean up the temporary directory
         sh.rm('-rf', tmp)
     }
 
@@ -771,22 +940,32 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // If there is no preset arg, prompt the user with a selection of presets.
+    // If no preset argument is provided, ask Application Extensibility questions
     if (!presetId) {
+        const appExtensions = fetchAvailableAppExtensions()
+
+        // Include version info in context
+        context.appExtensions = appExtensions
+
+        const generationAnswers = await prompt(askApplicationExtensibiltyQuestions(appExtensions))
+        context = merge(context, {answers: expandObject(generationAnswers)})
+
+        if (context.answers.project.useAppExtensibility) {
+            // Add the 'typescript-minimal' preset for Application Extension
+            context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
+        }
+    }
+
+    // If no preset is provided, prompt the user with available preset options
+    if (!presetId && !context.preset) {
         context.answers = await prompt(PRESET_QUESTIONS)
     }
 
-    // Add the selected preset to the context object.
-    const selectedPreset = PRESETS.find(
-        ({id}) => id === (presetId || context.answers.general.presetId)
-    )
-
-    // Add the preset to the context.
+    // Set the preset to the selected preset or based on presetId
+    const selectedPreset =
+        context.preset ||
+        PRESETS.find(({id}) => id === (presetId || context.answers.general.presetId))
     context.preset = selectedPreset
-
-    if (!OUTPUT_DIR_FLAG_ACTIVE) {
-        outputDir = p.join(process.cwd(), selectedPreset.id)
-    }
 
     // Ask preset specific questions and merge into the current context.
     const {questions = {}, answers = {}} = selectedPreset
@@ -796,6 +975,10 @@ const main = async (opts) => {
         context = merge(context, {
             answers: expandObject(projectAnswers)
         })
+    }
+
+    if (!OUTPUT_DIR_FLAG_ACTIVE) {
+        outputDir = p.join(process.cwd(), context.answers.project.name || selectedPreset.id)
     }
 
     if (context.answers.project.commerce?.instanceUrl) {
