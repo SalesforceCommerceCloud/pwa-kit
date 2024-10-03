@@ -1128,7 +1128,7 @@
   "dnt_notification.button.assistive_msg.accept": [
     {
       "type": 0,
-      "value": "Accept Tracking"
+      "value": "Accept tracking"
     }
   ],
   "dnt_notification.button.assistive_msg.close": [
@@ -1140,7 +1140,7 @@
   "dnt_notification.button.assistive_msg.decline": [
     {
       "type": 0,
-      "value": "Decline Tracking"
+      "value": "Decline tracking"
     }
   ],
   "dnt_notification.button.decline": [

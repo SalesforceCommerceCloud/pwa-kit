@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     DntNotification,
@@ -32,7 +31,7 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test('Notification gives the expected text', async () => {
+test('Notification renders properly', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => {
         expect(screen.getByText(/Tracking Consent/i)).toBeInTheDocument()
@@ -40,12 +39,11 @@ test('Notification gives the expected text', async () => {
 })
 
 test('Clicking out of notification does setDNT(null)', async () => {
-    const user = userEvent.setup()
-
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
 
     // open the notification
     const closeButton = screen.getByLabelText('Close consent tracking form')
+    expect(closeButton).toHaveAttribute('aria-label', 'Close consent tracking form');
     await user.click(closeButton)
 
     await waitFor(() => {
@@ -54,12 +52,11 @@ test('Clicking out of notification does setDNT(null)', async () => {
 })
 
 test('Clicking Accept does setDNT(false)', async () => {
-    const user = userEvent.setup()
-
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
 
     // open the notification
     const acceptButton = screen.getAllByText('Accept')[0]
+    expect(acceptButton).toHaveAttribute('aria-label', 'Accept tracking');
     await user.click(acceptButton)
 
     await waitFor(() => {
@@ -68,13 +65,12 @@ test('Clicking Accept does setDNT(false)', async () => {
 })
 
 test('Clicking Decline does setDNT(true)', async () => {
-    const user = userEvent.setup()
-
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
 
     // open the notification
-    const acceptButton = screen.getAllByText('Decline')[0]
-    await user.click(acceptButton)
+    const declineButton = screen.getAllByText('Decline')[0]
+    expect(declineButton).toHaveAttribute('aria-label', 'Decline tracking');
+    await user.click(declineButton)
 
     await waitFor(() => {
         expect(mockUpdateDNT).toHaveBeenCalledWith(true)

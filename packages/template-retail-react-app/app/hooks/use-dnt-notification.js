@@ -56,7 +56,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                 }}
                 aria-label={formatMessage({
                     id: 'dnt_notification.button.assistive_msg.decline',
-                    defaultMessage: 'Decline Tracking'
+                    defaultMessage: 'Decline tracking'
                 })}
                 width="100%"
             >
@@ -71,7 +71,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                 width="100%"
                 aria-label={formatMessage({
                     id: 'dnt_notification.button.assistive_msg.accept',
-                    defaultMessage: 'Accept Tracking'
+                    defaultMessage: 'Accept tracking'
                 })}
             >
                 <FormattedMessage defaultMessage="Accept" id="dnt_notification.button.accept" />
@@ -163,7 +163,7 @@ DntNotification.propTypes = {
 
 /**
  *
- * @returns {Object} - Object props to be spread on to the DntNotification component
+ * @returns {Object} - Object props to be passed into the DntNotification component
  */
 export const useDntNotification = () => {
     const {isOpen, onOpen, onClose} = useDisclosure()

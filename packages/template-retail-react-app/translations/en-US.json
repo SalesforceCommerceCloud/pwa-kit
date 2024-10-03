@@ -451,13 +451,13 @@
     "defaultMessage": "Accept"
   },
   "dnt_notification.button.assistive_msg.accept": {
-    "defaultMessage": "Accept Tracking"
+    "defaultMessage": "Accept tracking"
   },
   "dnt_notification.button.assistive_msg.close": {
     "defaultMessage": "Close consent tracking form"
   },
   "dnt_notification.button.assistive_msg.decline": {
-    "defaultMessage": "Decline Tracking"
+    "defaultMessage": "Decline tracking"
   },
   "dnt_notification.button.decline": {
     "defaultMessage": "Decline"
