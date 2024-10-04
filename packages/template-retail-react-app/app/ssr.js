@@ -53,7 +53,9 @@ const options = {
     // of the keys of headers that have been encoded
     // There may be a slight performance loss with requests/responses with large number
     // of headers as we loop through all the headers to verify ASCII vs non ASCII
-    encodeNonAsciiHttpHeaders: true
+    encodeNonAsciiHttpHeaders: true,
+
+    localAllowCookies: true
 }
 
 const runtime = getRuntime()
@@ -90,6 +92,12 @@ const {handler} = runtime.createHandler(options, (app) => {
         // Thus we cache it for a year to maximize performance
         res.set('Cache-Control', `max-age=31536000`)
         res.send()
+    })
+
+    app.get('/trusted-agent-callback?*', (req, res) => {
+        // Set trusted agent cookie
+        res.cookie('cc-ta-code', req.query.code, {maxAge: 1000 * 60 * 15})
+        res.redirect('/')
     })
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))

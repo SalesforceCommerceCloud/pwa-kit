@@ -70,6 +70,10 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'access_token_sfra'
     | 'dwsid'
+    | 'trusted_agent_code'
+    | 'trusted_agent_verifier'
+    | 'trusted_agent_login_id'
+    | 'trusted_agent_agent_id'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -134,6 +138,22 @@ const DATA_MAP: AuthDataMap = {
             store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
     },
+    trusted_agent_code: {
+        storageType: 'cookie',
+        key: 'cc-ta-code'
+    },
+    trusted_agent_verifier: {
+        storageType: 'cookie',
+        key: 'cc-ta-verifier'
+    },
+    trusted_agent_login_id: {
+        storageType: 'cookie',
+        key: 'cc-ta-login-id'
+    },
+    trusted_agent_agent_id: {
+        storageType: 'cookie',
+        key: 'cc-ta-agent-id'
+    },
     refresh_token_expires_in: {
         storageType: 'local',
         key: 'refresh_token_expires_in'
@@ -173,6 +193,7 @@ const DATA_MAP: AuthDataMap = {
  * @Internal
  */
 class Auth {
+    private config: AuthConfig
     private client: ShopperLogin<ApiClientConfigParams>
     private shopperCustomersClient: ShopperCustomers<ApiClientConfigParams>
     private redirectURI: string
@@ -185,6 +206,8 @@ class Auth {
     private defaultDnt: boolean | undefined
 
     constructor(config: AuthConfig) {
+        this.config = config
+
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
@@ -372,6 +395,21 @@ class Auth {
         store.delete(key)
     }
 
+    private clearTrustedAgentStorage() {
+        const keys = [
+            'trusted_agent_code',
+            'trusted_agent_verifier',
+            'trusted_agent_login_id',
+            'trusted_agent_agent_id'
+        ] as AuthDataKeys[]
+
+        keys.forEach((keyName) => {
+            const {key, storageType} = DATA_MAP[keyName]
+            const store = this.stores[storageType]
+            store.delete(key)
+        })
+    }
+
     /**
      * Converts a duration in seconds to a Date object.
      * This function takes a number representing seconds and returns a Date object
@@ -454,6 +492,7 @@ class Auth {
      * 3. PKCE flow
      */
     async ready() {
+        console.log('YE')
         if (this.fetchedToken && this.fetchedToken !== '') {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
@@ -465,6 +504,15 @@ class Auth {
         if (this.pendingToken) {
             return await this.pendingToken
         }
+
+        console.log(this.get('trusted_agent_login_id'))
+        console.log(this.get('trusted_agent_code'))
+
+        if (this.get('trusted_agent_code')) {
+            console.log('YESSSSSSSSS')
+            return await this.queueRequest(() => this.completeTrustedAgentLogin(), false)
+        }
+
         const accessToken = this.getAccessToken()
 
         if (accessToken && !this.isTokenExpired(accessToken)) {
@@ -610,6 +658,116 @@ class Auth {
         if (onClient()) {
             void this.clearECOMSession()
         }
+        return token
+    }
+
+    /**
+     * TODO: TAOB Eventually this will be a wrapper method for commerce-sdk-isomorphic helper: loginTrustedAgentRegisteredUserB2C.
+     *
+     */
+    async loginTrustedAgentRegisteredUserB2C(credentials: {
+        loginId: string;
+        agentId: string;
+        clientSecret?: string;
+    }) {
+        if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
+            this.logWarning(SLAS_SECRET_WARNING_MSG)
+        }
+
+        const redirectURI = 'http://localhost:3000/trusted-agent-callback'
+
+        // TODO: TAOB refactor to helper starts here
+        const slasClient = this.client
+        const codeVerifier = helpers.createCodeVerifier()
+        const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
+
+        this.set('trusted_agent_verifier', codeVerifier)
+        this.set('trusted_agent_login_id', credentials.loginId)
+        this.set('trusted_agent_agent_id', credentials.agentId)
+
+        // Create a copy to override specific fetchOptions
+        const slasClientCopy = new ShopperLogin(slasClient.clientConfig)
+
+        // set manual redirect on server since node allows access to the location
+        // header and it skips the extra call. In the browser, only the default
+        // follow setting allows us to get the url.
+        /* istanbul ignore next */
+        slasClientCopy.clientConfig.fetchOptions = {
+            ...slasClient.clientConfig.fetchOptions,
+            redirect: 'follow',
+        }
+
+        const baseUrl = this.config.proxy.split(MOBIFY_PATH)[0]
+        slasClientCopy.clientConfig.proxy = `${baseUrl}/mobify/slas/trusted-agent`
+
+        const optionsAuth = {
+            parameters: {
+                client_id: slasClient.clientConfig.parameters.clientId,
+                channel_id: slasClient.clientConfig.parameters.siteId,
+                idp_origin: 'ecom',
+                code_challenge: codeChallenge,
+                login_id: credentials.loginId,
+                redirect_uri: redirectURI,
+                response_type: 'code',
+            },
+        }
+
+        const response = await slasClientCopy.getTrustedAgentAuthorizationToken(optionsAuth, true)
+        const redirectUrlString = response.headers?.get('location') || response.url
+        const redirectUrl = new URL(redirectUrlString)
+        const errorMessage = redirectUrl.searchParams.get('error')
+
+        if (response.status >= 400 || errorMessage) {
+            throw new Error(`${response.status} ${response.statusText}`)
+        }
+
+        return redirectUrlString
+    }
+
+    async completeTrustedAgentLogin() {
+        const code = this.get('trusted_agent_code')
+        const codeVerifier = this.get('trusted_agent_verifier')
+        const loginId = this.get('trusted_agent_login_id')
+        const agentId = this.get('trusted_agent_agent_id')
+        const slasClient = this.client
+
+        const optionsToken = {
+            headers: {},
+            parameters: {},
+            body: {
+                client_id: slasClient.clientConfig.parameters.clientId,
+                channel_id: slasClient.clientConfig.parameters.siteId,
+                code,
+                code_verifier: codeVerifier,
+                grant_type: 'authorization_code_pkce',
+                organizationId: slasClient.clientConfig.parameters.organizationId,
+                redirect_uri: this.redirectURI,
+                // usid: authResponse.usid,
+                login_id: loginId,
+                agent_id: agentId,
+                idp_origin: 'ecom'
+            }
+        }
+
+        // // using slas private client
+        // if (credentials.clientSecret) {
+        //     const authorizationSecret = `Basic ${helpers.stringToBase64(
+        //         `${slasClient.clientConfig.parameters.clientId}:${credentials.clientSecret}`
+        //     )}`
+
+        //     optionsToken.headers = {
+        //         Authorization: authorizationSecret,
+        //     }
+        // }
+
+        const token = await slasClient.getTrustedAgentAccessToken(optionsToken)
+        // // TODO: TAOB refactor to helper ends here
+
+        this.handleTokenResponse(token, false)
+        if (onClient()) {
+            // void this.clearTrustedAgentStorage()
+        }
+
         return token
     }
 

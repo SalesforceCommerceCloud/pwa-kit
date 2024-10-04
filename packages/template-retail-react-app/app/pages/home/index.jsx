@@ -44,7 +44,9 @@ import {
     STALE_WHILE_REVALIDATE
 } from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {useProductSearch} from '@salesforce/commerce-sdk-react'
+import {useProductSearch, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 /**
  * This is the home page for Retail React App.
@@ -81,6 +83,15 @@ const Home = () => {
         einstein.sendViewPage(pathname)
     }, [])
 
+    // TODO: TAOB
+    const { data: customer } = useCurrentCustomer()
+    const login = useAuthHelper(AuthHelpers.LoginTrustedAgentRegisteredUserB2C)
+
+    const handleTrustedAgentClick = async () => {
+        const redirectUrl = await login.mutateAsync({loginId: 'johnnygreen@gmail.com', agentId: 'johnny.green@salesforce.com'})
+        console.log(redirectUrl)
+    }
+
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo
@@ -88,7 +99,9 @@ const Home = () => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
-
+            <Button onClick={() => handleTrustedAgentClick()}>
+                Login as 'johnnygreen@gmail.com'
+            </Button>
             <Hero
                 title={intl.formatMessage({
                     defaultMessage: 'The React PWA Starter Store for Retail',

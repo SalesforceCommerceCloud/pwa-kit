@@ -23,6 +23,8 @@ import {updateCache} from './utils'
 export const AuthHelpers = {
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
+    // TODO: TAOB LoginTrustedAgentGuestUser: 'loginTrustedAgentGuestUser',
+    LoginTrustedAgentRegisteredUserB2C: 'loginTrustedAgentRegisteredUserB2C',
     Logout: 'logout',
     Register: 'register'
 } as const
@@ -52,8 +54,10 @@ type CacheUpdateMatrix = {
  * For more, see https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/#public-client-shopper-login-helpers
  *
  * Avaliable helpers:
- * - loginRegisteredUserB2C
  * - loginGuestUser
+ * - loginRegisteredUserB2C
+ * - TODO: TAOB loginTrustedAgentGuestUser
+ * - loginTrustedAgentRegisteredUserB2C
  * - logout
  * - register
  *
@@ -93,8 +97,10 @@ export function useAuthHelper<Mutation extends AuthHelper>(
 }
 
 const cacheUpdateMatrix: CacheUpdateMatrix = {
-    loginRegisteredUserB2C: noop,
     loginGuestUser: noop,
+    loginRegisteredUserB2C: noop,
+    // TODO: TAOB loginTrustedAgentGuestUser: noop,
+    loginTrustedAgentRegisteredUserB2C: noop,
     logout() {
         return {
             remove: [{queryKey: ['/commerce-sdk-react']}]

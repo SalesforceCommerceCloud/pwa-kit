@@ -68,7 +68,7 @@ const AppConfig = ({children, locals = {}}) => {
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            // enablePWAKitPrivateClient={true}
+            enablePWAKitPrivateClient={false}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
