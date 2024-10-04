@@ -143,12 +143,12 @@ const Account = () => {
                                     _expanded={{background: 'transparent'}}
                                 >
                                     <Flex align="center" justify="center">
-                                        <Text as="span" mr={2}>
+                                        <Heading as="h2" fontSize="16px">
                                             <FormattedMessage
                                                 defaultMessage="My Account"
                                                 id="account.accordion.button.my_account"
                                             />
-                                        </Text>
+                                        </Heading>
                                         {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                     </Flex>
                                 </AccordionButton>
