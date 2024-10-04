@@ -1,3 +1,6 @@
+## v3.1.0-nightly-20241004080208 (Oct 04, 2024)
+## v3.1.0-dev (Oct 04, 2024)
+## v3.8.0-nightly-20241004080208 (Oct 04, 2024)
 ## v3.1.0-dev (Aug 08, 2024)
 
 -   Improve refresh token error logging [#2028](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2028)
