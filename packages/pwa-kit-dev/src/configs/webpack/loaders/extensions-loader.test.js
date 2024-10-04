@@ -66,6 +66,8 @@ describe('Extension Loader', () => {
                 {packageName: 'extension-this', instanceVariable: This}
             ]
 
+            // TODO: Once we create @salesforce/pwa-kit-extensibility we will refactor this code to use a shared utility that
+            // normalizes/expands the configuration array before it is uses in this loader.
             const normalizeExtensionsList = (extensions = []) =>
                 extensions.map((extension) => {
                     return {

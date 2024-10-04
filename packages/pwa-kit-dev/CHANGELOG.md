@@ -1,4 +1,5 @@
 ## v4.0.0-dev (Jun 21, 2024)
+- Overrides in `disabled` Application Extensions will take no effect. [#2051](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2051)
 - Ensure Application Extensions have their static folder copied into the bundle. [#2040](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2040)
 - Create new `OverrideResolverPlugin` and integrate into the Webpack configuration. [#2012](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2012)
 - Replace `IApplicationExtension` with `ApplicationExtension` abstract class. [#2019](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2019)

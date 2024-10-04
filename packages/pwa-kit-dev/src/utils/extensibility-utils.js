@@ -109,3 +109,21 @@ export const getExtensionNames = (extensions) => {
         return Array.isArray(extension) ? extension[0] : extension
     })
 }
+
+/**
+ * Determines if an extension is enabled based on the provided Application Extension entry.
+ *
+ * @param {Array} [extensionEntry=[]] - An array representing an extension entry.
+ *   The first element is the extension's name (string), and the second element is an optional configuration object.
+ * @param {string} extensionEntry[0] - The name of the extension.
+ * @param {Object} [extensionEntry[1]={}] - The configuration object for the extension.
+ * @param {boolean} [extensionEntry[1].enabled] - A flag indicating whether the extension is enabled.
+ *   If `true`, the extension is enabled. If `false`, it is disabled. If `undefined`, the extension is considered enabled.
+ *
+ * @returns {boolean} - Returns `true` if the extension has a name and is enabled (or if the enabled flag is `undefined`).
+ *   Returns `false` if the extension is explicitly disabled or if no name is provided.
+ */
+export const isEnabled = (extensionEntry = []) => {
+    const [name, config = {}] = extensionEntry
+    return !!(name && config?.enabled !== false)
+}
