@@ -103,7 +103,14 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
         // The reference can be a module/package or an absolute path to a file.
         const [extensionRef] = extensionEntry
         const srcPath = path.join(projectDir, NODE_MODULES, extensionRef, SRC)
-        return [...acc, path.join(srcPath, OVERRIDES, importPath), path.join(srcPath, importPath)]
+        const appPath = path.join(projectDir, NODE_MODULES, extensionRef, 'app')
+        return [
+            ...acc,
+            path.join(srcPath, OVERRIDES, importPath),
+            path.join(srcPath, importPath),
+            path.join(appPath, OVERRIDES, importPath),
+            path.join(appPath, importPath)
+        ]
     }, [])
 
     // Add non-extension search locations locations. The base project and the sdk as the final callback.
