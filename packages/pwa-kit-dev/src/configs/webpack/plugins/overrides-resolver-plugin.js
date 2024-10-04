@@ -44,7 +44,7 @@ class OverridesResolverPlugin {
                 extensions: this.fileExtensions,
                 packageIterator: () =>
                     buildCandidatePaths(importPath, sourcePath, {
-                        extensions: this.extensions,
+                        extensionEntries: this.extensions,
                         projectDir: this.projectDir
                     }),
                 ...this.resolveOptions

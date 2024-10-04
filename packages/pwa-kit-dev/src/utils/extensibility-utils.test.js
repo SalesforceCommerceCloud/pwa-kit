@@ -39,7 +39,7 @@ describe('extensibilityUtils', () => {
         })
     })
 
-    describe('"findFileWithExtension" correctly', () => {
+    describe('findFileWithExtension', () => {
         ;[
             {
                 name: 'returns null if path exists but no files no files with provided file extensions.',
@@ -81,7 +81,7 @@ describe('extensibilityUtils', () => {
         })
     })
 
-    describe('"buildAliases" correctly', () => {
+    describe('buildAliases', () => {
         ;[
             {
                 name: 'returns an empty object if undefined is passed',
@@ -126,6 +126,42 @@ describe('extensibilityUtils', () => {
 
                 expect(result).toEqual(testCase.expected)
             })
+        })
+    })
+
+    describe('isEnabled', () => {
+        test('should return true when the application extension has a name and config is undefined', () => {
+            const extensionEntry = ['myExtension']
+            expect(extensionUtils.isEnabled(extensionEntry)).toBe(true)
+        })
+
+        test('should return true when the application extension has a name and config.enabled is true', () => {
+            const extensionEntry = ['myExtension', {enabled: true}]
+            expect(extensionUtils.isEnabled(extensionEntry)).toBe(true)
+        })
+
+        test('should return false when the application extension has a name and config.enabled is false', () => {
+            const extensionEntry = ['myExtension', {enabled: false}]
+            expect(extensionUtils.isEnabled(extensionEntry)).toBe(false)
+        })
+
+        test('should return true when the application extension has a name and config.enabled is undefined', () => {
+            const extensionEntry = ['myExtension', {}]
+            expect(extensionUtils.isEnabled(extensionEntry)).toBe(true)
+        })
+
+        test('should return false when the application extension has no name', () => {
+            const extensionEntry = [null, {enabled: true}]
+            expect(extensionUtils.isEnabled(extensionEntry)).toBe(false)
+        })
+
+        test('should return false when the application extension entry is an empty array', () => {
+            const extensionEntry = []
+            expect(extensionUtils.isEnabled(extensionEntry)).toBe(false)
+        })
+
+        test('should return false when no arguments are passed (empty application extension entry)', () => {
+            expect(extensionUtils.isEnabled()).toBe(false)
         })
     })
 })

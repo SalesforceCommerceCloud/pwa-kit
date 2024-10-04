@@ -202,73 +202,132 @@ describe('resolverUtils', () => {
                         'pages',
                         'sample'
                     )
-                    // NOTE: This has been removed at we currently aren't using the `overrides-resolver-plugin` to resolve special components.
-                    // path.join(
-                    //     process.cwd(),
-                    //     'node_modules',
-                    //     '@salesforce',
-                    //     'pwa-kit-react-sdk',
-                    //     'ssr',
-                    //     'universal',
-                    //     'components',
-                    //     'routes'
-                    // )
+                ]
+            },
+            {
+                name: 'Correct paths are returned when "some" extensions are disabled',
+                importPath: '*/pages/sample',
+                sourcePath: path.join(
+                    process.cwd(),
+                    'node_modules',
+                    '@salesforce',
+                    'extension-module-extension-a',
+                    'src',
+                    'setup-app.ts'
+                ),
+
+                extensions: [
+                    'module-extension-a',
+                    'module-extension-b',
+                    ['module-extension-c', {enabled: false}]
+                ],
+                expected: [
+                    path.join(process.cwd(), 'app', 'overrides', 'pages', 'sample'),
+                    path.join(process.cwd(), 'app', 'pages', 'sample'),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-b',
+                        'src',
+                        'overrides',
+                        'pages',
+                        'sample'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-b',
+                        'src',
+                        'pages',
+                        'sample'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-a',
+                        'src',
+                        'overrides',
+                        'pages',
+                        'sample'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-a',
+                        'src',
+                        'pages',
+                        'sample'
+                    )
+                ]
+            },
+            {
+                name: 'Correct paths are returned when "all" extensions are disabled',
+                importPath: '*/pages/sample',
+                sourcePath: path.join(
+                    process.cwd(),
+                    'node_modules',
+                    '@salesforce',
+                    'extension-module-extension-a',
+                    'src',
+                    'setup-app.ts'
+                ),
+
+                extensions: [
+                    ['module-extension-a', {enabled: false}],
+                    ['module-extension-b', {enabled: false}],
+                    ['module-extension-c', {enabled: false}]
+                ],
+                expected: [
+                    path.join(process.cwd(), 'app', 'overrides', 'pages', 'sample'),
+                    path.join(process.cwd(), 'app', 'pages', 'sample')
+                ]
+            },
+            {
+                name: 'If sourcePath implies a self-reference, only the paths before its first mention is included',
+                importPath: '*/app/routes',
+                sourcePath: path.join(
+                    process.cwd(),
+                    'node_modules',
+                    '@salesforce',
+                    'extension-module-extension-b',
+                    'src',
+                    'overrides',
+                    'app',
+                    'routes.jsx'
+                ),
+                extensions: ['module-extension-a', 'module-extension-b'],
+                expected: [
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-a',
+                        'src',
+                        'overrides',
+                        'app',
+                        'routes'
+                    ),
+                    path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@salesforce',
+                        'extension-module-extension-a',
+                        'src',
+                        'app',
+                        'routes'
+                    )
                 ]
             }
-            // ,
-            // {
-            //     name: 'If sourcePath implies a self-reference, only the paths before its first mention is included',
-            //     importPath: '*/app/routes',
-            //     sourcePath: path.join(
-            //         process.cwd(),
-            //         'node_modules',
-            //         '@salesforce',
-            //         'extension-module-extension-b',
-            //         'src',
-            //         'overrides',
-            //         'app',
-            //         'routes.jsx'
-            //     ),
-            //     extensions: ['module-extension-a', 'module-extension-b'],
-            //     expected: [
-            //         path.join(
-            //             process.cwd(),
-            //             'node_modules',
-            //             '@salesforce',
-            //             'extension-module-extension-a',
-            //             'src',
-            //             'overrides',
-            //             'app',
-            //             'routes'
-            //         ),
-            //         path.join(
-            //             process.cwd(),
-            //             'node_modules',
-            //             '@salesforce',
-            //             'extension-module-extension-a',
-            //             'src',
-            //             'app',
-            //             'routes'
-            //         )
-            //         // NOTE: This has been removed at we currently aren't using the `overrides-resolver-plugin` to resolve special components.
-            //         // path.join(
-            //         //     process.cwd(),
-            //         //     'node_modules',
-            //         //     '@salesforce',
-            //         //     'pwa-kit-react-sdk',
-            //         //     'ssr',
-            //         //     'universal',
-            //         //     'components',
-            //         //     'routes'
-            //         // )
-            //     ]
-            // }
         ].forEach((testCase) => {
             test(`${testCase.name}`, () => {
                 const result = resolverUtils.buildCandidatePaths(
                     testCase.importPath,
                     testCase.sourcePath,
-                    {extensions: testCase.extensions}
+                    {extensionEntries: testCase.extensions}
                 )
 
                 expect(result).toEqual(testCase.expected)

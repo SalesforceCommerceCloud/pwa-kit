@@ -5,7 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+// Third-party imports
 import path from 'path'
+
+// Project imports
+import {isEnabled} from './extensibility-utils'
 
 const EXTENSION_NAMESPACE = '@salesforce'
 const EXTENSION_PREFIX = 'extension'
@@ -85,7 +89,7 @@ export const expand = (extensions = []) =>
  * @param {String} importPath - The import module-name.
  * @param {String} sourcePath - The path the the file of the source import.
  * @param {Object} opts - The path the the file of the source import.
- * @param {Array<shortName: String, config: Array>} opts.extensions - List of extensions used by the base PWA-Kit application.
+ * @param {Array<shortName: String, config: Array>} opts.extensionEntries - List of extension entries (tupals) used by the base PWA-Kit application.
  * @param {String>} opts.projectDir - Absolute path of the base project.
  * @returns {String[]} paths - The potential paths to find the module import.
  */
@@ -93,18 +97,24 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
     // Replace wildcard character as it has done its job getting us to this point.
     importPath = importPath.replace('*/', '')
 
-    const {extensions = [], projectDir = process.cwd()} = opts
+    const {extensionEntries = [], projectDir = process.cwd()} = opts
     const isSelfReferenceImport = isSelfReference(importPath, sourcePath)
-
-    let paths = expand(extensions).reverse()
+    let paths = []
 
     // Map all the extensions and resolve the module names to absolute paths.
-    paths = paths.reduce((acc, extensionEntry) => {
-        // The reference can be a module/package or an absolute path to a file.
-        const [extensionRef] = extensionEntry
-        const srcPath = path.join(projectDir, NODE_MODULES, extensionRef, SRC)
-        return [...acc, path.join(srcPath, OVERRIDES, importPath), path.join(srcPath, importPath)]
-    }, [])
+    paths = expand(extensionEntries)
+        .filter(isEnabled)
+        .reverse()
+        .reduce((acc, extensionEntry) => {
+            // The reference can be a module/package or an absolute path to a file.
+            const [extensionRef] = extensionEntry
+            const srcPath = path.join(projectDir, NODE_MODULES, extensionRef, SRC)
+            return [
+                ...acc,
+                path.join(srcPath, OVERRIDES, importPath),
+                path.join(srcPath, importPath)
+            ]
+        }, [])
 
     // Add non-extension search locations locations. The base project and the sdk as the final callback.
     paths = [
