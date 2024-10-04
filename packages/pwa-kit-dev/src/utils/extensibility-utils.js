@@ -125,5 +125,5 @@ export const getExtensionNames = (extensions) => {
  */
 export const isEnabled = (extensionEntry = []) => {
     const [name, config = {}] = extensionEntry
-    return name && config?.enabled !== false
+    return !!(name && config?.enabled !== false)
 }
