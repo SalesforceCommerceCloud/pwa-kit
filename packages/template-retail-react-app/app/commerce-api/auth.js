@@ -22,7 +22,6 @@ import {
     REFRESH_TOKEN_COOKIE_AGE,
     EXPIRED_TOKEN,
     INVALID_TOKEN,
-    DWSID_STORAGE_KEY,
     EXCLUDE_COOKIE_SUFFIX
 } from './constants'
 import Cookies from 'js-cookie'
@@ -51,7 +50,7 @@ class Auth {
         this._onClient = typeof window !== 'undefined'
 
         const _options = {
-            keySuffix: this._config.parameters.siteId,
+            keySuffix: this._config.parameters.siteId
         }
 
         this._cookieStorage = this._onClient ? new CookieStorage(_options) : new Map()
@@ -97,7 +96,7 @@ class Auth {
     }
 
     get userType() {
-        return this._storage.get(refreshTokenRegisteredStorageKey)
+        return this._cookieStorage.get(refreshTokenRegisteredStorageKey)
             ? Auth.USER_TYPE.REGISTERED
             : Auth.USER_TYPE.GUEST
     }
@@ -145,7 +144,7 @@ class Auth {
     }
 
     get dwsid() {
-        return this._cookieStorage.get(DWSID_STORAGE_KEY)
+        return this._cookieStorage.get(dwSessionIdKey)
     }
 
     get isTokenValid() {
@@ -343,7 +342,7 @@ class Auth {
         // For Phased Launch storefronts, if the shopper logs into a registered account on PWA Kit,
         // dwsid cookie must be cleared to trigger onSession in Plugin SLAS which will then use the new
         // registered refresh_token (cc-nx cookie) value to restore SFRA/SG session for registered shopper.
-        this._cookieStorage.delete(DWSID_STORAGE_KEY)
+        this._cookieStorage.delete(dwSessionIdKey)
 
         const tokenBody = createGetTokenBody(
             response.url,
@@ -475,13 +474,12 @@ class Auth {
      */
     _clearAuth() {
         this._storage.delete(tokenStorageKey)
-        this._storage.delete(refreshTokenRegisteredStorageKey)
-        this._storage.delete(refreshTokenGuestStorageKey)
-        this._storage.delete(usidStorageKey)
+        this._cookieStorage.delete(refreshTokenRegisteredStorageKey)
+        this._cookieStorage.delete(refreshTokenGuestStorageKey)
+        this._cookieStorage.delete(usidStorageKey)
         this._storage.delete(cidStorageKey)
         this._storage.delete(encUserIdStorageKey)
-        this._storage.delete(dwSessionIdKey)
-        this._cookieStorage.delete(DWSID_STORAGE_KEY)
+        this._cookieStorage.delete(dwSessionIdKey)
     }
 }
 

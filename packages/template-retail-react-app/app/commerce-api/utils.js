@@ -7,7 +7,12 @@
 import jwtDecode from 'jwt-decode'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
-import {ECOM_ACCESS_TOKEN_STORAGE_KEY, tokenStorageKey} from './constants'
+import {
+    cidStorageKey,
+    ECOM_ACCESS_TOKEN_STORAGE_KEY,
+    tokenStorageKey,
+    usidStorageKey
+} from './constants'
 import fetch from 'cross-fetch'
 
 /**
@@ -274,6 +279,34 @@ export const convertSnakeCaseToSentenceCase = (text) => {
 export const noop = () => {}
 
 /**
+ * Decode SLAS JWT and extract information such as customer id, usid, etc.
+ * @param {string} jwt
+ */
+export function parseSLASJwt(jwt) {
+    const payload = jwtDecode(jwt)
+    const {sub, isb} = payload
+
+    if (!sub || !isb) {
+        throw new Error('Unable to parse access token payload: missing sub and isb.')
+    }
+
+    // ISB format
+    //'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
+    const isbParts = isb.split('::')
+    const isGuest = isbParts[1] === 'upn:Guest'
+    const customerId = isGuest ? isbParts[3].replace('gcid:', '') : isbParts[4].replace('rcid:', '')
+
+    // Sub format
+    // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
+    const usid = sub.split('::')[3].replace('usid:', '')
+    return {
+        isGuest,
+        customerId,
+        usid
+    }
+}
+
+/**
  * WARNING: This function is relevant to be used in Phased Launch deployments only.
  *
  * If any of the SLAS Auth flows were called in Plugin SLAS that generate a new access_token,
@@ -302,8 +335,16 @@ export function hasSFRAAuthStateChanged(storage, cookieStorage) {
         return true
     }
 
-    // If a cc-at cookie is found and it's value is NOT 'refresh',
-    // Update localStoreage token cookie to cc-at value and delete cc-at cookie.
+    /**
+     * If a cc-at cookie is found and it's value is NOT 'refresh',
+     * Parse JWT to get customerId and usid and update the values,
+     * Update localStoreage token cookie to cc-at value and delete cc-at cookie.
+     */
+    const {customerId, usid} = parseSLASJwt(SFRAAuthToken)
+
     storage.set(tokenStorageKey, `Bearer ${SFRAAuthToken}`)
+    storage.set(cidStorageKey, customerId)
+    cookieStorage.set(usidStorageKey, usid)
     cookieStorage.delete(ECOM_ACCESS_TOKEN_STORAGE_KEY)
+    return false
 }
