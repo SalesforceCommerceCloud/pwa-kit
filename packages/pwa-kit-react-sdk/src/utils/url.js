@@ -5,8 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-
 /**
  * Returns the application's origin.
  *
@@ -21,16 +19,11 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * const url = `${getAppOrigin()}/path`
  */
 export const getAppOrigin = () => {
-    const config = getConfig()
     if (typeof window !== 'undefined') {
         return window.location.origin
     }
 
-    const {APP_ORIGIN, X_FORWARDED_HOST} = process.env
-
-    if (config?.app?.useXForwardedHost && X_FORWARDED_HOST) {
-        return X_FORWARDED_HOST
-    }
+    const {APP_ORIGIN} = process.env
 
     if (!APP_ORIGIN) {
         throw new Error(
