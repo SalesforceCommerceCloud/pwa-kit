@@ -25,7 +25,7 @@ const tarPathForPkg = (pkg) => p.resolve(templatesDir, `${pkg}.tar.gz`)
 
 const main = () => {
     const pkgNames = [
-        'retail-react-app',
+        // 'retail-react-app',
         'express-minimal',
         'typescript-minimal',
         'mrt-reference-app'
