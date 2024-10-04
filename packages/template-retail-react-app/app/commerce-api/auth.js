@@ -21,9 +21,9 @@ import {
     dwSessionIdKey,
     REFRESH_TOKEN_COOKIE_AGE,
     EXPIRED_TOKEN,
-    INVALID_TOKEN
+    INVALID_TOKEN,
+    EXCLUDE_COOKIE_SUFFIX
 } from './constants'
-import fetch from 'cross-fetch'
 import Cookies from 'js-cookie'
 
 /**
@@ -48,11 +48,12 @@ class Auth {
         this._api = api
         this._config = api._config
         this._onClient = typeof window !== 'undefined'
-        this._storageCopy = this._onClient ? new LocalStorage() : new Map()
 
-        // To store tokens as cookies
-        // change the next line to
-        // this._storage = this._onClient ? new CookieStorage() : new Map()
+        const _options = {
+            keySuffix: this._config.parameters.siteId
+        }
+
+        this._cookieStorage = this._onClient ? new CookieStorage(_options) : new Map()
         this._storage = this._onClient ? new LocalStorage() : new Map()
 
         const configOid = api._config.parameters.organizationId
@@ -95,7 +96,7 @@ class Auth {
     }
 
     get userType() {
-        return this._storage.get(refreshTokenRegisteredStorageKey)
+        return this._cookieStorage.get(refreshTokenRegisteredStorageKey)
             ? Auth.USER_TYPE.REGISTERED
             : Auth.USER_TYPE.GUEST
     }
@@ -105,15 +106,17 @@ class Auth {
             this.userType === Auth.USER_TYPE.REGISTERED
                 ? refreshTokenRegisteredStorageKey
                 : refreshTokenGuestStorageKey
-        return this._storage.get(storageKey)
+
+        // Refresh tokens are moved to cookie storage to support Phased Launch storefronts.
+        return this._cookieStorage.get(storageKey)
     }
 
     get usid() {
-        return this._storage.get(usidStorageKey)
+        return this._cookieStorage.get(usidStorageKey)
     }
 
     set usid(usid) {
-        this._storage.set(usidStorageKey, usid)
+        this._cookieStorage.set(usidStorageKey, usid)
     }
 
     get cid() {
@@ -140,40 +143,37 @@ class Auth {
         this._storage.set(oidStorageKey, oid)
     }
 
+    get dwsid() {
+        return this._cookieStorage.get(dwSessionIdKey)
+    }
+
     get isTokenValid() {
         return (
             !isTokenExpired(this.authToken) &&
-            !hasSFRAAuthStateChanged(this._storage, this._storageCopy)
+            !hasSFRAAuthStateChanged(this._storage, this._cookieStorage)
         )
     }
 
     /**
-     * Save refresh token in designated storage.
+     * Save refresh token in cookie storage.
+     * Refresh tokens are moved to cookie storage to support Phased Launch storefronts.
      *
      * @param {string} token The refresh token.
      * @param {USER_TYPE} type Type of the user.
      */
     _saveRefreshToken(token, type) {
-        /**
-         * For hybrid deployments, We store a copy of the refresh_token
-         * to update access_token whenever customer auth state changes on SFRA.
-         */
         if (type === Auth.USER_TYPE.REGISTERED) {
-            this._storage.set(refreshTokenRegisteredStorageKey, token, {
+            this._cookieStorage.set(refreshTokenRegisteredStorageKey, token, {
                 expires: REFRESH_TOKEN_COOKIE_AGE
             })
-            this._storage.delete(refreshTokenGuestStorageKey)
-
-            this._storageCopy.set(refreshTokenRegisteredStorageKey, token)
-            this._storageCopy.delete(refreshTokenGuestStorageKey)
+            this._cookieStorage.delete(refreshTokenGuestStorageKey)
             return
         }
 
-        this._storage.set(refreshTokenGuestStorageKey, token, {expires: REFRESH_TOKEN_COOKIE_AGE})
-        this._storage.delete(refreshTokenRegisteredStorageKey)
-
-        this._storageCopy.set(refreshTokenGuestStorageKey, token)
-        this._storageCopy.delete(refreshTokenRegisteredStorageKey)
+        this._cookieStorage.set(refreshTokenGuestStorageKey, token, {
+            expires: REFRESH_TOKEN_COOKIE_AGE
+        })
+        this._cookieStorage.delete(refreshTokenRegisteredStorageKey)
     }
 
     /**
@@ -208,31 +208,6 @@ class Auth {
     }
 
     /**
-     * Make a post request to the OCAPI /session endpoint to bridge the session.
-     *
-     * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
-     * This cookie is used on SFRA, and it allows shoppers to navigate between SFRA and
-     * this PWA site seamlessly; this is often used to enable hybrid deployment.
-     *
-     * (Note: this method is client side only, b/c MRT doesn't support set-cookie header right now)
-     *
-     * @returns {Promise}
-     */
-    createOCAPISession() {
-        return fetch(
-            `${getAppOrigin()}/mobify/proxy/ocapi/s/${
-                this._config.parameters.siteId
-            }/dw/shop/v22_8/sessions`,
-            {
-                method: 'POST',
-                headers: {
-                    Authorization: this.authToken
-                }
-            }
-        )
-    }
-
-    /**
      * Authorizes the customer as a registered or guest user.
      * @param {CustomerCredentials} [credentials]
      * @returns {Promise}
@@ -255,8 +230,6 @@ class Auth {
             }
             return this[authorizationMethod](credentials)
                 .then((result) => {
-                    // Uncomment the following line for phased launch
-                    // this._onClient && this.createOCAPISession()
                     return result
                 })
                 .catch((error) => {
@@ -365,6 +338,11 @@ class Auth {
             const json = await response.json()
             throw new HTTPError(response.status, json.message)
         }
+
+        // For Phased Launch storefronts, if the shopper logs into a registered account on PWA Kit,
+        // dwsid cookie must be cleared to trigger onSession in Plugin SLAS which will then use the new
+        // registered refresh_token (cc-nx cookie) value to restore SFRA/SG session for registered shopper.
+        this._cookieStorage.delete(dwSessionIdKey)
 
         const tokenBody = createGetTokenBody(
             response.url,
@@ -496,18 +474,25 @@ class Auth {
      */
     _clearAuth() {
         this._storage.delete(tokenStorageKey)
-        this._storage.delete(refreshTokenRegisteredStorageKey)
-        this._storage.delete(refreshTokenGuestStorageKey)
-        this._storage.delete(usidStorageKey)
+        this._cookieStorage.delete(refreshTokenRegisteredStorageKey)
+        this._cookieStorage.delete(refreshTokenGuestStorageKey)
+        this._cookieStorage.delete(usidStorageKey)
         this._storage.delete(cidStorageKey)
         this._storage.delete(encUserIdStorageKey)
-        this._storage.delete(dwSessionIdKey)
+        this._cookieStorage.delete(dwSessionIdKey)
     }
 }
 
 export default Auth
 
 class Storage {
+    constructor(options = {}) {
+        this.options = options
+        if (typeof this.options.keySuffix !== 'string') this.options.keySuffix = ''
+    }
+    getSuffixedKey(key) {
+        return this.options.keySuffix ? `${key}_${this.options.keySuffix}` : key
+    }
     set(key, value, options) {}
     get(key) {}
     delete(key) {}
@@ -515,19 +500,50 @@ class Storage {
 
 class CookieStorage extends Storage {
     constructor(...args) {
-        super(args)
+        // Accessing 0 index considering options{} is the first argument being passed to the constructor extending this class
+        super(args[0])
         if (typeof document === 'undefined') {
             throw new Error('CookieStorage is not avaliable on the current environment.')
         }
     }
+    getSuffixedKey(key) {
+        return this.options.keySuffix ? `${key}_${this.options.keySuffix}` : key
+    }
     set(key, value, options) {
-        Cookies.set(key, value, {secure: true, ...options})
+        const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
+        Cookies.set(suffixedKey, value, {secure: true, ...options})
     }
     get(key) {
-        return Cookies.get(key)
+        const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
+        let value = Cookies.get(suffixedKey)
+        if (value) {
+            // Some values, like the access token, may be split
+            // across multiple keys to fit under ECOM cookie size
+            // thresholds. We check for and append additional chunks here.
+            let chunk = 2
+            let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
+            while (additionalPart) {
+                value = value.concat(additionalPart)
+                chunk++
+                additionalPart = Cookies.get(`${suffixedKey}_${chunk}`) || ''
+            }
+        }
+        return value
     }
     delete(key) {
-        Cookies.remove(key)
+        const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
+        Cookies.remove(suffixedKey)
+
+        // Some values, like the access token, may be split
+        // across multiple keys to fit under ECOM cookie size
+        // thresholds. We check for and delete additional chunks here.
+        let chunk = 2
+        let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
+        while (additionalPart) {
+            Cookies.remove(`${suffixedKey}_${chunk}`)
+            chunk++
+            additionalPart = Cookies.get(`${suffixedKey}_${chunk}`) || ''
+        }
     }
 }
 
