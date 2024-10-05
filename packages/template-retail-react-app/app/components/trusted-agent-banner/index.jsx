@@ -16,15 +16,11 @@ import {
     Text,
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-import {useTrustedAgent, useMultiStyleConfig} from '@salesforce/commerce-sdk-react'
+import {useTrustedAgent} from '@salesforce/commerce-sdk-react'
 
 const TrustedAgentBanner = () => {
-    // const styles = useMultiStyleConfig()
     const {isAgent, agentId, loginId, login, logout} = useTrustedAgent()
-
     const [loginIdValue, setLoginId] = useState(loginId)
-
-    // console.log(styles)
 
     return (
         <Box px={8} py={2} bg="gray.100">
@@ -79,7 +75,7 @@ const TrustedAgentBanner = () => {
                                 placeholder="Login ID"
                                 onChange={e => setLoginId(e.target.value)}
                             />
-                            <Button onClick={() => login(/*'johnny.green@salesforce.com', */ loginIdValue)}>Login</Button>
+                            <Button onClick={() => login(loginIdValue)}>Login</Button>
                         </>
                     )}
                 </Center>

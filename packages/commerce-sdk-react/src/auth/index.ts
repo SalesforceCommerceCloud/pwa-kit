@@ -484,8 +484,8 @@ class Auth {
         if (this.pendingToken) {
             return await this.pendingToken
         }
-
         const accessToken = this.getAccessToken()
+
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
@@ -678,7 +678,6 @@ class Auth {
      *
      */
     async loginTrustedAgent(credentials: {
-        // agentId: string
         loginId?: string
         code: string
         codeVerifier: string
@@ -698,7 +697,6 @@ class Auth {
                 grant_type: 'client_credentials',
                 redirect_uri: this.redirectURI,
                 login_id: credentials.loginId || 'guest',
-                // agent_id: credentials.agentId,
                 idp_origin: 'ecom',
                 ...(credentials.usid && {usid: credentials.usid})
             }

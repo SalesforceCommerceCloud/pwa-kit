@@ -16,7 +16,7 @@ import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
-    useShopperBasketsMutation,
+    useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 // Chakra
