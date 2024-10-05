@@ -154,23 +154,30 @@ const Account = () => {
                                 </AccordionButton>
                                 <AccordionPanel px={4} paddingBottom={4}>
                                     <Flex as="nav" spacing={0} direction="column">
-                                        {navLinks.map((link) => (
-                                            <Button
-                                                key={link.name}
-                                                as={Link}
-                                                to={`/account${link.path}`}
-                                                useNavLink={true}
-                                                variant="menu-link-mobile"
-                                                justifyContent="center"
-                                                fontSize="md"
-                                                fontWeight="normal"
-                                                onClick={() => setMobileNavIndex(-1)}
-                                            >
-                                                {formatMessage(messages[link.name])}
-                                            </Button>
-                                        ))}
+                                        <Stack spacing={0} as="ul" data-testid="account-nav">
+                                            {navLinks.map((link) => (
+                                                <Box align="center"
+                                                    key={link.name}
+                                                    as="li"
+                                                    listStyleType="none"
+                                                >
+                                                    <Button
+                                                        as={Link}
+                                                        to={`/account${link.path}`}
+                                                        useNavLink={true}
+                                                        variant="menu-link-mobile"
+                                                        justifyContent="center"
+                                                        fontSize="md"
+                                                        fontWeight="normal"
+                                                        onClick={() => setMobileNavIndex(-1)}
+                                                    >
+                                                        {formatMessage(messages[link.name])}
+                                                    </Button>
+                                                </Box>
+                                            ))}
 
-                                        <LogoutButton justify="center" onClick={onSignoutClick} />
+                                            <LogoutButton justify="center" onClick={onSignoutClick} />
+                                        </Stack>
                                     </Flex>
                                 </AccordionPanel>
                             </>
