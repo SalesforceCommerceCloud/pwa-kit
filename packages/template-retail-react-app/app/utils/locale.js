@@ -17,7 +17,7 @@ import fetch from 'cross-fetch'
  * @returns {Promise<Object>} The messages (compiled in AST format) in the given locale.
  *      If the translation file is not found, return an empty object (so react-intl would fall back to the inline messages)
  */
-export const fetchTranslations = async (locale) => {
+export const fetchTranslations = async (locale, origin) => {
     const targetLocale =
         typeof window === 'undefined'
             ? process.env.USE_PSEUDOLOCALE === 'true'
@@ -25,8 +25,23 @@ export const fetchTranslations = async (locale) => {
                 : locale
             : locale
 
+    const isServerSide = typeof window === 'undefined'
+
     try {
-        const file = `${getAppOrigin()}${getAssetUrl(
+        if (isServerSide && process.env.NODE_ENV === 'production') {
+            // Fetch from the filesystem directly
+            const _require = eval('require')
+            console.log(
+                '--- trying to get translation file',
+                `./static/translations/compiled/${targetLocale}.json`
+            )
+            const json = _require(`./static/translations/compiled/${targetLocale}.json`)
+            console.log('--- resulting json', json)
+            return json
+        }
+
+        // Otherwise, fetch from the network
+        const file = `${origin || getAppOrigin()}${getAssetUrl(
             `static/translations/compiled/${targetLocale}.json`
         )}`
         const response = await fetch(file)
