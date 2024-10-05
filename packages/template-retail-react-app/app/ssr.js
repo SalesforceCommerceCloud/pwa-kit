@@ -75,7 +75,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                        "'unsafe-inline'"
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -95,9 +96,9 @@ const {handler} = runtime.createHandler(options, (app) => {
     })
 
     app.get('/trusted-agent-callback?*', (req, res) => {
-        // Set trusted agent cookie
-        res.cookie('cc-ta-code', req.query.code, {maxAge: 1000 * 60 * 15})
-        res.redirect('/')
+        res.cookie('cc-ta-code_RefArch', req.query.code, {maxAge: 1000 * 60 * 15})
+        res.set('Content-Type', 'text/html')
+        res.send(Buffer.from(`<script>window.close()</script>`))
     })
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))

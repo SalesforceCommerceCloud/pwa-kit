@@ -9,6 +9,8 @@ import React, {useEffect} from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 
+import Cookies from 'js-cookie'
+
 // Components
 import {
     Box,
@@ -44,9 +46,7 @@ import {
     STALE_WHILE_REVALIDATE
 } from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {useProductSearch, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
-
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useProductSearch, useAuthHelper, AuthHelpers, useTrustedAgent} from '@salesforce/commerce-sdk-react'
 
 /**
  * This is the home page for Retail React App.
@@ -84,13 +84,8 @@ const Home = () => {
     }, [])
 
     // TODO: TAOB
-    const { data: customer } = useCurrentCustomer()
-    const login = useAuthHelper(AuthHelpers.LoginTrustedAgentRegisteredUserB2C)
+    const {isAgent, agentId, loginId, handleTrustedAgentLogin} = useTrustedAgent()
 
-    const handleTrustedAgentClick = async () => {
-        const redirectUrl = await login.mutateAsync({loginId: 'johnnygreen@gmail.com', agentId: 'johnny.green@salesforce.com'})
-        console.log(redirectUrl)
-    }
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -99,8 +94,13 @@ const Home = () => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
-            <Button onClick={() => handleTrustedAgentClick()}>
-                Login as 'johnnygreen@gmail.com'
+            <Box>
+                isAgent {`${isAgent}`}<br/>
+                Agent ID {agentId}<br/>
+                Login ID {loginId}
+            </Box>
+            <Button onClick={() => handleTrustedAgentLogin('johnnygreen@gmail.com', 'johnny.green@salesforce.com')}>
+                Login as johnnygreen@gmail.com
             </Button>
             <Hero
                 title={intl.formatMessage({

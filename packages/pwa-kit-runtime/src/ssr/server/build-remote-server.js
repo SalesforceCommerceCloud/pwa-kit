@@ -365,7 +365,6 @@ export const RemoteServerFactory = {
         this._setupProxying(app, options)
 
         this._setupSlasPrivateClientProxy(app, options)
-        this._setupSlasTrustedAgentProxy(app, options)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
@@ -733,6 +732,15 @@ export const RemoteServerFactory = {
                     if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
+
+                    if (incomingRequest.path?.match('/\/oauth2\/trusted-agent\/token/')) {
+                        proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
+                        localDevLog('PATH MATCHES!!!')
+                        localDevLog('PATH MATCHES!!!')
+                        localDevLog('PATH MATCHES!!!')
+                        localDevLog('PATH MATCHES!!!')
+                        localDevLog('PATH MATCHES!!!')
+                    }
                 },
                 onProxyRes: (proxyRes, req) => {
                     if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
@@ -761,40 +769,6 @@ export const RemoteServerFactory = {
                         )
                     }
                 }
-            })
-        )
-    },
-
-    /**
-     * @private
-     */
-    _setupSlasTrustedAgentProxy(app, options) {
-        const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
-        const slasHostName = `${shortCode}.api.commercecloud.salesforce.com`
-        const slasTarget = `https://${slasHostName}`
-        const slasTrustedAgentProxyPath = '/mobify/slas/trusted-agent'
-        localDevLog(`Proxying ${slasTrustedAgentProxyPath} to ${slasTarget}`)
-
-        app.use(
-            slasTrustedAgentProxyPath,
-            createProxyMiddleware({
-                target: slasTarget,
-                changeOrigin: true,
-                pathRewrite: {[slasTrustedAgentProxyPath]: ''},
-                selfHandleResponse: true,
-                onProxyReq: (proxyRequest, incomingRequest) => {
-                    applyProxyRequestHeaders({
-                        proxyRequest,
-                        incomingRequest,
-                        proxyPath: slasTrustedAgentProxyPath,
-                        targetHost: slasHostName,
-                        targetProtocol: 'https'
-                    })
-                },
-                onProxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
-                    if (res.statusCode == 303) res.statusCode = 200
-                    return responseBuffer
-                })
             })
         )
     },
