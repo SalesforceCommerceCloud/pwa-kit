@@ -306,7 +306,7 @@ class Auth {
             token_type: this.get('token_type'),
             usid: this.get('usid'),
             customer_type: this.get('customer_type') as CustomerType,
-            refresh_token_expires_in: this.get('refresh_token_expires_in'),
+            refresh_token_expires_in: this.get('refresh_token_expires_in')
         }
     }
 
@@ -317,10 +317,6 @@ class Auth {
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
-
-        console.log('TOKEN EXPIRED?', validTimeSeconds <= tokenAgeSeconds)
-        console.log(jwtDecode<JWTHeaders>(token.replace('Bearer ', '')))
-
         return validTimeSeconds <= tokenAgeSeconds
     }
 

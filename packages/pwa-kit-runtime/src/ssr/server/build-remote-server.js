@@ -27,7 +27,7 @@ import {
     localDevLog
 } from '../../utils/ssr-server'
 import dns from 'dns'
-import express, { response } from 'express'
+import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
 import URL from 'url'

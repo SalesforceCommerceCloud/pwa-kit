@@ -46,7 +46,7 @@ import {
     STALE_WHILE_REVALIDATE
 } from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {useProductSearch, useAuthHelper, AuthHelpers, useTrustedAgent} from '@salesforce/commerce-sdk-react'
+import {useProductSearch, useTrustedAgent} from '@salesforce/commerce-sdk-react'
 
 /**
  * This is the home page for Retail React App.
