@@ -675,6 +675,7 @@ class Auth {
         agentId: string;
         code: string;
         codeVerifier: string;
+        usid?: string;
         clientSecret?: string;
     }) {
         const slasClient = this.client
@@ -686,17 +687,17 @@ class Auth {
             body: {
                 client_id: slasClient.clientConfig.parameters.clientId,
                 channel_id: slasClient.clientConfig.parameters.siteId,
-                // code: credentials.code,
                 code_verifier: credentials.codeVerifier,
                 grant_type: 'client_credentials',
                 redirect_uri: this.redirectURI,
-                // usid: authResponse.usid,
                 login_id: credentials.loginId,
                 agent_id: credentials.agentId,
-                idp_origin: 'ecom'
+                idp_origin: 'ecom',
+                ...(credentials.usid && {usid: credentials.usid})
             }
         }
 
+        // TODO: TAOB do we need to handle this isomorphic server side use case?
         // // using slas private client
         // if (credentials.clientSecret) {
         //     const authorizationSecret = `Basic ${helpers.stringToBase64(
