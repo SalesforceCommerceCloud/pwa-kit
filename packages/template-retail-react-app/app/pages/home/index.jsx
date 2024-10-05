@@ -86,7 +86,6 @@ const Home = () => {
     // TODO: TAOB
     const {isAgent, agentId, loginId, handleTrustedAgentLogin} = useTrustedAgent()
 
-
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo
