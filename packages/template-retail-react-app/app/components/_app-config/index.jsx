@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -32,7 +32,7 @@ import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {useCorrelationId, useAppOrigin} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import {useCorrelationId, useOrigin} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 /**
@@ -50,7 +50,7 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
-    const appOrigin = useAppOrigin()
+    const appOrigin = useOrigin()
 
     return (
         <CommerceApiProvider
@@ -82,18 +82,10 @@ AppConfig.restore = (locals = {}) => {
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
 
-    let site
-    let locale
+    let site = resolveSiteFromUrl(path)
+    let locale = resolveLocaleFromUrl(path)
+
     const {app: appConfig} = getConfig()
-
-    if (appConfig.useXForwardedHost && locals.xForwardedHost) {
-        site = resolveSiteFromUrl(path, locals.xForwardedHost)
-        locale = resolveLocaleFromUrl(path, locals.xForwardedHost)
-    } else {
-        site = resolveSiteFromUrl(path)
-        locale = resolveLocaleFromUrl(path)
-    }
-
     const apiConfig = {
         ...appConfig.commerceAPI,
         einsteinConfig: appConfig.einsteinAPI

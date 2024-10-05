@@ -23,10 +23,7 @@ import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/cons
  * @returns {string} - The fully qualified URL as a string.
  */
 export const absoluteUrl = (path, appOrigin) => {
-    if (appOrigin) {
-        return new URL(path, appOrigin).toString()
-    }
-    return new URL(path, getAppOrigin()).toString()
+    return new URL(path, appOrigin || getAppOrigin()).toString()
 }
 
 /**

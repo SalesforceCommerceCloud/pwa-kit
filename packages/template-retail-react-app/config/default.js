@@ -37,8 +37,8 @@ module.exports = {
             siteId: 'aaij-MobileFirst',
             isProduction: false
         },
-        // getAppOrigin will take x-forwarded-host header into account if this is true
-        useXForwardedHost: false
+        // if this is true, useOrigin will take x-forwarded-host header into consideration
+        enableXForwardHost: false
     },
     externals: [],
     pageNotFoundURL: '/page-not-found',

@@ -454,7 +454,7 @@ export const RemoteServerFactory = {
         app.use((req, res, next) => {
             const xForwardedHost = req.headers?.['x-forwarded-host']
             if (xForwardedHost) {
-                res.locals.xForwardedHost = `${options.protocol}://${xForwardedHost}`
+                res.locals.xForwardedHost = xForwardedHost
             }
 
             next()

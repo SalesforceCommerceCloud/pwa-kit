@@ -12,14 +12,13 @@ import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
  * This functions takes an url and returns a site object,
  * an error will be thrown if no url is passed in or no site is found
  * @param {string} url
- * @param {string} origin
  * @returns {object} site - a site object
  */
-export const resolveSiteFromUrl = (url, origin) => {
+export const resolveSiteFromUrl = (url) => {
     if (!url) {
         throw new Error('URL is required to find a site object.')
     }
-    const {pathname, search} = new URL(absoluteUrl(url, origin))
+    const {pathname, search} = getPathnameAndSearch(url)
     const path = `${pathname}${search}`
     let site
 
@@ -103,7 +102,7 @@ export const getSiteByReference = (siteRef) => {
  * @returns {{siteRef: string, localeRef: string}} - site and locale reference (it could either be id or alias)
  */
 export const getParamsFromPath = (path) => {
-    const {pathname, search} = new URL(absoluteUrl(path))
+    const {pathname, search} = getPathnameAndSearch(path)
 
     const config = getConfig()
     const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
@@ -196,15 +195,14 @@ export const getLocaleByReference = (site, localeRef) => {
  * and use it to find the locale object
  *
  * @param url
- * @param origin
  * @return {Object} locale object
  */
-export const resolveLocaleFromUrl = (url, origin) => {
+export const resolveLocaleFromUrl = (url) => {
     if (!url) {
         throw new Error('URL is required to look for the locale object')
     }
     let {localeRef} = getParamsFromPath(url)
-    const site = resolveSiteFromUrl(url, origin)
+    const site = resolveSiteFromUrl(url)
     const {supportedLocales} = site.l10n
     // if no localeRef is found, use the default value of the current site
     if (!localeRef) {
@@ -221,4 +219,21 @@ export const resolveLocaleFromUrl = (url, origin) => {
     return supportedLocales.find(
         (locale) => locale.alias === defaultLocale || locale.id === defaultLocale
     )
+}
+
+/**
+ * Extract pathname and search params from a given url
+ * @private
+ * @param url
+ * @returns {{search: (string|string), pathname: string}}
+ */
+function getPathnameAndSearch(url) {
+    // Clean up the URL by replacing double slashes with a single slash
+    const [baseUrl, searchString] = url.split('?')
+    const pathname = baseUrl.includes('://') ? baseUrl.split('/').slice(3).join('/') : baseUrl
+
+    return {
+        pathname: `${pathname.startsWith('/') ? '' : '/'}${pathname}`,
+        search: searchString ? `?${searchString}` : ''
+    }
 }
