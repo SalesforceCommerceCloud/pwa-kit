@@ -483,6 +483,8 @@ class Auth {
             return await this.pendingToken
         }
 
+        // TODO TAOB do we need this anymore? i don't think
+        //  so now that we aren't moving away from the page
         // if (this.get('trusted_agent_code')) {
         //     return await this.queueRequest(() => this.loginTrustedAgent(), false)
         // }
