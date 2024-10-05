@@ -9,8 +9,6 @@ import React, {useEffect} from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 
-import Cookies from 'js-cookie'
-
 // Components
 import {
     Box,
@@ -46,7 +44,7 @@ import {
     STALE_WHILE_REVALIDATE
 } from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {useProductSearch, useTrustedAgent} from '@salesforce/commerce-sdk-react'
+import {useProductSearch} from '@salesforce/commerce-sdk-react'
 
 /**
  * This is the home page for Retail React App.
@@ -83,9 +81,6 @@ const Home = () => {
         einstein.sendViewPage(pathname)
     }, [])
 
-    // TODO: TAOB
-    const {isAgent, agentId, loginId, handleTrustedAgentLogin} = useTrustedAgent()
-
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo
@@ -93,14 +88,7 @@ const Home = () => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
-            <Box>
-                isAgent {`${isAgent}`}<br/>
-                Agent ID {agentId}<br/>
-                Login ID {loginId}
-            </Box>
-            <Button onClick={() => handleTrustedAgentLogin('johnnygreen@gmail.com', 'johnny.green@salesforce.com')}>
-                Login as johnnygreen@gmail.com
-            </Button>
+
             <Hero
                 title={intl.formatMessage({
                     defaultMessage: 'The React PWA Starter Store for Retail',

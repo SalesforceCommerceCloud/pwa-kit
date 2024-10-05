@@ -27,6 +27,8 @@ import {
 import {Logger} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
+type TrustedAgentTokenRequest = ShopperLoginTypes.TrustedAgentTokenRequest
+
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
@@ -377,7 +379,7 @@ class Auth {
         store.delete(key)
     }
 
-    private clearTrustedAgentStorage() {
+    private clearTrustedAgentCode() {
         const keys = [
             'trusted_agent_code'
         ] as AuthDataKeys[]
@@ -483,17 +485,11 @@ class Auth {
             return await this.pendingToken
         }
 
-        // TODO TAOB do we need this anymore? i don't think
-        //  so now that we aren't moving away from the page
-        // if (this.get('trusted_agent_code')) {
-        //     return await this.queueRequest(() => this.loginTrustedAgent(), false)
-        // }
-
         const accessToken = this.getAccessToken()
-
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
+
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -527,6 +523,16 @@ class Auth {
                 }
             }
         }
+
+        console.log("ACCESS TOKEN", accessToken)
+
+        // if (accessToken && this.isTokenExpired(accessToken)) {
+        //     const {isAgent, agentId, loginId, usid} = this.parseSlasJWT(accessToken)
+        //     if (isAgent) {
+        //         return await this.authorizeTrustedAgent({agentId, loginId, usid})
+        //     }
+        // }
+
         return this.loginGuestUser()
     }
 
@@ -642,8 +648,7 @@ class Auth {
      *
      */
     async authorizeTrustedAgent(credentials: {
-        loginId: string;
-        agentId: string;
+        loginId?: string
     }) {
         const redirectURI = 'http://localhost:3000/trusted-agent-callback'
         const slasClient = this.client
@@ -652,9 +657,9 @@ class Auth {
         const organizationId = slasClient.clientConfig.parameters.organizationId
         const clientId = slasClient.clientConfig.parameters.clientId
         const siteId = slasClient.clientConfig.parameters.siteId
-        const loginId = credentials.loginId
+        const loginId = credentials.loginId || 'guest'
 
-        const redirectUrl = [
+        const url = [
             `http://localhost:3000/mobify/proxy/api/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize`,
                 `?client_id=${clientId}`,
                 `&channel_id=${siteId}`,
@@ -665,7 +670,7 @@ class Auth {
                 `&response_type=code`
             ].join('')
 
-        return {redirectUrl, codeVerifier}
+        return {url, codeVerifier}
     }
 
     /**
@@ -673,12 +678,12 @@ class Auth {
      *
      */
     async loginTrustedAgent(credentials: {
-        loginId: string;
-        agentId: string;
-        code: string;
-        codeVerifier: string;
-        usid?: string;
-        clientSecret?: string;
+        // agentId: string
+        loginId?: string
+        code: string
+        codeVerifier: string
+        usid?: string
+        clientSecret?: string
     }) {
         const slasClient = this.client
 
@@ -692,31 +697,25 @@ class Auth {
                 code_verifier: credentials.codeVerifier,
                 grant_type: 'client_credentials',
                 redirect_uri: this.redirectURI,
-                login_id: credentials.loginId,
-                agent_id: credentials.agentId,
+                login_id: credentials.loginId || 'guest',
+                // agent_id: credentials.agentId,
                 idp_origin: 'ecom',
                 ...(credentials.usid && {usid: credentials.usid})
             }
+        } as {headers: {[key: string]: string}, body: TrustedAgentTokenRequest}
+
+        // using slas private client
+        if (credentials.clientSecret) {
+            optionsToken.headers._sfdc_client_auth = `Basic ${helpers.stringToBase64(
+                `${slasClient.clientConfig.parameters.clientId}:${credentials.clientSecret}`
+            )}`
         }
 
-        // TODO: TAOB do we need to handle this isomorphic server side use case?
-        // // using slas private client
-        // if (credentials.clientSecret) {
-        //     const authorizationSecret = `Basic ${helpers.stringToBase64(
-        //         `${slasClient.clientConfig.parameters.clientId}:${credentials.clientSecret}`
-        //     )}`
-
-        //     optionsToken.headers = {
-        //         Authorization: authorizationSecret,
-        //     }
-        // }
-
         const token = await slasClient.getTrustedAgentAccessToken(optionsToken)
-        // // TODO: TAOB refactor to helper ends here
 
         this.handleTokenResponse(token, false)
         if (onClient()) {
-            void this.clearTrustedAgentStorage()
+            void this.clearTrustedAgentCode()
         }
 
         return token
@@ -761,7 +760,7 @@ class Auth {
         const loginId = isbParts[1].replace('upn:', '')
         const isAgent = !!isbParts?.[6]?.startsWith('agent')
         const agentId = isAgent
-            ? isbParts?.[6]?.replace('agent:', '') ?? null
+            ? isbParts?.[6]?.replace('agent:', '')
             : null
 
         // SUB format

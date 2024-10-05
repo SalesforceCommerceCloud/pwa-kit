@@ -9,21 +9,40 @@ import useConfig from './useConfig'
 import { useAuthHelper, AuthHelpers } from './useAuthHelper'
 import Cookies from 'js-cookie'
 import { UseMutationResult } from '@tanstack/react-query'
+import { ShopperLoginTypes } from 'commerce-sdk-isomorphic'
 
-type useTrustedAgent = {
+const onClient = typeof window !== 'undefined'
+
+type TokenResponse = ShopperLoginTypes.TokenResponse
+
+type UseTrustedAgent = {
     isAgent: boolean
     agentId: string | null
     loginId: string | null
-    handleTrustedAgentLogin: (loginId: string, agentId: string) => Promise<void>
+    login: (loginId?: string, usid?: string) => Promise<TokenResponse>
+    logout: () => Promise<TokenResponse>
 }
 
-const createPopup = async (url: string, siteId: string): Promise<string> => {
-    const popup = window.open(url, 'accountManagerPopup', "popup=true,width=500,height=400,scrollbars=false,status=false,location=false,menubar=false,toolbar=false")
+type AuthorizationTrustedAgent = UseMutationResult<{url: string, codeVerifier: string}, unknown, {loginId?: string}, unknown>
+
+type LoginTrustedAgent = UseMutationResult<TokenResponse, unknown, {
+    // agentId: string
+    loginId?: string
+    code: string
+    codeVerifier: string
+    usid?: string
+    clientSecret?: string
+}, unknown>
+
+type LogoutTrustedAgent = UseMutationResult<TokenResponse, unknown, void, unknown>
+
+const createTrustedAgentPopup = async (url: string, siteId: string): Promise<string> => {
+    const popup = window.open(url, 'accountManagerPopup', "popup=true,width=800,height=800,scrollbars=false,status=false,location=false,menubar=false,toolbar=false")
     return new Promise((resolve, reject) => {
         let intervalId: NodeJS.Timer
         intervalId = setInterval(function() {
             console.log('Waiting for code cookie ...')
-            if (Cookies.get(`cc-ta-code_${siteId}`) || popup?.closed) {
+            if (Cookies.get(`cc-ta-code_${siteId}`) || !popup || popup?.closed) {
                 clearInterval(intervalId)
                 resolve(Cookies.get(`cc-ta-code_${siteId}`) || '')
             }
@@ -31,11 +50,17 @@ const createPopup = async (url: string, siteId: string): Promise<string> => {
     })
 }
 
-export const createHandleTrustedAgentLogin = (authorizeTrustedAgent: UseMutationResult, loginTrustedAgent: UseMutationResult, siteId: string): (loginId: string, agentId: string) => Promise<string>  => {
-    return async (loginId: string, agentId: string): Promise<string> => {
-        const {redirectUrl, codeVerifier} = /*<Promise<{redirectUrl: string, codeVerifier: string}>>*/await authorizeTrustedAgent.mutateAsync({loginId, agentId})
-        const code = await createPopup(redirectUrl, siteId)
-        return /*<Promise<string>>*/await loginTrustedAgent.mutateAsync({loginId, agentId, code, codeVerifier})
+const createTrustedAgentLogin = (authorizeTrustedAgent: AuthorizationTrustedAgent, loginTrustedAgent: LoginTrustedAgent, siteId: string)  => {
+    return async (/*agentId: string, */loginId?: string, usid?: string): Promise<TokenResponse> => {
+        const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
+        const code = await createTrustedAgentPopup(url, siteId)
+        return await loginTrustedAgent.mutateAsync({loginId, /*agentId,*/ code, codeVerifier, usid})
+    }
+}
+
+const createTrustedAgentLogout = (logoutTrustedAgent: LogoutTrustedAgent)  => {
+    return async (): Promise<TokenResponse> => {
+        return await logoutTrustedAgent.mutateAsync()
     }
 }
 
@@ -46,19 +71,23 @@ export const createHandleTrustedAgentLogin = (authorizeTrustedAgent: UseMutation
  * @category Shopper Authentication
  *
  */
-const useTrustedAgent = (): useTrustedAgent => {
+const useTrustedAgent = (): UseTrustedAgent => {
     const auth = useAuthContext()
     const config = useConfig()
     const authorizeTrustedAgent = useAuthHelper(AuthHelpers.AuthorizeTrustedAgent)
     const loginTrustedAgent = useAuthHelper(AuthHelpers.LoginTrustedAgent)
-    const handleTrustedAgentLogin = createHandleTrustedAgentLogin(authorizeTrustedAgent, loginTrustedAgent, config.siteId)
+    const logoutTrustedAgent = useAuthHelper(AuthHelpers.Logout)
+    const login = createTrustedAgentLogin(authorizeTrustedAgent, loginTrustedAgent, config.siteId)
+    const logout = createTrustedAgentLogout(logoutTrustedAgent)
 
-    try {
-        const {isAgent, agentId, loginId} = auth.parseSlasJWT(auth.get('access_token'))
-        return {isAgent, agentId, loginId, handleTrustedAgentLogin}
-    } catch(e) { /* nada */}
+    if (onClient) {
+        try {
+            const {isAgent, agentId, loginId} = auth.parseSlasJWT(auth.get('access_token'))
+            return {isAgent, agentId, loginId, login, logout}
+        } catch(e) { /* nada */ }
+    }
 
-    return {isAgent: false, agentId: null, loginId: null, handleTrustedAgentLogin}
+    return {isAgent: false, agentId: null, loginId: null, login, logout}
 }
 
 export default useTrustedAgent
