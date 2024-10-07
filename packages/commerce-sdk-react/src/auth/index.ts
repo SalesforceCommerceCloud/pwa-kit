@@ -50,6 +50,10 @@ interface SlasJwtPayload extends JwtPayload {
     isb: string
 }
 
+type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[1]
+type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
+type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
+
 /**
  * The extended field is not from api response, we manually store the auth type,
  * so we don't need to make another API call when we already have the data.
@@ -637,7 +641,7 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
      */
-    async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
+    async loginRegisteredUserB2C(credentials: LoginRegisteredUserB2CCredentials) {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
@@ -683,7 +687,7 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizeIDP.
      *
      */
-    async authorizeIDP(parameters: Parameters<Helpers['authorizeIDP']>[1]) {
+    async authorizeIDP(parameters: AuthorizeIDPParams) {
         const privateClient = !!this.clientSecret
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
@@ -704,7 +708,7 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
      *
      */
-    async loginIDPUser(parameters: Parameters<Helpers['loginIDPUser']>[2]) {
+    async loginIDPUser(parameters: LoginIDPUserParams) {
         const codeVerifier = this.get('code_verifier')
         const code = parameters.code
         const usid = parameters.usid

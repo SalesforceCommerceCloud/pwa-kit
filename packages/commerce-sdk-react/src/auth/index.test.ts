@@ -487,7 +487,7 @@ describe('Auth', () => {
         })
     })
 
-    test('loginIDPUser', async () => {
+    test('loginIDPUser calls isomorphic loginIDPUser', async () => {
         const auth = new Auth(config)
         await auth.loginIDPUser({redirectURI: 'redirectURI', code: 'test'})
         expect(helpers.loginIDPUser).toHaveBeenCalled()
@@ -495,7 +495,7 @@ describe('Auth', () => {
         expect(functionArg).toMatchObject({redirectURI: 'redirectURI', code: 'test'})
     })
 
-    test('loginIDPUser with slas private', async () => {
+    test('loginIDPUser adds clientSecret to parameters when using private client', async () => {
         const auth = new Auth(configSLASPrivate)
         await auth.loginIDPUser({redirectURI: 'test', code: 'test'})
         expect(helpers.loginIDPUser).toHaveBeenCalled()
@@ -505,7 +505,7 @@ describe('Auth', () => {
         })
     })
 
-    test('authorizeIDP', async () => {
+    test('authorizeIDP calls isomorphic authorizeIDP', async () => {
         const auth = new Auth(config)
         await auth.authorizeIDP({redirectURI: 'redirectURI', hint: 'test'})
         expect(helpers.authorizeIDP).toHaveBeenCalled()
@@ -513,7 +513,7 @@ describe('Auth', () => {
         expect(functionArg).toMatchObject({redirectURI: 'redirectURI', hint: 'test'})
     })
 
-    test('authorizeIDP with slas private', async () => {
+    test('authorizeIDP adds clientSecret to parameters when using private client', async () => {
         const auth = new Auth(configSLASPrivate)
         await auth.authorizeIDP({redirectURI: 'test', hint: 'test'})
         expect(helpers.authorizeIDP).toHaveBeenCalled()
