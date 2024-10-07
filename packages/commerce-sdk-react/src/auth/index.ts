@@ -288,12 +288,14 @@ class Auth {
         storage.delete(key)
     }
 
-    getDnt() {
+    getDnt(domain?: string) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
         // Only '1' or '0' are valid, and invalid values or lack of cookie must be an undefined DNT
         let dntCookieStatus = undefined
         if (dntCookieVal !== '1' && dntCookieVal !== '0') {
-            this.delete(DNT_COOKIE_NAME)
+            this.delete(DNT_COOKIE_NAME, {
+                ...(domain !== undefined && {domain: domain}),
+            })
         } else {
             dntCookieStatus = Boolean(Number(dntCookieVal))
         }
