@@ -24,17 +24,17 @@ import {
 } from '@chakra-ui/react'
 
 // Project Components
-import Hero from '@salesforce/retail-react-app/app/components/hero'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
-import Section from '@salesforce/retail-react-app/app/components/section'
-import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
+import Hero from '../../components/hero'
+import Seo from '../../components/seo'
+import Section from '../../components/section'
+import ProductScroller from '../..components/product-scroller'
 
 // Others
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-import {heroFeatures, features} from '@salesforce/retail-react-app/app/pages/home/data'
+import {heroFeatures, features} from './data'
 
 //Hooks
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useEinstein from '../../hooks/use-einstein'
 
 // Constants
 import {
@@ -42,7 +42,7 @@ import {
     HOME_SHOP_PRODUCTS_LIMIT,
     MAX_CACHE_AGE,
     STALE_WHILE_REVALIDATE
-} from '@salesforce/retail-react-app/app/constants'
+} from '../../constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
 

@@ -13,8 +13,8 @@ import {
     useEncUserId,
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
-import {keysToCamel} from '@salesforce/retail-react-app/app/utils/utils'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import {keysToCamel} from '../../src/utils/utils'
+import logger from '../../src/utils/logger-instance'
 
 export class EinsteinAPI {
     constructor({host, einsteinId, siteId, isProduction}) {
