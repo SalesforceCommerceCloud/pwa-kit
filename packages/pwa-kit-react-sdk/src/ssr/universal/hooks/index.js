@@ -57,6 +57,8 @@ export const useServerContext = () => {
  *
  */
 export const useOrigin = () => {
+    const {res, req} = useServerContext()
+
     if (typeof window !== 'undefined') {
         return window.location.origin
     }
@@ -66,7 +68,6 @@ export const useOrigin = () => {
 
     const {APP_ORIGIN} = process.env
 
-    const {res, req} = useServerContext()
     const xForwardedHost = res.locals.xForwardedHost
     if (enableXForwardedHost && xForwardedHost) {
         return `${req.protocol}://${xForwardedHost}`
