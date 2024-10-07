@@ -111,7 +111,22 @@ const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
-const askApplicationExtensibiltyQuestions = (appExtensions) => {
+const INITIAL_QUESTION = [
+        {
+            name: 'project.type',
+            message: 'What type of project do you want to create?',
+            type: 'list',
+            choices: [
+                { name: 'PWA Kit Project', value: 'PWAKitProject' },
+                { name: 'Application Extension', value: 'appExtensionProject' }
+            ],
+            default: 'PWAKitProject'
+        }
+    ]
+
+
+
+const askApplicationExtensibiltyQuestions = (availableAppExtensions) => {
     return [
         {
             name: 'project.useAppExtensibility',
@@ -123,7 +138,7 @@ const askApplicationExtensibiltyQuestions = (appExtensions) => {
             name: 'project.selectedAppExtensions',
             message: 'Which Application Extensions do you want to install?',
             type: 'checkbox',
-            choices: appExtensions,
+            choices: availableAppExtensions,
             when: (answers) => answers.project.useAppExtensibility === true
         },
         {
@@ -133,13 +148,22 @@ const askApplicationExtensibiltyQuestions = (appExtensions) => {
                 'you will NO LONGER be able to consume upgrades from NPM. All changes\n' +
                 'made to the extracted code will be YOUR RESPONSIBILITY.\n' +
                 '\n' +
-                'Do you want to proceed with extracting the Application Extension code?',
+                'Do you want to proceed with extracting the Application Extensions code?',
             type: 'confirm',
             default: false,
             when: (answers) => answers.project.useAppExtensibility === true
         }
     ]
 }
+
+const APPLICATION_EXTENSION_QUESTIONS = [
+        {
+            name: 'project.extensionName',
+            message: 'What is the name of your Application Extension? (The prefix "extension-" will be added to the name.)',
+            validate: validProjectName
+        }
+    ]
+
 
 const EXTENSIBILITY_QUESTIONS = [
     {
@@ -424,6 +448,16 @@ const PRESETS = [
             id: 'typescript-minimal'
         },
         questions: TYPESCRIPT_MINIMAL_QUESTIONS,
+        private: true
+    },
+    {
+        id: 'typescript-minimal-app-extension-example',
+        name: 'Template Minimal Project',
+        description: '',
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'typescript-minimal'
+        },
         private: true
     },
     {
@@ -787,6 +821,8 @@ const fetchAvailableAppExtensions = () => {
 const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
+
+    console.log('DEBUG runGenerator context: ', context)
     const {
         extend = false,
         selectedAppExtensions = [],
@@ -831,6 +867,22 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         sync: true
     })
 
+    console.log('DEBUG answers.project.type : ', answers.project.type)
+
+    // Check project type and handle appropriately
+    if (answers.project.type === 'extension') {
+        // Add extension prefix to the name
+        answers.project.name = `extension-${answers.project.name}`;
+        // Create Application Extension project files
+        // await createApplicationExtensionFiles(outputDir, answers);
+        console.log('DEBUG createApplicationExtensionFiles...  ')
+    } else {
+        // Proceed with normal project generation
+        // await createNormalProjectFiles(outputDir, answers);
+        console.log('DEBUG createNormalProjectFiles... ')
+    }
+    // Other existing logic...
+
     if (extend) {
         // Bootstrap the projects.
         getFiles(BOOTSTRAP_DIR)
@@ -873,8 +925,8 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // Add selected Application Extensions to devDependencies and mobify object
         const appExtensionDeps = selectedAppExtensions.reduce((acc, appExtensionName) => {
             // Find the corresponding Application Extension details
-            const appExtension = context.appExtensions.find((ext) => ext.value === appExtensionName)
-            const version = appExtension ? appExtension.version : '1.0.0-dev'
+            const appExtensionDetails = context.availableAppExtensions.find((ext) => ext.value === appExtensionName)
+            const version = appExtensionDetails ? appExtensionDetails.version : '1.0.0-dev'
 
             acc[appExtensionName] = extractAppExtensions
                 ? `file:./app/application-extensions/${appExtensionName}`
@@ -942,17 +994,30 @@ const main = async (opts) => {
 
     // If no preset argument is provided, ask Application Extensibility questions
     if (!presetId) {
-        const appExtensions = fetchAvailableAppExtensions()
 
-        // Include version info in context
-        context.appExtensions = appExtensions
+        // Ask initial question
+        const initialAnswers = await inquirer.prompt(INITIAL_QUESTION)
+        context = { ...context, answers: { project: initialAnswers.project } }
 
-        const generationAnswers = await prompt(askApplicationExtensibiltyQuestions(appExtensions))
-        context = merge(context, {answers: expandObject(generationAnswers)})
+        if (initialAnswers.project.type === 'appExtensionProject') {
+            // Ask for extension name if Application Extension is selected
+            const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
+            context.answers.project.name = extensionNameAnswers.project.extensionName
+            context.preset = PRESETS.find(({id}) => id === 'typescript-minimal-app-extension-example')
+        } else {
 
-        if (context.answers.project.useAppExtensibility) {
-            // Add the 'typescript-minimal' preset for Application Extension
-            context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
+            const availableAppExtensions = fetchAvailableAppExtensions()
+
+            // Include version info in context
+            context.availableAppExtensions = availableAppExtensions
+
+            const generationAnswers = await prompt(askApplicationExtensibiltyQuestions(availableAppExtensions))
+            context = merge(context, {answers: expandObject(generationAnswers)})
+
+            if (context.answers.project.useAppExtensibility) {
+                // Add the 'typescript-minimal' preset for Application Extension
+                context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
+            }
         }
     }
 
