@@ -282,13 +282,13 @@ class Auth {
         DATA_MAP[name].callback?.(storage)
     }
 
-    private delete(name: AuthDataKeys) {
+    private delete(name: AuthDataKeys, options?: unknown) {
         const {key, storageType} = DATA_MAP[name]
         const storage = this.stores[storageType]
-        storage.delete(key)
+        storage.delete(key, options)
     }
 
-    getDnt() {
+    getDnt(domain?: string) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
         // Only '1' or '0' are valid, and invalid values, lack of cookie, or value conflict with token must be an undefined DNT
         let dntCookieStatus = undefined
@@ -299,14 +299,16 @@ class Auth {
             isInSync = dnt === dntCookieVal
         }
         if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
-            this.delete(DNT_COOKIE_NAME)
+            this.delete(DNT_COOKIE_NAME, {
+                ...(domain !== undefined && {domain: domain})
+            })
         } else {
             dntCookieStatus = Boolean(Number(dntCookieVal))
         }
         return dntCookieStatus
     }
 
-    async setDnt(preference: boolean | null) {
+    async setDnt(preference: boolean | null, domain?: string | undefined) {
         let dntCookieVal = String(Number(preference))
         // Use defaultDNT if defined. If not, use SLAS default DNT
         if (preference === null) {
@@ -315,6 +317,7 @@ class Auth {
         // Set the cookie once to include dnt in the access token and then again to set the expiry time
         this.set(DNT_COOKIE_NAME, dntCookieVal, {
             ...getDefaultCookieAttributes(),
+            ...(domain !== undefined && {domain: domain}),
             secure: true
         })
         const accessToken = this.getAccessToken()
@@ -331,6 +334,7 @@ class Auth {
             this.set(DNT_COOKIE_NAME, dntCookieVal, {
                 ...getDefaultCookieAttributes(),
                 secure: true,
+                ...(domain !== undefined && {domain: domain}),
                 expires: Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
             })
         }

@@ -18,5 +18,5 @@ export abstract class BaseStorage {
     }
     abstract set(key: string, value: string, options?: unknown): void
     abstract get(key: string): string
-    abstract delete(key: string): void
+    abstract delete(key: string, options?: unknown): void
 }

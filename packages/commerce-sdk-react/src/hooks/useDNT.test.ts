@@ -40,7 +40,7 @@ describe('useDNT tests', () => {
     it('updateDNT should create dw_dnt cookie', async () => {
         const {updateDNT} = useDNT()
         await updateDNT(true)
-        expect(mockSetDnt).toHaveBeenCalledWith(true)
+        expect(mockSetDnt).toHaveBeenCalledWith(true, undefined)
     })
 
     it('dntStatus should be false if dw_dnt cookie is "1"', () => {
@@ -64,5 +64,11 @@ describe('useDNT tests', () => {
         mockGetDnt.mockReturnValueOnce(undefined)
         const {dntStatus} = useDNT()
         expect(dntStatus).toBeUndefined()
+    })
+
+    it('updateDNT should pass hostname', async () => {
+        const {updateDNT} = useDNT()
+        await updateDNT(true, 'example.com')
+        expect(mockSetDnt).toHaveBeenCalledWith(true, 'example.com')
     })
 })

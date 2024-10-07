@@ -8,7 +8,7 @@ import useAuthContext from './useAuthContext'
 
 interface useDntReturn {
     dntStatus: boolean | undefined
-    updateDNT: (preference: boolean | null) => Promise<void>
+    updateDNT: (preference: boolean | null, domain?: string | undefined) => Promise<void>
 }
 
 /**
@@ -21,11 +21,11 @@ interface useDntReturn {
  * @category DNT
  *
  */
-const useDNT = (): useDntReturn => {
+const useDNT = (domain?: string): useDntReturn => {
     const auth = useAuthContext()
-    const dntStatus = auth.getDnt()
-    const updateDNT = async (preference: boolean | null) => {
-        await auth.setDnt(preference)
+    const dntStatus = auth.getDnt(domain)
+    const updateDNT = async (preference: boolean | null, domain?: string | undefined) => {
+        await auth.setDnt(preference, domain)
     }
 
     return {dntStatus, updateDNT}
