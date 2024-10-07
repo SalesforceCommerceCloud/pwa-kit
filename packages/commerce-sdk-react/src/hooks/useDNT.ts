@@ -31,5 +31,4 @@ const useDNT = (domain?: string): useDntReturn => {
     return {dntStatus, updateDNT}
 }
 
-
 export default useDNT
