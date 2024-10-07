@@ -41,7 +41,7 @@ import {
 } from '../../constants'
 import {productUrlBuilder, rebuildPathWithParams} from '../../utils/url'
 import {getPriceData} from '../../utils/product-utils'
-import {useCurrency} from '../../hooks'
+import {useCurrency} from '../../hooks/use-currency'
 import {
     filterImageGroups,
     getDecoratedVariationAttributes

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
+import {productUrlBuilder, rebuildPathWithParams} from './url'
 
 /**
  * Get the human-friendly version of the variation values that users have selected.
