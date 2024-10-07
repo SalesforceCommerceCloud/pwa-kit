@@ -137,6 +137,7 @@ const Account = () => {
                                 <AccordionButton
                                     as={Button}
                                     height={16}
+                                    paddingLeft={8}
                                     variant="ghost"
                                     color="black"
                                     _active={{background: 'gray.100'}}
@@ -169,6 +170,7 @@ const Account = () => {
                                                         justifyContent="center"
                                                         fontSize="md"
                                                         fontWeight="normal"
+                                                        width="100%"
                                                         onClick={() => setMobileNavIndex(-1)}
                                                     >
                                                         {formatMessage(messages[link.name])}
