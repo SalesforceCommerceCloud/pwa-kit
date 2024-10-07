@@ -28,13 +28,13 @@ describe('LoginForm', () => {
         jest.clearAllMocks()
     })
 
-    describe('allowPasswordless is true', () => {
+    describe('allowPasswordless is enabled', () => {
         beforeEach(() => {
             const newConfig = {
                 ...mockConfig,
                 app: {
                     ...mockConfig.app,
-                    login: {allowPasswordless: true}
+                    login: {passwordless: {enabled: true}}
                 }
             }
             getConfig.mockImplementation(() => newConfig)
@@ -68,13 +68,13 @@ describe('LoginForm', () => {
         })
     })
 
-    describe('allowPasswordless is false', () => {
+    describe('passwordless is disabled', () => {
         beforeEach(() => {
             const newConfig = {
                 ...mockConfig,
                 app: {
                     ...mockConfig.app,
-                    login: {allowPasswordless: false}
+                    login: {passwordless: {enabled: false}}
                 }
             }
             getConfig.mockImplementation(() => newConfig)

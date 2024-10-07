@@ -16,7 +16,7 @@ import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passw
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
-    const {allowPasswordless, idps} = getConfig().app.login
+    const {passwordless, social} = getConfig().app.login
 
     return (
         <Fragment>
@@ -43,17 +43,17 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                     </Alert>
                 )}
                 <Stack spacing={6}>
-                    {allowPasswordless ? (
+                    {passwordless?.enabled ? (
                         <PasswordlessLogin
                             form={form}
                             clickForgotPassword={clickForgotPassword}
-                            idps={idps}
+                            idps={social?.idps}
                         />
                     ) : (
                         <StandardLogin
                             form={form}
                             clickForgotPassword={clickForgotPassword}
-                            idps={idps}
+                            idps={social?.idps}
                         />
                     )}
 
