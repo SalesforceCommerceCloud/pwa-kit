@@ -7,7 +7,7 @@
 
 import React, {useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import DisplayPrice from '../display-price'
 
 // Components
 import {
@@ -21,15 +21,15 @@ import {
     IconButton,
     HStack
 } from '@chakra-ui/react'
-import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
+import DynamicImage from '../dynamic-image'
 
 // Project Components
-import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
-import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
+import {HeartIcon, HeartSolidIcon} from '../icons'
+import Link from '../link'
+import Swatch from '../swatch-group/swatch'
+import SwatchGroup from '../swatch-group'
+import withRegistration from '../with-registration'
+import PromoCallout from '../product-tile/promo-callout'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -38,15 +38,15 @@ import {useIntl} from 'react-intl'
 import {
     PRODUCT_TILE_IMAGE_VIEW_TYPE,
     PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID
-} from '@salesforce/retail-react-app/app/constants'
-import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
-import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+} from '../../constants'
+import {productUrlBuilder, rebuildPathWithParams} from '../../utils/url'
+import {getPriceData} from '../../utils/product-utils'
+import {useCurrency} from '../../hooks'
 import {
     filterImageGroups,
     getDecoratedVariationAttributes
-} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {PRODUCT_BADGE_DETAILS} from '@salesforce/retail-react-app/app/constants'
+} from '../../utils/product-utils'
+import {PRODUCT_BADGE_DETAILS} from '../../constants'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 

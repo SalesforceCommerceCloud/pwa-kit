@@ -27,7 +27,7 @@ import {
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
-import ProductScroller from '../..components/product-scroller'
+import ProductScroller from '../../components/product-scroller'
 
 // Others
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
