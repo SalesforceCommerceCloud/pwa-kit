@@ -8,7 +8,6 @@
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
-import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
 
 import App from '@salesforce/retail-react-app/app/components/_app/index.jsx'
@@ -44,6 +43,15 @@ afterEach(() => {
     windowSpy.mockRestore()
 })
 
+const mockUpdateDNT = jest.fn()
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useDNT: () => ({dntStatus: undefined, updateDNT: mockUpdateDNT})
+    }
+})
+
 describe('App', () => {
     const site = {
         ...mockConfig.app.sites[0],
@@ -62,15 +70,14 @@ describe('App', () => {
         buildUrl
     }
 
-    test('App component is rendered appropriately', async () => {
+    test('User can select DNT options when App component is rendered with DNT notification', async () => {
         useMultiSite.mockImplementation(() => resultUseMultiSite)
-        renderWithProviders(
+        const {user} = renderWithProviders(
             <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <p>Any children here</p>
             </App>
         )
-        const closeButton = screen.getByLabelText('Close dnt form')
-        const user = userEvent.setup()
+        const closeButton = screen.getByLabelText('Close consent tracking form')
         await user.click(closeButton)
         await waitFor(() => {
             expect(screen.getByRole('main')).toBeInTheDocument()

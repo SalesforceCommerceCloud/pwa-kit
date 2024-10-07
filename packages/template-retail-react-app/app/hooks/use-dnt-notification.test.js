@@ -6,9 +6,11 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {DntModal, useDntModal} from '@salesforce/retail-react-app/app/hooks/use-dnt-modal'
+import {
+    DntNotification,
+    useDntNotification
+} from '@salesforce/retail-react-app/app/hooks/use-dnt-notification'
 
 const mockUpdateDNT = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
@@ -20,8 +22,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 })
 
 const MockedComponent = () => {
-    const dntModal = useDntModal()
-    return <DntModal {...dntModal} />
+    const dntNotification = useDntNotification()
+    return <DntNotification {...dntNotification} />
 }
 
 afterEach(() => {
@@ -29,20 +31,19 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test('Modal gives the expected text', async () => {
+test('Notification renders properly', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => {
         expect(screen.getByText(/Tracking Consent/i)).toBeInTheDocument()
     })
 })
 
-test('Clicking out of modal does setDNT(null)', async () => {
-    const user = userEvent.setup()
+test('Clicking out of notification does setDNT(null)', async () => {
+    const {user} = renderWithProviders(<MockedComponent />)
 
-    renderWithProviders(<MockedComponent />)
-
-    // open the modal
-    const closeButton = screen.getByLabelText('Close dnt form')
+    // open the notification
+    const closeButton = screen.getByLabelText('Close consent tracking form')
+    expect(closeButton).toHaveAttribute('aria-label', 'Close consent tracking form')
     await user.click(closeButton)
 
     await waitFor(() => {
@@ -51,12 +52,11 @@ test('Clicking out of modal does setDNT(null)', async () => {
 })
 
 test('Clicking Accept does setDNT(false)', async () => {
-    const user = userEvent.setup()
+    const {user} = renderWithProviders(<MockedComponent />)
 
-    renderWithProviders(<MockedComponent />)
-
-    // open the modal
+    // open the notification
     const acceptButton = screen.getAllByText('Accept')[0]
+    expect(acceptButton).toHaveAttribute('aria-label', 'Accept tracking')
     await user.click(acceptButton)
 
     await waitFor(() => {
@@ -65,13 +65,12 @@ test('Clicking Accept does setDNT(false)', async () => {
 })
 
 test('Clicking Decline does setDNT(true)', async () => {
-    const user = userEvent.setup()
+    const {user} = renderWithProviders(<MockedComponent />)
 
-    renderWithProviders(<MockedComponent />)
-
-    // open the modal
-    const acceptButton = screen.getAllByText('Decline')[0]
-    await user.click(acceptButton)
+    // open the notification
+    const declineButton = screen.getAllByText('Decline')[0]
+    expect(declineButton).toHaveAttribute('aria-label', 'Decline tracking')
+    await user.click(declineButton)
 
     await waitFor(() => {
         expect(mockUpdateDNT).toHaveBeenCalledWith(true)

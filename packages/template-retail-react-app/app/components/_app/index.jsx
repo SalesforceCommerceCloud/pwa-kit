@@ -49,7 +49,10 @@ import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partia
 import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
-import {DntModal, useDntModal} from '@salesforce/retail-react-app/app/hooks/use-dnt-modal'
+import {
+    DntNotification,
+    useDntNotification
+} from '@salesforce/retail-react-app/app/hooks/use-dnt-notification'
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
@@ -130,7 +133,7 @@ const App = (props) => {
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
-    const dntModal = useDntModal()
+    const dntNotification = useDntNotification()
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
@@ -427,7 +430,7 @@ const App = (props) => {
                                 {!isCheckout ? <Footer /> : <CheckoutFooter />}
 
                                 <AuthModal {...authModal} />
-                                <DntModal {...dntModal} />
+                                <DntNotification {...dntNotification} />
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>

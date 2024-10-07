@@ -282,19 +282,25 @@ class Auth {
         DATA_MAP[name].callback?.(storage)
     }
 
-    private delete(name: AuthDataKeys) {
+    private delete(name: AuthDataKeys, domain: any) {
         const {key, storageType} = DATA_MAP[name]
         const storage = this.stores[storageType]
-        storage.delete(key)
+        storage.delete(key, domain)
     }
 
     getDnt(domain?: string) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
-        // Only '1' or '0' are valid, and invalid values or lack of cookie must be an undefined DNT
+        // Only '1' or '0' are valid, and invalid values, lack of cookie, or value conflict with token must be an undefined DNT
         let dntCookieStatus = undefined
-        if (dntCookieVal !== '1' && dntCookieVal !== '0') {
+        const accessToken = this.getAccessToken()
+        let isInSync = true
+        if (accessToken) {
+            const {dnt} = this.parseSlasJWT(accessToken)
+            isInSync = dnt === dntCookieVal
+        }
+        if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
             this.delete(DNT_COOKIE_NAME, {
-                ...(domain !== undefined && {domain: domain}),
+                ...(domain !== undefined && {domain: domain})
             })
         } else {
             dntCookieStatus = Boolean(Number(dntCookieVal))
@@ -555,6 +561,38 @@ class Auth {
     }
 
     /**
+     * This method extracts the status and message from a ResponseError that is returned
+     * by commerce-sdk-isomorphic.
+     *
+     * commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
+     * We can't use `instanceof`, so instead we just check for the `response` property
+     * and assume it is a `ResponseError` if a response is present
+     *
+     * Once commerce-sdk-isomorphic exports `ResponseError` we can revisit if this method is
+     * still required.
+     *
+     * @returns {status_code, responseMessage} contained within the ResponseError
+     * @throws error if the error is not a ResponseError
+     * @Internal
+     */
+    extractResponseError = async (error: Error) => {
+        // the regular error.message will return only the generic status code message
+        // ie. 'Bad Request' for 400. We need to drill specifically into the ResponseError
+        // to get a more descriptive error message from SLAS
+        if ('response' in error) {
+            const json = await (error['response'] as Response).json()
+            const status_code: string = json.status_code
+            const responseMessage: string = json.message
+
+            return {
+                status_code,
+                responseMessage
+            }
+        }
+        throw error
+    }
+
+    /**
      * The ready function returns a promise that resolves with valid ShopperLogin
      * token response.
      *
@@ -630,7 +668,17 @@ class Auth {
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
             : () => helpers.loginGuestUser(...guestPublicArgs)
 
-        return await this.queueRequest(callback, isGuest)
+        try {
+            return await this.queueRequest(callback, isGuest)
+        } catch (error) {
+            // We catch the error here to do logging but we still need to
+            // throw an error to stop the login flow from continuing.
+            const {status_code, responseMessage} = await this.extractResponseError(error as Error)
+            this.logger.error(`${status_code} ${responseMessage}`)
+            throw new Error(
+                `New guest user could not be logged in. ${status_code} ${responseMessage}`
+            )
+        }
     }
 
     /**

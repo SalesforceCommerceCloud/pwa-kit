@@ -2303,7 +2303,7 @@
       "value": "]"
     }
   ],
-  "dnt_modal.accept": [
+  "dnt_notification.button.accept": [
     {
       "type": 0,
       "value": "["
@@ -2317,21 +2317,49 @@
       "value": "]"
     }
   ],
-  "dnt_modal.button.close.assistive_msg": [
+  "dnt_notification.button.assistive_msg.accept": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ƈŀǿǿşḗḗ ḓƞŧ ƒǿǿřḿ"
+      "value": "Ȧƈƈḗḗƥŧ ŧřȧȧƈķīƞɠ"
     },
     {
       "type": 0,
       "value": "]"
     }
   ],
-  "dnt_modal.decline": [
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŀǿǿşḗḗ ƈǿǿƞşḗḗƞŧ ŧřȧȧƈķīƞɠ ƒǿǿřḿ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗƈŀīƞḗḗ ŧřȧȧƈķīƞɠ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "dnt_notification.button.decline": [
     {
       "type": 0,
       "value": "["
@@ -2345,21 +2373,21 @@
       "value": "]"
     }
   ],
-  "dnt_modal.description": [
+  "dnt_notification.description": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ŧħīş ẇḗḗƀşīŧḗḗ ŭŭşḗḗş ƈǿǿǿǿķīḗḗş ŧǿǿ ḗḗƞħȧȧƞƈḗḗ ŭŭşḗḗř ḗḗẋƥḗḗřīḗḗƞƈḗḗ ȧȧƞḓ ŧǿǿ ȧȧƞȧȧŀẏẑḗḗ ƥḗḗřƒǿǿřḿȧȧƞƈḗḗ ȧȧƞḓ ŧřȧȧƒƒīƈ ǿǿƞ ǿǿŭŭř ẇḗḗƀşīŧḗḗ. Ẇḗḗ ȧȧŀşǿǿ şħȧȧřḗḗ īƞƒǿǿřḿȧȧŧīǿǿƞ ȧȧƀǿǿŭŭŧ ẏǿǿŭŭř ŭŭşḗḗ ǿǿƒ ǿǿŭŭř şīŧḗḗ ẇīŧħ ǿǿŭŭř şǿǿƈīȧȧŀ ḿḗḗḓīȧȧ, ȧȧḓṽḗḗřŧīşīƞɠ ȧȧƞḓ ȧȧƞȧȧŀẏŧīƈş ƥȧȧřŧƞḗḗřş. Ɓẏ ƈŀīƈķīƞɠ “Ȧƈƈḗḗƥŧ,” ẏǿǿŭŭ ȧȧɠřḗḗḗḗ ŧǿǿ ǿǿŭŭř ẇḗḗƀşīŧḗḗ’ş ƈǿǿǿǿķīḗḗ ŭŭşḗḗ ȧȧş ḓḗḗşƈřīƀḗḗḓ īƞ ǿǿŭŭř Ƈǿǿǿǿķīḗḗ Ƥǿǿŀīƈẏ."
+      "value": "Ŀǿǿřḗḗḿ īƥşŭŭḿ ḓǿǿŀǿǿř şīŧ ȧȧḿḗḗŧ, ƈǿǿƞşḗḗƈŧḗḗŧŭŭř ȧȧḓīƥīşƈīƞɠ ḗḗŀīŧ, şḗḗḓ ḓǿǿ ḗḗīŭŭşḿǿǿḓ ŧḗḗḿƥǿǿř īƞƈīḓīḓŭŭƞŧ ŭŭŧ ŀȧȧƀǿǿřḗḗ ḗḗŧ ḓǿǿŀǿǿřḗḗ ḿȧȧɠƞȧȧ ȧȧŀīɋŭŭȧȧ. Ŭŧ ḗḗƞīḿ ȧȧḓ ḿīƞīḿ ṽḗḗƞīȧȧḿ, ɋŭŭīş ƞǿǿşŧřŭŭḓ ḗḗẋḗḗřƈīŧȧȧŧīǿǿƞ ŭŭŀŀȧȧḿƈǿǿ ŀȧȧƀǿǿřīş ƞīşī ŭŭŧ ȧȧŀīɋŭŭīƥ ḗḗẋ ḗḗȧȧ ƈǿǿḿḿǿǿḓǿǿ ƈǿǿƞşḗḗɋŭŭȧȧŧ. Ḓŭŭīş ȧȧŭŭŧḗḗ īřŭŭřḗḗ ḓǿǿŀǿǿř īƞ řḗḗƥřḗḗħḗḗƞḓḗḗřīŧ īƞ ṽǿǿŀŭŭƥŧȧȧŧḗḗ ṽḗḗŀīŧ ḗḗşşḗḗ ƈīŀŀŭŭḿ ḓǿǿŀǿǿřḗḗ ḗḗŭŭ ƒŭŭɠīȧȧŧ ƞŭŭŀŀȧȧ ƥȧȧřīȧȧŧŭŭř."
     },
     {
       "type": 0,
       "value": "]"
     }
   ],
-  "dnt_modal.title": [
+  "dnt_notification.title": [
     {
       "type": 0,
       "value": "["
@@ -3875,6 +3903,32 @@
     {
       "type": 0,
       "value": "Ɋŭŭȧȧƞŧīŧẏ "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "item_variant.quantity.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɋŭŭȧȧƞŧīŧẏ şḗḗŀḗḗƈŧǿǿř ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": ". Şḗḗŀḗḗƈŧḗḗḓ ɋŭŭȧȧƞŧīŧẏ īş "
     },
     {
       "type": 1,
@@ -5784,7 +5838,11 @@
     },
     {
       "type": 0,
-      "value": "Ḓḗḗƈřḗḗḿḗḗƞŧ Ɋŭŭȧȧƞŧīŧẏ"
+      "value": "Ḓḗḗƈřḗḗḿḗḗƞŧ Ɋŭŭȧȧƞŧīŧẏ ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     },
     {
       "type": 0,
@@ -5798,7 +5856,11 @@
     },
     {
       "type": 0,
-      "value": "Īƞƈřḗḗḿḗḗƞŧ Ɋŭŭȧȧƞŧīŧẏ"
+      "value": "Īƞƈřḗḗḿḗḗƞŧ Ɋŭŭȧȧƞŧīŧẏ ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     },
     {
       "type": 0,
@@ -6327,6 +6389,42 @@
     {
       "type": 0,
       "value": "Ƈǿǿƞŧīƞŭŭḗḗ ŧǿǿ Şħīƥƥīƞɠ Ḿḗḗŧħǿǿḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_address.label.edit_button": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗḓīŧ "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_address.label.remove_button": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗḿǿǿṽḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "address"
     },
     {
       "type": 0,
@@ -8121,6 +8219,50 @@
       "value": "]"
     }
   ],
+  "wishlist_primary_action.button.addSetToCart.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " şḗḗŧ ŧǿǿ ƈȧȧřŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "wishlist_primary_action.button.addToCart.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " ŧǿǿ ƈȧȧřŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "wishlist_primary_action.button.add_set_to_cart": [
     {
       "type": 0,
@@ -8149,6 +8291,24 @@
       "value": "]"
     }
   ],
+  "wishlist_primary_action.button.viewFullDetails.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ṽīḗḗẇ ƒŭŭŀŀ ḓḗḗŧȧȧīŀş ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
@@ -8171,6 +8331,24 @@
     {
       "type": 0,
       "value": "Ṽīḗḗẇ Ǿƥŧīǿǿƞş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "wishlist_primary_action.button.view_options.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ṽīḗḗẇ Ǿƥŧīǿǿƞş ƒǿǿř "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     },
     {
       "type": 0,
@@ -8231,6 +8409,24 @@
     {
       "type": 0,
       "value": "Řḗḗḿǿǿṽḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item.remove.label": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗḿǿǿṽḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     },
     {
       "type": 0,

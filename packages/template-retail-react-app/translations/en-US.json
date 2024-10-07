@@ -447,19 +447,25 @@
   "display_price.label.current_price_with_range": {
     "defaultMessage": "From {currentPrice}"
   },
-  "dnt_modal.accept": {
+  "dnt_notification.button.accept": {
     "defaultMessage": "Accept"
   },
-  "dnt_modal.button.close.assistive_msg": {
-    "defaultMessage": "Close dnt form"
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "Accept tracking"
   },
-  "dnt_modal.decline": {
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "Close consent tracking form"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "Decline tracking"
+  },
+  "dnt_notification.button.decline": {
     "defaultMessage": "Decline"
   },
-  "dnt_modal.description": {
-    "defaultMessage": "This website uses cookies to enhance user experience and to analyze performance and traffic on our website. We also share information about your use of our site with our social media, advertising and analytics partners. By clicking “Accept,” you agree to our website’s cookie use as described in our Cookie Policy."
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
   },
-  "dnt_modal.title": {
+  "dnt_notification.title": {
     "defaultMessage": "Tracking Consent"
   },
   "drawer_menu.button.account_details": {
@@ -770,6 +776,9 @@
   },
   "item_variant.assistive_msg.quantity": {
     "defaultMessage": "Quantity {quantity}"
+  },
+  "item_variant.quantity.label": {
+    "defaultMessage": "Quantity selector for {productName}. Selected quantity is {quantity}"
   },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
@@ -1160,10 +1169,10 @@
     "defaultMessage": "Update"
   },
   "product_view.label.assistive_msg.quantity_decrement": {
-    "defaultMessage": "Decrement Quantity"
+    "defaultMessage": "Decrement Quantity for {productName}"
   },
   "product_view.label.assistive_msg.quantity_increment": {
-    "defaultMessage": "Increment Quantity"
+    "defaultMessage": "Increment Quantity for {productName}"
   },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"
@@ -1270,6 +1279,12 @@
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
+  },
+  "shipping_address.label.edit_button": {
+    "defaultMessage": "Edit {address}"
+  },
+  "shipping_address.label.remove_button": {
+    "defaultMessage": "Remove {address}"
   },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"
@@ -1645,11 +1660,20 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "New Password"
   },
+  "wishlist_primary_action.button.addSetToCart.label": {
+    "defaultMessage": "Add {productName} set to cart"
+  },
+  "wishlist_primary_action.button.addToCart.label": {
+    "defaultMessage": "Add {productName} to cart"
+  },
   "wishlist_primary_action.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
   },
   "wishlist_primary_action.button.add_to_cart": {
     "defaultMessage": "Add to Cart"
+  },
+  "wishlist_primary_action.button.viewFullDetails.label": {
+    "defaultMessage": "View full details for {productName}"
   },
   "wishlist_primary_action.button.view_full_details": {
     "defaultMessage": "View Full Details"
@@ -1657,11 +1681,17 @@
   "wishlist_primary_action.button.view_options": {
     "defaultMessage": "View Options"
   },
+  "wishlist_primary_action.button.view_options.label": {
+    "defaultMessage": "View Options for {productName}"
+  },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
   "wishlist_secondary_button_group.action.remove": {
     "defaultMessage": "Remove"
+  },
+  "wishlist_secondary_button_group.info.item.remove.label": {
+    "defaultMessage": "Remove {productName}"
   },
   "wishlist_secondary_button_group.info.item_removed": {
     "defaultMessage": "Item removed from wishlist"
