@@ -4625,6 +4625,20 @@
       "value": "]"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧƥƥŀḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "login_form.button.continue_securely": [
     {
       "type": 0,
@@ -4633,6 +4647,20 @@
     {
       "type": 0,
       "value": "Ƈǿǿƞŧīƞŭŭḗḗ Şḗḗƈŭŭřḗḗŀẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɠǿǿǿǿɠŀḗḗ"
     },
     {
       "type": 0,
@@ -4661,20 +4689,6 @@
     {
       "type": 0,
       "value": "Şīɠƞ Īƞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "login_form.button.social": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 1,
-      "value": "message"
     },
     {
       "type": 0,
