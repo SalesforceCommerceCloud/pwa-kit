@@ -28,6 +28,7 @@ const APP_EXTENSION_PREFIX = 'extension' // aligns with what's in `nameRegex`
  */
 module.exports = function () {
     const {pkg} = this.getOptions() || {}
+    // TODO: is this supposed to be regular dependencies? Retail react app has it as 'dependencies'
     const {devDependencies} = pkg
 
     const extensions = Object.keys(devDependencies)
