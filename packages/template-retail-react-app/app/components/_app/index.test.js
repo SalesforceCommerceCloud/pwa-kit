@@ -43,6 +43,15 @@ afterEach(() => {
     windowSpy.mockRestore()
 })
 
+const mockUpdateDNT = jest.fn()
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useDNT: () => ({dntStatus: undefined, updateDNT: mockUpdateDNT})
+    }
+})
+
 describe('App', () => {
     const site = {
         ...mockConfig.app.sites[0],
@@ -61,15 +70,19 @@ describe('App', () => {
         buildUrl
     }
 
-    test('App component is rendered appropriately', () => {
+    test('User can select DNT options when App component is rendered with DNT notification', async () => {
         useMultiSite.mockImplementation(() => resultUseMultiSite)
-        renderWithProviders(
+        const {user} = renderWithProviders(
             <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
                 <p>Any children here</p>
             </App>
         )
-        expect(screen.getByRole('main')).toBeInTheDocument()
-        expect(screen.getByText('Any children here')).toBeInTheDocument()
+        const closeButton = screen.getByLabelText('Close consent tracking form')
+        await user.click(closeButton)
+        await waitFor(() => {
+            expect(screen.getByRole('main')).toBeInTheDocument()
+            expect(screen.getByText('Any children here')).toBeInTheDocument()
+        })
     })
 
     test('Active Data component is not rendered', async () => {

@@ -21,7 +21,8 @@ import {
     SLAS_PRIVATE_PROXY_PATH,
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
-    SLAS_SECRET_OVERRIDE_MSG
+    SLAS_SECRET_OVERRIDE_MSG,
+    DNT_COOKIE_NAME
 } from '../constant'
 
 import {Logger} from '../types'
@@ -33,7 +34,6 @@ interface AuthConfig extends ApiClientConfigParams {
     proxy: string
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
-    OCAPISessionsURL?: string
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
@@ -65,7 +65,6 @@ export type AuthData = Prettify<
     }
 >
 
-const DNT_COOKIE_NAME = 'dw_dnt' as const
 /** A shopper could be guest or registered, so we store the refresh tokens individually. */
 type AuthDataKeys =
     | Exclude<keyof AuthData, 'refresh_token'>
@@ -73,6 +72,7 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'access_token_sfra'
     | typeof DNT_COOKIE_NAME
+    | 'dwsid'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -164,6 +164,10 @@ const DATA_MAP: AuthDataMap = {
     [DNT_COOKIE_NAME]: {
         storageType: 'cookie',
         key: DNT_COOKIE_NAME
+    },
+    dwsid: {
+        storageType: 'cookie',
+        key: 'dwsid'
     }
 }
 
@@ -182,7 +186,6 @@ class Auth {
     private pendingToken: Promise<TokenResponse> | undefined
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
-    private OCAPISessionsURL: string
     private clientSecret: string
     private silenceWarnings: boolean
     private logger: Logger
@@ -191,8 +194,7 @@ class Auth {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
-        // Add keys that should not be site specific to this array
-        const keysExcludedFromSuffixing = [DNT_COOKIE_NAME]
+
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
             parameters: {
@@ -218,7 +220,6 @@ class Auth {
 
         const options = {
             keySuffix: config.siteId,
-            keysExcludedFromSuffixing: keysExcludedFromSuffixing,
             // Setting this to true on the server allows us to reuse guest auth tokens across lambda runs
             sharedContext: !onClient()
         }
@@ -232,8 +233,6 @@ class Auth {
         this.redirectURI = config.redirectURI
 
         this.fetchedToken = config.fetchedToken || ''
-
-        this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
         this.logger = config.logger
 
@@ -291,9 +290,15 @@ class Auth {
 
     getDnt() {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
-        // Only '1' or '0' are valid, and invalid values or lack of cookie must be an undefined DNT
+        // Only '1' or '0' are valid, and invalid values, lack of cookie, or value conflict with token must be an undefined DNT
         let dntCookieStatus = undefined
-        if (dntCookieVal !== '1' && dntCookieVal !== '0') {
+        const accessToken = this.getAccessToken()
+        let isInSync = true
+        if (accessToken) {
+            const {dnt} = this.parseSlasJWT(accessToken)
+            isInSync = dnt === dntCookieVal
+        }
+        if ((dntCookieVal !== '1' && dntCookieVal !== '0') || !isInSync) {
             this.delete(DNT_COOKIE_NAME)
         } else {
             dntCookieStatus = Boolean(Number(dntCookieVal))
@@ -438,6 +443,12 @@ class Auth {
         store.delete(key)
     }
 
+    private clearECOMSession() {
+        const {key, storageType} = DATA_MAP['dwsid']
+        const store = this.stores[storageType]
+        store.delete(key)
+    }
+
     /**
      * Converts a duration in seconds to a Date object.
      * This function takes a number representing seconds and returns a Date object
@@ -530,9 +541,6 @@ class Auth {
             .then(async () => {
                 const token = await fn()
                 this.handleTokenResponse(token, isGuest)
-                if (onClient() && this.OCAPISessionsURL) {
-                    void this.createOCAPISession()
-                }
                 // Q: Why don't we just return token? Why re-construct the same object again?
                 // A: because a user could open multiple tabs and the data in memory could be out-dated
                 // We must always grab the data from the storage (cookie/localstorage) directly
@@ -548,6 +556,38 @@ class Auth {
         if (!this.silenceWarnings) {
             this.logger.warn(msg)
         }
+    }
+
+    /**
+     * This method extracts the status and message from a ResponseError that is returned
+     * by commerce-sdk-isomorphic.
+     *
+     * commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
+     * We can't use `instanceof`, so instead we just check for the `response` property
+     * and assume it is a `ResponseError` if a response is present
+     *
+     * Once commerce-sdk-isomorphic exports `ResponseError` we can revisit if this method is
+     * still required.
+     *
+     * @returns {status_code, responseMessage} contained within the ResponseError
+     * @throws error if the error is not a ResponseError
+     * @Internal
+     */
+    extractResponseError = async (error: Error) => {
+        // the regular error.message will return only the generic status code message
+        // ie. 'Bad Request' for 400. We need to drill specifically into the ResponseError
+        // to get a more descriptive error message from SLAS
+        if ('response' in error) {
+            const json = await (error['response'] as Response).json()
+            const status_code: string = json.status_code
+            const responseMessage: string = json.message
+
+            return {
+                status_code,
+                responseMessage
+            }
+        }
+        throw error
     }
 
     /**
@@ -626,7 +666,17 @@ class Auth {
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
             : () => helpers.loginGuestUser(...guestPublicArgs)
 
-        return await this.queueRequest(callback, isGuest)
+        try {
+            return await this.queueRequest(callback, isGuest)
+        } catch (error) {
+            // We catch the error here to do logging but we still need to
+            // throw an error to stop the login flow from continuing.
+            const {status_code, responseMessage} = await this.extractResponseError(error as Error)
+            this.logger.error(`${status_code} ${responseMessage}`)
+            throw new Error(
+                `New guest user could not be logged in. ${status_code} ${responseMessage}`
+            )
+        }
     }
 
     /**
@@ -684,8 +734,8 @@ class Auth {
             }
         )
         this.handleTokenResponse(token, isGuest)
-        if (onClient() && this.OCAPISessionsURL) {
-            void this.createOCAPISession()
+        if (onClient()) {
+            void this.clearECOMSession()
         }
         return token
     }
@@ -704,26 +754,6 @@ class Auth {
         }
         this.clearStorage()
         return await this.loginGuestUser()
-    }
-
-    /**
-     * Make a post request to the OCAPI /session endpoint to bridge the session.
-     *
-     * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
-     * This cookie is used on SFRA, and it allows shoppers to navigate between SFRA and
-     * this PWA site seamlessly; this is often used to enable hybrid deployment.
-     *
-     * (Note: this method is client side only, b/c MRT doesn't support set-cookie header right now)
-     *
-     * @returns {Promise}
-     */
-    createOCAPISession() {
-        return fetch(this.OCAPISessionsURL, {
-            method: 'POST',
-            headers: {
-                Authorization: 'Bearer ' + this.get('access_token')
-            }
-        })
     }
 
     /**
