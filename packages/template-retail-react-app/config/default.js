@@ -38,7 +38,7 @@ module.exports = {
             isProduction: false
         },
         // if this is true, useOrigin will take x-forwarded-host header into consideration
-        enableXForwardHost: false
+        enableXForwardedHost: false
     },
     externals: [],
     pageNotFoundURL: '/page-not-found',

@@ -6,7 +6,6 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {absoluteUrl} from '@salesforce/retail-react-app/app/utils/url'
 
 /**
  * This functions takes an url and returns a site object,
@@ -228,12 +227,7 @@ export const resolveLocaleFromUrl = (url) => {
  * @returns {{search: (string|string), pathname: string}}
  */
 function getPathnameAndSearch(url) {
-    // Clean up the URL by replacing double slashes with a single slash
-    const [baseUrl, searchString] = url.split('?')
-    const pathname = baseUrl.includes('://') ? baseUrl.split('/').slice(3).join('/') : baseUrl
-
-    return {
-        pathname: `${pathname.startsWith('/') ? '' : '/'}${pathname}`,
-        search: searchString ? `?${searchString}` : ''
-    }
+    // since url is a partial url, we pass in a dummy domain to create a validate url to pass into URL constructor
+    const {pathname, search} = new URL(url, 'https://www.some-domain.com')
+    return {pathname, search}
 }

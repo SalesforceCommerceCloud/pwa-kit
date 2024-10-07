@@ -139,7 +139,6 @@ const App = (props) => {
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useDisclosure()
-    console.log('appOrigin', appOrigin)
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -174,7 +173,7 @@ const App = (props) => {
                 // Otherwise, it'll continue to fetch the missing translation file again
                 return {}
             }
-            return fetchTranslations(targetLocale)
+            return fetchTranslations(targetLocale, appOrigin)
         },
         enabled: isServer
     })
