@@ -629,6 +629,8 @@ describe('Auth', () => {
                 '1',
                 expect.objectContaining({domain: 'example.com'})
             )
+        })
+    })
 
     test('getDnt() returns undefined if token and cookie value is conflicting', async () => {
         const getSpiedOn = jest.spyOn(Auth.prototype as any, 'get')

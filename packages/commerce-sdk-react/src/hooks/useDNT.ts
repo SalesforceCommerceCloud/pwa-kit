@@ -21,14 +21,15 @@ interface useDntReturn {
  * @category DNT
  *
  */
-const useDNT = (): useDntReturn => {
+const useDNT = (domain?: string): useDntReturn => {
     const auth = useAuthContext()
-    const dntStatus = auth.getDnt()
+    const dntStatus = auth.getDnt(domain)
     const updateDNT = async (preference: boolean | null, domain?: string | undefined) => {
         await auth.setDnt(preference, domain)
     }
 
     return {dntStatus, updateDNT}
 }
+
 
 export default useDNT
