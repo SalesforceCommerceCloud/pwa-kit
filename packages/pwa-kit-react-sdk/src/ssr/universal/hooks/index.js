@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -44,6 +44,18 @@ export const useServerContext = () => {
     return serverContext
 }
 
+/**
+ * Returns the application's origin.
+ *
+ * By default, it will return the ORIGIN under which we are serving the page.
+ *
+ * If you enabled `enableXForwardedHost` in your app, it will use the value of `x-forwarded-host` header in req
+ * to build origin. (it is false by default)
+ *
+ * NOTE: this is a React hook, so it has to be used in a React rendering pipeline.
+ * @returns {string} origin string
+ *
+ */
 export const useOrigin = () => {
     if (typeof window !== 'undefined') {
         return window.location.origin
