@@ -190,6 +190,7 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
+    private refreshTrustedAgentHandler: ((loginId: string, usid: string) => Promise<TokenResponse>) | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -317,8 +318,9 @@ class Auth {
      */
     private isTokenExpired(token: string) {
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
-        const validTimeSeconds = exp - iat - 60
+        const validTimeSeconds = exp - iat - 60 - 810
         const tokenAgeSeconds = Date.now() / 1000 - iat
+        console.log(`auth.isTokenExpired() valid for ${parseInt((validTimeSeconds - tokenAgeSeconds).toString())}s`)
         return validTimeSeconds <= tokenAgeSeconds
     }
 
@@ -470,7 +472,8 @@ class Auth {
      * The flow:
      * 1. If we have valid access token - use it
      * 2. If we have valid refresh token - refresh token flow
-     * 3. PKCE flow
+     * 3. If we have an invalid TAOB access token - refresh TAOB flow
+     * 4. PKCE flow
      */
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
@@ -524,16 +527,26 @@ class Auth {
             }
         }
 
-        console.log("ACCESS TOKEN", accessToken)
+        // refresh flow for TAOB
+        if (accessToken && this.isTokenExpired(accessToken)) {
+            const {isAgent, loginId, usid} = this.parseSlasJWT(accessToken)
+            if (isAgent) {
+                return await this.refreshTrustedAgent(loginId, usid)
+            }
+        }
 
-        // if (accessToken && this.isTokenExpired(accessToken)) {
-        //     const {isAgent, agentId, loginId, usid} = this.parseSlasJWT(accessToken)
-        //     if (isAgent) {
-        //         return await this.authorizeTrustedAgent({agentId, loginId, usid})
-        //     }
-        // }
+        // if a TAOB left a usid and it tries to
+        // use it, we will be stuck in a fail loop
+        let token
+        try {
+            token = await this.loginGuestUser()
+        } catch(e) {
+            console.error('auth.ready() this.clearStorage() this.loginGuestUser()')
+            this.clearStorage()
+            token = await this.loginGuestUser()
+        }
 
-        return this.loginGuestUser()
+        return token
     }
 
     /**
@@ -650,8 +663,10 @@ class Auth {
     async authorizeTrustedAgent(credentials: {
         loginId?: string
     }) {
-        const redirectURI = 'http://localhost:3000/trusted-agent-callback'
         const slasClient = this.client
+        // TODO: TAOB replace the hardcoded values
+        // console.log(slasClient.clientConfig.baseUri, slasClient.clientConfig.proxy)
+        const redirectURI = 'http://localhost:3000/trusted-agent-callback'
         const codeVerifier = helpers.createCodeVerifier()
         const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
         const organizationId = slasClient.clientConfig.parameters.organizationId
@@ -659,6 +674,9 @@ class Auth {
         const siteId = slasClient.clientConfig.parameters.siteId
         const loginId = credentials.loginId || 'guest'
 
+        const idpOrigin = loginId === 'guest' ? 'slas' : 'ecom'
+
+        // TODO: TAOB replace the hardcoded values
         const url = [
             `http://localhost:3000/mobify/proxy/api/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize`,
                 `?client_id=${clientId}`,
@@ -666,7 +684,7 @@ class Auth {
                 `&code_challenge=${codeChallenge}`,
                 `&login_id=${loginId}`,
                 `&redirect_uri=${redirectURI}`,
-                `&idp_origin=ecom`,
+                `&idp_origin=${idpOrigin}`,
                 `&response_type=code`
             ].join('')
 
@@ -709,14 +727,24 @@ class Auth {
             )}`
         }
 
-        const token = await slasClient.getTrustedAgentAccessToken(optionsToken)
-
-        this.handleTokenResponse(token, false)
         if (onClient()) {
             void this.clearTrustedAgentCode()
         }
 
-        return token
+        return await this.queueRequest(() => slasClient.getTrustedAgentAccessToken(optionsToken), optionsToken.body.login_id === 'guest')
+    }
+
+    registerTrustedAgentRefreshHandler(refreshTrustedAgentHandler: (loginId?: string, usid?: string) => Promise<TokenResponse>) {
+        this.refreshTrustedAgentHandler = refreshTrustedAgentHandler
+    }
+
+    async refreshTrustedAgent(loginId: string, usid: string): Promise<TokenResponse> {
+        if (this.refreshTrustedAgentHandler) {
+            return await this.refreshTrustedAgentHandler(loginId, usid)
+        }
+
+        this.clearStorage()
+        return await this.loginGuestUser()
     }
 
     /**

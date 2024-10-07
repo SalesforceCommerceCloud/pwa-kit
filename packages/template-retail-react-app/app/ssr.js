@@ -105,6 +105,10 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
+
+    // // maybe partial render solution?
+    // app.get('/trusted-agent/*', taobLock, runtime.render)
+
     app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that

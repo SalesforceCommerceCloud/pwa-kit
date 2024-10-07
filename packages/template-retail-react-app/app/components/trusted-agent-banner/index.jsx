@@ -13,14 +13,14 @@ import {
     Center,
     Flex,
     Input,
-    Text,
+    Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 import {useTrustedAgent} from '@salesforce/commerce-sdk-react'
 
 const TrustedAgentBanner = () => {
     const {isAgent, agentId, loginId, login, logout} = useTrustedAgent()
-    const [loginIdValue, setLoginId] = useState(loginId)
+    const [inputValue, setInputValue] = useState(loginId === 'Guest' ? 'guest' : loginId)
 
     return (
         <Box px={8} py={2} bg="gray.100">
@@ -30,53 +30,54 @@ const TrustedAgentBanner = () => {
                         as="h2"
                         color={'black'}
                         fontWeight={700}
-                        fontSize={20}>
+                        fontSize={20}
+                        pr={8}>
                         Trusted Agent
                     </Text>
                 </Center>
                 <Center>
                     {agentId && (
                         <>
-                            <Box>
-                                <Text
-                                    fontWeight={700}
-                                    fontSize={16}
-                                    px={4}>
-                                    Agent ID
-                                </Text>
-                            </Box>
-                            <Box><Text>{agentId}</Text></Box>
+                            <Text
+                                as="div"
+                                fontWeight={700}
+                                fontSize={16}
+                                px={4}>
+                                Agent ID
+                            </Text>
+                            <Text as="div">{agentId}</Text>
                         </>
                     )}
-                    {loginId && (
+                    {isAgent && loginId && (
                         <>
-                            <Box>
-                                <Text
-                                    fontWeight={700}
-                                    fontSize={16}
-                                    px={4}>
-                                    Login ID
-                                </Text>
-                            </Box>
-                            <Box><Text>{loginId}</Text></Box>
+                            <Text
+                                as="div"
+                                fontWeight={700}
+                                fontSize={16}
+                                px={4}>
+                                Login ID
+                            </Text>
+                            <Text as="div">{loginId}</Text>
                         </>
                     )}
                 </Center>
                 <Box flex={1}/>
                 <Center>
-                    {isAgent ? (
-                        <Button onClick={() => logout()}>Logout</Button>
+                    {!isAgent ? (
+                        <form onSubmit={(e) => (e.preventDefault(), login(inputValue))}>
+                            <Flex>
+                                <Input
+                                    mr={4}
+                                    bg="white.100"
+                                    value={inputValue && inputValue !== 'guest' ? inputValue : ''}
+                                    placeholder="Login ID"
+                                    onChange={e => setInputValue(e.target.value)}
+                                />
+                                <Button type="submit">Login</Button>
+                            </Flex>
+                        </form>
                     ) : (
-                        <>
-                            <Input
-                                mr={4}
-                                bg="white.100"
-                                value={loginIdValue && loginIdValue !== 'Guest' ? loginIdValue : ''}
-                                placeholder="Login ID"
-                                onChange={e => setLoginId(e.target.value)}
-                            />
-                            <Button onClick={() => login(loginIdValue)}>Login</Button>
-                        </>
+                        <Button onClick={() => logout()}>Logout</Button>
                     )}
                 </Center>
             </Flex>
