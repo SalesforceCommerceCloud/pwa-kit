@@ -168,7 +168,7 @@ const DATA_MAP: AuthDataMap = {
         key: 'dwsid'
     },
     code_verifier: {
-        storageType: 'cookie',
+        storageType: 'local',
         key: 'code_verifier'
     }
 }
@@ -726,7 +726,6 @@ class Auth {
                 ...(usid && {usid})
             }
         )
-        // Should this be false ?
         const isGuest = false
         this.handleTokenResponse(token, isGuest)
         // Delete the code verifier once the user has logged in
