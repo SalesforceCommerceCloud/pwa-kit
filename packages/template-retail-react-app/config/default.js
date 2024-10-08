@@ -36,9 +36,7 @@ module.exports = {
             // This differs from the siteId in commerceAPIConfig for testing purposes
             siteId: 'aaij-MobileFirst',
             isProduction: false
-        },
-        // if this is true, useOrigin will take x-forwarded-host header into consideration
-        enableXForwardedHost: false
+        }
     },
     externals: [],
     pageNotFoundURL: '/page-not-found',

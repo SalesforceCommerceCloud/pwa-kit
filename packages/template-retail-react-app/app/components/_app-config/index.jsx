@@ -83,8 +83,8 @@ AppConfig.restore = (locals = {}) => {
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
 
-    let site = resolveSiteFromUrl(path)
-    let locale = resolveLocaleFromUrl(path)
+    const site = resolveSiteFromUrl(path)
+    const locale = resolveLocaleFromUrl(path)
 
     const {app: appConfig} = getConfig()
     const apiConfig = {
