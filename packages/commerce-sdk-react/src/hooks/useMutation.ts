@@ -8,7 +8,7 @@ import {
     useMutation as useReactQueryMutation,
     useQueryClient,
     UseMutationOptions,
-    UseMutationResult
+    MutationFunction
 } from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
@@ -54,12 +54,11 @@ export const useMutation = <
     })
 }
 
-type MutationVariablesWithBody = {
-    body: unknown
+type TMutationVariables = {
+    body?: unknown
     parameters?: {[key: string]: string | number | boolean | string[] | number[]}
     headers?: {[key: string]: string}
-}
-type MutationVariables = MutationVariablesWithBody | void
+} | void
 
 /**
  * A hook for SCAPI custom endpoint mutations.
@@ -73,87 +72,49 @@ type MutationVariables = MutationVariablesWithBody | void
  */
 export const useCustomMutation = <TData = unknown, TError = unknown>(
     apiOptions: OptionalCustomEndpointClientConfig,
-    mutationOptions?: UseMutationOptions<TData, TError, MutationVariables>
-): UseMutationResult<TData, TError, MutationVariables> => {
+    mutationOptions?: UseMutationOptions<TData, TError, TMutationVariables>
+) => {
     const auth = useAuthContext()
-    const config = useConfig()
-    const clientHeaders = config.headers || {}
-    const currentClientConfig = {
+    const globalConfig = useConfig()
+    const globalHeaders = globalConfig.headers || {}
+    const globalClientConfig = {
         parameters: {
-            clientId: config.clientId,
-            siteId: config.siteId,
-            organizationId: config.organizationId,
-            shortCode: config.shortCode
+            clientId: globalConfig.clientId,
+            siteId: globalConfig.siteId,
+            organizationId: globalConfig.organizationId,
+            shortCode: globalConfig.shortCode
         },
-        proxy: config.proxy
+        proxy: globalConfig.proxy
     }
 
-    const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
-        return async (): Promise<any> => {
-            const clientConfig = options.clientConfig || {}
+    const createMutationFnWithAuth = (): MutationFunction<TData, TMutationVariables> => {
+        return async (args): Promise<TData> => {
             const {access_token} = await auth.ready()
-            return await helpers.callCustomEndpoint({
-                ...options,
+            return (await helpers.callCustomEndpoint({
+                ...apiOptions,
                 options: {
-                    ...options.options,
+                    ...apiOptions.options,
                     headers: {
                         Authorization: `Bearer ${access_token}`,
-                        ...clientHeaders,
-                        ...options.options?.headers
-                    }
+                        // Note the order of the following destructred objects is important.
+                        // Priority assending order: global config < mutation config < mutate func args
+                        ...globalHeaders,
+                        ...apiOptions.options?.headers,
+                        ...(args?.headers ? args.headers : {})
+                    },
+                    ...(args?.body ? {body: args.body} : {}),
+                    ...(args?.parameters ? {parameters: args.parameters} : {})
                 },
                 clientConfig: {
-                    ...currentClientConfig,
-                    ...clientConfig
+                    ...globalClientConfig,
+                    ...(apiOptions.clientConfig || {})
                 }
-            })
+            })) as TData
         }
     }
 
-    const callCustomEndpointWithBody = async (args: MutationVariablesWithBody): Promise<any> => {
-        const clientConfig = apiOptions.clientConfig || {}
-        const {access_token} = await auth.ready()
-        return await helpers.callCustomEndpoint({
-            ...apiOptions,
-            options: {
-                ...apiOptions.options,
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                    ...clientHeaders,
-                    ...apiOptions.options.headers,
-                    ...args.headers
-                },
-                body: args.body,
-                parameters: {
-                    ...apiOptions.options.parameters,
-                    ...args.parameters
-                }
-            },
-            clientConfig: {
-                ...currentClientConfig,
-                ...clientConfig
-            }
-        })
-    }
-
-    if (!apiOptions?.options?.body) {
-        // If users don't define a body when they use this hook, they can pass in a body later
-        // when calling mutate() or mutateAsync()
-        // this allows users to call the same endpoint with different arguments
-
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useReactQueryMutation(
-            callCustomEndpointWithBody,
-            mutationOptions
-        ) as UseMutationResult<TData, TError, MutationVariables>
-    } else {
-        // If users define a body when they use this hook, every time they call
-        // mutate() or mutateAsync(), it will make the exactly the same call
-        // with the same arguments to the provided endpoint
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useReactQueryMutation<TData, TError, undefined, unknown>(
-            callCustomEndpointWithAuth(apiOptions),
-            mutationOptions
-        ) as UseMutationResult<TData, TError, MutationVariables>
-    }
+    return useReactQueryMutation<TData, TError, TMutationVariables, unknown>(
+        createMutationFnWithAuth(),
+        mutationOptions
+    )
 }

@@ -2977,6 +2977,26 @@
       "value": "Continue to Shipping Method"
     }
   ],
+  "shipping_address.label.edit_button": [
+    {
+      "type": 0,
+      "value": "Edit "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
+  "shipping_address.label.remove_button": [
+    {
+      "type": 0,
+      "value": "Remove "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,

@@ -6297,6 +6297,42 @@
       "value": "]"
     }
   ],
+  "shipping_address.label.edit_button": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗḓīŧ "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_address.label.remove_button": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗḿǿǿṽḗḗ "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,

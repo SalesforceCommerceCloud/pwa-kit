@@ -1259,6 +1259,12 @@
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
   },
+  "shipping_address.label.edit_button": {
+    "defaultMessage": "Edit {address}"
+  },
+  "shipping_address.label.remove_button": {
+    "defaultMessage": "Remove {address}"
+  },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"
   },
