@@ -406,7 +406,7 @@ const ProductList = (props) => {
         if (!isUpdatingShopperContext) {
             refetch()
         }
-        },[isUpdatingShopperContext])
+    }, [isUpdatingShopperContext])
 
     return (
         <Box
@@ -426,7 +426,9 @@ const ProductList = (props) => {
             ) : (
                 <>
                     <AbovePageHeader />
-                    <PageDesignerPromotionalBanner isUpdatingShopperContext={isUpdatingShopperContext}/>
+                    <PageDesignerPromotionalBanner
+                        isUpdatingShopperContext={isUpdatingShopperContext}
+                    />
 
                     {/* Header */}
                     <Stack

@@ -12,7 +12,7 @@ import {
     useShopperContext,
     useShopperContextsMutation
 } from '@salesforce/commerce-sdk-react'
-import {isServer, isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Hooks
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
@@ -25,15 +25,16 @@ import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/ho
  * to shopper context are present.
  */
 export const useUpdateShopperContext = () => {
-    const [isUpdating, setIsUpdating] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false)
     const {site} = useMultiSite()
     const {usid} = useUsid()
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
-    const {data: shopperContext, isLoading, refetch} = useShopperContext(
-        {parameters: {usid, siteId: site.id}},
-        {enabled: !isServer}
-    )
+    const {
+        data: shopperContext,
+        isLoading,
+        refetch
+    } = useShopperContext({parameters: {usid, siteId: site.id}}, {enabled: !isServer})
 
     // Handle updating the shopper context based on URL search params
     const shopperContextFromSearchParams = useShopperContextSearchParams()

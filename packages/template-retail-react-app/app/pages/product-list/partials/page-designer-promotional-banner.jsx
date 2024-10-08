@@ -24,10 +24,18 @@ const PageDesignerPromotionalBanner = ({isUpdatingShopperContext}) => {
         'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
     }
 
-    const {data: promoBannerDesktop, error: pageErrorDesktop, refetch: refetchDesktop} = usePage({
+    const {
+        data: promoBannerDesktop,
+        error: pageErrorDesktop,
+        refetch: refetchDesktop
+    } = usePage({
         parameters: {pageId: PROMO_BANNER_DESKTOP_PAGE_ID}
     })
-    const {data: promoBannerMobile, error: pageErrorMobile, refetch: refetchMobile} = usePage({
+    const {
+        data: promoBannerMobile,
+        error: pageErrorMobile,
+        refetch: refetchMobile
+    } = usePage({
         parameters: {pageId: PROMO_BANNER_MOBILE_PAGE_ID}
     })
 
@@ -36,7 +44,7 @@ const PageDesignerPromotionalBanner = ({isUpdatingShopperContext}) => {
             refetchDesktop()
             refetchMobile()
         }
-        },[isUpdatingShopperContext])
+    }, [isUpdatingShopperContext])
 
     return (
         <Box>
