@@ -568,15 +568,38 @@ describe('SSRServer operation', () => {
             })
     })
 
-    test('SSRServer set x-forwarded-host header to locals object when it is available', () => {
+    test('should set xForwardedOrigin based on defined x-forwarded-host and x-forwarded-proto headers ', () => {
         process.env = {
             MRT_ALLOW_COOKIES: 'true'
         }
         const forwardedHost = 'www.example.com'
+        const forwardedProto = 'https'
         const app = RemoteServerFactory._createApp(opts())
         const route = (req, res) => {
             expect(req.headers['x-forwarded-host']).toBe(forwardedHost)
-            expect(res.locals.xForwardedHost).toBe(forwardedHost)
+            expect(res.locals.xForwardedOrigin).toBe(`${forwardedProto}://${forwardedHost}`)
+            res.sendStatus(200)
+        }
+        app.get('/*', route)
+
+        return request(app)
+            .get('/')
+            .set('x-forwarded-host', forwardedHost)
+            .set('x-forwarded-proto', 'https')
+            .then((response) => {
+                expect(response.status).toBe(200)
+            })
+    })
+    test('should set xForwardedOrigin based on defined x-forwarded-host and undefined x-forwarded-proto headers', () => {
+        process.env = {
+            MRT_ALLOW_COOKIES: 'true'
+        }
+        const options = opts()
+        const forwardedHost = 'www.example.com'
+        const app = RemoteServerFactory._createApp(options)
+        const route = (req, res) => {
+            expect(req.headers['x-forwarded-host']).toBe(forwardedHost)
+            expect(res.locals.xForwardedOrigin).toBe(`${options.protocol}://${forwardedHost}`)
             res.sendStatus(200)
         }
         app.get('/*', route)
@@ -586,10 +609,6 @@ describe('SSRServer operation', () => {
             .set('x-forwarded-host', forwardedHost)
             .then((response) => {
                 expect(response.status).toBe(200)
-            })
-            .finally(() => {
-                // Ensure that the environment variable is cleared after the response
-                expect(process.env.X_FORWARDED_HOST).toBeUndefined()
             })
     })
 
