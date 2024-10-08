@@ -400,10 +400,9 @@ const ProductList = (props) => {
     }, [productSearchResult])
 
     /**************** Shopper Context ****************/
-    const {shopperContext, isUpdating: isUpdatingShopperContext} = useUpdateShopperContext()
+    const {isUpdating: isUpdatingShopperContext} = useUpdateShopperContext()
 
     useEffect(() => {
-        console.log('JINSU PLP shopperContext:', shopperContext, 'isUpdatingShopperContext:', isUpdatingShopperContext)
         if (!isUpdatingShopperContext) {
             refetch()
         }
@@ -427,7 +426,7 @@ const ProductList = (props) => {
             ) : (
                 <>
                     <AbovePageHeader />
-                    <PageDesignerPromotionalBanner />
+                    <PageDesignerPromotionalBanner isUpdatingShopperContext={isUpdatingShopperContext}/>
 
                     {/* Header */}
                     <Stack

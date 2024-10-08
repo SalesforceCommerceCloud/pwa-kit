@@ -16,9 +16,7 @@ import {Page} from '@salesforce/commerce-sdk-react/components'
 import {ImageWithText} from '@salesforce/retail-react-app/app/page-designer/assets'
 import {MobileGrid1r1c} from '@salesforce/retail-react-app/app/page-designer/layouts'
 
-import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
-
-const PageDesignerPromotionalBanner = () => {
+const PageDesignerPromotionalBanner = ({isUpdatingShopperContext}) => {
     const PROMO_BANNER_DESKTOP_PAGE_ID = 'instagram-promo-banner-desktop'
     const PROMO_BANNER_MOBILE_PAGE_ID = 'instagram-promo-banner-mobile'
     const PAGEDESIGNER_TO_COMPONENT = {
@@ -33,10 +31,7 @@ const PageDesignerPromotionalBanner = () => {
         parameters: {pageId: PROMO_BANNER_MOBILE_PAGE_ID}
     })
 
-    const {shopperContext, isUpdating: isUpdatingShopperContext} = useUpdateShopperContext()
-
     useEffect(() => {
-        console.log('JINSU banner shopperContext:', shopperContext, 'isUpdatingShopperContext:', isUpdatingShopperContext)
         if (!isUpdatingShopperContext) {
             refetchDesktop()
             refetchMobile()
@@ -68,6 +63,7 @@ const PageDesignerPromotionalBanner = () => {
 }
 
 PageDesignerPromotionalBanner.propTypes = {
+    isUpdatingShopperContext: PropTypes.bool
 }
 
 export default PageDesignerPromotionalBanner
