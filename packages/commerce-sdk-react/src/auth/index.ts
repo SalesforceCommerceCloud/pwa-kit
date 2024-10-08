@@ -190,7 +190,7 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
-    private refreshTrustedAgentHandler: ((loginId: string, usid: string) => Promise<TokenResponse>) | undefined
+    private refreshTrustedAgentHandler: ((loginId: string, usid: string, refresh: boolean) => Promise<TokenResponse>) | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -716,6 +716,7 @@ class Auth {
                 redirect_uri: this.redirectURI,
                 login_id: credentials.loginId || 'guest',
                 idp_origin: 'ecom',
+                dnt: 'true',
                 ...(credentials.usid && {usid: credentials.usid})
             }
         } as {headers: {[key: string]: string}, body: TrustedAgentTokenRequest}
@@ -734,13 +735,9 @@ class Auth {
         return await this.queueRequest(() => slasClient.getTrustedAgentAccessToken(optionsToken), optionsToken.body.login_id === 'guest')
     }
 
-    registerTrustedAgentRefreshHandler(refreshTrustedAgentHandler: (loginId?: string, usid?: string) => Promise<TokenResponse>) {
-        this.refreshTrustedAgentHandler = refreshTrustedAgentHandler
-    }
-
     async refreshTrustedAgent(loginId: string, usid: string): Promise<TokenResponse> {
         if (this.refreshTrustedAgentHandler) {
-            return await this.refreshTrustedAgentHandler(loginId, usid)
+            return await this.refreshTrustedAgentHandler(loginId, usid, true)
         }
 
         this.clearStorage()
@@ -761,6 +758,11 @@ class Auth {
         }
         this.clearStorage()
         return await this.loginGuestUser()
+    }
+
+
+    registerTrustedAgentRefreshHandler(refreshTrustedAgentHandler: (loginId?: string, usid?: string, refresh?: boolean) => Promise<TokenResponse>) {
+        this.refreshTrustedAgentHandler = refreshTrustedAgentHandler
     }
 
     /**
