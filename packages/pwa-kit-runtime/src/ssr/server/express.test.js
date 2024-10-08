@@ -568,7 +568,7 @@ describe('SSRServer operation', () => {
             })
     })
 
-    test('should set xForwardedOrigin based on defined x-forwarded-host and x-forwarded-proto headers ', () => {
+    test('should set xForwardedOrigin based on defined x-forwarded-host and x-forwarded-proto headers', () => {
         process.env = {
             MRT_ALLOW_COOKIES: 'true'
         }
