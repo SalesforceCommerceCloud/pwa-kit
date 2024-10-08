@@ -28,7 +28,7 @@ const SUPPORTED_FILE_TYPES = ['.ts', '.js']
  *     ['@salesforce/extension-checkout/setup-app']: '/path/to/setup-app.ts',
  * }
  */
-export const buildAliases = (extensions = []) => {
+export const buildAliases = (extensions: ApplicationExtensionEntry[] = []) => {
     const projectDir = process.cwd()
 
     const aliases = getExtensionNames(extensions).reduce((acc, extension) => {
@@ -76,7 +76,7 @@ export const buildAliases = (extensions = []) => {
  *     console.log('File not found.')
  * }
  */
-export const findFileWithExtension = (basePath, extensions = []) => {
+export const findFileWithExtension = (basePath: string, extensions: string[] = []) => {
     for (const ext of extensions) {
         const filePath = path.format({...path.parse(basePath), base: undefined, ext})
         if (fs.existsSync(filePath)) {
@@ -104,11 +104,19 @@ export const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
 /**
  * @private
  */
-export const getExtensionNames = (extensions) => {
+export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
     return (extensions || []).map((extension) => {
         return Array.isArray(extension) ? extension[0] : extension
     })
 }
+
+// TODO: Move these to the types file!
+interface ApplicationExtensionConfig extends Record<string, unknown> {
+    enabled: boolean
+}
+
+type ApplicationExtensionEntryArray = [string, ApplicationExtensionConfig]
+type ApplicationExtensionEntry = ApplicationExtensionEntryArray | string
 
 /**
  * Determines if an extension is enabled based on the provided Application Extension entry.
@@ -123,7 +131,7 @@ export const getExtensionNames = (extensions) => {
  * @returns {boolean} - Returns `true` if the extension has a name and is enabled (or if the enabled flag is `undefined`).
  *   Returns `false` if the extension is explicitly disabled or if no name is provided.
  */
-export const isEnabled = (extensionEntry = []) => {
-    const [name, config = {}] = extensionEntry
+export const isEnabled = (extensionEntry: ApplicationExtensionEntryArray): boolean => {
+    const [name, config] = extensionEntry
     return !!(name && config?.enabled !== false)
 }

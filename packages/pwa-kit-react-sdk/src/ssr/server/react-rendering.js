@@ -28,9 +28,8 @@ import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import App from '../universal/components/_app'
 import Document from '../universal/components/_document'
-import {getExtensions} from '../universal/extensibility/extensions'
+import {getExtensions} from '@salesforce/pwa-kit-extension-support/core/extensions'
 import Throw404 from '../universal/components/throw-404'
-
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
@@ -128,7 +127,7 @@ export const render = async (req, res, next) => {
     // Get the application config which should have been stored at this point.
     const config = getConfig()
     const extensions = getExtensions()
-
+    console.log('React Rendering: ', extensions)
     AppConfig.restore(res.locals)
 
     // Use locals to thread the application extensions through the rendering pipeline.

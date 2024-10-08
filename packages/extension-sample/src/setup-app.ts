@@ -10,7 +10,7 @@ import loadable from '@loadable/component'
 import {ApplicationExtension, IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
 
 import withRedBorder from '*/components/with-red-border'
-import {ReactExtensionConfig as Config} from './types'
+import {Config} from './types'
 
 const SamplePage = loadable(() => import('*/pages/sample'))
 
@@ -21,7 +21,7 @@ class Sample extends ApplicationExtension<Config> {
     }
 
     extendRoutes(routes: IRouteConfig[]): IRouteConfig[] {
-        console.log('Extend Routes for ', this.getName())
+        console.log('Extend Routes for ', this.getName(), this.getConfig().path || defaultPath)
         return [
             {
                 exact: true,

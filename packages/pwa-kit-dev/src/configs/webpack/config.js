@@ -20,8 +20,11 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import WebpackNotifierPlugin from 'webpack-notifier'
 
+// TODO: Simplify the exports in this package. 
+import OverridesResolverPlugin from '@salesforce/pwa-kit-extension-support/configs/webpack/plugins/overrides-resolver-plugin.js'
+
 // Local Plugins
-import OverridesResolverPlugin from './plugins/overrides-resolver-plugin'
+// import OverridesResolverPlugin from './plugins/overrides-resolver-plugin'
 import {sdkReplacementPlugin} from './plugins'
 
 // Constants
@@ -29,7 +32,8 @@ import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-
 
 // Utilities
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {buildAliases, getExtensionNames, nameRegex} from '../../utils/extensibility-utils'
+// import {buildAliases, getExtensionNames, nameRegex} from '../../utils/extensibility-utils'
+import {buildAliases, getExtensionNames, nameRegex} from '@salesforce/pwa-kit-extension-support/utils/extensibility-utils.js'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -252,10 +256,17 @@ const baseConfig = (target) => {
                             }
                         },
                         {
-                            test: /universal[\\/]+extensibility[\\/]+extensions/,
-                            loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extensions-loader`,
-                            options: {
-                                pkg
+                            // NOTE: Might be better to export a rule directly that we can plog in here, this will 
+                            // make the "extensions" file private so was can change that implementation detail later 
+                            // if we choose to do so.
+                            test: /core[\\/]+extensions/,
+                            // loader: '@salesforce/pwa-kit-extension-support/dist/configs/webpack/loaders/extensions-loader',
+                            use: {
+                                loader: findDepInStack('@salesforce/pwa-kit-extension-support/dist/configs/webpack/loaders/extensions-loader'),
+                                options: {
+                                    pkg,
+                                    getConfig
+                                }
                             }
                         }
                     ].filter(Boolean)

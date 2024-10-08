@@ -22,12 +22,12 @@ const PWA_KIT_REACT_SDK = 'pwa-kit-react-sdk'
 // TODO: We should determine if we want the `overrides-resolver-plugin` to handle resolution of application special
 // components like _app and _document. If so we can update this map and remove the special logic from our webpack
 // configuration.
-const SDK_COMPONENT_MAP = {}
+const SDK_COMPONENT_MAP: Record<string, string> = {}
 const INDEX_FILE = 'index' // TODO: Make this value obey the webpack's `resolve.mainFiles` options.
 
 // Returns true/false indicating if the importPath resolves to a same named file as the sourcePath.
 // @private
-export const isSelfReference = (importPath, sourcePath) => {
+export const isSelfReference = (importPath: string, sourcePath: string) => {
     const indexRegExp = new RegExp(`(/${INDEX_FILE})$`)
 
     // Sanitize the input. Here we want to remove the file extension and index file if it exists.
@@ -53,11 +53,11 @@ export const isSelfReference = (importPath, sourcePath) => {
  * console.log(result)
  * // [["@salesforce/extension-store-finder", {}], ["@salesforce/extension-account-pages", {singlePage: true}], ["/home/project/extensions/local-extension", {}]]
  */
-export const expand = (extensions = []) =>
+export const expand = (extensions: ApplicationExtensionEntry[] = []): ApplicationExtensionEntryArray[] =>
     extensions
         .filter((extension) => Boolean(extension))
         .map((extension) => {
-            let [nameRef, config = {}] = Array.isArray(extension) ? extension : [extension, {}]
+            let [nameRef, config = {}] : [string, any] = Array.isArray(extension) ? extension : [extension, {}]
 
             switch (true) {
                 case /^\./.test(nameRef):
@@ -82,6 +82,19 @@ export const expand = (extensions = []) =>
             return [nameRef, config]
         })
 
+type BuildCandidatePathsOptions = {
+    projectDir: string, 
+    extensionEntries: ApplicationExtensionEntry[]
+}
+
+interface ApplicationExtensionConfig extends Record<string, unknown> {
+    enabled: boolean
+}
+
+type ApplicationExtensionEntryArray = [string, ApplicationExtensionConfig]
+type ApplicationExtensionEntry = ApplicationExtensionEntryArray | string
+
+
 /**
  * Based on the current extensibility configuration, return an array of candiate file paths to be used
  * in the wild-card import module resolution for the given import path..
@@ -90,10 +103,10 @@ export const expand = (extensions = []) =>
  * @param {String} sourcePath - The path the the file of the source import.
  * @param {Object} opts - The path the the file of the source import.
  * @param {Array<shortName: String, config: Array>} opts.extensionEntries - List of extension entries (tupals) used by the base PWA-Kit application.
- * @param {String>} opts.projectDir - Absolute path of the base project.
+ * @param {String} opts.projectDir - Absolute path of the base project.
  * @returns {String[]} paths - The potential paths to find the module import.
  */
-export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
+export const buildCandidatePaths = (importPath: string, sourcePath: string, opts: BuildCandidatePathsOptions) => {
     // Replace wildcard character as it has done its job getting us to this point.
     importPath = importPath.replace('*/', '')
 
@@ -114,7 +127,7 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
                 path.join(srcPath, OVERRIDES, importPath),
                 path.join(srcPath, importPath)
             ]
-        }, [])
+        }, [] as ApplicationExtensionEntry[])
 
     // Add non-extension search locations locations. The base project and the sdk as the final callback.
     paths = [
