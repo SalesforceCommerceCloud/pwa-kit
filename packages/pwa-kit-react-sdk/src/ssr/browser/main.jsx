@@ -10,6 +10,7 @@ import {hydrateRoot} from 'react-dom/client'
 import PropTypes from 'prop-types'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {loadableReady} from '@loadable/component'
+import {getExtensions} from '@salesforce/pwa-kit-extension-support/core/extensions'
 
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
@@ -19,7 +20,6 @@ import {getRoutes, routeComponent} from '../universal/components/route-component
 import {applyAppExtensions} from '../universal/extensibility/utils'
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
-import {getExtensions} from '../universal/extensibility/extensions'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {

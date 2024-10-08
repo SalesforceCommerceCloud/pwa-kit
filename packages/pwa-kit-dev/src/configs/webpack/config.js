@@ -32,7 +32,7 @@ import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-
 
 // Utilities
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {buildAliases, getExtensionNames, nameRegex} from '@salesforce/pwa-kit-extension-support/utils/extensibility-utils.js'
+import {buildAliases, getExtensionNames, nameRegex} from '@salesforce/pwa-kit-extension-support/utils/extensibility-utils'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -143,6 +143,7 @@ const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
     }
+
     class Builder {
         constructor() {
             this.config = {
@@ -193,6 +194,11 @@ const baseConfig = (target) => {
                     ],
                     extensions: SUPPORTED_FILE_EXTENSIONS,
                     alias: {
+                        ...Object.assign(
+                            ...DEPS_TO_DEDUPE.map((dep) => ({
+                                [dep]: findDepInStack(dep)
+                            }))
+                        ),
                         // TODO: This alias is temporary. When we investigate turning the retail template into an application extension
                         // we'll have to decide if we want to continue using an alias, or change back to using relative paths.
                         '@salesforce/retail-react-app': projectDir,
@@ -203,11 +209,6 @@ const baseConfig = (target) => {
                             Object.keys(pkg?.devDependencies || {}).filter((dependency) =>
                                 dependency.match(nameRegex)
                             )
-                        ),
-                        ...Object.assign(
-                            ...DEPS_TO_DEDUPE.map((dep) => ({
-                                [dep]: findDepInStack(dep)
-                            }))
                         )
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
@@ -259,9 +260,9 @@ const baseConfig = (target) => {
                             // make the "extensions" file private so was can change that implementation detail later 
                             // if we choose to do so.
                             test: /core[\\/]+extensions/,
-                            // loader: '@salesforce/pwa-kit-extension-support/dist/configs/webpack/loaders/extensions-loader',
+
                             use: {
-                                loader: findDepInStack('@salesforce/pwa-kit-extension-support/dist/configs/webpack/loaders/extensions-loader'),
+                                loader: findDepInStack('@salesforce/pwa-kit-extension-support/configs/webpack/loaders/extensions-loader'),
                                 options: {
                                     pkg,
                                     getConfig

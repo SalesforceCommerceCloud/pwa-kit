@@ -61,8 +61,9 @@ module.exports = function (this: ExtensionsLoaderContext) {
     })
     
     const appExtensions = getConfig()?.app?.extensions
+
     // TODO: later consider updating `normalizeExtensionsList` to use a util function
-    const result = dedent`
+    return dedent`
             /*
             * Copyright (c) 2024, salesforce.com, inc.
             * All rights reserved.
@@ -113,7 +114,4 @@ module.exports = function (this: ExtensionsLoaderContext) {
                 return configuredExtensions
             }
         `
-    
-    console.log('result: ', result)
-    return result
 }

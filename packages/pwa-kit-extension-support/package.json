@@ -20,14 +20,16 @@
     "types",
     "utils"
   ],
-  "exports": {
-    "./*": "./dist/*"
+  "publishConfig": {
+    "directory": "dist"
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build-old": "tsc",
+    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc"
   },
   "dependencies": {
+    "cross-env": "^5.2.1",
     "dedent": "^1.5.3",
     "fs-extra": "^11.2.0",
     "hoist-non-react-statics": "^3.3.2",
@@ -40,6 +42,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/resolve": "^1.20.6",
     "@types/webpack": "^5.28.5",
+    "internal-lib-build": "4.0.0-dev",
     "type-fest": "^4.26.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
