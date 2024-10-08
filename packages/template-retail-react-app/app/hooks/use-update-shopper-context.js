@@ -6,14 +6,13 @@
  */
 
 import isEqual from 'lodash/isEqual'
-import {useEffect} from 'react'
+import {useEffect, useState} from 'react'
 import {
     useUsid,
     useShopperContext,
     useShopperContextsMutation
 } from '@salesforce/commerce-sdk-react'
 import {isServer, isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
-import {useQueryClient} from '@tanstack/react-query'
 
 // Hooks
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
@@ -26,21 +25,18 @@ import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/ho
  * to shopper context are present.
  */
 export const useUpdateShopperContext = () => {
+    const [isUpdating, setIsUpdating] = useState(false);
     const {site} = useMultiSite()
     const {usid} = useUsid()
-    const queryClient = useQueryClient()
     const createShopperContext = useShopperContextsMutation('createShopperContext')
     const updateShopperContext = useShopperContextsMutation('updateShopperContext')
-    const {data: shopperContext, isLoading} = useShopperContext(
+    const {data: shopperContext, isLoading, refetch} = useShopperContext(
         {parameters: {usid, siteId: site.id}},
         {enabled: !isServer}
     )
+
     // Handle updating the shopper context based on URL search params
     const shopperContextFromSearchParams = useShopperContextSearchParams()
-
-    const refetchDataOnClient = () => {
-        queryClient.invalidateQueries()
-    }
 
     const handleShopperContextUpdate = async (shopperContext, newShopperContext) => {
         const payload = {
@@ -52,6 +48,7 @@ export const useUpdateShopperContext = () => {
         } else {
             await updateShopperContext.mutateAsync(payload)
         }
+        await refetch()
     }
 
     useEffect(() => {
@@ -61,9 +58,12 @@ export const useUpdateShopperContext = () => {
             !isEqual(shopperContext, shopperContextFromSearchParams)
 
         if (shouldUpdateShopperContext) {
+            setIsUpdating(true)
             handleShopperContextUpdate(shopperContext, shopperContextFromSearchParams)
-        } else if (shopperContext && isHydrated()) {
-            refetchDataOnClient()
+        } else if (shopperContext) {
+            setIsUpdating(false)
         }
     }, [isLoading, shopperContext, shopperContextFromSearchParams])
+
+    return {shopperContext, isUpdating}
 }

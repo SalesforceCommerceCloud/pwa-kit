@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useEffect} from 'react'
 import {usePage} from '@salesforce/commerce-sdk-react'
+import PropTypes from 'prop-types'
 
 // Components
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -15,6 +16,8 @@ import {Page} from '@salesforce/commerce-sdk-react/components'
 import {ImageWithText} from '@salesforce/retail-react-app/app/page-designer/assets'
 import {MobileGrid1r1c} from '@salesforce/retail-react-app/app/page-designer/layouts'
 
+import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
+
 const PageDesignerPromotionalBanner = () => {
     const PROMO_BANNER_DESKTOP_PAGE_ID = 'instagram-promo-banner-desktop'
     const PROMO_BANNER_MOBILE_PAGE_ID = 'instagram-promo-banner-mobile'
@@ -22,12 +25,23 @@ const PageDesignerPromotionalBanner = () => {
         'commerce_assets.productListTile': ImageWithText,
         'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
     }
-    const {data: promoBannerDesktop, error: pageErrorDesktop} = usePage({
+
+    const {data: promoBannerDesktop, error: pageErrorDesktop, refetch: refetchDesktop} = usePage({
         parameters: {pageId: PROMO_BANNER_DESKTOP_PAGE_ID}
     })
-    const {data: promoBannerMobile, error: pageErrorMobile} = usePage({
+    const {data: promoBannerMobile, error: pageErrorMobile, refetch: refetchMobile} = usePage({
         parameters: {pageId: PROMO_BANNER_MOBILE_PAGE_ID}
     })
+
+    const {shopperContext, isUpdating: isUpdatingShopperContext} = useUpdateShopperContext()
+
+    useEffect(() => {
+        console.log('JINSU banner shopperContext:', shopperContext, 'isUpdatingShopperContext:', isUpdatingShopperContext)
+        if (!isUpdatingShopperContext) {
+            refetchDesktop()
+            refetchMobile()
+        }
+        },[isUpdatingShopperContext])
 
     return (
         <Box>
@@ -53,6 +67,7 @@ const PageDesignerPromotionalBanner = () => {
     )
 }
 
-PageDesignerPromotionalBanner.propTypes = {}
+PageDesignerPromotionalBanner.propTypes = {
+}
 
 export default PageDesignerPromotionalBanner

@@ -72,6 +72,7 @@ import {
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
@@ -149,7 +150,8 @@ const ProductList = (props) => {
     const {
         isLoading,
         isRefetching,
-        data: productSearchResult
+        data: productSearchResult,
+        refetch
     } = useProductSearch(
         {
             parameters: {
@@ -396,6 +398,16 @@ const ProductList = (props) => {
             }
         }
     }, [productSearchResult])
+
+    /**************** Shopper Context ****************/
+    const {shopperContext, isUpdating: isUpdatingShopperContext} = useUpdateShopperContext()
+
+    useEffect(() => {
+        console.log('JINSU PLP shopperContext:', shopperContext, 'isUpdatingShopperContext:', isUpdatingShopperContext)
+        if (!isUpdatingShopperContext) {
+            refetch()
+        }
+        },[isUpdatingShopperContext])
 
     return (
         <Box
