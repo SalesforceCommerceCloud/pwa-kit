@@ -112,19 +112,17 @@ const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
 const INITIAL_QUESTION = [
-        {
-            name: 'project.type',
-            message: 'What type of project do you want to create?',
-            type: 'list',
-            choices: [
-                { name: 'PWA Kit Project', value: 'PWAKitProject' },
-                { name: 'Application Extension', value: 'appExtensionProject' }
-            ],
-            default: 'PWAKitProject'
-        }
-    ]
-
-
+    {
+        name: 'project.type',
+        message: 'What type of project do you want to create?',
+        type: 'list',
+        choices: [
+            {name: 'PWA Kit Project', value: 'PWAKitProject'},
+            {name: 'Application Extension', value: 'appExtensionProject'}
+        ],
+        default: 'PWAKitProject'
+    }
+]
 
 const askApplicationExtensibiltyQuestions = (availableAppExtensions) => {
     return [
@@ -157,13 +155,13 @@ const askApplicationExtensibiltyQuestions = (availableAppExtensions) => {
 }
 
 const APPLICATION_EXTENSION_QUESTIONS = [
-        {
-            name: 'project.extensionName',
-            message: 'What is the name of your Application Extension? (The prefix "extension-" will be added to the name.)',
-            validate: validProjectName
-        }
-    ]
-
+    {
+        name: 'project.extensionName',
+        message:
+            'What is the name of your Application Extension? (The prefix "extension-" will be added to the name.)',
+        validate: validProjectName
+    }
+]
 
 const EXTENSIBILITY_QUESTIONS = [
     {
@@ -451,16 +449,6 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'typescript-minimal-app-extension-example',
-        name: 'Template Minimal Project',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'typescript-minimal'
-        },
-        private: true
-    },
-    {
         id: 'express-minimal-test-project',
         name: 'Express Minimal Test Project',
         description: '',
@@ -501,6 +489,16 @@ const PRESETS = [
         questions: MRT_REFERENCE_QUESTIONS,
         answers: {
             ['project.name']: 'mrt-reference-app'
+        },
+        private: true
+    },
+    {
+        id: 'base-app-extension',
+        name: 'Template base Application Extension',
+        description: '',
+        templateSource: {
+            type: TEMPLATE_SOURCE_BUNDLE,
+            id: 'base-app-extension'
         },
         private: true
     },
@@ -818,10 +816,11 @@ const fetchAvailableAppExtensions = () => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
+const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
     const {answers, preset} = context
     const {templateSource} = preset
 
+    console.log('DEBUG runGenerator outputDir: ', outputDir)
     console.log('DEBUG runGenerator context: ', context)
     const {
         extend = false,
@@ -840,18 +839,22 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     const {id, type} = templateSource
     let tarPath
 
+
     switch (type) {
         case TEMPLATE_SOURCE_NPM: {
+            console.log('DEBUG downloading template from NPM: ', id, templateVersion)
             const tarFile = sh
                 .exec(`npm pack ${id}@${templateVersion} --pack-destination="${tmp}"`, {
                     silent: true
                 })
                 .stdout.trim()
             tarPath = p.join(tmp, tarFile)
+            console.log('DEBUG downloaded NPM template tar path: ', tarPath)
             break
         }
         case TEMPLATE_SOURCE_BUNDLE:
             tarPath = p.join(__dirname, '..', 'templates', `${id}.tar.gz`)
+            console.log('DEBUG using bundled template tar path: ', tarPath)
             break
         default: {
             const msg = `Error: Cannot handle template source type ${type}.`
@@ -861,6 +864,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     }
 
     // Extract the main template
+    console.log('DEBUG extracting template from: ', tarPath)
     tar.x({
         file: tarPath,
         cwd: tmp,
@@ -869,21 +873,8 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
     console.log('DEBUG answers.project.type : ', answers.project.type)
 
-    // Check project type and handle appropriately
-    if (answers.project.type === 'extension') {
-        // Add extension prefix to the name
-        answers.project.name = `extension-${answers.project.name}`;
-        // Create Application Extension project files
-        // await createApplicationExtensionFiles(outputDir, answers);
-        console.log('DEBUG createApplicationExtensionFiles...  ')
-    } else {
-        // Proceed with normal project generation
-        // await createNormalProjectFiles(outputDir, answers);
-        console.log('DEBUG createNormalProjectFiles... ')
-    }
-    // Other existing logic...
-
     if (extend) {
+        console.log('DEBUG extending project...')
         // Bootstrap the projects.
         getFiles(BOOTSTRAP_DIR)
             .map((file) => file.replace(BOOTSTRAP_DIR, ''))
@@ -893,15 +884,17 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
         // Copy required assets defined on the preset level.
         const {assets = []} = preset
+        console.log('DEBUG copying assets: ', assets)
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
     } else {
-        // Copy the base template either from the package or npm.
+        console.log('DEBUG copying base template to outputDir: ', outputDir)
         sh.cp('-rf', packagePath, outputDir)
 
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
+        console.log('DEBUG checking template-specific assets in: ', assetsDir)
         if (sh.test('-e', assetsDir)) {
             getFiles(assetsDir)
                 .map((file) => {
@@ -913,19 +906,76 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 })
         }
 
-        // Process selected Application Extensions
-        processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
+        // Check project type and handle appropriately
+        if (answers.project.type === 'appExtensionProject') {
+            console.log(
+                'DEBUG creating Application Extension project files... answers.project.name:',
+                answers.project.name
+            )
 
-        // Update the generated project's package.json. NOTE: For bootstrapped projects this
-        // can be done in the template building. But since we have two types of project builds,
-        // (bootstrap/bundle) we'll do it here where it works in both scenarios.
+            const developmentProjectOutputDir = p.join(outputDir, 'dev')
+            console.log(
+                'DEBUG: Recursively generating for appExtensionProject... developmentProjectOutputDir:',
+                developmentProjectOutputDir
+            )
+            // Recursively call runGenerator for the 'typescript-minimal' preset
+            const extensionContext = {
+                ...context,
+                preset: {
+                    id: 'typescript-minimal',
+                    templateSource: {type: TEMPLATE_SOURCE_BUNDLE, id: 'typescript-minimal'},
+                    private: true
+                },
+                answers: {project: {type: 'PWAKitProject', name: 'typescript-dev'}}
+            }
+
+            await runGenerator(extensionContext, {
+                outputDir: developmentProjectOutputDir,
+                templateVersion,
+                verbose
+            })
+
+            // Update the dev/package.json with dependencies
+            const devPkgJsonPath = p.resolve(developmentProjectOutputDir, 'package.json')
+            const devPkgJSON = readJson(devPkgJsonPath)
+
+            const finalDevPkgData = {
+                ...devPkgJSON,
+                devDependencies: {
+                    ...(devPkgJSON.devDependencies || {}),
+                    [answers.project.name]: 'file:../'
+                }
+            }
+
+            writeJson(devPkgJsonPath, finalDevPkgData)
+
+            // Update the root package.json to add a start script
+            const rootPkgJsonPath = p.resolve(outputDir, 'package.json')
+            const rootPkgJSON = readJson(rootPkgJsonPath)
+
+            const updatedRootPkgData = merge(rootPkgJSON, {
+                scripts: {
+                    start: 'npm --prefix ./dev start'
+                }
+            })
+
+            // Write the updated package.json back to the output directory
+            writeJson(rootPkgJsonPath, updatedRootPkgData)
+        } else {
+            console.log('DEBUG processing selected Application Extensions...')
+            processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
+        }
+
+        console.log('DEBUG updating package.json for the generated project...')
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
 
         // Add selected Application Extensions to devDependencies and mobify object
         const appExtensionDeps = selectedAppExtensions.reduce((acc, appExtensionName) => {
             // Find the corresponding Application Extension details
-            const appExtensionDetails = context.availableAppExtensions.find((ext) => ext.value === appExtensionName)
+            const appExtensionDetails = context.availableAppExtensions.find(
+                (ext) => ext.value === appExtensionName
+            )
             const version = appExtensionDetails ? appExtensionDetails.version : '1.0.0-dev'
 
             acc[appExtensionName] = extractAppExtensions
@@ -933,6 +983,8 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 : version
             return acc
         }, {})
+
+        console.log('DEBUG final application extension dependencies: ', appExtensionDeps)
 
         const finalPkgData = merge(pkgJSON, {
             name: slugifyName(context.answers.project.name || context.preset.id),
@@ -950,10 +1002,12 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
         // Clean up the temporary directory
         sh.rm('-rf', tmp)
+        console.log('DEBUG cleaned up temporary directory: ', tmp)
     }
 
     // Install dependencies for the newly minted project.
     npmInstall(outputDir, {verbose})
+    console.log('DEBUG runGenerator finished.')
 }
 
 const foundNode = process.versions.node
@@ -994,24 +1048,24 @@ const main = async (opts) => {
 
     // If no preset argument is provided, ask Application Extensibility questions
     if (!presetId) {
-
         // Ask initial question
         const initialAnswers = await inquirer.prompt(INITIAL_QUESTION)
-        context = { ...context, answers: { project: initialAnswers.project } }
+        context = {...context, answers: {project: initialAnswers.project}}
 
         if (initialAnswers.project.type === 'appExtensionProject') {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
-            context.answers.project.name = extensionNameAnswers.project.extensionName
-            context.preset = PRESETS.find(({id}) => id === 'typescript-minimal-app-extension-example')
+            context.answers.project.name = `extension-${extensionNameAnswers.project.extensionName}`
+            context.preset = PRESETS.find(({id}) => id === 'base-app-extension')
         } else {
-
             const availableAppExtensions = fetchAvailableAppExtensions()
 
             // Include version info in context
             context.availableAppExtensions = availableAppExtensions
 
-            const generationAnswers = await prompt(askApplicationExtensibiltyQuestions(availableAppExtensions))
+            const generationAnswers = await prompt(
+                askApplicationExtensibiltyQuestions(availableAppExtensions)
+            )
             context = merge(context, {answers: expandObject(generationAnswers)})
 
             if (context.answers.project.useAppExtensibility) {

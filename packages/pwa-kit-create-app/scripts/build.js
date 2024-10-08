@@ -28,7 +28,8 @@ const main = () => {
         'retail-react-app',
         'express-minimal',
         'typescript-minimal',
-        'mrt-reference-app'
+        'mrt-reference-app',
+        'base-app-extension'
     ]
 
     if (!sh.test('-d', templatesDir)) {
