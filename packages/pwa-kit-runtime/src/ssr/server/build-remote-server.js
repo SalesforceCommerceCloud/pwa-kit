@@ -453,8 +453,10 @@ export const RemoteServerFactory = {
     _setForwardedHeaders(app, options) {
         app.use((req, res, next) => {
             const xForwardedHost = req.headers?.['x-forwarded-host']
+            const xForwardedProto = req.headers?.['x-forwarded-proto']
             if (xForwardedHost) {
-                res.locals.xForwardedHost = xForwardedHost
+                // prettier-ignore
+                res.locals.xForwardedOrigin = `${xForwardedProto || options.protocol}://${xForwardedHost}`
             }
 
             next()

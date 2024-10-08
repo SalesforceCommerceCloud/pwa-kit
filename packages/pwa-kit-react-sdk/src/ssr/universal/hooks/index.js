@@ -49,28 +49,25 @@ export const useServerContext = () => {
  *
  * By default, it will return the ORIGIN under which we are serving the page.
  *
- * If you enabled `enableXForwardedHost` in your app, it will use the value of `x-forwarded-host` header in req
+ * If `fromXForwardedHeader` is true, it will use the value of `x-forwarded-proto` and `x-forwarded-host` headers in req
  * to build origin. (it is false by default)
  *
  * NOTE: this is a React hook, so it has to be used in a React rendering pipeline.
  * @returns {string} origin string
  *
  */
-export const useOrigin = () => {
-    const {res, req} = useServerContext()
+export const useOrigin = ({fromXForwardedHeader = false}) => {
+    const {res} = useServerContext()
 
     if (typeof window !== 'undefined') {
         return window.location.origin
     }
-    const {
-        app: {enableXForwardedHost}
-    } = getConfig()
 
     const {APP_ORIGIN} = process.env
 
-    const xForwardedHost = res.locals.xForwardedHost
-    if (enableXForwardedHost && xForwardedHost) {
-        return `${req.protocol}://${xForwardedHost}`
+    const xForwardedOrigin = res.locals.xForwardedOrigin
+    if (fromXForwardedHeader && xForwardedOrigin) {
+        return xForwardedOrigin
     }
     return APP_ORIGIN
 }

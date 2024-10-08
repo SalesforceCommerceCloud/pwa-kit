@@ -18,6 +18,8 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+
 // Chakra
 import {
     Box,
@@ -73,7 +75,6 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
-import {useOrigin} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -123,7 +124,7 @@ const App = (props) => {
     })
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
-    const appOrigin = useOrigin()
+    const appOrigin = useAppOrigin()
     const activeData = useActiveData()
     const history = useHistory()
     const location = useLocation()

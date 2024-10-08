@@ -22,6 +22,7 @@ import 'focus-visible/dist/focus-visible'
 
 import theme from '@salesforce/retail-react-app/app/theme'
 import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {
     resolveSiteFromUrl,
     resolveLocaleFromUrl
@@ -32,7 +33,7 @@ import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {useCorrelationId, useOrigin} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 /**
@@ -50,7 +51,7 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
-    const appOrigin = useOrigin()
+    const appOrigin = useAppOrigin()
 
     return (
         <CommerceApiProvider
