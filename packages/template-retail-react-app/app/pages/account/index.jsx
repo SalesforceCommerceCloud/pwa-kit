@@ -157,7 +157,8 @@ const Account = () => {
                                     <Flex as="nav" spacing={0} direction="column">
                                         <Stack spacing={0} as="ul" data-testid="account-nav">
                                             {navLinks.map((link) => (
-                                                <Box align="center"
+                                                <Box
+                                                    align="center"
                                                     key={link.name}
                                                     as="li"
                                                     listStyleType="none"
@@ -178,7 +179,10 @@ const Account = () => {
                                                 </Box>
                                             ))}
 
-                                            <LogoutButton justify="center" onClick={onSignoutClick} />
+                                            <LogoutButton
+                                                justify="center"
+                                                onClick={onSignoutClick}
+                                            />
                                         </Stack>
                                     </Flex>
                                 </AccordionPanel>
