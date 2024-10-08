@@ -19,9 +19,12 @@ import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
     const authorizeIDP = useAuthHelper(AuthHelpers.AuthorizeIDP)
+    const {app: appConfig} = getConfig()
+    const idpHint = appConfig.login.idp
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
@@ -75,7 +78,7 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                         <Button
                             variant="outline"
                             onClick={async () => {
-                                await authorizeIDP.mutateAsync()
+                                await authorizeIDP.mutateAsync({hint: idpHint})
                             }}
                         >
                             <Text>

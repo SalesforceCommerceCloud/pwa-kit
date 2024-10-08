@@ -83,7 +83,7 @@ export const routes = [
         component: CheckoutConfirmation
     },
     {
-        path: '/callback',
+        path: '/login-redirect',
         component: LoginRedirect,
         exact: true
     },
@@ -121,6 +121,6 @@ export const routes = [
 export default () => {
     const config = getConfig()
     return configureRoutes(routes, config, {
-        ignoredRoutes: ['/callback', '*']
+        ignoredRoutes: ['*']
     })
 }

@@ -15,6 +15,9 @@ module.exports = {
             showDefaults: true,
             interpretPlusSignAsSpace: false
         },
+        login: {
+            idp: 'Google'
+        },
         defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',

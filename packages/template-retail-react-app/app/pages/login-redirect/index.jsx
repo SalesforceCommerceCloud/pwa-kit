@@ -8,9 +8,39 @@
 // This page is here along witht the `callback` route to handle the redirect
 // after a user logs in using the SLAS Implementation
 
-import React, {Fragment} from 'react'
+import React, {Fragment, useEffect} from 'react'
+import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+
+// Hooks
+import {useSearchParams} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
 const LoginRedirect = () => {
+    const navigate = useNavigation()
+    const [searchParams] = useSearchParams()
+    const loginIDPUser = useAuthHelper(AuthHelpers.LoginIDPUser)
+    const {data: customer} = useCurrentCustomer()
+    /********** Social Login **********/
+    useEffect(() => {
+        if (searchParams.code && searchParams.usid) {
+            loginIDPUser.mutateAsync({
+                usid: searchParams.usid
+            })
+        }
+    }, [])
+
+    useEffect(() => {
+        console.log('CUSTOMER: ', customer)
+        if (customer?.isRegistered) {
+            if (location?.state?.directedFrom) {
+                navigate(location.state.directedFrom)
+            } else {
+                navigate('/account')
+            }
+        }
+    }, [customer?.isRegistered])
+
     return (
         <Fragment>
             <h1 data-testid="login-redirect-page-heading">Login Redirect</h1>
