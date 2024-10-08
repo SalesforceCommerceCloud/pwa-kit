@@ -1,6 +1,7 @@
 ## v4.1.0-dev (Aug 8, 2024)
 - Announce wishlist change in total for screen readers (a11y) [#2033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2033)
 - Fixed a bug that incorrectly imports uninstalled package `@chakra-ui/layout` [#2047](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2047)
+- [a11y] Mobile view account menu a11y adjustments [#1059](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2059)
 
 ### Performance Improvements
 -   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
@@ -14,7 +15,7 @@
 - Encode non ASCII HTTP headers when `encodeNonAsciiHttpHeaders` flag is set to true in `ssr.js` [#2009](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2009)
 
 ### Accessibility Improvements
-- [a11y] Hide svg from screenreader as they are decorative on homepage [#1980](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1980) 
+- [a11y] Hide svg from screenreader as they are decorative on homepage [#1980](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1980)
 - [a11y] Hide log out svg from screenreader as they are decorative [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
 - [a11y] Ensure heading level matches the heading's visual importance/level [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
 - [a11y] Provide a descriptive dialog title for Mobile Navigation Header [#2000](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2000)
