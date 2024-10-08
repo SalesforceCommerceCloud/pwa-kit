@@ -21,7 +21,7 @@ import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import WebpackNotifierPlugin from 'webpack-notifier'
 
 // TODO: Simplify the exports in this package. 
-import OverridesResolverPlugin from '@salesforce/pwa-kit-extension-support/configs/webpack/plugins/overrides-resolver-plugin.js'
+import OverridesResolverPlugin from '@salesforce/pwa-kit-extension-support/configs/webpack/plugins/overrides-resolver-plugin'
 
 // Local Plugins
 // import OverridesResolverPlugin from './plugins/overrides-resolver-plugin'
@@ -32,7 +32,6 @@ import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-
 
 // Utilities
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-// import {buildAliases, getExtensionNames, nameRegex} from '../../utils/extensibility-utils'
 import {buildAliases, getExtensionNames, nameRegex} from '@salesforce/pwa-kit-extension-support/utils/extensibility-utils.js'
 
 const projectDir = process.cwd()

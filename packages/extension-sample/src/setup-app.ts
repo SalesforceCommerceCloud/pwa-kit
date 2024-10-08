@@ -12,7 +12,7 @@ import {ApplicationExtension, IRouteConfig} from '@salesforce/pwa-kit-react-sdk/
 import withRedBorder from '*/components/with-red-border'
 import {Config} from './types'
 
-const SamplePage = loadable(() => import('*/pages/sample'))
+const SamplePage = loadable(() => import(/* webpackChunkName: "extension-2-page-sample-2" */'./pages/sample'))
 
 const defaultPath: string = '/sample-page'
 class Sample extends ApplicationExtension<Config> {
