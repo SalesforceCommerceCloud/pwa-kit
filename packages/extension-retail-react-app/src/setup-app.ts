@@ -14,6 +14,7 @@ import {
 
 // import withRedBorder from '*/components/with-red-border'
 import {ReactExtensionConfig as Config} from './types'
+import withProviders from './components/with-providers'
 
 // const SamplePage = loadable(() => import('*/pages/sample'))
 // const defaultPath = '/sample-page'
@@ -25,8 +26,7 @@ const Home = loadable(() => import('*/pages/home-rra'))
 class RetailReactApp extends ApplicationExtension<Config> {
     extendApp(App: React.ComponentType): React.ComponentType {
         // TODO
-        // return doSomething(App)
-        return App
+        return withProviders(App)
     }
 
     // extendAppConfig(AppConfig, locals) {

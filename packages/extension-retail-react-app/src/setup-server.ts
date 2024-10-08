@@ -23,6 +23,7 @@ class SampleExtension extends ExpressApplicationExtension<Config> {
         // Set default HTTP security headers required by PWA Kit
         app.use(defaultPwaKitSecurityHeaders)
         // Set custom HTTP security headers
+        // TODO: how to verify this?
         app.use(
             helmet({
                 contentSecurityPolicy: {
