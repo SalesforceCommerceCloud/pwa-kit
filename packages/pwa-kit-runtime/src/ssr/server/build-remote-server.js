@@ -447,7 +447,7 @@ export const RemoteServerFactory = {
     },
 
     /**
-     * Set x-forward-* headers into locals
+     * Set x-forward-* headers into locals, this is primarily used to facilitate react sdk hook `useOrigin`
      * @private
      */
     _setForwardedHeaders(app, options) {

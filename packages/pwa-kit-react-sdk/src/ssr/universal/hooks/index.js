@@ -8,7 +8,6 @@
 
 import React, {useContext} from 'react'
 import {CorrelationIdContext, ServerContext} from '../contexts'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 /**
  * Use this hook to get the correlation id value of the closest CorrelationIdProvider component.

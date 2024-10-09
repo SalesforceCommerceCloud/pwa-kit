@@ -12,7 +12,7 @@
  * initialized using the `_createApp` method (This happens in your /app/ssr.js file).
  *
  * @function
- * @deprecated since version 3.8.0 - use `useOrigin()` instead.
+ * @deprecated use `useOrigin()` instead.
  * This function will be removed in version 4.0.0.
  * @returns {string} Returns the ORIGIN under which we are serving the page.
  * @example
