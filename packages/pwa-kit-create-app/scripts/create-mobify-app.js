@@ -836,8 +836,6 @@ const runGenerator = async (
     const {answers, preset} = context
     const {templateSource} = preset
 
-    console.log('DEBUG runGenerator outputDir: ', outputDir)
-    console.log('DEBUG runGenerator context: ', context)
     const {
         extend = false,
         selectedAppExtensions = [],
@@ -860,19 +858,16 @@ const runGenerator = async (
 
     switch (type) {
         case TEMPLATE_SOURCE_NPM: {
-            console.log('DEBUG downloading template from NPM: ', id, templateVersion)
             const tarFile = sh
                 .exec(`npm pack ${id}@${templateVersion} --pack-destination="${tmp}"`, {
                     silent: true
                 })
                 .stdout.trim()
             tarPath = p.join(tmp, tarFile)
-            console.log('DEBUG downloaded NPM template tar path: ', tarPath)
             break
         }
         case TEMPLATE_SOURCE_BUNDLE:
             tarPath = p.join(__dirname, '..', 'templates', `${id}.tar.gz`)
-            console.log('DEBUG using bundled template tar path: ', tarPath)
             break
         default: {
             const msg = `Error: Cannot handle template source type ${type}.`
@@ -1050,6 +1045,7 @@ const main = async (opts) => {
         if (initialAnswers.project.type === 'appExtensionProject') {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
+            //TODO: Avoid hardcoding the prefix @salesforce/extension-
             context.answers.project.name = `@salesforce/extension-${extensionNameAnswers.project.extensionName}`
             context.preset = PRESETS.find(({id}) => id === 'base-app-extension')
         } else {
