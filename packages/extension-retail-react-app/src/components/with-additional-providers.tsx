@@ -30,11 +30,13 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 // Define a type for the HOC props
-type WithAdditionalProviders = React.ComponentPropsWithoutRef<any>;
+type WithAdditionalProviders = React.ComponentPropsWithoutRef<any>
 
 // Define the HOC function
-const withAdditionalProviders = <P extends object>(WrappedComponent: React.ComponentType<P>, locals: Record<string, unknown>) => {
-
+const withAdditionalProviders = <P extends object>(
+    WrappedComponent: React.ComponentType<P>,
+    locals: Record<string, unknown>
+) => {
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl
@@ -55,10 +57,7 @@ const withAdditionalProviders = <P extends object>(WrappedComponent: React.Compo
     locals.locale = locale
     locals.appConfig = appConfig
 
-
-
-
-      const AppConfig: React.FC<P> = (props: WithAdditionalProviders) => {
+    const AppConfig: React.FC<P> = (props: WithAdditionalProviders) => {
         const {correlationId} = useCorrelationId()
         const headers = {
             'correlation-id': correlationId
@@ -85,17 +84,20 @@ const withAdditionalProviders = <P extends object>(WrappedComponent: React.Compo
                 OCAPISessionsURL={`${appOrigin}${proxyBasePath}/ocapi/s/${locals.site?.id}/dw/shop/v22_8/sessions`}
                 logger={createLogger({packageName: 'commerce-sdk-react'})}
             >
-                <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
+                <MultiSiteProvider
+                    site={locals.site}
+                    locale={locals.locale}
+                    buildUrl={locals.buildUrl}
+                >
                     <ChakraProvider theme={theme}>
-                            <WrappedComponent {...(props as P)} />
-                        </ChakraProvider>
+                        <WrappedComponent {...(props as P)} />
+                    </ChakraProvider>
                 </MultiSiteProvider>
                 <ReactQueryDevtools />
             </CommerceApiProvider>
         )
-
     }
-  return AppConfig
+    return AppConfig
 }
 
 export default withAdditionalProviders
