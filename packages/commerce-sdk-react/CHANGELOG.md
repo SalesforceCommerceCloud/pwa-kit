@@ -8,6 +8,7 @@
 -   Update `useCustomMutation` hook to accept request body as a parameter to the mutate function [#2030](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2030)
 -  Simplify `useCustomMutation` hook implementation [#2034](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2034)
 -  Documentation for `useCustomMutation` hook along with new dynamic `body` param option [#2042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2042)
+-  Add wrappers for social login helpers: `authorizeIDP` and `loginIDPUser` [#2049](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2049)
 
 ## v3.0.1 (Sep 04, 2024)
 
