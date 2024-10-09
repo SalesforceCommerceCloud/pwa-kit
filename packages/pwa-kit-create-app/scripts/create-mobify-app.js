@@ -111,6 +111,8 @@ const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
+const APP_EXTENSIBILITY_TYPESCRIPT_MINIMAL_DEV_DIR = 'dev'
+
 const INITIAL_QUESTION = [
     {
         name: 'project.type',
@@ -568,6 +570,18 @@ const readJson = (path) => JSON.parse(sh.cat(path))
 
 const writeJson = (path, data) => new sh.ShellString(JSON.stringify(data, null, 2)).to(path)
 
+/**
+ * Updates the `package.json` file in place by merging new updates with the existing content.
+ *
+ * @param {string} pkgJsonPath - The file path to the `package.json` file that needs to be updated.
+ * @param {Object} updates - An object containing the updates to be merged into the existing `package.json`.
+ */
+const updatePackageJson = (pkgJsonPath, updates) => {
+    const pkgJSON = readJson(pkgJsonPath)
+    const finalPkgData = merge(pkgJSON, updates)
+    writeJson(pkgJsonPath, finalPkgData)
+}
+
 const slugifyName = (name) =>
     slugify(name, {
         lower: true,
@@ -665,6 +679,19 @@ const expandKey = (key, value) =>
         )
 
 /**
+ * Creates an .npmignore file at the root of the generated project.
+ * Ensures the specified directories and files are excluded from being published to npm.
+ *
+ * @param {string} outputDir - The path to the root of the generated project.
+ * @param {string[]} ignorePaths - An array of directory or file paths to ignore in the npm package.
+ */
+function createNpmIgnoreFile(outputDir, ignorePaths = []) {
+    const npmIgnoreContent = ignorePaths.join('\n') + '\n'
+
+    fs.writeFileSync(p.join(outputDir, '.npmignore'), npmIgnoreContent)
+}
+
+/**
  * Provided an object there the keys use "dot notation", expand each individual key.
  * NOTE: This only expands keys at the root level, and not those nested.
  *
@@ -678,18 +705,6 @@ const expandKey = (key, value) =>
  */
 const expandObject = (obj = {}) =>
     Object.keys(obj).reduce((acc, curr) => merge(acc, expandKey(curr, obj[curr])), {})
-
-/**
- * Updates the `package.json` file in place by merging new updates with the existing content.
- *
- * @param {string} pkgJsonPath - The file path to the `package.json` file that needs to be updated.
- * @param {Object} updates - An object containing the updates to be merged into the existing `package.json`.
- */
-const updatePackageJson = (pkgJsonPath, updates) => {
-    const pkgJSON = readJson(pkgJsonPath)
-    const finalPkgData = merge(pkgJSON, updates)
-    writeJson(pkgJsonPath, finalPkgData)
-}
 
 /**
  * Envoke the "npm install" command for the provided project directory.
@@ -914,7 +929,7 @@ const runGenerator = async (
 
         // Check project type and handle appropriately
         if (answers.project.type === 'appExtensionProject') {
-            const devOutputDir = p.join(outputDir, 'dev')
+            const devOutputDir = p.join(outputDir, APP_EXTENSIBILITY_TYPESCRIPT_MINIMAL_DEV_DIR)
 
             // Update the root package.json to add a start script
             updatePackageJson(p.resolve(outputDir, 'package.json'), {
@@ -941,12 +956,16 @@ const runGenerator = async (
                 isRecursiveCall: true
             })
 
-            // Update the dev/package.json with dependencies
+            // Update the typescript-minimal dev package.json with dependencies
             updatePackageJson(p.resolve(devOutputDir, 'package.json'), {
                 devDependencies: {[answers.project.name]: 'file:../'},
                 mobify: {app: {extensions: [answers.project.name]}}
             })
 
+            // Create the .npmignore file, excluding the typescript-minimal dev folder
+            createNpmIgnoreFile(outputDir, [`${APP_EXTENSIBILITY_TYPESCRIPT_MINIMAL_DEV_DIR}/`])
+
+            //TODO: Avoid duplicated console.log Installing dependencies in terminal
             npmInstall(devOutputDir, {verbose})
         } else {
             processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
@@ -983,11 +1002,15 @@ const runGenerator = async (
             })(),
             version: GENERATED_PROJECT_VERSION,
             devDependencies: appExtensionDeps,
-            mobify: {
-                app: {
-                    extensions: selectedAppExtensions.map((appExtensionName) => [appExtensionName])
+            ...(selectedAppExtensions.length > 0 && {
+                mobify: {
+                    app: {
+                        extensions: selectedAppExtensions.map((appExtensionName) => [
+                            appExtensionName
+                        ])
+                    }
                 }
-            }
+            })
         })
 
         // Clean up the temporary directory
@@ -1045,7 +1068,7 @@ const main = async (opts) => {
         if (initialAnswers.project.type === 'appExtensionProject') {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
-            //TODO: Avoid hardcoding the prefix @salesforce/extension-
+            //TODO: Avoid hardcoding the prefix @salesforce/extension- and support package names with spaces, etc.
             context.answers.project.name = `@salesforce/extension-${extensionNameAnswers.project.extensionName}`
             context.preset = PRESETS.find(({id}) => id === 'base-app-extension')
         } else {
