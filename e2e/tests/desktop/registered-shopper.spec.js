@@ -126,3 +126,49 @@ test("Registered shopper can checkout items", async ({ page }) => {
 });
 
 // TODO: add test for adding product to wishlist
+test("Registered shopper can add item to wishlist", async ({ page }) => {
+  // TODO: implement login shopper
+  // try {
+    // await page.goto(config.RETAIL_APP_HOME + "/login");
+  //   // login shopper here, if login fails, register new user
+  // } catch(error) {
+  //   await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS})
+  // }
+
+  await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS})
+
+  // navigate to PDP
+  await page.goto(config.RETAIL_APP_HOME);
+
+  await page.getByRole("link", { name: "Womens" }).hover();
+  const topsNav = page.getByRole("link", { name: "Tops", exact: true });
+  await expect(topsNav).toBeVisible();
+  await topsNav.click();
+
+  const productTile = page.getByRole("link", {
+    name: /Cotton Turtleneck Sweater/i,
+  });
+  await productTile.getByLabel(/Black/, { exact: true }).hover();
+  await productTile.click();
+
+  // add product to wishlist
+  await expect(
+    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
+  ).toBeVisible();
+
+  await page.getByRole("radio", { name: "L", exact: true }).click();
+  await page.getByRole("button", { name: /Add to Wishlist/i }).click()
+
+  // wishlist
+  await page.goto(config.RETAIL_APP_HOME + "/account/wishlist");
+
+  await expect(
+    page.getByRole("heading", { name: /Wishlist/i })
+  ).toBeVisible();
+
+  await expect(
+    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
+  ).toBeVisible();
+  await expect(page.getByText(/Color: Black/i)).toBeVisible()
+  await expect(page.getByText(/Size: L/i)).toBeVisible()
+});
