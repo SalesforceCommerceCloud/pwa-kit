@@ -1,6 +1,7 @@
 ## v4.1.0-dev (Aug 8, 2024)
 - Announce wishlist change in total for screen readers (a11y) [#2033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2033)
 - Fixed a bug that incorrectly imports uninstalled package `@chakra-ui/layout` [#2047](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2047)
+- Replace getAppOrigin with useOrigin to have a better support for an app origin building. [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050)
 - [a11y] Mobile view account menu a11y adjustments [#1059](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2059)
 
 ### Performance Improvements
