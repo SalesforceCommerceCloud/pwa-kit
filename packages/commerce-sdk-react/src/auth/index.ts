@@ -192,6 +192,7 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
+    private isPrivate: boolean
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -270,6 +271,8 @@ class Auth {
               config.clientSecret || ''
 
         this.silenceWarnings = config.silenceWarnings || false
+
+        this.isPrivate = !!this.clientSecret
     }
 
     get(name: AuthDataKeys) {
@@ -688,7 +691,6 @@ class Auth {
      *
      */
     async authorizeIDP(parameters: AuthorizeIDPParams) {
-        const privateClient = !!this.clientSecret
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
         const {url, codeVerifier} = await helpers.authorizeIDP(
@@ -698,9 +700,13 @@ class Auth {
                 hint: parameters.hint,
                 ...(usid && {usid})
             },
-            privateClient
+            this.isPrivate
         )
-        window.location.assign(url)
+        if (onClient()) {
+            window.location.assign(url)
+        } else {
+            console.warn('Something went wrong, this client side method is invoked on the server.')
+        }
         this.set('code_verifier', codeVerifier)
     }
 
