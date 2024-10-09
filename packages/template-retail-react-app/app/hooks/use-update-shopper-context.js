@@ -17,9 +17,15 @@ import {useQueryClient} from '@tanstack/react-query'
 
 // Hooks
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
 
 // Constants
-import {useShopperContextSearchParams} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
+// Add any query keys that need to be refreshed after the Shopper Context is updated
+const QUERIES_TO_INVALIDATE = [
+    '/product-search',
+    'instagram-promo-banner-desktop',
+    'instagram-promo-banner-mobile'
+]
 
 /*
  * This hook will set the shopper context when search params pertinant
@@ -39,7 +45,16 @@ export const useUpdateShopperContext = () => {
     const shopperContextFromSearchParams = useShopperContextSearchParams()
 
     const refetchDataOnClient = () => {
-        queryClient.invalidateQueries()
+        queryClient.invalidateQueries({
+            predicate: (query) => {
+                return QUERIES_TO_INVALIDATE.some((queryToInvalidate) =>
+                    query.queryKey.some(
+                        (key) => typeof key === 'string' && key.includes(queryToInvalidate)
+                    )
+                )
+            },
+            refetchActive: true
+        })
     }
 
     const handleShopperContextUpdate = async (shopperContext, newShopperContext) => {
