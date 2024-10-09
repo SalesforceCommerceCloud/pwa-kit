@@ -43,7 +43,7 @@ class RetailReactApp extends ApplicationExtension<Config> {
             //     component: SamplePage
             // },
             {
-                path: '/home',
+                path: '/',
                 component: Home,
                 exact: true,
                 foo: 'bar'
