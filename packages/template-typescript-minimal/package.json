@@ -66,11 +66,7 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
   },
   "mobify": {
-    "app":{
-      "extensions": [
-        "@salesforce/extension-retail-react-app"
-      ]
-    },
+    "app": {},
     "ssrEnabled": true,
     "ssrOnly": [
       "ssr.js",

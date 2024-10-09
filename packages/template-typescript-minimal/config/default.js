@@ -9,6 +9,7 @@ const sites = require('./sites.js')
 
 module.exports = {
     app: {
+        extensions: ['@salesforce/extension-retail-react-app'],
         url: {
             site: 'path',
             locale: 'path',
