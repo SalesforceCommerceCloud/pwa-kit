@@ -131,7 +131,7 @@ export const render = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
-    applyAppConfigExtensions(res.locals, AppConfig, extensions)
+    const WrappedAppConfig = applyAppConfigExtensions(res.locals, AppConfig, extensions)
 
     // Use locals to thread the application extensions through the rendering pipeline.
     res.locals.appExtensions = extensions
@@ -180,6 +180,7 @@ export const render = async (req, res, next) => {
         req,
         res,
         App: WrappedApp,
+        AppConfig: WrappedAppConfig,
         routes,
         location
     }
@@ -192,7 +193,7 @@ export const render = async (req, res, next) => {
         appStateError = new errors.HTTPNotFound('Not found')
     } else {
         res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'start')
-        const ret = await AppConfig.initAppState({
+        const ret = await WrappedAppConfig.initAppState({
             App: WrappedApp,
             component,
             match,
@@ -204,7 +205,7 @@ export const render = async (req, res, next) => {
         })
         appState = {
             ...ret.appState,
-            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
+            __STATE_MANAGEMENT_LIBRARY: WrappedAppConfig.freeze(res.locals)
         }
         appStateError = ret.error
         res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'end')
@@ -256,8 +257,7 @@ export const render = async (req, res, next) => {
     }
 }
 
-const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
-    const AppConfig = getAppConfig()
+const OuterApp = ({req, res, error, App, AppConfig, appState, routes, routerContext, location}) => {
     return (
         <ServerContext.Provider value={{req, res}}>
             <Router location={location} context={routerContext}>
@@ -279,6 +279,7 @@ OuterApp.propTypes = {
     res: PropTypes.object,
     error: PropTypes.object,
     App: PropTypes.elementType,
+    AppConfig: PropTypes.elementType,
     appState: PropTypes.object,
     routes: PropTypes.array,
     routerContext: PropTypes.object,

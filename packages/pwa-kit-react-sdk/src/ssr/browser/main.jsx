@@ -44,8 +44,7 @@ export const registerServiceWorker = (url) => {
     })
 }
 
-export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
-    const AppConfig = getAppConfig()
+export const OuterApp = ({routes, error, App, AppConfig, locals, onHydrate}) => {
     const isInitialPageRef = useRef(true)
 
     return (
@@ -66,7 +65,7 @@ export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
                             error={error}
                             appState={window.__PRELOADED_STATE__}
                             routes={routes}
-                            App={WrappedApp}
+                            App={App}
                         />
                     </AppConfig>
                 </CorrelationIdProvider>
@@ -78,7 +77,8 @@ export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
 OuterApp.propTypes = {
     routes: PropTypes.array.isRequired,
     error: PropTypes.object,
-    WrappedApp: PropTypes.func.isRequired,
+    App: PropTypes.func.isRequired,
+    AppConfig: PropTypes.func.isRequired,
     locals: PropTypes.object,
     onHydrate: PropTypes.func
 }
@@ -106,7 +106,8 @@ export const start = () => {
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
 
-    applyAppConfigExtensions(locals, AppConfig, extensions)
+    const extensions = getExtensions()
+    const WrappedAppConfig = applyAppConfigExtensions(locals, AppConfig, extensions)
 
     // We need to tell the routeComponent HOC when the app is hydrating in order to
     // prevent pages from re-fetching data on the first client-side render. The
@@ -119,7 +120,6 @@ export const start = () => {
     window.__HYDRATING__ = true
 
     let WrappedApp = routeComponent(App, false, locals)
-    const extensions = getExtensions()
 
     // Use locals to thread the application extensions through the react app start flow.
     locals.appExtensions = extensions
@@ -131,7 +131,8 @@ export const start = () => {
         error: window.__ERROR__,
         locals: locals,
         routes: getRoutes(locals),
-        WrappedApp
+        App: WrappedApp,
+        AppConfig: WrappedAppConfig
     }
 
     return Promise.resolve()
