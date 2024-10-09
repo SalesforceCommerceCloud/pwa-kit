@@ -159,8 +159,9 @@ const askApplicationExtensibiltyQuestions = (availableAppExtensions) => {
 const APPLICATION_EXTENSION_QUESTIONS = [
     {
         name: 'project.extensionName',
+        //TODO: Avoid hardcoding the prefix @salesforce/extension- and support package names with spaces, etc.
         message:
-            'What is the name of your Application Extension? (The prefix "extension-" will be added to the name.)',
+            'What is the name of your Application Extension? (The prefix "@salesforce/extension-" will be added to the name.)',
         validate: validProjectName
     }
 ]
@@ -776,10 +777,10 @@ const processAppExtensions = (
 ) => {
     if (appExtensions.length > 0 && extractAppExtensions) {
         appExtensions.forEach((appExtensionName) => {
-            const appExtensionTmp = fs.mkdtempSync(
-                p.resolve(os.tmpdir(), `extract-${appExtensionName}`)
-            )
+            // Create the full path for the temporary directory, preserving the namespace
+            const appExtensionTmp = p.join(os.tmpdir(), `extract-${appExtensionName}`)
             fs.mkdirSync(appExtensionTmp, {recursive: true})
+
             const appExtensionTarFile = sh
                 .exec(`npm pack ${appExtensionName} --pack-destination="${appExtensionTmp}"`, {
                     silent: true
@@ -912,6 +913,7 @@ const runGenerator = async (
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
     } else {
+        // Copy the base template either from the package or npm.
         sh.cp('-rf', p.join(packagePath, '*'), outputDir)
 
         // Copy template specific assets over.
