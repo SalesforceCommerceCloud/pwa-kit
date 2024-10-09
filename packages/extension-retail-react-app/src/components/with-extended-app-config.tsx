@@ -29,14 +29,7 @@ import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
-// Define a type for the HOC props
-type WithAdditionalProviders = React.ComponentPropsWithoutRef<any>
-
-// Define the HOC function
-const withAdditionalProviders = <P extends object>(
-    WrappedComponent: React.ComponentType<P>,
-    locals: Record<string, unknown>
-) => {
+const extendLocals = (locals) => {
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl
@@ -56,8 +49,19 @@ const withAdditionalProviders = <P extends object>(
     locals.site = site
     locals.locale = locale
     locals.appConfig = appConfig
+}
 
-    const AppConfig: React.FC<P> = (props: WithAdditionalProviders) => {
+// Define a type for the HOC props
+type WithExtendedAppConfig = React.ComponentPropsWithoutRef<any>
+
+// Define the HOC function
+const withExtendedAppConfig = <P extends object>(
+    WrappedComponent: React.ComponentType<P>,
+    locals: Record<string, unknown>
+) => {
+    extendLocals(locals)
+
+    const AppConfig: React.FC<P> = (props: WithExtendedAppConfig) => {
         const {correlationId} = useCorrelationId()
         const headers = {
             'correlation-id': correlationId
@@ -136,4 +140,4 @@ const withAdditionalProviders = <P extends object>(
     return withReactQuery(AppConfig, options)
 }
 
-export default withAdditionalProviders
+export default withExtendedAppConfig

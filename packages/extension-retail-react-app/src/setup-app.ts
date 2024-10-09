@@ -14,24 +14,24 @@ import {
 
 // import withRedBorder from '*/components/with-red-border'
 import {ReactExtensionConfig as Config} from './types'
-import withProviders from './components/with-providers'
-import withAdditionalProviders from './components/with-additional-providers'
+import withExtendedApp from './components/with-extended-app'
+import withExtendedAppConfig from './components/with-extended-app-config'
 
 // const SamplePage = loadable(() => import('*/pages/sample'))
 // const defaultPath = '/sample-page'
 
 // NOTE: had to rename this home path, so that the wildcard will resolve to the copy found in the app extension.
 // Otherwise, it'll resolve to the base project version.
-const Home = loadable(() => import('./pages/home-rra'))
+const Home = loadable(() => import('*/pages/home-rra'))
 
 class RetailReactApp extends ApplicationExtension<Config> {
     extendApp(App: React.ComponentType): React.ComponentType {
-        return withProviders(App)
+        return withExtendedApp(App)
     }
 
     extendAppConfig(locals: Record<string, unknown>, AppConfig: React.ComponentType) {
         console.log('--- extendAppConfig', AppConfig, locals)
-        return withAdditionalProviders(AppConfig, locals)
+        return withExtendedAppConfig(AppConfig, locals)
     }
 
     extendRoutes(routes: IRouteConfig[]): IRouteConfig[] {
