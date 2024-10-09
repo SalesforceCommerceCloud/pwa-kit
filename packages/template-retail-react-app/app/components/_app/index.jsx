@@ -274,7 +274,6 @@ const App = (props) => {
 
     return (
         <Box className="sf-app" {...styles.container}>
-            AppOrigin {appOrigin}
             <StorefrontPreview getToken={getTokenWhenReady}>
                 <Helmet>
                     {ACTIVE_DATA_ENABLED && (
