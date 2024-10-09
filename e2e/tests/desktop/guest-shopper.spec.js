@@ -17,7 +17,7 @@ const { addProductToCart } = require("../../scripts/pageHelpers.js")
 const GUEST_USER_CREDENTIALS = generateUserCredentials();
 
 test("Guest shopper can checkout items as guest", async ({ page }) => {
-  await addProductToCart(page)
+  await addProductToCart({page})
 
   // cart
   await page.getByLabel(/My cart/i).click();
@@ -120,7 +120,7 @@ test("Guest shopper can edit product item in cart", async ({ page }) => {
   const DEBUG_TIME = 3000
   // TODO: potentially remove this
   test.setTimeout(120000)
-  await addProductToCart(page)
+  await addProductToCart({page})
 
   // cart
   await page.getByLabel(/My cart/i).click();

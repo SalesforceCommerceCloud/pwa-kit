@@ -1,7 +1,7 @@
 const { expect } = require("@playwright/test");
 const config = require("../config");
 
-export const addProductToCart = async (page) => {
+export const addProductToCart = async ({page}) => {
     await page.goto(config.RETAIL_APP_HOME);
 
     await page.getByRole("link", { name: "Womens" }).hover();
@@ -49,4 +49,36 @@ export const addProductToCart = async (page) => {
     await addedToCartModal.waitFor();
 
     await page.getByLabel("Close").click();
+}
+
+export const registerShopper = async ({page, userCredentials}) => {
+    // Create Account and Sign In
+    await page.goto(config.RETAIL_APP_HOME + "/registration");
+
+    const registrationFormHeading = page.getByText(/Let's get started!/i);
+    await registrationFormHeading.waitFor();
+
+    await page
+        .locator("input#firstName")
+        .fill(userCredentials.firstName);
+    await page
+        .locator("input#lastName")
+        .fill(userCredentials.lastName);
+    await page.locator("input#email").fill(userCredentials.email);
+    await page
+        .locator("input#password")
+        .fill(userCredentials.password);
+
+    await page.getByRole("button", { name: /Create Account/i }).click();
+
+    await expect(
+        page.getByRole("heading", { name: /Account Details/i })
+    ).toBeVisible();
+
+    await expect(
+        page.getByRole("heading", { name: /My Account/i })
+    ).toBeVisible();
+
+    await expect(page.getByText(/Email/i)).toBeVisible();
+    await expect(page.getByText(userCredentials.email)).toBeVisible();
 }

@@ -7,7 +7,7 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { addProductToCart } = require("../../scripts/pageHelpers");
+const { addProductToCart, registerShopper } = require("../../scripts/pageHelpers");
 const {
   generateUserCredentials,
   getCreditCardExpiry,
@@ -16,38 +16,11 @@ const {
 const REGISTERED_USER_CREDENTIALS = generateUserCredentials();
 
 test("Registered shopper can checkout items", async ({ page }) => {
-  // Create Account and Sign In
-  await page.goto(config.RETAIL_APP_HOME + "/registration");
-
-  const registrationFormHeading = page.getByText(/Let's get started!/i);
-  await registrationFormHeading.waitFor();
-
-  await page
-    .locator("input#firstName")
-    .fill(REGISTERED_USER_CREDENTIALS.firstName);
-  await page
-    .locator("input#lastName")
-    .fill(REGISTERED_USER_CREDENTIALS.lastName);
-  await page.locator("input#email").fill(REGISTERED_USER_CREDENTIALS.email);
-  await page
-    .locator("input#password")
-    .fill(REGISTERED_USER_CREDENTIALS.password);
-
-  await page.getByRole("button", { name: /Create Account/i }).click();
-
-  await expect(
-    page.getByRole("heading", { name: /Account Details/i })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole("heading", { name: /My Account/i })
-  ).toBeVisible();
-
-  await expect(page.getByText(/Email/i)).toBeVisible();
-  await expect(page.getByText(REGISTERED_USER_CREDENTIALS.email)).toBeVisible();
+  // register and login user
+  await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS})
 
   // Shop for items as registered user
-  await addProductToCart(page)
+  await addProductToCart({page})
 
   // cart
   await page.getByLabel(/My cart/i).click();
@@ -148,6 +121,8 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
+
+  // TODO: check order history page to ensure that order history matches up
 });
 
 // TODO: add test for adding product to wishlist
