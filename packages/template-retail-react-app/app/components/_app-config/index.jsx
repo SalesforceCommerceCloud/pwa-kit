@@ -45,9 +45,7 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
  * You can also use the AppConfig to configure a state-management library such
  * as Redux, or Mobx, if you like.
  */
-// TODO: these locals are the same as res.locals? OR just what is being saved from the restore() method
 const AppConfig = ({children, locals = {}}) => {
-    console.log('--- locals inside AppConfig', locals)
     const {correlationId} = useCorrelationId()
     const headers = {
         'correlation-id': correlationId
@@ -82,9 +80,7 @@ const AppConfig = ({children, locals = {}}) => {
     )
 }
 
-// TODO: these locals have the same values as res.locals?
 AppConfig.restore = (locals = {}) => {
-    console.log('--- locals from restore', locals)
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl
