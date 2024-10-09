@@ -680,6 +680,18 @@ const expandObject = (obj = {}) =>
     Object.keys(obj).reduce((acc, curr) => merge(acc, expandKey(curr, obj[curr])), {})
 
 /**
+ * Updates the `package.json` file in place by merging new updates with the existing content.
+ *
+ * @param {string} pkgJsonPath - The file path to the `package.json` file that needs to be updated.
+ * @param {Object} updates - An object containing the updates to be merged into the existing `package.json`.
+ */
+const updatePackageJson = (pkgJsonPath, updates) => {
+    const pkgJSON = readJson(pkgJsonPath)
+    const finalPkgData = merge(pkgJSON, updates)
+    writeJson(pkgJsonPath, finalPkgData)
+}
+
+/**
  * Envoke the "npm install" command for the provided project directory.
  *
  * @param {*} outputDir
@@ -750,8 +762,9 @@ const processAppExtensions = (
     if (appExtensions.length > 0 && extractAppExtensions) {
         appExtensions.forEach((appExtensionName) => {
             const appExtensionTmp = fs.mkdtempSync(
-                p.resolve(os.tmpdir(), `extract-${appExtensionName.replace('@salesforce/', '')}`)
+                p.resolve(os.tmpdir(), `extract-${appExtensionName}`)
             )
+            fs.mkdirSync(appExtensionTmp, {recursive: true})
             const appExtensionTarFile = sh
                 .exec(`npm pack ${appExtensionName} --pack-destination="${appExtensionTmp}"`, {
                     silent: true
@@ -816,7 +829,10 @@ const fetchAvailableAppExtensions = () => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
+const runGenerator = async (
+    context,
+    {outputDir, templateVersion, verbose, isRecursiveCall = false}
+) => {
     const {answers, preset} = context
     const {templateSource} = preset
 
@@ -831,6 +847,9 @@ const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
 
+    // Ensure the output directory exists
+    fs.mkdirSync(outputDir, {recursive: true})
+
     // We need to get some assets from the base template. So extract it after
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
@@ -838,7 +857,6 @@ const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
     const appExtensionsDir = p.join(outputDir, 'app', 'application-extensions')
     const {id, type} = templateSource
     let tarPath
-
 
     switch (type) {
         case TEMPLATE_SOURCE_NPM: {
@@ -864,17 +882,13 @@ const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
     }
 
     // Extract the main template
-    console.log('DEBUG extracting template from: ', tarPath)
     tar.x({
         file: tarPath,
         cwd: tmp,
         sync: true
     })
 
-    console.log('DEBUG answers.project.type : ', answers.project.type)
-
     if (extend) {
-        console.log('DEBUG extending project...')
         // Bootstrap the projects.
         getFiles(BOOTSTRAP_DIR)
             .map((file) => file.replace(BOOTSTRAP_DIR, ''))
@@ -884,17 +898,14 @@ const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
 
         // Copy required assets defined on the preset level.
         const {assets = []} = preset
-        console.log('DEBUG copying assets: ', assets)
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
     } else {
-        console.log('DEBUG copying base template to outputDir: ', outputDir)
-        sh.cp('-rf', packagePath, outputDir)
+        sh.cp('-rf', p.join(packagePath, '*'), outputDir)
 
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
-        console.log('DEBUG checking template-specific assets in: ', assetsDir)
         if (sh.test('-e', assetsDir)) {
             getFiles(assetsDir)
                 .map((file) => {
@@ -908,16 +919,15 @@ const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
 
         // Check project type and handle appropriately
         if (answers.project.type === 'appExtensionProject') {
-            console.log(
-                'DEBUG creating Application Extension project files... answers.project.name:',
-                answers.project.name
-            )
+            const devOutputDir = p.join(outputDir, 'dev')
 
-            const developmentProjectOutputDir = p.join(outputDir, 'dev')
-            console.log(
-                'DEBUG: Recursively generating for appExtensionProject... developmentProjectOutputDir:',
-                developmentProjectOutputDir
-            )
+            // Update the root package.json to add a start script
+            updatePackageJson(p.resolve(outputDir, 'package.json'), {
+                scripts: {
+                    start: 'npm --prefix ./dev start'
+                }
+            })
+
             // Recursively call runGenerator for the 'typescript-minimal' preset
             const extensionContext = {
                 ...context,
@@ -930,45 +940,22 @@ const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
             }
 
             await runGenerator(extensionContext, {
-                outputDir: developmentProjectOutputDir,
+                outputDir: devOutputDir,
                 templateVersion,
-                verbose
+                verbose,
+                isRecursiveCall: true
             })
 
             // Update the dev/package.json with dependencies
-            const devPkgJsonPath = p.resolve(developmentProjectOutputDir, 'package.json')
-            const devPkgJSON = readJson(devPkgJsonPath)
-
-            const finalDevPkgData = {
-                ...devPkgJSON,
-                devDependencies: {
-                    ...(devPkgJSON.devDependencies || {}),
-                    [answers.project.name]: 'file:../'
-                }
-            }
-
-            writeJson(devPkgJsonPath, finalDevPkgData)
-
-            // Update the root package.json to add a start script
-            const rootPkgJsonPath = p.resolve(outputDir, 'package.json')
-            const rootPkgJSON = readJson(rootPkgJsonPath)
-
-            const updatedRootPkgData = merge(rootPkgJSON, {
-                scripts: {
-                    start: 'npm --prefix ./dev start'
-                }
+            updatePackageJson(p.resolve(devOutputDir, 'package.json'), {
+                devDependencies: {[answers.project.name]: 'file:../'},
+                mobify: {app: {extensions: [answers.project.name]}}
             })
 
-            // Write the updated package.json back to the output directory
-            writeJson(rootPkgJsonPath, updatedRootPkgData)
+            npmInstall(devOutputDir, {verbose})
         } else {
-            console.log('DEBUG processing selected Application Extensions...')
             processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
         }
-
-        console.log('DEBUG updating package.json for the generated project...')
-        const pkgJsonPath = p.resolve(outputDir, 'package.json')
-        const pkgJSON = readJson(pkgJsonPath)
 
         // Add selected Application Extensions to devDependencies and mobify object
         const appExtensionDeps = selectedAppExtensions.reduce((acc, appExtensionName) => {
@@ -984,10 +971,21 @@ const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
             return acc
         }, {})
 
-        console.log('DEBUG final application extension dependencies: ', appExtensionDeps)
+        updatePackageJson(p.resolve(outputDir, 'package.json'), {
+            name: (() => {
+                const projectName = context.answers.project.name || context.preset.id
+                // Match @namespace/project-name pattern
+                const namespaceRegex = /^(@[a-zA-Z0-9-_]+)\/(.+)$/
+                const match = projectName.match(namespaceRegex)
 
-        const finalPkgData = merge(pkgJSON, {
-            name: slugifyName(context.answers.project.name || context.preset.id),
+                if (match) {
+                    const [, namespace, actualName] = match
+                    // Slugify only the project name part
+                    return `${namespace}/${slugifyName(actualName)}`
+                }
+
+                return slugifyName(projectName)
+            })(),
             version: GENERATED_PROJECT_VERSION,
             devDependencies: appExtensionDeps,
             mobify: {
@@ -997,17 +995,14 @@ const runGenerator = async (context, {outputDir, templateVersion, verbose}) => {
             }
         })
 
-        // Write updated package.json back to the output directory
-        writeJson(pkgJsonPath, finalPkgData)
-
         // Clean up the temporary directory
         sh.rm('-rf', tmp)
-        console.log('DEBUG cleaned up temporary directory: ', tmp)
     }
 
-    // Install dependencies for the newly minted project.
-    npmInstall(outputDir, {verbose})
-    console.log('DEBUG runGenerator finished.')
+    if (!isRecursiveCall) {
+        // Install dependencies for the newly minted project.
+        npmInstall(outputDir, {verbose})
+    }
 }
 
 const foundNode = process.versions.node
@@ -1055,7 +1050,7 @@ const main = async (opts) => {
         if (initialAnswers.project.type === 'appExtensionProject') {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
-            context.answers.project.name = `extension-${extensionNameAnswers.project.extensionName}`
+            context.answers.project.name = `@salesforce/extension-${extensionNameAnswers.project.extensionName}`
             context.preset = PRESETS.find(({id}) => id === 'base-app-extension')
         } else {
             const availableAppExtensions = fetchAvailableAppExtensions()
