@@ -58,6 +58,12 @@ export default abstract class ApplicationExtension<Config> {
     public extendApp(App: React.ComponentType): React.ComponentType {
         return App
     }
+    public extendAppConfig(
+        locals: Record<string, unknown>,
+        AppConfig: React.ComponentType
+    ): React.ComponentType {
+        return AppConfig
+    }
 
     /**
      * Called during server rendering and client application initialization. This method allows

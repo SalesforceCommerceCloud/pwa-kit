@@ -123,7 +123,6 @@ type WithProviders = React.ComponentPropsWithoutRef<any>;
 const withProviders = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
   // TODO: setup eslint
   const App: React.FC<P> = (props: WithProviders) => {
-    const {children} = props
     const {data: categoriesTree} = useCategory({
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })

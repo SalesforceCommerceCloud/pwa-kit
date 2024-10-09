@@ -16,7 +16,7 @@ import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
-import {applyAppExtensions} from '../universal/extensibility/utils'
+import {applyAppConfigExtensions, applyAppExtensions} from '../universal/extensibility/utils'
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
 import {getExtensions} from '../universal/extensibility/extensions'
@@ -105,6 +105,8 @@ export const start = () => {
 
     // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
+
+    applyAppConfigExtensions(locals, AppConfig, extensions)
 
     // We need to tell the routeComponent HOC when the app is hydrating in order to
     // prevent pages from re-fetching data on the first client-side render. The

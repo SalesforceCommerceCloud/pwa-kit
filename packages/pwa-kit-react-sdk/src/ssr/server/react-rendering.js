@@ -23,7 +23,7 @@ import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {getAssetUrl} from '../universal/utils'
-import {applyAppExtensions} from '../universal/extensibility/utils'
+import {applyAppConfigExtensions, applyAppExtensions} from '../universal/extensibility/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import App from '../universal/components/_app'
@@ -130,6 +130,8 @@ export const render = async (req, res, next) => {
     const extensions = getExtensions()
 
     AppConfig.restore(res.locals)
+
+    applyAppConfigExtensions(res.locals, AppConfig, extensions)
 
     // Use locals to thread the application extensions through the rendering pipeline.
     res.locals.appExtensions = extensions

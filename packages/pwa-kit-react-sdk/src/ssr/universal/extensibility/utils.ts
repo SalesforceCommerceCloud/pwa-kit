@@ -25,3 +25,15 @@ export const applyAppExtensions = (
 
     return applyHOCs(App, extendAppHocs)
 }
+
+export const applyAppConfigExtensions = (
+    locals: Record<string, unknown>,
+    AppConfig: React.ComponentType,
+    extensions: ApplicationExtension<ApplicationExtensionConfig>[]
+) => {
+    const extendAppConfigHocs = extensions
+        .map((extension) => extension.extendAppConfig.bind(extension, locals))
+        .filter(Boolean)
+
+    return applyHOCs(AppConfig, extendAppConfigHocs)
+}
