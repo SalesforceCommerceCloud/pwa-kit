@@ -25,13 +25,13 @@ const LoginRedirect = () => {
     useEffect(() => {
         if (searchParams.code && searchParams.usid) {
             loginIDPUser.mutateAsync({
+                code: searchParams.code,
                 usid: searchParams.usid
             })
         }
     }, [])
 
     useEffect(() => {
-        console.log('CUSTOMER: ', customer)
         if (customer?.isRegistered) {
             if (location?.state?.directedFrom) {
                 navigate(location.state.directedFrom)

@@ -5,12 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import Auth, {AuthData} from './'
-import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
-import {getDefaultCookieAttributes} from '../utils'
+
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
     const originalModule = jest.requireActual('./storage')
@@ -32,7 +31,9 @@ jest.mock('commerce-sdk-isomorphic', () => {
             loginGuestUser: jest.fn().mockResolvedValue(''),
             loginGuestUserPrivate: jest.fn().mockResolvedValue(''),
             loginRegisteredUserB2C: jest.fn().mockResolvedValue(''),
-            logout: jest.fn().mockResolvedValue('')
+            logout: jest.fn().mockResolvedValue(''),
+            loginIDPUser: jest.fn().mockResolvedValue(''),
+            authorizeIDP: jest.fn().mockResolvedValue('')
         }
     }
 })
@@ -41,8 +42,7 @@ jest.mock('../utils', () => ({
     __esModule: true,
     onClient: () => true,
     getParentOrigin: jest.fn().mockResolvedValue(''),
-    isOriginTrusted: () => false,
-    getDefaultCookieAttributes: () => {}
+    isOriginTrusted: () => false
 }))
 
 /** The auth data we store has a slightly different shape than what we use. */
@@ -381,6 +381,51 @@ describe('Auth', () => {
         await auth.ready()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
+    test('ready - throw error and discard refresh token if refresh token is invalid', async () => {
+        // Force the mock to throw just for this test
+        const refreshAccessTokenSpy = jest.spyOn(helpers, 'refreshAccessToken')
+        refreshAccessTokenSpy.mockRejectedValueOnce({
+            response: {
+                json: () => {
+                    return {
+                        status_code: 404,
+                        message: 'test'
+                    }
+                }
+            }
+        })
+
+        const JWTExpired = jwt.sign({exp: Math.floor(Date.now() / 1000) - 1000}, 'secret')
+
+        // To simulate real-world scenario, let's start with an expired access token
+        const data: StoredAuthData = {
+            refresh_token_guest: 'refresh_token_guest',
+            access_token: JWTExpired,
+            customer_id: 'customer_id',
+            enc_user_id: 'enc_user_id',
+            expires_in: 1800,
+            id_token: 'id_token',
+            idp_access_token: 'idp_access_token',
+            token_type: 'token_type',
+            usid: 'usid',
+            customer_type: 'guest',
+            refresh_token_expires_in: 30 * 24 * 3600
+        }
+
+        const auth = new Auth(config)
+
+        Object.keys(data).forEach((key) => {
+            // @ts-expect-error private method
+            auth.set(key, data[key])
+        })
+
+        await auth.ready()
+
+        // The call to loginGuestUser only executes when refreshAccessToken fails
+        expect(refreshAccessTokenSpy).toHaveBeenCalled()
+        expect(auth.get('refresh_token_guest')).toBe('')
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+    })
 
     test('loginGuestUser', async () => {
         const auth = new Auth(config)
@@ -389,29 +434,17 @@ describe('Auth', () => {
     })
 
     test.each([
-        // When user has not selected DNT pref
-        [true, undefined, {dnt: true}],
-        [false, undefined, {dnt: false}],
-        [undefined, undefined, {}],
-        // When user has selected DNT, the dw_dnt cookie sets dnt
-        [true, '0', {dnt: false}],
-        [false, '1', {dnt: true}],
-        [false, '0', {dnt: false}]
-    ])(
-        'dnt flag is set correctly for defaultDnt=`%p`, dw_dnt=`%i`, expected=`%s`',
-        async (defaultDnt, dw_dnt, expected) => {
-            const auth = new Auth({...config, defaultDnt})
-            if (dw_dnt) {
-                // @ts-expect-error private method
-                auth.set('dw_dnt', dw_dnt)
-            }
-            await auth.loginGuestUser()
-            expect(helpers.loginGuestUser).toHaveBeenCalledWith(
-                expect.anything(),
-                expect.objectContaining(expected)
-            )
-        }
-    )
+        {defaultDnt: true, expected: {dnt: true}},
+        {defaultDnt: false, expected: {dnt: false}},
+        {defaultDnt: undefined, expected: {}}
+    ])('dnt flag is set correctly', async ({defaultDnt, expected}) => {
+        const auth = new Auth({...config, defaultDnt})
+        await auth.loginGuestUser()
+        expect(helpers.loginGuestUser).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining(expected)
+        )
+    })
 
     test('loginGuestUser with slas private', async () => {
         const auth = new Auth(configSLASPrivate)
@@ -419,6 +452,16 @@ describe('Auth', () => {
         expect(helpers.loginGuestUserPrivate).toHaveBeenCalled()
         const funcArg = (helpers.loginGuestUserPrivate as jest.Mock).mock.calls[0][2]
         expect(funcArg).toMatchObject({clientSecret: SLAS_SECRET_PLACEHOLDER})
+    })
+
+    test('loginGuestUser throws error when API has error', async () => {
+        // Force the mock to throw just for this test
+        const loginGuestUserSpy = jest.spyOn(helpers, 'loginGuestUser')
+        loginGuestUserSpy.mockRejectedValueOnce(new Error('test'))
+
+        const auth = new Auth(config)
+        await expect(auth.loginGuestUser()).rejects.toThrow()
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
     })
 
     test('loginRegisteredUserB2C', async () => {
@@ -443,6 +486,41 @@ describe('Auth', () => {
             clientSecret: SLAS_SECRET_PLACEHOLDER
         })
     })
+
+    test('loginIDPUser calls isomorphic loginIDPUser', async () => {
+        const auth = new Auth(config)
+        await auth.loginIDPUser({redirectURI: 'redirectURI', code: 'test'})
+        expect(helpers.loginIDPUser).toHaveBeenCalled()
+        const functionArg = (helpers.loginIDPUser as jest.Mock).mock.calls[0][2]
+        expect(functionArg).toMatchObject({redirectURI: 'redirectURI', code: 'test'})
+    })
+
+    test('loginIDPUser adds clientSecret to parameters when using private client', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.loginIDPUser({redirectURI: 'test', code: 'test'})
+        expect(helpers.loginIDPUser).toHaveBeenCalled()
+        const functionArg = (helpers.loginIDPUser as jest.Mock).mock.calls[0][1]
+        expect(functionArg).toMatchObject({
+            clientSecret: SLAS_SECRET_PLACEHOLDER
+        })
+    })
+
+    test('authorizeIDP calls isomorphic authorizeIDP', async () => {
+        const auth = new Auth(config)
+        await auth.authorizeIDP({redirectURI: 'redirectURI', hint: 'test'})
+        expect(helpers.authorizeIDP).toHaveBeenCalled()
+        const functionArg = (helpers.authorizeIDP as jest.Mock).mock.calls[0][1]
+        expect(functionArg).toMatchObject({redirectURI: 'redirectURI', hint: 'test'})
+    })
+
+    test('authorizeIDP adds clientSecret to parameters when using private client', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.authorizeIDP({redirectURI: 'test', hint: 'test'})
+        expect(helpers.authorizeIDP).toHaveBeenCalled()
+        const privateClient = (helpers.authorizeIDP as jest.Mock).mock.calls[0][2]
+        expect(privateClient).toBe(true)
+    })
+
     test('logout as registered user calls isomorphic logout', async () => {
         const auth = new Auth(config)
 
@@ -500,66 +578,5 @@ describe('Auth', () => {
         // Set mock value back to expected.
         // @ts-expect-error read-only property
         utils.onClient = () => true
-    })
-
-    test('setDNT(true) results dw_dnt=1', async () => {
-        const auth = new Auth({...config, siteId: 'siteA'})
-        await auth.setDnt(true)
-        expect(auth.get('dw_dnt')).toBe('1')
-    })
-    test('setDNT(false) results dw_dnt=0', async () => {
-        const auth = new Auth({...config, siteId: 'siteA'})
-        await auth.setDnt(false)
-        expect(auth.get('dw_dnt')).toBe('0')
-    })
-    test('setDNT(null) results in SLAS default if defaultDNT not defined', async () => {
-        const auth = new Auth({...config, siteId: 'siteA'})
-        await auth.setDnt(null)
-        expect(auth.get('dw_dnt')).toBe('0')
-    })
-    test('setDNT(null) results in defaultDnt if defaultDnt is defined', async () => {
-        const auth = new Auth({...config, siteId: 'siteA', defaultDnt: true})
-        await auth.setDnt(null)
-        expect(auth.get('dw_dnt')).toBe('1')
-    })
-    test('setDNT("invalidValue") results in SLAS default if defaultDNT not defined', async () => {
-        const auth = new Auth({...config, siteId: 'siteA'})
-        await auth.setDnt(null)
-        expect(auth.get('dw_dnt')).toBe('0')
-    })
-
-    test('setDNT(true) sets cookie with an expiration time', async () => {
-        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
-        const auth = new Auth({...config, siteId: 'siteA'})
-        await auth.setDnt(true)
-        expect(setDntSpiedOn).toHaveBeenLastCalledWith(
-            'dw_dnt',
-            '1',
-            expect.objectContaining({expires: expect.any(Number)})
-        )
-    })
-
-    test('setDNT(false) sets cookie with an expiration time', async () => {
-        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
-        const auth = new Auth({...config, siteId: 'siteA'})
-        await auth.setDnt(false)
-        expect(setDntSpiedOn).toHaveBeenLastCalledWith(
-            'dw_dnt',
-            '0',
-            expect.objectContaining({expires: expect.any(Number)})
-        )
-    })
-
-    test('setDNT(null) sets cookie WITHOUT an expiration time', async () => {
-        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
-        const auth = new Auth({...config, siteId: 'siteA'})
-        await auth.setDnt(null)
-        await waitFor(() => {
-            expect(setDntSpiedOn).not.toHaveBeenCalledWith(
-                'dw_dnt',
-                '1',
-                expect.objectContaining({expires: expect.any(Number)})
-            )
-        })
     })
 })

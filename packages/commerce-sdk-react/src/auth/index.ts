@@ -15,7 +15,7 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
 import {
     MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
@@ -33,7 +33,6 @@ interface AuthConfig extends ApiClientConfigParams {
     proxy: string
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
-    OCAPISessionsURL?: string
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
     silenceWarnings?: boolean
@@ -49,8 +48,11 @@ interface JWTHeaders {
 interface SlasJwtPayload extends JwtPayload {
     sub: string
     isb: string
-    dnt: string
 }
+
+type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[1]
+type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
+type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
 
 /**
  * The extended field is not from api response, we manually store the auth type,
@@ -65,14 +67,14 @@ export type AuthData = Prettify<
     }
 >
 
-const DNT_COOKIE_NAME = 'dw_dnt' as const
 /** A shopper could be guest or registered, so we store the refresh tokens individually. */
 type AuthDataKeys =
     | Exclude<keyof AuthData, 'refresh_token'>
     | 'refresh_token_guest'
     | 'refresh_token_registered'
     | 'access_token_sfra'
-    | typeof DNT_COOKIE_NAME
+    | 'dwsid'
+    | 'code_verifier'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -161,9 +163,13 @@ const DATA_MAP: AuthDataMap = {
         storageType: 'cookie',
         key: 'cc-at'
     },
-    [DNT_COOKIE_NAME]: {
+    dwsid: {
         storageType: 'cookie',
-        key: DNT_COOKIE_NAME
+        key: 'dwsid'
+    },
+    code_verifier: {
+        storageType: 'local',
+        key: 'code_verifier'
     }
 }
 
@@ -182,17 +188,17 @@ class Auth {
     private pendingToken: Promise<TokenResponse> | undefined
     private stores: Record<StorageType, BaseStorage>
     private fetchedToken: string
-    private OCAPISessionsURL: string
     private clientSecret: string
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
+    private isPrivate: boolean
+
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
-        // Add keys that should not be site specific to this array
-        const keysExcludedFromSuffixing = [DNT_COOKIE_NAME]
+
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
             parameters: {
@@ -218,7 +224,6 @@ class Auth {
 
         const options = {
             keySuffix: config.siteId,
-            keysExcludedFromSuffixing: keysExcludedFromSuffixing,
             // Setting this to true on the server allows us to reuse guest auth tokens across lambda runs
             sharedContext: !onClient()
         }
@@ -232,8 +237,6 @@ class Auth {
         this.redirectURI = config.redirectURI
 
         this.fetchedToken = config.fetchedToken || ''
-
-        this.OCAPISessionsURL = config.OCAPISessionsURL || ''
 
         this.logger = config.logger
 
@@ -268,6 +271,8 @@ class Auth {
               config.clientSecret || ''
 
         this.silenceWarnings = config.silenceWarnings || false
+
+        this.isPrivate = !!this.clientSecret
     }
 
     get(name: AuthDataKeys) {
@@ -287,48 +292,6 @@ class Auth {
         const {key, storageType} = DATA_MAP[name]
         const storage = this.stores[storageType]
         storage.delete(key)
-    }
-
-    getDnt() {
-        const dntCookieVal = this.get(DNT_COOKIE_NAME)
-        // Only '1' or '0' are valid, and invalid values or lack of cookie must be an undefined DNT
-        let dntCookieStatus = undefined
-        if (dntCookieVal !== '1' && dntCookieVal !== '0') {
-            this.delete(DNT_COOKIE_NAME)
-        } else {
-            dntCookieStatus = Boolean(Number(dntCookieVal))
-        }
-        return dntCookieStatus
-    }
-
-    async setDnt(preference: boolean | null) {
-        let dntCookieVal = String(Number(preference))
-        // Use defaultDNT if defined. If not, use SLAS default DNT
-        if (preference === null) {
-            dntCookieVal = this.defaultDnt ? String(Number(this.defaultDnt)) : '0'
-        }
-        // Set the cookie once to include dnt in the access token and then again to set the expiry time
-        this.set(DNT_COOKIE_NAME, dntCookieVal, {
-            ...getDefaultCookieAttributes(),
-            secure: true
-        })
-        const accessToken = this.getAccessToken()
-        if (accessToken !== '') {
-            const {dnt} = this.parseSlasJWT(accessToken)
-            if (dnt !== dntCookieVal) {
-                await this.refreshAccessToken()
-            }
-        } else {
-            await this.refreshAccessToken()
-        }
-        if (preference !== null) {
-            const SECONDS_IN_DAY = 86400
-            this.set(DNT_COOKIE_NAME, dntCookieVal, {
-                ...getDefaultCookieAttributes(),
-                secure: true,
-                expires: Number(this.get('refresh_token_expires_in')) / SECONDS_IN_DAY
-            })
-        }
     }
 
     private clearStorage() {
@@ -371,22 +334,6 @@ class Auth {
     }
 
     /**
-     * Gets the Do-Not-Track (DNT) preference from the `dw_dnt` cookie.
-     * If user has set their DNT preference, read the cookie, if not, use the default DNT pref. If the default DNT pref has not been set, default to false.
-     */
-    private getDntPreference(dw_dnt: string | undefined, defaultDnt: boolean | undefined) {
-        let dntPref
-        // Read `dw_dnt` cookie
-        const dntCookie = dw_dnt === '1' ? true : dw_dnt === '0' ? false : undefined
-        dntPref = dntCookie
-
-        // If the cookie is not set, read the default DNT preference.
-        if (dntCookie === undefined) dntPref = defaultDnt !== undefined ? defaultDnt : undefined
-
-        return dntPref
-    }
-
-    /**
      * Returns the SLAS access token or an empty string if the access token
      * is not found in local store or if SFRA wants PWA to trigger refresh token login.
      *
@@ -415,6 +362,7 @@ class Auth {
                 this.clearSFRAAuthToken()
                 return ''
             }
+
             const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
             this.set('access_token', sfraAuthToken)
             this.set('customer_id', customerId)
@@ -432,6 +380,12 @@ class Auth {
 
     private clearSFRAAuthToken() {
         const {key, storageType} = DATA_MAP['access_token_sfra']
+        const store = this.stores[storageType]
+        store.delete(key)
+    }
+
+    private clearECOMSession() {
+        const {key, storageType} = DATA_MAP['dwsid']
         const store = this.stores[storageType]
         store.delete(key)
     }
@@ -460,7 +414,6 @@ class Auth {
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
         this.set('expires_in', `${res.expires_in}`)
-        this.set('refresh_token_expires_in', res.refresh_token_expires_in)
         this.set('id_token', res.id_token)
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
@@ -477,44 +430,6 @@ class Auth {
         })
     }
 
-    async refreshAccessToken() {
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
-        const refreshTokenRegistered = this.get('refresh_token_registered')
-        const refreshTokenGuest = this.get('refresh_token_guest')
-        const refreshToken = refreshTokenRegistered || refreshTokenGuest
-        if (refreshToken) {
-            try {
-                return await this.queueRequest(
-                    () =>
-                        helpers.refreshAccessToken(
-                            this.client,
-                            {
-                                refreshToken,
-                                ...(dntPref !== undefined && {dnt: dntPref})
-                            },
-                            {
-                                clientSecret: this.clientSecret
-                            }
-                        ),
-                    !!refreshTokenGuest
-                )
-            } catch (error) {
-                // If the refresh token is invalid, we need to re-login the user
-                if (error instanceof Error && 'response' in error) {
-                    // commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
-                    // We can't use `instanceof`, so instead we just check for the `response` property
-                    // and assume it is a fetch Response.
-                    const json = await (error['response'] as Response).json()
-                    if (json.message === 'invalid refresh_token') {
-                        // clean up storage and restart the login flow
-                        this.clearStorage()
-                    }
-                }
-            }
-        }
-        return this.loginGuestUser()
-    }
-
     /**
      * This method queues the requests and handles the SLAS token response.
      *
@@ -528,9 +443,6 @@ class Auth {
             .then(async () => {
                 const token = await fn()
                 this.handleTokenResponse(token, isGuest)
-                if (onClient() && this.OCAPISessionsURL) {
-                    void this.createOCAPISession()
-                }
                 // Q: Why don't we just return token? Why re-construct the same object again?
                 // A: because a user could open multiple tabs and the data in memory could be out-dated
                 // We must always grab the data from the storage (cookie/localstorage) directly
@@ -546,6 +458,38 @@ class Auth {
         if (!this.silenceWarnings) {
             this.logger.warn(msg)
         }
+    }
+
+    /**
+     * This method extracts the status and message from a ResponseError that is returned
+     * by commerce-sdk-isomorphic.
+     *
+     * commerce-sdk-isomorphic throws a `ResponseError`, but doesn't export the class.
+     * We can't use `instanceof`, so instead we just check for the `response` property
+     * and assume it is a `ResponseError` if a response is present
+     *
+     * Once commerce-sdk-isomorphic exports `ResponseError` we can revisit if this method is
+     * still required.
+     *
+     * @returns {status_code, responseMessage} contained within the ResponseError
+     * @throws error if the error is not a ResponseError
+     * @Internal
+     */
+    extractResponseError = async (error: Error) => {
+        // the regular error.message will return only the generic status code message
+        // ie. 'Bad Request' for 400. We need to drill specifically into the ResponseError
+        // to get a more descriptive error message from SLAS
+        if ('response' in error) {
+            const json = await (error['response'] as Response).json()
+            const status_code: string = json.status_code
+            const responseMessage: string = json.message
+
+            return {
+                status_code,
+                responseMessage
+            }
+        }
+        throw error
     }
 
     /**
@@ -576,7 +520,37 @@ class Auth {
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
-        return await this.refreshAccessToken()
+        const refreshTokenRegistered = this.get('refresh_token_registered')
+        const refreshTokenGuest = this.get('refresh_token_guest')
+        const refreshToken = refreshTokenRegistered || refreshTokenGuest
+        if (refreshToken) {
+            try {
+                return await this.queueRequest(
+                    () =>
+                        helpers.refreshAccessToken(
+                            this.client,
+                            {
+                                refreshToken,
+                                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt})
+                            },
+                            {
+                                clientSecret: this.clientSecret
+                            }
+                        ),
+                    !!refreshTokenGuest
+                )
+            } catch (error) {
+                // If the refresh token login fails, we fall back to the new guest refresh login
+                const {status_code, responseMessage} = await this.extractResponseError(
+                    error as Error
+                )
+                this.logger.error(`${status_code} ${responseMessage}`)
+                // clean up storage and restart the login flow
+                this.clearStorage()
+                this.logger.info(`Refresh login error. Attempting to log user in as new guest.`)
+            }
+        }
+        return this.loginGuestUser()
     }
 
     /**
@@ -602,12 +576,11 @@ class Auth {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
             {
-                ...(dntPref !== undefined && {dnt: dntPref}),
+                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
                 ...(usid && {usid})
             },
             {clientSecret: this.clientSecret}
@@ -616,7 +589,7 @@ class Auth {
             this.client,
             {
                 redirectURI: this.redirectURI,
-                ...(dntPref !== undefined && {dnt: dntPref}),
+                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
                 ...(usid && {usid})
             }
         ] as const
@@ -624,42 +597,17 @@ class Auth {
             ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
             : () => helpers.loginGuestUser(...guestPublicArgs)
 
-        return await this.queueRequest(callback, isGuest)
-    }
-
-    /**
-     * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
-     *
-     */
-    async authorizeIDP() {
-        if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
-            this.logWarning(SLAS_SECRET_WARNING_MSG)
+        try {
+            return await this.queueRequest(callback, isGuest)
+        } catch (error) {
+            // We catch the error here to do logging but we still need to
+            // throw an error to stop the login flow from continuing.
+            const {status_code, responseMessage} = await this.extractResponseError(error as Error)
+            this.logger.error(`${status_code} ${responseMessage}`)
+            throw new Error(
+                `New guest user could not be logged in. ${status_code} ${responseMessage}`
+            )
         }
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
-        const {url, codeVerifier} = await helpers.authorizeIDP(
-            this.client,
-            {
-                redirectURI: this.redirectURI,
-                hint: "Google",
-                ...(dntPref !== undefined && {dnt: dntPref}),
-            }
-        )
-        console.log('AUTH INDEX URL: ' + url)
-        window.location.assign(url)
-        localStorage.setItem('codeVerifier', codeVerifier)
-    }
-
-    async loginIDPUser(parameters: Parameters<Helpers['loginIDPUser']>[2]) {
-        console.log('(YUNA) parameters', parameters)
-        const codeVerifier = localStorage.getItem('codeVerifier') || ''
-        return await helpers.loginIDPUser(
-            this.client,
-            {codeVerifier},
-            {
-                ...parameters,
-                redirectURI: this.redirectURI
-            }
-        )
     }
 
     /**
@@ -696,13 +644,12 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
      */
-    async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
+    async loginRegisteredUserB2C(credentials: LoginRegisteredUserB2CCredentials) {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
@@ -712,13 +659,13 @@ class Auth {
             },
             {
                 redirectURI,
-                ...(dntPref !== undefined && {dnt: dntPref}),
+                ...(this.defaultDnt !== undefined && {dnt: this.defaultDnt}),
                 ...(usid && {usid})
             }
         )
         this.handleTokenResponse(token, isGuest)
-        if (onClient() && this.OCAPISessionsURL) {
-            void this.createOCAPISession()
+        if (onClient()) {
+            void this.clearECOMSession()
         }
         return token
     }
@@ -740,23 +687,60 @@ class Auth {
     }
 
     /**
-     * Make a post request to the OCAPI /session endpoint to bridge the session.
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizeIDP.
      *
-     * The HTTP response contains a set-cookie header which sets the dwsid session cookie.
-     * This cookie is used on SFRA, and it allows shoppers to navigate between SFRA and
-     * this PWA site seamlessly; this is often used to enable hybrid deployment.
-     *
-     * (Note: this method is client side only, b/c MRT doesn't support set-cookie header right now)
-     *
-     * @returns {Promise}
      */
-    createOCAPISession() {
-        return fetch(this.OCAPISessionsURL, {
-            method: 'POST',
-            headers: {
-                Authorization: 'Bearer ' + this.get('access_token')
+    async authorizeIDP(parameters: AuthorizeIDPParams) {
+        const redirectURI = this.redirectURI
+        const usid = this.get('usid')
+        const {url, codeVerifier} = await helpers.authorizeIDP(
+            this.client,
+            {
+                redirectURI,
+                hint: parameters.hint,
+                ...(usid && {usid})
+            },
+            this.isPrivate
+        )
+        if (onClient()) {
+            console.log('we are on the client')
+            window.location.assign(url)
+        } else {
+            console.warn('Something went wrong, this client side method is invoked on the server.')
+        }
+        this.set('code_verifier', codeVerifier)
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
+     *
+     */
+    async loginIDPUser(parameters: LoginIDPUserParams) {
+        const codeVerifier = this.get('code_verifier')
+        const code = parameters.code
+        const usid = parameters.usid
+        const redirectURI = parameters.redirectURI || this.redirectURI
+
+        const token = await helpers.loginIDPUser(
+            this.client,
+            {
+                codeVerifier,
+                clientSecret: this.clientSecret
+            },
+            {
+                redirectURI,
+                code,
+                ...(usid && {usid})
             }
-        })
+        )
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
+        // Delete the code verifier once the user has logged in
+        this.delete('code_verifier')
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
     }
 
     /**
@@ -765,7 +749,7 @@ class Auth {
      */
     parseSlasJWT(jwt: string) {
         const payload: SlasJwtPayload = jwtDecode(jwt)
-        const {sub, isb, dnt} = payload
+        const {sub, isb} = payload
 
         if (!sub || !isb) {
             throw new Error('Unable to parse access token payload: missing sub and isb.')
@@ -784,8 +768,7 @@ class Auth {
         return {
             isGuest,
             customerId,
-            usid,
-            dnt
+            usid
         }
     }
 }
