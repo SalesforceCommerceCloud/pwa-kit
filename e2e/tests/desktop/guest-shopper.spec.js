@@ -6,63 +6,19 @@
  */
 
 const { test, expect } = require("@playwright/test");
+// TODO: remove this if we don't need this
 const config = require("../../config");
 const {
   generateUserCredentials,
   getCreditCardExpiry,
 } = require("../../scripts/utils.js");
+const { addProductToCart } = require("../../scripts/pageHelpers.js")
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials();
 
 test("Guest shopper can checkout items as guest", async ({ page }) => {
-  // home page
-  await page.goto(config.RETAIL_APP_HOME);
+  await addProductToCart(page)
 
-  await page.getByRole("link", { name: "Womens" }).hover();
-  const topsNav = await page.getByRole("link", { name: "Tops", exact: true });
-  await expect(topsNav).toBeVisible();
-
-  await topsNav.click();
-  // PLP
-  const productTile = page.getByRole("link", {
-    name: /Cotton Turtleneck Sweater/i,
-  });
-  // selecting swatch
-  const productTileImg = productTile.locator("img");
-  await productTileImg.waitFor({state: 'visible'})
-  const initialSrc = await productTileImg.getAttribute("src");
-  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-
-  await productTile.getByLabel(/Black/, { exact: true }).hover();
-  // Make sure the image src has changed
-  await expect(async () => {
-    const newSrc = await productTileImg.getAttribute("src")
-    expect(newSrc).not.toBe(initialSrc)
-  }).toPass()
-  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-  await productTile.click();
-
-  // PDP
-  await expect(
-    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
-  ).toBeVisible();
-  await page.getByRole("radio", { name: "L", exact: true }).click();
-
-  await page.locator("button[data-testid='quantity-increment']").click();
-
-  // // Selected Size and Color texts are broken into multiple elements on the page.
-  // // So we need to look at the page URL to verify selected variants
-  const updatedPageURL = await page.url();
-  const params = updatedPageURL.split("?")[1];
-  expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ169XX/i);
-  await page.getByRole("button", { name: /Add to Cart/i }).click();
-
-  const addedToCartModal = page.getByText(/2 items added to cart/i);
-
-  await addedToCartModal.waitFor();
-
-  await page.getByLabel("Close").click();
   // cart
   await page.getByLabel(/My cart/i).click();
 
@@ -155,4 +111,55 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
+});
+
+// TODO: implement for mobile
+// TODO: figure out why mobile tests aren't running
+test("Guest shopper can edit product item in cart", async ({ page }) => {
+  
+  const DEBUG_TIME = 3000
+  // TODO: potentially remove this
+  test.setTimeout(120000)
+  await addProductToCart(page)
+
+  // cart
+  await page.getByLabel(/My cart/i).click();
+
+  // TODO: figure out a better way to block for time
+  // wait for DEBUG_TIME seconds for page to render
+  await page.waitForTimeout(DEBUG_TIME);
+
+  await expect(
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
+  ).toBeVisible();
+
+  await expect(page.getByText(/Color: Black/i)).toBeVisible()
+  await expect(page.getByText(/Size: L/i)).toBeVisible()
+
+  // open product edit modal
+  const editBtn = page.getByRole("button", { name: /Edit/i })
+  await editBtn.waitFor()
+
+  expect(editBtn).toBeAttached()
+
+  await editBtn.click()
+
+  // TODO: figure out a better way to block for time
+  // wait for DEBUG_TIME seconds for page to render
+  await page.waitForTimeout(DEBUG_TIME);
+
+
+  // Product edit modal should be open
+  await expect(page.getByTestId('product-view')).toBeVisible()      
+  
+  // TODO: also change color
+  await page.getByRole("radio", { name: "S", exact: true }).click();
+  await page.getByRole("radio", { name: "Meadow Violet", exact: true }).click();
+  await page.getByRole("button", { name: /Update/i }).click()
+
+  // TODO: figure out a better way to block for time
+  // wait for DEBUG_TIME seconds for page to render
+  await page.waitForTimeout(DEBUG_TIME);
+  await expect(page.getByText(/Color: Meadow Violet/i)).toBeVisible()
+  await expect(page.getByText(/Size: S/i)).toBeVisible()
 });
