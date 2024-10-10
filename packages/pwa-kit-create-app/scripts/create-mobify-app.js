@@ -116,17 +116,17 @@ const LOCAL_DEV_PROJECT_DIR = 'dev'
 const INITIAL_QUESTION = [
     {
         name: 'project.type',
-        message: 'What type of project do you want to create?',
+        message: 'What type of PWA Kit project would you like to create?',
         type: 'list',
         choices: [
-            {name: 'PWA Kit Project', value: 'PWAKitProject'},
-            {name: 'Application Extension', value: 'appExtensionProject'}
+            {name: 'PWA Kit App (full project)', value: 'PWAKitProject'},
+            {name: 'PWA Kit Application Extension (for existing PWA Kit apps)', value: 'appExtensionProject'}
         ],
         default: 'PWAKitProject'
     }
 ]
 
-const askApplicationExtensibiltyQuestions = (availableAppExtensions) => {
+const askApplicationExtensibilityQuestions = (availableAppExtensions) => {
     return [
         {
             name: 'project.useAppExtensibility',
@@ -1085,7 +1085,7 @@ const main = async (opts) => {
             context.availableAppExtensions = availableAppExtensions
 
             const generationAnswers = await prompt(
-                askApplicationExtensibiltyQuestions(availableAppExtensions)
+                askApplicationExtensibilityQuestions(availableAppExtensions)
             )
             context = merge(context, {answers: expandObject(generationAnswers)})
 
