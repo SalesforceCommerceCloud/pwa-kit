@@ -7,7 +7,7 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { addProductToCart, registerShopper } = require("../../scripts/pageHelpers");
+const { addProductToCartDesktop, registerShopper } = require("../../scripts/pageHelpers");
 const {
   generateUserCredentials,
   getCreditCardExpiry,
@@ -20,7 +20,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS})
 
   // Shop for items as registered user
-  await addProductToCart({page})
+  await addProductToCartDesktop({page})
 
   // cart
   await page.getByLabel(/My cart/i).click();
