@@ -111,7 +111,7 @@ const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
-const APP_EXTENSIBILITY_DEV_PROJECT_DIR = 'dev'
+const LOCAL_DEV_PROJECT_DIR = 'dev'
 
 const INITIAL_QUESTION = [
     {
@@ -686,7 +686,7 @@ const expandKey = (key, value) =>
  * @param {string} outputDir - The path to the root of the generated project.
  * @param {string[]} ignorePaths - An array of directory or file paths to ignore in the npm package.
  */
-function createNpmIgnoreFile(outputDir, ignorePaths = []) {
+const createNpmIgnoreFile = (outputDir, ignorePaths = []) => {
     const npmIgnoreContent = ignorePaths.join('\n') + '\n'
 
     fs.writeFileSync(p.join(outputDir, '.npmignore'), npmIgnoreContent)
@@ -931,7 +931,7 @@ const runGenerator = async (
 
         // Check project type and handle appropriately
         if (answers.project.type === 'appExtensionProject') {
-            const devOutputDir = p.join(outputDir, APP_EXTENSIBILITY_DEV_PROJECT_DIR)
+            const devOutputDir = p.join(outputDir, LOCAL_DEV_PROJECT_DIR)
 
             // Update the root package.json to add a start script
             updatePackageJson(p.resolve(outputDir, 'package.json'), {
@@ -965,7 +965,7 @@ const runGenerator = async (
             })
 
             // Create the .npmignore file, excluding the typescript-minimal dev folder
-            createNpmIgnoreFile(outputDir, [`${APP_EXTENSIBILITY_DEV_PROJECT_DIR}/`])
+            createNpmIgnoreFile(outputDir, [`${LOCAL_DEV_PROJECT_DIR}/`])
 
             //TODO: Avoid duplicated console.log Installing dependencies in terminal
             npmInstall(devOutputDir, {verbose})
