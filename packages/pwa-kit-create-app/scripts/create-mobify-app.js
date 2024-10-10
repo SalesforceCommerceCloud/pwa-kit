@@ -111,7 +111,7 @@ const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
-const APP_EXTENSIBILITY_TYPESCRIPT_MINIMAL_DEV_DIR = 'dev'
+const APP_EXTENSIBILITY_DEV_PROJECT_DIR = 'dev'
 
 const INITIAL_QUESTION = [
     {
@@ -931,7 +931,7 @@ const runGenerator = async (
 
         // Check project type and handle appropriately
         if (answers.project.type === 'appExtensionProject') {
-            const devOutputDir = p.join(outputDir, APP_EXTENSIBILITY_TYPESCRIPT_MINIMAL_DEV_DIR)
+            const devOutputDir = p.join(outputDir, APP_EXTENSIBILITY_DEV_PROJECT_DIR)
 
             // Update the root package.json to add a start script
             updatePackageJson(p.resolve(outputDir, 'package.json'), {
@@ -965,7 +965,7 @@ const runGenerator = async (
             })
 
             // Create the .npmignore file, excluding the typescript-minimal dev folder
-            createNpmIgnoreFile(outputDir, [`${APP_EXTENSIBILITY_TYPESCRIPT_MINIMAL_DEV_DIR}/`])
+            createNpmIgnoreFile(outputDir, [`${APP_EXTENSIBILITY_DEV_PROJECT_DIR}/`])
 
             //TODO: Avoid duplicated console.log Installing dependencies in terminal
             npmInstall(devOutputDir, {verbose})
