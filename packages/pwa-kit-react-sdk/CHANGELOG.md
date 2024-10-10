@@ -1,3 +1,4 @@
+## v3.8.0-nightly-20241010080205 (Oct 10, 2024)
 ## v3.8.0-dev (Aug 08, 2024)
 - Create useOrigin hook to return an app origin that takes x-forwarded-host header into consideration. [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050) 
 
