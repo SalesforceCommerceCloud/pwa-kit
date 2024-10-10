@@ -847,7 +847,7 @@ const fetchAvailableAppExtensions = () => {
  */
 const runGenerator = async (
     context,
-    {outputDir, templateVersion, verbose, isRecursiveCall = false}
+    {outputDir, templateVersion, verbose, installDependencies = true}
 ) => {
     const {answers, preset} = context
     const {templateSource} = preset
@@ -940,8 +940,8 @@ const runGenerator = async (
                 }
             })
 
-            // Recursively call runGenerator for the 'typescript-minimal' preset
-            const extensionContext = {
+            // Recursively call runGenerator for the 'typescript-minimal' local dev project
+            const localDevProjectContext = {
                 ...context,
                 preset: {
                     id: 'typescript-minimal',
@@ -951,11 +951,11 @@ const runGenerator = async (
                 answers: {project: {type: 'PWAKitProject', name: 'typescript-dev'}}
             }
 
-            await runGenerator(extensionContext, {
+            await runGenerator(localDevProjectContext, {
                 outputDir: devOutputDir,
                 templateVersion,
                 verbose,
-                isRecursiveCall: true
+                installDependencies: false
             })
 
             // Update the typescript-minimal dev package.json with dependencies
@@ -964,7 +964,7 @@ const runGenerator = async (
                 mobify: {app: {extensions: [answers.project.name]}}
             })
 
-            // Create the .npmignore file, excluding the typescript-minimal dev folder
+            // Create the .npmignore file, excluding the typescript-minimal local dev project folder
             createNpmIgnoreFile(outputDir, [`${LOCAL_DEV_PROJECT_DIR}/`])
 
             //TODO: Avoid duplicated console.log Installing dependencies in terminal
@@ -1019,7 +1019,7 @@ const runGenerator = async (
         sh.rm('-rf', tmp)
     }
 
-    if (!isRecursiveCall) {
+    if (installDependencies) {
         // Install dependencies for the newly minted project.
         npmInstall(outputDir, {verbose})
     }
