@@ -713,8 +713,11 @@ const expandObject = (obj = {}) =>
  * @param {*} outputDir
  * @param {*} param1
  */
-const npmInstall = (outputDir, {verbose}) => {
-    console.log('Installing dependencies... This may take a few minutes.\n')
+const npmInstall = (outputDir, {verbose, projectName}) => {
+    console.log(`Installing dependencies${
+        projectName ? ` for ${projectName}` : ''
+    }... This may take a few minutes.
+`)
     const npmLogLevel = verbose ? 'notice' : 'error'
     const disableStdOut = ['inherit', 'ignore', 'inherit']
     const stdio = verbose ? 'inherit' : disableStdOut
@@ -948,7 +951,7 @@ const runGenerator = async (
                     templateSource: {type: TEMPLATE_SOURCE_BUNDLE, id: 'typescript-minimal'},
                     private: true
                 },
-                answers: {project: {type: 'PWAKitProject', name: 'typescript-dev'}}
+                answers: {project: {type: 'PWAKitProject', name: 'local-dev-project'}}
             }
 
             await runGenerator(localDevProjectContext, {
@@ -967,8 +970,10 @@ const runGenerator = async (
             // Create the .npmignore file, excluding the typescript-minimal local dev project folder
             createNpmIgnoreFile(outputDir, [`${LOCAL_DEV_PROJECT_DIR}/`])
 
-            //TODO: Avoid duplicated console.log Installing dependencies in terminal
-            npmInstall(devOutputDir, {verbose})
+            npmInstall(devOutputDir, {
+                verbose,
+                projectName: localDevProjectContext.answers.project.name
+            })
         } else {
             processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
         }
@@ -1021,7 +1026,7 @@ const runGenerator = async (
 
     if (installDependencies) {
         // Install dependencies for the newly minted project.
-        npmInstall(outputDir, {verbose})
+        npmInstall(outputDir, {verbose, projectName: context.answers.project.name})
     }
 }
 
