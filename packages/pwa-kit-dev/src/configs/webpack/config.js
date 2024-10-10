@@ -33,6 +33,10 @@ import {buildAliases, getExtensionNames, nameRegex} from '../../utils/extensibil
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
+const installedExtensions = Object.keys(pkg?.devDependencies || {}).filter((dependency) =>
+    dependency.match(nameRegex)
+)
+
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
     : resolve(projectDir, 'build')
@@ -184,7 +188,7 @@ const baseConfig = (target) => {
                     plugins: [
                         new OverridesResolverPlugin({
                             projectDir: process.cwd(),
-                            extensions: appConfig?.extensions,
+                            extensions: installedExtensions,
                             fileExtensions: SUPPORTED_FILE_EXTENSIONS
                         })
                     ],
@@ -202,11 +206,7 @@ const baseConfig = (target) => {
                         // Create alias's for "all" extensions, enabled or disabled, as they as they are being imported from the SDK package
                         // and cannot be resolved from that location. We create alias's for all because we do not know which extensions
                         // are configured at build time.
-                        ...buildAliases(
-                            Object.keys(pkg?.devDependencies || {}).filter((dependency) =>
-                                dependency.match(nameRegex)
-                            )
-                        ),
+                        ...buildAliases(installedExtensions),
                         ...Object.assign(
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
