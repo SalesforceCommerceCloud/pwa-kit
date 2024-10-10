@@ -1,6 +1,5 @@
 ## Version on which DNT SDK will go live (TODO: Update/cleanup when merging to develop)
-- Added useDNT hook to commerce-sdk-react [#1989](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1989) Feature branch
-- Added check for token and cookie DNT value mismatch [#2017](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2017)
+- Added useDNT hook to commerce-sdk-react and put DNT in auth [#2067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2067/files)
 
 ## v3.1.0-dev (Aug 08, 2024)
 
