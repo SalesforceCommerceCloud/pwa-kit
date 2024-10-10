@@ -9,6 +9,8 @@ runs:
   steps:
     - name: Send metrics to Datadog
       run : |
+        pip install datadog
+
         # Add a dogrc so we can submit metrics to datadog
         printf "[Connection]\napikey = ${{inputs.datadog_api_key}}\nappkey =\n" > ~/.dogrc
 
