@@ -357,6 +357,7 @@ export const RemoteServerFactory = {
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
         this._setupSSRRequestProcessorMiddleware(app)
+        this._setForwardedHeaders(app, options)
 
         this._setupLogging(app)
         this._setupMetricsFlushing(app)
@@ -443,6 +444,23 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _addSDKInternalHandlers(app) {
         // This method is used by the dev server, but is not needed here.
+    },
+
+    /**
+     * Set x-forward-* headers into locals, this is primarily used to facilitate react sdk hook `useOrigin`
+     * @private
+     */
+    _setForwardedHeaders(app, options) {
+        app.use((req, res, next) => {
+            const xForwardedHost = req.headers?.['x-forwarded-host']
+            const xForwardedProto = req.headers?.['x-forwarded-proto']
+            if (xForwardedHost) {
+                // prettier-ignore
+                res.locals.xForwardedOrigin = `${xForwardedProto || options.protocol}://${xForwardedHost}`
+            }
+
+            next()
+        })
     },
 
     /**
