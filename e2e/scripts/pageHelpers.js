@@ -51,6 +51,7 @@ export const addProductToCartDesktop = async ({page}) => {
     await page.getByLabel("Close").click();
 }
 
+// TODO: potentially combine to have addProductToCart and accept isMobile flag
 export const addProductToCartMobile = async ({page}) => {
     // Home page
     await page.goto(config.RETAIL_APP_HOME);
@@ -121,7 +122,7 @@ export const addProductToCartMobile = async ({page}) => {
     await page.getByLabel("Close").click();
 }
 
-export const registerShopper = async ({page, userCredentials}) => {
+export const registerShopper = async ({page, userCredentials, isMobile = false}) => {
     // Create Account and Sign In
     await page.goto(config.RETAIL_APP_HOME + "/registration");
 
@@ -145,9 +146,11 @@ export const registerShopper = async ({page, userCredentials}) => {
         page.getByRole("heading", { name: /Account Details/i })
     ).toBeVisible();
 
-    await expect(
-        page.getByRole("heading", { name: /My Account/i })
-    ).toBeVisible();
+    if(!isMobile) {
+        await expect(
+            page.getByRole("heading", { name: /My Account/i })
+        ).toBeVisible();
+    }
 
     await expect(page.getByText(/Email/i)).toBeVisible();
     await expect(page.getByText(userCredentials.email)).toBeVisible();

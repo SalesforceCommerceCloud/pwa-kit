@@ -137,6 +137,7 @@ test("Registered shopper can add item to wishlist", async ({ page }) => {
 
   await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS})
 
+  // TODO: could pull this out into helper function
   // navigate to PDP
   await page.goto(config.RETAIL_APP_HOME);
 
