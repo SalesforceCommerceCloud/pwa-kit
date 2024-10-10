@@ -22,29 +22,27 @@ const SocialLoginRedirect = () => {
                 marginBottom={8}
                 borderRadius="base"
             >
-                <Fragment>
-                    <Stack justify="center" align="center" spacing={8} marginBottom={8}>
-                        <BrandLogo width="60px" height="auto" />
-                        <Text align="center" fontSize="xl" fontWeight="semibold">
-                            <FormattedMessage defaultMessage="Authenticating..." />
-                        </Text>
-                        <Text align="center" fontSize="m">
-                            <FormattedMessage
-                                defaultMessage="If you are not automatically redirected, click <link>this link</link> to proceed."
-                                values={{
-                                    link: (chunks) => (
-                                        <a
-                                            href="/account"
-                                            style={{color: '#0176D3', textDecoration: 'underline'}}
-                                        >
-                                            {chunks}
-                                        </a>
-                                    )
-                                }}
-                            />
-                        </Text>
-                    </Stack>
-                </Fragment>
+                <Stack justify="center" align="center" spacing={8} marginBottom={8}>
+                    <BrandLogo width="60px" height="auto" />
+                    <Text align="center" fontSize="xl" fontWeight="semibold">
+                        <FormattedMessage defaultMessage="Authenticating..." />
+                    </Text>
+                    <Text align="center" fontSize="m">
+                        <FormattedMessage
+                            defaultMessage="If you are not automatically redirected, click <link>this link</link> to proceed."
+                            values={{
+                                link: (chunks) => (
+                                    <a
+                                        href="/account"
+                                        style={{color: '#0176D3', textDecoration: 'underline'}}
+                                    >
+                                        {chunks}
+                                    </a>
+                                )
+                            }}
+                        />
+                    </Text>
+                </Stack>
             </Container>
         </Box>
     )
