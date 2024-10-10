@@ -2,7 +2,6 @@
 
 - Add the `authorizeCustomer` and `getPasswordResetToken` to the `ShopperLoginMutations` [#2056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2056)
 
-
 ## v3.1.0-dev (Aug 08, 2024)
 
 -   Improve refresh token error logging [#2028](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2028)
