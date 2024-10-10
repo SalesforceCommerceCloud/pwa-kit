@@ -10,10 +10,6 @@ runs:
     - name: Install Dependencies
       working-directory: ${{ inputs.cwd }}
       run: |-
-        # Install system dependencies
-        sudo apt-get update -yq
-        sudo pip3 install datadog==0.40.1
-
         # Install node dependencies
         node ./scripts/gtime.js monorepo_install npm ci
 
