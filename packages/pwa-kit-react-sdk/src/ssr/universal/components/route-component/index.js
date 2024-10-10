@@ -404,14 +404,14 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  */
 export const getRoutes = (locals = {}) => {
     let _routes = routes
-    const {appExtensions = []} = locals
+    const {applicationExtensions = []} = locals
     if (typeof routes === 'function') {
         _routes = routes()
     }
 
     // Call the `extendRoutes` function for all the Application Extensions.
-    appExtensions.forEach((appExtension) => {
-        _routes = appExtension.extendRoutes(_routes)
+    applicationExtensions.forEach((applicationExtension) => {
+        _routes = applicationExtension.extendRoutes(_routes)
     })
 
     const allRoutes = [

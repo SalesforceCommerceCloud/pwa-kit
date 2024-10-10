@@ -25,8 +25,8 @@ export const withLegacyGetProps = (Wrapped) => {
          * @private
          */
         static async doInitAppState({App, match, route, req, res, location}) {
+            debugger
             const {params} = match
-
             const components = [App, route.component]
             const promises = components.map((c, i) => {
                 // getTemplateName is a promise and it's intentially not awaited here

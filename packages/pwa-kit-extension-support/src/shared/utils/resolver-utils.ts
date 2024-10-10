@@ -11,6 +11,9 @@ import path from 'path'
 // Project imports
 import {isEnabled} from './extensibility-utils'
 
+// Types
+import {ApplicationExtensionEntry, ApplicationExtensionEntryArray, BuildCandidatePathsOptions} from '../../types'
+
 const EXTENSION_NAMESPACE = '@salesforce'
 const EXTENSION_PREFIX = 'extension'
 const NODE_MODULES = 'node_modules'
@@ -81,19 +84,6 @@ export const expand = (extensions: ApplicationExtensionEntry[] = []): Applicatio
 
             return [nameRef, config]
         })
-
-type BuildCandidatePathsOptions = {
-    projectDir: string, 
-    extensionEntries: ApplicationExtensionEntry[]
-}
-
-interface ApplicationExtensionConfig extends Record<string, unknown> {
-    enabled: boolean
-}
-
-type ApplicationExtensionEntryArray = [string, ApplicationExtensionConfig]
-type ApplicationExtensionEntry = ApplicationExtensionEntryArray | string
-
 
 /**
  * Based on the current extensibility configuration, return an array of candiate file paths to be used

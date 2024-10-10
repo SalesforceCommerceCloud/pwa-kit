@@ -8,6 +8,9 @@
 import path from 'path'
 import fs from 'fs-extra'
 
+// Types 
+import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../types'
+
 const REACT_EXTENSIBILITY_FILE = 'setup-app'
 const SUPPORTED_FILE_TYPES = ['.ts', '.js']
 
@@ -109,14 +112,6 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
         return Array.isArray(extension) ? extension[0] : extension
     })
 }
-
-// TODO: Move these to the types file!
-interface ApplicationExtensionConfig extends Record<string, unknown> {
-    enabled: boolean
-}
-
-type ApplicationExtensionEntryArray = [string, ApplicationExtensionConfig]
-type ApplicationExtensionEntry = ApplicationExtensionEntryArray | string
 
 /**
  * Determines if an extension is enabled based on the provided Application Extension entry.

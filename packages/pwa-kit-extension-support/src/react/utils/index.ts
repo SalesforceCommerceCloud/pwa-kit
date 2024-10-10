@@ -7,8 +7,6 @@
 
 import React from 'react'
 import hoistNonReactStatics from 'hoist-non-react-statics'
-import ApplicationExtension from '../core/application-extension'
-import {ApplicationExtensionConfig} from '../types'
 
 // NOTE: Similar to how I was thinking that the ExpressJS interface should be a middleware,
 // it might also be wise to make the React interface with application extensibility be an HOC.
@@ -30,20 +28,4 @@ export const applyHOCs = <T extends React.ComponentType<any>>(
         const WrappedComponent = hoc(AccumulatedComponent)
         return hoistNonReactStatics(WrappedComponent, AccumulatedComponent) as T
     }, Component)
-}
-
-/**
- * Given the provided Application, apply all the App extensions to it.
- *
- * @param App
- */
-export const applyApplicationExtensions = (
-    App: React.ComponentType,
-    extensions: ApplicationExtension<ApplicationExtensionConfig>[]
-): React.ComponentType => {
-    const extendAppHocs = extensions
-        .map((extension) => extension.extendApp.bind(extension))
-        .filter(Boolean)
-
-    return applyHOCs(App, extendAppHocs)
 }

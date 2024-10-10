@@ -5,7 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export {applyApplicationExtensions} from './utils'
+// Re-exports
+export * from './extensibility-utils'
+export * from './resolver-utils'
 
 /**
  * Converts a kebab-case string to UpperCamelCase (PascalCase).

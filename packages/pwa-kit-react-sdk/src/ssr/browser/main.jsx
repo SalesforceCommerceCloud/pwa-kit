@@ -10,14 +10,13 @@ import {hydrateRoot} from 'react-dom/client'
 import PropTypes from 'prop-types'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {loadableReady} from '@loadable/component'
-import {getExtensions} from '@salesforce/pwa-kit-extension-support/core/extensions'
+import {withApplicationExtensions} from '@salesforce/pwa-kit-extension-support/react'
 
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
-import {applyAppExtensions} from '../universal/extensibility/utils'
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
 
@@ -116,14 +115,7 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    let WrappedApp = routeComponent(App, false, locals)
-    const extensions = getExtensions()
-
-    // Use locals to thread the application extensions through the react app start flow.
-    locals.appExtensions = extensions
-
-    // Initialize all the react app extensions.
-    WrappedApp = applyAppExtensions(WrappedApp, extensions)
+    const WrappedApp = withApplicationExtensions(routeComponent(App, false, locals), {locals})
 
     const props = {
         error: window.__ERROR__,

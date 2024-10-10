@@ -5,15 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
-
-// TODO: Move this somewhere closer to the router code.
-export interface IRouteConfig {
-    path: string
-    exact?: boolean
-    component: React.ComponentType<any>
-}
-
 export interface ApplicationExtensionConfig extends Record<string, unknown> {
     enabled: boolean
+}
+
+export type ApplicationExtensionEntryArray = [string, ApplicationExtensionConfig]
+
+export type ApplicationExtensionEntry = ApplicationExtensionEntryArray | string
+
+export type BuildCandidatePathsOptions = {
+    projectDir: string, 
+    extensionEntries: ApplicationExtensionEntry[]
 }

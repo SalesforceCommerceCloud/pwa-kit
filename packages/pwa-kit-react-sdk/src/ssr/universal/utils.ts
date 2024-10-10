@@ -119,3 +119,4 @@ export const applyHOCs = <T extends React.ComponentType<any>>(
         return hoistNonReactStatics(WrappedComponent, AccumulatedComponent) as T
     }, Component)
 }
+

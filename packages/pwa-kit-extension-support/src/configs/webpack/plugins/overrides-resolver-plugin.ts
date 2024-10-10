@@ -8,7 +8,11 @@
 import resolve from 'resolve'
 import {Resolver} from 'webpack'
 
-import {buildCandidatePaths} from '../../../utils/resolver-utils'
+// Local
+import {buildCandidatePaths} from '../../../shared/utils/resolver-utils'
+
+// Type
+import {ApplicationExtensionEntry} from '../../../types'
 
 export const DEFAULT_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
 
@@ -18,13 +22,6 @@ interface OverridesResolverPluginOptions {
     fileExtensions?: string[]
     resolveOptions: any
 }
-
-interface ApplicationExtensionConfig extends Record<string, unknown> {
-    enabled: boolean
-}
-type ApplicationExtensionEntryArray = [string, ApplicationExtensionConfig]
-type ApplicationExtensionEntry = ApplicationExtensionEntryArray | string
-
 
 const defaultOptions = {
     projectDir: process.cwd(),

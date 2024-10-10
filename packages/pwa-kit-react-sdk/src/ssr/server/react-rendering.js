@@ -21,10 +21,9 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getExtensions} from '@salesforce/pwa-kit-extension-support/core/extensions'
+import {withApplicationExtensions} from '@salesforce/pwa-kit-extension-support/react'
 
 import {getAssetUrl} from '../universal/utils'
-import {applyAppExtensions} from '../universal/extensibility/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import App from '../universal/components/_app'
@@ -126,17 +125,11 @@ export const render = async (req, res, next) => {
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
-    const extensions = getExtensions()
-    console.log('React Rendering: ', extensions)
+
     AppConfig.restore(res.locals)
 
     // Use locals to thread the application extensions through the rendering pipeline.
-    res.locals.appExtensions = extensions
-
-    let WrappedApp = routeComponent(App, false, res.locals)
-
-    // Initialize all the react app extensions.
-    WrappedApp = applyAppExtensions(WrappedApp, extensions)
+    const WrappedApp = withApplicationExtensions(routeComponent(App, false, res.locals), {locals: res.locals})
 
     const routes = getRoutes(res.locals)
 

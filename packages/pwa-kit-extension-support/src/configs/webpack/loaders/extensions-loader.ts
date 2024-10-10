@@ -9,8 +9,8 @@ import dedent from 'dedent'
 import {LoaderContext} from 'webpack'
 import {PackageJson} from 'type-fest'
 
-import {kebabToUpperCamelCase} from '../../../utils'
-import {nameRegex} from '../../../utils/extensibility-utils'
+import {kebabToUpperCamelCase} from '../../../shared/utils'
+import {nameRegex} from '../../../shared/utils/extensibility-utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
 const APP_EXTENSION_PREFIX = 'extension' // aligns with what's in `nameRegex`
@@ -110,8 +110,6 @@ module.exports = function (this: ExtensionsLoaderContext) {
                 })
                 .filter(Boolean)
 
-            export const getExtensions = () => {
-                return configuredExtensions
-            }
+            export default configuredExtensions
         `
 }

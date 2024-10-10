@@ -15,7 +15,7 @@ import {RouteProps} from 'react-router-dom'
  *
  * @abstract
  */
-export default abstract class ApplicationExtension<Config> {
+export abstract class ApplicationExtension<Config> {
     private config: Config
 
     /**
@@ -55,7 +55,7 @@ export default abstract class ApplicationExtension<Config> {
      * @param App - The base application component.
      * @returns EnhancedApp - The enhanced application component.
      */
-    public extendApp(App: React.ComponentType): React.ComponentType {
+    public extendApp<T extends {}>(App: React.ComponentType<T>): React.ComponentType<T> {
         return App
     }
 

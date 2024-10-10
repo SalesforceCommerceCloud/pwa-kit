@@ -5,6 +5,4 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export interface ApplicationExtensionConfig extends Record<string, unknown> {
-    enabled: boolean
-}
+export {default as withApplicationExtensions } from './withApplicationExtensions'

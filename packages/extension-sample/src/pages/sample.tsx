@@ -8,7 +8,7 @@ import React, {Fragment} from 'react'
 import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 
 const Sample = () => {
-    const logoUrl = getStaticAssetUrl('salesforce-logo.svg', {extensionPackageName: '@salesforce/extension-sample'})
+    const logoUrl = getStaticAssetUrl('salesforce-logo.svg', {appExtensionPackageName: '@salesforce/extension-sample'})
     return (
         <Fragment>
             <h1>Welcome to the Sample Page 👋</h1>
