@@ -1,4 +1,5 @@
 ## v3.8.0-dev (Aug 8, 2024)
+- Update ssr.js templates to include new feature flag to encode non ASCII HTTP headers [#2048](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2048)
 
 ## v3.7.0 (Aug 7, 2024)
 
