@@ -17,7 +17,7 @@ import helmet from 'helmet'
 
 const runtime = getRuntime()
 
-class SampleExtension extends ExpressApplicationExtension<Config> {
+class RetailReactAppServer extends ExpressApplicationExtension<Config> {
     extendApp(app: ExpressApplication): ExpressApplication {
         console.log('--- extending the express app')
         // Set default HTTP security headers required by PWA Kit
@@ -54,4 +54,4 @@ class SampleExtension extends ExpressApplicationExtension<Config> {
     }
 }
 
-export default SampleExtension
+export default RetailReactAppServer

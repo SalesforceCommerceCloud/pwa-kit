@@ -7,6 +7,7 @@
 import AppConfig from './components/_app-config'
 import {withLegacyGetProps} from './components/with-legacy-get-props'
 
+// TODO: if we allow for extended AppConfig, then how to access it from this file?
 let _appConfig = AppConfig
 
 /**
