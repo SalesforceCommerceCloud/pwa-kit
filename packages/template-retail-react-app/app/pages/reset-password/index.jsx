@@ -17,8 +17,9 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {
-    useShopperCustomersMutation,
-    ShopperCustomersMutations
+    helpers,
+    useShopperLoginMutation,
+    ShopperLoginMutations
 } from '@salesforce/commerce-sdk-react'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
@@ -26,6 +27,7 @@ import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useLocation} from 'react-router-dom'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const ResetPassword = () => {
     const form = useForm()
@@ -34,13 +36,21 @@ const ResetPassword = () => {
     const [showSubmittedSuccess, setShowSubmittedSuccess] = useState(false)
     const einstein = useEinstein()
     const {pathname} = useLocation()
-    const getResetPasswordToken = useShopperCustomersMutation(
-        ShopperCustomersMutations.GetResetPasswordToken
+    const config = getConfig()
+    const getResetPasswordToken = useShopperLoginMutation(
+        ShopperLoginMutations.GetPasswordResetToken
     )
 
     const submitForm = async ({email}) => {
+        const codeVerifier = helpers.createCodeVerifier()
+        const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
+
         const body = {
-            login: email
+            user_id: email,
+            channel_id: config.app.commerceAPI.parameters.siteId,
+            mode: 'callback',
+            callback_url: 'https://reverse-proxy.jhnnygrn.workers.dev/password-reset-callback',
+            code_challenge: codeChallenge
         }
         try {
             await getResetPasswordToken.mutateAsync({body})

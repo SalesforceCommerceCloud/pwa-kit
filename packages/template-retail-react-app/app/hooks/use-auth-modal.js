@@ -27,9 +27,9 @@ import {
     useCustomerId,
     useCustomerType,
     useCustomerBaskets,
-    useShopperCustomersMutation,
+    useShopperLoginMutation,
     useShopperBasketsMutation,
-    ShopperCustomersMutations
+    ShopperLoginMutations
 } from '@salesforce/commerce-sdk-react'
 import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
@@ -40,9 +40,12 @@ import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
 const PASSWORD_VIEW = 'password'
+
+import {helpers} from 'commerce-sdk-isomorphic'
 
 const LOGIN_ERROR = defineMessage({
     defaultMessage: "Something's not right with your email or password. Try again.",
@@ -58,6 +61,7 @@ export const AuthModal = ({
     onClose,
     ...props
 }) => {
+    const config = getConfig()
     const {formatMessage} = useIntl()
     const customerId = useCustomerId()
     const {isRegistered, customerType} = useCustomerType()
@@ -75,9 +79,8 @@ export const AuthModal = ({
     const toast = useToast()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
-
-    const getResetPasswordToken = useShopperCustomersMutation(
-        ShopperCustomersMutations.GetResetPasswordToken
+    const getResetPasswordToken = useShopperLoginMutation(
+        ShopperLoginMutations.GetPasswordResetToken
     )
 
     const {data: baskets} = useCustomerBaskets(
@@ -148,8 +151,16 @@ export const AuthModal = ({
             },
             password: async (data) => {
                 try {
+                    const codeVerifier = helpers.createCodeVerifier()
+                    const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
+
                     const body = {
-                        login: data.email
+                        client_id: config.app.commerceAPI.parameters.clientId,
+                        user_id: data.email,
+                        channel_id: config.app.commerceAPI.parameters.siteId,
+                        mode: 'callback',
+                        callback_uri: 'https://reverse-proxy.jhnnygrn.workers.dev/password-reset-callback',
+                        code_challenge: codeChallenge
                     }
                     await getResetPasswordToken.mutateAsync({body})
                 } catch (e) {

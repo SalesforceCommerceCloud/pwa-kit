@@ -21,6 +21,8 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import helmet from 'helmet'
+import bodyParser from 'body-parser'
+
 
 const options = {
     // The build directory (an absolute path)
@@ -99,6 +101,18 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.cookie('cc-ta-code_RefArch', req.query.code, {maxAge: 1000 * 60 * 15})
         res.set('Content-Type', 'text/html')
         res.send(Buffer.from(`<script>window.close()</script>`))
+    })
+
+    // TODO: TAOB remove after testing ...
+    // the callback should be implemented by the customer
+    app.post('/password-reset-callback?*', bodyParser.json(), (req, res) => {
+        console.log({query: req.query, headers: req.headers, body: req.body})
+        res.set('Content-Type', 'application/json')
+        res.send(Buffer.from(JSON.stringify({
+            query: req.query,
+            headers: req.headers,
+            body: req.body
+        })))
     })
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
