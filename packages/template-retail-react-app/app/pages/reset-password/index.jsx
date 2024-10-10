@@ -46,6 +46,7 @@ const ResetPassword = () => {
         const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
 
         const body = {
+            channel_id: config.app.commerceAPI.parameters.siteId,
             user_id: email,
             channel_id: config.app.commerceAPI.parameters.siteId,
             mode: 'callback',
