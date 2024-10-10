@@ -10,6 +10,13 @@ runs:
     - name: Install Dependencies
       working-directory: ${{ inputs.cwd }}
       run: |-
+
+        # For the datadog cli, it must be installed via python
+        # to install python packages on CI environment, we must activate the virtual env
+        # or otherwise it throws error: externally-managed-environment
+        python3 -m venv venv
+        source venv/bin/activate
+
         # Install node dependencies
         node ./scripts/gtime.js monorepo_install npm ci
 
