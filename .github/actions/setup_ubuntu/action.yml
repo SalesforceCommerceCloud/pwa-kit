@@ -16,6 +16,7 @@ runs:
         # or otherwise it throws error: externally-managed-environment
         python3 -m venv venv
         source venv/bin/activate
+        pip install datadog
 
         # Install node dependencies
         node ./scripts/gtime.js monorepo_install npm ci
