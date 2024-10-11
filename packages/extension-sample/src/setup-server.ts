@@ -5,16 +5,20 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    Application as ExpressApplication,
-    ApplicationExtension as ExpressApplicationExtension
-} from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
-import {ServerExtensionConfig as Config} from './types'
+// Third-Party Imports
+import {Application} from 'express'
 
-class SampleExtension extends ExpressApplicationExtension<Config> {
+// Platform Imports
+import {ApplicationExtension} from '@salesforce/pwa-kit-extension-support/express/application-extension'
+// import {ApplicationExtension} from '@salesforce/pwa-kit-extension-support/express' // NOTE: Doing this causes a circular dependency. Looks to fix whatever is happening in the index file.
 
-    extendApp(app: ExpressApplication): ExpressApplication {
+// Local Imports
+import {Config} from './types'
 
+class SampleExtension extends ApplicationExtension<Config> {
+
+    extendApp(app: Application): Application {
+        console.log('setup-server: SampleExtension: extendApp: ', app)
         app.get('/sample', (req, res) => {
             console.log('SampleExtension extendApp GET /sample')
             res.send(

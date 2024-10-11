@@ -50,7 +50,7 @@ import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware} from 'http-proxy-middleware'
-import {ApplicationExtension} from './extensibility'
+import {applicationExtensionMiddleware} from '@salesforce/pwa-kit-extension-support/express'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -370,8 +370,6 @@ export const RemoteServerFactory = {
         // processing.
         this._setupCommonMiddleware(app, options)
 
-        this._setupExtensions(app, options)
-
         this._addStaticAssetServing(app)
         this._addDevServerGarbageCollection(app)
         return app
@@ -650,121 +648,6 @@ export const RemoteServerFactory = {
     },
 
     /**
-     * This function is called during server initialization.
-     *
-     * This function assumes that optionally, there is a `setup-server.js`
-     * file in each extension directory in the build.
-     *
-     * This file should export a default which is a class extending ApplicationExtension abstract class.
-     *
-     * @private
-     */
-    _setupExtensions(app, options) {
-        logger.info('Setting up extensions...')
-
-        // Normalize the extensions list for easier parsing
-        const extensions = (options.mobify?.app?.extensions || [])
-            .map((extension) => {
-                return {
-                    // TODO: later we'll consider reusing a util function or perhaps eliminate this
-                    packageName: Array.isArray(extension) ? extension[0] : extension,
-                    config: Array.isArray(extension)
-                        ? {enabled: true, ...extension[1]}
-                        : {enabled: true}
-                }
-            })
-            .filter((extension) => extension.config.enabled)
-
-        logger.info('Extensions to load', {
-            namespace: 'RemoteServerFactory._setupExtensions',
-            additionalProperties: {extensions: extensions}
-        })
-
-        app.__extensions = extensions
-
-        let _require
-
-        extensions.forEach((extension) => {
-            logger.info(`Loading extension: ${extension.packageName}`)
-
-            const setupServerFilePath = path.join(
-                options.buildDir,
-                'extensions',
-                extension.packageName,
-                'setup-server.js'
-            )
-
-            // Only eval when there are extensions
-            // this makes it slightly faster for projects that
-            // have no extensions
-            if (!_require) {
-                _require = eval('require')
-            }
-
-            let ExtensionClass
-            try {
-                ExtensionClass = _require(setupServerFilePath).default
-            } catch (e) {
-                if (e.message && e.message.startsWith('Cannot find module')) {
-                    logger.warn(
-                        `No setup-server.js file found for ${extension.packageName}. Skipping.`
-                    )
-                    return
-                }
-
-                logger.error(`Error loading extension ${extension.packageName}:`, {
-                    namespace: 'RemoteServerFactory._setupExtensions',
-                    additionalProperties: {error: e}
-                })
-                throw e
-            }
-
-            // Ensure that the default export is a class that extends abstract class "ApplicationExtension".
-            const isPrototype = Object.prototype.isPrototypeOf.call(
-                ApplicationExtension.prototype,
-                ExtensionClass?.prototype
-            )
-
-            if (!isPrototype) {
-                logger.error(
-                    `'${extension.packageName}' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`,
-                    {
-                        namespace: 'RemoteServerFactory._setupExtensions'
-                    }
-                )
-                return
-            }
-
-            let extensionInstance
-            try {
-                logger.info(`Instantiating extension class for ${extension.packageName}...`)
-                extensionInstance = new ExtensionClass(extension.config)
-                logger.info(`Successfully instantiated extension ${extension.packageName}.`)
-            } catch (e) {
-                logger.error(`Error instantiating extension ${extension.packageName}:`, {
-                    namespace: 'RemoteServerFactory._setupExtensions',
-                    additionalProperties: {error: e}
-                })
-                return
-            }
-
-            // Extend the app using the provided method
-            try {
-                logger.log(`Extending app using extension ${extension.packageName}...`)
-                app = extensionInstance.extendApp(app)
-                logger.log(`Successfully extended app with ${extension.packageName}.`)
-            } catch (e) {
-                logger.error(`Error setting extension ${extension.packageName}:`, {
-                    namespace: 'RemoteServerFactory._setupExtensions',
-                    additionalProperties: {error: e}
-                })
-            }
-        })
-
-        logger.info('Finished setting up extensions.')
-    },
-
-    /**
      * @private
      */
     _handleMissingSlasPrivateEnvVar(app) {
@@ -871,6 +754,11 @@ export const RemoteServerFactory = {
         // to add in their projects, like in any regular Express app.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
+        console.log('Applying Application Extension Middleware: ', applicationExtensionMiddleware)
+
+        // NOTE: Think about changing the name of this function to `applyApplicationExtensions`. First look into
+        // what a common pattern is for application enhancement.
+        applicationExtensionMiddleware(app)
 
         applyPatches(options)
     },

@@ -239,8 +239,11 @@ const main = async () => {
                 'babel-node'
             )
 
+            // This incluse 100% needs some work
             execSync(
-                `${babelNode} ${inspect ? '--inspect' : ''} ${babelArgs} ${getAppEntrypoint()}`,
+                `${babelNode} ${
+                    inspect ? '--inspect' : ''
+                } -i [\"/(?:\\/.*)?\\/node_modules\\//(?!@salesforce\/pwa-kit-extension-support\/dist)\\//i\"] ${babelArgs} ${getAppEntrypoint()}`,
                 {
                     env: {
                         ...process.env,

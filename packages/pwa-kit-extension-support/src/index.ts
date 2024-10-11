@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {RouteProps} from 'react-router-dom'
+
+import {ApplicationExtensionConfig} from './types'
 
 /**
  * An abstract class representing an Application Extension. This class provides
@@ -15,7 +16,7 @@ import {RouteProps} from 'react-router-dom'
  *
  * @abstract
  */
-export abstract class ApplicationExtension<Config> {
+export abstract class ApplicationExtension<Config extends ApplicationExtensionConfig> {
     private config: Config
 
     /**
@@ -45,30 +46,5 @@ export abstract class ApplicationExtension<Config> {
      */
     public getName(): string {
         return this.constructor.name
-    }
-
-    /**
-     * Called during the rendering of the base application on the server and the client.
-     * It is predominantly used to enhance the "base" application by wrapping it with React providers.
-     *
-     * @protected
-     * @param App - The base application component.
-     * @returns EnhancedApp - The enhanced application component.
-     */
-    public extendApp<T extends {}>(App: React.ComponentType<T>): React.ComponentType<T> {
-        return App
-    }
-
-    /**
-     * Called during server rendering and client application initialization. This method allows
-     * you to modify the routes of the base application, typically used to add new routes pointing
-     * at page components added by your application extension.
-     *
-     * @protected
-     * @param routes - The base application routes.
-     * @returns routes - The modified application routes.
-     */
-    public extendRoutes(routes: RouteProps[]): RouteProps[] {
-        return routes
     }
 }

@@ -9,7 +9,7 @@ import React from 'react'
 
 // Local
 // TODO: We can probably pass this in as an initial value.?
-import {getApplicationExtensions} from '../../shared/utils/universal-utils'
+// import {getApplicationExtensions} from '../../shared/utils/universal-utils'
 import ApplicationExtensionsContext from './ApplicationExtensionsContext'
 
 // TODO: Clean this up.
@@ -18,10 +18,10 @@ type ApplicationExtensionsProviderProps = {
 }
 
 const ApplicationExtensionsProvider = ({children}: ApplicationExtensionsProviderProps) => {
-    const extensions = getApplicationExtensions()
+    // const extensions = getApplicationExtensions()
 
     return (
-        <ApplicationExtensionsContext.Provider value={extensions}>
+        <ApplicationExtensionsContext.Provider value={[]}>
             {children}
         </ApplicationExtensionsContext.Provider>
     )

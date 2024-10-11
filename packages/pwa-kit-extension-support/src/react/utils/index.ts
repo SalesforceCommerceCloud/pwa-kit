@@ -20,11 +20,13 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
  * @param {Array<(component: T) => T>} hocs - An array of Higher-Order Components (HOCs) to apply to the component.
  * @returns {T} - The React component wrapped with the provided HOCs.
  */
+// type GenericHocType<C> = (component: React.ComponentType<C>) => React.ComponentType<C>
+
 export const applyHOCs = <T extends React.ComponentType<any>>(
     Component: T,
-    hocs: Array<(component: T) => T>
+    hocs: any
 ): T => {
-    return hocs.reduce((AccumulatedComponent, hoc) => {
+    return hocs.reduce((AccumulatedComponent: any, hoc: any) => {
         const WrappedComponent = hoc(AccumulatedComponent)
         return hoistNonReactStatics(WrappedComponent, AccumulatedComponent) as T
     }, Component)

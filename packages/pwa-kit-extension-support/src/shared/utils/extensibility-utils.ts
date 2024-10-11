@@ -12,6 +12,8 @@ import fs from 'fs-extra'
 import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../types'
 
 const REACT_EXTENSIBILITY_FILE = 'setup-app'
+const EXPRESS_EXTENSIBILITY_FILE = 'setup-server'
+
 const SUPPORTED_FILE_TYPES = ['.ts', '.js']
 
 /**
@@ -39,20 +41,23 @@ export const buildAliases = (extensions: ApplicationExtensionEntry[] = []) => {
             projectDir,
             'node_modules',
             extension,
-            'src', // 🤔
-            REACT_EXTENSIBILITY_FILE
+            'src'
+            // , // 🤔
+            // REACT_EXTENSIBILITY_FILE
         )
 
-        const foundFilePath = findFileWithExtension(basePath, SUPPORTED_FILE_TYPES)
+        // const foundFilePath = findFileWithExtension(basePath, SUPPORTED_FILE_TYPES)
 
-        if (!foundFilePath) {
-            // no setup-server file found, early exit because it's optional
-            return acc
-        }
+        // if (!foundFilePath) {
+        //     // no setup-server file found, early exit because it's optional
+        //     return acc
+        // }
 
         return {
             ...acc,
-            [`${extension}/${REACT_EXTENSIBILITY_FILE}`]: foundFilePath
+            // [`${extension}/${REACT_EXTENSIBILITY_FILE}`]: findFileWithExtension(path.join(basePath, REACT_EXTENSIBILITY_FILE), SUPPORTED_FILE_TYPES),
+            // [`${extension}/${EXPRESS_EXTENSIBILITY_FILE}`]: findFileWithExtension(path.join(basePath, EXPRESS_EXTENSIBILITY_FILE), SUPPORTED_FILE_TYPES)
+            [`${extension}`]: basePath
         }
     }, {})
 

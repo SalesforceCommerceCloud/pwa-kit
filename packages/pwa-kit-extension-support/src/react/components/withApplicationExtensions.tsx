@@ -9,7 +9,13 @@ import React from 'react'
 
 // Local
 import {applyHOCs} from '../utils'
-import {getApplicationExtensions} from '../../shared/utils/universal-utils'
+// import {getApplicationExtensions} from '../../shared/utils/universal-utils'
+import APPLICATION_EXTENSIONS from '../assets/application-extensions-placeholder'
+
+
+// Types
+import {ApplicationExtension} from '../ApplicationExtension'
+import {ApplicationExtensionConfig as ApplicationExtensionConfigBase} from '../../types'
 
 type withApplicationExtensionsOptions = {
     locals?: any
@@ -31,18 +37,21 @@ type withApplicationExtensionsOptions = {
  * @returns A new React component with all extensions applied, rendering the `WrappedComponent` 
  *          with the extended behavior.
  */
+type GenericHocType<C> = (component: React.ComponentType<C>) => React.ComponentType<C>
 
-const withApplicationExtensions = <P extends {}>(WrappedComponent: React.ComponentType<P>, options: withApplicationExtensionsOptions) => {
-    const extensions = getApplicationExtensions()
-    const extendAppHocs: Array<(component: React.ComponentType<P>) => React.ComponentType<P>> = extensions
-        .map((extension) => extension.extendApp.bind(extension))
+const withApplicationExtensions = <C, P extends ApplicationExtension<ApplicationExtensionConfigBase>>(WrappedComponent: React.ComponentType<C>, options: withApplicationExtensionsOptions) => {
+    // const extensions = getApplicationExtensions<P>() as P[]
+    const hocs: GenericHocType<C>[] = APPLICATION_EXTENSIONS
+        .map((extension: any) => extension.extendApp.bind(extension) as GenericHocType<C>)
         .filter(Boolean)
   
     if (options?.locals) {
-        options.locals.applicationExtensions = extensions
+        options.locals.applicationExtensions = APPLICATION_EXTENSIONS
     }
 
-    return applyHOCs(WrappedComponent, extendAppHocs)
+    return applyHOCs(WrappedComponent, hocs)
 }
 
 export default withApplicationExtensions
+
+

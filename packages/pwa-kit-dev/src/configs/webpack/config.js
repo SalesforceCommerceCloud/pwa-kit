@@ -263,7 +263,8 @@ const baseConfig = (target) => {
                                 loader: findDepInStack('@salesforce/pwa-kit-extension-support/configs/webpack/loaders/extensions-loader'),
                                 options: {
                                     pkg,
-                                    getConfig
+                                    getConfig,
+                                    target
                                 }
                             }
                         }
@@ -546,76 +547,8 @@ const requestProcessor =
         })
         .build()
 
-// This is the extensions for multi-extensibility feature in PWA Kit.
-// Don't mistake this with the concept of extensions for Webpack.
-const extensions =
-    mode === 'production'
-        ? (getExtensionNames(appConfig?.extensions) || [])
-              .map((extension) => {
-                  const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/src/setup-server`
-                  const foundType = ['ts', 'js'].find((type) =>
-                      fse.existsSync(`${setupServerFilePathBase}.${type}`)
-                  )
 
-                  if (!foundType) {
-                      // No setup-server file found, early exit because it's optional
-                      return
-                  }
-
-                  const defaultTsConfig = {
-                      target: 'ES2020',
-                      module: 'commonjs',
-                      strict: true,
-                      esModuleInterop: true,
-                      skipLibCheck: true
-                  }
-
-                  let tsConfigFound = fse.existsSync(
-                      `${projectDir}/node_modules/${extension}/tsconfig.json`
-                  )
-
-                  return {
-                      name: 'extensions',
-                      target: 'node',
-                      mode,
-                      entry: setupServerFilePathBase,
-                      output: {
-                          path: `${buildDir}/extensions/${extension}`,
-                          filename: 'setup-server.js',
-                          libraryTarget: 'commonjs2'
-                      },
-                      resolve: {
-                          extensions: ['.ts', '.js']
-                      },
-                      module: {
-                          rules: [
-                              {
-                                  test: /\.ts?$/,
-                                  use: {
-                                      loader: findDepInStack('ts-loader'),
-                                      options: {
-                                          // If tsconfig is not found, ignore tsconfig.json and rely on
-                                          // using the default compilerOptions
-                                          // TODO: Avoid using happyPackMode in the future.
-                                          // This was required to get your PR working because the `tsconfig.json`
-                                          // file was not found.
-                                          happyPackMode: !tsConfigFound,
-                                          compilerOptions: tsConfigFound ? {} : defaultTsConfig
-                                      }
-                                  },
-                                  exclude: /node_modules/
-                              }
-                          ]
-                      },
-                      optimization: {
-                          minimize: false
-                      }
-                  }
-              })
-              .filter(Boolean)
-        : []
-
-module.exports = [client, ssr, renderer, clientOptional, requestProcessor, ...extensions]
+module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
     .filter(Boolean)
     .map((config) => {
         return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)
