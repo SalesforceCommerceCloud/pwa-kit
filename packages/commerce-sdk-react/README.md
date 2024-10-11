@@ -321,7 +321,135 @@ const Example = ({basketId}) => {
 }
 ```
 
-You could also import the mutation options as a constant like:
+##### `useCustomMutation`
+
+The `useCustomMutation` hook facilitates communication with the SCAPI custom endpoint. It has a different signature than the other declared mutation hooks.
+
+###### Parameters
+
+- `options` (Object): Configuration for the API request.
+  - `method` (String): The HTTP method to use (e.g., 'POST', 'GET').
+  - `customApiPathParameters` (Object): Contains parameters to define the API path.
+    - `endpointPath` (String): Specific endpoint path to target in the API.
+    - `apiName` (String): The name of the API.
+
+- `clientConfig` (Object): Configuration settings for the client.
+  - `parameters` (Object): Essential parameters required by the Salesforce Commerce Cloud API.
+    - `clientId` (String): Your client ID.
+    - `siteId` (String): Your site ID.
+    - `organizationId` (String): Your organization ID.
+    - `shortCode` (String): Short code for your organization.
+  - `proxy` (String): Proxy address for API calls.
+
+- `rawResponse` (Boolean): Determines whether to receive the raw response from the API or a parsed version.
+
+###### `mutate` Method
+
+The `mutation.mutate(args)` function is used to execute the mutation. It accepts an argument `args`, which is an object that may contain the following properties:
+
+- `headers` (Object): Optional headers to send with the request.
+- `parameters` (Object): Optional query parameters to append to the API URL.
+- `body` (Object): Optional the payload for POST, PUT, PATCH methods.
+
+##### Usage
+
+Below is a sample usage of the `useCustomMutation` hook within a React component.
+
+
+
+```jsx
+const clientConfig = {
+    parameters: {
+        clientId: 'CLIENT_ID',
+        siteId: 'SITE_ID',
+        organizationId: 'ORG_ID',
+        shortCode: 'SHORT_CODE'
+    },
+    proxy: 'http://localhost:8888/mobify/proxy/api'
+};
+
+const mutation = useCustomMutation({
+    options: {
+        method: 'POST',
+        customApiPathParameters: {
+            endpointPath: 'test-hello-world',
+            apiName: 'hello-world'
+        }
+    },
+    clientConfig,
+    rawResponse: false
+});
+
+// In your React component
+<button onClick={() => mutation.mutate({
+    body: { test: '123' },
+    parameters: { additional: 'value' },
+    headers: { ['X-Custom-Header']: 'test' }
+})}>
+    Send Request
+</button>
+```
+
+It is a common scenario that a mutate function might pass a value along to a request that is dynamic and therefore can't be available when the hook is declared (contrary to example in [Mutation Hooks](#mutation-hooks) above, which would work for a button that only adds one product to a basket, but doesn't handle a changeable input for adding a different product).
+
+Sending a custom body param is supported, the example below combines this strategy with the use of a `useCustomMutation()` hook, making it possible to dynamically declare a body when calling a custom API endpoint.
+
+```jsx
+import {useCustomMutation} from '@salesforce/commerce-sdk-react'
+const clientConfig = {
+    parameters: {
+        clientId: 'CLIENT_ID',
+        siteId: 'SITE_ID',
+        organizationId: 'ORG_ID',
+        shortCode: 'SHORT_CODE'
+    },
+    proxy: 'http://localhost:8888/mobify/proxy/api'
+};
+
+const mutation = useCustomMutation({
+    options: {
+        method: 'POST',
+        customApiPathParameters: {
+            endpointPath: 'path/to/resource',
+            apiName: 'hello-world'
+        }
+    },
+    clientConfig,
+    rawResponse: false
+});
+
+// use it in a react component
+const ExampleDynamicMutation = () => {
+    const [colors, setColors] = useState(['blue', 'green', 'white'])
+    const [selectedColor, setSelectedColor] = useState(colors[0])
+
+    return (
+        <>
+            <select value={selectedColor} onChange={(e) => setSelectedColor(e.target.value)}>
+                {colors.map((color, index) => (
+                    <option key={index} value={color}>
+                        {color}
+                    </option>
+                ))}
+            </select>
+            <button
+                onClick={() =>
+                    mutation.mutate({
+                        parameters: {
+                            myCustomParam: 'custom parameters'
+                        },
+                        body: {
+                            resourceParam: selectedColor
+                        }
+                    })
+                }
+            />
+        </>
+    )
+}
+```
+
+Mutations also have their named methods exported as constants, available in this way:
 
 ```jsx
 import {useShopperBasketsMutation, ShopperBasketsMutations} from '@salesforce/commerce-sdk-react'
