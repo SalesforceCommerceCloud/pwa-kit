@@ -393,7 +393,7 @@ ProductTile.propTypes = {
      */
     badgeDetails: PropTypes.array,
     /**
-     * TODO: block comment
+     * Determines whether to display a skeleton over personalizable data (e.g., pricing and promotions) during data refetch.
      */
     isRefetching: PropTypes.bool
 }
