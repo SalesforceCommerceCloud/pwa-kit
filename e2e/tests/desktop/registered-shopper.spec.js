@@ -12,7 +12,8 @@ const {
   registerShopper,
   validateOrderHistory,
   validateWishlist,
-  loginShopper
+  loginShopper,
+  navigateToPDPDesktop,
 } = require("../../scripts/pageHelpers");
 const {
   generateUserCredentials,
@@ -143,18 +144,7 @@ test("Registered shopper can add item to wishlist", async ({ page }) => {
   }
 
   // Navigate to PDP
-  await page.goto(config.RETAIL_APP_HOME);
-
-  await page.getByRole("link", { name: "Womens" }).hover();
-  const topsNav = page.getByRole("link", { name: "Tops", exact: true });
-  await expect(topsNav).toBeVisible();
-  await topsNav.click();
-
-  const productTile = page.getByRole("link", {
-    name: /Cotton Turtleneck Sweater/i,
-  });
-  await productTile.getByLabel(/Black/, { exact: true }).hover();
-  await productTile.click();
+  await navigateToPDPDesktop({page});
 
   // add product to wishlist
   await expect(

@@ -2,15 +2,6 @@ const { expect } = require("@playwright/test");
 const config = require("../config");
 const { getCreditCardExpiry } = require("../scripts/utils.js")
 
-/*
-
-TODO: 
-- refactor login to register user if login fails
-- Add test for product bundles
-- Test again using add addProductToCart AND navigateToPDP(Mobile/Desktop) for both
-
-*/
-
 /**
  * Navigates to the `Cotton Turtleneck Sweater` PDP (Product Detail Page) on mobile 
  * with the black variant selected
@@ -106,7 +97,7 @@ export const navigateToPDPDesktop = async ({page}) => {
  * Size: L
  * 
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
- * @param {Boolean} options.isMobile - flag to indicate if device type is mobile or not, defaulted to false
+ * @param {Boolean} options.isMobile - Flag to indicate if device type is mobile or not, defaulted to false
  */
 export const addProductToCart = async ({page, isMobile = false}) => {
     // Navigate to Cotton Turtleneck Sweater with Black color variant selected
@@ -229,8 +220,7 @@ export const validateWishlist = async ({page}) => {
 }
 
 /**
- * Logs in a shopper with provided user credentials.
- * If login is unsuccessful, function will attempt to register a shopper using the same credentials
+ * Attempts to log in a shopper with provided user credentials.
  * 
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  * @param {Object} options.userCredentials - Object containing user credentials with the following properties:
@@ -238,6 +228,8 @@ export const validateWishlist = async ({page}) => {
  *      - lastName
  *      - email
  *      - password
+ * 
+ * @return {Boolean} - denotes whether or not login was successful
  */
 export const loginShopper = async ({page, userCredentials}) => {
     try {
@@ -254,14 +246,19 @@ export const loginShopper = async ({page, userCredentials}) => {
         await expect(
           page.getByRole("heading", { name: /Account Details/i })
         ).toBeVisible({ timeout: 2000 });
-        return true
-    } catch(error) {
-        return false
-        // TODO: register shopper
+        return true;
+    } catch {
+        return false;
     }
 }
 
-// TODO: add documentation
+/**
+ * Search for products by query string that takes you to the PLP
+ * 
+ * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
+ * @param {String} options.query - Product name other product related descriptors to search for
+ * @param {Object} options.isMobile - Flag to indicate if device type is mobile or not, defaulted to false
+ */
 export const searchProduct = async ({page, query, isMobile = false}) => {
     await page.goto(config.RETAIL_APP_HOME);
 
@@ -276,8 +273,17 @@ export const searchProduct = async ({page, query, isMobile = false}) => {
     await page.waitForLoadState();
 }
 
-// TODO: add documentation
-export const checkoutProduct = async ({ page, userCredentials, isRegistered = false }) => {
+/**
+ * Checkout products that are in the cart
+ * 
+ * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
+ * @param {Object} options.userCredentials - Object containing user credentials with the following properties:
+ *      - firstName
+ *      - lastName
+ *      - email
+ *      - password
+ */
+export const checkoutProduct = async ({ page, userCredentials }) => {
     await page.getByRole("link", { name: "Proceed to Checkout" }).click();
     
     await expect(
@@ -356,5 +362,4 @@ export const checkoutProduct = async ({ page, userCredentials, isRegistered = fa
         name: /Thank you for your order!/i,
     });
     await orderConfirmationHeading.waitFor();
-
 }

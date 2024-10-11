@@ -12,7 +12,8 @@ const {
   addProductToCart,
   validateOrderHistory,
   validateWishlist,
-  loginShopper
+  loginShopper,
+  navigateToPDPMobile
 } = require("../../scripts/pageHelpers");
 const {
   generateUserCredentials,
@@ -149,41 +150,8 @@ test("Registered shopper can add item to wishlist", async ({ page }) => {
     })
   }
 
-  // navigate to PDP
-  await page.goto(config.RETAIL_APP_HOME);
-  await page.getByLabel("Menu", { exact: true }).click();
-
-  // SSR nav loads top level categories as direct links so we wait till all sub-categories load in the accordion
-  const categoryAccordion = page.locator(
-      "#category-nav .chakra-accordion__button svg+:text('Womens')"
-  );
-  await categoryAccordion.waitFor();
-
-  await page.getByRole("button", { name: "Womens" }).click();
-
-  const clothingNav = page.getByRole("button", { name: "Clothing" });
-  await clothingNav.waitFor();
-  await clothingNav.click();
-
-  const topsLink = page.getByLabel('Womens').getByRole("link", { name: "Tops" })
-  await topsLink.click();
-  // Wait for the nav menu to close first
-  await topsLink.waitFor({state: 'hidden'})
-  await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
-
-  // PLP
-  const productTile = page.getByRole("link", {
-      name: /Cotton Turtleneck Sweater/i,
-  });
-  await productTile.scrollIntoViewIfNeeded();
-
-  // selecting swatch
-  const productTileImg = productTile.locator("img");
-  await productTileImg.waitFor({state: 'visible'})
-  await productTile.getByLabel(/Black/, { exact: true }).click();
-
-  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-  await productTile.click();
+  // PDP
+  await navigateToPDPMobile({page});
 
   // add product to wishlist
   await expect(
