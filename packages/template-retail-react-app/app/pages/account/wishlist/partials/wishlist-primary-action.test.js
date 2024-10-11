@@ -53,7 +53,7 @@ test('the Add To Cart button', async () => {
     const {user} = renderWithProviders(<MockedComponent variant={variant} />)
 
     const addToCartButton = await screen.findByRole('button', {
-        name: /add to cart/i
+        name: new RegExp(`Add ${variant.name} to cart`, 'i')
     })
     await user.click(addToCartButton)
 
@@ -65,8 +65,9 @@ test('the Add To Cart button', async () => {
 test('the Add Set To Cart button', async () => {
     const productSetWithoutVariants = mockWishListDetails.data[1]
     const {user} = renderWithProviders(<MockedComponent variant={productSetWithoutVariants} />)
-
-    const button = await screen.findByRole('button', {name: /add set to cart/i})
+    const button = await screen.findByRole('button', {
+        name: new RegExp(`Add ${productSetWithoutVariants.name} set to cart`, 'i')
+    })
     await user.click(button)
 
     await waitFor(() => {

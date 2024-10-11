@@ -25,6 +25,7 @@ import {
     SimpleGrid,
     Grid,
     Select,
+    Heading,
     Text,
     FormControl,
     Stack,
@@ -452,6 +453,7 @@ const ProductList = (props) => {
                         </Box>
                     </Stack>
 
+                    {/* Filter Button for Mobile */}
                     <HideOnDesktop>
                         <Stack spacing={6}>
                             <PageHeader
@@ -638,12 +640,12 @@ const ProductList = (props) => {
                 <ModalOverlay />
                 <ModalContent top={0} marginTop={0}>
                     <ModalHeader>
-                        <Text fontWeight="bold" fontSize="2xl">
+                        <Heading as="h1" fontWeight="bold" fontSize="2xl">
                             <FormattedMessage
                                 defaultMessage="Filter"
                                 id="product_list.modal.title.filter"
                             />
-                        </Text>
+                        </Heading>
                     </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody py={4}>

@@ -11,7 +11,6 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
@@ -19,6 +18,8 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+
 // Chakra
 import {
     Box,
@@ -124,7 +125,7 @@ const App = (props) => {
     })
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
-    const appOrigin = getAppOrigin()
+    const appOrigin = useAppOrigin()
     const activeData = useActiveData()
     const history = useHistory()
     const location = useLocation()
@@ -173,7 +174,7 @@ const App = (props) => {
                 // Otherwise, it'll continue to fetch the missing translation file again
                 return {}
             }
-            return fetchTranslations(targetLocale)
+            return fetchTranslations(targetLocale, appOrigin)
         },
         enabled: isServer
     })

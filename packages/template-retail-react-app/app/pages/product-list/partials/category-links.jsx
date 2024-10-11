@@ -16,7 +16,8 @@ import {
     AccordionPanel,
     AccordionIcon,
     Stack,
-    Text
+    Text,
+    Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
@@ -29,9 +30,9 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
     return (
         <AccordionItem paddingBottom={6} borderTop="none" key="show-all">
             <AccordionButton>
-                <Text flex="1" textAlign="left" fontSize="md" fontWeight={600}>
+                <Heading as="h2" flex="1" textAlign="left" fontSize="md" fontWeight={600}>
                     <FormattedMessage defaultMessage="Categories" id="category_links.button_text" />
-                </Text>
+                </Heading>
                 <AccordionIcon />
             </AccordionButton>
             <AccordionPanel>
