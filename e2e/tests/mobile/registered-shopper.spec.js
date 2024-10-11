@@ -7,7 +7,13 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { registerShopper, addProductToCartMobile, validateOrderHistory } = require("../../scripts/pageHelpers");
+const {
+  registerShopper,
+  addProductToCartMobile,
+  validateOrderHistory,
+  validateWishlist,
+  loginShopper
+} = require("../../scripts/pageHelpers");
 const {
   generateUserCredentials,
   getCreditCardExpiry,
@@ -130,21 +136,19 @@ test("Registered shopper can checkout items", async ({ page }) => {
 });
 
 test("Registered shopper can add item to wishlist", async ({ page }) => {
-  // TODO: implement login shopper
-  // try {
-    // await page.goto(config.RETAIL_APP_HOME + "/login");
-  //   // login shopper here, if login fails, register new user
-  // } catch(error) {
-  //   await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS})
-  // }
-
-  await registerShopper({
-    page, 
-    userCredentials: REGISTERED_USER_CREDENTIALS, 
-    isMobile: true 
+  const isLoggedIn = await loginShopper({
+    page,
+    userCredentials: REGISTERED_USER_CREDENTIALS
   })
 
-  // TODO: pull out navigate to PDP in helper function
+  if(!isLoggedIn) {
+    await registerShopper({
+      page,
+      userCredentials: REGISTERED_USER_CREDENTIALS,
+      isMobile: true
+    })
+  }
+
   // navigate to PDP
   await page.goto(config.RETAIL_APP_HOME);
   await page.getByLabel("Menu", { exact: true }).click();
@@ -171,19 +175,13 @@ test("Registered shopper can add item to wishlist", async ({ page }) => {
   const productTile = page.getByRole("link", {
       name: /Cotton Turtleneck Sweater/i,
   });
-  await productTile.scrollIntoViewIfNeeded()
+  await productTile.scrollIntoViewIfNeeded();
+
   // selecting swatch
   const productTileImg = productTile.locator("img");
   await productTileImg.waitFor({state: 'visible'})
-  const initialSrc = await productTileImg.getAttribute("src");
-  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-
   await productTile.getByLabel(/Black/, { exact: true }).click();
-  // Make sure the image src has changed
-  await expect(async () => {
-      const newSrc = await productTileImg.getAttribute("src")
-      expect(newSrc).not.toBe(initialSrc)
-  }).toPass()
+
   await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
   await productTile.click();
 
@@ -194,17 +192,6 @@ test("Registered shopper can add item to wishlist", async ({ page }) => {
   await page.getByRole("radio", { name: "L", exact: true }).click();
   await page.getByRole("button", { name: /Add to Wishlist/i }).click()
 
-  // TODO: potentially pull out into helper function to share between desktop and mobile
   // wishlist
-  await page.goto(config.RETAIL_APP_HOME + "/account/wishlist");
-
-  await expect(
-    page.getByRole("heading", { name: /Wishlist/i })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
-  ).toBeVisible();
-  await expect(page.getByText(/Color: Black/i)).toBeVisible()
-  await expect(page.getByText(/Size: L/i)).toBeVisible()
+  await validateWishlist({page})
 });

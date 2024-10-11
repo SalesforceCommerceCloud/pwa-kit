@@ -128,6 +128,9 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
     // Create Account and Sign In
     await page.goto(config.RETAIL_APP_HOME + "/registration");
 
+    // TODO: see if there's a better way to do this
+    await page.waitForTimeout(2000);
+
     const registrationFormHeading = page.getByText(/Let's get started!/i);
     await registrationFormHeading.waitFor();
 
@@ -178,4 +181,44 @@ export const validateOrderHistory = async ({page}) => {
     ).toBeVisible();
     await expect(page.getByText(/Color: Black/i)).toBeVisible();
     await expect(page.getByText(/Size: L/i)).toBeVisible();
+}
+
+export const validateWishlist = async ({page}) => {
+    await page.goto(config.RETAIL_APP_HOME + "/account/wishlist");
+
+    await expect(
+      page.getByRole("heading", { name: /Wishlist/i })
+    ).toBeVisible();
+  
+    await expect(
+      page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
+    ).toBeVisible();
+    await expect(page.getByText(/Color: Black/i)).toBeVisible()
+    await expect(page.getByText(/Size: L/i)).toBeVisible()
+}
+
+/**
+ * 
+ * @returns boolean if log in was successful or not
+ */
+export const loginShopper = async ({page, userCredentials}) => {
+    try {
+        await page.goto(config.RETAIL_APP_HOME + "/login");
+        await page.locator("input#email").fill(userCredentials.email);
+        await page
+            .locator("input#password")
+            .fill(userCredentials.password);
+        await page.getByRole("button", { name: /Sign In/i }).click();
+    
+        // TODO: see if there's a better way to do this
+        await page.waitForTimeout(2000);
+    
+        // redirected to Account Details page after logging in
+        await expect(
+          page.getByRole("heading", { name: /Account Details/i })
+        ).toBeVisible({ timeout: 2000 });
+        return true
+    } catch(error) {
+        return false
+    }
 }
