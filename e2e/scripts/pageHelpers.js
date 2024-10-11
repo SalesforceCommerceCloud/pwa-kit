@@ -339,10 +339,10 @@ export const checkoutProduct = async ({ page, userCredentials }) => {
         await expect(continueToPayment).toBeVisible({ timeout: 2000 });
         await continueToPayment.click();
     } catch {
-    } finally {
-        await expect(page.getByRole("heading", { name: /Payment/i })).toBeVisible();
+
     }
 
+    await expect(page.getByRole("heading", { name: /Payment/i })).toBeVisible();
     const creditCardExpiry = getCreditCardExpiry();
 
     await page.locator("input#number").fill("4111111111111111");
