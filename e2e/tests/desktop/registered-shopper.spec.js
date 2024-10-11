@@ -80,7 +80,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /Shipping & Gift Options/i })
   ).toBeVisible();
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState();
 
   const continueToPayment = page.getByRole("button", {
     name: /Continue to Payment/i,
@@ -132,7 +132,6 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await validateOrderHistory({page});
 });
 
-// TODO: add test for adding product to wishlist
 test("Registered shopper can add item to wishlist", async ({ page }) => {
   const isLoggedIn = await loginShopper({
     page,

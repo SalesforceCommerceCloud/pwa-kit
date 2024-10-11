@@ -128,8 +128,7 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
     // Create Account and Sign In
     await page.goto(config.RETAIL_APP_HOME + "/registration");
 
-    // TODO: see if there's a better way to do this
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState();
 
     const registrationFormHeading = page.getByText(/Let's get started!/i);
     await registrationFormHeading.waitFor();
@@ -210,8 +209,7 @@ export const loginShopper = async ({page, userCredentials}) => {
             .fill(userCredentials.password);
         await page.getByRole("button", { name: /Sign In/i }).click();
     
-        // TODO: see if there's a better way to do this
-        await page.waitForTimeout(2000);
+        await page.waitForLoadState();
     
         // redirected to Account Details page after logging in
         await expect(

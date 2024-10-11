@@ -72,7 +72,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /Shipping & Gift Options/i })
   ).toBeVisible();
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState();
 
   const continueToPayment = page.getByRole("button", {
     name: /Continue to Payment/i,
@@ -113,53 +113,37 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   ).toBeVisible();
 });
 
-// TODO: implement for mobile
-// TODO: figure out why mobile tests aren't running
 test("Guest shopper can edit product item in cart", async ({ page }) => {
-  
-  const DEBUG_TIME = 3000
-  // TODO: potentially remove this
-  test.setTimeout(120000)
-  await addProductToCartDesktop({page})
+  await addProductToCartDesktop({page});
 
   // cart
   await page.getByLabel(/My cart/i).click();
-
-  // TODO: figure out a better way to block for time
-  // wait for DEBUG_TIME seconds for page to render
-  await page.waitForTimeout(DEBUG_TIME);
+  await page.waitForLoadState();
 
   await expect(
     page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
 
-  await expect(page.getByText(/Color: Black/i)).toBeVisible()
-  await expect(page.getByText(/Size: L/i)).toBeVisible()
+  await expect(page.getByText(/Color: Black/i)).toBeVisible();
+  await expect(page.getByText(/Size: L/i)).toBeVisible();
 
   // open product edit modal
-  const editBtn = page.getByRole("button", { name: /Edit/i })
-  await editBtn.waitFor()
+  const editBtn = page.getByRole("button", { name: /Edit/i });
+  await editBtn.waitFor();
 
-  expect(editBtn).toBeAttached()
+  expect(editBtn).toBeAttached();
 
-  await editBtn.click()
-
-  // TODO: figure out a better way to block for time
-  // wait for DEBUG_TIME seconds for page to render
-  await page.waitForTimeout(DEBUG_TIME);
-
+  await editBtn.click();
+  await page.waitForLoadState();
 
   // Product edit modal should be open
-  await expect(page.getByTestId('product-view')).toBeVisible()      
+  await expect(page.getByTestId('product-view')).toBeVisible();
   
-  // TODO: also change color
   await page.getByRole("radio", { name: "S", exact: true }).click();
   await page.getByRole("radio", { name: "Meadow Violet", exact: true }).click();
-  await page.getByRole("button", { name: /Update/i }).click()
+  await page.getByRole("button", { name: /Update/i }).click();
 
-  // TODO: figure out a better way to block for time
-  // wait for DEBUG_TIME seconds for page to render
-  await page.waitForTimeout(DEBUG_TIME);
-  await expect(page.getByText(/Color: Meadow Violet/i)).toBeVisible()
-  await expect(page.getByText(/Size: S/i)).toBeVisible()
+  await page.waitForLoadState();
+  await expect(page.getByText(/Color: Meadow Violet/i)).toBeVisible();
+  await expect(page.getByText(/Size: S/i)).toBeVisible();
 });

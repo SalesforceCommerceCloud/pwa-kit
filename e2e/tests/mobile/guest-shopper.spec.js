@@ -71,7 +71,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /Shipping & Gift Options/i })
   ).toBeVisible();
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState();
 
   const continueToPayment = page.getByRole("button", {
     name: /Continue to Payment/i,
