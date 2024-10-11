@@ -37,7 +37,7 @@ function extract(locale) {
     const {extends: extendsPkg, overridesDir} = pkgJSON.ccExtensibility || {}
     if (!overridesDir) {
         const command = [
-            'formatjs extract "app/**/*.{js,jsx,ts,tsx}"',
+            'formatjs extract "src/**/*.{js,jsx,ts,tsx}"',
             `--out-file translations/${locale}.json`,
             '--id-interpolation-pattern [sha512:contenthash:base64:6]'
         ].join(' ')
