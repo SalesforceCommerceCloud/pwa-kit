@@ -30,7 +30,7 @@ import Section from '../../components/section'
 import ProductScroller from '../../components/product-scroller'
 
 // Others
-import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {heroFeatures, features} from './data'
 
 //Hooks
@@ -95,7 +95,9 @@ const Home = () => {
                     id: 'home.title.react_starter_store'
                 })}
                 img={{
-                    src: getAssetUrl('static/img/hero.png'),
+                    src: getStaticAssetUrl('img/hero.png', {
+                        appExtensionPackageName: '@salesforce/extension-retail-react-app'
+                    }),
                     alt: 'npx pwa-kit-create-app'
                 }}
                 actions={

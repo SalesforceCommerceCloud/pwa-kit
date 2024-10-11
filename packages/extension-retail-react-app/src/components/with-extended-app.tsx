@@ -6,10 +6,9 @@
  */
 
 import React, {useState, useEffect} from 'react'
-import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
-import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '../hooks/use-active-data'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useQuery} from '@tanstack/react-query'
@@ -280,7 +279,10 @@ const withExtendedApp = <P extends object>(WrappedComponent: React.ComponentType
                     <Helmet>
                         {ACTIVE_DATA_ENABLED && (
                             <script
-                                src={getAssetUrl('static/head-active_data.js')}
+                                src={getStaticAssetUrl('head-active_data.js', {
+                                    appExtensionPackageName:
+                                        '@salesforce/extension-retail-react-app'
+                                })}
                                 id="headActiveData"
                                 type="text/javascript"
                             ></script>
@@ -323,9 +325,18 @@ const withExtendedApp = <P extends object>(WrappedComponent: React.ComponentType
                                 />
                                 <link
                                     rel="apple-touch-icon"
-                                    href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                                    href={getStaticAssetUrl('img/global/apple-touch-icon.png', {
+                                        appExtensionPackageName:
+                                            '@salesforce/extension-retail-react-app'
+                                    })}
                                 />
-                                <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+                                <link
+                                    rel="manifest"
+                                    href={getStaticAssetUrl('manifest.json', {
+                                        appExtensionPackageName:
+                                            '@salesforce/extension-retail-react-app'
+                                    })}
+                                />
 
                                 {/* Urls for all localized versions of this page (including current page)
                             For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
@@ -435,7 +446,9 @@ const withExtendedApp = <P extends object>(WrappedComponent: React.ComponentType
                     {ACTIVE_DATA_ENABLED && (
                         <script
                             type="text/javascript"
-                            src={getAssetUrl('static/dwanalytics-22.2.js')}
+                            src={getStaticAssetUrl('dwanalytics-22.2.js', {
+                                appExtensionPackageName: '@salesforce/extension-retail-react-app'
+                            })}
                             id="dwanalytics"
                             async="async"
                             onLoad={trackPage}
@@ -443,7 +456,9 @@ const withExtendedApp = <P extends object>(WrappedComponent: React.ComponentType
                     )}
                     {ACTIVE_DATA_ENABLED && (
                         <script
-                            src={getAssetUrl('static/dwac-21.7.js')}
+                            src={getStaticAssetUrl('dwac-21.7.js', {
+                                appExtensionPackageName: '@salesforce/extension-retail-react-app'
+                            })}
                             type="text/javascript"
                             id="dwac"
                             async="async"

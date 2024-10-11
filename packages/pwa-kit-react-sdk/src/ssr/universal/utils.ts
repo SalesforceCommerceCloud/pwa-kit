@@ -54,8 +54,8 @@ export const getAssetUrl = (path: string) => {
  * @function
  * @returns {string} The full URL to the static asset.
  */
-export const getStaticAssetUrl = (path: string, opts: GetAssetUrlOptions) => {
-    const {appExtensionPackageName = ''} = opts || {}
+export const getStaticAssetUrl = (path: string, opts: GetAssetUrlOptions = {}) => {
+    const {appExtensionPackageName = ''} = opts
 
     /* istanbul ignore next */
     const publicPath = onClient
