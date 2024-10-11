@@ -392,6 +392,7 @@ const App = (props) => {
                                     <CheckoutHeader />
                                 )}
                             </Box>
+                            <div>Hello</div>
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
                                 <SkipNavContent
