@@ -72,6 +72,14 @@ const validProjectName = (s) => {
     return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
 }
 
+const validAppExtensionNameRegex = /^(@[a-zA-Z0-9-_]+\/)?extension-[a-zA-Z0-9-_]+$/
+const validProjectAppExtensionName = (input) => {
+    if (!validAppExtensionNameRegex.test(input)) {
+        return 'The Application Extension name must follow the format @{namespace}/extension-{package-name} (namespace is optional).'
+    }
+    return true
+}
+
 const validUrl = (s) => {
     try {
         new URL(s)
@@ -120,7 +128,10 @@ const INITIAL_QUESTION = [
         type: 'list',
         choices: [
             {name: 'PWA Kit App (full project)', value: 'PWAKitProject'},
-            {name: 'PWA Kit Application Extension (for existing PWA Kit apps)', value: 'appExtensionProject'}
+            {
+                name: 'PWA Kit Application Extension (for existing PWA Kit apps)',
+                value: 'appExtensionProject'
+            }
         ],
         default: 'PWAKitProject'
     }
@@ -159,10 +170,10 @@ const askApplicationExtensibilityQuestions = (availableAppExtensions) => {
 const APPLICATION_EXTENSION_QUESTIONS = [
     {
         name: 'project.extensionName',
-        //TODO: Avoid hardcoding the prefix @salesforce/extension- and support package names with spaces, etc.
         message:
-            'What is the name of your Application Extension? (The prefix "@salesforce/extension-" will be added to the name.)',
-        validate: validProjectName
+            'What is the name of your Application Extension? \n' +
+            'The name must follow the pattern "@{namespace}/extension-{package-name}", where namespace is optional.',
+        validate: validProjectAppExtensionName
     }
 ]
 
@@ -589,6 +600,17 @@ const slugifyName = (name) =>
         strict: true
     }).slice(0, PROJECT_ID_MAX_LENGTH)
 
+const getSlugifiedProjectName = (projectName) => {
+    // Split the project name into namespace and actual name if in the format @namespace/name
+    const [namespace, slugifiedName] = projectName.includes('/')
+        ? projectName.split('/').map(slugifyName)
+        : ['', slugifyName(projectName)]
+
+    const result = namespace ? `${namespace}/${slugifiedName}` : slugifiedName
+
+    return result
+}
+
 /**
  * Check if the provided path is an empty directory.
  * @param {*} path
@@ -993,20 +1015,7 @@ const runGenerator = async (
         }, {})
 
         updatePackageJson(p.resolve(outputDir, 'package.json'), {
-            name: (() => {
-                const projectName = context.answers.project.name || context.preset.id
-                // Match @namespace/project-name pattern
-                const namespaceRegex = /^(@[a-zA-Z0-9-_]+)\/(.+)$/
-                const match = projectName.match(namespaceRegex)
-
-                if (match) {
-                    const [, namespace, actualName] = match
-                    // Slugify only the project name part
-                    return `${namespace}/${slugifyName(actualName)}`
-                }
-
-                return slugifyName(projectName)
-            })(),
+            name: getSlugifiedProjectName(context.answers.project.name || context.preset.id),
             version: GENERATED_PROJECT_VERSION,
             devDependencies: appExtensionDeps,
             ...(selectedAppExtensions.length > 0 && {
@@ -1075,8 +1084,7 @@ const main = async (opts) => {
         if (initialAnswers.project.type === 'appExtensionProject') {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
-            //TODO: Avoid hardcoding the prefix @salesforce/extension- and support package names with spaces, etc.
-            context.answers.project.name = `@salesforce/extension-${extensionNameAnswers.project.extensionName}`
+            context.answers.project.name = extensionNameAnswers.project.extensionName
             context.preset = PRESETS.find(({id}) => id === 'base-app-extension')
         } else {
             const availableAppExtensions = fetchAvailableAppExtensions()
