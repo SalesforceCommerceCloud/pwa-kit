@@ -63,6 +63,7 @@ const AppConfig = ({children, locals = {}}) => {
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            refreshTokenTTL={commerceApiConfig.refreshTokenTTL}
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.

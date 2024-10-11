@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 
 import {
     Box,
@@ -26,23 +26,14 @@ const TrustedAgentBanner = () => {
         <Box px={8} py={2} bg="gray.100">
             <Flex>
                 <Center>
-                    <Text
-                        as="h2"
-                        color={'black'}
-                        fontWeight={700}
-                        fontSize={20}
-                        pr={8}>
+                    <Text as="h2" color={'black'} fontWeight={700} fontSize={20} pr={8}>
                         Trusted Agent
                     </Text>
                 </Center>
                 <Center>
                     {agentId && (
                         <>
-                            <Text
-                                as="div"
-                                fontWeight={700}
-                                fontSize={16}
-                                px={4}>
+                            <Text as="div" fontWeight={700} fontSize={16} px={4}>
                                 Agent ID
                             </Text>
                             <Text as="div">{agentId}</Text>
@@ -50,18 +41,14 @@ const TrustedAgentBanner = () => {
                     )}
                     {isAgent && loginId && (
                         <>
-                            <Text
-                                as="div"
-                                fontWeight={700}
-                                fontSize={16}
-                                px={4}>
+                            <Text as="div" fontWeight={700} fontSize={16} px={4}>
                                 Login ID
                             </Text>
                             <Text as="div">{loginId}</Text>
                         </>
                     )}
                 </Center>
-                <Box flex={1}/>
+                <Box flex={1} />
                 <Center>
                     {!isAgent ? (
                         <form onSubmit={(e) => (e.preventDefault(), login(inputValue))}>
@@ -71,7 +58,7 @@ const TrustedAgentBanner = () => {
                                     bg="white.100"
                                     value={inputValue && inputValue !== 'guest' ? inputValue : ''}
                                     placeholder="Login ID"
-                                    onChange={e => setInputValue(e.target.value)}
+                                    onChange={(e) => setInputValue(e.target.value)}
                                 />
                                 <Button type="submit">Login</Button>
                             </Flex>

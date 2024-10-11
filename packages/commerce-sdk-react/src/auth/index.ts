@@ -40,6 +40,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
+    refreshTokenTTL?: number
 }
 
 interface JWTHeaders {
@@ -190,7 +191,10 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
-    private refreshTrustedAgentHandler: ((loginId: string, usid: string, refresh: boolean) => Promise<TokenResponse>) | undefined
+    private refreshTokenTTL: number | undefined
+    private refreshTrustedAgentHandler:
+        | ((loginId: string, usid: string, refresh: boolean) => Promise<TokenResponse>)
+        | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -239,6 +243,8 @@ class Auth {
         this.logger = config.logger
 
         this.defaultDnt = config.defaultDnt
+
+        this.refreshTokenTTL = config.refreshTokenTTL || 90 * 24 * 60 * 60 // 90 days in seconds
 
         /*
          * There are 2 ways to enable SLAS private client mode.
@@ -320,7 +326,11 @@ class Auth {
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
         const validTimeSeconds = exp - iat - 60 - 810
         const tokenAgeSeconds = Date.now() / 1000 - iat
-        console.log(`auth.isTokenExpired() valid for ${parseInt((validTimeSeconds - tokenAgeSeconds).toString())}s`)
+        console.log(
+            `auth.isTokenExpired() valid for ${parseInt(
+                (validTimeSeconds - tokenAgeSeconds).toString()
+            )}s`
+        )
         return validTimeSeconds <= tokenAgeSeconds
     }
 
@@ -382,9 +392,7 @@ class Auth {
     }
 
     private clearTrustedAgentCode() {
-        const keys = [
-            'trusted_agent_code'
-        ] as AuthDataKeys[]
+        const keys = ['trusted_agent_code'] as AuthDataKeys[]
 
         keys.forEach((keyName) => {
             const {key, storageType} = DATA_MAP[keyName]
@@ -409,28 +417,45 @@ class Auth {
     }
 
     /**
-     * This method stores the TokenResponse object retrived from SLAS, and
+     * This method stores the TokenResponse object retrieved from SLAS, and
      * store the data in storage.
      */
     private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
         this.set('access_token', res.access_token)
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
-        this.set('expires_in', `${res.expires_in}`)
+        // this.set('expires_in', `${res.expires_in}`)
+        this.set('expires_in', `${15}`)
         this.set('id_token', res.id_token)
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
         this.set('usid', res.usid)
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
+        console.log(
+            `\n\n\n\n res.refresh_token_expires_in ${
+                res.refresh_token_expires_in / (24 * 60 * 60)
+            } days`
+        )
+
+        console.log(
+            `\n\n\n\n setting refresh token to expire in ${
+                (res.refresh_token_expires_in + this.refreshTokenTTL) / (24 * 60 * 60)
+            } days`
+        )
+
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-        const expiresDate = res.refresh_token_expires_in
-            ? this.convertSecondsToDate(res.refresh_token_expires_in)
-            : undefined
+        const fallbackTTL =
+            typeof this.refreshTokenTTL === 'number' && this.refreshTokenTTL >= 0
+                ? this?.refreshTokenTTL
+                : res.refresh_token_expires_in || undefined
+        const expiresDate = this.convertSecondsToDate(fallbackTTL)
 
         this.set(refreshTokenKey, res.refresh_token, {
             expires: expiresDate
         })
+
+        console.log(`\n\n\n\n this.get(refreshTokenKey) ${this.get(refreshTokenKey)}`)
     }
 
     /**
@@ -569,7 +594,7 @@ class Auth {
         let token
         try {
             token = await this.loginGuestUser()
-        } catch(e) {
+        } catch (e) {
             console.error('auth.ready() this.clearStorage() this.loginGuestUser()')
             this.clearStorage()
             token = await this.loginGuestUser()
@@ -699,9 +724,7 @@ class Auth {
      * TODO: TAOB Eventually this will be a wrapper method for commerce-sdk-isomorphic helper: authorizeTrustedAgent.
      *
      */
-    async authorizeTrustedAgent(credentials: {
-        loginId?: string
-    }) {
+    async authorizeTrustedAgent(credentials: {loginId?: string}) {
         const slasClient = this.client
         // TODO: TAOB replace the hardcoded values
         // console.log(slasClient.clientConfig.baseUri, slasClient.clientConfig.proxy)
@@ -718,14 +741,14 @@ class Auth {
         // TODO: TAOB replace the hardcoded values
         const url = [
             `http://localhost:3000/mobify/proxy/api/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize`,
-                `?client_id=${clientId}`,
-                `&channel_id=${siteId}`,
-                `&code_challenge=${codeChallenge}`,
-                `&login_id=${loginId}`,
-                `&redirect_uri=${redirectURI}`,
-                `&idp_origin=${idpOrigin}`,
-                `&response_type=code`
-            ].join('')
+            `?client_id=${clientId}`,
+            `&channel_id=${siteId}`,
+            `&code_challenge=${codeChallenge}`,
+            `&login_id=${loginId}`,
+            `&redirect_uri=${redirectURI}`,
+            `&idp_origin=${idpOrigin}`,
+            `&response_type=code`
+        ].join('')
 
         return {url, codeVerifier}
     }
@@ -758,7 +781,7 @@ class Auth {
                 dnt: 'true',
                 ...(credentials.usid && {usid: credentials.usid})
             }
-        } as {headers: {[key: string]: string}, body: TrustedAgentTokenRequest}
+        } as {headers: {[key: string]: string}; body: TrustedAgentTokenRequest}
 
         // using slas private client
         if (credentials.clientSecret) {
@@ -771,7 +794,10 @@ class Auth {
             void this.clearTrustedAgentCode()
         }
 
-        return await this.queueRequest(() => slasClient.getTrustedAgentAccessToken(optionsToken), optionsToken.body.login_id === 'guest')
+        return await this.queueRequest(
+            () => slasClient.getTrustedAgentAccessToken(optionsToken),
+            optionsToken.body.login_id === 'guest'
+        )
     }
 
     async refreshTrustedAgent(loginId: string, usid: string): Promise<TokenResponse> {
@@ -799,8 +825,13 @@ class Auth {
         return await this.loginGuestUser()
     }
 
-
-    registerTrustedAgentRefreshHandler(refreshTrustedAgentHandler: (loginId?: string, usid?: string, refresh?: boolean) => Promise<TokenResponse>) {
+    registerTrustedAgentRefreshHandler(
+        refreshTrustedAgentHandler: (
+            loginId?: string,
+            usid?: string,
+            refresh?: boolean
+        ) => Promise<TokenResponse>
+    ) {
         this.refreshTrustedAgentHandler = refreshTrustedAgentHandler
     }
 
@@ -826,9 +857,7 @@ class Auth {
 
         const loginId = isbParts[1].replace('upn:', '')
         const isAgent = !!isbParts?.[6]?.startsWith('agent')
-        const agentId = isAgent
-            ? isbParts?.[6]?.replace('agent:', '')
-            : null
+        const agentId = isAgent ? isbParts?.[6]?.replace('agent:', '') : null
 
         // SUB format
         // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
