@@ -9,7 +9,7 @@ const { test, expect } = require("@playwright/test");
 const config = require("../../config");
 const {
   registerShopper,
-  addProductToCartMobile,
+  addProductToCart,
   validateOrderHistory,
   validateWishlist,
   loginShopper
@@ -30,7 +30,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
   })
 
   // Shop for items as registered user
-  await addProductToCartMobile({page})
+  await addProductToCart({page, isMobile: true})
 
   // cart
   await page.getByLabel(/My cart/i).click();

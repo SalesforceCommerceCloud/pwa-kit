@@ -7,7 +7,7 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { addProductToCartMobile } = require("../../scripts/pageHelpers");
+const { addProductToCart, searchProduct, checkoutProduct } = require("../../scripts/pageHelpers");
 const {
   generateUserCredentials,
   getCreditCardExpiry,
@@ -16,7 +16,7 @@ const {
 const GUEST_USER_CREDENTIALS = generateUserCredentials();
 
 test("Guest shopper can checkout items as guest", async ({ page }) => {
-  await addProductToCartMobile({page})
+  await addProductToCart({page, isMobile: true})
 
   // Cart
   await page.getByLabel(/My cart/i).click();
@@ -117,7 +117,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
 });
 
 test("Guest shopper can edit product item in cart", async ({ page }) => {
-  await addProductToCartMobile({page})
+  await addProductToCart({page, isMobile: true});
 
   // Cart
   await page.getByLabel(/My cart/i).click();
@@ -139,4 +139,54 @@ test("Guest shopper can edit product item in cart", async ({ page }) => {
 
   await expect(page.getByText(/Color: Meadow Violet/i)).toBeVisible()
   await expect(page.getByText(/Size: S/i)).toBeVisible()
+});
+
+test("Guest shopper can checkout product bundle", async ({ page }) => {
+  await searchProduct({page, query: 'bundle', isMobile: true});
+
+  await page.getByRole("link", {
+    name: /Turquoise Jewelry Bundle/i,
+  }).click();
+
+  await page.waitForLoadState();
+
+  await expect(
+    page.getByRole("heading", { name: /Turquoise Jewelry Bundle/i })
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: /Add Bundle to Cart/i }).click();
+
+  const addedToCartModal = page.getByText(/1 item added to cart/i);
+  await addedToCartModal.waitFor();
+  await page.getByLabel("Close").click();
+
+  await page.getByLabel(/My cart/i).click();
+  await page.waitForLoadState();
+
+  await expect(
+    page.getByRole("heading", { name: /Turquoise Jewelry Bundle/i })
+  ).toBeVisible();
+
+  // bundle child selections with all color gold
+  await expect(page.getByText(/Turquoise and Gold Bracelet/i)).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Necklace/i)).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Hoop Earring/i)).toBeVisible();
+
+  const qtyText = page.locator('text="Qty: 1"');
+  const colorGoldText = page.locator('text="Color: Gold"');
+  await expect(colorGoldText).toHaveCount(3);
+  await expect(qtyText).toHaveCount(3);
+
+  await checkoutProduct({page, userCredentials: GUEST_USER_CREDENTIALS });
+
+  await expect(
+    page.getByRole("heading", { name: /Order Summary/i })
+  ).toBeVisible();
+  await expect(page.getByText(/1 Item/i)).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Turquoise Jewelry Bundle/i })
+  ).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Bracelet/i)).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Necklace/i)).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Hoop Earring/i)).toBeVisible();
 });

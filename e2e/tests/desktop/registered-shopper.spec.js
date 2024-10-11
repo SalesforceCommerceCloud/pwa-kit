@@ -8,7 +8,7 @@
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
 const { 
-  addProductToCartDesktop,
+  addProductToCart,
   registerShopper,
   validateOrderHistory,
   validateWishlist,
@@ -26,7 +26,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS});
 
   // Shop for items as registered user
-  await addProductToCartDesktop({page});
+  await addProductToCart({page});
 
   // cart
   await page.getByLabel(/My cart/i).click();
