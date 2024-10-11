@@ -7,7 +7,7 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { addProductToCartDesktop, registerShopper } = require("../../scripts/pageHelpers");
+const { addProductToCartDesktop, registerShopper, validateOrderHistory } = require("../../scripts/pageHelpers");
 const {
   generateUserCredentials,
   getCreditCardExpiry,
@@ -17,10 +17,10 @@ const REGISTERED_USER_CREDENTIALS = generateUserCredentials();
 
 test("Registered shopper can checkout items", async ({ page }) => {
   // register and login user
-  await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS})
+  await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS});
 
   // Shop for items as registered user
-  await addProductToCartDesktop({page})
+  await addProductToCartDesktop({page});
 
   // cart
   await page.getByLabel(/My cart/i).click();
@@ -122,7 +122,8 @@ test("Registered shopper can checkout items", async ({ page }) => {
     page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
 
-  // TODO: check order history page to ensure that order history matches up
+  // order history
+  await validateOrderHistory({page});
 });
 
 // TODO: add test for adding product to wishlist

@@ -7,7 +7,7 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
-const { registerShopper, addProductToCartMobile } = require("../../scripts/pageHelpers");
+const { registerShopper, addProductToCartMobile, validateOrderHistory } = require("../../scripts/pageHelpers");
 const {
   generateUserCredentials,
   getCreditCardExpiry,
@@ -124,6 +124,9 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
+
+  // order history
+  await validateOrderHistory({page});
 });
 
 test("Registered shopper can add item to wishlist", async ({ page }) => {

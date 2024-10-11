@@ -1,6 +1,8 @@
 const { expect } = require("@playwright/test");
 const config = require("../config");
 
+// TODO: add documentation for all this
+
 export const addProductToCartDesktop = async ({page}) => {
     await page.goto(config.RETAIL_APP_HOME);
 
@@ -154,4 +156,26 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
 
     await expect(page.getByText(/Email/i)).toBeVisible();
     await expect(page.getByText(userCredentials.email)).toBeVisible();
+}
+
+/**
+ * 
+ * 
+ */
+export const validateOrderHistory = async ({page}) => {
+    await page.goto(config.RETAIL_APP_HOME + "/account/orders");
+    await expect(
+      page.getByRole("heading", { name: /Order History/i })
+    ).toBeVisible();
+  
+    await page.getByRole('link', { name: 'View details' }).click();
+  
+    await expect(
+      page.getByRole("heading", { name: /Order Details/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
+    ).toBeVisible();
+    await expect(page.getByText(/Color: Black/i)).toBeVisible();
+    await expect(page.getByText(/Size: L/i)).toBeVisible();
 }
