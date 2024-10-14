@@ -73,7 +73,6 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'access_token_sfra'
     | 'dwsid'
-    | 'trusted_agent_code'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -137,10 +136,6 @@ const DATA_MAP: AuthDataMap = {
         callback: (store) => {
             store.delete(isParentTrusted ? 'cc-nx-g-iframe' : 'cc-nx-g')
         }
-    },
-    trusted_agent_code: {
-        storageType: 'cookie',
-        key: 'cc-ta-code'
     },
     refresh_token_expires_in: {
         storageType: 'local',
@@ -389,16 +384,6 @@ class Auth {
         const {key, storageType} = DATA_MAP['dwsid']
         const store = this.stores[storageType]
         store.delete(key)
-    }
-
-    private clearTrustedAgentCode() {
-        const keys = ['trusted_agent_code'] as AuthDataKeys[]
-
-        keys.forEach((keyName) => {
-            const {key, storageType} = DATA_MAP[keyName]
-            const store = this.stores[storageType]
-            store.delete(key)
-        })
     }
 
     /**
@@ -726,29 +711,24 @@ class Auth {
      */
     async authorizeTrustedAgent(credentials: {loginId?: string}) {
         const slasClient = this.client
-        // TODO: TAOB replace the hardcoded values
-        console.log('slasClient.clientConfig: ', slasClient.clientConfig, slasClient.clientConfig)
-        const redirectURI = `${this.redirectURI.replace('callback', 'trusted-agent-callback')}`
         const codeVerifier = helpers.createCodeVerifier()
         const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
         const organizationId = slasClient.clientConfig.parameters.organizationId
         const clientId = slasClient.clientConfig.parameters.clientId
         const siteId = slasClient.clientConfig.parameters.siteId
         const loginId = credentials.loginId || 'guest'
-
         const idpOrigin = loginId === 'guest' ? 'slas' : 'ecom'
 
-        // TODO: TAOB replace the hardcoded values
         const url = [
             `${slasClient.clientConfig.proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize`,
-            `?client_id=${clientId}`,
-            `&channel_id=${siteId}`,
-            `&code_challenge=${codeChallenge}`,
-            `&login_id=${loginId}`,
-            `&redirect_uri=${redirectURI}`,
-            `&idp_origin=${idpOrigin}`,
-            `&response_type=code`
-        ].join('')
+                `?client_id=${clientId}`,
+                `&channel_id=${siteId}`,
+                `&code_challenge=${codeChallenge}`,
+                `&login_id=${loginId}`,
+                `&redirect_uri=${this.redirectURI}`,
+                `&idp_origin=${idpOrigin}`,
+                `&response_type=code`
+            ].join('')
 
         return {url, codeVerifier}
     }
@@ -790,14 +770,7 @@ class Auth {
             )}`
         }
 
-        if (onClient()) {
-            void this.clearTrustedAgentCode()
-        }
-
-        return await this.queueRequest(
-            () => slasClient.getTrustedAgentAccessToken(optionsToken),
-            optionsToken.body.login_id === 'guest'
-        )
+        return await this.queueRequest(() => slasClient.getTrustedAgentAccessToken(optionsToken), optionsToken.body.login_id === 'guest')
     }
 
     async refreshTrustedAgent(loginId: string, usid: string): Promise<TokenResponse> {

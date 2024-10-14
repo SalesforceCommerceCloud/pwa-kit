@@ -8,7 +8,6 @@ import React, {useState, useEffect, useCallback} from 'react'
 import Cookies from 'js-cookie'
 import { useMutation, UseMutationResult } from '@tanstack/react-query'
 import useAuthContext from './useAuthContext'
-import useConfig from './useConfig'
 import { ShopperLoginTypes } from 'commerce-sdk-isomorphic'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
@@ -20,47 +19,84 @@ type LogoutTrustedAgent = UseMutationResult<TokenResponse, unknown, void, unknow
 let popup: Window | null
 let intervalId: NodeJS.Timer
 
-const createTrustedAgentPopup = async (url: string, siteId: string, isRefresh: boolean = false, timeoutMinutes: number = 2, refreshTimeoutFocusMinutes: number = 0.25): Promise<string> => {
-    if (popup) popup.close()
-    if (intervalId) clearTimeout(intervalId)
+const getCodeValueFromPopup = (popup: Window | null): string | null => {
+    let codeValue = null
 
+    try {
+        codeValue = new URL(popup?.location?.toString() || 'http://localhost').searchParams.get('code')
+    } catch (e) { /* do nothing */ }
+
+    return codeValue
+}
+
+const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, timeoutMinutes: number = 3, refreshTimeoutFocusMinutes: number = 1): Promise<string> => {
+    // if a popup already exists, close it
+    if (popup) {
+        popup.close()
+    }
+
+    // if a timer already exists, clear it
+    if (intervalId) {
+        clearTimeout(intervalId)
+    }
+
+    // create our popup
     popup = window.open(url, 'accountManagerPopup', "popup=true,width=800,height=800,scrollbars=false,status=false,location=false,menubar=false,toolbar=false")
 
-    // if this is intended to be a behind the scenes refresh
-    // call, make sure our main window stays focused
+    // if this is intended to be a behind the
+    // scenes refresh call, make sure our main
+    // window stays focused
     if (isRefresh) {
-        console.log('IS REFRESH')
         window.focus()
     }
 
-    let startTime = Date.now() / 1000
+    let startTime = Date.now()
 
     return new Promise((resolve, reject) => {
-        intervalId = setInterval(function() {
-            console.log('useTrustedAgent cookie check internval')
-            const cookieValue = Cookies.get(`cc-ta-code_${siteId}`)
+        intervalId = setInterval(() => {
             const popupCouldntInitialize = !popup
-            const popupClosedWithoutAuthenicating = popup?.closed && !cookieValue
-            const popupTimeoutOccurred = Math.floor(Date.now() / 1000 - startTime) > timeoutMinutes * 60
+            if (popupCouldntInitialize) {
+                clearTimeout(intervalId)
+                return reject(`Popup couldn't initialize. Check your popup blocker.`)
+            }
 
-            popupCouldntInitialize && (clearTimeout(intervalId), reject(`Popup couldn't initialize.`))
-            popupClosedWithoutAuthenicating && (clearTimeout(intervalId), reject(`Popup closed without authenticating.`))
-            popupTimeoutOccurred && (clearTimeout(intervalId), reject(`Popup timed out after ${timeoutMinutes} minutes.`))
-            cookieValue && (clearTimeout(intervalId), resolve(cookieValue || ''))
+            const popupTimeoutOccurred = Math.floor(Date.now() - startTime) > (timeoutMinutes * 1000 * 60)
+            if (popupTimeoutOccurred) {
+                clearTimeout(intervalId)
+                popup?.close()
+                return reject(`Popup timed out after ${timeoutMinutes} minutes.`)
+            }
 
-            if (Date.now() - startTime > refreshTimeoutFocusMinutes * 60) {
+            const codeValue = getCodeValueFromPopup(popup)
+
+            const popupClosedWithoutAuthenicating = popup?.closed && !codeValue
+            if (popupClosedWithoutAuthenicating) {
+                clearTimeout(intervalId)
+                return reject(`Popup closed without authenticating`)
+            }
+
+            // success state
+            if (codeValue && codeValue !== '') {
+                clearTimeout(intervalId)
+                popup?.close()
+                return resolve(codeValue)
+            }
+
+            // if our refresh flow is stuck, focus the window
+            const popupRefreshTimeoutOccurred = Math.floor(Date.now() - startTime) > (refreshTimeoutFocusMinutes * 1000 * 60)
+            if (isRefresh && popupRefreshTimeoutOccurred) {
                 popup?.focus()
             }
         }, 1000)
     })
 }
 
-const createTrustedAgentLogin = (authorizeTrustedAgent: AuthorizationTrustedAgent, loginTrustedAgent: LoginTrustedAgent, siteId: string)  => {
+const createTrustedAgentLogin = (authorizeTrustedAgent: AuthorizationTrustedAgent, loginTrustedAgent: LoginTrustedAgent)  => {
     return async (loginId?: string, usid?: string, refresh: boolean = false): Promise<TokenResponse> => {
         console.log('useTrustedAgent auth.authorizeTrustedAgent()')
         const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
         console.log('useTrustedAgent createTrustedAgentPopup')
-        const code = await createTrustedAgentPopup(url, siteId, refresh)
+        const code = await createTrustedAgentPopup(url, refresh)
         console.log('useTrustedAgent auth.loginTrustedAgent()')
         return await loginTrustedAgent.mutateAsync({loginId, code, codeVerifier, usid})
     }
@@ -84,11 +120,10 @@ const useTrustedAgent = (): UseTrustedAgent => {
     const [isAgent, setIsAgent] = useState(false)
     const [agentId, setAgentId] = useState('')
     const [loginId, setLoginId] = useState('')
-    const config = useConfig()
     const auth = useAuthContext()
 
     // TODO: TAOB should i use useCallback here?
-    const login = createTrustedAgentLogin(useMutation(auth.authorizeTrustedAgent.bind(auth)), useMutation(auth.loginTrustedAgent.bind(auth)), config.siteId)
+    const login = createTrustedAgentLogin(useMutation(auth.authorizeTrustedAgent.bind(auth)), useMutation(auth.loginTrustedAgent.bind(auth)))
     const logout = createTrustedAgentLogout(useMutation(auth.logout.bind(auth)))
 
     // TODO: TAOB do we even need this to be in a useEffect?
