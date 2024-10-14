@@ -319,13 +319,8 @@ class Auth {
      */
     private isTokenExpired(token: string) {
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
-        const validTimeSeconds = exp - iat - 60 - 810
+        const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
-        console.log(
-            `auth.isTokenExpired() valid for ${parseInt(
-                (validTimeSeconds - tokenAgeSeconds).toString()
-            )}s`
-        )
         return validTimeSeconds <= tokenAgeSeconds
     }
 
