@@ -72,7 +72,6 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'access_token_sfra'
     | 'dwsid'
-    | 'trusted_agent_code'
 
 type AuthDataMap = Record<
     AuthDataKeys,
