@@ -727,8 +727,8 @@ class Auth {
     async authorizeTrustedAgent(credentials: {loginId?: string}) {
         const slasClient = this.client
         // TODO: TAOB replace the hardcoded values
-        // console.log(slasClient.clientConfig.baseUri, slasClient.clientConfig.proxy)
-        const redirectURI = 'http://localhost:3000/trusted-agent-callback'
+        console.log('slasClient.clientConfig: ', slasClient.clientConfig, slasClient.clientConfig)
+        const redirectURI = `${this.redirectURI.replace('callback', 'trusted-agent-callback')}`
         const codeVerifier = helpers.createCodeVerifier()
         const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
         const organizationId = slasClient.clientConfig.parameters.organizationId
@@ -740,7 +740,7 @@ class Auth {
 
         // TODO: TAOB replace the hardcoded values
         const url = [
-            `http://localhost:3000/mobify/proxy/api/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize`,
+            `${slasClient.clientConfig.proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize`,
             `?client_id=${clientId}`,
             `&channel_id=${siteId}`,
             `&code_challenge=${codeChallenge}`,
