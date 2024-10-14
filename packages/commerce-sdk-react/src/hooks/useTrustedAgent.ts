@@ -93,11 +93,8 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
 
 const createTrustedAgentLogin = (authorizeTrustedAgent: AuthorizationTrustedAgent, loginTrustedAgent: LoginTrustedAgent)  => {
     return async (loginId?: string, usid?: string, refresh: boolean = false): Promise<TokenResponse> => {
-        console.log('useTrustedAgent auth.authorizeTrustedAgent()')
         const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
-        console.log('useTrustedAgent createTrustedAgentPopup')
         const code = await createTrustedAgentPopup(url, refresh)
-        console.log('useTrustedAgent auth.loginTrustedAgent()')
         return await loginTrustedAgent.mutateAsync({loginId, code, codeVerifier, usid})
     }
 }

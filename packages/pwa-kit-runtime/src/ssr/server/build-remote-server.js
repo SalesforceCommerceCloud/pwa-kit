@@ -50,7 +50,7 @@ import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
-import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
+import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
