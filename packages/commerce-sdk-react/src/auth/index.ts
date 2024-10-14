@@ -417,18 +417,6 @@ class Auth {
         this.set('usid', res.usid)
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
-        console.log(
-            `\n\n\n\n res.refresh_token_expires_in ${
-                res.refresh_token_expires_in / (24 * 60 * 60)
-            } days`
-        )
-
-        console.log(
-            `\n\n\n\n setting refresh token to expire in ${
-                (res.refresh_token_expires_in + this.refreshTokenTTL) / (24 * 60 * 60)
-            } days`
-        )
-
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         const fallbackTTL =
             typeof this.refreshTokenTTL === 'number' && this.refreshTokenTTL >= 0
@@ -439,8 +427,6 @@ class Auth {
         this.set(refreshTokenKey, res.refresh_token, {
             expires: expiresDate
         })
-
-        console.log(`\n\n\n\n this.get(refreshTokenKey) ${this.get(refreshTokenKey)}`)
     }
 
     /**

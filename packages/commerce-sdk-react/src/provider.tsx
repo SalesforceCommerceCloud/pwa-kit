@@ -144,7 +144,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     if (refreshTokenTTL && refreshTokenTTL < 0) {
         refreshTokenTTL = 0
         throw new Error(
-            `'refreshTokenTTL' must be a positive value in seconds, overriding negative value ${refreshTokenTTL} to zero`
+            `'refreshTokenTTL' must be a non-negative value in seconds, overriding negative value ${refreshTokenTTL} to zero`
         )
     }
     const apiClients = useMemo(() => {

@@ -22,7 +22,7 @@ module.exports = {
         },
         sites,
         commerceAPI: {
-            refreshTokenTTL: 0, // 0 seconds, the minimum
+            refreshTokenTTL: 180, // 0 seconds, the minimum
             proxyPath: `/mobify/proxy/api`,
             parameters: {
                 clientId: '3872b78d-3fb1-4885-8e8e-10481da37780',

@@ -724,11 +724,6 @@ export const RemoteServerFactory = {
 
                     if (incomingRequest.path?.match('/\/oauth2\/trusted-agent\/token/')) {
                         proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
-                        localDevLog('PATH MATCHES!!!')
-                        localDevLog('PATH MATCHES!!!')
-                        localDevLog('PATH MATCHES!!!')
-                        localDevLog('PATH MATCHES!!!')
-                        localDevLog('PATH MATCHES!!!')
                     }
                 },
                 onProxyRes: (proxyRes, req) => {
