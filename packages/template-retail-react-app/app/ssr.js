@@ -53,9 +53,7 @@ const options = {
     // of the keys of headers that have been encoded
     // There may be a slight performance loss with requests/responses with large number
     // of headers as we loop through all the headers to verify ASCII vs non ASCII
-    encodeNonAsciiHttpHeaders: true,
-
-    localAllowCookies: true
+    encodeNonAsciiHttpHeaders: true
 }
 
 const runtime = getRuntime()
@@ -75,8 +73,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com',
-                        "'unsafe-inline'"
+                        'storage.googleapis.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -95,19 +92,10 @@ const {handler} = runtime.createHandler(options, (app) => {
         res.send()
     })
 
-    app.get('/trusted-agent-callback?*', (req, res) => {
-        res.cookie('cc-ta-code_RefArch', req.query.code, {maxAge: 1000 * 60 * 15})
-        res.set('Content-Type', 'text/html')
-        res.send(Buffer.from(`<script>window.close()</script>`))
-    })
-
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
-
-    // // maybe partial render solution?
-    // app.get('/trusted-agent/*', taobLock, runtime.render)
 
     app.get('*', runtime.render)
 })
