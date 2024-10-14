@@ -74,19 +74,6 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                                 id="login_form.button.sign_in"
                             />
                         </Button>
-                        <Button
-                            variant="outline"
-                            onClick={async () => {
-                                await authorizeIDP.mutateAsync({hint: idpHint})
-                            }}
-                        >
-                            <Text>
-                                <FormattedMessage
-                                    defaultMessage="Login with Google"
-                                    id="login_form.button.google_sign_in"
-                                />
-                            </Text>
-                        </Button>
 
                         <SocialLogin idps={idps} />
 

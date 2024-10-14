@@ -29,6 +29,7 @@ const SocialLogin = ({idps}) => {
             message: 'Google'
         }
     }
+    const authorizeIDP = useAuthHelper(AuthHelpers.AuthorizeIDP)
 
     return (
         idps && (
@@ -41,8 +42,8 @@ const SocialLogin = ({idps}) => {
                     return (
                         config && (
                             <Button
-                                onClick={() => {
-                                    alert(message)
+                                onClick={async () => {
+                                    await authorizeIDP.mutateAsync({hint: name})
                                 }}
                                 borderColor="gray.500"
                                 color="blue.600"

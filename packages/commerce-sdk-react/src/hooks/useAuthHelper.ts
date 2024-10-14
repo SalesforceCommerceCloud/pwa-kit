@@ -25,8 +25,6 @@ export const AuthHelpers = {
     LoginIDPUser: 'loginIDPUser',
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
-    AuthorizeIDP: 'authorizeIDP',
-    LoginIDPUser: 'loginIDPUser',
     Logout: 'logout',
     Register: 'register'
 } as const

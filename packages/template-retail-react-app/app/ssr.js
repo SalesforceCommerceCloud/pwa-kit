@@ -86,6 +86,10 @@ const {handler} = runtime.createHandler(options, (app) => {
         })
     )
 
+    // Configure this if you want to enable passwordless login
+    // Grab token from response and connect to email/sms API
+    app.post()
+
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {
         // This endpoint does nothing and is not expected to change

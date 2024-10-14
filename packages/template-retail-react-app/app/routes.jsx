@@ -47,6 +47,7 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const SocialLoginRedirect = loadable(() => import('./pages/social-login-redirect'))
 
 export const routes = [
     {
@@ -85,6 +86,11 @@ export const routes = [
     {
         path: '/login-redirect',
         component: LoginRedirect,
+        exact: true
+    },
+    {
+        path: '/social-login-redirect',
+        component: SocialLoginRedirect,
         exact: true
     },
     {

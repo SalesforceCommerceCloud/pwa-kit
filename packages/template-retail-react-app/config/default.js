@@ -16,7 +16,10 @@ module.exports = {
             interpretPlusSignAsSpace: false
         },
         login: {
-            idp: 'Google'
+            idps: ['Google'],
+            passwordless: {
+                callbackURI: ''
+            }
         },
         defaultSite: 'RefArchGlobal',
         siteAliases: {
