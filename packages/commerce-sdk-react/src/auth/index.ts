@@ -704,7 +704,6 @@ class Auth {
     }) {
         const slasClient = this.client
         // TODO: TAOB replace the hardcoded values
-        console.log('slasClient.clientConfig: ', slasClient.clientConfig, slasClient.clientConfig)
         const redirectURI = `${this.redirectURI.replace('callback', 'trusted-agent-callback')}`
         const codeVerifier = helpers.createCodeVerifier()
         const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
