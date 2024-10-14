@@ -11,7 +11,6 @@ describe('getAppOrigin', () => {
     const OLD_ENV = process.env
     const OLD_WINDOW = global.window
     const TEST_ORIGIN = 'https://www.example.com'
-
     beforeEach(() => {
         jest.resetModules()
         process.env = {...OLD_ENV}

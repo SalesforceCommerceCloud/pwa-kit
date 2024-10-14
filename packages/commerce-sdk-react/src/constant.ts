@@ -27,3 +27,7 @@ export const SLAS_SECRET_PLACEHOLDER = '_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_S
 
 export const SLAS_SECRET_OVERRIDE_MSG =
     'You have enabled PWA Kit Private Client mode which gets the SLAS secret from your environment variable. The SLAS secret you have set in the Auth provider will be ignored.'
+
+// commerce-sdk-react namespaces cookies with siteID as suffixes to allow multisite setups.
+// However some cookies are set and used outside of PWA Kit and must not be modified with suffixes.
+export const EXCLUDE_COOKIE_SUFFIX = ['dwsid']

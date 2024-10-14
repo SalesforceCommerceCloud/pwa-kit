@@ -234,12 +234,12 @@ const AccountOrderDetail = () => {
                         ) : (
                             <>
                                 <Stack spacing={1}>
-                                    <Text fontWeight="bold" fontSize="sm">
+                                    <Heading as="h2" fontSize="sm" pt={1}>
                                         <FormattedMessage
                                             defaultMessage="Shipping Method"
                                             id="account_order_detail.heading.shipping_method"
                                         />
-                                    </Text>
+                                    </Heading>
                                     <Box>
                                         <Text fontSize="sm" textTransform="titlecase">
                                             {
@@ -276,14 +276,16 @@ const AccountOrderDetail = () => {
                                     </Box>
                                 </Stack>
                                 <Stack spacing={1}>
-                                    <Text fontWeight="bold" fontSize="sm">
+                                    <Heading as="h2" fontSize="sm" pt={1}>
                                         <FormattedMessage
                                             defaultMessage="Payment Method"
                                             id="account_order_detail.heading.payment_method"
                                         />
-                                    </Text>
+                                    </Heading>
                                     <Stack direction="row">
-                                        {CardIcon && <CardIcon layerStyle="ccIcon" />}
+                                        {CardIcon && (
+                                            <CardIcon layerStyle="ccIcon" aria-hidden="true" />
+                                        )}
                                         <Box>
                                             <Text fontSize="sm">{paymentCard?.cardType}</Text>
                                             <Stack direction="row">
@@ -300,12 +302,12 @@ const AccountOrderDetail = () => {
                                     </Stack>
                                 </Stack>
                                 <Stack spacing={1}>
-                                    <Text fontWeight="bold" fontSize="sm">
+                                    <Heading as="h2" fontSize="sm" pt={1}>
                                         <FormattedMessage
                                             defaultMessage="Shipping Address"
                                             id="account_order_detail.heading.shipping_address"
                                         />
-                                    </Text>
+                                    </Heading>
                                     <Box>
                                         <Text fontSize="sm">
                                             {shippingAddress.firstName} {shippingAddress.lastName}
@@ -318,12 +320,12 @@ const AccountOrderDetail = () => {
                                     </Box>
                                 </Stack>
                                 <Stack spacing={1}>
-                                    <Text fontWeight="bold" fontSize="sm">
+                                    <Heading as="h2" fontSize="sm" pt={1}>
                                         <FormattedMessage
                                             defaultMessage="Billing Address"
                                             id="account_order_detail.heading.billing_address"
                                         />
-                                    </Text>
+                                    </Heading>
                                     <Box>
                                         <Text fontSize="sm">
                                             {order.billingAddress.firstName}{' '}

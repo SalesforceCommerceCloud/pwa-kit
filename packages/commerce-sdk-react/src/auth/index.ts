@@ -703,7 +703,6 @@ class Auth {
             this.isPrivate
         )
         if (onClient()) {
-            console.log('we are on the client')
             window.location.assign(url)
         } else {
             console.warn('Something went wrong, this client side method is invoked on the server.')

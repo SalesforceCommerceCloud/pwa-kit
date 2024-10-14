@@ -756,6 +756,9 @@
   "item_variant.assistive_msg.quantity": {
     "defaultMessage": "Quantity {quantity}"
   },
+  "item_variant.quantity.label": {
+    "defaultMessage": "Quantity selector for {productName}. Selected quantity is {quantity}"
+  },
   "lCPCxk": {
     "defaultMessage": "Please select all your options above"
   },
@@ -924,8 +927,8 @@
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
   },
-  "login_form.button.google_sign_in": {
-    "defaultMessage": "Login with Google"
+  "login_form.button.social": {
+    "defaultMessage": "{message}"
   },
   "login_form.button.sign_in": {
     "defaultMessage": "Sign In"
@@ -1148,10 +1151,10 @@
     "defaultMessage": "Update"
   },
   "product_view.label.assistive_msg.quantity_decrement": {
-    "defaultMessage": "Decrement Quantity"
+    "defaultMessage": "Decrement Quantity for {productName}"
   },
   "product_view.label.assistive_msg.quantity_increment": {
-    "defaultMessage": "Increment Quantity"
+    "defaultMessage": "Increment Quantity for {productName}"
   },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"
@@ -1258,6 +1261,12 @@
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
+  },
+  "shipping_address.label.edit_button": {
+    "defaultMessage": "Edit {address}"
+  },
+  "shipping_address.label.remove_button": {
+    "defaultMessage": "Remove {address}"
   },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"
@@ -1633,11 +1642,20 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "New Password"
   },
+  "wishlist_primary_action.button.addSetToCart.label": {
+    "defaultMessage": "Add {productName} set to cart"
+  },
+  "wishlist_primary_action.button.addToCart.label": {
+    "defaultMessage": "Add {productName} to cart"
+  },
   "wishlist_primary_action.button.add_set_to_cart": {
     "defaultMessage": "Add Set to Cart"
   },
   "wishlist_primary_action.button.add_to_cart": {
     "defaultMessage": "Add to Cart"
+  },
+  "wishlist_primary_action.button.viewFullDetails.label": {
+    "defaultMessage": "View full details for {productName}"
   },
   "wishlist_primary_action.button.view_full_details": {
     "defaultMessage": "View Full Details"
@@ -1645,11 +1663,17 @@
   "wishlist_primary_action.button.view_options": {
     "defaultMessage": "View Options"
   },
+  "wishlist_primary_action.button.view_options.label": {
+    "defaultMessage": "View Options for {productName}"
+  },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
   "wishlist_secondary_button_group.action.remove": {
     "defaultMessage": "Remove"
+  },
+  "wishlist_secondary_button_group.info.item.remove.label": {
+    "defaultMessage": "Remove {productName}"
   },
   "wishlist_secondary_button_group.info.item_removed": {
     "defaultMessage": "Item removed from wishlist"
