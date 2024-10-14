@@ -38,7 +38,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
-    callbackURI: string
+    callbackURI?: string
 }
 
 interface JWTHeaders {
@@ -240,7 +240,7 @@ class Auth {
 
         this.redirectURI = config.redirectURI
 
-        this.callbackURI = config.callbackURI
+        this.callbackURI = config.callbackURI || ''
 
         this.fetchedToken = config.fetchedToken || ''
 
