@@ -29,7 +29,7 @@ const getCodeValueFromPopup = (popup: Window | null): string | null => {
     return codeValue
 }
 
-const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, timeoutMinutes: number = 2, refreshTimeoutFocusMinutes: number = 0.25): Promise<string> => {
+const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, timeoutMinutes: number = 3, refreshTimeoutFocusMinutes: number = 1): Promise<string> => {
     // if a popup already exists, close it
     if (popup) {
         popup.close()
