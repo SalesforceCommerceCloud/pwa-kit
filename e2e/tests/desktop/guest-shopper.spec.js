@@ -13,6 +13,10 @@ const { addProductToCart, searchProduct, checkoutProduct } = require("../../scri
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials();
 
+/**
+ * Test that guest shoppers can add a product to cart and go through the entire checkout process,
+ * validating that shopper is able to get to the order summary section
+ */
 test("Guest shopper can checkout items as guest", async ({ page }) => {
   await addProductToCart({page})
 
@@ -34,6 +38,9 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   ).toBeVisible();
 });
 
+/**
+ * Test that guest shoppers can use the product edit modal on cart page
+ */
 test("Guest shopper can edit product item in cart", async ({ page }) => {
   await addProductToCart({page});
 
@@ -69,6 +76,9 @@ test("Guest shopper can edit product item in cart", async ({ page }) => {
   await expect(page.getByText(/Size: S/i)).toBeVisible();
 });
 
+/**
+ * Test that guest shoppers can add product bundle to cart and successfully checkout
+ */
 test("Guest shopper can checkout product bundle", async ({ page }) => {
   await searchProduct({page, query: 'bundle'});
 

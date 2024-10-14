@@ -22,6 +22,11 @@ const {
 
 const REGISTERED_USER_CREDENTIALS = generateUserCredentials();
 
+/**
+ * Test that registered shoppers can add a product to cart and go through the entire checkout process,
+ * validating that shopper is able to get to the order summary section,
+ * and that order shows up in order history
+ */
 test("Registered shopper can checkout items", async ({ page }) => {
   // Create Account and Sign In
   await registerShopper({
@@ -136,6 +141,9 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await validateOrderHistory({page});
 });
 
+/**
+ * Test that registered shoppers can navigate to PDP and add a product to wishlist
+ */
 test("Registered shopper can add item to wishlist", async ({ page }) => {
   const isLoggedIn = await loginShopper({
     page,
