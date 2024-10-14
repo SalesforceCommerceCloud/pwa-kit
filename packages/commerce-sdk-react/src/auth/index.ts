@@ -38,6 +38,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
+    callbackURI: string
 }
 
 interface JWTHeaders {
@@ -52,6 +53,8 @@ interface SlasJwtPayload extends JwtPayload {
 
 type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[1]
 type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
+type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[2]
+type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[2]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
 
 /**
@@ -193,6 +196,7 @@ class Auth {
     private logger: Logger
     private defaultDnt: boolean | undefined
     private isPrivate: boolean
+    private callbackURI: string
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -235,6 +239,8 @@ class Auth {
         }
 
         this.redirectURI = config.redirectURI
+
+        this.callbackURI = config.callbackURI
 
         this.fetchedToken = config.fetchedToken || ''
 
@@ -736,6 +742,46 @@ class Auth {
         this.handleTokenResponse(token, isGuest)
         // Delete the code verifier once the user has logged in
         this.delete('code_verifier')
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
+     */
+    async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
+        const userid = parameters.userid
+        await helpers.authorizePasswordless(
+            this.client,
+            {
+                clientSecret: this.clientSecret
+            },
+            {
+                callbackURI: this.callbackURI,
+                userid,
+                mode: 'callback'
+            }
+        )
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
+     */
+    async getPasswordLessAccessToken(parameters: LoginPasswordlessParams) {
+        const pwdlessLoginToken = parameters.pwdlessLoginToken
+        const token = await helpers.getPasswordLessAccessToken(
+            this.client,
+            {
+                clientSecret: this.clientSecret
+            },
+            {
+                pwdlessLoginToken
+            }
+        )
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
         if (onClient()) {
             void this.clearECOMSession()
         }
