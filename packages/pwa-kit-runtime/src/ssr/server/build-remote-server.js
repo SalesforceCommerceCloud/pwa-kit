@@ -134,7 +134,7 @@ export const RemoteServerFactory = {
             // client secret handler will inject an Authorization header.
             // Do not modify unless a project wants to customize additional SLAS
             // endpoints that we currently do not support (ie. /oauth2/passwordless/token)
-            applySLASPrivateClientToEndpoints: /\/oauth2\/token/
+            applySLASPrivateClientToEndpoints: /\/oauth2\/token|\/passwordless\/login/
         }
 
         options = Object.assign({}, defaults, options)
