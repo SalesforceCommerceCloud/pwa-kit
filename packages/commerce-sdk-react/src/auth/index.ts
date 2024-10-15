@@ -561,7 +561,6 @@ class Auth {
         try {
             token = await this.loginGuestUser()
         } catch (e) {
-            console.error('auth.ready() this.clearStorage() this.loginGuestUser()')
             this.clearStorage()
             token = await this.loginGuestUser()
         }
