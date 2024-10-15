@@ -23,8 +23,6 @@ import {updateCache} from './utils'
 export const AuthHelpers = {
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
-    AuthorizeTrustedAgent: 'authorizeTrustedAgent',
-    LoginTrustedAgent: 'loginTrustedAgent',
     Logout: 'logout',
     Register: 'register'
 } as const
@@ -56,8 +54,6 @@ type CacheUpdateMatrix = {
  * Avaliable helpers:
  * - loginGuestUser
  * - loginRegisteredUserB2C
- * - authorizeTrustedAgent
- * - loginTrustedAgent
  * - logout
  * - register
  *
@@ -99,8 +95,6 @@ export function useAuthHelper<Mutation extends AuthHelper>(
 const cacheUpdateMatrix: CacheUpdateMatrix = {
     loginGuestUser: noop,
     loginRegisteredUserB2C: noop,
-    authorizeTrustedAgent: noop,
-    loginTrustedAgent: noop,
     logout() {
         return {
             remove: [{queryKey: ['/commerce-sdk-react']}]
