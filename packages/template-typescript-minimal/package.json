@@ -3,7 +3,11 @@
   "version": "4.0.0-dev",
   "private": true,
   "scripts": {
-    "build": "pwa-kit-dev build",
+    "build": "npm run build-translations && pwa-kit-dev build",
+    "build-translations": "npm run extract-default-translations && npm run compile-translations && npm run compile-translations:pseudo",
+    "compile-translations": "node ./node_modules/@salesforce/extension-translations/scripts/compile-folder.js translations",
+    "compile-translations:pseudo": "node ./node_modules/@salesforce/extension-translations/scripts/compile-pseudo.js translations/en-US.json",
+    "extract-default-translations": "node ./node_modules/@salesforce/extension-translations/scripts/extract-default-messages.js en-US en-GB",
     "format": "pwa-kit-dev format \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "npm run lint:js && npm run typecheck",
     "lint:fix": "npm run lint:js -- --fix",

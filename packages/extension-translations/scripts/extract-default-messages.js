@@ -7,9 +7,6 @@
  */
 /* eslint @typescript-eslint/no-var-requires: "off" */
 
-// TODO: move this file into the base project
-// TODO: should this be in the SDK now?
-
 /**
  * This script will extract messages from base template and extended app and output all translations in the extended app
  * If a file is overridden, it won't extract messages from that file in the base template
@@ -40,7 +37,7 @@ function extract(locale) {
     const {extends: extendsPkg, overridesDir} = pkgJSON.ccExtensibility || {}
     if (!overridesDir) {
         const command = [
-            'formatjs extract "src/**/*.{js,jsx,ts,tsx}"',
+            'formatjs extract "app/**/*.{js,jsx,ts,tsx}" "node_modules/@salesforce/extension-*/src/**/*.{js,jsx,ts,tsx}"',
             `--out-file translations/${locale}.json`,
             '--id-interpolation-pattern [sha512:contenthash:base64:6]'
         ].join(' ')

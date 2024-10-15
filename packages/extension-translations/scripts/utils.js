@@ -20,7 +20,7 @@ const getOutputFolder = () => {
         overridesDir && extendsTemplate
             ? path.join(overridesDir, 'app/static/translations/compiled')
             : // TODO
-              'static/translations/compiled'
+              'app/static/translations/compiled'
 
     return outputFolder
 }
