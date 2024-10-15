@@ -48,6 +48,7 @@ const semver = require('semver')
 const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
+const {nameRegex} = require('@salesforce/pwa-kit-dev/utils/extensibility-utils')
 
 const program = new Command()
 
@@ -72,7 +73,7 @@ const validProjectName = (s) => {
     return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
 }
 
-const validAppExtensionNameRegex = /^(@[a-zA-Z0-9-_]+\/)?extension-[a-zA-Z0-9-_]+$/
+const validAppExtensionNameRegex = nameRegex
 const validProjectAppExtensionName = (input) => {
     if (!validAppExtensionNameRegex.test(input)) {
         return 'The Application Extension name must follow the format @{namespace}/extension-{package-name} (namespace is optional).'
@@ -961,7 +962,8 @@ const runGenerator = async (
             // Update the root package.json to add a start script
             updatePackageJson(p.resolve(outputDir, 'package.json'), {
                 scripts: {
-                    start: 'npm --prefix ./dev start'
+                    start: `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} start`,
+                    'start:inspect': `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} run start:inspect`
                 }
             })
 
