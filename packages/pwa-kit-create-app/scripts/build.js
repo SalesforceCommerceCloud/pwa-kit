@@ -15,6 +15,7 @@ sh.set('-e')
 sh.config.silent = false
 
 const TEMPLATE_PREFIX = 'template-'
+const BASE_EXTENSION_DIR = 'extension-base'
 
 const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
 const templatesDir = p.resolve(__dirname, '..', 'templates')
@@ -49,12 +50,15 @@ const main = () => {
 
     return Promise.all(
         pkgNames.map((pkgName) => {
+            // Handle base-app-extension using the 'extension-base' directory
+            const actualPkgName =
+                pkgName === 'base-app-extension'
+                    ? `${BASE_EXTENSION_DIR}`
+                    : `${TEMPLATE_PREFIX}${pkgName}`
+
             // Emulate an NPM package by having the tar contain a "package" folder.
             const tmpPackageDir = mkdtempSync()
-            sh.mv(
-                p.join(packageDir, `${TEMPLATE_PREFIX}${pkgName}`),
-                p.join(tmpPackageDir, 'package')
-            )
+            sh.mv(p.join(packageDir, actualPkgName), p.join(tmpPackageDir, 'package'))
 
             return tar
                 .c(
