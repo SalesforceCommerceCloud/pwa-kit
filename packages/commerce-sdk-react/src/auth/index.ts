@@ -321,7 +321,6 @@ class Auth {
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
-
         return validTimeSeconds <= tokenAgeSeconds
     }
 
@@ -515,7 +514,6 @@ class Auth {
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
-
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
