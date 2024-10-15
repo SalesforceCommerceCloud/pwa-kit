@@ -10,11 +10,10 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Button, Divider, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import StandardLogin from '../standard-login/index'
 import SocialLogin from '@salesforce/retail-react-app/app/components/social-login'
 
-const PasswordlessLogin = ({form, idps = [], clickForgotPassword = noop}) => {
+const PasswordlessLogin = ({form, clickForgotPassword, isSocialEnabled = false, idps = []}) => {
     const [showPasswordView, setShowPasswordView] = useState(false)
 
     const handlePasswordButton = async (e) => {
@@ -69,7 +68,7 @@ const PasswordlessLogin = ({form, idps = [], clickForgotPassword = noop}) => {
                                 id="login_form.button.password"
                             />
                         </Button>
-                        <SocialLogin idps={idps} />
+                        {isSocialEnabled && <SocialLogin idps={idps} />}
                     </Stack>
                 </Stack>
             )}
@@ -88,8 +87,9 @@ const PasswordlessLogin = ({form, idps = [], clickForgotPassword = noop}) => {
 
 PasswordlessLogin.propTypes = {
     form: PropTypes.object,
-    idps: PropTypes.arrayOf[PropTypes.string],
-    clickForgotPassword: PropTypes.func
+    clickForgotPassword: PropTypes.func,
+    isSocialEnabled: PropTypes.bool,
+    idps: PropTypes.arrayOf[PropTypes.string]
 }
 
 export default PasswordlessLogin

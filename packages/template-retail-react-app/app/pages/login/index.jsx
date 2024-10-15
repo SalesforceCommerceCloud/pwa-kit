@@ -111,6 +111,7 @@ const Login = () => {
                     clickCreateAccount={() => navigate('/registration')}
                     clickForgotPassword={() => navigate('/reset-password')}
                     isPasswordlessEnabled={passwordless?.enabled}
+                    isSocialEnabled={social?.enabled}
                     idps={social?.idps}
                 />
             </Container>

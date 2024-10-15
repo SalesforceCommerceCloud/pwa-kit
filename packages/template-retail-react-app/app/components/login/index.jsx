@@ -20,6 +20,7 @@ const LoginForm = ({
     clickCreateAccount = noop,
     form,
     isPasswordlessEnabled = false,
+    isSocialEnabled = false,
     idps = []
 }) => {
     return (
@@ -51,12 +52,14 @@ const LoginForm = ({
                         <PasswordlessLogin
                             form={form}
                             clickForgotPassword={clickForgotPassword}
+                            isSocialEnabled={isSocialEnabled}
                             idps={idps}
                         />
                     ) : (
                         <StandardLogin
                             form={form}
                             clickForgotPassword={clickForgotPassword}
+                            isSocialEnabled={isSocialEnabled}
                             idps={idps}
                         />
                     )}
@@ -87,6 +90,7 @@ LoginForm.propTypes = {
     clickCreateAccount: PropTypes.func,
     form: PropTypes.object,
     isPasswordlessEnabled: PropTypes.bool,
+    isSocialEnabled: PropTypes.bool,
     idps: PropTypes.array[PropTypes.string]
 }
 

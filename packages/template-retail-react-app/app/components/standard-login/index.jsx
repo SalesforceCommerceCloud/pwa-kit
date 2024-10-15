@@ -12,7 +12,13 @@ import {Button, Divider, Stack, Text} from '@salesforce/retail-react-app/app/com
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import SocialLogin from '../social-login/index'
 
-const StandardLogin = ({form, idps = [], clickForgotPassword, hideEmail = false}) => {
+const StandardLogin = ({
+    form,
+    clickForgotPassword,
+    hideEmail = false,
+    isSocialEnabled = false,
+    idps = []
+}) => {
     return (
         <Stack spacing={8} paddingLeft={4} paddingRight={4}>
             <Stack>
@@ -32,7 +38,7 @@ const StandardLogin = ({form, idps = [], clickForgotPassword, hideEmail = false}
                 >
                     <FormattedMessage defaultMessage="Sign In" id="login_form.button.sign_in" />
                 </Button>
-                {idps.length > 0 && (
+                {isSocialEnabled && (
                     <>
                         <Divider />
                         <Text align="center" fontSize="sm">
@@ -51,9 +57,10 @@ const StandardLogin = ({form, idps = [], clickForgotPassword, hideEmail = false}
 
 StandardLogin.propTypes = {
     form: PropTypes.object,
-    idps: PropTypes.array[PropTypes.string],
     clickForgotPassword: PropTypes.func,
-    hideEmail: PropTypes.bool
+    hideEmail: PropTypes.bool,
+    isSocialEnabled: PropTypes.bool,
+    idps: PropTypes.array[PropTypes.string]
 }
 
 export default StandardLogin

@@ -58,6 +58,7 @@ export const AuthModal = ({
     onOpen,
     onClose,
     isPasswordlessEnabled = false,
+    isSocialEnabled = false,
     idps = [],
     ...props
 }) => {
@@ -295,6 +296,7 @@ export const AuthModal = ({
                             clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
                             clickForgotPassword={() => setCurrentView(PASSWORD_VIEW)}
                             isPasswordlessEnabled={isPasswordlessEnabled}
+                            isSocialEnabled={isSocialEnabled}
                             idps={idps}
                         />
                     )}
@@ -329,6 +331,7 @@ AuthModal.propTypes = {
     onLoginSuccess: PropTypes.func,
     onRegistrationSuccess: PropTypes.func,
     isPasswordlessEnabled: PropTypes.bool,
+    isSocialEnabled: PropTypes.bool,
     idps: PropTypes.array[PropTypes.string]
 }
 
@@ -347,6 +350,7 @@ export const useAuthModal = (initialView = LOGIN_VIEW) => {
         onOpen,
         onClose,
         isPasswordlessEnabled: passwordless?.enabled,
+        isSocialEnabled: social?.enabled,
         idps: social?.idps
     }
 }

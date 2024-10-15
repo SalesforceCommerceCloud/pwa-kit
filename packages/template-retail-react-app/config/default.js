@@ -41,10 +41,11 @@ module.exports = {
         useXForwardedHost: false,
         login: {
             passwordless: {
-                enabled: false
+                enabled: true
             },
             social: {
-                idps: []
+                enabled: true,
+                idps: ['google', 'apple']
             }
         }
     },
