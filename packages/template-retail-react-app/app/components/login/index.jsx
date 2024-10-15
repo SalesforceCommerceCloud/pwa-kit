@@ -8,16 +8,20 @@
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {Alert, Button, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import StandardLogin from '@salesforce/retail-react-app/app/components/standard-login'
 import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passwordless-login'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
-const LoginForm = ({submitForm, clickForgotPassword, clickCreateAccount = noop, form}) => {
-    const {passwordless, social} = getConfig().app.login
-
+const LoginForm = ({
+    submitForm,
+    clickForgotPassword,
+    clickCreateAccount = noop,
+    form,
+    isPasswordlessEnabled = false,
+    idps = []
+}) => {
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
@@ -43,17 +47,17 @@ const LoginForm = ({submitForm, clickForgotPassword, clickCreateAccount = noop, 
                     </Alert>
                 )}
                 <Stack spacing={6}>
-                    {passwordless?.enabled ? (
+                    {isPasswordlessEnabled ? (
                         <PasswordlessLogin
                             form={form}
                             clickForgotPassword={clickForgotPassword}
-                            idps={social?.idps}
+                            idps={idps}
                         />
                     ) : (
                         <StandardLogin
                             form={form}
                             clickForgotPassword={clickForgotPassword}
-                            idps={social?.idps}
+                            idps={idps}
                         />
                     )}
 
@@ -81,7 +85,9 @@ LoginForm.propTypes = {
     submitForm: PropTypes.func,
     clickForgotPassword: PropTypes.func,
     clickCreateAccount: PropTypes.func,
-    form: PropTypes.object
+    form: PropTypes.object,
+    isPasswordlessEnabled: PropTypes.bool,
+    idps: PropTypes.array[PropTypes.string]
 }
 
 export default LoginForm

@@ -9,14 +9,6 @@ import {screen} from '@testing-library/react'
 import LoginForm from '@salesforce/retail-react-app/app/components/login/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useForm} from 'react-hook-form'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    return {
-        getConfig: jest.fn()
-    }
-})
 
 const WrapperComponent = ({...props}) => {
     const form = useForm()
@@ -24,24 +16,9 @@ const WrapperComponent = ({...props}) => {
 }
 
 describe('LoginForm', () => {
-    beforeEach(() => {
-        jest.clearAllMocks()
-    })
-
-    describe('allowPasswordless is enabled', () => {
-        beforeEach(() => {
-            const newConfig = {
-                ...mockConfig,
-                app: {
-                    ...mockConfig.app,
-                    login: {passwordless: {enabled: true}}
-                }
-            }
-            getConfig.mockImplementation(() => newConfig)
-        })
-
+    describe('isPasswordlessEnabled is enabled', () => {
         test('renders passwordless login form', () => {
-            renderWithProviders(<WrapperComponent />)
+            renderWithProviders(<WrapperComponent isPasswordlessEnabled={true} />)
 
             expect(screen.getByText(/Welcome Back/)).toBeInTheDocument()
             expect(screen.getByLabelText('Email')).toBeInTheDocument()
@@ -54,14 +31,14 @@ describe('LoginForm', () => {
         })
 
         test('renders form errors when "Continue Securely" button is clicked', async () => {
-            const {user} = renderWithProviders(<WrapperComponent />)
+            const {user} = renderWithProviders(<WrapperComponent isPasswordlessEnabled={true} />)
 
             await user.click(screen.getByRole('button', {name: 'Continue Securely'}))
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()
         })
 
         test('renders form errors when "Password" button is clicked', async () => {
-            const {user} = renderWithProviders(<WrapperComponent />)
+            const {user} = renderWithProviders(<WrapperComponent isPasswordlessEnabled={true} />)
 
             await user.click(screen.getByRole('button', {name: 'Password'}))
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()
@@ -69,17 +46,6 @@ describe('LoginForm', () => {
     })
 
     describe('passwordless is disabled', () => {
-        beforeEach(() => {
-            const newConfig = {
-                ...mockConfig,
-                app: {
-                    ...mockConfig.app,
-                    login: {passwordless: {enabled: false}}
-                }
-            }
-            getConfig.mockImplementation(() => newConfig)
-        })
-
         test('renders standard login form', () => {
             renderWithProviders(<WrapperComponent />)
 
