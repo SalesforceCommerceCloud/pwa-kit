@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import Auth, {AuthData} from './'
+import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
-
+import {getDefaultCookieAttributes} from '../utils'
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
     const originalModule = jest.requireActual('./storage')
@@ -42,7 +43,8 @@ jest.mock('../utils', () => ({
     __esModule: true,
     onClient: () => true,
     getParentOrigin: jest.fn().mockResolvedValue(''),
-    isOriginTrusted: () => false
+    isOriginTrusted: () => false,
+    getDefaultCookieAttributes: () => {}
 }))
 
 /** The auth data we store has a slightly different shape than what we use. */
@@ -434,17 +436,29 @@ describe('Auth', () => {
     })
 
     test.each([
-        {defaultDnt: true, expected: {dnt: true}},
-        {defaultDnt: false, expected: {dnt: false}},
-        {defaultDnt: undefined, expected: {}}
-    ])('dnt flag is set correctly', async ({defaultDnt, expected}) => {
-        const auth = new Auth({...config, defaultDnt})
-        await auth.loginGuestUser()
-        expect(helpers.loginGuestUser).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.objectContaining(expected)
-        )
-    })
+        // When user has not selected DNT pref
+        [true, undefined, {dnt: true}],
+        [false, undefined, {dnt: false}],
+        [undefined, undefined, {}],
+        // When user has selected DNT, the dw_dnt cookie sets dnt
+        [true, '0', {dnt: false}],
+        [false, '1', {dnt: true}],
+        [false, '0', {dnt: false}]
+    ])(
+        'dnt flag is set correctly for defaultDnt=`%p`, dw_dnt=`%i`, expected=`%s`',
+        async (defaultDnt, dw_dnt, expected) => {
+            const auth = new Auth({...config, defaultDnt})
+            if (dw_dnt) {
+                // @ts-expect-error private method
+                auth.set('dw_dnt', dw_dnt)
+            }
+            await auth.loginGuestUser()
+            expect(helpers.loginGuestUser).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining(expected)
+            )
+        }
+    )
 
     test('loginGuestUser with slas private', async () => {
         const auth = new Auth(configSLASPrivate)
@@ -578,5 +592,72 @@ describe('Auth', () => {
         // Set mock value back to expected.
         // @ts-expect-error read-only property
         utils.onClient = () => true
+    })
+
+    test.each([
+        // When user has not selected DNT pref
+        [true, '1'],
+        [false, '0'],
+        [null, '0']
+    ])('setDNT(true) results dw_dnt=1', async (newDntPref, expectedDwDnt) => {
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(newDntPref)
+        expect(auth.get('dw_dnt')).toBe(expectedDwDnt)
+    })
+
+    test('setDNT(null) results in defaultDnt if defaultDnt is defined', async () => {
+        const auth = new Auth({...config, siteId: 'siteA', defaultDnt: true})
+        await auth.setDnt(null)
+        expect(auth.get('dw_dnt')).toBe('1')
+    })
+
+    test('setDNT(true) sets cookie with an expiration time', async () => {
+        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(true)
+        expect(setDntSpiedOn).toHaveBeenLastCalledWith(
+            'dw_dnt',
+            '1',
+            expect.objectContaining({expires: expect.any(Number)})
+        )
+    })
+
+    test('setDNT(false) sets cookie with an expiration time', async () => {
+        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(false)
+        expect(setDntSpiedOn).toHaveBeenLastCalledWith(
+            'dw_dnt',
+            '0',
+            expect.objectContaining({expires: expect.any(Number)})
+        )
+    })
+
+    test('setDNT(null) sets cookie WITHOUT an expiration time', async () => {
+        const setDntSpiedOn = jest.spyOn(Auth.prototype as any, 'set')
+        const auth = new Auth({...config, siteId: 'siteA'})
+        await auth.setDnt(null)
+        await waitFor(() => {
+            expect(setDntSpiedOn).not.toHaveBeenCalledWith(
+                'dw_dnt',
+                '1',
+                expect.objectContaining({expires: expect.any(Number)})
+            )
+        })
+    })
+
+    test('getDnt() returns undefined if token and cookie value is conflicting', async () => {
+        const getSpiedOn = jest.spyOn(Auth.prototype as any, 'get')
+        const parseSlasJWTSpiedOn = jest.spyOn(Auth.prototype as any, 'parseSlasJWT')
+        parseSlasJWTSpiedOn.mockReturnValue({
+            dnt: '1'
+        })
+        getSpiedOn.mockReturnValue('0')
+
+        const auth = new Auth({...config, siteId: 'siteA'})
+        auth.getDnt()
+        await waitFor(() => {
+            expect(auth.getDnt()).toBeUndefined()
+        })
     })
 })
