@@ -89,7 +89,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         // This endpoint does nothing and is not expected to change
         // Thus we cache it for a year to maximize performance
         res.set('Cache-Control', `max-age=31536000`)
-        res.send('') // TODO: TAOB adding '' here keeps this from triggering a download
+        res.send()
     })
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
