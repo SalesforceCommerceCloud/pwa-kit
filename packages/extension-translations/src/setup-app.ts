@@ -19,10 +19,6 @@ class Translations extends ApplicationExtension<Config> {
     extendApp(App: React.ComponentType): React.ComponentType {
         return withExtendedApp(App)
     }
-
-    extendRoutes(routes: IRouteConfig[]): IRouteConfig[] {
-        return routes
-    }
 }
 
 export default Translations
