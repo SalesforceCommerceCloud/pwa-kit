@@ -28,7 +28,6 @@ import {Logger} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type TrustedAgentTokenRequest = ShopperLoginTypes.TrustedAgentTokenRequest
-
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string

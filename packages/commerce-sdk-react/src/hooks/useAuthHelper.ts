@@ -21,8 +21,8 @@ import {updateCache} from './utils'
  * @enum
  */
 export const AuthHelpers = {
-    LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
+    LoginGuestUser: 'loginGuestUser',
     Logout: 'logout',
     Register: 'register'
 } as const
@@ -93,8 +93,8 @@ export function useAuthHelper<Mutation extends AuthHelper>(
 }
 
 const cacheUpdateMatrix: CacheUpdateMatrix = {
-    loginGuestUser: noop,
     loginRegisteredUserB2C: noop,
+    loginGuestUser: noop,
     logout() {
         return {
             remove: [{queryKey: ['/commerce-sdk-react']}]
