@@ -47,7 +47,7 @@ test('Renders Skeleton', () => {
 
 test('Renders PricingAndPromotionsSkeleton when isRefetching is true', async () => {
     const {getAllByRole, getByTestId, queryAllByText, queryByTestId} = renderWithProviders(
-        <ProductTile isRefetching={true} product={mockMasterProductHitWithMultipleVariants} />
+        <ProductTile isRefreshingData={true} product={mockMasterProductHitWithMultipleVariants} />
     )
 
     expect(getByTestId('product-tile-image')).toBeDefined()

@@ -91,7 +91,7 @@ const ProductTile = (props) => {
         product,
         selectableAttributeId = PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID,
         badgeDetails = PRODUCT_BADGE_DETAILS,
-        isRefetching = false,
+        isRefreshingData = false,
         ...rest
     } = props
     const {imageGroups, productId, representedProduct, variants} = product
@@ -254,7 +254,7 @@ const ProductTile = (props) => {
                 {/* Title */}
                 <Text {...styles.title}>{localizedProductName}</Text>
 
-                {isRefetching ? (
+                {isRefreshingData ? (
                     <PricingAndPromotionsSkeleton />
                 ) : (
                     <>
@@ -393,9 +393,9 @@ ProductTile.propTypes = {
      */
     badgeDetails: PropTypes.array,
     /**
-     * Determines whether to display a skeleton over personalizable data (e.g., pricing and promotions) during data refetch.
+     * Determines whether to display a skeleton over personalizable data (e.g., pricing and promotions) during data refresh.
      */
-    isRefetching: PropTypes.bool
+    isRefreshingData: PropTypes.bool
 }
 
 export default ProductTile
