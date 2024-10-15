@@ -1,9 +1,11 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+// TODO: TAOB remove after testing
 
 import React, { useState } from 'react'
 
@@ -20,7 +22,7 @@ import {useTrustedAgent} from '@salesforce/commerce-sdk-react'
 
 const TrustedAgentBanner = () => {
     const {isAgent, agentId, loginId, login, logout} = useTrustedAgent()
-    const [inputValue, setInputValue] = useState(loginId === 'Guest' ? 'guest' : loginId)
+    const [inputValue, setInputValue] = useState(loginId)
 
     return (
         <Box px={8} py={2} bg="gray.100">
@@ -69,9 +71,9 @@ const TrustedAgentBanner = () => {
                                 <Input
                                     mr={4}
                                     bg="white.100"
-                                    value={inputValue && inputValue !== 'guest' ? inputValue : ''}
+                                    value={inputValue ? inputValue : ''}
                                     placeholder="Login ID"
-                                    onChange={e => setInputValue(e.target.value)}
+                                    onChange={(e) => setInputValue(e.target.value)}
                                 />
                                 <Button type="submit">Login</Button>
                             </Flex>

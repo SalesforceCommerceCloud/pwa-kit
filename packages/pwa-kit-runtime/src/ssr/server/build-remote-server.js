@@ -50,7 +50,7 @@ import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
-import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
+import {createProxyMiddleware} from 'http-proxy-middleware'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -722,13 +722,9 @@ export const RemoteServerFactory = {
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
 
-                    if (incomingRequest.path?.match('/\/oauth2\/trusted-agent\/token/')) {
+                    // /oauth2/trusted-agent/token endpoint requires a different auth header
+                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
                         proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
-                        localDevLog('PATH MATCHES!!!')
-                        localDevLog('PATH MATCHES!!!')
-                        localDevLog('PATH MATCHES!!!')
-                        localDevLog('PATH MATCHES!!!')
-                        localDevLog('PATH MATCHES!!!')
                     }
                 },
                 onProxyRes: (proxyRes, req) => {
