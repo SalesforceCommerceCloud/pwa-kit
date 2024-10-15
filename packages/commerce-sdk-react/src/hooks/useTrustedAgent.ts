@@ -70,8 +70,8 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
                 return resolve({code, state})
             }
 
-            const popupClosedWithoutAuthenicating = popup?.closed
-            if (popupClosedWithoutAuthenicating) {
+            const popupClosedWithoutAuthenticating = popup?.closed
+            if (popupClosedWithoutAuthenticating) {
                 clearTimeout(intervalId)
                 return reject('Popup closed without authenticating.')
             }
