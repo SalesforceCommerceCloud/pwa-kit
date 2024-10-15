@@ -192,6 +192,7 @@ class Auth {
         | undefined
 
     constructor(config: AuthConfig) {
+        console.log(`auth.constructor()`)
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
@@ -322,7 +323,10 @@ class Auth {
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
 
-        return validTimeSeconds <= tokenAgeSeconds
+        // TODO: TAOB remove this after testing done
+        const testValidTimeSeconds = validTimeSeconds - 810
+        console.log(`auth.isTokenExpired() valid for ${parseInt((testValidTimeSeconds - tokenAgeSeconds).toString())}s`)
+        return testValidTimeSeconds <= tokenAgeSeconds
     }
 
     /**
@@ -499,6 +503,7 @@ class Auth {
      * 4. PKCE flow
      */
     async ready() {
+        console.log(`auth.ready()`)
         if (this.fetchedToken && this.fetchedToken !== '') {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
