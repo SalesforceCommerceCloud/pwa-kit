@@ -192,6 +192,7 @@ class Auth {
         | undefined
 
     constructor(config: AuthConfig) {
+        console.log(`auth.constructor()`)
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
@@ -321,7 +322,11 @@ class Auth {
         const {exp, iat} = jwtDecode<JWTHeaders>(token.replace('Bearer ', ''))
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
-        return validTimeSeconds <= tokenAgeSeconds
+
+        // TODO: TAOB remove this after testing done
+        const testValidTimeSeconds = validTimeSeconds - 810
+        console.log(`auth.isTokenExpired() valid for ${parseInt((testValidTimeSeconds - tokenAgeSeconds).toString())}s`)
+        return testValidTimeSeconds <= tokenAgeSeconds
     }
 
     /**
@@ -498,6 +503,7 @@ class Auth {
      * 4. PKCE flow
      */
     async ready() {
+        console.log(`auth.ready()`)
         if (this.fetchedToken && this.fetchedToken !== '') {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
@@ -548,9 +554,9 @@ class Auth {
 
         // refresh flow for TAOB
         if (accessToken && this.isTokenExpired(accessToken)) {
-            const {isAgent, loginId, usid} = this.parseSlasJWT(accessToken)
+            const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
             if (isAgent) {
-                return await this.refreshTrustedAgent(loginId, usid)
+                return await this.queueRequest(() => this.refreshTrustedAgent(loginId, usid), isGuest)
             }
         }
 
@@ -697,48 +703,53 @@ class Auth {
         const clientId = slasClient.clientConfig.parameters.clientId
         const siteId = slasClient.clientConfig.parameters.siteId
         const loginId = credentials.loginId || 'guest'
-        const idpOrigin = loginId === 'guest' ? 'slas' : 'ecom'
+        const isGuest = loginId === 'guest'
+        const idpOrigin = isGuest ? 'slas' : 'ecom'
 
-        const url = [
-            `${slasClient.clientConfig.proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize`,
-                `?client_id=${clientId}`,
-                `&channel_id=${siteId}`,
-                `&code_challenge=${codeChallenge}`,
-                `&login_id=${loginId}`,
-                `&redirect_uri=${this.redirectURI}`,
-                `&idp_origin=${idpOrigin}`,
-                `&response_type=code`
-            ].join('')
+        const url = `${slasClient.clientConfig.proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize?${[
+            ...[
+                `client_id=${clientId}`,
+                `channel_id=${siteId}`,
+                `login_id=${loginId}`,
+                `redirect_uri=${this.redirectURI}`,
+                `idp_origin=${idpOrigin}`,
+                `response_type=code`
+            ],
+            ...(!this.clientSecret ? [`code_challenge=${codeChallenge}`] : [])
+        ].join('&')}`
 
         return {url, codeVerifier}
     }
 
-    /**
-     * TODO: TAOB Eventually this will be a wrapper method for commerce-sdk-isomorphic helper: loginTrustedAgent.
-     *
-     */
     async loginTrustedAgent(credentials: {
         loginId?: string
         code: string
-        codeVerifier: string
+        codeVerifier?: string
         usid?: string
+        state?: string
         clientSecret?: string
     }) {
         const slasClient = this.client
+        const loginId = credentials.loginId || 'guest'
+        const isGuest = loginId === 'guest'
+        const idpOrigin = isGuest ? 'slas' : 'ecom'
 
         const optionsToken = {
             headers: {
                 Authorization: `Bearer ${credentials.code}`
             },
             body: {
-                client_id: slasClient.clientConfig.parameters.clientId,
                 channel_id: slasClient.clientConfig.parameters.siteId,
-                code_verifier: credentials.codeVerifier,
                 grant_type: 'client_credentials',
                 redirect_uri: this.redirectURI,
-                login_id: credentials.loginId || 'guest',
-                idp_origin: 'ecom',
+                login_id: loginId,
+                idp_origin: idpOrigin,
                 dnt: 'true',
+                ...(!this.clientSecret && {
+                    client_id: slasClient.clientConfig.parameters.clientId,
+                    code_verifier: credentials.codeVerifier
+                }),
+                ...(credentials.state && {state: credentials.state}),
                 ...(credentials.usid && {usid: credentials.usid})
             }
         } as {headers: {[key: string]: string}; body: TrustedAgentTokenRequest}
@@ -750,7 +761,20 @@ class Auth {
             )}`
         }
 
-        return await this.queueRequest(() => slasClient.getTrustedAgentAccessToken(optionsToken), optionsToken.body.login_id === 'guest')
+        const token = await slasClient.getTrustedAgentAccessToken(optionsToken)
+        this.handleTokenResponse(token, isGuest)
+
+        return token
+    }
+
+    registerTrustedAgentRefreshHandler(
+        refreshTrustedAgentHandler: (
+            loginId?: string,
+            usid?: string,
+            refresh?: boolean
+        ) => Promise<TokenResponse>
+    ) {
+        this.refreshTrustedAgentHandler = refreshTrustedAgentHandler
     }
 
     async refreshTrustedAgent(loginId: string, usid: string): Promise<TokenResponse> {
@@ -778,16 +802,6 @@ class Auth {
         return await this.loginGuestUser()
     }
 
-    registerTrustedAgentRefreshHandler(
-        refreshTrustedAgentHandler: (
-            loginId?: string,
-            usid?: string,
-            refresh?: boolean
-        ) => Promise<TokenResponse>
-    ) {
-        this.refreshTrustedAgentHandler = refreshTrustedAgentHandler
-    }
-
     /**
      * Decode SLAS JWT and extract information such as customer id, usid, etc.
      *
@@ -808,9 +822,14 @@ class Auth {
             ? isbParts[3].replace('gcid:', '')
             : isbParts[4].replace('rcid:', '')
 
-        const loginId = isbParts[1].replace('upn:', '')
-        const isAgent = !!isbParts?.[6]?.startsWith('agent')
-        const agentId = isAgent ? isbParts?.[6]?.replace('agent:', '') : null
+        const loginId = isGuest
+            ? 'guest'
+            : isbParts[1].replace('upn:', '')
+
+        const isAgent = !!isbParts?.[isGuest ? 5 : 6]?.startsWith('agent:')
+        const agentId = isAgent
+            ? isbParts?.[isGuest ? 5 : 6]?.replace('agent:', '')
+            : null
 
         // SUB format
         // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
@@ -819,9 +838,9 @@ class Auth {
             isGuest,
             customerId,
             usid,
+            loginId,
             isAgent,
-            agentId,
-            loginId
+            agentId
         }
     }
 }

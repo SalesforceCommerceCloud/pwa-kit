@@ -722,7 +722,8 @@ export const RemoteServerFactory = {
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
 
-                    if (incomingRequest.path?.match('/\/oauth2\/trusted-agent\/token/')) {
+                    // /oauth2/trusted-agent/token endpoint requires a different auth header
+                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
                         proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
                     }
                 },
