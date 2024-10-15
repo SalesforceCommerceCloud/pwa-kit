@@ -7,13 +7,17 @@
 
 import React from 'react'
 import loadable from '@loadable/component'
-import {ApplicationExtension, IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
+import {
+    ApplicationExtension,
+    IRouteConfig
+} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
 
 import {ReactExtensionConfig as Config} from './types'
+import withExtendedApp from './components/with-extended-app'
 
 class Translations extends ApplicationExtension<Config> {
     extendApp(App: React.ComponentType): React.ComponentType {
-        return App
+        return withExtendedApp(App)
     }
 
     extendRoutes(routes: IRouteConfig[]): IRouteConfig[] {

@@ -10,7 +10,6 @@
 import PropTypes from 'prop-types'
 import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import fetch from 'cross-fetch'
 
 /**
@@ -29,8 +28,7 @@ export const fetchTranslations = async (locale) => {
 
     try {
         const file = `${getAppOrigin()}${getStaticAssetUrl(
-            `translations/compiled/${targetLocale}.json`,
-            {appExtensionPackageName: '@salesforce/extension-retail-react-app'}
+            `translations/compiled/${targetLocale}.json`
         )}`
         const response = await fetch(file)
 
@@ -42,7 +40,7 @@ export const fetchTranslations = async (locale) => {
 
         return await response.json()
     } catch (err) {
-        logger.error(
+        console.error(
             'Translation not found. Loading empty messages, so that react-intl would fall back to the inline default messages',
             {namespace: 'utils.fetchTranslations', additionalProperties: {error: err}}
         )

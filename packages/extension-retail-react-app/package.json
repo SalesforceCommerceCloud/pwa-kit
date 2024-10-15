@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/extension-retail-react-app",
-  "version": "4.1.0-dev",
+  "version": "1.0.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "scripts": {

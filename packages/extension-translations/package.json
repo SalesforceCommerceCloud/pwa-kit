@@ -6,7 +6,13 @@
   "peerDependencies": {
     "@loadable/component": "^5.15.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "express": "^4.19.2",
+    "@tanstack/react-query": "^4.28.0",
+    "@tanstack/react-query-devtools": "^4.29.1",
+    "react-intl": "^5.25.1",
+    "prop-types": "^15.8.1",
+    "cross-fetch": "^3.1.4"
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
@@ -17,7 +23,12 @@
     "@types/react-dom": "~18.2.1",
     "express": "^4.19.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@tanstack/react-query": "^4.28.0",
+    "@tanstack/react-query-devtools": "^4.29.1",
+    "react-intl": "^5.25.1",
+    "prop-types": "^15.8.1",
+    "cross-fetch": "^3.1.4"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
