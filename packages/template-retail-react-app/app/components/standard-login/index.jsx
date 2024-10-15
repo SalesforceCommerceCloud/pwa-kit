@@ -38,7 +38,7 @@ const StandardLogin = ({
                 >
                     <FormattedMessage defaultMessage="Sign In" id="login_form.button.sign_in" />
                 </Button>
-                {isSocialEnabled && (
+                {isSocialEnabled && idps.length > 0 && (
                     <>
                         <Divider />
                         <Text align="center" fontSize="sm">
