@@ -15,7 +15,7 @@ import StandardLogin from '@salesforce/retail-react-app/app/components/standard-
 import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passwordless-login'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
-const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
+const LoginForm = ({submitForm, clickForgotPassword, clickCreateAccount = noop, form}) => {
     const {passwordless, social} = getConfig().app.login
 
     return (

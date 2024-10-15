@@ -10,10 +10,9 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Button, Divider, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import SocialLogin from '../social-login/index'
 
-const StandardLogin = ({form, idps = [], clickForgotPassword = noop, hideEmail = false}) => {
+const StandardLogin = ({form, idps = [], clickForgotPassword, hideEmail = false}) => {
     return (
         <Stack spacing={8} paddingLeft={4} paddingRight={4}>
             <Stack>

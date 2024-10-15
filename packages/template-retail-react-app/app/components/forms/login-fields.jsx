@@ -10,11 +10,10 @@ import {FormattedMessage} from 'react-intl'
 import {Stack, Box, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 const LoginFields = ({
     form,
-    clickForgotPassword = noop,
+    clickForgotPassword,
     prefix = '',
     hideEmail = false,
     hidePassword = false
@@ -26,14 +25,16 @@ const LoginFields = ({
             {!hidePassword && (
                 <Stack>
                     <Field {...fields.password} />
-                    <Box>
-                        <Button variant="link" size="sm" onClick={clickForgotPassword}>
-                            <FormattedMessage
-                                defaultMessage="Forgot password?"
-                                id="login_form.link.forgot_password"
-                            />
-                        </Button>
-                    </Box>
+                    {clickForgotPassword && (
+                        <Box>
+                            <Button variant="link" size="sm" onClick={clickForgotPassword}>
+                                <FormattedMessage
+                                    defaultMessage="Forgot password?"
+                                    id="login_form.link.forgot_password"
+                                />
+                            </Button>
+                        </Box>
+                    )}
                 </Stack>
             )}
         </Stack>
