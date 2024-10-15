@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment} from 'react'
+import React, {Fragment, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {
@@ -20,9 +20,22 @@ import LoginFields from '@salesforce/retail-react-app/app/components/forms/login
 import SocialLogin from '@salesforce/retail-react-app/app/components/social-login'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
     const idps = getConfig().app?.login?.idps
+    const authorizePasswordless = useAuthHelper(AuthHelpers.AuthorizePasswordless)
+    const loginPasswordlessUser = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
+
+    // State to store the value of the text input
+    const [inputValue, setInputValue] = useState('')
+
+    // Function to handle form submission
+    const handleSubmit = async (event) => {
+        event.preventDefault() // Prevent the default form submission behavior
+        // Call a function with the input value as a parameter
+        await loginPasswordlessUser.mutateAsync({pwdlessLoginToken: inputValue})
+    }
 
     return (
         <Fragment>
@@ -76,6 +89,15 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                         </Button>
 
                         <SocialLogin idps={idps} />
+                        <Button
+                            variant="outline"
+                            onClick={async () => {
+                                await authorizePasswordless.mutateAsync({userid: 'diana@test.com'})
+                            }}
+                            isLoading={form.formState.isSubmitting}
+                        >
+                            <FormattedMessage defaultMessage="Continue Securely" />
+                        </Button>
 
                         <Stack direction="row" spacing={1} justify="center">
                             <Text fontSize="sm">
@@ -93,6 +115,17 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                         </Stack>
                     </Stack>
                 </Stack>
+            </form>
+            <form onSubmit={handleSubmit}>
+                <label>
+                    Enter text:
+                    <input
+                        type="text"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                    />
+                </label>
+                <button type="submit">Submit</button>
             </form>
         </Fragment>
     )

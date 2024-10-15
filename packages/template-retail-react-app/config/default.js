@@ -15,6 +15,11 @@ module.exports = {
             showDefaults: true,
             interpretPlusSignAsSpace: false
         },
+        login: {
+            passwordless: {
+                callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c'
+            }
+        },
         defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',
@@ -24,9 +29,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                clientId: 'f18109c2-153d-4e2e-baa9-e8ab0e665456',
                 organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                shortCode: 'staging-001',
                 siteId: 'RefArchGlobal'
             }
         },
@@ -53,7 +58,7 @@ module.exports = {
         ssrFunctionNodeVersion: '20.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'staging-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {

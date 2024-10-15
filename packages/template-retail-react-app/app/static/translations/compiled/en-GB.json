@@ -1,4 +1,10 @@
 {
+  "OqMeSa": [
+    {
+      "type": 0,
+      "value": "Continue Securely"
+    }
+  ],
   "account.accordion.button.my_account": [
     {
       "type": 0,
@@ -2173,6 +2179,12 @@
     {
       "type": 0,
       "value": "Sign In"
+    }
+  ],
+  "login_form.button.social": [
+    {
+      "type": 1,
+      "value": "message"
     }
   ],
   "login_form.link.forgot_password": [
