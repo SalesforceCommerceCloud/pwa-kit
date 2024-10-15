@@ -6,26 +6,53 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
-import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
+import {FormattedMessage} from 'react-intl'
+import {Stack, Box, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Field from '@salesforce/retail-react-app/app/components/field'
+import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
 
-const LoginFields = ({form, prefix = ''}) => {
+const LoginFields = ({
+    form,
+    clickForgotPassword,
+    prefix = '',
+    hideEmail = false,
+    hidePassword = false
+}) => {
     const fields = useLoginFields({form, prefix})
     return (
         <Stack spacing={5}>
-            <Field {...fields.email} />
-            <Field {...fields.password} />
+            {!hideEmail && <Field {...fields.email} />}
+            {!hidePassword && (
+                <Stack>
+                    <Field {...fields.password} />
+                    {clickForgotPassword && (
+                        <Box>
+                            <Button variant="link" size="sm" onClick={clickForgotPassword}>
+                                <FormattedMessage
+                                    defaultMessage="Forgot password?"
+                                    id="login_form.link.forgot_password"
+                                />
+                            </Button>
+                        </Box>
+                    )}
+                </Stack>
+            )}
         </Stack>
     )
 }
 
 LoginFields.propTypes = {
+    clickForgotPassword: PropTypes.func,
+
     /** Object returned from `useForm` */
     form: PropTypes.object.isRequired,
 
     /** Optional prefix for field names */
-    prefix: PropTypes.string
+    prefix: PropTypes.string,
+
+    /** Optional configurations */
+    hideEmail: PropTypes.bool,
+    hidePassword: PropTypes.bool
 }
 
 export default LoginFields

@@ -40,6 +40,7 @@ import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
 const PASSWORD_VIEW = 'password'
@@ -56,6 +57,9 @@ export const AuthModal = ({
     isOpen,
     onOpen,
     onClose,
+    isPasswordlessEnabled = false,
+    isSocialEnabled = false,
+    idps = [],
     ...props
 }) => {
     const {formatMessage} = useIntl()
@@ -291,6 +295,9 @@ export const AuthModal = ({
                             submitForm={submitForm}
                             clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
                             clickForgotPassword={() => setCurrentView(PASSWORD_VIEW)}
+                            isPasswordlessEnabled={isPasswordlessEnabled}
+                            isSocialEnabled={isSocialEnabled}
+                            idps={idps}
                         />
                     )}
                     {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
@@ -322,7 +329,10 @@ AuthModal.propTypes = {
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onLoginSuccess: PropTypes.func,
-    onRegistrationSuccess: PropTypes.func
+    onRegistrationSuccess: PropTypes.func,
+    isPasswordlessEnabled: PropTypes.bool,
+    isSocialEnabled: PropTypes.bool,
+    idps: PropTypes.array[PropTypes.string]
 }
 
 /**
@@ -332,11 +342,15 @@ AuthModal.propTypes = {
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
+    const {passwordless, social} = getConfig().app.login
 
     return {
         initialView,
         isOpen,
         onOpen,
-        onClose
+        onClose,
+        isPasswordlessEnabled: passwordless?.enabled,
+        isSocialEnabled: social?.enabled,
+        idps: social?.idps
     }
 }
