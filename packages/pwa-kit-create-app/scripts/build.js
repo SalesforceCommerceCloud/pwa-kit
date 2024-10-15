@@ -15,7 +15,7 @@ sh.set('-e')
 sh.config.silent = false
 
 const TEMPLATE_PREFIX = 'template-'
-const BASE_EXTENSION_DIR = 'extension-base'
+const EXTENSION_BASE_NAME = 'extension-base'
 
 const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
 const templatesDir = p.resolve(__dirname, '..', 'templates')
@@ -30,7 +30,7 @@ const main = () => {
         'express-minimal',
         'typescript-minimal',
         'mrt-reference-app',
-        'base-app-extension'
+        EXTENSION_BASE_NAME
     ]
 
     if (!sh.test('-d', templatesDir)) {
@@ -52,9 +52,7 @@ const main = () => {
         pkgNames.map((pkgName) => {
             // Handle base-app-extension using the 'extension-base' directory
             const actualPkgName =
-                pkgName === 'base-app-extension'
-                    ? `${BASE_EXTENSION_DIR}`
-                    : `${TEMPLATE_PREFIX}${pkgName}`
+                pkgName === EXTENSION_BASE_NAME ? EXTENSION_BASE_NAME : `${TEMPLATE_PREFIX}${pkgName}`
 
             // Emulate an NPM package by having the tar contain a "package" folder.
             const tmpPackageDir = mkdtempSync()
