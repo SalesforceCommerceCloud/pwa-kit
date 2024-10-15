@@ -87,8 +87,13 @@ module.exports = {
             isProduction: false
         },
         login: {
-            allowPasswordless: false,
-            idps: []
+            passwordless: {
+                enabled: false
+            },
+            social: {
+                enabled: false,
+                idps: ['google', 'apple']
+            }
         }
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack
