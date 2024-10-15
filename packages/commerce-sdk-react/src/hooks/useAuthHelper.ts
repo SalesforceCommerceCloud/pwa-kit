@@ -21,8 +21,8 @@ import {updateCache} from './utils'
  * @enum
  */
 export const AuthHelpers = {
-    LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
     LoginGuestUser: 'loginGuestUser',
+    LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
     Logout: 'logout',
     Register: 'register'
 } as const
@@ -52,8 +52,8 @@ type CacheUpdateMatrix = {
  * For more, see https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/#public-client-shopper-login-helpers
  *
  * Avaliable helpers:
- * - loginGuestUser
  * - loginRegisteredUserB2C
+ * - loginGuestUser
  * - logout
  * - register
  *
