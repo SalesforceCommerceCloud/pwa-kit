@@ -53,9 +53,7 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
     let startTime = Date.now()
 
     return new Promise((resolve, reject) => {
-        console.log('useTrustedAgent setInterval')
         intervalId = setInterval(() => {
-            console.log('useTrustedAgent interval tick')
             const popupCouldntInitialize = !popup
             if (popupCouldntInitialize) {
                 clearTimeout(intervalId)
@@ -93,23 +91,18 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
 }
 
 const createTrustedAgentLogin = (auth: Auth)  => {
-    console.log('useTrustedAgent createTrustedAgentLogin()')
     const authorizeTrustedAgent = useMutation(auth.authorizeTrustedAgent.bind(auth))
     const loginTrustedAgent = useMutation(auth.loginTrustedAgent.bind(auth))
     return async (loginId?: string, usid?: string, refresh: boolean = false): Promise<TokenResponse> => {
         const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
-        console.log('useTrustedAgent createTrustedAgentPopup')
         const {code, state} = await createTrustedAgentPopup(url, refresh)
-        console.log('useTrustedAgent auth.loginTrustedAgent()')
         return await loginTrustedAgent.mutateAsync({loginId, code, codeVerifier, state, usid})
     }
 }
 
 const createTrustedAgentLogout = (auth: Auth)  => {
-    console.log('useTrustedAgent createTrustedAgentLogout()')
     const logoutTrustedAgent = useMutation(auth.logout.bind(auth))
     return async (): Promise<TokenResponse> => {
-        console.log('useTrustedAgent auth.logout()')
         return await logoutTrustedAgent.mutateAsync()
     }
 }
@@ -130,12 +123,10 @@ const useTrustedAgent = (): UseTrustedAgent => {
     const login = useCallback(createTrustedAgentLogin(auth), [auth])
     const logout = useCallback(createTrustedAgentLogout(auth), [auth])
     useEffect(() => {
-        console.log('useTrustedAgent auth.registerTrustedAgentRefreshHandler()')
         auth.registerTrustedAgentRefreshHandler(login)
     }, [auth])
 
     useEffect(() => {
-        console.log('useTrustedAgent auth.parseSlasJWT()')
         try {
             const {isAgent, agentId, loginId} = auth.parseSlasJWT(auth.get('access_token'))
             setIsAgent(isAgent)

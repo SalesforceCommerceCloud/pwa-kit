@@ -47,10 +47,6 @@ import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/compon
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
 import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
-
-// TODO: TAOB remove after testing
-import TrustedAgentBanner from '@salesforce/retail-react-app/app/components/trusted-agent-banner'
-
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
@@ -354,8 +350,6 @@ const App = (props) => {
                                 isOpen={isOpenStoreLocator}
                                 onClose={onCloseStoreLocator}
                             />
-                            {/* TODO: TAOB remove after testing */}
-                            <TrustedAgentBanner/>
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <>
