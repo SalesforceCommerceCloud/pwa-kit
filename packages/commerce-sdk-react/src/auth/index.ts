@@ -25,7 +25,7 @@ import {
     DNT_COOKIE_NAME
 } from '../constant'
 
-import {Logger} from '../types'
+import {Logger, PasswordlessConfig} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -58,11 +58,6 @@ type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
 type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[2]
 type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[2]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
-
-type PasswordlessConfig = {
-    mode?: string
-    callbackURI?: string
-}
 
 /**
  * The extended field is not from api response, we manually store the auth type,
