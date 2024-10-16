@@ -58,12 +58,27 @@ const config = {
     proxy: 'proxy',
     redirectURI: 'redirectURI',
     logger: console,
-    callbackURI: 'callbackURI'
+    passwordlessConfig: {
+        callbackURI: 'callbackURI'
+    }
 }
 
 const configSLASPrivate = {
     ...config,
     enablePWAKitPrivateClient: true
+}
+
+const configPasswordlessSms = {
+    clientId: 'clientId',
+    organizationId: 'organizationId',
+    shortCode: 'shortCode',
+    siteId: 'siteId',
+    proxy: 'proxy',
+    redirectURI: 'redirectURI',
+    logger: console,
+    passwordlessConfig: {
+        mode: 'sms'
+    }
 }
 
 describe('Auth', () => {
@@ -530,6 +545,14 @@ describe('Auth', () => {
         expect(helpers.authorizePasswordless).toHaveBeenCalled()
         const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][2]
         expect(functionArg).toMatchObject({callbackURI: 'callbackURI', userid: 'userid', mode: 'callback'})
+    })
+
+    test('authorizePasswordless sets mode to sms as configured', async () => {
+        const auth = new Auth(configPasswordlessSms)
+        await auth.authorizePasswordless({userid: 'userid', mode: 'sms'})
+        expect(helpers.authorizePasswordless).toHaveBeenCalled()
+        const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][2]
+        expect(functionArg).toMatchObject({userid: 'userid', mode: 'sms'})
     })
 
     test('getPasswordLessAccessToken calls isomorphic getPasswordLessAccessToken', async () => {

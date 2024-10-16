@@ -38,7 +38,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
-    callbackURI?: string
+    passwordlessConfig?: PasswordlessConfig
 }
 
 interface JWTHeaders {
@@ -56,6 +56,11 @@ type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
 type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[2]
 type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[2]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
+
+type PasswordlessConfig = {
+    mode?: string
+    callbackURI?: string
+}
 
 /**
  * The extended field is not from api response, we manually store the auth type,
@@ -196,7 +201,7 @@ class Auth {
     private logger: Logger
     private defaultDnt: boolean | undefined
     private isPrivate: boolean
-    private callbackURI: string
+    private passwordlessConfig?: PasswordlessConfig | undefined
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
@@ -240,7 +245,7 @@ class Auth {
 
         this.redirectURI = config.redirectURI
 
-        this.callbackURI = config.callbackURI || ''
+        this.passwordlessConfig = config.passwordlessConfig
 
         this.fetchedToken = config.fetchedToken || ''
 
@@ -753,15 +758,17 @@ class Auth {
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const userid = parameters.userid
+        const mode = this.passwordlessConfig?.callbackURI ? 'callback' : 'sms'
+
         await helpers.authorizePasswordless(
             this.client,
             {
                 clientSecret: this.clientSecret
             },
             {
-                callbackURI: this.callbackURI,
+                ...(this.passwordlessConfig?.callbackURI && {callbackURI: this.passwordlessConfig?.callbackURI}),
                 userid,
-                mode: 'callback'
+                mode: mode
             }
         )
     }
