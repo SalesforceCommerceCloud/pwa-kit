@@ -435,12 +435,31 @@ class Auth {
         return accessToken
     }
 
+    /**
+     * For Hybrid storefronts ONLY!!!
+     * This method clears out SLAS access token generated in Plugin SLAS and passed in via "cc-at" cookie.
+     *
+     * In a hybrid setup, whenever any SLAS flow executes in Plugin SLAS and an access token is generated,
+     * the access token is sent over to PWA Kit using cc-at cookie.
+     *
+     * PWA Kit will check to see if cc-at cookie exists, if it does, the access token value in localStorage is updated
+     * with value from the cc-at cookie and is then used for all SCAPI requests made from PWA Kit. The cc-at cookie is then cleared.
+     */
     private clearSFRAAuthToken() {
         const {key, storageType} = DATA_MAP['access_token_sfra']
         const store = this.stores[storageType]
         store.delete(key)
     }
 
+    /**
+     * For Hybrid storefronts ONLY!!!
+     * This method clears the dwsid cookie from the browser.
+     * In a hybrid setup, dwsid points to an ECOM session and is passed between PWA Kit and SFRA/SG sites via "dwsid" cookie.
+     *
+     * Whenever a registered shopper logs in on PWA Kit, we must clear the dwsid cookie if one exists. When shopper navigates
+     * to SFRA as a logged-in shopper, ECOM notices a missing DWSID, generates a new DWSID and triggers the onSession hook which uses
+     * registered shopper refresh-token and restores session and basket on SFRA.
+     */
     private clearECOMSession() {
         const {key, storageType} = DATA_MAP['dwsid']
         const store = this.stores[storageType]
