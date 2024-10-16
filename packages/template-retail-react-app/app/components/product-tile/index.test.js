@@ -46,15 +46,14 @@ test('Renders Skeleton', () => {
 })
 
 test('Renders PricingAndPromotionsSkeleton when isRefetching is true', async () => {
-    const {getAllByRole, getByTestId, queryAllByText, queryByTestId} = renderWithProviders(
+    const {getAllByTestId, queryByTestId} = renderWithProviders(
         <ProductTile isRefreshingData={true} product={mockMasterProductHitWithMultipleVariants} />
     )
 
-    expect(getByTestId('product-tile-image')).toBeDefined()
-    expect(getAllByRole('radio')).toBeDefined()
-    expect(queryAllByText(/£18\.55/i)).toHaveLength(0)
-    expect(queryAllByText(/£31\.36/i)).toHaveLength(0)
-    expect(queryByTestId('promo-callout')).not.toBeInTheDocument()
+    const skeleton = getAllByTestId('sf-product-tile-pricing-and-promotions-skeleton')
+
+    expect(skeleton).toBeDefined()
+    expect(queryByTestId('sf-product-tile-skeleton')).not.toBeInTheDocument()
 })
 
 test('Remove from wishlist cannot be muti-clicked', () => {

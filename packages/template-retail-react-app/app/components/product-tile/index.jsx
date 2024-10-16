@@ -53,7 +53,7 @@ const IconButtonWithRegistration = withRegistration(IconButton)
 // Component Skeleton
 const PricingAndPromotionsSkeleton = () => {
     return (
-        <Stack spacing={2}>
+        <Stack spacing={2} data-testid="sf-product-tile-pricing-and-promotions-skeleton">
             <ChakraSkeleton width="80px" height="20px" />
             <ChakraSkeleton width={{base: '120px', md: '220px'}} height="12px" />
         </Stack>
