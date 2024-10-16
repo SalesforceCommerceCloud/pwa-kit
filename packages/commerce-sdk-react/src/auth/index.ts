@@ -15,7 +15,7 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient, isAbsoluteUrl} from '../utils'
 import {
     MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
@@ -38,7 +38,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
-    callbackURI?: string
+    passwordlessConfig?: PasswordlessConfig
 }
 
 interface JWTHeaders {
@@ -56,6 +56,11 @@ type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
 type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[2]
 type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[2]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
+
+type PasswordlessConfig = {
+    mode?: string
+    callbackURI?: string
+}
 
 /**
  * The extended field is not from api response, we manually store the auth type,
@@ -196,12 +201,13 @@ class Auth {
     private logger: Logger
     private defaultDnt: boolean | undefined
     private isPrivate: boolean
-    private callbackURI: string
+    private passwordlessConfig: PasswordlessConfig
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+        const callbackURI = config.passwordlessConfig?.callbackURI
 
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
@@ -240,7 +246,12 @@ class Auth {
 
         this.redirectURI = config.redirectURI
 
-        this.callbackURI = config.callbackURI || ''
+        this.passwordlessConfig = {
+            ...config.passwordlessConfig,
+            ...(callbackURI && {
+                callbackURI: isAbsoluteUrl(callbackURI) ? callbackURI : `${baseUrl}${callbackURI}`
+            })
+        }
 
         this.fetchedToken = config.fetchedToken || ''
 
@@ -746,15 +757,18 @@ class Auth {
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const userid = parameters.userid
+        const mode = this.passwordlessConfig.mode === 'sms' ? 'sms' : 'callback'
+        const callbackURI = this.passwordlessConfig.callbackURI
+
         await helpers.authorizePasswordless(
             this.client,
             {
                 clientSecret: this.clientSecret
             },
             {
-                callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
+                ...(callbackURI && {callbackURI: callbackURI}),
                 userid,
-                mode: 'callback'
+                mode: mode
             }
         )
     }
@@ -780,6 +794,7 @@ class Auth {
         }
         return token
     }
+
 
     /**
      * Decode SLAS JWT and extract information such as customer id, usid, etc.
