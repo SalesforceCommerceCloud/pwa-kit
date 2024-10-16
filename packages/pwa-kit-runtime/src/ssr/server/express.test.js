@@ -1145,9 +1145,6 @@ describe('SLAS private client proxy', () => {
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
                 expect(response.body['x-mobify']).toBe('true')
             })
-            .catch((err) => {
-                throw err
-            })
     }, 15000)
 
     test('inserts client secret if request is for /oauth2/token', async () => {
@@ -1179,9 +1176,6 @@ describe('SLAS private client proxy', () => {
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
                 expect(response.body['x-mobify']).toBe('true')
             })
-            .catch((err) => {
-                throw err
-            })
     }, 15000)
 
     test('does not add _sfdc_client_auth header if request not for /oauth2/trusted-agent/token', async () => {
@@ -1210,9 +1204,6 @@ describe('SLAS private client proxy', () => {
             .get('/mobify/slas/oauth2/other-path')
             .then((response) => {
                 expect(response.body._sfdc_client_auth).toBeUndefined()
-            })
-            .catch((err) => {
-                throw err
             })
     }, 15000)
 
@@ -1245,9 +1236,6 @@ describe('SLAS private client proxy', () => {
                 expect(response.body['_sfdc_client_auth']).toBe(encodedCredentials)
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
                 expect(response.body['x-mobify']).toBe('true')
-            })
-            .catch((err) => {
-                throw err
             })
     }, 15000)
 })
